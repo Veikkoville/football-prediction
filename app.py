@@ -39,6 +39,50 @@ from src.models.totals_classifier import opeta_totals_classifier, ennusta_totals
 import numpy as _np_for_cal
 
 st.set_page_config(page_title="Jalkapallon ennustemalli", page_icon="⚽", layout="wide")
+
+
+# ---------------------------------------------------------------------------
+# SALASANASUOJAUS (vain jos APP_PASSWORD on asetettu st.secrets:iin)
+# ---------------------------------------------------------------------------
+def _check_password() -> bool:
+    """
+    Yksinkertainen salasanasuojaus. Aktiivinen jos APP_PASSWORD on st.secrets:issa.
+    Lokaalisti (.env / ei secretsia) suojausta ei ole.
+    """
+    import hmac
+    try:
+        oikea_salasana = st.secrets.get("APP_PASSWORD")
+    except Exception:
+        oikea_salasana = None
+    if not oikea_salasana:
+        return True  # Ei salasanaa asetettu -> vapaa pasy
+
+    if st.session_state.get("password_correct", False):
+        return True
+
+    def _password_entered():
+        if hmac.compare_digest(
+            st.session_state.get("password", ""), str(oikea_salasana)
+        ):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
+
+    st.title("⚽ Jalkapallon ennustemalli")
+    st.text_input(
+        "Salasana", type="password",
+        on_change=_password_entered, key="password",
+    )
+    if "password_correct" in st.session_state and not st.session_state["password_correct"]:
+        st.error("❌ Vaara salasana.")
+    return False
+
+
+if not _check_password():
+    st.stop()
+
+
 st.title("⚽ Jalkapallon ennustemalli")
 st.caption(
     "Ensemble-ennuste = Dixon-Coles (pitka historia) + LightGBM (viime 5 ottelua). "
