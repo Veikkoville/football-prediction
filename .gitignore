@@ -21,9 +21,9 @@ __pycache__/
 .Python
 
 # Datavalimuisti — voi olla iso, ei kuulu repoon
+# Huom: /data/ alussa = vain projektin juuren data/, EI src/data/
 raw_data/
-data/
-data/cache/
+/data/
 downloaded_files/
 ~/soccerdata/
 
