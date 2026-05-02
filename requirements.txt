@@ -1,0 +1,33 @@
+# Datankäsittely
+pandas>=2.1
+numpy>=1.26
+scipy>=1.11
+
+# Datalähteet
+soccerdata>=1.8        # FBref, Understat, SofaScore, ClubElo (yksi kirjasto kaikkeen)
+statsbombpy>=1.14      # StatsBomb open data virallinen Python-kääre
+requests>=2.31
+cloudscraper>=1.2.71   # Kiertaa SofaScoren Cloudflare-suojauksen live-haussa
+
+# Mallinnus
+scikit-learn>=1.4
+lightgbm>=4.3          # Gradient boosting 1X2 + O/U
+statsmodels>=0.14      # Poisson-regressio Dixon-Coles -malliin
+
+# Visualisointi
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.20
+mplsoccer>=1.4         # Jalkapallokenttäpiirrokset (heatmapit, syöttöverkot)
+
+# Notebook-ympäristö
+jupyterlab>=4.1
+ipywidgets>=8.1
+
+# Käyttöliittymä
+streamlit>=1.32      # Selainpohjainen UI ennustesovellukselle (app.py)
+
+# Kehitystyökalut (vapaaehtoinen)
+tqdm>=4.66             # Etenemispalkit
+python-dotenv>=1.0     # API-avainten lataus .env-tiedostosta
+optuna>=3.5            # LightGBM hyperparam-tuning (vapaaehtoinen)

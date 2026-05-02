@@ -1,0 +1,66 @@
+# API-avaimet ja salaisuudet — EI KOSKAAN GitHubiin
+.env
+.env.local
+.env.*.local
+*.key
+secrets.toml
+
+# Streamlit asetukset (paitsi config.toml jonka voit pushata)
+.streamlit/secrets.toml
+
+# Python-virtuaaliymparisto
+.venv/
+venv/
+env/
+
+# Python-cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Datavalimuisti — voi olla iso, ei kuulu repoon
+raw_data/
+data/
+data/cache/
+downloaded_files/
+~/soccerdata/
+
+# Mallin valimuisti
+*.pkl
+*.joblib
+*.lgb
+
+# Notebookien checkpoint-tiedostot
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# IDE-asetukset
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-spesifit
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Optuna-tietokannat
+*.db
+optuna_studies/
+
+# Logitiedostot
+*.log
+logs/
+
+# Testikoodi
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build-tiedostot
+build/
+dist/
+*.egg-info/
