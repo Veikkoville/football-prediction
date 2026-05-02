@@ -53,25 +53,31 @@ def lataa_otteludata_yksityiskohtaisesti(liigat: Iterable[str], kaudet: Iterable
     palaset = []
 
     for liiga in liigat:
-        # 1. Understat
+        # 1. Understat (xG-data) — kokeile ensin, fallback football-data.co.uk:hon
+        understat_onnistui = False
         if liiga in UNDERSTAT_LEAGUES:
             try:
                 from src.data.understat import lataa_otteludata as lataa_us
                 us = lataa_us([liiga], kaudet, cache_dir=config.RAW_DATA_DIR / "understat")
                 us = us.rename(columns={"home_goals": "home_score", "away_goals": "away_score"})
                 us = us[us["home_score"].notna() & us["away_score"].notna()].copy()
-                if us.empty:
-                    tulos.virheet[liiga] = "Understat: ei valmiita otteluita."
-                    continue
-                us["date"] = pd.to_datetime(us["date"])
-                us["lahde"] = "Understat"
-                cols = ["date", "home_team", "away_team", "home_score", "away_score",
-                        "league", "season", "home_xg", "away_xg", "lahde"]
-                us = us[[c for c in cols if c in us.columns]].copy()
-                palaset.append(us)
-                tulos.onnistui[liiga] = len(us)
+                if not us.empty:
+                    us["date"] = pd.to_datetime(us["date"])
+                    us["lahde"] = "Understat"
+                    cols = ["date", "home_team", "away_team", "home_score", "away_score",
+                            "league", "season", "home_xg", "away_xg", "lahde"]
+                    us = us[[c for c in cols if c in us.columns]].copy()
+                    palaset.append(us)
+                    tulos.onnistui[liiga] = len(us)
+                    understat_onnistui = True
             except Exception as e:
-                tulos.virheet[liiga] = f"Understat: {type(e).__name__}: {e}"
+                # Understat epaonnistui (esim. tls_requests pilvessa) -> jatka
+                # football-data.co.uk -fallbackiin alla
+                tulos.virheet[liiga] = (
+                    f"Understat: {type(e).__name__}: {e}. "
+                    f"Yritetaan football-data.co.uk:ta ilman xG."
+                )
+        if understat_onnistui:
             continue
 
         # 2a. football-data.org (jos API-avain) — UEFA-turnaukset
