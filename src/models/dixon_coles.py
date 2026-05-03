@@ -25,6 +25,7 @@ class DixonColesModel:
     rho: float = -0.1
     teams_: list = field(default_factory=list)
     per_team_home_adv: bool = True        # True = sovita joukkuekohtainen kotietu
+    model_type_: str = "dc"               # "dc" tai "bivariate_poisson"
 
     def fit(self, matches, home_team_col="home_team", away_team_col="away_team",
             home_goals_col="home_score", away_goals_col="away_score",
@@ -235,6 +236,7 @@ class DixonColesModel:
         self.home_advantage = params[-2]
         self.rho = params[-1]
         self.teams_ = teams
+        self.model_type_ = model_type
         return self
 
     def expected_goals(self, home_team, away_team, adjustments=None):
@@ -249,14 +251,51 @@ class DixonColesModel:
             mu *= float(adjustments.get("away_factor", 1.0))
         return float(lam), float(mu)
 
+    def _bp_score_matrix(self, lam, mu, rho_eff, max_goals):
+        """
+        Bivariate Poisson score-matriisi.
+        Decomposition: H = X1 + Z, A = X2 + Z, missa Z mallintaa "matsi-rytmin".
+        lam3 = max(0, -rho) * min(lam, mu) — rho<0 -> positiivinen kovarianssi.
+        """
+        from scipy.special import gammaln
+        lam3 = max(0.0, -rho_eff) * min(lam, mu)
+        lam1 = max(lam - lam3, 1e-9)
+        lam2 = max(mu - lam3, 1e-9)
+        M = np.zeros((max_goals + 1, max_goals + 1))
+        for h in range(max_goals + 1):
+            for a in range(max_goals + 1):
+                summa = 0.0
+                for k in range(min(h, a) + 1):
+                    log_term = (
+                        -lam1 + (h - k) * np.log(lam1) - gammaln(h - k + 1)
+                        - lam2 + (a - k) * np.log(lam2) - gammaln(a - k + 1)
+                        - lam3 + k * np.log(max(lam3, 1e-9)) - gammaln(k + 1)
+                    )
+                    summa += np.exp(log_term)
+                M[h, a] = summa
+        s = M.sum()
+        return M / s if s > 0 else M
+
     def score_matrix(self, home_team, away_team, max_goals=10, adjustments=None):
         lam, mu = self.expected_goals(home_team, away_team, adjustments=adjustments)
+        # Derby-adjustment rho:lle (jos adjustments antaa rho_delta:n)
+        rho_eff = self.rho
+        if adjustments and "rho_delta" in adjustments:
+            rho_eff = self.rho + float(adjustments["rho_delta"])
+
+        # Bivariate Poisson — kayta omaa score-matriisia
+        if getattr(self, "model_type_", "dc") == "bivariate_poisson":
+            return self._bp_score_matrix(lam, mu, rho_eff, max_goals)
+
+        # Standardi Dixon-Coles + tau-korjaus
         h = poisson.pmf(np.arange(max_goals + 1), lam)
         a = poisson.pmf(np.arange(max_goals + 1), mu)
         m = np.outer(h, a)
+        # Estetaan ettei tau menee negatiiviseksi (turvallisuusrajat rho:lle)
         for i in range(2):
             for j in range(2):
-                m[i, j] *= _tau(i, j, lam, mu, self.rho)
+                t = _tau(i, j, lam, mu, rho_eff)
+                m[i, j] *= max(t, 1e-9)  # alalattia ettei mene negatiiviseksi
         return m / m.sum()
 
     def predict_1x2(self, home_team, away_team, adjustments=None):
@@ -300,13 +339,19 @@ def apply_match_adjustments(home_injury_pct=0.0, away_injury_pct=0.0,
     away *= 1.0 + away_motivation_pct / 100.0
     home *= 1.0 + 0.015 * home_rest_advantage_days
     away *= 1.0 - 0.015 * home_rest_advantage_days
+    rho_delta = 0.0
     if is_derby:
-        home *= 1.08
-        away *= 1.08
+        # Derby: lievempi maaliboost (4% molemmille) + rho-adjustment
+        # joka nostaa tasapelitodennakoisyytta empiirisesti havaittuun tasoon
+        # (~+4 prosenttiyksikköä). Empiirinen havainto: derby-pelit ovat
+        # varovaisempia ja tasapeleja syntyy tilastollisesti useammin.
+        home *= 1.04
+        away *= 1.04
+        rho_delta = -0.07  # negatiivisempi rho -> enemman matalia tasapeleja
     if weather_total_goals_delta != 0.0:
         wm = 1.0 + weather_total_goals_delta / 3.0
         home *= wm
         away *= wm
     home = max(0.3, min(2.5, home))
     away = max(0.3, min(2.5, away))
-    return {"home_factor": home, "away_factor": away}
+    return {"home_factor": home, "away_factor": away, "rho_delta": rho_delta}
