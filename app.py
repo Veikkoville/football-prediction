@@ -593,15 +593,66 @@ with st.expander("🤖 Auto-tunnistettu konteksti (yliajettavissa alla)", expand
 # ---------------------------------------------------------------------------
 # MANUAALINEN SAATOPANEELI — tayttaa auto-arvot, kayttaja yliajaa
 # ---------------------------------------------------------------------------
+# Pre-compute injury values from player session state so sliders show auto-values
+def _auto_injury_value(team_name: str, players_str: str) -> tuple[int, str]:
+    """Palauttaa (auto_arvo, info_teksti) — auto_arvo 0 jos ei laskua."""
+    if not players_str or pelaajat is None or pelaajat.empty:
+        return 0, ""
+    try:
+        from src.features.poissaolot import laske_poissaolovaikutus
+        # Etsi sarakkeet
+        col_min_a = next((c for c in pelaajat.columns if c in ["Playing Time_Min", "Playing_Time_Min", "Min", "Minutes"]), None)
+        col_xg_a = next((c for c in pelaajat.columns if c in ["Expected_xG", "Standard_xG", "xG"]), None)
+        if not col_xg_a:
+            return 0, ""
+        # Sumea joukkue-haku (sama logiikka kuin poissaolopaneelissa)
+        joukkue_match = team_name
+        if "team" in pelaajat.columns and not (pelaajat["team"] == team_name).any():
+            from difflib import SequenceMatcher
+            kaikki_jt = pelaajat["team"].dropna().unique()
+            kandidaatit = [(SequenceMatcher(None, team_name.lower(), str(j).lower()).ratio(), j) for j in kaikki_jt]
+            kandidaatit.sort(reverse=True)
+            if kandidaatit and kandidaatit[0][0] > 0.7:
+                joukkue_match = kandidaatit[0][1]
+        # Sumea pelaajamatch
+        joukkue_pel = pelaajat[pelaajat.get("team", "") == joukkue_match]
+        kaikki_nimet = joukkue_pel["player"].tolist() if "player" in joukkue_pel.columns else []
+        syote = [p.strip() for p in players_str.split(",") if p.strip()]
+        yhdistetyt = []
+        for s in syote:
+            s_low = s.lower()
+            matches = [n for n in kaikki_nimet if s_low in str(n).lower()]
+            if matches:
+                yhdistetyt.append(matches[0])
+        if not yhdistetyt:
+            return 0, ""
+        v = laske_poissaolovaikutus(pelaajat, joukkue_match, yhdistetyt, minuutit_col=col_min_a, xg_col=col_xg_a)
+        auto_v = max(-30, min(0, -int(round(v["prosentti"] / 5)) * 5))
+        return auto_v, f"🤖 {len(yhdistetyt)} pelaajaa -> {auto_v}%"
+    except Exception:
+        return 0, ""
+
+auto_hi, info_hi = _auto_injury_value(koti, st.session_state.get("poissa_koti", ""))
+auto_ai, info_ai = _auto_injury_value(vieras, st.session_state.get("poissa_vieras", ""))
+
 with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=False):
     s1, s2 = st.columns(2)
     with s1:
         st.markdown(f"**🏠 {koti}**")
+        # Jos auto-arvo on saatavilla, kayta sita oletuksena (yliajaa session-staten)
+        if auto_hi != 0:
+            st.session_state["hi"] = auto_hi
         home_injury = st.slider("Avainpelaajia poissa %", -30, 0, 0, 5, key="hi")
+        if info_hi:
+            st.caption(info_hi)
         home_motivation = st.slider("Motivaatio %", -15, 15, mot_home, 5, key="hm")
     with s2:
         st.markdown(f"**✈️ {vieras}**")
+        if auto_ai != 0:
+            st.session_state["ai"] = auto_ai
         away_injury = st.slider("Avainpelaajia poissa %", -30, 0, 0, 5, key="ai")
+        if info_ai:
+            st.caption(info_ai)
         away_motivation = st.slider("Motivaatio %", -15, 15, mot_away, 5, key="am")
 
     s3, s4, s5 = st.columns(3)
