@@ -40,6 +40,130 @@ import numpy as _np_for_cal
 
 st.set_page_config(page_title="Jalkapallon ennustemalli", page_icon="⚽", layout="wide")
 
+# Custom CSS — paremmat varit, tyypografia, korttinakyma
+st.markdown("""
+<style>
+    /* Pa-otsikkojen tyyli */
+    h1, h2, h3 { letter-spacing: -0.02em; }
+    h1 { font-weight: 700; }
+
+    /* Metric-arvot suuremmiksi ja terinemmiksi */
+    [data-testid="stMetricValue"] {
+        font-size: 2.0rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.85rem;
+        opacity: 0.85;
+        font-weight: 500;
+    }
+
+    /* Korttinaket */
+    .pred-card {
+        background: linear-gradient(135deg, rgba(38,50,70,0.6) 0%, rgba(28,40,60,0.6) 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 6px 0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .pred-card-header {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        opacity: 0.7;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    /* Probability bar */
+    .prob-bar-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 6px 0;
+    }
+    .prob-bar-label {
+        min-width: 100px;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    .prob-bar-track {
+        flex: 1;
+        height: 28px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 6px;
+        overflow: hidden;
+        position: relative;
+    }
+    .prob-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.4s ease;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        color: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    .prob-bar-fill.home { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+    .prob-bar-fill.draw { background: linear-gradient(90deg, #6b7280, #9ca3af); }
+    .prob-bar-fill.away { background: linear-gradient(90deg, #dc2626, #ef4444); }
+    .prob-bar-fill.over { background: linear-gradient(90deg, #16a34a, #22c55e); }
+    .prob-bar-fill.under { background: linear-gradient(90deg, #ea580c, #f97316); }
+    .prob-bar-fill.btts-yes { background: linear-gradient(90deg, #9333ea, #a855f7); }
+    .prob-bar-fill.btts-no { background: linear-gradient(90deg, #475569, #64748b); }
+
+    /* Otteluheader */
+    .match-header {
+        background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(220,38,38,0.12) 100%);
+        border-radius: 14px;
+        padding: 24px;
+        margin: 16px 0 24px 0;
+        text-align: center;
+    }
+    .match-header-teams {
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 8px 0;
+    }
+    .match-header-vs {
+        opacity: 0.5;
+        font-weight: 400;
+        margin: 0 14px;
+    }
+    .match-header-meta {
+        font-size: 0.9rem;
+        opacity: 0.7;
+        margin-top: 6px;
+    }
+
+    /* Score heatmap cell */
+    .heatmap-cell {
+        text-align: center;
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    /* Status pill */
+    .pill {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin: 2px 4px 2px 0;
+    }
+    .pill-success { background: rgba(34,197,94,0.18); color: #22c55e; }
+    .pill-warning { background: rgba(234,88,12,0.18); color: #f97316; }
+    .pill-info { background: rgba(59,130,246,0.18); color: #3b82f6; }
+</style>
+""", unsafe_allow_html=True)
+
 
 # ---------------------------------------------------------------------------
 # SALASANASUOJAUS (vain jos APP_PASSWORD on asetettu st.secrets:iin)
@@ -1078,35 +1202,57 @@ if kayta_kalibrointia and cal is not None:
         kaytetty_p = {"home": float(p_cal[0]), "draw": float(p_cal[1]), "away": float(p_cal[2])}
         kalibrointi_aktiivinen = True
 
-# Odotetut maalit
-m1, m2, m3 = st.columns(3)
-m1.metric(f"{koti} odotetut maalit", f"{lam:.2f}")
-m2.metric(f"{vieras} odotetut maalit", f"{mu:.2f}")
-m3.metric("Yhteensa", f"{lam + mu:.2f}")
-
-status_osat = []
+# OTTELUHEADER — komeampi
+status_pillit = []
 if ensemble_aktiivinen:
-    status_osat.append(
-        f"✅ Ensemble: DC {ensemble_paino:.0%} + LightGBM {1-ensemble_paino:.0%}"
+    status_pillit.append(
+        f'<span class="pill pill-success">✓ Ensemble DC {ensemble_paino:.0%} + LGB {1-ensemble_paino:.0%}</span>'
     )
 else:
-    status_osat.append("⚠️ Vain Dixon-Coles (ei xG-piirteita)")
+    status_pillit.append('<span class="pill pill-warning">⚠ Vain Dixon-Coles</span>')
 if kalibrointi_aktiivinen:
-    status_osat.append("🎯 Kalibroitu")
-elif kayta_kalibrointia and cal is None:
-    status_osat.append("⚠️ Kalibraattori ei opetettu (datasetti liian pieni)")
-st.caption(" • ".join(status_osat))
+    status_pillit.append('<span class="pill pill-success">🎯 Kalibroitu</span>')
+if str(model_type_val) == "bivariate_poisson":
+    status_pillit.append('<span class="pill pill-info">BP</span>')
+if float(form_blend_val) > 0:
+    status_pillit.append(f'<span class="pill pill-info">Form {form_blend_val:.0%}</span>')
 
-# 1X2
-st.markdown("### 1X2 — voittajaennuste")
-c1, c2, c3 = st.columns(3)
-c1.metric("1 (kotivoitto)", f"{kaytetty_p['home']*100:.1f} %")
-c2.metric("X (tasapeli)", f"{kaytetty_p['draw']*100:.1f} %")
-c3.metric("2 (vierasvoitto)", f"{kaytetty_p['away']*100:.1f} %")
+st.markdown(f"""
+<div class="match-header">
+    <div class="match-header-meta">⚽ Ennuste · {datetime.now().strftime('%d.%m.%Y %H:%M')}</div>
+    <div class="match-header-teams">
+        🏠 {koti} <span class="match-header-vs">vs</span> {vieras} ✈️
+    </div>
+    <div class="match-header-meta">
+        Odotetut maalit: <strong>{lam:.2f}</strong> – <strong>{mu:.2f}</strong>
+        &nbsp;·&nbsp; Yhteensa: <strong>{lam+mu:.2f}</strong>
+    </div>
+    <div style="margin-top: 10px;">{''.join(status_pillit)}</div>
+</div>
+""", unsafe_allow_html=True)
 
-st.caption(
-    f"Reilu kerroin: 1 = **{1/kaytetty_p['home']:.2f}** | "
-    f"X = **{1/kaytetty_p['draw']:.2f}** | 2 = **{1/kaytetty_p['away']:.2f}**"
+# 1X2 — kortti probability-palkeilla
+# HUOM: HTML ilman sisennysta — muuten Streamlit tulkitsee 4+-sisennyksen koodiblokiksi
+def _prob_bar(label, prob, kind, kerroin):
+    pct = prob * 100
+    return (
+        f'<div class="prob-bar-container">'
+        f'<div class="prob-bar-label">{label}</div>'
+        f'<div class="prob-bar-track">'
+        f'<div class="prob-bar-fill {kind}" style="width: {max(8, pct):.1f}%;">{pct:.1f} %</div>'
+        f'</div>'
+        f'<div style="min-width: 70px; text-align: right; font-weight: 600; opacity: 0.9;">kerr. {kerroin:.2f}</div>'
+        f'</div>'
+    )
+
+st.markdown(
+    f'<div class="pred-card">'
+    f'<div class="pred-card-header">⚡ 1X2 — voittajaennuste</div>'
+    f'{_prob_bar(f"1 · {koti}", kaytetty_p["home"], "home", 1/max(kaytetty_p["home"], 0.001))}'
+    f'{_prob_bar("X · Tasapeli", kaytetty_p["draw"], "draw", 1/max(kaytetty_p["draw"], 0.001))}'
+    f'{_prob_bar(f"2 · {vieras}", kaytetty_p["away"], "away", 1/max(kaytetty_p["away"], 0.001))}'
+    f'</div>',
+    unsafe_allow_html=True,
 )
 
 if p_lgb is not None:
@@ -1137,17 +1283,26 @@ if kayta_kalibrointia and cal is not None:
         ou["over"] = p_over_cal
         ou["under"] = 1.0 - p_over_cal
 btts = dc.predict_btts(koti, vieras, adjustments=saadot)
+
 oc1, oc2 = st.columns(2)
 with oc1:
-    st.markdown("### Over/Under 2.5")
-    o1, o2 = st.columns(2)
-    o1.metric("Over", f"{ou['over']*100:.1f} %")
-    o2.metric("Under", f"{ou['under']*100:.1f} %")
+    st.markdown(
+        f'<div class="pred-card">'
+        f'<div class="pred-card-header">📊 Over / Under 2.5 maalia</div>'
+        f'{_prob_bar("Yli 2.5", ou["over"], "over", 1/max(ou["over"], 0.001))}'
+        f'{_prob_bar("Alle 2.5", ou["under"], "under", 1/max(ou["under"], 0.001))}'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 with oc2:
-    st.markdown("### BTTS")
-    b1, b2 = st.columns(2)
-    b1.metric("Kylla", f"{btts['btts_yes']*100:.1f} %")
-    b2.metric("Ei", f"{btts['btts_no']*100:.1f} %")
+    st.markdown(
+        f'<div class="pred-card">'
+        f'<div class="pred-card-header">⚽ BTTS — Both Teams To Score</div>'
+        f'{_prob_bar("Kylla", btts["btts_yes"], "btts-yes", 1/max(btts["btts_yes"], 0.001))}'
+        f'{_prob_bar("Ei", btts["btts_no"], "btts-no", 1/max(btts["btts_no"], 0.001))}'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
 # Vetokerroin-vertailu
 st.divider()
@@ -1179,12 +1334,43 @@ if suos:
 else:
     st.info("Mallin mukaan markkina on tehokas — ei yli 5 % value-vetoa.")
 
-# Tarkat tulokset
-st.markdown("### 🎯 Todennakoisimmat tarkat tulokset")
-top = dc.todennakoisin_tulos(koti, vieras, top_n=10, adjustments=saadot)
-df_t = pd.DataFrame(top, columns=["Tulos", "p"])
-df_t["%"] = (df_t["p"] * 100).round(2)
-st.bar_chart(df_t.set_index("Tulos")["%"], height=300)
+# Tarkat tulokset — heatmap + lista
+st.markdown("### 🎯 Tarkkojen tulosten todennakoisyydet")
+hh1, hh2 = st.columns([3, 2])
+
+with hh1:
+    # Heatmap: 6x6 matriisi (koti 0-5, vieras 0-5)
+    sm = dc.score_matrix(koti, vieras, adjustments=saadot)
+    max_g = 6
+    sm_small = sm[:max_g, :max_g]
+    # Normalisoi naiden 36 ruudun yhteissummaan visualisointia varten
+    df_sm = pd.DataFrame(
+        sm_small * 100,
+        index=[f"{i}" for i in range(max_g)],
+        columns=[f"{j}" for j in range(max_g)],
+    )
+    df_sm.index.name = f"{koti} (kotimaalit)"
+    df_sm.columns.name = f"{vieras} (vierasmaalit)"
+    # Streamlitin styling
+    st.markdown("**Tulosmatrisi (% todennakoisyys)**")
+    st.dataframe(
+        df_sm.style.background_gradient(cmap="RdYlGn", vmin=0, vmax=15)
+              .format("{:.2f}"),
+        use_container_width=True, height=270,
+    )
+    st.caption(f"Lukea: rivi = {koti}n maalit, sarake = {vieras}n maalit. Kirkkaampi = todennakoisempi.")
+
+with hh2:
+    top = dc.todennakoisin_tulos(koti, vieras, top_n=8, adjustments=saadot)
+    st.markdown("**🏆 Top-8 todennakoisinta tulosta**")
+    df_t = pd.DataFrame(top, columns=["Tulos", "p"])
+    df_t["%"] = (df_t["p"] * 100).round(2)
+    df_t = df_t[["Tulos", "%"]]
+    st.dataframe(
+        df_t.style.bar(subset=["%"], color="#22c55e", vmax=df_t["%"].max())
+            .format({"%": "{:.2f} %"}),
+        hide_index=True, use_container_width=True, height=315,
+    )
 
 st.caption(
     "Vastuuvapaus: oppimismalli, ei sijoitusneuvo. "
