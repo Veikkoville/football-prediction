@@ -701,17 +701,76 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
                         tulos.append(matches[0])
                 return tulos
 
-            joukkue_pelaajat = pelaajat[pelaajat.get("team", "") == koti] if "team" in pelaajat.columns else pelaajat
+            # Manuaaliset alias-mappingit yleisimmille FBref-nimivarianteille
+            JOUKKUE_ALIAS = {
+                "Manchester United": ["Manchester Utd", "Man United", "Man Utd"],
+                "Manchester City": ["Man City", "Manchester C."],
+                "Newcastle United": ["Newcastle Utd", "Newcastle"],
+                "Tottenham Hotspur": ["Tottenham", "Spurs"],
+                "Wolverhampton Wanderers": ["Wolves", "Wolverhampton"],
+                "Brighton & Hove Albion": ["Brighton", "Brighton and Hove"],
+                "West Ham United": ["West Ham", "West Ham Utd"],
+                "Nottingham Forest": ["Nott'ham Forest", "Nottm Forest"],
+                "Leicester City": ["Leicester"],
+                "Leeds United": ["Leeds", "Leeds Utd"],
+                "Sheffield United": ["Sheffield Utd"],
+                "Crystal Palace": ["Crystal P."],
+                "Aston Villa": ["A. Villa"],
+                "AFC Bournemouth": ["Bournemouth"],
+            }
+
+            def _etsi_joukkue_pelaajat(joukkue_nimi: str) -> tuple[pd.DataFrame, str]:
+                """
+                Etsi pelaajadatasta joukkueen pelaajat. Strategiat:
+                  1. Eksakti
+                  2. Manuaalinen alias-mappi (yleisimmat FBref-variantit)
+                  3. SequenceMatcher (sumea, mutta KORKEAT samankaltaisuusvaatimukset)
+                """
+                if "team" not in pelaajat.columns:
+                    return pelaajat, joukkue_nimi
+                # 1. Eksakti
+                eksakti = pelaajat[pelaajat["team"] == joukkue_nimi]
+                if not eksakti.empty:
+                    return eksakti, joukkue_nimi
+                kaikki_joukkueet = list(pelaajat["team"].dropna().unique())
+                # 2. Alias-mappi
+                alias_lista = JOUKKUE_ALIAS.get(joukkue_nimi, [])
+                for alias in alias_lista:
+                    df_alias = pelaajat[pelaajat["team"] == alias]
+                    if not df_alias.empty:
+                        return df_alias, alias
+                # 3. SequenceMatcher — vaadi >0.7 samankaltaisuutta
+                from difflib import SequenceMatcher
+                kandidaatit = []
+                for jt in kaikki_joukkueet:
+                    sim = SequenceMatcher(None, joukkue_nimi.lower(), str(jt).lower()).ratio()
+                    if sim > 0.7:
+                        kandidaatit.append((sim, jt))
+                if kandidaatit:
+                    kandidaatit.sort(reverse=True)
+                    paras = kandidaatit[0][1]
+                    return pelaajat[pelaajat["team"] == paras], paras
+                return pd.DataFrame(), joukkue_nimi
+
+            joukkue_pelaajat, koti_match = _etsi_joukkue_pelaajat(koti)
             kaikki_koti = joukkue_pelaajat["player"].tolist() if "player" in joukkue_pelaajat.columns else []
             yhdistetyt_koti = _yhdista_nimet(poissa_koti_lista, kaikki_koti)
+            if poissa_koti_lista and not yhdistetyt_koti and koti_match != koti:
+                st.caption(f"ℹ️ '{koti}' -> FBref-nimi '{koti_match}', mutta nimia ei tunnistettu.")
+            elif poissa_koti_lista and koti_match != koti:
+                st.caption(f"ℹ️ FBref-nimi: '{koti_match}'")
 
-            joukkue_pelaajat_v = pelaajat[pelaajat.get("team", "") == vieras] if "team" in pelaajat.columns else pelaajat
+            joukkue_pelaajat_v, vieras_match = _etsi_joukkue_pelaajat(vieras)
             kaikki_vieras = joukkue_pelaajat_v["player"].tolist() if "player" in joukkue_pelaajat_v.columns else []
             yhdistetyt_vieras = _yhdista_nimet(poissa_vieras_lista, kaikki_vieras)
+            if poissa_vieras_lista and not yhdistetyt_vieras and vieras_match != vieras:
+                st.caption(f"ℹ️ '{vieras}' -> FBref-nimi '{vieras_match}', mutta nimia ei tunnistettu.")
+            elif poissa_vieras_lista and vieras_match != vieras:
+                st.caption(f"ℹ️ FBref-nimi: '{vieras_match}'")
 
             if yhdistetyt_koti:
                 v_koti = laske_poissaolovaikutus(
-                    pelaajat, koti, yhdistetyt_koti,
+                    pelaajat, koti_match, yhdistetyt_koti,
                     minuutit_col=col_min, xg_col=col_xg,
                 )
                 st.caption(
@@ -724,7 +783,7 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
 
             if yhdistetyt_vieras:
                 v_vieras = laske_poissaolovaikutus(
-                    pelaajat, vieras, yhdistetyt_vieras,
+                    pelaajat, vieras_match, yhdistetyt_vieras,
                     minuutit_col=col_min, xg_col=col_xg,
                 )
                 st.caption(
