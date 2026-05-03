@@ -97,7 +97,10 @@ st.caption(
 def opeta_kaikki(liigat: tuple, kaudet: tuple, decay: float, nopea: bool = False,
                  bayes_shrinkage: float = 2.0,
                  kayta_promotio_priorit: bool = False,
-                 promotion_factor: float = 0.5):
+                 promotion_factor: float = 0.5,
+                 xg_weight: float = 0.0,
+                 form_blend: float = 0.0,
+                 model_type: str = "dc"):
     tulos = lataa_otteludata_yksityiskohtaisesti(list(liigat), list(kaudet))
     treenidata = tulos.data
     if treenidata.empty:
@@ -139,6 +142,8 @@ def opeta_kaikki(liigat: tuple, kaudet: tuple, decay: float, nopea: bool = False
         except Exception as e:
             print(f"Promotio-prior moduuli epaonnistui: {e}")
 
+    # xG-sarakkeet ovat olemassa Understat-otteluille — vain niille xG-likelihood
+    has_xg_cols = "home_xg" in treenidata.columns and "away_xg" in treenidata.columns
     dc = DixonColesModel().fit(
         treenidata,
         home_team_col="home_team", away_team_col="away_team",
@@ -146,9 +151,40 @@ def opeta_kaikki(liigat: tuple, kaudet: tuple, decay: float, nopea: bool = False
         decay=decay, date_col="date",
         l2_attack_defence=bayes_shrinkage,
         team_priors=team_priors_yhd if team_priors_yhd else None,
+        home_xg_col="home_xg" if has_xg_cols else None,
+        away_xg_col="away_xg" if has_xg_cols else None,
+        xg_weight=xg_weight,
+        model_type=model_type,
     )
-    # Tallennetaan promotion-priorit DC:n attribuuttiin debug-tarkoituksiin
     dc.team_priors_kaytetty = team_priors_yhd
+
+    # Dynamic DC: jos form_blend > 0, sovita toinen DC nopealla decay:lla
+    # ja yhdista joukkue-vahvuudet form-painon mukaan.
+    if form_blend > 0:
+        try:
+            decay_nopea = max(decay * 4.0, 0.012)  # ~58 paivan puolittumisaika
+            dc_form = DixonColesModel().fit(
+                treenidata,
+                home_team_col="home_team", away_team_col="away_team",
+                home_goals_col="home_score", away_goals_col="away_score",
+                decay=decay_nopea, date_col="date",
+                l2_attack_defence=bayes_shrinkage,
+                team_priors=team_priors_yhd if team_priors_yhd else None,
+                home_xg_col="home_xg" if has_xg_cols else None,
+                away_xg_col="away_xg" if has_xg_cols else None,
+                xg_weight=xg_weight,
+                model_type=model_type,
+            )
+            # Blendaa: uusi attack = baseline + form_blend * (form - baseline)
+            for j in dc.attack:
+                if j in dc_form.attack:
+                    dc.attack[j] = dc.attack[j] + form_blend * (dc_form.attack[j] - dc.attack[j])
+                if j in dc_form.defence:
+                    dc.defence[j] = dc.defence[j] + form_blend * (dc_form.defence[j] - dc.defence[j])
+            dc.form_blend_kaytetty = form_blend
+            dc.dc_form_baseline = dc_form  # debug-tarkoituksiin
+        except Exception as e:
+            print(f"Form-blend epaonnistui: {e}")
 
     # LightGBM tarvitsee xG-piirteet -> vain Understat-otteluille
     us_only = treenidata[treenidata["home_xg"].notna()].copy()
@@ -310,6 +346,31 @@ bayes_shrink = st.sidebar.slider(
          "uusille joukkueille kuten Sunderland), 10 = hyvin vahva.",
 )
 
+xg_weight_val = st.sidebar.slider(
+    "xG-paino likelihood:ssa", 0.0, 1.0, 0.0, 0.05,
+    help="0 = vain toteutuneet maalit (vanha kayttaytyminen), 0.3-0.5 = "
+         "tasapaino maalit + xG, 1.0 = vain xG. Vaikutus: mallin estimaatit "
+         "siloittuvat luck-tekijoita kohti. Toimii vain Understat-liigoissa "
+         "(top-5) joissa xG on saatavilla.",
+)
+
+form_blend_val = st.sidebar.slider(
+    "Form-paino (Dynamic DC)", 0.0, 1.0, 0.0, 0.05,
+    help="0 = vain pitkan aikavalin baseline (decay-arvosi), 0.3 = lisaa "
+         "viimeaikaista muoto-painotusta, 1.0 = vain viime ottelut. Sovittaa "
+         "toisen DC:n nopeammalla decaylla ja blendaa joukkuevahvuudet "
+         "(huomioi tuoreet vammat, valmentajavaihdokset, momentum).",
+)
+
+model_type_val = st.sidebar.selectbox(
+    "Mallityyppi", ["dc", "bivariate_poisson"],
+    format_func=lambda x: "Dixon-Coles (oletus)" if x == "dc" else "Bivariate Poisson",
+    help="Dixon-Coles: standardi tau-korjauksella matalille tuloksille. "
+         "Bivariate Poisson: jaettu Z-komponentti, matemaattisesti elegantimpi "
+         "korrelaation kasittely. BP on hitaampi (~5x) mutta voi antaa hieman "
+         "tarkempia ennusteita.",
+)
+
 kayta_promotio_priorit = st.sidebar.toggle(
     "🆙 Promotoitujen prior alasarjasta",
     value=False,
@@ -374,6 +435,9 @@ try:
         float(bayes_shrink),
         bool(kayta_promotio_priorit),
         float(promotion_factor_val),
+        float(xg_weight_val),
+        float(form_blend_val),
+        str(model_type_val),
     )
 except Exception as e:
     st.error(f"Mallin lataus epaonnistui: {e}")

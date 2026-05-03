@@ -29,7 +29,9 @@ class DixonColesModel:
     def fit(self, matches, home_team_col="home_team", away_team_col="away_team",
             home_goals_col="home_score", away_goals_col="away_score",
             decay=0.0, date_col=None, l2_per_team=2.0,
-            l2_attack_defence=2.0, team_priors=None):
+            l2_attack_defence=2.0, team_priors=None,
+            home_xg_col=None, away_xg_col=None, xg_weight=0.0,
+            model_type="dc"):
         """
         Sovita malli.
 
@@ -56,6 +58,17 @@ class DixonColesModel:
             joukkueiden L2-prior on (0, 0); tama vaihtaa shrinkage-kohteen
             (ja initialisoinnin) mainittuun arvoon. Hyodyllinen promotoiduille
             joukkueille joiden alasarjaestimaatti tunnetaan.
+        home_xg_col, away_xg_col, xg_weight
+            **xG-painotettu likelihood**. Jos `xg_weight > 0` ja xG-sarakkeet
+            on annettu, lisataan likelihoodiin Gaussian-tyylinen termi joka
+            rankaisee mallin lambdan poikkeamaa toteutuneesta xG:sta.
+            Vaikutus: mallin estimaatit "siloittuvat" toteutuneiden xG:iden
+            mukaan eika perustu pelkille maaleille (jotka ovat noisy).
+            Suositus: 0.3-0.5 jos xG-data luotettava (Understat top-5 -liigat).
+        model_type
+            "dc" (oletus) = Dixon-Coles tau-korjauksella, "bivariate_poisson" =
+            Bivariate Poisson -malli (jaettu Z-komponentti). Bivariate Poisson
+            on matemaattisesti elegantimpi ratkaisu maalien korrelaatioon.
         """
         df = matches.dropna(subset=[home_goals_col, away_goals_col]).copy()
         df[home_goals_col] = df[home_goals_col].astype(int)
@@ -75,6 +88,23 @@ class DixonColesModel:
         a_idx = df[away_team_col].map(idx).values
         h_g = df[home_goals_col].values
         a_g = df[away_goals_col].values
+
+        # xG-painotettu likelihood — varaa mask:t otteluille joilla xG-arvot
+        kayta_xg = (
+            xg_weight > 0
+            and home_xg_col is not None
+            and away_xg_col is not None
+            and home_xg_col in df.columns
+            and away_xg_col in df.columns
+        )
+        if kayta_xg:
+            h_xg_arr = pd.to_numeric(df[home_xg_col], errors="coerce").values
+            a_xg_arr = pd.to_numeric(df[away_xg_col], errors="coerce").values
+            xg_mask = ~(np.isnan(h_xg_arr) | np.isnan(a_xg_arr))
+        else:
+            h_xg_arr = None
+            a_xg_arr = None
+            xg_mask = None
 
         # Rakenna prior-vektorit team_priors:sta. Default: kaikki nollia.
         prior_attack = np.zeros(n)
@@ -110,23 +140,56 @@ class DixonColesModel:
                 lam = np.exp(attack[h_idx] + defence[a_idx] + gamma_global)
             mu = np.exp(attack[a_idx] + defence[h_idx])
 
-            log_p = poisson.logpmf(h_g, lam) + poisson.logpmf(a_g, mu)
-            # Vektoroitu tau: vain (0,0), (0,1), (1,0), (1,1) -ottelut saavat
-            # epatriviaalin korjauskertoimen, muut jaavat 1.0:ksi.
-            # Korvaa Python for-loopin -> ~150x nopeampi per fit-kutsu.
-            tau_arr = np.ones(len(h_g))
-            m_00 = (h_g == 0) & (a_g == 0)
-            m_01 = (h_g == 0) & (a_g == 1)
-            m_10 = (h_g == 1) & (a_g == 0)
-            m_11 = (h_g == 1) & (a_g == 1)
-            tau_arr[m_00] = 1.0 - lam[m_00] * mu[m_00] * rho
-            tau_arr[m_01] = 1.0 + lam[m_01] * rho
-            tau_arr[m_10] = 1.0 + mu[m_10] * rho
-            tau_arr[m_11] = 1.0 - rho
-            tau_arr = np.clip(tau_arr, 1e-10, None)
-            log_p = log_p + np.log(tau_arr)
+            if model_type == "bivariate_poisson":
+                # Bivariate Poisson: jaettu Z-komponentti rho-skaalauksella.
+                # P(X=h, Y=a) summa min(h,a)+1 termin yli.
+                # Tehokkuussyista lasketaan vain pienet tulokset (>10 -> Poisson)
+                lam3 = max(0.0, -rho) * np.minimum(lam, mu)  # rho<0 -> positiivinen Z
+                lam1 = np.maximum(lam - lam3, 1e-9)
+                lam2 = np.maximum(mu - lam3, 1e-9)
+                # Iteroitu summa
+                log_p = np.full(len(h_g), -np.inf)
+                from scipy.special import gammaln
+                for i in range(len(h_g)):
+                    h_i, a_i = int(h_g[i]), int(a_g[i])
+                    if h_i > 12 or a_i > 12:
+                        # Fallback: itsenainen Poisson
+                        log_p[i] = poisson.logpmf(h_i, lam[i]) + poisson.logpmf(a_i, mu[i])
+                        continue
+                    summa = 0.0
+                    for k in range(min(h_i, a_i) + 1):
+                        # P(X=h-k|lam1) * P(Y=a-k|lam2) * P(Z=k|lam3) summa
+                        log_term = (
+                            -lam1[i] + (h_i - k) * np.log(lam1[i]) - gammaln(h_i - k + 1)
+                            - lam2[i] + (a_i - k) * np.log(lam2[i]) - gammaln(a_i - k + 1)
+                            - lam3[i] + k * np.log(max(lam3[i], 1e-9)) - gammaln(k + 1)
+                        )
+                        summa += np.exp(log_term)
+                    log_p[i] = np.log(max(summa, 1e-300))
+            else:
+                # Standardi Dixon-Coles + tau-korjaus
+                log_p = poisson.logpmf(h_g, lam) + poisson.logpmf(a_g, mu)
+                tau_arr = np.ones(len(h_g))
+                m_00 = (h_g == 0) & (a_g == 0)
+                m_01 = (h_g == 0) & (a_g == 1)
+                m_10 = (h_g == 1) & (a_g == 0)
+                m_11 = (h_g == 1) & (a_g == 1)
+                tau_arr[m_00] = 1.0 - lam[m_00] * mu[m_00] * rho
+                tau_arr[m_01] = 1.0 + lam[m_01] * rho
+                tau_arr[m_10] = 1.0 + mu[m_10] * rho
+                tau_arr[m_11] = 1.0 - rho
+                tau_arr = np.clip(tau_arr, 1e-10, None)
+                log_p = log_p + np.log(tau_arr)
 
             nll = -np.sum(painot * log_p)
+            # xG-painotettu likelihood: lisaa Gaussian-tyylinen rangaistus
+            # mallin lambdan poikkeamasta toteutuneeseen xG:hen.
+            if kayta_xg and xg_mask is not None and xg_mask.any():
+                lam_diff = lam[xg_mask] - h_xg_arr[xg_mask]
+                mu_diff = mu[xg_mask] - a_xg_arr[xg_mask]
+                xg_painot = painot[xg_mask] if hasattr(painot, "__len__") else painot
+                xg_penalty = np.sum(xg_painot * (lam_diff ** 2 + mu_diff ** 2))
+                nll += xg_weight * xg_penalty
             # L2-shrinkage: rankaisee joukkuekohtaista poikkeamaa nollasta
             if self.per_team_home_adv:
                 nll += l2_per_team * np.sum(gamma_team ** 2)
