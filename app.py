@@ -600,37 +600,135 @@ def _auto_injury_value(team_name: str, players_str: str) -> tuple[int, str]:
         return 0, ""
     try:
         from src.features.poissaolot import laske_poissaolovaikutus
-        # Etsi sarakkeet
-        col_min_a = next((c for c in pelaajat.columns if c in ["Playing Time_Min", "Playing_Time_Min", "Min", "Minutes"]), None)
-        col_xg_a = next((c for c in pelaajat.columns if c in ["Expected_xG", "Standard_xG", "xG"]), None)
+
+        # Aggressiivinen sarakehaku — sama kuin poissaolopaneelissa
+        def _find_xg(df):
+            for k in ["Expected_xG", "Standard_xG", "xG"]:
+                if k in df.columns:
+                    return k
+            for col in df.columns:
+                if not isinstance(col, str):
+                    continue
+                if col == "xG" or col.endswith("_xG"):
+                    if "npxG" not in col and "xGA" not in col and "/" not in col:
+                        return col
+            for col in df.columns:
+                if not isinstance(col, str):
+                    continue
+                cl = col.lower()
+                if "xg" in cl and "xga" not in cl and "npxg" not in cl and "/" not in cl and "+" not in cl:
+                    return col
+            return None
+
+        def _find_min(df):
+            for k in ["Playing Time_Min", "Playing_Time_Min", "Min", "Minutes"]:
+                if k in df.columns:
+                    return k
+            for col in df.columns:
+                if isinstance(col, str) and (col.endswith("_Min") or col.endswith("Time_Min")):
+                    return col
+            return None
+
+        def _find_gls(df):
+            for k in ["Performance_Gls", "Standard_Gls", "Gls", "Goals"]:
+                if k in df.columns:
+                    return k
+            return None
+
+        col_xg_a = _find_xg(pelaajat) or _find_gls(pelaajat)  # fallback Gls
+        col_min_a = _find_min(pelaajat)
         if not col_xg_a:
             return 0, ""
-        # Sumea joukkue-haku (sama logiikka kuin poissaolopaneelissa)
+
+        # Joukkue-alias-haku (sama kuin poissaolopaneelissa)
+        ALIAS = {
+            "Manchester United": ["Manchester Utd", "Man United", "Man Utd"],
+            "Manchester City": ["Man City"],
+            "Newcastle United": ["Newcastle Utd", "Newcastle"],
+            "Tottenham Hotspur": ["Tottenham", "Spurs"],
+            "Wolverhampton Wanderers": ["Wolves", "Wolverhampton"],
+            "Brighton & Hove Albion": ["Brighton"],
+            "West Ham United": ["West Ham", "West Ham Utd"],
+            "Nottingham Forest": ["Nott'ham Forest", "Nottm Forest"],
+            "Leicester City": ["Leicester"],
+            "Leeds United": ["Leeds"],
+            "Sheffield United": ["Sheffield Utd"],
+            "AFC Bournemouth": ["Bournemouth"],
+        }
         joukkue_match = team_name
-        if "team" in pelaajat.columns and not (pelaajat["team"] == team_name).any():
-            from difflib import SequenceMatcher
-            kaikki_jt = pelaajat["team"].dropna().unique()
-            kandidaatit = [(SequenceMatcher(None, team_name.lower(), str(j).lower()).ratio(), j) for j in kaikki_jt]
-            kandidaatit.sort(reverse=True)
-            if kandidaatit and kandidaatit[0][0] > 0.7:
-                joukkue_match = kandidaatit[0][1]
-        # Sumea pelaajamatch
+        if "team" in pelaajat.columns:
+            if not (pelaajat["team"] == team_name).any():
+                # Yrita aliaksia
+                for alias in ALIAS.get(team_name, []):
+                    if (pelaajat["team"] == alias).any():
+                        joukkue_match = alias
+                        break
+                else:
+                    # SequenceMatcher tiukasti
+                    from difflib import SequenceMatcher
+                    kaikki_jt = pelaajat["team"].dropna().unique()
+                    kandidaatit = [(SequenceMatcher(None, team_name.lower(), str(j).lower()).ratio(), j) for j in kaikki_jt]
+                    kandidaatit.sort(reverse=True)
+                    if kandidaatit and kandidaatit[0][0] > 0.7:
+                        joukkue_match = kandidaatit[0][1]
+
         joukkue_pel = pelaajat[pelaajat.get("team", "") == joukkue_match]
+        if joukkue_pel.empty:
+            return 0, ""
         kaikki_nimet = joukkue_pel["player"].tolist() if "player" in joukkue_pel.columns else []
         syote = [p.strip() for p in players_str.split(",") if p.strip()]
+        # 1. Etsi nimet ensin omasta joukkueesta (aksenttitietoinen vertailu)
+        import unicodedata as _ucd_a
+        def _norm_a(s):
+            return "".join(c for c in _ucd_a.normalize("NFD", str(s))
+                           if _ucd_a.category(c) != "Mn").lower()
+
         yhdistetyt = []
+        siirtopelaajat = []
         for s in syote:
-            s_low = s.lower()
-            matches = [n for n in kaikki_nimet if s_low in str(n).lower()]
+            s_norm = _norm_a(s)
+            matches = [n for n in kaikki_nimet if s_norm in _norm_a(n)]
             if matches:
                 yhdistetyt.append(matches[0])
-        if not yhdistetyt:
+                continue
+            # 2. Ei loytynyt omasta joukkueesta -> etsi KAIKISTA joukkueista
+            kaikki_pelaajat_lista = pelaajat["player"].dropna().tolist()
+            global_matches = [n for n in kaikki_pelaajat_lista if s_norm in _norm_a(n)]
+            if global_matches:
+                paras_nimi = global_matches[0]
+                paras_rivi = pelaajat[pelaajat["player"] == paras_nimi].iloc[0]
+                paras_team = paras_rivi.get("team", "?")
+                # Lisaa siirtopelaajaksi: kaytetaan hanen xG-arvoa, mutta merkitaan
+                siirtopelaajat.append((paras_nimi, paras_team))
+
+        if not yhdistetyt and not siirtopelaajat:
             return 0, ""
-        v = laske_poissaolovaikutus(pelaajat, joukkue_match, yhdistetyt, minuutit_col=col_min_a, xg_col=col_xg_a)
+
+        # Laske vaikutus: omasta joukkueesta normaalisti + siirtopelaajien xG mukaan
+        v = laske_poissaolovaikutus(pelaajat, joukkue_match, yhdistetyt,
+                                    minuutit_col=col_min_a, xg_col=col_xg_a)
+        # Lisaa siirtopelaajien xG-osuus (skaalataan oman joukkueen totalin mukaan)
+        siirto_xg_lisays = 0.0
+        if siirtopelaajat and v.get("joukkueen_xg", 0) > 0:
+            for nimi, _ in siirtopelaajat:
+                rivi = pelaajat[pelaajat["player"] == nimi].iloc[0]
+                xg_p = pd.to_numeric(rivi.get(col_xg_a), errors="coerce")
+                if pd.notna(xg_p):
+                    siirto_xg_lisays += float(xg_p)
+            # Skaalaa kuten muut: 70% nettovaikutus
+            lisa_pct = (siirto_xg_lisays / v["joukkueen_xg"]) * 0.7 * 100
+            v["prosentti"] += lisa_pct
+
         auto_v = max(-30, min(0, -int(round(v["prosentti"] / 5)) * 5))
-        return auto_v, f"🤖 {len(yhdistetyt)} pelaajaa -> {auto_v}%"
-    except Exception:
-        return 0, ""
+        info_osat = []
+        if yhdistetyt:
+            info_osat.append(f"{len(yhdistetyt)} omasta joukkueesta")
+        if siirtopelaajat:
+            info_osat.append(f"{len(siirtopelaajat)} siirtopelaajaa ({', '.join(n for n, _ in siirtopelaajat)})")
+        info = "🤖 Auto: " + " + ".join(info_osat) + f" -> {auto_v}%"
+        return auto_v, info
+    except Exception as e:
+        return 0, f"⚠️ Auto-laskenta epaonnistui: {e}"
 
 auto_hi, info_hi = _auto_injury_value(koti, st.session_state.get("poissa_koti", ""))
 auto_ai, info_ai = _auto_injury_value(vieras, st.session_state.get("poissa_vieras", ""))
@@ -639,20 +737,30 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
     s1, s2 = st.columns(2)
     with s1:
         st.markdown(f"**🏠 {koti}**")
-        # Jos auto-arvo on saatavilla, kayta sita oletuksena (yliajaa session-staten)
+        # Auto-laskettu poissaolovaikutus voittaa manuaalisen sliderin
+        manual_hi = st.slider(
+            "Avainpelaajia poissa % (manuaalinen)",
+            -30, 0, 0, 5, key="hi",
+            help="Tama on kaytossa vain jos et syota pelaajia poissaolopaneeliin alla.",
+        )
         if auto_hi != 0:
-            st.session_state["hi"] = auto_hi
-        home_injury = st.slider("Avainpelaajia poissa %", -30, 0, 0, 5, key="hi")
-        if info_hi:
-            st.caption(info_hi)
+            home_injury = auto_hi
+            st.success(f"✅ {info_hi} (yliajaa sliderin)")
+        else:
+            home_injury = manual_hi
         home_motivation = st.slider("Motivaatio %", -15, 15, mot_home, 5, key="hm")
     with s2:
         st.markdown(f"**✈️ {vieras}**")
+        manual_ai = st.slider(
+            "Avainpelaajia poissa % (manuaalinen)",
+            -30, 0, 0, 5, key="ai",
+            help="Tama on kaytossa vain jos et syota pelaajia poissaolopaneeliin alla.",
+        )
         if auto_ai != 0:
-            st.session_state["ai"] = auto_ai
-        away_injury = st.slider("Avainpelaajia poissa %", -30, 0, 0, 5, key="ai")
-        if info_ai:
-            st.caption(info_ai)
+            away_injury = auto_ai
+            st.success(f"✅ {info_ai} (yliajaa sliderin)")
+        else:
+            away_injury = manual_ai
         away_motivation = st.slider("Motivaatio %", -15, 15, mot_away, 5, key="am")
 
     s3, s4, s5 = st.columns(3)
@@ -742,12 +850,21 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
             poissa_koti_lista = [p.strip() for p in poissa_koti_str.split(",") if p.strip()]
             poissa_vieras_lista = [p.strip() for p in poissa_vieras_str.split(",") if p.strip()]
 
+            import unicodedata as _ucd
+
+            def _norm_nimi(s):
+                """Normalisoi nimi vertailua varten: lowercase + poista aksentit."""
+                return "".join(
+                    c for c in _ucd.normalize("NFD", str(s))
+                    if _ucd.category(c) != "Mn"
+                ).lower()
+
             def _yhdista_nimet(syote, kaikki_nimet):
-                """Sumea match: 'Saka' -> 'Bukayo Saka'."""
+                """Sumea match: 'Saka' -> 'Bukayo Saka', 'Ekitiké' -> 'Hugo Ekitike'."""
                 tulos = []
                 for s in syote:
-                    s_low = s.lower()
-                    matches = [n for n in kaikki_nimet if s_low in str(n).lower()]
+                    s_norm = _norm_nimi(s)
+                    matches = [n for n in kaikki_nimet if s_norm in _norm_nimi(n)]
                     if matches:
                         tulos.append(matches[0])
                 return tulos
@@ -803,46 +920,103 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
                     return pelaajat[pelaajat["team"] == paras], paras
                 return pd.DataFrame(), joukkue_nimi
 
+            def _yhdista_nimet_globaalisti(syote, joukkueen_nimet):
+                """
+                Etsi pelaajat: ensin omasta joukkueesta, sitten globaalisti
+                kaikista joukkueista (= siirtopelaajat).
+
+                Palauttaa: (omat: list[str], siirtopelaajat: list[(nimi, team)])
+                """
+                omat = []
+                siirrot = []
+                kaikki_globaalit = pelaajat["player"].dropna().tolist() if "player" in pelaajat.columns else []
+                for s in syote:
+                    s_norm = _norm_nimi(s)
+                    # Ensin omasta joukkueesta
+                    omat_matches = [n for n in joukkueen_nimet if s_norm in _norm_nimi(n)]
+                    if omat_matches:
+                        omat.append(omat_matches[0])
+                        continue
+                    # Sitten globaalisti (myos aksenteilla normalisoituna)
+                    glob_matches = [n for n in kaikki_globaalit if s_norm in _norm_nimi(n)]
+                    if glob_matches:
+                        nimi = glob_matches[0]
+                        rivi = pelaajat[pelaajat["player"] == nimi].iloc[0]
+                        team = rivi.get("team", "?")
+                        siirrot.append((nimi, team))
+                return omat, siirrot
+
+            def _laske_kokonaisvaikutus(omat, siirrot, joukkue_match):
+                """Yhdistaa oman joukkueen pelaajien xG + siirtopelaajien xG."""
+                if not omat and not siirrot:
+                    return None
+                v = laske_poissaolovaikutus(
+                    pelaajat, joukkue_match, omat or [""],
+                    minuutit_col=col_min, xg_col=col_xg,
+                )
+                # Lisaa siirtopelaajien vaikutus
+                if siirrot and v.get("joukkueen_xg", 0) > 0:
+                    siirto_xg = 0.0
+                    for nimi, _ in siirrot:
+                        xg_val = pd.to_numeric(
+                            pelaajat[pelaajat["player"] == nimi].iloc[0].get(col_xg),
+                            errors="coerce",
+                        )
+                        if pd.notna(xg_val):
+                            siirto_xg += float(xg_val)
+                    if siirto_xg > 0:
+                        # 70% nettovaikutus kuten omasta joukkueesta
+                        lisa = (siirto_xg / v["joukkueen_xg"]) * 0.7 * 100
+                        v["prosentti"] += lisa
+                return v
+
             joukkue_pelaajat, koti_match = _etsi_joukkue_pelaajat(koti)
             kaikki_koti = joukkue_pelaajat["player"].tolist() if "player" in joukkue_pelaajat.columns else []
-            yhdistetyt_koti = _yhdista_nimet(poissa_koti_lista, kaikki_koti)
-            if poissa_koti_lista and not yhdistetyt_koti and koti_match != koti:
+            omat_koti, siirrot_koti = _yhdista_nimet_globaalisti(poissa_koti_lista, kaikki_koti)
+
+            if poissa_koti_lista and not omat_koti and not siirrot_koti and koti_match != koti:
                 st.caption(f"ℹ️ '{koti}' -> FBref-nimi '{koti_match}', mutta nimia ei tunnistettu.")
             elif poissa_koti_lista and koti_match != koti:
                 st.caption(f"ℹ️ FBref-nimi: '{koti_match}'")
 
             joukkue_pelaajat_v, vieras_match = _etsi_joukkue_pelaajat(vieras)
             kaikki_vieras = joukkue_pelaajat_v["player"].tolist() if "player" in joukkue_pelaajat_v.columns else []
-            yhdistetyt_vieras = _yhdista_nimet(poissa_vieras_lista, kaikki_vieras)
-            if poissa_vieras_lista and not yhdistetyt_vieras and vieras_match != vieras:
+            omat_vieras, siirrot_vieras = _yhdista_nimet_globaalisti(poissa_vieras_lista, kaikki_vieras)
+
+            if poissa_vieras_lista and not omat_vieras and not siirrot_vieras and vieras_match != vieras:
                 st.caption(f"ℹ️ '{vieras}' -> FBref-nimi '{vieras_match}', mutta nimia ei tunnistettu.")
             elif poissa_vieras_lista and vieras_match != vieras:
                 st.caption(f"ℹ️ FBref-nimi: '{vieras_match}'")
 
-            if yhdistetyt_koti:
-                v_koti = laske_poissaolovaikutus(
-                    pelaajat, koti_match, yhdistetyt_koti,
-                    minuutit_col=col_min, xg_col=col_xg,
-                )
-                st.caption(
-                    f"🏠 {koti}: tunnistettu {len(yhdistetyt_koti)} pelaajaa "
-                    f"({', '.join(yhdistetyt_koti)}) -> "
-                    f"-{v_koti['prosentti']:.1f}% xG"
-                )
-                # Auto-syota injury-slideriin (yliajaa kayttajan asetuksen)
-                home_injury = max(-30, min(0, -int(round(v_koti["prosentti"] / 5)) * 5))
+            if omat_koti or siirrot_koti:
+                v_koti = _laske_kokonaisvaikutus(omat_koti, siirrot_koti, koti_match)
+                if v_koti:
+                    osat = []
+                    if omat_koti:
+                        osat.append(f"{len(omat_koti)} omasta joukkueesta ({', '.join(omat_koti)})")
+                    if siirrot_koti:
+                        siirto_str = ", ".join(f"{n} (oli: {t})" for n, t in siirrot_koti)
+                        osat.append(f"{len(siirrot_koti)} siirtopelaajaa ({siirto_str})")
+                    st.caption(
+                        f"🏠 {koti}: " + " + ".join(osat) +
+                        f" -> -{v_koti['prosentti']:.1f}% xG"
+                    )
+                    home_injury = max(-30, min(0, -int(round(v_koti["prosentti"] / 5)) * 5))
 
-            if yhdistetyt_vieras:
-                v_vieras = laske_poissaolovaikutus(
-                    pelaajat, vieras_match, yhdistetyt_vieras,
-                    minuutit_col=col_min, xg_col=col_xg,
-                )
-                st.caption(
-                    f"✈️ {vieras}: tunnistettu {len(yhdistetyt_vieras)} pelaajaa "
-                    f"({', '.join(yhdistetyt_vieras)}) -> "
-                    f"-{v_vieras['prosentti']:.1f}% xG"
-                )
-                away_injury = max(-30, min(0, -int(round(v_vieras["prosentti"] / 5)) * 5))
+            if omat_vieras or siirrot_vieras:
+                v_vieras = _laske_kokonaisvaikutus(omat_vieras, siirrot_vieras, vieras_match)
+                if v_vieras:
+                    osat = []
+                    if omat_vieras:
+                        osat.append(f"{len(omat_vieras)} omasta joukkueesta ({', '.join(omat_vieras)})")
+                    if siirrot_vieras:
+                        siirto_str = ", ".join(f"{n} (oli: {t})" for n, t in siirrot_vieras)
+                        osat.append(f"{len(siirrot_vieras)} siirtopelaajaa ({siirto_str})")
+                    st.caption(
+                        f"✈️ {vieras}: " + " + ".join(osat) +
+                        f" -> -{v_vieras['prosentti']:.1f}% xG"
+                    )
+                    away_injury = max(-30, min(0, -int(round(v_vieras["prosentti"] / 5)) * 5))
         else:
             st.warning(
                 f"Pelaajadatasta ei loytynyt xG-saraketta. Manuaalinen syotto kaytossa. "
