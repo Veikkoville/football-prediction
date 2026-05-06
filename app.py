@@ -1453,6 +1453,82 @@ with st.expander("🎯 Tarkkojen tulosten lampokartta", expanded=False):
     st.markdown("**Top-5 todennakoisinta tulosta:**")
     st.dataframe(df_top, hide_index=True, use_container_width=True)
 
+
+# #14 — Joukkueiden laukauskeskittymat kentalla (Understat-shot-data)
+with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokartat)", expanded=False):
+    st.caption(
+        "Lampokartta nayttaa mihin alueelle kentalla kumpikin joukkue laukoo eniten "
+        "viime kausilla. Tummempi alue = enemman laukauksia. Maalit korostetaan keltaisin tahdein. "
+        "Vaatii Understat-laukauksia (top-5 -liigat lokaalisti)."
+    )
+
+    @st.cache_data(ttl=3600 * 6, show_spinner="Ladataan laukauksia Understatista...")
+    def _hae_laukaukset_kausi(liigat: tuple, kaudet: tuple):
+        """Hae laukaukset cache:lla. Kestaa ekan kerran 30-60s, sen jalkeen heti."""
+        try:
+            from src.data.understat import lataa_laukaukset
+            return lataa_laukaukset(list(liigat), list(kaudet),
+                                    cache_dir=config.RAW_DATA_DIR / "understat")
+        except Exception as e:
+            return None
+
+    if st.button("Lataa laukaukset ja piirra heatmaps", key="load_shots"):
+        # Kayta nykyisia liigavalintoja + kausia
+        us_in_app = [l for l in liiga_valinta if l in {
+            "ENG-Premier League", "ESP-La Liga", "GER-Bundesliga",
+            "ITA-Serie A", "FRA-Ligue 1",
+        }]
+        if not us_in_app:
+            st.warning(
+                "Laukausdataa ei ole valituille liigoille. Valitse vahintaan yksi top-5 -liiga."
+            )
+        else:
+            try:
+                laukaukset = _hae_laukaukset_kausi(tuple(us_in_app), tuple(kausi_valinta))
+                if laukaukset is None or laukaukset.empty:
+                    st.error("Laukausdataa ei saatu Understatista. Pilvessa Understat ei toimi.")
+                else:
+                    from src.viz.xg_plots import plot_shot_heatmap
+                    import matplotlib.pyplot as plt
+                    sc1, sc2 = st.columns(2)
+                    with sc1:
+                        st.markdown(f"#### 🏠 {koti}")
+                        try:
+                            from mplsoccer import VerticalPitch
+                            pitch = VerticalPitch(half=True, pitch_type="opta",
+                                                  line_color="white", pitch_color="#0d4f3c")
+                            fig, ax = pitch.draw(figsize=(6, 7))
+                            fig.set_facecolor("#0d4f3c")
+                            plot_shot_heatmap(laukaukset, joukkue=koti, ax=ax, cmap="Reds")
+                            st.pyplot(fig)
+                            plt.close(fig)
+                        except Exception as e:
+                            st.error(f"Heatmap epaonnistui: {e}")
+                    with sc2:
+                        st.markdown(f"#### ✈️ {vieras}")
+                        try:
+                            from mplsoccer import VerticalPitch
+                            pitch = VerticalPitch(half=True, pitch_type="opta",
+                                                  line_color="white", pitch_color="#0d4f3c")
+                            fig, ax = pitch.draw(figsize=(6, 7))
+                            fig.set_facecolor("#0d4f3c")
+                            plot_shot_heatmap(laukaukset, joukkue=vieras, ax=ax, cmap="Blues")
+                            st.pyplot(fig)
+                            plt.close(fig)
+                        except Exception as e:
+                            st.error(f"Heatmap epaonnistui: {e}")
+
+                    # Jatkona myos rinnakkainen vertailu xG/laukaus
+                    h_count = len(laukaukset[laukaukset["team"] == koti]) if "team" in laukaukset.columns else 0
+                    a_count = len(laukaukset[laukaukset["team"] == vieras]) if "team" in laukaukset.columns else 0
+                    if h_count or a_count:
+                        st.caption(
+                            f"📊 {koti}: {h_count} laukausta · {vieras}: {a_count} laukausta valituilta kausilta."
+                        )
+            except Exception as e:
+                st.error(f"Laukausten lataus epaonnistui: {e}")
+
+
 # Vetokerroin-vertailu
 st.divider()
 st.markdown("### 💰 Vetokerroin-vertailu")
@@ -1730,6 +1806,123 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
         "💡 Value % = (mallin_p × kerroin − 1) × 100. "
         "Kelly 1/4 = optimaalinen panostuskoko bankrollistä, kun otat 1/4 Kelly-fraktiosta. "
         "Korostettu rivi = value > 5%."
+    )
+
+    # #12 — Interaktiivinen Kelly-laskuri (HTML/JS)
+    st.markdown("---")
+    st.markdown("**💼 Interaktiivinen Kelly-laskuri**")
+    st.caption(
+        "Saada bankroll-slider niin nakee suositellut panostukset reaaliajassa. "
+        "Ei vaadi sivun uudelleenlatauksia — koko laskenta tapahtuu selaimessa."
+    )
+
+    import streamlit.components.v1 as components
+    import json as _json
+
+    # Rakenna data JS:lle vain value > 0 -riveistä
+    kelly_rivit_js = []
+    for _, r in df_value.iterrows():
+        kelly_rivit_js.append({
+            "markkina": r["Markkina"],
+            "p": r["Mallin %"] / 100.0,
+            "k": r["Kerroin"],
+            "value": r["Value %"],
+            "kelly_pct": r["Kelly 1/4 %"],
+        })
+
+    kelly_data = _json.dumps(kelly_rivit_js)
+    components.html(
+        f"""
+<style>
+  .kelly-widget {{
+    font-family: -apple-system, system-ui, sans-serif;
+    color: #e5e7eb;
+    padding: 16px;
+    background: rgba(31, 41, 55, 0.4);
+    border-radius: 12px;
+  }}
+  .kelly-slider-row {{
+    display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  }}
+  .kelly-slider {{ flex: 1; }}
+  .kelly-bankroll-display {{
+    font-size: 24px; font-weight: 700; color: #60a5fa; min-width: 120px;
+    text-align: right;
+  }}
+  .kelly-row {{
+    display: flex; align-items: center; padding: 8px 12px;
+    border-radius: 8px; margin-bottom: 6px; transition: all 0.2s;
+  }}
+  .kelly-row.value {{ background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }}
+  .kelly-row.no-value {{ background: rgba(75, 85, 99, 0.2); opacity: 0.6; }}
+  .kelly-row-label {{ flex: 2; font-weight: 600; }}
+  .kelly-row-stat {{ flex: 1; font-size: 13px; opacity: 0.85; }}
+  .kelly-stake {{ flex: 1; font-weight: 700; font-size: 16px; color: #10b981; text-align: right; }}
+  .kelly-stake.no-value {{ color: #6b7280; }}
+  input[type=range] {{
+    -webkit-appearance: none; appearance: none; height: 6px;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4); border-radius: 3px;
+  }}
+  input[type=range]::-webkit-slider-thumb {{
+    -webkit-appearance: none; appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: #fff; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }}
+</style>
+
+<div class="kelly-widget">
+  <div class="kelly-slider-row">
+    <label style="min-width: 100px; font-weight: 600">Bankroll:</label>
+    <input type="range" class="kelly-slider" id="bankroll" min="50" max="10000" step="50" value="500">
+    <div class="kelly-bankroll-display" id="bankroll-display">500 €</div>
+  </div>
+
+  <div id="kelly-rows"></div>
+
+  <div style="margin-top: 12px; font-size: 12px; opacity: 0.7;">
+    💡 Vihrealla rivilla on value > 5% — Kelly 1/4 -metodi suosittelee turvallisen panostuksen.
+    Harmaat rivit = ei value:a, ei suositusta.
+  </div>
+</div>
+
+<script>
+  const rivit = {kelly_data};
+
+  function paivita() {{
+    const bankroll = parseFloat(document.getElementById("bankroll").value);
+    document.getElementById("bankroll-display").textContent = bankroll.toLocaleString("fi-FI") + " €";
+
+    const container = document.getElementById("kelly-rows");
+    container.innerHTML = "";
+
+    // Lajittele value:n mukaan laskevasti
+    const sortedRivit = [...rivit].sort((a, b) => b.value - a.value);
+
+    for (const r of sortedRivit) {{
+      const stake = bankroll * (r.kelly_pct / 100);
+      const tuotto = stake * (r.k - 1);
+      const isValue = r.value > 5 && r.kelly_pct > 0;
+      const rowClass = isValue ? "value" : "no-value";
+      const stakeClass = isValue ? "" : "no-value";
+
+      container.innerHTML += `
+        <div class="kelly-row ${{rowClass}}">
+          <div class="kelly-row-label">${{r.markkina}}</div>
+          <div class="kelly-row-stat">@ ${{r.k.toFixed(2)}} · value ${{r.value.toFixed(1)}}%</div>
+          <div class="kelly-stake ${{stakeClass}}">
+            ${{isValue ? stake.toFixed(0) + ' €' : '—'}}
+            ${{isValue ? `<div style="font-size:11px;font-weight:400;opacity:0.7">tuotto +${{tuotto.toFixed(0)}} €</div>` : ''}}
+          </div>
+        </div>
+      `;
+    }}
+  }}
+
+  document.getElementById("bankroll").addEventListener("input", paivita);
+  paivita();
+</script>
+""",
+        height=560,
     )
 
 st.caption(

@@ -226,6 +226,28 @@ nayta.columns = new_names
 nayta = nayta.round(3)
 st.dataframe(nayta.head(20), hide_index=True, use_container_width=True)
 
+# #13 — Pelaajakortit kuvilla (FPL API)
+st.markdown("### 🏃 Top-8 maalintekijaa — kuvakortit")
+st.caption("Kuvat haetaan Premier Leaguen virallisesta CDN:sta (FPL). Kortit ilmestyvat jos joukkue on PL.")
+
+try:
+    from src.viz.player_photos import hae_pelaaja_kortti_html
+    top8 = nayta.head(8)
+    cols_per_row = 4
+    for row_start in range(0, len(top8), cols_per_row):
+        cols = st.columns(cols_per_row)
+        for i, (_, rivi) in enumerate(top8.iloc[row_start:row_start + cols_per_row].iterrows()):
+            with cols[i]:
+                kortti_html = hae_pelaaja_kortti_html(
+                    rivi["Pelaaja"],
+                    joukkue=joukkue,
+                    xg=float(rivi[f"Odotettu {metriikka_nimi}"]),
+                    stat_label=f"Odotettu {metriikka_nimi}",
+                )
+                st.markdown(kortti_html, unsafe_allow_html=True)
+except Exception as e:
+    st.caption(f"Pelaajakorttien lataus epaonnistui: {e}")
+
 st.markdown("### Top-10 anytime scorers")
 top10 = nayta.head(10).set_index("Pelaaja")["Anytime %"]
 st.bar_chart(top10, height=300)

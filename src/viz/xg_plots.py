@@ -83,6 +83,101 @@ def plot_xg_race(
     return ax
 
 
+def plot_shot_heatmap(
+    laukaukset: pd.DataFrame,
+    joukkue: str | None = None,
+    ax: plt.Axes | None = None,
+    cmap: str = "Reds",
+):
+    """
+    Piirra laukausten LAMPOKARTTA jalkapallokentalla.
+
+    Tama on tehokkaampi kuin scatter kun laukauksia paljon — alueet jotka
+    saavat eniten laukauksia tulevat tummempina. Voi vertailla joukkueen
+    hyokkayksen "tiheyspaikkoja".
+
+    Vaatii mplsoccer:n.
+    """
+    df = laukaukset.copy()
+    if joukkue and "team" in df.columns:
+        df = df[df["team"] == joukkue]
+    if df.empty:
+        raise ValueError(f"Ei laukauksia joukkueelle '{joukkue}'")
+
+    # Etsi sarakkeet — soccerdatan versiot vaihtelevat
+    # Tunnetut variantit: X/Y, x/y, shot_x/shot_y, location_x/location_y
+    KOORDINAATTI_KANDIDAATIT = [
+        ("X", "Y"),
+        ("x", "y"),
+        ("shot_x", "shot_y"),
+        ("location_x", "location_y"),
+        ("x_coord", "y_coord"),
+        ("X_coord", "Y_coord"),
+    ]
+    x_col, y_col = None, None
+    for xc, yc in KOORDINAATTI_KANDIDAATIT:
+        if xc in df.columns and yc in df.columns:
+            x_col, y_col = xc, yc
+            break
+
+    # Fallback: etsi yhden kirjaimen sarakkeet jotka voisivat olla koordinaatteja
+    if not x_col:
+        x_kandidaatit = [c for c in df.columns
+                         if isinstance(c, str) and c.lower() in ("x", "shot_x", "x_pos")]
+        y_kandidaatit = [c for c in df.columns
+                         if isinstance(c, str) and c.lower() in ("y", "shot_y", "y_pos")]
+        if x_kandidaatit and y_kandidaatit:
+            x_col, y_col = x_kandidaatit[0], y_kandidaatit[0]
+
+    if not x_col or not y_col:
+        raise ValueError(
+            f"X/Y-koordinaatteja ei loytynyt. Kaikki saatavilla olevat sarakkeet: "
+            f"{', '.join(str(c) for c in df.columns)}"
+        )
+
+    xg_col = next((c for c in ["xG", "xg"] if c in df.columns), None)
+    result_col = next((c for c in ["result", "Result"] if c in df.columns), None)
+
+    from mplsoccer import VerticalPitch
+    pitch = VerticalPitch(
+        half=True, pitch_type="opta",
+        line_color="white", pitch_color="#0d4f3c", linewidth=1.5,
+    )
+    if ax is None:
+        fig, ax = pitch.draw(figsize=(7, 9))
+
+    # Understatin x/y on normalisoitu 0-1; muunna Opta-skaalaan (0-100)
+    x_vals = pd.to_numeric(df[x_col], errors="coerce") * 100
+    y_vals = pd.to_numeric(df[y_col], errors="coerce") * 100
+    valid = x_vals.notna() & y_vals.notna()
+    x_vals = x_vals[valid]
+    y_vals = y_vals[valid]
+
+    # Lampokartta — tiheys laukausten sijainneista
+    bin_x = pitch.bin_statistic(
+        x_vals.values, y_vals.values, statistic="count", bins=(8, 8),
+    )
+    pitch.heatmap(bin_x, ax=ax, cmap=cmap, edgecolors="white", alpha=0.7)
+
+    # Paalle laukaukset & maalit erottuvana
+    df_v = df.loc[valid]
+    if result_col:
+        maalit = df_v[result_col].astype(str).str.lower() == "goal"
+    else:
+        maalit = pd.Series([False] * len(df_v), index=df_v.index)
+    pitch.scatter(x_vals[~maalit], y_vals[~maalit], s=30, ax=ax,
+                  alpha=0.6, color="white", edgecolor="black", linewidth=0.5)
+    pitch.scatter(x_vals[maalit], y_vals[maalit], s=120, ax=ax,
+                  color="yellow", edgecolor="black", linewidth=1.5,
+                  marker="*", label="Maali", zorder=5)
+
+    otsikko = "Laukauskeskittyma"
+    if joukkue:
+        otsikko += f" — {joukkue}"
+    ax.set_title(otsikko, fontsize=13, color="white", weight="bold")
+    return ax
+
+
 def plot_laukauskartta(
     laukaukset: pd.DataFrame,
     pelaaja: str | None = None,
