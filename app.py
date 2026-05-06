@@ -36,6 +36,10 @@ from src.models.ensemble import yhdista_1x2
 from src.models.value import vertaile_kertoimia, marginaali
 from src.models.main_calibrator import kouluta_kalibraattori
 from src.models.totals_classifier import opeta_totals_classifier, ennusta_totals
+from src.viz.team_branding import get_logo_url, get_team_color
+from src.viz.match_visuals import (
+    render_1x2_bars, render_ou_btts_bars, render_score_heatmap, render_match_card,
+)
 import numpy as _np_for_cal
 
 st.set_page_config(page_title="Jalkapallon ennustemalli", page_icon="⚽", layout="wide")
@@ -100,13 +104,46 @@ st.markdown("""
     .prob-bar-fill {
         height: 100%;
         border-radius: 6px;
-        transition: width 0.4s ease;
         display: flex;
         align-items: center;
         padding-left: 10px;
         color: white;
         font-weight: 700;
         font-size: 0.9rem;
+        /* Animaatio: palkki kasvaa nollasta lopulliseen leveyteen */
+        transform-origin: left center;
+        animation: probBarGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    @keyframes probBarGrow {
+        0% {
+            transform: scaleX(0);
+            opacity: 0.3;
+        }
+        70% {
+            opacity: 1;
+        }
+        100% {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+    }
+    /* "Sheen"-kiilto-efekti palkin yli kasvun jalkeen */
+    .prob-bar-fill::after {
+        content: "";
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg,
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.25) 50%,
+            rgba(255,255,255,0) 100%);
+        animation: probBarSheen 1.6s 0.9s ease-out;
+    }
+    @keyframes probBarSheen {
+        0% { left: -100%; }
+        100% { left: 200%; }
     }
     .prob-bar-fill.home { background: linear-gradient(90deg, #2563eb, #3b82f6); }
     .prob-bar-fill.draw { background: linear-gradient(90deg, #6b7280, #9ca3af); }
@@ -212,6 +249,47 @@ st.caption(
     "Ensemble-ennuste = Dixon-Coles (pitka historia) + LightGBM (viime 5 ottelua). "
     "Auto-konteksti tayttaa lepopaivat, sarjasijan, derbyn ja saan — yliajettavissa."
 )
+
+
+# ---------------------------------------------------------------------------
+# 🔴 LIVE-INDIKAATTORI — nayttaa kaynnissa olevat PL-ottelut
+# ---------------------------------------------------------------------------
+@st.cache_data(ttl=120, show_spinner=False)
+def _hae_live_pl():
+    """Hae kaynnissa olevat PL-ottelut (cache 2 min)."""
+    try:
+        from src.data.sofascore import hae_live_ottelut, parsi_live_ottelut
+        ev = hae_live_ottelut()
+        df = parsi_live_ottelut(ev)
+        if df.empty:
+            return df
+        # Suodata vain Englannin Premier League
+        return df[df["tournament"].fillna("").str.contains("Premier League", na=False)
+                  & df["country"].fillna("").str.contains("England", na=False)]
+    except Exception:
+        return None
+
+try:
+    _live_pl = _hae_live_pl()
+    if _live_pl is not None and not _live_pl.empty:
+        live_html = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
+        for _, r in _live_pl.iterrows():
+            koti_l = r.get("home_team", "?")
+            vieras_l = r.get("away_team", "?")
+            score_l = f"{r.get('home_score', '?')}-{r.get('away_score', '?')}"
+            status_l = r.get("status", "")
+            live_html += (
+                f'<div style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.4);'
+                f'border-radius:8px;padding:6px 10px;font-size:13px">'
+                f'<span style="color:#ef4444;font-weight:600">🔴 LIVE</span> '
+                f'<strong>{koti_l}</strong> {score_l} <strong>{vieras_l}</strong> '
+                f'<span style="opacity:0.7">· {status_l}</span>'
+                f'</div>'
+            )
+        live_html += '</div>'
+        st.markdown(live_html, unsafe_allow_html=True)
+except Exception:
+    pass  # Live-haku epaonnistui -> jatka hiljaisesti
 
 
 # ---------------------------------------------------------------------------
@@ -1217,40 +1295,85 @@ if str(model_type_val) == "bivariate_poisson":
 if float(form_blend_val) > 0:
     status_pillit.append(f'<span class="pill pill-info">Form {form_blend_val:.0%}</span>')
 
+# Logot ja tiimivärit (#7 + #8)
+koti_logo = get_logo_url(koti, size=70)
+vieras_logo = get_logo_url(vieras, size=70)
+koti_color_brand = get_team_color(koti)
+vieras_color_brand = get_team_color(vieras)
+
+# Logo-block-helperit
+def _team_block(name, logo_url, color, xg):
+    if logo_url:
+        img_html = f'<img src="{logo_url}" style="height:60px;margin-bottom:10px" alt=""/>'
+    else:
+        initials = "".join(w[0] for w in name.split()[:2]).upper()
+        img_html = (
+            f'<div style="height:60px;width:60px;display:inline-flex;'
+            f'align-items:center;justify-content:center;background:{color};'
+            f'color:white;border-radius:50%;font-weight:bold;font-size:22px;'
+            f'margin-bottom:10px">{initials}</div>'
+        )
+    return (
+        f'<div style="text-align:center;flex:1">'
+        f'{img_html}'
+        f'<div style="font-weight:700;font-size:18px;color:{color};margin-bottom:4px">{name}</div>'
+        f'<div style="opacity:0.7;font-size:13px">xG <strong>{xg:.2f}</strong></div>'
+        f'</div>'
+    )
+
 st.markdown(f"""
 <div class="match-header">
-    <div class="match-header-meta">⚽ Ennuste · {datetime.now().strftime('%d.%m.%Y %H:%M')}</div>
-    <div class="match-header-teams">
-        🏠 {koti} <span class="match-header-vs">vs</span> {vieras} ✈️
+    <div class="match-header-meta" style="text-align:center;margin-bottom:14px">
+        ⚽ Ennuste · {datetime.now().strftime('%d.%m.%Y %H:%M')}
     </div>
-    <div class="match-header-meta">
-        Odotetut maalit: <strong>{lam:.2f}</strong> – <strong>{mu:.2f}</strong>
-        &nbsp;·&nbsp; Yhteensa: <strong>{lam+mu:.2f}</strong>
+    <div style="display:flex;align-items:center;justify-content:space-around">
+        {_team_block(koti, koti_logo, koti_color_brand, lam)}
+        <div style="text-align:center;font-size:22px;font-weight:700;opacity:0.5">VS</div>
+        {_team_block(vieras, vieras_logo, vieras_color_brand, mu)}
     </div>
-    <div style="margin-top: 10px;">{''.join(status_pillit)}</div>
+    <div class="match-header-meta" style="text-align:center;margin-top:14px">
+        Yhteensa odotetut maalit: <strong>{lam+mu:.2f}</strong>
+    </div>
+    <div style="margin-top: 10px;text-align:center">{''.join(status_pillit)}</div>
 </div>
 """, unsafe_allow_html=True)
 
 # 1X2 — kortti probability-palkeilla
 # HUOM: HTML ilman sisennysta — muuten Streamlit tulkitsee 4+-sisennyksen koodiblokiksi
-def _prob_bar(label, prob, kind, kerroin):
+def _prob_bar(label, prob, kind, kerroin, custom_bg=None):
+    """custom_bg = oma tausta (esim. tiimin gradient) joka voittaa kind-luokan."""
     pct = prob * 100
+    style_extra = ""
+    if custom_bg:
+        # Yliajaa kind-luokan taustan (kayttaa tiimin omaa varia)
+        style_extra = f"background: {custom_bg};"
     return (
         f'<div class="prob-bar-container">'
         f'<div class="prob-bar-label">{label}</div>'
         f'<div class="prob-bar-track">'
-        f'<div class="prob-bar-fill {kind}" style="width: {max(8, pct):.1f}%;">{pct:.1f} %</div>'
+        f'<div class="prob-bar-fill {kind}" style="width: {max(8, pct):.1f}%;{style_extra}">{pct:.1f} %</div>'
         f'</div>'
         f'<div style="min-width: 70px; text-align: right; font-weight: 600; opacity: 0.9;">kerr. {kerroin:.2f}</div>'
         f'</div>'
     )
 
+
+# Tiimien omat brandivarit gradient-muotoon
+def _gradient(color: str) -> str:
+    """Tee gradient kahdesta saman varin savystä."""
+    # Yksinkertainen: kayttaa varia + samaa varia 80% lighter alpha:lla
+    return f"linear-gradient(90deg, {color}, {color})"
+
+
+_koti_grad = _gradient(koti_color_brand)
+_vieras_grad = _gradient(vieras_color_brand)
+
 st.markdown(
     f'<div class="pred-card">'
     f'<div class="pred-card-header">⚡ 1X2 — voittajaennuste</div>'
-    f'{_prob_bar(f"1 · {koti}", kaytetty_p["home"], "home", 1/max(kaytetty_p["home"], 0.001))}'
+    f'{_prob_bar(f"1 · {koti}", kaytetty_p["home"], "home", 1/max(kaytetty_p["home"], 0.001), _koti_grad)}'
     f'{_prob_bar("X · Tasapeli", kaytetty_p["draw"], "draw", 1/max(kaytetty_p["draw"], 0.001))}'
-    f'{_prob_bar(f"2 · {vieras}", kaytetty_p["away"], "away", 1/max(kaytetty_p["away"], 0.001))}'
+    f'{_prob_bar(f"2 · {vieras}", kaytetty_p["away"], "away", 1/max(kaytetty_p["away"], 0.001), _vieras_grad)}'
     f'</div>',
     unsafe_allow_html=True,
 )
@@ -1303,6 +1426,32 @@ with oc2:
         f'</div>',
         unsafe_allow_html=True,
     )
+
+# Score-heatmap (#10) — visualisoi todennakoisimmat tarkat tulokset
+with st.expander("🎯 Tarkkojen tulosten lampokartta", expanded=False):
+    st.caption(
+        "Mallin todennakoisyydet kullekin tarkalle tulokselle. Top-3 todennakoisinta "
+        "tulosta korostettu **lihavoituna**."
+    )
+    score_m = dc.score_matrix(koti, vieras, max_goals=8, adjustments=saadot)
+    fig_heatmap = render_score_heatmap(
+        score_m, koti, vieras, max_display=6, koti_color=koti_color_brand,
+    )
+    st.plotly_chart(fig_heatmap, use_container_width=True)
+
+    # Top-5 lista taulukkona
+    rivit = []
+    for i in range(min(7, score_m.shape[0])):
+        for j in range(min(7, score_m.shape[1])):
+            rivit.append({"Tulos": f"{i}-{j}", "Todennakoisyys": float(score_m[i, j]) * 100})
+    df_top = pd.DataFrame(rivit).sort_values("Todennakoisyys", ascending=False).head(5)
+    df_top["Todennakoisyys"] = df_top["Todennakoisyys"].round(2).astype(str) + " %"
+    df_top["Reilu kerroin"] = [
+        round(1.0 / max(float(score_m[int(t.split("-")[0]), int(t.split("-")[1])]), 0.001), 2)
+        for t in df_top["Tulos"]
+    ]
+    st.markdown("**Top-5 todennakoisinta tulosta:**")
+    st.dataframe(df_top, hide_index=True, use_container_width=True)
 
 # Vetokerroin-vertailu
 st.divider()
