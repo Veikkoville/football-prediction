@@ -1490,29 +1490,55 @@ with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokart
                 else:
                     from src.viz.xg_plots import plot_shot_heatmap
                     import matplotlib.pyplot as plt
+                    from matplotlib.colors import LinearSegmentedColormap
+
+                    def _team_cmap(hex_color: str, name: str = "team"):
+                        """Tee custom colormap valkoisesta tiimivariin."""
+                        return LinearSegmentedColormap.from_list(
+                            name,
+                            [(0.0, "#FFFFFF00"), (0.3, hex_color + "80"), (1.0, hex_color)],
+                        )
+
+                    def _team_logo_md(team, color):
+                        """Tiimi-headeri logolla + nimellä omassa varissa."""
+                        url = get_logo_url(team, size=50)
+                        if url:
+                            return (
+                                f'<div style="display:flex;align-items:center;gap:10px;'
+                                f'margin-bottom:8px">'
+                                f'<img src="{url}" style="height:36px"/>'
+                                f'<span style="font-size:18px;font-weight:700;'
+                                f'color:{color}">{team}</span>'
+                                f'</div>'
+                            )
+                        return f'<div style="font-size:18px;font-weight:700;color:{color};margin-bottom:8px">{team}</div>'
+
                     sc1, sc2 = st.columns(2)
+                    koti_cmap = _team_cmap(koti_color_brand, "koti")
+                    vieras_cmap = _team_cmap(vieras_color_brand, "vieras")
+
                     with sc1:
-                        st.markdown(f"#### 🏠 {koti}")
+                        st.markdown(_team_logo_md(koti, koti_color_brand), unsafe_allow_html=True)
                         try:
                             from mplsoccer import VerticalPitch
                             pitch = VerticalPitch(half=True, pitch_type="opta",
                                                   line_color="white", pitch_color="#0d4f3c")
                             fig, ax = pitch.draw(figsize=(6, 7))
                             fig.set_facecolor("#0d4f3c")
-                            plot_shot_heatmap(laukaukset, joukkue=koti, ax=ax, cmap="Reds")
+                            plot_shot_heatmap(laukaukset, joukkue=koti, ax=ax, cmap=koti_cmap)
                             st.pyplot(fig)
                             plt.close(fig)
                         except Exception as e:
                             st.error(f"Heatmap epaonnistui: {e}")
                     with sc2:
-                        st.markdown(f"#### ✈️ {vieras}")
+                        st.markdown(_team_logo_md(vieras, vieras_color_brand), unsafe_allow_html=True)
                         try:
                             from mplsoccer import VerticalPitch
                             pitch = VerticalPitch(half=True, pitch_type="opta",
                                                   line_color="white", pitch_color="#0d4f3c")
                             fig, ax = pitch.draw(figsize=(6, 7))
                             fig.set_facecolor("#0d4f3c")
-                            plot_shot_heatmap(laukaukset, joukkue=vieras, ax=ax, cmap="Blues")
+                            plot_shot_heatmap(laukaukset, joukkue=vieras, ax=ax, cmap=vieras_cmap)
                             st.pyplot(fig)
                             plt.close(fig)
                         except Exception as e:
@@ -1608,13 +1634,18 @@ with st.expander("🔍 Mallin parametrit ja joukkueiden vahvuus"):
     cc1, cc2 = st.columns(2)
     with cc1:
         st.markdown("**Globaalit parametrit**")
-        st.write({
-            "Globaali kotietu (gamma)": round(dc.home_advantage, 4),
-            "Rho-korjaus": round(dc.rho, 4),
-            "Joukkueita": len(joukkueet),
-            "Decay": float(decay_val),
-            "Otteluita treenissa": len(hist_data),
-        })
+        gp1, gp2 = st.columns(2)
+        gp1.metric("🏠 Kotietu γ", f"{dc.home_advantage:.4f}",
+                   help="Globaali kotijoukkueen maaliodotus-bonus (eksponentiaalinen kerroin)")
+        gp2.metric("🔗 Rho", f"{dc.rho:.4f}",
+                   help="Maalien korrelaatio (negatiivinen = enemman tasapelejä)")
+        gp3, gp4 = st.columns(2)
+        gp3.metric("⚽ Joukkueita", f"{len(joukkueet)}")
+        gp4.metric("📋 Otteluita", f"{len(hist_data):,}".replace(",", " "))
+        st.caption(
+            f"Aikapainotus (decay): **{decay_val:.4f}** · "
+            f"Puolittumisaika ~**{int(np.log(2)/decay_val) if decay_val > 0 else '∞'} pv**"
+        )
         if dc.home_advantage_per_team:
             keskiarvo_kotietu = float(dc.home_advantage)
             tot_kotietu = pd.DataFrame([
