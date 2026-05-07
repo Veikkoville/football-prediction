@@ -32,6 +32,9 @@ fastapi>=0.110       # Moderni REST-framework
 uvicorn[standard]>=0.27   # ASGI-palvelin, ajaa FastAPI-sovelluksen
 pydantic>=2.6        # Datavalidointi (tulee fastapin mukana, mutta varmuudeksi)
 
+# Stripe-maksut
+stripe>=8.0          # Stripe Checkout + tilausten hallinta
+
 # Kehitystyökalut (vapaaehtoinen)
 tqdm>=4.66             # Etenemispalkit
 python-dotenv>=1.0     # API-avainten lataus .env-tiedostosta

@@ -15,6 +15,7 @@ Sitten avaa selain:
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -24,13 +25,19 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from fastapi import FastAPI, HTTPException, Query
+import stripe
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 import config
 from src.data.loader import lataa_otteludata
 from src.models.dixon_coles import DixonColesModel, apply_match_adjustments
+
+# Stripe-konfiguraatio (Render env varseista)
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 
 
 # ---------------------------------------------------------------------------
@@ -268,3 +275,119 @@ def clear_cache():
     n = len(_MODEL_CACHE)
     _MODEL_CACHE.clear()
     return {"cleared_models": n}
+
+
+# ---------------------------------------------------------------------------
+# STRIPE: Checkout-session ja webhook
+# ---------------------------------------------------------------------------
+class CheckoutRequest(BaseModel):
+    """Pyyntö Stripe Checkout Sessionin luomiseen."""
+    user_id: str = Field(..., description="Supabase user UUID")
+    email: str = Field(..., description="Käyttäjän sähköposti (Stripe lähettää kuitin)")
+
+
+class CheckoutResponse(BaseModel):
+    checkout_url: str
+    session_id: str
+
+
+@app.post("/api/checkout", response_model=CheckoutResponse)
+def create_checkout_session(req: CheckoutRequest):
+    """
+    Luo Stripe Checkout Session premium-tilaukselle.
+
+    Mobiili-app kutsuu tätä → saa `checkout_url`:n → avaa selaimessa →
+    kayttaja maksaa → Stripe lahettaa webhook:in joka päivittää
+    Supabase profiles.is_premium = true.
+    """
+    if not stripe.api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="Stripe not configured (STRIPE_SECRET_KEY missing)",
+        )
+    if not STRIPE_PRICE_ID:
+        raise HTTPException(
+            status_code=500,
+            detail="Stripe price not configured (STRIPE_PRICE_ID missing)",
+        )
+
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            payment_method_types=["card"],
+            line_items=[{
+                "price": STRIPE_PRICE_ID,
+                "quantity": 1,
+            }],
+            customer_email=req.email,
+            client_reference_id=req.user_id,  # Webhook käyttää tätä identifiointiin
+            metadata={"user_id": req.user_id},
+            # Deep linkit takaisin mobiili-appiin
+            success_url="goaliq://payment-success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url="goaliq://payment-cancel",
+            allow_promotion_codes=True,
+        )
+        return CheckoutResponse(
+            checkout_url=session.url or "",
+            session_id=session.id,
+        )
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400, detail=f"Stripe error: {e.user_message or str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """
+    Vastaanottaa Stripen webhookit. Päivittää Supabase profiles.is_premium
+    kun maksu onnistuu / tilaus loppuu.
+
+    HUOM: Tama vaatii myöhemmin Supabase service-role-key:n (premium-statuksen
+    päivittäminen edellyttää backend-oikeuksia). Toteutetaan vaiheittain.
+    """
+    if not STRIPE_WEBHOOK_SECRET:
+        # Webhook-secret ei vielä konfiguroitu — palauta 200 OK että Stripe
+        # ei yritä uudelleen jatkuvasti
+        return {"received": True, "warning": "STRIPE_WEBHOOK_SECRET not configured"}
+
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature", "")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    # Käsittele eventti
+    event_type = event["type"]
+    obj = event["data"]["object"]
+
+    if event_type == "checkout.session.completed":
+        # Maksu onnistui — paivita kayttajalle is_premium=true
+        user_id = obj.get("client_reference_id") or obj.get("metadata", {}).get("user_id")
+        if user_id:
+            # TODO: Päivitä Supabase profiles.is_premium = true
+            # (vaatii Supabase service-role-key:n)
+            print(f"[Stripe webhook] Premium activated for user_id={user_id}")
+
+    elif event_type == "customer.subscription.deleted":
+        # Tilaus peruttu/loppui — paivita is_premium=false
+        # TODO: Päivitä Supabase
+        print(f"[Stripe webhook] Subscription ended: {obj.get('id')}")
+
+    return {"received": True}
+
+
+@app.get("/api/stripe-config")
+def stripe_config():
+    """Diagnostiikka: tarkista että Stripe on konfiguroitu (älä paljasta avaimia)."""
+    return {
+        "secret_key_set": bool(stripe.api_key),
+        "price_id_set": bool(STRIPE_PRICE_ID),
+        "webhook_secret_set": bool(STRIPE_WEBHOOK_SECRET),
+    }
