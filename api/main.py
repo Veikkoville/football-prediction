@@ -385,6 +385,53 @@ def create_checkout_session(req: CheckoutRequest):
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
 
 
+class PortalRequest(BaseModel):
+    email: str = Field(..., description="Käyttäjän sähköposti (löytää Stripe-customerin)")
+
+
+class PortalResponse(BaseModel):
+    portal_url: str
+
+
+@app.post("/api/customer-portal", response_model=PortalResponse)
+def create_portal_session(req: PortalRequest):
+    """
+    Luo Stripe Customer Portal -session jossa kayttaja voi peruuttaa
+    tilauksen, paivittaa kortin tai nahda laskut.
+
+    Customer haetaan emailin perusteella (yksinkertaisin lahestymistapa MVP:lle —
+    myohemmin voi tallentaa stripe_customer_id Supabaseen).
+    """
+    if not stripe.api_key:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+
+    try:
+        # Etsi Stripe-customer emailin perusteella
+        customers = stripe.Customer.list(email=req.email, limit=1)
+        if not customers.data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No Stripe customer found for {req.email}",
+            )
+        customer_id = customers.data[0].id
+
+        # Luo portal-session
+        session = stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url="goaliq://subscription-managed",
+        )
+        return PortalResponse(portal_url=session.url)
+    except stripe.error.StripeError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Stripe error: {e.user_message or str(e)}",
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+
 @app.post("/api/webhook/stripe")
 async def stripe_webhook(request: Request):
     """
