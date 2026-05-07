@@ -49,9 +49,9 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "")  # esim. https://xxxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 
-def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
+def _update_profile(user_id: str, fields: dict) -> bool:
     """
-    Päivittää Supabase profiles.is_premium kayttajalle PATCH-kutsulla.
+    Geneerinen Supabase profiles -paivitys. fields = sarakkeet jotka asetetaan.
     Palauttaa True jos onnistui, False jos epaonnistui (logaa virheen).
     """
     if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
@@ -66,14 +66,9 @@ def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
         "Prefer": "return=minimal",
     }
     try:
-        resp = requests.patch(
-            url,
-            json={"is_premium": is_premium},
-            headers=headers,
-            timeout=10,
-        )
+        resp = requests.patch(url, json=fields, headers=headers, timeout=10)
         if resp.status_code in (200, 204):
-            print(f"[Supabase] Updated user_id={user_id} is_premium={is_premium}")
+            print(f"[Supabase] Updated user_id={user_id} fields={fields}")
             return True
         print(
             f"[Supabase] FAILED status={resp.status_code} body={resp.text[:200]} "
@@ -83,6 +78,11 @@ def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
     except Exception as e:
         print(f"[Supabase] EXCEPTION user_id={user_id}: {e}")
         return False
+
+
+def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
+    """Yksinkertaistettu wrapper vain is_premium -kentalle."""
+    return _update_profile(user_id, {"is_premium": is_premium})
 
 
 # ---------------------------------------------------------------------------
@@ -465,20 +465,50 @@ async def stripe_webhook(request: Request):
     obj = event["data"]["object"]
 
     if event_type == "checkout.session.completed":
-        # Maksu onnistui — paivita kayttajalle is_premium=true
+        # Maksu onnistui — aktivoi premium ja nollaa cancel-tiedot
         user_id = obj.get("client_reference_id") or obj.get("metadata", {}).get("user_id")
         if user_id:
             print(f"[Stripe webhook] checkout.session.completed user_id={user_id}")
-            _update_profile_premium(user_id, True)
+            _update_profile(user_id, {
+                "is_premium": True,
+                "subscription_cancel_at_period_end": False,
+                # current_period_end asetetaan kun subscription.updated saapuu
+            })
         else:
             print(f"[Stripe webhook] checkout.session.completed but no user_id in payload")
+
+    elif event_type == "customer.subscription.updated":
+        # Subscription muuttui — esim. kayttaja peruutti, mutta access on
+        # voimassa current_period_end -paivaan asti
+        user_id = obj.get("metadata", {}).get("user_id")
+        if user_id:
+            cancel_at_end = obj.get("cancel_at_period_end", False)
+            period_end_ts = obj.get("current_period_end")  # unix timestamp tai null
+            period_end_iso = None
+            if period_end_ts:
+                from datetime import datetime, timezone
+                period_end_iso = datetime.fromtimestamp(period_end_ts, tz=timezone.utc).isoformat()
+            print(
+                f"[Stripe webhook] subscription.updated user_id={user_id} "
+                f"cancel_at_period_end={cancel_at_end} period_end={period_end_iso}"
+            )
+            _update_profile(user_id, {
+                "subscription_cancel_at_period_end": cancel_at_end,
+                "subscription_current_period_end": period_end_iso,
+            })
+        else:
+            print(f"[Stripe webhook] subscription.updated no user_id sub_id={obj.get('id')}")
 
     elif event_type == "customer.subscription.deleted":
         # Tilaus peruttu/loppui — paivita is_premium=false
         user_id = obj.get("metadata", {}).get("user_id")
         if user_id:
             print(f"[Stripe webhook] subscription.deleted user_id={user_id}")
-            _update_profile_premium(user_id, False)
+            _update_profile(user_id, {
+                "is_premium": False,
+                "subscription_cancel_at_period_end": False,
+                "subscription_current_period_end": None,
+            })
         else:
             print(f"[Stripe webhook] subscription.deleted no user_id in metadata sub_id={obj.get('id')}")
 
