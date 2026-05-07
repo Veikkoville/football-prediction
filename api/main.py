@@ -34,10 +34,54 @@ import config
 from src.data.loader import lataa_otteludata
 from src.models.dixon_coles import DixonColesModel, apply_match_adjustments
 
+import requests
+
 # Stripe-konfiguraatio (Render env varseista)
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+# Supabase-konfiguraatio webhook-päivityksiä varten.
+# SUPABASE_SERVICE_ROLE_KEY on backend-only-key (ei saa koskaan vuotaa frontille);
+# se ohittaa Row Level Securityn, jotta webhook voi päivittää profiilin.
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")  # esim. https://xxxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+
+
+def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
+    """
+    Päivittää Supabase profiles.is_premium kayttajalle PATCH-kutsulla.
+    Palauttaa True jos onnistui, False jos epaonnistui (logaa virheen).
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        print(f"[Supabase] WARNING: missing env vars, cannot update user_id={user_id}")
+        return False
+
+    url = f"{SUPABASE_URL}/rest/v1/profiles?id=eq.{user_id}"
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal",
+    }
+    try:
+        resp = requests.patch(
+            url,
+            json={"is_premium": is_premium},
+            headers=headers,
+            timeout=10,
+        )
+        if resp.status_code in (200, 204):
+            print(f"[Supabase] Updated user_id={user_id} is_premium={is_premium}")
+            return True
+        print(
+            f"[Supabase] FAILED status={resp.status_code} body={resp.text[:200]} "
+            f"user_id={user_id}"
+        )
+        return False
+    except Exception as e:
+        print(f"[Supabase] EXCEPTION user_id={user_id}: {e}")
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -322,6 +366,9 @@ def create_checkout_session(req: CheckoutRequest):
             customer_email=req.email,
             client_reference_id=req.user_id,  # Webhook käyttää tätä identifiointiin
             metadata={"user_id": req.user_id},
+            # Kopioi user_id myös tilauksen metadataan, jotta cancel-eventti
+            # tietää kenen premium poistetaan
+            subscription_data={"metadata": {"user_id": req.user_id}},
             # Deep linkit takaisin mobiili-appiin
             success_url="goaliq://payment-success?session_id={CHECKOUT_SESSION_ID}",
             cancel_url="goaliq://payment-cancel",
@@ -371,14 +418,22 @@ async def stripe_webhook(request: Request):
         # Maksu onnistui — paivita kayttajalle is_premium=true
         user_id = obj.get("client_reference_id") or obj.get("metadata", {}).get("user_id")
         if user_id:
-            # TODO: Päivitä Supabase profiles.is_premium = true
-            # (vaatii Supabase service-role-key:n)
-            print(f"[Stripe webhook] Premium activated for user_id={user_id}")
+            print(f"[Stripe webhook] checkout.session.completed user_id={user_id}")
+            _update_profile_premium(user_id, True)
+        else:
+            print(f"[Stripe webhook] checkout.session.completed but no user_id in payload")
 
     elif event_type == "customer.subscription.deleted":
         # Tilaus peruttu/loppui — paivita is_premium=false
-        # TODO: Päivitä Supabase
-        print(f"[Stripe webhook] Subscription ended: {obj.get('id')}")
+        user_id = obj.get("metadata", {}).get("user_id")
+        if user_id:
+            print(f"[Stripe webhook] subscription.deleted user_id={user_id}")
+            _update_profile_premium(user_id, False)
+        else:
+            print(f"[Stripe webhook] subscription.deleted no user_id in metadata sub_id={obj.get('id')}")
+
+    else:
+        print(f"[Stripe webhook] ignored event_type={event_type}")
 
     return {"received": True}
 
@@ -390,4 +445,6 @@ def stripe_config():
         "secret_key_set": bool(stripe.api_key),
         "price_id_set": bool(STRIPE_PRICE_ID),
         "webhook_secret_set": bool(STRIPE_WEBHOOK_SECRET),
+        "supabase_url_set": bool(SUPABASE_URL),
+        "supabase_service_role_key_set": bool(SUPABASE_SERVICE_ROLE_KEY),
     }
