@@ -15,6 +15,7 @@ Sitten avaa selain:
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -401,16 +402,18 @@ async def stripe_webhook(request: Request):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
 
+    # Tarkista allekirjoitus Stripen kirjastolla (ei käytetä paluuarvoa,
+    # koska StripeObject ei tue .get() -metodia natiivisti)
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, STRIPE_WEBHOOK_SECRET
-        )
+        stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid payload")
     except stripe.error.SignatureVerificationError:
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    # Käsittele eventti
+    # Parsitaan raaka JSON käsittelyä varten — natiivi dict on luotettavampi
+    # kuin Stripen StripeObject-wrapper sisäkkäisten kenttien lukemiseen
+    event = json.loads(payload)
     event_type = event["type"]
     obj = event["data"]["object"]
 
