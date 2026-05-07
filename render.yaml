@@ -1,0 +1,20 @@
+# Render.com -konfiguraatio GoalIQ API:lle
+# Pushataan GitHubiin → Render havaitsee → autodeploy
+# Free tier: 512 MB RAM, sleep 15 min idle (herää 30s seuraavasta requestista)
+
+services:
+  - type: web
+    name: goaliq-api
+    runtime: python
+    region: frankfurt           # Lähinnä Suomea (matala latenssi)
+    plan: free                  # Vaihda paid:iksi jos haluat aina-päällä (7 $/kk)
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    autoDeploy: true            # Joka git push -> uusi deploy
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      # API-avain football-data.org:lle (asetetaan Render-dashboardissa secrets:eihin)
+      - key: FOOTBALL_DATA_API_KEY
+        sync: false             # sync: false = aseta käsin Render UI:ssa, ei pushata

@@ -27,6 +27,11 @@ ipywidgets>=8.1
 # Käyttöliittymä
 streamlit>=1.32      # Selainpohjainen UI ennustesovellukselle (app.py)
 
+# REST-API (mobiili/natiivi-clientit) — api/main.py
+fastapi>=0.110       # Moderni REST-framework
+uvicorn[standard]>=0.27   # ASGI-palvelin, ajaa FastAPI-sovelluksen
+pydantic>=2.6        # Datavalidointi (tulee fastapin mukana, mutta varmuudeksi)
+
 # Kehitystyökalut (vapaaehtoinen)
 tqdm>=4.66             # Etenemispalkit
 python-dotenv>=1.0     # API-avainten lataus .env-tiedostosta
