@@ -42,14 +42,46 @@ from src.viz.match_visuals import (
 )
 import numpy as _np_for_cal
 
-st.set_page_config(page_title="Football Prediction Model", page_icon="⚽", layout="wide")
+st.set_page_config(
+    page_title="GoalIQ — Football Prediction Model",
+    page_icon="⚽",
+    layout="wide",
+)
 
 # Custom CSS — better colors, typography, card view
 st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+    /* Body / background — subtle radial gradient for depth */
+    .stApp {
+        background:
+            radial-gradient(ellipse at top left, rgba(99,102,241,0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at bottom right, rgba(16,185,129,0.06) 0%, transparent 50%),
+            linear-gradient(180deg, #0a0e1a 0%, #0d1117 100%);
+    }
+
+    /* Typography — Inter font globally */
+    html, body, [class*="css"], .stApp {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-feature-settings: 'cv11', 'ss01', 'ss03';
+    }
+    code, pre, .stCodeBlock {
+        font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+    }
+
     /* Main heading style */
-    h1, h2, h3 { letter-spacing: -0.02em; }
-    h1 { font-weight: 700; }
+    h1, h2, h3 { letter-spacing: -0.025em; }
+    h1 {
+        font-weight: 800;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    h2 { font-weight: 700; }
+    h3 { font-weight: 600; }
 
     /* Metric values larger and crisper */
     [data-testid="stMetricValue"] {
@@ -63,22 +95,35 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* Card views */
+    /* Card views — glass-morphism style */
     .pred-card {
-        background: linear-gradient(135deg, rgba(38,50,70,0.6) 0%, rgba(28,40,60,0.6) 100%);
+        background: linear-gradient(135deg, rgba(38,50,70,0.5) 0%, rgba(28,40,60,0.5) 100%);
         border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin: 6px 0;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 10px 0;
+        box-shadow:
+            0 4px 24px rgba(0,0,0,0.2),
+            inset 0 1px 0 rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .pred-card:hover {
+        border-color: rgba(255,255,255,0.15);
+        box-shadow:
+            0 8px 32px rgba(0,0,0,0.3),
+            inset 0 1px 0 rgba(255,255,255,0.08);
+        transform: translateY(-2px);
     }
     .pred-card-header {
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        opacity: 0.7;
-        margin-bottom: 8px;
-        font-weight: 600;
+        letter-spacing: 0.1em;
+        opacity: 0.75;
+        margin-bottom: 12px;
+        font-weight: 700;
+        color: #94a3b8;
     }
 
     /* Probability bar */
@@ -153,13 +198,23 @@ st.markdown("""
     .prob-bar-fill.btts-yes { background: linear-gradient(90deg, #9333ea, #a855f7); }
     .prob-bar-fill.btts-no { background: linear-gradient(90deg, #475569, #64748b); }
 
-    /* Otteluheader */
+    /* Match header — premium glass card with subtle glow */
     .match-header {
-        background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(220,38,38,0.12) 100%);
-        border-radius: 14px;
-        padding: 24px;
-        margin: 16px 0 24px 0;
+        background:
+            linear-gradient(135deg,
+                rgba(99,102,241,0.10) 0%,
+                rgba(139,92,246,0.06) 50%,
+                rgba(236,72,153,0.10) 100%);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 20px;
+        padding: 28px;
+        margin: 20px 0 28px 0;
         text-align: center;
+        box-shadow:
+            0 12px 48px rgba(0,0,0,0.25),
+            inset 0 1px 0 rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
     .match-header-teams {
         font-size: 2.2rem;
@@ -176,6 +231,85 @@ st.markdown("""
         font-size: 0.9rem;
         opacity: 0.7;
         margin-top: 6px;
+    }
+
+    /* App brand header */
+    .brand-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 6px;
+    }
+    .brand-logo {
+        flex-shrink: 0;
+    }
+    .brand-name {
+        font-size: 2.4rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.1;
+    }
+    .brand-tagline {
+        font-size: 0.85rem;
+        opacity: 0.6;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        margin-top: 2px;
+    }
+
+    /* Sidebar polish */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, rgba(15,20,35,0.6) 0%, rgba(10,14,26,0.6) 100%);
+        backdrop-filter: blur(8px);
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+    [data-testid="stSidebar"] h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        opacity: 0.9;
+    }
+
+    /* Buttons — modern flat style with subtle hover */
+    .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+        border-color: rgba(99,102,241,0.4) !important;
+    }
+
+    /* Expander styling */
+    .streamlit-expanderHeader, [data-testid="stExpander"] summary {
+        font-weight: 600 !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stExpander"] {
+        border: 1px solid rgba(255,255,255,0.06) !important;
+        border-radius: 12px !important;
+        background: rgba(255,255,255,0.02) !important;
+    }
+
+    /* Dataframes — softer borders */
+    .stDataFrame, [data-testid="stDataFrame"] {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 4px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
     }
 
     /* Score heatmap cell */
@@ -230,7 +364,41 @@ def _check_password() -> bool:
         else:
             st.session_state["password_correct"] = False
 
-    st.title("⚽ Football Prediction Model")
+    st.markdown(
+        """
+<div style="text-align:center;margin-top:8vh">
+  <svg width="96" height="96" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6366f1"/>
+        <stop offset="50%" stop-color="#8b5cf6"/>
+        <stop offset="100%" stop-color="#ec4899"/>
+      </linearGradient>
+      <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#10b981"/>
+        <stop offset="100%" stop-color="#06b6d4"/>
+      </linearGradient>
+    </defs>
+    <circle cx="32" cy="32" r="28" fill="none" stroke="url(#lg1)" stroke-width="2.5" opacity="0.9"/>
+    <circle cx="32" cy="32" r="22" fill="url(#lg1)" opacity="0.15"/>
+    <circle cx="32" cy="32" r="22" fill="none" stroke="url(#lg1)" stroke-width="1.5"/>
+    <polygon points="32,18 41,25 38,36 26,36 23,25" fill="url(#lg1)" opacity="0.85"/>
+    <path d="M 8 50 Q 32 8 56 50" stroke="url(#lg2)" stroke-width="2.5" fill="none"
+          stroke-linecap="round" stroke-dasharray="3 4" opacity="0.9"/>
+    <circle cx="56" cy="50" r="3" fill="#10b981"/>
+  </svg>
+  <h1 style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+             font-size:3rem;font-weight:800;margin:14px 0 4px 0;letter-spacing:-0.03em">
+    GoalIQ
+  </h1>
+  <div style="opacity:0.6;font-size:0.95rem;margin-bottom:32px">
+    AI football predictions
+  </div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
     st.text_input(
         "Password", type="password",
         on_change=_password_entered, key="password",
@@ -244,7 +412,54 @@ if not _check_password():
     st.stop()
 
 
-st.title("⚽ Football Prediction Model")
+# GoalIQ brand header — custom SVG logo + gradient text
+GOALIQ_LOGO_SVG = """
+<svg class="brand-logo" width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Outer ring with gradient -->
+  <circle cx="32" cy="32" r="28" fill="none" stroke="url(#g1)" stroke-width="2.5" opacity="0.9"/>
+  <!-- Football ball body -->
+  <circle cx="32" cy="32" r="22" fill="url(#g1)" opacity="0.15"/>
+  <circle cx="32" cy="32" r="22" fill="none" stroke="url(#g1)" stroke-width="1.5"/>
+  <!-- Pentagon center (stylized) -->
+  <polygon points="32,18 41,25 38,36 26,36 23,25" fill="url(#g1)" opacity="0.85"/>
+  <!-- Trajectory / prediction arc -->
+  <path d="M 8 50 Q 32 8 56 50" stroke="url(#g2)" stroke-width="2.5" fill="none"
+        stroke-linecap="round" stroke-dasharray="3 4" filter="url(#glow)" opacity="0.9"/>
+  <!-- Endpoint dot -->
+  <circle cx="56" cy="50" r="3" fill="#10b981" filter="url(#glow)"/>
+</svg>
+"""
+
+st.markdown(
+    f"""
+<div class="brand-header">
+  {GOALIQ_LOGO_SVG}
+  <div>
+    <div class="brand-name">GoalIQ</div>
+    <div class="brand-tagline">AI football predictions · Dixon-Coles + LightGBM ensemble</div>
+  </div>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 st.caption(
     "Ensemble prediction = Dixon-Coles (long history) + LightGBM (last 5 matches). "
     "Auto-context fills rest days, league position, derby and weather — overridable."

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Outer ring with gradient -->
+  <circle cx="32" cy="32" r="28" fill="none" stroke="url(#g1)" stroke-width="2.5" opacity="0.9"/>
+  <!-- Football ball body -->
+  <circle cx="32" cy="32" r="22" fill="url(#g1)" opacity="0.15"/>
+  <circle cx="32" cy="32" r="22" fill="none" stroke="url(#g1)" stroke-width="1.5"/>
+  <!-- Pentagon center (stylized) -->
+  <polygon points="32,18 41,25 38,36 26,36 23,25" fill="url(#g1)" opacity="0.85"/>
+  <!-- Trajectory / prediction arc -->
+  <path d="M 8 50 Q 32 8 56 50" stroke="url(#g2)" stroke-width="2.5" fill="none"
+        stroke-linecap="round" stroke-dasharray="3 4" filter="url(#glow)" opacity="0.9"/>
+  <!-- Endpoint dot -->
+  <circle cx="56" cy="50" r="3" fill="#10b981" filter="url(#glow)"/>
+</svg>
