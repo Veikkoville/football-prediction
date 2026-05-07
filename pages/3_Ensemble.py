@@ -25,16 +25,16 @@ from src.models.ensemble import yhdista_1x2
 
 st.set_page_config(page_title="Ensemble", page_icon="🤝", layout="wide")
 st.title("🤝 Ensemble: Dixon-Coles + LightGBM")
-st.caption("Kaksi mallia samaan otteluun. Painotettu keskiarvo on usein parempi kuin kumpikaan yksinään.")
+st.caption("Two models for the same match. Weighted average is often better than either alone.")
 
-st.sidebar.header("Datan valinta")
+st.sidebar.header("Data selection")
 us_liigat = st.sidebar.multiselect(
-    "Top-5 -liigat (Understat, xG)",
+    "Top-5 leagues (Understat, xG)",
     options=["ENG-Premier League", "ESP-La Liga", "GER-Bundesliga", "ITA-Serie A", "FRA-Ligue 1"],
     default=["ENG-Premier League"],
 )
 fb_liigat = st.sidebar.multiselect(
-    "Muut liigat (football-data.co.uk)",
+    "Other leagues (football-data.co.uk)",
     options=[
         "ENG-Championship", "ENG-League One", "ENG-League Two",
         "ESP-La Liga 2", "GER-2. Bundesliga", "ITA-Serie B", "FRA-Ligue 2",
@@ -46,16 +46,16 @@ fb_liigat = st.sidebar.multiselect(
 )
 liigat = us_liigat + fb_liigat
 kaudet = st.sidebar.multiselect(
-    "Kaudet", options=["2122", "2223", "2324", "2425", "2526"],
+    "Seasons", options=["2122", "2223", "2324", "2425", "2526"],
     default=["2425", "2526"],
-    help="Lisaa kausia -> Dixon-Coles oppii pidemmasta historiasta ja sovittuu uudelleen.",
+    help="Adding seasons -> Dixon-Coles learns from longer history and refits.",
 )
 decay_val = st.sidebar.slider(
     "Decay", min_value=0.0, max_value=0.020, value=0.0065, step=0.0005, format="%.4f",
 )
 
 
-@st.cache_resource(show_spinner="Sovitetaan molemmat mallit...")
+@st.cache_resource(show_spinner="Fitting both models...")
 def opeta_mallit(liigat: tuple, kaudet: tuple, decay: float):
     treenidata = lataa_otteludata(list(liigat), list(kaudet))
     if treenidata.empty:
@@ -100,37 +100,37 @@ def opeta_mallit(liigat: tuple, kaudet: tuple, decay: float):
 
 
 if not liigat or not kaudet:
-    st.warning("Valitse liiga ja kausi.")
+    st.warning("Select league and season.")
     st.stop()
 
 try:
     dc, lgb, feature_cols, viimeisimmat = opeta_mallit(tuple(liigat), tuple(kaudet), float(decay_val))
 except Exception as e:
-    st.error(f"Mallien lataus epäonnistui: {e}")
+    st.error(f"Model loading failed: {e}")
     st.stop()
 
 if dc is None:
-    st.error("Dixon-Coles ei voitu sovittaa — datasetti tyhjä.")
+    st.error("Dixon-Coles could not be fitted — dataset empty.")
     st.stop()
 
 joukkueet = sorted(dc.teams_)
 c1, c2 = st.columns(2)
 with c1:
     koti_def = st.session_state.get("koti", joukkueet[0])
-    koti = st.selectbox("Kotijoukkue", joukkueet,
+    koti = st.selectbox("Home team", joukkueet,
                         index=joukkueet.index(koti_def) if koti_def in joukkueet else 0,
                         key="koti")
 with c2:
     vieras_def = st.session_state.get("vieras", joukkueet[1] if len(joukkueet) > 1 else joukkueet[0])
-    vieras = st.selectbox("Vierasjoukkue", joukkueet,
+    vieras = st.selectbox("Away team", joukkueet,
                           index=joukkueet.index(vieras_def) if vieras_def in joukkueet else min(1, len(joukkueet) - 1),
                           key="vieras")
 
 if koti == vieras:
-    st.warning("Valitse kaksi eri joukkuetta.")
+    st.warning("Select two different teams.")
     st.stop()
 
-paino = st.slider("Dixon-Coles -paino (1.0 = pelkkä DC, 0.0 = pelkkä LightGBM)",
+paino = st.slider("Dixon-Coles weight (1.0 = DC only, 0.0 = LightGBM only)",
                   0.0, 1.0, 0.5, 0.05)
 
 p_dc = dc.predict_1x2(koti, vieras)
@@ -148,9 +148,9 @@ if lgb is not None and viimeisimmat is not None:
             p_lgb = {"home": float(p_lgb_arr[0]), "draw": float(p_lgb_arr[1]), "away": float(p_lgb_arr[2])}
             p_ens = yhdista_1x2(p_dc, p_lgb_arr, paino_dixon=paino)
 
-st.subheader("Mallin vertailu")
+st.subheader("Model comparison")
 vertailu_df = pd.DataFrame({
-    "Malli": ["Dixon-Coles", "LightGBM", "Ensemble"],
+    "Model": ["Dixon-Coles", "LightGBM", "Ensemble"],
     "1": [p_dc["home"], p_lgb["home"] if p_lgb else np.nan, p_ens["home"] if p_ens else np.nan],
     "X": [p_dc["draw"], p_lgb["draw"] if p_lgb else np.nan, p_ens["draw"] if p_ens else np.nan],
     "2": [p_dc["away"], p_lgb["away"] if p_lgb else np.nan, p_ens["away"] if p_ens else np.nan],
@@ -162,20 +162,20 @@ st.dataframe(vs, hide_index=True, use_container_width=True)
 
 if p_ens is None:
     st.warning(
-        "LightGBM-ennustetta ei voitu tehdä tälle ottelulle — joko datasetti on liian pieni "
-        "tai kotijoukkue/vierasjoukkue ei kuulu Understat-liigoihin (LGB tarvitsee xG-piirteet)."
+        "LightGBM prediction could not be made for this match — either dataset too small "
+        "or home/away team not in Understat leagues (LGB requires xG features)."
     )
 
-chart_df = vertailu_df.melt(id_vars="Malli", var_name="Tulos", value_name="Todennäköisyys")
-chart_df["Todennäköisyys %"] = chart_df["Todennäköisyys"] * 100
-fig = px.bar(chart_df.dropna(), x="Tulos", y="Todennäköisyys %",
-             color="Malli", barmode="group", height=400)
+chart_df = vertailu_df.melt(id_vars="Model", var_name="Outcome", value_name="Probability")
+chart_df["Probability %"] = chart_df["Probability"] * 100
+fig = px.bar(chart_df.dropna(), x="Outcome", y="Probability %",
+             color="Model", barmode="group", height=400)
 st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 st.caption(
-    "Dixon-Coles katsoo joukkueiden pitkan aikavalin hyokkays/puolustus -tasoja "
-    "(historia kaudet decay-painolla). LightGBM kiinnittaa huomion siihen mita on "
-    "tapahtunut viime 5 ottelun aikana (rolling-form). Ensemble pehmentaa "
-    "molempien yli-itsevarmuuden — usein vakaampi ennuste kuin kumpikaan yksinaan."
+    "Dixon-Coles looks at long-term attack/defence levels of teams "
+    "(historical seasons with decay-weighting). LightGBM focuses on what has "
+    "happened in the last 5 matches (rolling form). Ensemble softens "
+    "both models' over-confidence — often a more stable prediction than either alone."
 )

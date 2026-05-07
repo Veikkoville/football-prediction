@@ -22,13 +22,13 @@ from src.data.sofascore import (
 )
 
 st.set_page_config(page_title="Live", layout="wide", page_icon="⚽")
-st.title("⚽ Live-ottelut + in-play ennuste")
+st.title("⚽ Live matches + in-play prediction")
 
 st.caption(
-    "Listaa kaikki SofaScoren mukaan parhaillaan kaynnissa olevat ottelut. "
-    "Valitse ottelu nahdaksesi live-tilastot (laukaukset, kulmat, kortit, hallinta) "
-    "ja saadaksesi paivitetyn ennusteen jaljella olevalle peliajalle. "
-    "**Epavirallinen API** — paivita malttisesti."
+    "Lists all matches currently in-play according to SofaScore. "
+    "Select a match to see live stats (shots, corners, cards, possession) "
+    "and an updated prediction for the remaining time. "
+    "**Unofficial API** — refresh sparingly."
 )
 
 
@@ -56,17 +56,17 @@ def _lataa_tilastot(match_id: int):
 # ---------------------------------------------------------------------------
 top_l, top_r = st.columns([1, 4])
 with top_l:
-    if st.button("🔄 Paivita lista", use_container_width=True):
+    if st.button("🔄 Refresh list", use_container_width=True):
         _lataa_live.clear()
         st.rerun()
 with top_r:
-    st.caption(f"Sivu renderoity: {datetime.now().strftime('%H:%M:%S')} • Cache 60 s")
+    st.caption(f"Page rendered: {datetime.now().strftime('%H:%M:%S')} • Cache 60 s")
 
-with st.spinner("Haetaan live-otteluita…"):
+with st.spinner("Fetching live matches…"):
     try:
         df_live, raw_by_id = _lataa_live()
     except Exception as e:
-        st.error(f"Live-haku epaonnistui: {e}")
+        st.error(f"Live fetch failed: {e}")
         try:
             from src.data.sofascore import _SCRAPER as _scr
             scraper_ok = _scr is not None
@@ -74,24 +74,24 @@ with st.spinner("Haetaan live-otteluita…"):
             scraper_ok = False
         if not scraper_ok:
             st.warning(
-                "🛠 **cloudscraper-kirjastoa ei ole asennettu** — se kiertaa "
-                "SofaScoren Cloudflare-suojauksen. Asenna terminaalissa:\n\n"
+                "🛠 **cloudscraper library not installed** — it bypasses "
+                "SofaScore's Cloudflare protection. Install in your terminal:\n\n"
                 "```\npip install cloudscraper\n```\n\n"
-                "Sen jalkeen kaynnista Streamlit uudelleen."
+                "Then restart Streamlit."
             )
         else:
             st.info(
-                "Cloudscraper kayttoiset, mutta SofaScore blokkasi silti. "
-                "Cloudflare-suojaus on saattanut paivittya, tai liian monta "
-                "pyyntoa peratysti. Odota muutama minuutti ja yrita uudelleen."
+                "Cloudscraper in use but SofaScore still blocked. "
+                "Cloudflare protection may have updated, or too many "
+                "requests in a row. Wait a few minutes and try again."
             )
         st.stop()
 
 if df_live.empty:
-    st.info("Ei kaynnissa olevia jalkapallo-otteluita talla hetkella.")
+    st.info("No football matches currently in-play.")
     st.stop()
 
-st.success(f"Loytyi **{len(df_live)}** kaynnissa olevaa ottelua.")
+st.success(f"Found **{len(df_live)}** live matches.")
 
 
 # ---------------------------------------------------------------------------
@@ -102,11 +102,11 @@ maat = sorted([m for m in df_live["country"].dropna().unique().tolist() if m])
 turnaukset = sorted([t for t in df_live["tournament"].dropna().unique().tolist() if t])
 
 with fc1:
-    valitut_maat = st.multiselect("Maat", maat, default=[])
+    valitut_maat = st.multiselect("Countries", maat, default=[])
 with fc2:
-    valitut_turnaukset = st.multiselect("Turnaukset", turnaukset, default=[])
+    valitut_turnaukset = st.multiselect("Tournaments", turnaukset, default=[])
 with fc3:
-    haku = st.text_input("Haku (joukkueen nimi)", "")
+    haku = st.text_input("Search (team name)", "")
 
 df_nayta = df_live.copy()
 if valitut_maat:
@@ -121,18 +121,18 @@ if haku:
     )
     df_nayta = df_nayta[mask]
 
-st.markdown(f"**Naytetaan {len(df_nayta)} / {len(df_live)} ottelua**")
+st.markdown(f"**Showing {len(df_nayta)} / {len(df_live)} matches**")
 
 naytto = df_nayta[[
     "country", "tournament", "home_team", "home_score", "away_score",
     "away_team", "status",
 ]].rename(columns={
-    "country": "Maa",
-    "tournament": "Turnaus",
-    "home_team": "Koti",
-    "home_score": "K",
-    "away_score": "V",
-    "away_team": "Vieras",
+    "country": "Country",
+    "tournament": "Tournament",
+    "home_team": "Home",
+    "home_score": "H",
+    "away_score": "A",
+    "away_team": "Away",
     "status": "Status",
 })
 
@@ -143,7 +143,7 @@ st.dataframe(naytto, hide_index=True, use_container_width=True, height=380)
 # OTTELUN VALINTA
 # ---------------------------------------------------------------------------
 st.divider()
-st.subheader("📊 Valitse ottelu tarkemmaksi tarkasteluksi")
+st.subheader("📊 Select a match for detailed view")
 
 valinnat = [
     f"{r['home_team']} {r.get('home_score','?')}-{r.get('away_score','?')} {r['away_team']}  "
@@ -151,11 +151,11 @@ valinnat = [
     for _, r in df_nayta.iterrows()
 ]
 if not valinnat:
-    st.info("Ei valittavia otteluita — vapauta filttereita.")
+    st.info("No matches to select — relax the filters.")
     st.stop()
 
 idx_valinta = st.selectbox(
-    "Ottelu",
+    "Match",
     options=range(len(valinnat)),
     format_func=lambda i: valinnat[i],
 )
@@ -164,14 +164,14 @@ match_id = int(rivi["match_id"])
 
 
 # ---------------------------------------------------------------------------
-# OTTELUN HEADER + MINUUTTI
+# MATCH HEADER + MINUTE
 # ---------------------------------------------------------------------------
 st.markdown(
     f"### {rivi['home_team']} {rivi.get('home_score','?')}-"
     f"{rivi.get('away_score','?')} {rivi['away_team']}"
 )
 st.caption(
-    f"Turnaus: {rivi['tournament']} • Maa: {rivi['country']} • Status: {rivi['status']}"
+    f"Tournament: {rivi['tournament']} • Country: {rivi['country']} • Status: {rivi['status']}"
 )
 
 raw = raw_by_id.get(match_id, {}) or {}
@@ -205,29 +205,29 @@ minuutti_arvio = _arvioi_minuutti(raw)
 # ---------------------------------------------------------------------------
 # LIVE-TILASTOT
 # ---------------------------------------------------------------------------
-st.markdown("#### 📈 Live-tilastot")
+st.markdown("#### 📈 Live stats")
 
-with st.spinner("Haetaan live-tilastot…"):
+with st.spinner("Fetching live stats…"):
     statit = _lataa_tilastot(match_id)
 
 if "_error" in statit:
-    st.warning(f"Tilastoja ei saatu: {statit['_error']}")
+    st.warning(f"Stats not available: {statit['_error']}")
 else:
     periods = statit.get("statistics", []) or []
     if not periods:
-        st.info("Ei tilastoja viela saatavilla — odota ensimmaisia tapahtumia.")
+        st.info("No stats available yet — wait for the first events.")
     else:
-        # Kayta 'ALL' periodin tilastoja jos saatavilla
+        # Use 'ALL' period stats if available
         valittu_per = next((p for p in periods if p.get("period") == "ALL"), periods[0])
         for grp in valittu_per.get("groups", []):
-            grp_nimi = grp.get("groupName", "Tilastot")
+            grp_nimi = grp.get("groupName", "Stats")
             with st.expander(f"📂 {grp_nimi}", expanded=("Shots" in grp_nimi or "Match overview" in grp_nimi)):
                 rivit_grp = []
                 for it in grp.get("statisticsItems", []):
                     rivit_grp.append({
-                        "Tilasto": it.get("name"),
-                        "Koti": it.get("home"),
-                        "Vieras": it.get("away"),
+                        "Stat": it.get("name"),
+                        "Home": it.get("home"),
+                        "Away": it.get("away"),
                     })
                 if rivit_grp:
                     st.dataframe(
@@ -237,20 +237,20 @@ else:
 
 
 # ---------------------------------------------------------------------------
-# IN-PLAY ENNUSTE
+# IN-PLAY PREDICTION
 # ---------------------------------------------------------------------------
 st.divider()
-st.subheader("🎯 In-play ennuste loppuottelulle")
+st.subheader("🎯 In-play prediction for the rest of the match")
 
 st.caption(
-    "Pre-match Dixon-Coles -ennuste skaalataan jaljella olevalle peliajalle "
-    "ja lisataan nykyiseen tulokseen. Vaatii etta valitut joukkueet loytyvat "
-    "opetusdatasta."
+    "The pre-match Dixon-Coles prediction is scaled to the remaining playing time "
+    "and added to the current score. Requires that the selected teams are in "
+    "the training data."
 )
 
-with st.expander("Mallin opetusasetukset", expanded=True):
+with st.expander("Model training settings", expanded=True):
     liigat = st.multiselect(
-        "Liigat (mallia varten)",
+        "Leagues (for the model)",
         options=[
             "ENG-Premier League", "ESP-La Liga", "GER-Bundesliga",
             "ITA-Serie A", "FRA-Ligue 1",
@@ -260,47 +260,47 @@ with st.expander("Mallin opetusasetukset", expanded=True):
         ],
         default=["ENG-Premier League"],
         key="live_liigat",
-        help="Valitse liiga johon ottelu kuuluu, jotta joukkueet ovat opetusdatassa.",
+        help="Choose the league the match belongs to, so the teams are in the training data.",
     )
     kaudet = st.multiselect(
-        "Kaudet", ["2324", "2425", "2526"],
+        "Seasons", ["2324", "2425", "2526"],
         default=["2425", "2526"], key="live_kaudet",
     )
     decay = st.slider(
-        "Decay (recency-painotus, suurempi = viime ottelut painottuvat enemman)",
+        "Decay (recency weighting, higher = recent matches weight more)",
         min_value=0.0, max_value=0.01, value=0.0035, step=0.0005,
         format="%.4f", key="live_decay",
     )
 
-# Manuaalinen minuutti jos automaattinen ei toimi
+# Manual minute if automatic doesn't work
 if minuutti_arvio is not None:
-    st.metric("Ottelun minuutti (arvioitu)", f"{minuutti_arvio}'")
+    st.metric("Match minute (estimated)", f"{minuutti_arvio}'")
     minuutti_kaytetty = st.slider(
-        "Korjaa minuutti tarvittaessa",
+        "Adjust minute if needed",
         0, 90, value=min(90, minuutti_arvio), key="live_minuutti",
     )
 else:
-    st.info("Minuuttia ei saatu SofaScoresta — syota se kasin.")
+    st.info("Minute could not be obtained from SofaScore — enter manually.")
     minuutti_kaytetty = st.slider(
-        "Ottelun minuutti", 0, 90, 45, key="live_minuutti",
+        "Match minute", 0, 90, 45, key="live_minuutti",
     )
 
-if st.button("🚀 Laske in-play ennuste", use_container_width=False):
+if st.button("🚀 Compute in-play prediction", use_container_width=False):
     from src.data.loader import lataa_otteludata
     from src.models.dixon_coles import DixonColesModel
 
     if not liigat or not kaudet:
-        st.error("Valitse liiga ja kausi.")
+        st.error("Select league and season.")
         st.stop()
 
-    with st.spinner("Ladataan otteludata ja sovitetaan Dixon-Coles…"):
+    with st.spinner("Loading match data and fitting Dixon-Coles…"):
         try:
             df_otts = lataa_otteludata(liigat, kaudet)
         except Exception as e:
-            st.error(f"Datan lataus epaonnistui: {e}")
+            st.error(f"Data load failed: {e}")
             st.stop()
         if df_otts.empty:
-            st.error("Otteludata on tyhja — kokeile toista liigaa/kautta.")
+            st.error("Match data is empty — try a different league/season.")
             st.stop()
         try:
             dc = DixonColesModel().fit(
@@ -309,33 +309,33 @@ if st.button("🚀 Laske in-play ennuste", use_container_width=False):
                 home_goals_col="home_score", away_goals_col="away_score",
             )
         except Exception as e:
-            st.error(f"Mallin opetus epaonnistui: {e}")
+            st.error(f"Model fitting failed: {e}")
             st.stop()
 
     koti = rivi["home_team"]
     vieras = rivi["away_team"]
 
     if koti not in dc.attack:
-        # Kokeile sumeaa hakua
+        # Try fuzzy match
         kandidaatit = [t for t in dc.attack if koti.lower() in t.lower() or t.lower() in koti.lower()]
         if kandidaatit:
-            st.info(f"'{koti}' ei suoraan loydy — kaytetaan: {kandidaatit[0]}")
+            st.info(f"'{koti}' not found exactly — using: {kandidaatit[0]}")
             koti = kandidaatit[0]
         else:
             st.error(
-                f"Joukkue '{koti}' ei loydy mallista. "
-                f"Mallissa {len(dc.attack)} joukkuetta. Tarkista liigavalinta."
+                f"Team '{koti}' not found in model. "
+                f"Model has {len(dc.attack)} teams. Check league selection."
             )
             st.stop()
     if vieras not in dc.attack:
         kandidaatit = [t for t in dc.attack if vieras.lower() in t.lower() or t.lower() in vieras.lower()]
         if kandidaatit:
-            st.info(f"'{vieras}' ei suoraan loydy — kaytetaan: {kandidaatit[0]}")
+            st.info(f"'{vieras}' not found exactly — using: {kandidaatit[0]}")
             vieras = kandidaatit[0]
         else:
             st.error(
-                f"Joukkue '{vieras}' ei loydy mallista. "
-                f"Mallissa {len(dc.attack)} joukkuetta. Tarkista liigavalinta."
+                f"Team '{vieras}' not found in model. "
+                f"Model has {len(dc.attack)} teams. Check league selection."
             )
             st.stop()
 
@@ -387,32 +387,32 @@ if st.button("🚀 Laske in-play ennuste", use_container_width=False):
     p_btts_no = 1.0 - p_btts_yes
 
     st.markdown(
-        f"**Tilanne:** {koti} **{h_now}-{a_now}** {vieras}  "
-        f"• {minuutti_kaytetty}' pelattu, **{min_jaljella}' jaljella**"
+        f"**Situation:** {koti} **{h_now}-{a_now}** {vieras}  "
+        f"• {minuutti_kaytetty}' played, **{min_jaljella}' remaining**"
     )
     st.caption(
-        f"Pre-match odotetut maalit: {koti} {lam:.2f} - {mu:.2f} {vieras}  •  "
-        f"Jaljella olevan ajan odotetut: {lam_left:.2f} - {mu_left:.2f}"
+        f"Pre-match expected goals: {koti} {lam:.2f} - {mu:.2f} {vieras}  •  "
+        f"Remaining-time expected: {lam_left:.2f} - {mu_left:.2f}"
     )
 
-    st.markdown("##### Lopullisen tuloksen todennakoisyydet")
+    st.markdown("##### Final-result probabilities")
     c1, c2, c3 = st.columns(3)
-    c1.metric(f"1 ({koti})", f"{p_h*100:.1f} %", help=f"Reilu kerroin {1/max(p_h,0.001):.2f}")
-    c2.metric("X (tasapeli)", f"{p_d*100:.1f} %", help=f"Reilu kerroin {1/max(p_d,0.001):.2f}")
-    c3.metric(f"2 ({vieras})", f"{p_a*100:.1f} %", help=f"Reilu kerroin {1/max(p_a,0.001):.2f}")
+    c1.metric(f"1 ({koti})", f"{p_h*100:.1f} %", help=f"Fair odds {1/max(p_h,0.001):.2f}")
+    c2.metric("X (Draw)", f"{p_d*100:.1f} %", help=f"Fair odds {1/max(p_d,0.001):.2f}")
+    c3.metric(f"2 ({vieras})", f"{p_a*100:.1f} %", help=f"Fair odds {1/max(p_a,0.001):.2f}")
 
     c4, c5 = st.columns(2)
-    c4.metric("Yli 2.5 maalia", f"{p_over*100:.1f} %", help=f"Reilu kerroin {1/max(p_over,0.001):.2f}")
-    c5.metric("Alle 2.5 maalia", f"{p_under*100:.1f} %", help=f"Reilu kerroin {1/max(p_under,0.001):.2f}")
+    c4.metric("Over 2.5 goals", f"{p_over*100:.1f} %", help=f"Fair odds {1/max(p_over,0.001):.2f}")
+    c5.metric("Under 2.5 goals", f"{p_under*100:.1f} %", help=f"Fair odds {1/max(p_under,0.001):.2f}")
 
     c6, c7 = st.columns(2)
-    c6.metric("BTTS Kylla", f"{p_btts_yes*100:.1f} %", help=f"Reilu kerroin {1/max(p_btts_yes,0.001):.2f}")
-    c7.metric("BTTS Ei", f"{p_btts_no*100:.1f} %", help=f"Reilu kerroin {1/max(p_btts_no,0.001):.2f}")
+    c6.metric("BTTS Yes", f"{p_btts_yes*100:.1f} %", help=f"Fair odds {1/max(p_btts_yes,0.001):.2f}")
+    c7.metric("BTTS No", f"{p_btts_no*100:.1f} %", help=f"Fair odds {1/max(p_btts_no,0.001):.2f}")
 
     st.caption(
-        "💡 Mallin oletus: jaljella oleva aika on Poisson-jakauma skaalatulla "
-        "pre-match xG:lla. Ei huomioi punaisia kortteja, vaihtoja eika sita "
-        "etta johdossa oleva joukkue tyypillisesti hidastaa peliä."
+        "💡 Model assumption: remaining time is a Poisson distribution with scaled "
+        "pre-match xG. Does not account for red cards, substitutions or the fact "
+        "that a leading team typically slows down the game."
     )
 
-st.caption("⚠️ Vastuuvapaus: oppimissovellus, ei sijoitusneuvo.")
+st.caption("⚠️ Disclaimer: educational app, not investment advice.")

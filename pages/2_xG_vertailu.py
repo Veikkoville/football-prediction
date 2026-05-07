@@ -19,28 +19,28 @@ from src.data.statsbomb import (
     listaa_kilpailut, hae_ottelut, hae_tapahtumat, laske_xg_per_joukkue,
 )
 
-st.set_page_config(page_title="xG-vertailu", page_icon="📊", layout="wide")
-st.title("📊 StatsBomb xG-vertailu")
+st.set_page_config(page_title="xG comparison", page_icon="📊", layout="wide")
+st.title("📊 StatsBomb xG comparison")
 st.caption(
-    "StatsBomb open data on alan tunnustettu xG-malli. "
-    "Käytä tätä sivua tarkistamaan tuttujen otteluiden xG-arvoja, ja vertaa niitä "
-    "mielessäsi mallin Understat-pohjaisiin lukuihin."
+    "StatsBomb open data uses an industry-recognized xG model. "
+    "Use this page to verify xG values for known matches and mentally compare "
+    "them against the model's Understat-based numbers."
 )
 
 
 # ---------------------------------------------------------------------------
-# KILPAILUT — lasketaan ottelumäärät
+# COMPETITIONS — count matches
 # ---------------------------------------------------------------------------
-@st.cache_data(show_spinner="Haetaan kilpailulista...")
+@st.cache_data(show_spinner="Fetching competition list...")
 def lataa_kilpailut() -> pd.DataFrame:
     return listaa_kilpailut()
 
 
 @st.cache_data(show_spinner=False)
 def laske_ottelumaarat(kilpailut: pd.DataFrame) -> pd.DataFrame:
-    """Lisää ``n_matches`` -sarake — kuinka monta ottelua per kilpailu/kausi."""
+    """Add ``n_matches`` column — how many matches per competition/season."""
     rivit = []
-    progress = st.progress(0.0, text="Lasketaan ottelumääriä per kilpailu...")
+    progress = st.progress(0.0, text="Counting matches per competition...")
     for i, (_, r) in enumerate(kilpailut.iterrows()):
         try:
             ot = hae_ottelut(competition_id=int(r["competition_id"]),
@@ -55,27 +55,27 @@ def laske_ottelumaarat(kilpailut: pd.DataFrame) -> pd.DataFrame:
 
 kilpailut = lataa_kilpailut()
 
-st.sidebar.header("Suodatus")
+st.sidebar.header("Filter")
 nayta_kaikki = st.sidebar.checkbox(
-    "Näytä kaikki kilpailut (myös pienet)",
+    "Show all competitions (including small ones)",
     value=False,
-    help="Päällä → näytetään kaikki StatsBombin avoimet kilpailut. "
-         "Pois → näytetään vain isot turnaukset (MM, EM, NWSL, La Liga 'Messi-data').",
+    help="On → show all open StatsBomb competitions. "
+         "Off → show only big tournaments (World Cup, Euro, NWSL, La Liga 'Messi data').",
 )
 
 if nayta_kaikki:
-    st.sidebar.info("Lasketaan ottelumäärät kerran — kestää muutaman minuutin ensimmäisellä kerralla.")
-    if st.sidebar.button("📊 Laske ottelumäärät"):
-        with st.spinner("Lasketaan..."):
+    st.sidebar.info("Match counts are computed once — takes a few minutes the first time.")
+    if st.sidebar.button("📊 Count matches"):
+        with st.spinner("Counting..."):
             kilpailut = laske_ottelumaarat(kilpailut)
             st.session_state["lasketut_kilpailut"] = kilpailut
     if "lasketut_kilpailut" in st.session_state:
         kilpailut = st.session_state["lasketut_kilpailut"]
     else:
         kilpailut = kilpailut.copy()
-        kilpailut["n_matches"] = -1  # Ei tiedetä vielä
+        kilpailut["n_matches"] = -1  # not known yet
 else:
-    # Suodata isot turnaukset (vähintään 10 ottelua taatusti)
+    # Filter big tournaments (with at least 10 matches reliably)
     isot = ["FIFA World Cup", "UEFA Euro", "FIFA Women's World Cup",
             "UEFA Women's Euro", "La Liga", "NWSL", "Indian Super League",
             "Premier League", "Bundesliga", "Serie A", "Ligue 1",
@@ -86,52 +86,52 @@ else:
     ].copy()
     kilpailut["n_matches"] = -1
 
-# Lajittele uusimmat ensin
+# Sort newest first
 kilpailut = kilpailut.sort_values(["competition_name", "season_id"], ascending=[True, False])
 
 if kilpailut.empty:
-    st.warning("Ei kilpailuita näytettäväksi. Käännä 'Näytä kaikki' päälle.")
+    st.warning("No competitions to show. Toggle 'Show all' on.")
     st.stop()
 
-# Näytä label (ottelumäärä jos tiedossa)
+# Show label (match count if known)
 def _label(r):
     txt = f"{r['competition_name']} — {r['season_name']}"
     if r.get("n_matches", -1) > 0:
-        txt += f" ({int(r['n_matches'])} ottelua)"
+        txt += f" ({int(r['n_matches'])} matches)"
     return txt
 
 kilpailut["_label"] = kilpailut.apply(_label, axis=1)
 
-valinta = st.selectbox("Kilpailu / kausi", kilpailut["_label"].tolist())
+valinta = st.selectbox("Competition / season", kilpailut["_label"].tolist())
 rivi = kilpailut[kilpailut["_label"] == valinta].iloc[0]
 comp_id = int(rivi["competition_id"])
 season_id = int(rivi["season_id"])
 
 # ---------------------------------------------------------------------------
-# OTTELUT
+# MATCHES
 # ---------------------------------------------------------------------------
-@st.cache_data(show_spinner="Haetaan otteluita...")
+@st.cache_data(show_spinner="Fetching matches...")
 def lataa_ottelut(c: int, s: int) -> pd.DataFrame:
     return hae_ottelut(competition_id=c, season_id=s)
 
 try:
     ottelut = lataa_ottelut(comp_id, season_id)
 except Exception as e:
-    st.error(f"Otteluiden haku epäonnistui: {e}")
+    st.error(f"Match fetch failed: {e}")
     st.stop()
 
 if ottelut.empty:
-    st.warning("Tässä kilpailussa ei ole avoimena yhtään ottelua.")
+    st.warning("No matches available for this competition.")
     st.stop()
 
-st.success(f"Kilpailussa **{rivi['competition_name']} {rivi['season_name']}** on {len(ottelut)} ottelua avoimena.")
+st.success(f"Competition **{rivi['competition_name']} {rivi['season_name']}** has {len(ottelut)} matches available.")
 
 ottelut_sorted = ottelut.sort_values("match_date", ascending=False)
 ottelu_strings = (
     ottelut_sorted["match_date"].astype(str) + ": " +
     ottelut_sorted["home_team"] + " vs " + ottelut_sorted["away_team"]
 ).tolist()
-valittu = st.selectbox(f"Valitse ottelu ({len(ottelu_strings)})", ottelu_strings)
+valittu = st.selectbox(f"Select match ({len(ottelu_strings)})", ottelu_strings)
 match_idx = ottelu_strings.index(valittu)
 match_id = int(ottelut_sorted.iloc[match_idx]["match_id"])
 home_team = ottelut_sorted.iloc[match_idx]["home_team"]
@@ -142,7 +142,7 @@ away_score = int(ottelut_sorted.iloc[match_idx]["away_score"])
 # ---------------------------------------------------------------------------
 # TAPAHTUMAT
 # ---------------------------------------------------------------------------
-@st.cache_data(show_spinner="Haetaan ottelun tapahtumia...")
+@st.cache_data(show_spinner="Fetching match events...")
 def lataa_tapahtumat(m: int) -> pd.DataFrame:
     return hae_tapahtumat(match_id=m)
 
@@ -157,40 +157,40 @@ with c1:
     if not h_row.empty:
         h_row = h_row.iloc[0]
         st.metric(f"{home_team} StatsBomb xG", f"{h_row['xG']:.2f}")
-        st.metric(f"{home_team} laukauksia", int(h_row['shots']))
-        st.metric(f"{home_team} maalit", int(h_row['goals']))
+        st.metric(f"{home_team} shots", int(h_row['shots']))
+        st.metric(f"{home_team} goals", int(h_row['goals']))
 with c2:
     a_row = xg_per[xg_per["team"] == away_team]
     if not a_row.empty:
         a_row = a_row.iloc[0]
         st.metric(f"{away_team} StatsBomb xG", f"{a_row['xG']:.2f}")
-        st.metric(f"{away_team} laukauksia", int(a_row['shots']))
-        st.metric(f"{away_team} maalit", int(a_row['goals']))
+        st.metric(f"{away_team} shots", int(a_row['shots']))
+        st.metric(f"{away_team} goals", int(a_row['goals']))
 
 yhteen_xg = xg_per["xG"].sum()
 yhteen_maalit = xg_per["goals"].sum()
 delta = yhteen_maalit - yhteen_xg
 if abs(delta) > 0.5:
-    suunta = "yli-" if delta > 0 else "ali-"
+    suunta = "over" if delta > 0 else "under"
     st.info(
-        f"Ottelussa tehtiin {yhteen_maalit} maalia mutta xG yhteensä oli "
-        f"{yhteen_xg:.2f} → joukkueet {suunta}suorittivat {abs(delta):.2f} maalilla."
+        f"The match had {yhteen_maalit} goals while total xG was "
+        f"{yhteen_xg:.2f} → teams {suunta}-performed by {abs(delta):.2f} goals."
     )
 
-# Laukaustaulukko
+# Shot table
 laukaukset = events[events["type"] == "Shot"].copy()
 if not laukaukset.empty:
-    st.markdown("### Kaikki laukaukset")
+    st.markdown("### All shots")
     nayta = laukaukset[[
         "minute", "team", "player", "shot_outcome", "shot_statsbomb_xg"
     ]].rename(columns={
-        "minute": "Min", "team": "Joukkue", "player": "Pelaaja",
-        "shot_outcome": "Lopputulos", "shot_statsbomb_xg": "xG",
+        "minute": "Min", "team": "Team", "player": "Player",
+        "shot_outcome": "Outcome", "shot_statsbomb_xg": "xG",
     }).round({"xG": 3})
     st.dataframe(nayta.sort_values("Min"), hide_index=True, use_container_width=True, height=300)
 
-# Laukauskartta
-st.markdown("### Laukauskartta")
+# Shot map
+st.markdown("### Shot map")
 try:
     from mplsoccer import Pitch
     pitch = Pitch(pitch_type="statsbomb", pitch_color="white", line_color="black")
@@ -203,7 +203,7 @@ try:
             on_maali = r.get("shot_outcome") == "Goal"
             vari = "red" if on_maali else ("blue" if r["team"] == home_team else "orange")
             pitch.scatter(x, y, s=koko, color=vari, alpha=0.7, edgecolor="black", ax=ax)
-    ax.set_title(f"{home_team} (sininen) vs {away_team} (oranssi). Maalit punaisella.")
+    ax.set_title(f"{home_team} (blue) vs {away_team} (orange). Goals in red.")
     st.pyplot(fig)
 except Exception as e:
-    st.warning(f"Laukauskartan piirto ei onnistunut: {e}")
+    st.warning(f"Shot map could not be drawn: {e}")

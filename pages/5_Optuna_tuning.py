@@ -19,41 +19,41 @@ from src.features.team_features import (
 )
 from src.models.optuna_tune import tune_lgbm_1x2
 
-st.set_page_config(page_title="Optuna-tuning", page_icon="🔧", layout="wide")
-st.title("🔧 LightGBM-hyperparametrien optimointi")
+st.set_page_config(page_title="Optuna tuning", page_icon="🔧", layout="wide")
+st.title("🔧 LightGBM hyperparameter optimization")
 st.caption(
-    "Optuna etsii parhaat hyperparametrit minimoiden validointi log lossin. "
-    "Tee tama kerran kun haluat saada lisaa suorituskykya — kayta tuloksena saatuja "
-    "parametreja Ensemble-sivulla."
+    "Optuna searches for the best hyperparameters by minimizing validation log loss. "
+    "Run this once when you want extra performance — use the resulting parameters "
+    "on the Ensemble page."
 )
 
-st.sidebar.header("Datan valinta")
+st.sidebar.header("Data selection")
 liigat = st.sidebar.multiselect(
-    "Liigat (vain Top-5 toimii — tarvitaan xG)",
+    "Leagues (Top-5 only — xG required)",
     options=["ENG-Premier League", "ESP-La Liga", "GER-Bundesliga", "ITA-Serie A", "FRA-Ligue 1"],
     default=["ENG-Premier League"],
 )
 kaudet = st.sidebar.multiselect(
-    "Kaudet", options=["2122", "2223", "2324", "2425", "2526"],
+    "Seasons", options=["2122", "2223", "2324", "2425", "2526"],
     default=["2324", "2425"],
 )
-n_trials = st.sidebar.slider("Optuna trial-maara", 10, 100, 30, 5,
-                             help="Enemman = parempi tulos mutta hitaampi.")
-timeout_s = st.sidebar.slider("Timeout (sekuntia)", 30, 600, 120, 30)
+n_trials = st.sidebar.slider("Optuna trials", 10, 100, 30, 5,
+                             help="More = better result but slower.")
+timeout_s = st.sidebar.slider("Timeout (seconds)", 30, 600, 120, 30)
 
 if not liigat or not kaudet:
-    st.warning("Valitse liiga + kausi.")
+    st.warning("Select league + season.")
     st.stop()
 
-if st.button("▶️ Aja Optuna-tuning", type="primary"):
-    with st.spinner("Ladataan dataa..."):
+if st.button("▶️ Run Optuna tuning", type="primary"):
+    with st.spinner("Loading data..."):
         treenidata = lataa_otteludata(list(liigat), list(kaudet))
         treenidata = treenidata[treenidata["home_xg"].notna()].copy()
         if treenidata.empty:
-            st.error("Ei xG-dataa — Optuna toimii vain Understat-liigoille.")
+            st.error("No xG data — Optuna only works for Understat leagues.")
             st.stop()
 
-    with st.spinner("Rakennetaan piirteita..."):
+    with st.spinner("Building features..."):
         joukkue_ottelu = laajenna_per_joukkue(treenidata)
         joukkue_ottelu["xg_for"] = np.where(
             joukkue_ottelu["is_home"] == 1, joukkue_ottelu["home_xg"], joukkue_ottelu["away_xg"])
@@ -69,26 +69,26 @@ if st.button("▶️ Aja Optuna-tuning", type="primary"):
         split = int(len(data) * 0.8)
         train, valid = data.iloc[:split], data.iloc[split:]
 
-    st.info(f"Treenidata: {len(train)} ottelua, validointi: {len(valid)} ottelua, "
-            f"piirteita: {len(feature_cols)}")
+    st.info(f"Train data: {len(train)} matches, validation: {len(valid)} matches, "
+            f"features: {len(feature_cols)}")
 
-    with st.spinner(f"Optuna ajaa enintaan {n_trials} trialia, timeout {timeout_s}s..."):
+    with st.spinner(f"Optuna runs up to {n_trials} trials, timeout {timeout_s}s..."):
         try:
             best = tune_lgbm_1x2(
                 train[feature_cols], train["result_1x2"],
                 valid[feature_cols], valid["result_1x2"],
                 n_trials=n_trials, timeout_s=timeout_s,
             )
-            st.success("✅ Optimointi valmis!")
-            st.subheader("Parhaat hyperparametrit")
+            st.success("✅ Optimization complete!")
+            st.subheader("Best hyperparameters")
             st.json(best)
             st.code(
-                "# Liita nama src/models/outcome_model.py:n oletuksiin:\n"
+                "# Paste these into src/models/outcome_model.py defaults:\n"
                 + "\n".join(f'    "{k}": {v},' for k, v in best.items()),
                 language="python",
             )
             st.session_state["optuna_best"] = best
         except ImportError:
-            st.error("Optuna ei ole asennettuna. Aja: `pip install optuna`")
+            st.error("Optuna not installed. Run: `pip install optuna`")
         except Exception as e:
-            st.error(f"Optimointi epaonnistui: {e}")
+            st.error(f"Optimization failed: {e}")

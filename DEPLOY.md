@@ -1,157 +1,160 @@
-# Deployment-ohje: Streamlit Community Cloud
+# Deployment guide: Streamlit Community Cloud
 
-Vaiheittainen ohje sovelluksen viemiseen ilmaiseen Streamlit Community Cloudiin
-salasanasuojauksen kanssa.
+Step-by-step guide for deploying the app to free Streamlit Community Cloud
+with password protection.
 
-## Mitä tarvitset
+## What you need
 
-- GitHub-tili (jos ei ole, rekisteröidy: https://github.com)
-- Git asennettuna koneelle (testaa: `git --version` PowerShellissä)
-- Tämä projekti toimivana lokaalisti
+- A GitHub account (if not, sign up at https://github.com)
+- Git installed on your computer (test: `git --version` in PowerShell)
+- This project working locally
 
-## Vaihe 1: Luo GitHub-repo
+## Step 1: Create a GitHub repository
 
-### 1.1 Mene https://github.com/new
+### 1.1 Go to https://github.com/new
 
-Täytä:
-- **Repository name**: `football-prediction` (tai mitä haluat)
-- **Description**: vapaaehtoinen
-- **Public** vai **Private**:
-  - **Private** = suositeltu, koodi ei näy muille
-  - **Public** = vaadittu Streamlit Cloud Free-tasolla! Jos haluat Private + Streamlit Cloud, tarvitset Streamlitin Connect-tilin
-- **EI** rastia "Add README" / .gitignore / license -kohtiin (meillä on jo)
+Fill in:
+- **Repository name**: `football-prediction` (or whatever you prefer)
+- **Description**: optional
+- **Public** vs **Private**:
+  - **Private** = recommended, code stays hidden
+  - **Public** = required on Streamlit Cloud Free! For Private + Streamlit Cloud
+    you need a Streamlit Connect account
+- **Do NOT** check "Add README" / .gitignore / license (we already have these)
 
-Klikkaa **Create repository**.
+Click **Create repository**.
 
-### 1.2 Linkitä paikallinen projekti GitHubiin
+### 1.2 Link your local project to GitHub
 
-PowerShellissä projektikansiossa:
+In PowerShell, in your project folder:
 
 ```powershell
 cd C:\Users\vvsaa\Documents\football-prediction
 
-# Initialisoi git jos ei jo ole
+# Initialize git if it isn't already
 git init
 git branch -M main
 
-# Lisää kaikki tiedostot (paitsi .gitignoressa olevat)
+# Add all files (except those in .gitignore)
 git add .
 
-# Tee ensimmäinen commit
+# Make the first commit
 git commit -m "Initial commit: football prediction app"
 
-# Lisää GitHub remote (KORVAA YOUR_USERNAME ja REPONAME omillasi)
+# Add GitHub remote (REPLACE YOUR_USERNAME and REPONAME with yours)
 git remote add origin https://github.com/YOUR_USERNAME/football-prediction.git
 
-# Pushaa GitHubiin
+# Push to GitHub
 git push -u origin main
 ```
 
-GitHub voi pyytää kirjautumaan: tee se selaimessa kun se avautuu.
+GitHub may ask you to log in: do it in the browser when it opens.
 
-### 1.3 Tarkista että salaisuudet eivät menneet GitHubiin
+### 1.3 Verify that secrets did NOT go to GitHub
 
-Avaa GitHubin repo selaimessa. Varmista että:
-- ✅ `app.py`, `pages/`, `src/` ovat siellä
-- ❌ `.env` EI näy missään
-- ❌ `raw_data/` EI näy
-- ❌ `.venv/` EI näy
+Open your repo in the browser. Confirm:
+- ✅ `app.py`, `pages/`, `src/` are there
+- ❌ `.env` is NOT visible anywhere
+- ❌ `raw_data/` is NOT visible
+- ❌ `.venv/` is NOT visible
 
-Jos `.env` näkyy GitHubissa, se on **iso ongelma** — API-avain on julkinen. Toimi näin:
-1. Mene `https://www.football-data.org/client/home`
-2. Regeneroi API-avain (vanha kuolee)
-3. Lisää uusi avain `.env`-tiedostoon paikallisesti
-4. Aja: `git rm --cached .env && git commit -m "Remove .env" && git push`
+If `.env` is visible on GitHub, that's a **big problem** — your API key is public.
+Do this:
+1. Go to `https://www.football-data.org/client/home`
+2. Regenerate the API key (the old one dies)
+3. Add the new key to your local `.env` file
+4. Run: `git rm --cached .env && git commit -m "Remove .env" && git push`
 
-## Vaihe 2: Streamlit Community Cloudiin
+## Step 2: Streamlit Community Cloud
 
-### 2.1 Rekisteröidy
+### 2.1 Sign up
 
-Mene https://share.streamlit.io ja kirjaudu **GitHub-tilillä**.
+Go to https://share.streamlit.io and sign in with **your GitHub account**.
 
-### 2.2 Deploy uusi app
+### 2.2 Deploy a new app
 
-Klikkaa **"Create app"** → **"Deploy a public app from GitHub"**.
+Click **"Create app"** → **"Deploy a public app from GitHub"**.
 
-Täytä:
-- **Repository**: valitse `YOUR_USERNAME/football-prediction`
+Fill in:
+- **Repository**: choose `YOUR_USERNAME/football-prediction`
 - **Branch**: `main`
 - **Main file path**: `app.py`
-- **App URL**: (valinnainen) keksi nimi, esim. `myfootballapp`
+- **App URL**: (optional) pick a name, e.g. `myfootballapp`
 
-### 2.3 Lisää API-avain salaisuutena
+### 2.3 Add the API key as a secret
 
-Klikkaa **"Advanced settings..."** ennen Deploy-nappia.
+Click **"Advanced settings..."** before pressing Deploy.
 
-Kohdassa **Secrets** liitä TOML-formaatissa:
+Under **Secrets**, paste in TOML format:
 
 ```toml
 FOOTBALL_DATA_API_KEY = "4e793bdedcf64ed5b91a7d38ae157c99"
 ```
 
-(Käytä omaa avaintasi, joka on `.env`-tiedostossasi.)
+(Use your own key, the one in your `.env` file.)
 
-Klikkaa **"Save"**.
+Click **"Save"**.
 
 ### 2.4 Deploy
 
-Klikkaa **"Deploy"**. Streamlit asentaa requirements.txt:n paketteja
-(~3-5 minuuttia ensimmäisellä kerralla).
+Click **"Deploy"**. Streamlit will install the packages from requirements.txt
+(~3-5 minutes the first time).
 
-Kun se on valmis, näet sovelluksen toimivana selaimessa osoitteessa
+When done, you'll see the app working in the browser at
 `https://[appname]-[hash].streamlit.app`.
 
-## Vaihe 3: Lisää salasanasuojaus
+## Step 3: Add password protection
 
-### 3.1 App-asetuksiin
+### 3.1 Open app settings
 
-Mene https://share.streamlit.io → klikkaa appiasi → **Settings** (oikeassa yläkulmassa).
+Go to https://share.streamlit.io → click your app → **Settings** (top-right).
 
-### 3.2 Sharing-välilehti
+### 3.2 Sharing tab
 
-Valitse:
+Choose:
 - **"Only specific people can view this app"**
 
-Tämä vaatii vierailijalta GitHub-tilin tai sähköpostin sallitusta listasta.
+This requires the visitor to have a GitHub account or an email address from the
+allow list.
 
-**Lisää sähköpostit** jotka saavat katsoa appia (vähintään oma sähköpostisi).
+**Add the emails** that are allowed to view the app (at least your own).
 
-Tai jos haluat URL+salasana-tyylisen ratkaisun: katso vaihtoehto B alla.
+Or for URL+password protection, see option B below.
 
-## Vaihe 4: Päivitysten tekeminen
+## Step 4: Making updates
 
-Kun haluat päivittää sovellusta:
+When you want to update the app:
 
 ```powershell
-# 1. Tee muutoksia paikallisesti, testaa: streamlit run app.py
-# 2. Commit ja push GitHubiin:
+# 1. Make changes locally, test: streamlit run app.py
+# 2. Commit and push to GitHub:
 git add .
-git commit -m "Kuvaus muutoksesta"
+git commit -m "Description of change"
 git push
 
-# 3. Streamlit Cloud havaitsee push:n ja redeployaa automaattisesti (~30s)
+# 3. Streamlit Cloud detects the push and redeploys automatically (~30s)
 ```
 
-Voit seurata deploymentia https://share.streamlit.io:ssa.
+You can monitor the deployment at https://share.streamlit.io.
 
-## Vianetsintä
+## Troubleshooting
 
-### "Module not found" -virhe pilvessä
+### "Module not found" error in cloud
 
-`requirements.txt` ei sisällä jotain tarvittua. Lisää puuttuva paketti, push ja redeploy.
+`requirements.txt` is missing something. Add the missing package, push, redeploy.
 
-### App kaatuu RAM-rajoissa (1 GB)
+### App crashes due to RAM (1 GB limit)
 
-Vältä: 4 kautta + Optuna + ensemble + kalibrointi yhdessä. Käytä `nopea_tila` togglea
-tai vähemmän kausia.
+Avoid: 4 seasons + Optuna + ensemble + calibration in one go. Use the
+`Fast mode` toggle or fewer seasons.
 
-### .env-tiedosto vahingossa GitHubiin
+### .env file accidentally pushed to GitHub
 
 ```powershell
-# Poista cachesta:
+# Remove from cache:
 git rm --cached .env
 
-# Varmista .gitignoressa:
+# Make sure it's in .gitignore:
 echo ".env" >> .gitignore
 
 # Commit:
@@ -159,25 +162,25 @@ git add .gitignore
 git commit -m "Remove .env from tracking"
 git push
 
-# REGENEROI API-avain footballdata.orgissa! Vanha on jo paljastunut.
+# REGENERATE the API key on footballdata.org! The old one is exposed.
 ```
 
-### SofaScore-live-sivu ei toimi pilvessä
+### SofaScore live page doesn't work in the cloud
 
-Pilven palvelin-IP on Cloudflaren herkemmin blokkaama. Tämä on tunnettu rajoitus
-— Live-sivu toimii vain lokaalisti.
+The cloud server's IP is blocked more aggressively by Cloudflare. This is a
+known limitation — the Live page only works locally.
 
-## Vaihtoehto B: Streamlit-secret-tason salasana koodissa
+## Option B: Streamlit-secret-level password in code
 
-Jos haluat URL+salasana-ratkaisun (kuka vaan voi avata URL:n, mutta tarvitsee
-salasanan jatkaakseen), lisää tämä `app.py`:n alkuun:
+If you want a URL+password approach (anyone can open the URL, but they need a
+password to continue), add this near the top of `app.py`:
 
 ```python
 import streamlit as st
 import hmac
 
 def check_password():
-    """Pyytaa salasanan ja palauttaa True jos oikea."""
+    """Asks for the password and returns True if correct."""
     def password_entered():
         if hmac.compare_digest(
             st.session_state["password"],
@@ -192,23 +195,23 @@ def check_password():
         return True
 
     st.text_input(
-        "Salasana", type="password", on_change=password_entered, key="password"
+        "Password", type="password", on_change=password_entered, key="password"
     )
     if "password_correct" in st.session_state:
-        st.error("Vaara salasana.")
+        st.error("Wrong password.")
     return False
 
 if not check_password():
     st.stop()
 ```
 
-Lisää myös `Secrets`-asetuksiin:
+Also add to **Secrets**:
 ```toml
-APP_PASSWORD = "valitse_salasana_tahan"
+APP_PASSWORD = "choose_a_password_here"
 ```
 
-## Lisalukemista
+## Further reading
 
-- Streamlit Cloudin dokumentaatio: https://docs.streamlit.io/deploy/streamlit-community-cloud
+- Streamlit Cloud docs: https://docs.streamlit.io/deploy/streamlit-community-cloud
 - Streamlit secrets: https://docs.streamlit.io/develop/concepts/connections/secrets-management
-- Salasanasuojaus: https://docs.streamlit.io/knowledge-base/deploy/authentication-without-sso
+- Password protection: https://docs.streamlit.io/knowledge-base/deploy/authentication-without-sso

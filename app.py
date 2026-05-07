@@ -1,9 +1,9 @@
 """
-Jalkapallon ennustemalli — paasivu (Ensemble + Auto-konteksti).
+Football prediction model — main page (Ensemble + Auto-context).
 
-Pa-paivan ennusteet pohjautuvat ENSEMBLE:een (Dixon-Coles + LightGBM rolling-form).
-Manuaaliset saadot (loukkaantumiset, motivaatio, sa, lepoetu, derby) joko taytetaan
-automaattisesti otteludatasta tai sa-API:sta — kayttaja voi yliajaa.
+Match-day predictions are based on ENSEMBLE (Dixon-Coles + LightGBM rolling-form).
+Manual adjustments (injuries, motivation, weather, rest advantage, derby) are
+either auto-filled from match data / weather API or overridden by the user.
 """
 
 from __future__ import annotations
@@ -42,16 +42,16 @@ from src.viz.match_visuals import (
 )
 import numpy as _np_for_cal
 
-st.set_page_config(page_title="Jalkapallon ennustemalli", page_icon="⚽", layout="wide")
+st.set_page_config(page_title="Football Prediction Model", page_icon="⚽", layout="wide")
 
-# Custom CSS — paremmat varit, tyypografia, korttinakyma
+# Custom CSS — better colors, typography, card view
 st.markdown("""
 <style>
-    /* Pa-otsikkojen tyyli */
+    /* Main heading style */
     h1, h2, h3 { letter-spacing: -0.02em; }
     h1 { font-weight: 700; }
 
-    /* Metric-arvot suuremmiksi ja terinemmiksi */
+    /* Metric values larger and crisper */
     [data-testid="stMetricValue"] {
         font-size: 2.0rem;
         font-weight: 700;
@@ -63,7 +63,7 @@ st.markdown("""
         font-weight: 500;
     }
 
-    /* Korttinaket */
+    /* Card views */
     .pred-card {
         background: linear-gradient(135deg, rgba(38,50,70,0.6) 0%, rgba(28,40,60,0.6) 100%);
         border: 1px solid rgba(255,255,255,0.08);
@@ -110,7 +110,7 @@ st.markdown("""
         color: white;
         font-weight: 700;
         font-size: 0.9rem;
-        /* Animaatio: palkki kasvaa nollasta lopulliseen leveyteen */
+        /* Animation: bar grows from zero to final width */
         transform-origin: left center;
         animation: probBarGrow 0.9s cubic-bezier(0.22, 1, 0.36, 1);
         position: relative;
@@ -230,13 +230,13 @@ def _check_password() -> bool:
         else:
             st.session_state["password_correct"] = False
 
-    st.title("⚽ Jalkapallon ennustemalli")
+    st.title("⚽ Football Prediction Model")
     st.text_input(
-        "Salasana", type="password",
+        "Password", type="password",
         on_change=_password_entered, key="password",
     )
     if "password_correct" in st.session_state and not st.session_state["password_correct"]:
-        st.error("❌ Vaara salasana.")
+        st.error("❌ Wrong password.")
     return False
 
 
@@ -244,10 +244,10 @@ if not _check_password():
     st.stop()
 
 
-st.title("⚽ Jalkapallon ennustemalli")
+st.title("⚽ Football Prediction Model")
 st.caption(
-    "Ensemble-ennuste = Dixon-Coles (pitka historia) + LightGBM (viime 5 ottelua). "
-    "Auto-konteksti tayttaa lepopaivat, sarjasijan, derbyn ja saan — yliajettavissa."
+    "Ensemble prediction = Dixon-Coles (long history) + LightGBM (last 5 matches). "
+    "Auto-context fills rest days, league position, derby and weather — overridable."
 )
 
 
@@ -295,7 +295,7 @@ except Exception:
 # ---------------------------------------------------------------------------
 # DATA + MOLEMMAT MALLIT YHDESSA
 # ---------------------------------------------------------------------------
-@st.cache_resource(show_spinner="Sovitetaan Dixon-Coles + LightGBM...")
+@st.cache_resource(show_spinner="Fitting Dixon-Coles + LightGBM...")
 def opeta_kaikki(liigat: tuple, kaudet: tuple, decay: float, nopea: bool = False,
                  bayes_shrinkage: float = 2.0,
                  kayta_promotio_priorit: bool = False,
@@ -308,8 +308,8 @@ def opeta_kaikki(liigat: tuple, kaudet: tuple, decay: float, nopea: bool = False
     if treenidata.empty:
         viestit = "\n".join(f"- **{l}**: {e}" for l, e in tulos.virheet.items())
         raise RuntimeError(
-            "Datan lataus palautti tyhjan DataFramen.\n\n"
-            "Yksityiskohdat per liiga:\n" + viestit
+            "Data load returned empty DataFrame.\n\n"
+            "Details per league:\n" + viestit
         )
 
     # Promotoitujen joukkueiden priorit alasarjasta (jos paalla)
@@ -487,147 +487,147 @@ def opeta_kaikki(liigat: tuple, kaudet: tuple, decay: float, nopea: bool = False
 # ---------------------------------------------------------------------------
 # SIVUPALKKI
 # ---------------------------------------------------------------------------
-st.sidebar.header("Datan valinta")
+st.sidebar.header("Data selection")
 us_liigat = st.sidebar.multiselect(
-    "Top-5 -liigat (Understat, xG)",
+    "Top-5 leagues (Understat, xG)",
     options=["ENG-Premier League", "ESP-La Liga", "GER-Bundesliga", "ITA-Serie A", "FRA-Ligue 1"],
     default=["ENG-Premier League"],
 )
 fb_liigat = st.sidebar.multiselect(
-    "Muut liigat (football-data.co.uk, ei xG)",
+    "Other leagues (football-data.co.uk, no xG)",
     options=[
-        # Englannin alasarjat
+        # English lower divisions
         "ENG-Championship", "ENG-League One", "ENG-League Two",
-        # Muu Eurooppa
+        # Rest of Europe
         "ESP-La Liga 2", "GER-2. Bundesliga", "ITA-Serie B", "FRA-Ligue 2",
         "POR-Primeira Liga", "NED-Eredivisie", "BEL-Pro League",
         "SCO-Premiership", "TUR-Super Lig", "GRE-Super League",
-        # Pohjoismaat (kaikki kaudet yhdessa)
+        # Nordic countries (calendar-year seasons combined)
         "FIN-Veikkausliiga", "SWE-Allsvenskan", "NOR-Eliteserien", "DEN-Superliga",
-        # Muut maailman sarjat
+        # Other world leagues
         "USA-MLS", "MEX-Liga MX", "JPN-J1 League", "BRA-Serie A", "ARG-Primera Division",
-        # UEFA-turnaukset (football-data.org tai openfootball)
+        # UEFA tournaments (football-data.org or openfootball)
         "INT-Champions League", "INT-Europa League", "INT-Conference League",
     ],
     default=[],
-    help="Englannin alasarjat ja Pohjoismaat football-data.co.uk:sta. "
-         "UEFA-turnaukset ensisijaisesti football-data.org API:n kautta jos "
-         "FOOTBALL_DATA_API_KEY on .env-tiedostossa, fallbackina openfootball.",
+    help="English lower divisions and Nordic leagues from football-data.co.uk. "
+         "UEFA tournaments primarily via football-data.org API if "
+         "FOOTBALL_DATA_API_KEY is in your .env file, with openfootball as fallback.",
 )
 liiga_valinta = us_liigat + fb_liigat
 
 kausi_valinta = st.sidebar.multiselect(
-    "Kaudet", options=["2122", "2223", "2324", "2425", "2526"],
+    "Seasons", options=["2122", "2223", "2324", "2425", "2526"],
     default=["2223", "2324", "2425", "2526"],
-    help="Useampi kausi -> vakaampi joukkuekohtainen kotietu. Decay painottaa "
-         "silti tuoreita otteluita.",
+    help="More seasons -> more stable per-team home advantage. Decay still "
+         "weights recent matches more.",
 )
 
-# API-avaimen tila
+# API key status
 from src.data.football_data_org import api_key_kunnossa
 if api_key_kunnossa():
-    st.sidebar.success("✅ football-data.org API-avain loytyy")
+    st.sidebar.success("✅ football-data.org API key found")
 else:
     st.sidebar.info(
-        "ℹ️ football-data.org API-avainta ei loydy. UEL/UECL-data ei ole "
-        "saatavilla. Lisaa `.env`-tiedostoon: `FOOTBALL_DATA_API_KEY=oma_avaimesi`"
+        "ℹ️ football-data.org API key not found. UEL/UECL data is not available. "
+        "Add to `.env` file: `FOOTBALL_DATA_API_KEY=your_key`"
     )
 
 st.sidebar.divider()
-st.sidebar.markdown("**Mallin parametrit**")
+st.sidebar.markdown("**Model parameters**")
 decay_val = st.sidebar.slider(
-    "Decay (aikapainotus)", 0.0, 0.020, 0.0035, 0.0005, format="%.4f",
+    "Decay (time-weighting)", 0.0, 0.020, 0.0035, 0.0005, format="%.4f",
 )
 puoli = (np.log(2) / decay_val) if decay_val > 0 else float("inf")
-st.sidebar.caption(f"Puolittumisaika: ~{puoli:.0f} paivaa" if puoli != float("inf") else "Ei aikapainotusta")
+st.sidebar.caption(f"Half-life: ~{puoli:.0f} days" if puoli != float("inf") else "No time-weighting")
 
 bayes_shrink = st.sidebar.slider(
-    "Bayes-shrinkage (joukkuevahvuudet)", 0.0, 10.0, 2.0, 0.5,
-    help="Vetaa hyokkays/puolustus-estimaatit kohti liigan keskiarvoa. "
-         "0 = pure ML (vanha kayttaytyminen), 2 = oletus, 5 = vahva (auttaa "
-         "uusille joukkueille kuten Sunderland), 10 = hyvin vahva.",
+    "Bayes shrinkage (team strengths)", 0.0, 10.0, 2.0, 0.5,
+    help="Pulls attack/defence estimates toward league mean. "
+         "0 = pure ML (legacy behavior), 2 = default, 5 = strong (helps "
+         "new teams like Sunderland), 10 = very strong.",
 )
 
 xg_weight_val = st.sidebar.slider(
-    "xG-paino likelihood:ssa", 0.0, 1.0, 0.0, 0.05,
-    help="0 = vain toteutuneet maalit (vanha kayttaytyminen), 0.3-0.5 = "
-         "tasapaino maalit + xG, 1.0 = vain xG. Vaikutus: mallin estimaatit "
-         "siloittuvat luck-tekijoita kohti. Toimii vain Understat-liigoissa "
-         "(top-5) joissa xG on saatavilla.",
+    "xG weight in likelihood", 0.0, 1.0, 0.0, 0.05,
+    help="0 = only actual goals (legacy behavior), 0.3-0.5 = "
+         "balance goals + xG, 1.0 = only xG. Effect: model estimates "
+         "smooth toward luck-corrected values. Works only in Understat leagues "
+         "(top-5) where xG is available.",
 )
 
 form_blend_val = st.sidebar.slider(
-    "Form-paino (Dynamic DC)", 0.0, 1.0, 0.0, 0.05,
-    help="0 = vain pitkan aikavalin baseline (decay-arvosi), 0.3 = lisaa "
-         "viimeaikaista muoto-painotusta, 1.0 = vain viime ottelut. Sovittaa "
-         "toisen DC:n nopeammalla decaylla ja blendaa joukkuevahvuudet "
-         "(huomioi tuoreet vammat, valmentajavaihdokset, momentum).",
+    "Form weight (Dynamic DC)", 0.0, 1.0, 0.0, 0.05,
+    help="0 = only long-term baseline (your decay value), 0.3 = adds "
+         "recent-form weighting, 1.0 = only recent matches. Fits a "
+         "second DC with faster decay and blends team strengths "
+         "(captures recent injuries, manager changes, momentum).",
 )
 
 model_type_val = st.sidebar.selectbox(
-    "Mallityyppi", ["dc", "bivariate_poisson"],
-    format_func=lambda x: "Dixon-Coles (oletus)" if x == "dc" else "Bivariate Poisson",
-    help="Dixon-Coles: standardi tau-korjauksella matalille tuloksille. "
-         "Bivariate Poisson: jaettu Z-komponentti, matemaattisesti elegantimpi "
-         "korrelaation kasittely. BP on hitaampi (~5x) mutta voi antaa hieman "
-         "tarkempia ennusteita.",
+    "Model type", ["dc", "bivariate_poisson"],
+    format_func=lambda x: "Dixon-Coles (default)" if x == "dc" else "Bivariate Poisson",
+    help="Dixon-Coles: standard with tau correction for low scores. "
+         "Bivariate Poisson: shared Z component, mathematically more elegant "
+         "correlation handling. BP is slower (~5x) but can give slightly "
+         "more accurate predictions.",
 )
 
 kayta_promotio_priorit = st.sidebar.toggle(
-    "🆙 Promotoitujen prior alasarjasta",
+    "🆙 Use promoted teams' priors from lower division",
     value=False,
-    help="Sovittaa erillisen DC-mallin alasarjadataan ja kayttaa promotoitujen "
-         "joukkueiden estimaatteja prior:ana yliliigan mallissa. Toimii vain "
-         "Englannin liigaketjussa (PL <- Championship <- League One <- League Two). "
-         "Lisaa latausaikaan ~10 sekuntia. Hyodyllinen kun tasalla on uusia "
-         "joukkueita kuten Sunderland 2526.",
+    help="Fits a separate DC model on lower-division data and uses promoted "
+         "teams' estimates as priors in the upper-league model. Works only "
+         "for the English league chain (PL <- Championship <- League One <- League Two). "
+         "Adds ~10 seconds to load time. Useful when there are new teams "
+         "like Sunderland in 2526.",
 )
 promotion_factor_val = 0.5
 if kayta_promotio_priorit:
     promotion_factor_val = st.sidebar.slider(
-        "Promotion factor (alasarjasta -> ylaliiga)", 0.0, 1.0, 0.5, 0.05,
-        help="Skaalauskerroin: 1.0 = priorit suoraan alasarjaestimaatista, "
-             "0.5 = puolet (varovainen, kompensoi tasoeroa), 0.0 = ei prioria. "
-             "Empiirinen tutkimus suosittelee 0.4-0.6.",
+        "Promotion factor (lower -> upper league)", 0.0, 1.0, 0.5, 0.05,
+        help="Scaling factor: 1.0 = priors directly from lower-division estimate, "
+             "0.5 = half (cautious, compensates for skill gap), 0.0 = no prior. "
+             "Empirical research suggests 0.4-0.6.",
     )
 
-# Kalibraattorin tila — nakyy kun malli on koulutettu
+# Calibrator status — shown when model is trained
 if "cal_status_msg" in st.session_state:
     st.sidebar.markdown(st.session_state["cal_status_msg"])
 
 kayta_kalibrointia = st.sidebar.toggle(
-    "🎯 Kayta kalibroituja todennakoisyyksia",
+    "🎯 Use calibrated probabilities",
     value=True,
-    help="Sisaisesti opetettu kalibraattori korjaa mallin yli-/ali-itsevarmuuden. "
-         "Tekee todennakoisyyksista luotettavampia.",
+    help="Internally trained calibrator corrects model over-/under-confidence. "
+         "Makes probabilities more reliable.",
 )
 
 ensemble_paino_oletus = st.session_state.get("optim_paino", 0.5)
 ensemble_paino = st.sidebar.slider(
-    "Ensemble-paino (Dixon-Coles)", 0.0, 1.0, ensemble_paino_oletus, 0.05,
-    help="0 = pelkka LightGBM (form), 1 = pelkka Dixon-Coles (historia), 0.5 = tasapaino. "
-         "Voit optimoida painon walk-forwardilla alaosan paneelista.",
+    "Ensemble weight (Dixon-Coles)", 0.0, 1.0, ensemble_paino_oletus, 0.05,
+    help="0 = only LightGBM (form), 1 = only Dixon-Coles (history), 0.5 = balanced. "
+         "You can optimize the weight via walk-forward in the panel below.",
 )
 if "optim_paino" in st.session_state:
     st.sidebar.caption(
-        f"🎯 Walk-forward suositus: **{st.session_state['optim_paino']:.2f}** "
-        f"({st.session_state.get('optim_n', '?')} OOS-ennustetta)"
+        f"🎯 Walk-forward recommendation: **{st.session_state['optim_paino']:.2f}** "
+        f"({st.session_state.get('optim_n', '?')} OOS predictions)"
     )
 
 nopea_tila = st.sidebar.toggle(
-    "⚡ Nopea-tila",
+    "⚡ Fast mode",
     value=False,
-    help="Ohita kalibraattorin ja totals-classifierin koulutus -> mallin lataus "
-         "puolet nopeammin (~30s saastoa). Hyodyllinen kun iteroit eri liigojen valilla. "
-         "Tarkista ennusteet pois paalta kun olet valmis.",
+    help="Skip calibrator and totals-classifier training -> model loads "
+         "twice as fast (~30s saved). Useful when iterating between leagues. "
+         "Turn off when you want final predictions.",
 )
 
-if st.sidebar.button("🔄 Paivita malli"):
+if st.sidebar.button("🔄 Refresh model"):
     st.cache_resource.clear()
     st.rerun()
 
 if not liiga_valinta or not kausi_valinta:
-    st.warning("Valitse liiga ja kausi sivupalkista.")
+    st.warning("Select league and season from the sidebar.")
     st.stop()
 
 try:
@@ -642,33 +642,33 @@ try:
         str(model_type_val),
     )
 except Exception as e:
-    st.error(f"Mallin lataus epaonnistui: {e}")
+    st.error(f"Model loading failed: {e}")
     st.stop()
 
-# Paivita kalibraattorin tila sivupalkkiin
+# Update calibrator status in sidebar
 n_matches = len(hist_data)
 if cal is None:
     if n_matches < 500:
         st.session_state["cal_status_msg"] = (
-            f"⚠️ **Kalibraattori**: ei opetettu — vain {n_matches} ottelua, "
-            "tarvitaan ≥ 500."
+            f"⚠️ **Calibrator**: not trained — only {n_matches} matches, "
+            "≥ 500 required."
         )
     else:
         st.session_state["cal_status_msg"] = (
-            f"⚠️ **Kalibraattori**: koulutus epaonnistui ({n_matches} ottelua datassa). "
-            "Tarkista terminaalin lokit virheviesteille."
+            f"⚠️ **Calibrator**: training failed ({n_matches} matches in data). "
+            "Check terminal logs for error messages."
         )
 elif hasattr(cal, "cal_1x2") and hasattr(cal, "cal_ou"):
     a = "✅" if cal.cal_1x2 is not None else "❌"
     b = "✅" if cal.cal_ou is not None else "❌"
     st.session_state["cal_status_msg"] = (
-        f"**Kalibraattori (MainCalibrators):**\n\n{a} 1X2 • {b} O/U 2.5 "
-        f"_(opetettu {n_matches} ottelusta)_"
+        f"**Calibrator (MainCalibrators):**\n\n{a} 1X2 • {b} O/U 2.5 "
+        f"_(trained on {n_matches} matches)_"
     )
 else:
     st.session_state["cal_status_msg"] = (
-        "⚠️ **Kalibraattori (vanha)**: vain 1X2. Paina '🔄 Paivita malli' "
-        "saadaksesi uuden MainCalibrators-version (1X2 + O/U)."
+        "⚠️ **Calibrator (legacy)**: 1X2 only. Click '🔄 Refresh model' "
+        "to get the new MainCalibrators version (1X2 + O/U)."
     )
 
 joukkueet = sorted(dc.teams_)
@@ -677,10 +677,10 @@ joukkueet = sorted(dc.teams_)
 # ---------------------------------------------------------------------------
 # JOUKKUEIDEN VALINTA — jaetaan session_statella muille sivuille
 # ---------------------------------------------------------------------------
-st.subheader("Valitse ottelu")
+st.subheader("Select match")
 c1, c2, c3 = st.columns([5, 1, 5])
 with c1:
-    koti = st.selectbox("🏠 Kotijoukkue", joukkueet,
+    koti = st.selectbox("🏠 Home team", joukkueet,
                         index=joukkueet.index(st.session_state.get("koti", joukkueet[0]))
                         if st.session_state.get("koti") in joukkueet else 0,
                         key="koti")
@@ -689,10 +689,10 @@ with c2:
 with c3:
     vieras_def = st.session_state.get("vieras", joukkueet[1] if len(joukkueet) > 1 else joukkueet[0])
     vieras_idx = joukkueet.index(vieras_def) if vieras_def in joukkueet else 1
-    vieras = st.selectbox("✈️ Vierasjoukkue", joukkueet, index=vieras_idx, key="vieras")
+    vieras = st.selectbox("✈️ Away team", joukkueet, index=vieras_idx, key="vieras")
 
 if koti == vieras:
-    st.warning("Valitse kaksi eri joukkuetta.")
+    st.warning("Select two different teams.")
     st.stop()
 
 
@@ -700,7 +700,7 @@ if koti == vieras:
 # AUTO-KONTEKSTI
 # ---------------------------------------------------------------------------
 st.divider()
-ottelu_paiva = st.date_input("Ottelun paiva", value=datetime.now().date())
+ottelu_paiva = st.date_input("Match date", value=datetime.now().date())
 ottelu_dt = datetime.combine(ottelu_paiva, datetime.min.time())
 
 @st.cache_data(show_spinner=False)
@@ -771,25 +771,25 @@ with st.expander("🤖 Auto-tunnistettu konteksti (yliajettavissa alla)", expand
     dd, ee, ff = st.columns(3)
     if not table_h.empty and koti in table_h["team"].values:
         h_pos = int(table_h[table_h["team"] == koti].iloc[0]["position"])
-        dd.metric(f"{koti} sarjasija", f"{h_pos}.")
+        dd.metric(f"{koti} position", f"{h_pos}.")
     if not table_h.empty and vieras in table_h["team"].values:
         a_pos = int(table_h[table_h["team"] == vieras].iloc[0]["position"])
-        ee.metric(f"{vieras} sarjasija", f"{a_pos}.")
+        ee.metric(f"{vieras} position", f"{a_pos}.")
     if sel_liiga and sel_kausi:
-        st.caption(f"Sarjataulukko laskettu: **{sel_liiga}** kaudelta **{sel_kausi}** "
-                   f"(otteluita: {len(table_h)*2} per joukkue keskimaarin).")
+        st.caption(f"Standings calculated: **{sel_liiga}** for season **{sel_kausi}** "
+                   f"(matches: {len(table_h)*2} per team on average).")
     else:
-        st.caption("⚠️ Joukkueille ei loytynyt yhteista liigaa+kautta — sarjasija perustuu kaikkiin otteluihin.")
-    ff.metric("Derby?", "Kylla 🔥" if derby_auto else "Ei")
+        st.caption("⚠️ No common league+season found for the teams — position based on all matches.")
+    ff.metric("Derby?", "Yes 🔥" if derby_auto else "No")
 
     if saa_info and "error" not in saa_info:
         st.success(
             f"🌤️ {joukkueen_kaupunki(koti)}: {saa_info['desc']}, "
-            f"{saa_info['temp_c']}°C, sade {saa_info['rain_mm']}mm, tuuli {saa_info['wind_kph']}km/h "
-            f"-> sa-vaikutus kokonaismaaleihin: {saa_delta:+.2f}"
+            f"{saa_info['temp_c']}°C, rain {saa_info['rain_mm']}mm, wind {saa_info['wind_kph']}km/h "
+            f"-> weather effect on total goals: {saa_delta:+.2f}"
         )
     elif saa_info:
-        st.warning(f"Sa-haku epaonnistui: {saa_info['error']}")
+        st.warning(f"Weather fetch failed: {saa_info['error']}")
 
 
 # ---------------------------------------------------------------------------
@@ -924,60 +924,60 @@ def _auto_injury_value(team_name: str, players_str: str) -> tuple[int, str]:
         auto_v = max(-30, min(0, -int(round(v["prosentti"] / 5)) * 5))
         info_osat = []
         if yhdistetyt:
-            info_osat.append(f"{len(yhdistetyt)} omasta joukkueesta")
+            info_osat.append(f"{len(yhdistetyt)} from own team")
         if siirtopelaajat:
-            info_osat.append(f"{len(siirtopelaajat)} siirtopelaajaa ({', '.join(n for n, _ in siirtopelaajat)})")
+            info_osat.append(f"{len(siirtopelaajat)} transfer player(s) ({', '.join(n for n, _ in siirtopelaajat)})")
         info = "🤖 Auto: " + " + ".join(info_osat) + f" -> {auto_v}%"
         return auto_v, info
     except Exception as e:
-        return 0, f"⚠️ Auto-laskenta epaonnistui: {e}"
+        return 0, f"⚠️ Auto-calculation failed: {e}"
 
 auto_hi, info_hi = _auto_injury_value(koti, st.session_state.get("poissa_koti", ""))
 auto_ai, info_ai = _auto_injury_value(vieras, st.session_state.get("poissa_vieras", ""))
 
-with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=False):
+with st.expander("🛠️ Manual adjustments (override auto values)", expanded=False):
     s1, s2 = st.columns(2)
     with s1:
         st.markdown(f"**🏠 {koti}**")
         # Auto-laskettu poissaolovaikutus voittaa manuaalisen sliderin
         manual_hi = st.slider(
-            "Avainpelaajia poissa % (manuaalinen)",
+            "Key players out % (manual)",
             -30, 0, 0, 5, key="hi",
-            help="Tama on kaytossa vain jos et syota pelaajia poissaolopaneeliin alla.",
+            help="Used only when you don't enter players in the absence panel below.",
         )
         if auto_hi != 0:
             home_injury = auto_hi
-            st.success(f"✅ {info_hi} (yliajaa sliderin)")
+            st.success(f"✅ {info_hi} (overrides slider)")
         else:
             home_injury = manual_hi
-        home_motivation = st.slider("Motivaatio %", -15, 15, mot_home, 5, key="hm")
+        home_motivation = st.slider("Motivation %", -15, 15, mot_home, 5, key="hm")
     with s2:
         st.markdown(f"**✈️ {vieras}**")
         manual_ai = st.slider(
-            "Avainpelaajia poissa % (manuaalinen)",
+            "Key players out % (manual)",
             -30, 0, 0, 5, key="ai",
-            help="Tama on kaytossa vain jos et syota pelaajia poissaolopaneeliin alla.",
+            help="Used only when you don't enter players in the absence panel below.",
         )
         if auto_ai != 0:
             away_injury = auto_ai
-            st.success(f"✅ {info_ai} (yliajaa sliderin)")
+            st.success(f"✅ {info_ai} (overrides slider)")
         else:
             away_injury = manual_ai
-        away_motivation = st.slider("Motivaatio %", -15, 15, mot_away, 5, key="am")
+        away_motivation = st.slider("Motivation %", -15, 15, mot_away, 5, key="am")
 
     s3, s4, s5 = st.columns(3)
-    rest_advantage = s3.slider("Lepoetu kotille (pv)", -5, 5, max(-5, min(5, rest_diff)), 1)
+    rest_advantage = s3.slider("Rest advantage for home (days)", -5, 5, max(-5, min(5, rest_diff)), 1)
     is_derby_ui = s4.toggle("Derby", value=derby_auto)
-    weather_delta = s5.number_input("Sa -> kokonaismaalit", -1.0, 0.5, value=float(saa_delta), step=0.1)
+    weather_delta = s5.number_input("Weather -> total goals", -1.0, 0.5, value=float(saa_delta), step=0.1)
 
     # POISSAOLOPANEELI — pelaajien nimien perusteella laskettu xG-vaikutus
     if pelaajat is not None and not pelaajat.empty:
         st.markdown("---")
-        st.markdown("**🏥 Poissaolot (auto-laskenta xG:sta)**")
+        st.markdown("**🏥 Absences (auto-calculated from xG)**")
         st.caption(
-            "Kirjoita poissa olevien pelaajien nimet pilkulla erotettuna. "
-            "Sovellus etsii heidat FBref-pelaajadatasta ja laskee menetetyn xG-osuuden. "
-            "Korvaaja oletetaan tuottavan 30% poissa olevan tasosta -> nettovaikutus n. 70%."
+            "Type the names of absent players, comma-separated. "
+            "The app will look them up in FBref player data and calculate lost xG share. "
+            "Replacement is assumed to produce 30% of absent player's level -> net effect ~70%."
         )
         from src.features.poissaolot import laske_poissaolovaikutus
 
@@ -1029,23 +1029,23 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
         if not col_xg:
             col_xg = _loyda_gls(pelaajat)
             if col_xg:
-                metriikka_nimi = "maaleja"
+                metriikka_nimi = "goals"
 
         # xG/Gls riittaa, minuutit eivat ole pakollisia poissaololaskennassa
         if col_xg:
             st.caption(
-                f"Metriikka: **{metriikka_nimi}** ({col_xg})"
-                + (f" • Minuutit: {col_min}" if col_min else "")
+                f"Metric: **{metriikka_nimi}** ({col_xg})"
+                + (f" • Minutes: {col_min}" if col_min else "")
             )
             po1, po2 = st.columns(2)
             poissa_koti_str = po1.text_input(
-                f"🏠 {koti} poissa pelaajat",
-                placeholder="esim. Saka, Saliba",
+                f"🏠 {koti} absent players",
+                placeholder="e.g. Saka, Saliba",
                 key="poissa_koti",
             )
             poissa_vieras_str = po2.text_input(
-                f"✈️ {vieras} poissa pelaajat",
-                placeholder="esim. Watkins",
+                f"✈️ {vieras} absent players",
+                placeholder="e.g. Watkins",
                 key="poissa_vieras",
             )
 
@@ -1177,28 +1177,28 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
             omat_koti, siirrot_koti = _yhdista_nimet_globaalisti(poissa_koti_lista, kaikki_koti)
 
             if poissa_koti_lista and not omat_koti and not siirrot_koti and koti_match != koti:
-                st.caption(f"ℹ️ '{koti}' -> FBref-nimi '{koti_match}', mutta nimia ei tunnistettu.")
+                st.caption(f"ℹ️ '{koti}' -> FBref name '{koti_match}', but no names recognized.")
             elif poissa_koti_lista and koti_match != koti:
-                st.caption(f"ℹ️ FBref-nimi: '{koti_match}'")
+                st.caption(f"ℹ️ FBref name: '{koti_match}'")
 
             joukkue_pelaajat_v, vieras_match = _etsi_joukkue_pelaajat(vieras)
             kaikki_vieras = joukkue_pelaajat_v["player"].tolist() if "player" in joukkue_pelaajat_v.columns else []
             omat_vieras, siirrot_vieras = _yhdista_nimet_globaalisti(poissa_vieras_lista, kaikki_vieras)
 
             if poissa_vieras_lista and not omat_vieras and not siirrot_vieras and vieras_match != vieras:
-                st.caption(f"ℹ️ '{vieras}' -> FBref-nimi '{vieras_match}', mutta nimia ei tunnistettu.")
+                st.caption(f"ℹ️ '{vieras}' -> FBref name '{vieras_match}', but no names recognized.")
             elif poissa_vieras_lista and vieras_match != vieras:
-                st.caption(f"ℹ️ FBref-nimi: '{vieras_match}'")
+                st.caption(f"ℹ️ FBref name: '{vieras_match}'")
 
             if omat_koti or siirrot_koti:
                 v_koti = _laske_kokonaisvaikutus(omat_koti, siirrot_koti, koti_match)
                 if v_koti:
                     osat = []
                     if omat_koti:
-                        osat.append(f"{len(omat_koti)} omasta joukkueesta ({', '.join(omat_koti)})")
+                        osat.append(f"{len(omat_koti)} from own team ({', '.join(omat_koti)})")
                     if siirrot_koti:
-                        siirto_str = ", ".join(f"{n} (oli: {t})" for n, t in siirrot_koti)
-                        osat.append(f"{len(siirrot_koti)} siirtopelaajaa ({siirto_str})")
+                        siirto_str = ", ".join(f"{n} (was at: {t})" for n, t in siirrot_koti)
+                        osat.append(f"{len(siirrot_koti)} transfer player(s) ({siirto_str})")
                     st.caption(
                         f"🏠 {koti}: " + " + ".join(osat) +
                         f" -> -{v_koti['prosentti']:.1f}% xG"
@@ -1210,10 +1210,10 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
                 if v_vieras:
                     osat = []
                     if omat_vieras:
-                        osat.append(f"{len(omat_vieras)} omasta joukkueesta ({', '.join(omat_vieras)})")
+                        osat.append(f"{len(omat_vieras)} from own team ({', '.join(omat_vieras)})")
                     if siirrot_vieras:
-                        siirto_str = ", ".join(f"{n} (oli: {t})" for n, t in siirrot_vieras)
-                        osat.append(f"{len(siirrot_vieras)} siirtopelaajaa ({siirto_str})")
+                        siirto_str = ", ".join(f"{n} (was at: {t})" for n, t in siirrot_vieras)
+                        osat.append(f"{len(siirrot_vieras)} transfer player(s) ({siirto_str})")
                     st.caption(
                         f"✈️ {vieras}: " + " + ".join(osat) +
                         f" -> -{v_vieras['prosentti']:.1f}% xG"
@@ -1221,15 +1221,15 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
                     away_injury = max(-30, min(0, -int(round(v_vieras["prosentti"] / 5)) * 5))
         else:
             st.warning(
-                f"Pelaajadatasta ei loytynyt xG-saraketta. Manuaalinen syotto kaytossa. "
-                f"(Saatavilla {len(pelaajat.columns)} saraketta: "
+                f"No xG column found in player data. Manual input in use. "
+                f"(Available {len(pelaajat.columns)} columns: "
                 f"{', '.join(str(c) for c in list(pelaajat.columns))})"
             )
 
     st.info(
-        "ℹ️ **Loukkaantumiset/kokoonpanot eivat paivity automaattisesti** — "
-        "ei luotettavaa avointa rajapintaa. Kayta yla 'Avainpelaajia poissa' -liu'utinta "
-        "kun tiedat poissaolot esim. SofaScoresta tai Transfermarktista."
+        "ℹ️ **Injuries/lineups do not update automatically** — "
+        "no reliable open API. Use the 'Key players out' slider above "
+        "when you know the absences from e.g. SofaScore or Transfermarkt."
     )
 
     saadot = apply_match_adjustments(
@@ -1245,7 +1245,7 @@ with st.expander("🛠️ Manuaaliset saadot (yliaja auto-arvot)", expanded=Fals
 # ENSEMBLE-ENNUSTE — DC + LightGBM yhdistettyna
 # ---------------------------------------------------------------------------
 st.divider()
-st.subheader(f"📊 Ennuste: {koti} vs {vieras}")
+st.subheader(f"📊 Prediction: {koti} vs {vieras}")
 
 p_dc = dc.predict_1x2(koti, vieras, adjustments=saadot)
 lam, mu = dc.expected_goals(koti, vieras, adjustments=saadot)
@@ -1287,9 +1287,9 @@ if ensemble_aktiivinen:
         f'<span class="pill pill-success">✓ Ensemble DC {ensemble_paino:.0%} + LGB {1-ensemble_paino:.0%}</span>'
     )
 else:
-    status_pillit.append('<span class="pill pill-warning">⚠ Vain Dixon-Coles</span>')
+    status_pillit.append('<span class="pill pill-warning">⚠ Dixon-Coles only</span>')
 if kalibrointi_aktiivinen:
-    status_pillit.append('<span class="pill pill-success">🎯 Kalibroitu</span>')
+    status_pillit.append('<span class="pill pill-success">🎯 Calibrated</span>')
 if str(model_type_val) == "bivariate_poisson":
     status_pillit.append('<span class="pill pill-info">BP</span>')
 if float(form_blend_val) > 0:
@@ -1324,7 +1324,7 @@ def _team_block(name, logo_url, color, xg):
 st.markdown(f"""
 <div class="match-header">
     <div class="match-header-meta" style="text-align:center;margin-bottom:14px">
-        ⚽ Ennuste · {datetime.now().strftime('%d.%m.%Y %H:%M')}
+        ⚽ Prediction · {datetime.now().strftime('%d.%m.%Y %H:%M')}
     </div>
     <div style="display:flex;align-items:center;justify-content:space-around">
         {_team_block(koti, koti_logo, koti_color_brand, lam)}
@@ -1332,7 +1332,7 @@ st.markdown(f"""
         {_team_block(vieras, vieras_logo, vieras_color_brand, mu)}
     </div>
     <div class="match-header-meta" style="text-align:center;margin-top:14px">
-        Yhteensa odotetut maalit: <strong>{lam+mu:.2f}</strong>
+        Total expected goals: <strong>{lam+mu:.2f}</strong>
     </div>
     <div style="margin-top: 10px;text-align:center">{''.join(status_pillit)}</div>
 </div>
@@ -1353,7 +1353,7 @@ def _prob_bar(label, prob, kind, kerroin, custom_bg=None):
         f'<div class="prob-bar-track">'
         f'<div class="prob-bar-fill {kind}" style="width: {max(8, pct):.1f}%;{style_extra}">{pct:.1f} %</div>'
         f'</div>'
-        f'<div style="min-width: 70px; text-align: right; font-weight: 600; opacity: 0.9;">kerr. {kerroin:.2f}</div>'
+        f'<div style="min-width: 70px; text-align: right; font-weight: 600; opacity: 0.9;">odds {kerroin:.2f}</div>'
         f'</div>'
     )
 
@@ -1370,18 +1370,18 @@ _vieras_grad = _gradient(vieras_color_brand)
 
 st.markdown(
     f'<div class="pred-card">'
-    f'<div class="pred-card-header">⚡ 1X2 — voittajaennuste</div>'
+    f'<div class="pred-card-header">⚡ 1X2 — winner prediction</div>'
     f'{_prob_bar(f"1 · {koti}", kaytetty_p["home"], "home", 1/max(kaytetty_p["home"], 0.001), _koti_grad)}'
-    f'{_prob_bar("X · Tasapeli", kaytetty_p["draw"], "draw", 1/max(kaytetty_p["draw"], 0.001))}'
+    f'{_prob_bar("X · Draw", kaytetty_p["draw"], "draw", 1/max(kaytetty_p["draw"], 0.001))}'
     f'{_prob_bar(f"2 · {vieras}", kaytetty_p["away"], "away", 1/max(kaytetty_p["away"], 0.001), _vieras_grad)}'
     f'</div>',
     unsafe_allow_html=True,
 )
 
 if p_lgb is not None:
-    with st.expander("Mallin osatekijat (DC vs LightGBM)"):
+    with st.expander("Model components (DC vs LightGBM)"):
         df = pd.DataFrame({
-            "Malli": ["Dixon-Coles", "LightGBM", "Ensemble"],
+            "Model": ["Dixon-Coles", "LightGBM", "Ensemble"],
             "1": [p_dc["home"], p_lgb["home"], kaytetty_p["home"]],
             "X": [p_dc["draw"], p_lgb["draw"], kaytetty_p["draw"]],
             "2": [p_dc["away"], p_lgb["away"], kaytetty_p["away"]],
@@ -1411,9 +1411,9 @@ oc1, oc2 = st.columns(2)
 with oc1:
     st.markdown(
         f'<div class="pred-card">'
-        f'<div class="pred-card-header">📊 Over / Under 2.5 maalia</div>'
-        f'{_prob_bar("Yli 2.5", ou["over"], "over", 1/max(ou["over"], 0.001))}'
-        f'{_prob_bar("Alle 2.5", ou["under"], "under", 1/max(ou["under"], 0.001))}'
+        f'<div class="pred-card-header">📊 Over / Under 2.5 goals</div>'
+        f'{_prob_bar("Over 2.5", ou["over"], "over", 1/max(ou["over"], 0.001))}'
+        f'{_prob_bar("Under 2.5", ou["under"], "under", 1/max(ou["under"], 0.001))}'
         f'</div>',
         unsafe_allow_html=True,
     )
@@ -1421,17 +1421,17 @@ with oc2:
     st.markdown(
         f'<div class="pred-card">'
         f'<div class="pred-card-header">⚽ BTTS — Both Teams To Score</div>'
-        f'{_prob_bar("Kylla", btts["btts_yes"], "btts-yes", 1/max(btts["btts_yes"], 0.001))}'
-        f'{_prob_bar("Ei", btts["btts_no"], "btts-no", 1/max(btts["btts_no"], 0.001))}'
+        f'{_prob_bar("Yes", btts["btts_yes"], "btts-yes", 1/max(btts["btts_yes"], 0.001))}'
+        f'{_prob_bar("No", btts["btts_no"], "btts-no", 1/max(btts["btts_no"], 0.001))}'
         f'</div>',
         unsafe_allow_html=True,
     )
 
 # Score-heatmap (#10) — visualisoi todennakoisimmat tarkat tulokset
-with st.expander("🎯 Tarkkojen tulosten lampokartta", expanded=False):
+with st.expander("🎯 Exact score heatmap", expanded=False):
     st.caption(
-        "Mallin todennakoisyydet kullekin tarkalle tulokselle. Top-3 todennakoisinta "
-        "tulosta korostettu **lihavoituna**."
+        "Model probabilities for each exact score. Top-3 most likely "
+        "scores highlighted **in bold**."
     )
     score_m = dc.score_matrix(koti, vieras, max_goals=8, adjustments=saadot)
     fig_heatmap = render_score_heatmap(
@@ -1443,26 +1443,26 @@ with st.expander("🎯 Tarkkojen tulosten lampokartta", expanded=False):
     rivit = []
     for i in range(min(7, score_m.shape[0])):
         for j in range(min(7, score_m.shape[1])):
-            rivit.append({"Tulos": f"{i}-{j}", "Todennakoisyys": float(score_m[i, j]) * 100})
-    df_top = pd.DataFrame(rivit).sort_values("Todennakoisyys", ascending=False).head(5)
-    df_top["Todennakoisyys"] = df_top["Todennakoisyys"].round(2).astype(str) + " %"
-    df_top["Reilu kerroin"] = [
+            rivit.append({"Score": f"{i}-{j}", "Probability": float(score_m[i, j]) * 100})
+    df_top = pd.DataFrame(rivit).sort_values("Probability", ascending=False).head(5)
+    df_top["Probability"] = df_top["Probability"].round(2).astype(str) + " %"
+    df_top["Fair odds"] = [
         round(1.0 / max(float(score_m[int(t.split("-")[0]), int(t.split("-")[1])]), 0.001), 2)
-        for t in df_top["Tulos"]
+        for t in df_top["Score"]
     ]
-    st.markdown("**Top-5 todennakoisinta tulosta:**")
+    st.markdown("**Top-5 most likely scores:**")
     st.dataframe(df_top, hide_index=True, use_container_width=True)
 
 
 # #14 — Joukkueiden laukauskeskittymat kentalla (Understat-shot-data)
-with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokartat)", expanded=False):
+with st.expander("🎯 Team shot concentrations (pitch-location heatmaps)", expanded=False):
     st.caption(
-        "Lampokartta nayttaa mihin alueelle kentalla kumpikin joukkue laukoo eniten "
-        "viime kausilla. Tummempi alue = enemman laukauksia. Maalit korostetaan keltaisin tahdein. "
-        "Vaatii Understat-laukauksia (top-5 -liigat lokaalisti)."
+        "Heatmap shows where on the pitch each team takes the most shots "
+        "in recent seasons. Darker area = more shots. Goals highlighted with yellow stars. "
+        "Requires Understat shot data (top-5 leagues, locally only)."
     )
 
-    @st.cache_data(ttl=3600 * 6, show_spinner="Ladataan laukauksia Understatista...")
+    @st.cache_data(ttl=3600 * 6, show_spinner="Loading shots from Understat...")
     def _hae_laukaukset_kausi(liigat: tuple, kaudet: tuple):
         """Hae laukaukset cache:lla. Kestaa ekan kerran 30-60s, sen jalkeen heti."""
         try:
@@ -1472,7 +1472,7 @@ with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokart
         except Exception as e:
             return None
 
-    if st.button("Lataa laukaukset ja piirra heatmaps", key="load_shots"):
+    if st.button("Load shots and draw heatmaps", key="load_shots"):
         # Kayta nykyisia liigavalintoja + kausia
         us_in_app = [l for l in liiga_valinta if l in {
             "ENG-Premier League", "ESP-La Liga", "GER-Bundesliga",
@@ -1480,13 +1480,13 @@ with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokart
         }]
         if not us_in_app:
             st.warning(
-                "Laukausdataa ei ole valituille liigoille. Valitse vahintaan yksi top-5 -liiga."
+                "No shot data available for selected leagues. Pick at least one top-5 league."
             )
         else:
             try:
                 laukaukset = _hae_laukaukset_kausi(tuple(us_in_app), tuple(kausi_valinta))
                 if laukaukset is None or laukaukset.empty:
-                    st.error("Laukausdataa ei saatu Understatista. Pilvessa Understat ei toimi.")
+                    st.error("Could not load shot data from Understat. Understat does not work in cloud.")
                 else:
                     from src.viz.xg_plots import plot_shot_heatmap
                     import matplotlib.pyplot as plt
@@ -1529,7 +1529,7 @@ with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokart
                             st.pyplot(fig)
                             plt.close(fig)
                         except Exception as e:
-                            st.error(f"Heatmap epaonnistui: {e}")
+                            st.error(f"Heatmap failed: {e}")
                     with sc2:
                         st.markdown(_team_logo_md(vieras, vieras_color_brand), unsafe_allow_html=True)
                         try:
@@ -1542,28 +1542,28 @@ with st.expander("🎯 Joukkueiden laukauskeskittymat (kenttapaikkojen lampokart
                             st.pyplot(fig)
                             plt.close(fig)
                         except Exception as e:
-                            st.error(f"Heatmap epaonnistui: {e}")
+                            st.error(f"Heatmap failed: {e}")
 
                     # Jatkona myos rinnakkainen vertailu xG/laukaus
                     h_count = len(laukaukset[laukaukset["team"] == koti]) if "team" in laukaukset.columns else 0
                     a_count = len(laukaukset[laukaukset["team"] == vieras]) if "team" in laukaukset.columns else 0
                     if h_count or a_count:
                         st.caption(
-                            f"📊 {koti}: {h_count} laukausta · {vieras}: {a_count} laukausta valituilta kausilta."
+                            f"📊 {koti}: {h_count} shots · {vieras}: {a_count} shots in selected seasons."
                         )
             except Exception as e:
-                st.error(f"Laukausten lataus epaonnistui: {e}")
+                st.error(f"Shot loading failed: {e}")
 
 
 # Vetokerroin-vertailu
 st.divider()
-st.markdown("### 💰 Vetokerroin-vertailu")
+st.markdown("### 💰 Odds comparison")
 ok1, ok2, ok3 = st.columns(3)
-odds_h = ok1.number_input("1 kerroin", 1.01, value=2.10, step=0.05, format="%.2f")
-odds_d = ok2.number_input("X kerroin", 1.01, value=3.40, step=0.05, format="%.2f")
-odds_a = ok3.number_input("2 kerroin", 1.01, value=3.50, step=0.05, format="%.2f")
+odds_h = ok1.number_input("1 odds", 1.01, value=2.10, step=0.05, format="%.2f")
+odds_d = ok2.number_input("X odds", 1.01, value=3.40, step=0.05, format="%.2f")
+odds_a = ok3.number_input("2 odds", 1.01, value=3.50, step=0.05, format="%.2f")
 markkina = {"home": odds_h, "draw": odds_d, "away": odds_a}
-st.caption(f"Markkinan marginaali: **{marginaali(markkina)*100:.2f} %**")
+st.caption(f"Market margin: **{marginaali(markkina)*100:.2f} %**")
 
 vertailu = vertaile_kertoimia(kaytetty_p, markkina)
 df_v = pd.DataFrame(vertailu)
@@ -1578,19 +1578,19 @@ st.dataframe(df_v_show.drop(columns=["Kelly (1x)"]), hide_index=True, use_contai
 
 suos = [r for r in vertailu if r["Value %"] > 5 and r["Kelly (1/4)"] > 0]
 if suos:
-    st.success("**Mallin value-vetoehdotus:** " + ", ".join(
+    st.success("**Model value bet recommendation:** " + ", ".join(
         f"{r['Valinta']} @ {r['Markkinakerroin']:.2f} (value {r['Value %']:.1f} %)"
         for r in suos
     ))
 else:
-    st.info("Mallin mukaan markkina on tehokas — ei yli 5 % value-vetoa.")
+    st.info("Model says the market is efficient — no value bet over 5 %.")
 
-# Tarkat tulokset — heatmap + lista
-st.markdown("### 🎯 Tarkkojen tulosten todennakoisyydet")
+# Exact-score predictions — heatmap + list
+st.markdown("### 🎯 Exact-score probabilities")
 hh1, hh2 = st.columns([3, 2])
 
 with hh1:
-    # Heatmap: 6x6 matriisi (koti 0-5, vieras 0-5)
+    # Heatmap: 6x6 matrix (home 0-5, away 0-5)
     sm = dc.score_matrix(koti, vieras, adjustments=saadot)
     max_g = 6
     sm_small = sm[:max_g, :max_g]
@@ -1600,23 +1600,23 @@ with hh1:
         index=[f"{i}" for i in range(max_g)],
         columns=[f"{j}" for j in range(max_g)],
     )
-    df_sm.index.name = f"{koti} (kotimaalit)"
-    df_sm.columns.name = f"{vieras} (vierasmaalit)"
+    df_sm.index.name = f"{koti} (home goals)"
+    df_sm.columns.name = f"{vieras} (away goals)"
     # Streamlitin styling
-    st.markdown("**Tulosmatrisi (% todennakoisyys)**")
+    st.markdown("**Score matrix (% probability)**")
     st.dataframe(
         df_sm.style.background_gradient(cmap="RdYlGn", vmin=0, vmax=15)
               .format("{:.2f}"),
         use_container_width=True, height=270,
     )
-    st.caption(f"Lukea: rivi = {koti}n maalit, sarake = {vieras}n maalit. Kirkkaampi = todennakoisempi.")
+    st.caption(f"Read: row = {koti} goals, column = {vieras} goals. Brighter = more likely.")
 
 with hh2:
     top = dc.todennakoisin_tulos(koti, vieras, top_n=8, adjustments=saadot)
-    st.markdown("**🏆 Top-8 todennakoisinta tulosta**")
-    df_t = pd.DataFrame(top, columns=["Tulos", "p"])
+    st.markdown("**🏆 Top-8 most likely scores**")
+    df_t = pd.DataFrame(top, columns=["Score", "p"])
     df_t["%"] = (df_t["p"] * 100).round(2)
-    df_t = df_t[["Tulos", "%"]]
+    df_t = df_t[["Score", "%"]]
     st.dataframe(
         df_t.style.bar(subset=["%"], color="#22c55e", vmax=df_t["%"].max())
             .format({"%": "{:.2f} %"}),
@@ -1624,65 +1624,65 @@ with hh2:
     )
 
 st.caption(
-    "Vastuuvapaus: oppimismalli, ei sijoitusneuvo. "
-    "Loukkaantumiset/kokoonpanot pitaa syottaa kasin (ei avointa rajapintaa). "
-    "Sa, lepopaivat, sarjasija, derby — auto."
+    "Disclaimer: educational model, not investment advice. "
+    "Injuries/lineups must be entered manually (no open API). "
+    "Weather, rest days, league position, derby — auto."
 )
 
 st.divider()
-with st.expander("🔍 Mallin parametrit ja joukkueiden vahvuus"):
+with st.expander("🔍 Model parameters & team strengths"):
     cc1, cc2 = st.columns(2)
     with cc1:
-        st.markdown("**Globaalit parametrit**")
+        st.markdown("**Global parameters**")
         gp1, gp2 = st.columns(2)
-        gp1.metric("🏠 Kotietu γ", f"{dc.home_advantage:.4f}",
-                   help="Globaali kotijoukkueen maaliodotus-bonus (eksponentiaalinen kerroin)")
+        gp1.metric("🏠 Home advantage γ", f"{dc.home_advantage:.4f}",
+                   help="Global home team goal-expectation bonus (exponential factor)")
         gp2.metric("🔗 Rho", f"{dc.rho:.4f}",
-                   help="Maalien korrelaatio (negatiivinen = enemman tasapelejä)")
+                   help="Goal correlation (negative = more draws)")
         gp3, gp4 = st.columns(2)
-        gp3.metric("⚽ Joukkueita", f"{len(joukkueet)}")
-        gp4.metric("📋 Otteluita", f"{len(hist_data):,}".replace(",", " "))
+        gp3.metric("⚽ Teams", f"{len(joukkueet)}")
+        gp4.metric("📋 Matches", f"{len(hist_data):,}".replace(",", " "))
         st.caption(
-            f"Aikapainotus (decay): **{decay_val:.4f}** · "
-            f"Puolittumisaika ~**{int(np.log(2)/decay_val) if decay_val > 0 else '∞'} pv**"
+            f"Time-weighting (decay): **{decay_val:.4f}** · "
+            f"Half-life ~**{int(np.log(2)/decay_val) if decay_val > 0 else '∞'} days**"
         )
         if dc.home_advantage_per_team:
             keskiarvo_kotietu = float(dc.home_advantage)
             tot_kotietu = pd.DataFrame([
-                {"Joukkue": j, "Kotietu (yhteens)": round(
+                {"Team": j, "Home advantage (total)": round(
                     keskiarvo_kotietu + dc.home_advantage_per_team.get(j, 0.0), 3)}
                 for j in joukkueet
-            ]).sort_values("Kotietu (yhteens)", ascending=False)
-            st.markdown("**Top-5 vahvinta kotietua** (joukkuekohtainen + globaali)")
+            ]).sort_values("Home advantage (total)", ascending=False)
+            st.markdown("**Top-5 strongest home advantages** (per-team + global)")
             st.dataframe(tot_kotietu.head(5), hide_index=True, use_container_width=True)
     with cc2:
-        st.markdown("**Hyokkays / puolustus / kotietu**")
+        st.markdown("**Attack / defence / home advantage**")
         joukkue_df = pd.DataFrame([
             {
-                "Joukkue": j,
-                "Hyokkays": round(dc.attack[j], 3),
-                "Puolustus": round(dc.defence[j], 3),
-                "Kotietu+": round(dc.home_advantage_per_team.get(j, 0.0), 3),
+                "Team": j,
+                "Attack": round(dc.attack[j], 3),
+                "Defence": round(dc.defence[j], 3),
+                "Home+": round(dc.home_advantage_per_team.get(j, 0.0), 3),
             }
             for j in joukkueet
-        ]).sort_values("Hyokkays", ascending=False)
+        ]).sort_values("Attack", ascending=False)
         st.dataframe(joukkue_df, hide_index=True, use_container_width=True, height=400)
 
-    # Promotio-priorit (jos kaytossa) — info paneeli
+    # Promotion priors (if used) — info panel
     promotio_priorit = getattr(dc, "team_priors_kaytetty", {}) or {}
     if promotio_priorit:
-        with st.expander(f"🆙 Promotio-priorit kaytossa ({len(promotio_priorit)} joukkuetta)", expanded=False):
+        with st.expander(f"🆙 Promotion priors active ({len(promotio_priorit)} teams)", expanded=False):
             st.caption(
-                "Naille joukkueille DC-mallin estimaatti vedetaan kohti alasarjasta "
-                "skaalattua prioria, ei kohti liigan keskiarvoa (= 0)."
+                "For these teams, the DC model estimate is pulled toward a "
+                "scaled lower-division prior rather than toward the league mean (= 0)."
             )
             df_pr = pd.DataFrame([
                 {
-                    "Joukkue": j,
-                    "Prior hyokkays": round(p["attack"], 3),
-                    "Prior puolustus": round(p["defence"], 3),
-                    "Toteutunut hyokkays": round(dc.attack.get(j, 0.0), 3),
-                    "Toteutunut puolustus": round(dc.defence.get(j, 0.0), 3),
+                    "Team": j,
+                    "Prior attack": round(p["attack"], 3),
+                    "Prior defence": round(p["defence"], 3),
+                    "Fitted attack": round(dc.attack.get(j, 0.0), 3),
+                    "Fitted defence": round(dc.defence.get(j, 0.0), 3),
                     "Prior weight": round(p["weight"], 2),
                 }
                 for j, p in promotio_priorit.items()
@@ -1694,22 +1694,22 @@ with st.expander("🔍 Mallin parametrit ja joukkueiden vahvuus"):
 # 🎯 ENSEMBLE-PAINON OPTIMOINTI walk-forwardilla
 # ---------------------------------------------------------------------------
 st.divider()
-with st.expander("🎯 Optimoi ensemble-paino walk-forwardilla", expanded=False):
+with st.expander("🎯 Optimize ensemble weight via walk-forward", expanded=False):
     st.caption(
-        "Etsii optimaalisen Dixon-Coles vs LightGBM -painon ajamalla walk-forward-CV:n. "
-        "Sovittaa molemmat mallit useaan otokseen ja kokeilee paino-arvoja 0.0 - 1.0. "
-        "Vie 30-90 sekuntia datasta riippuen."
+        "Finds the optimal Dixon-Coles vs LightGBM weight by running walk-forward CV. "
+        "Fits both models in multiple folds and tests weights from 0.0 to 1.0. "
+        "Takes 30-90 seconds depending on data."
     )
-    n_folds_input = st.slider("Foldien maara", 3, 10, 6, 1, key="opt_n_folds")
+    n_folds_input = st.slider("Number of folds", 3, 10, 6, 1, key="opt_n_folds")
     min_train_input = st.number_input(
         "Min train size", 100, 2000, 300, 50, key="opt_min_train",
-        help="Vahimmaismaara otteluita ennen ensimmaista foldia.",
+        help="Minimum number of matches before the first fold.",
     )
-    if st.button("🚀 Aja walk-forward optimointi", use_container_width=False):
+    if st.button("🚀 Run walk-forward optimization", use_container_width=False):
         from src.models.ensemble import optimoi_paino_walk_forward
-        prog = st.progress(0.0, text="Aloitetaan...")
+        prog = st.progress(0.0, text="Starting...")
         def _cb(i, n):
-            prog.progress(i / n, text=f"Foldi {i}/{n}")
+            prog.progress(i / n, text=f"Fold {i}/{n}")
         try:
             paras_w, log_lossit, n_oos = optimoi_paino_walk_forward(
                 hist_data,
@@ -1725,55 +1725,55 @@ with st.expander("🎯 Optimoi ensemble-paino walk-forwardilla", expanded=False)
             st.session_state["optim_log_lossit"] = log_lossit
 
             st.success(
-                f"✅ Paras paino: **{paras_w:.2f}** (DC {paras_w*100:.0f}% / "
-                f"LGB {(1-paras_w)*100:.0f}%) • {n_oos} OOS-ennustetta"
+                f"✅ Best weight: **{paras_w:.2f}** (DC {paras_w*100:.0f}% / "
+                f"LGB {(1-paras_w)*100:.0f}%) • {n_oos} OOS predictions"
             )
             df_ll = pd.DataFrame([
-                {"Paino DC": w, "Paino LGB": round(1-w, 2), "Log-loss": ll}
+                {"DC weight": w, "LGB weight": round(1-w, 2), "Log-loss": ll}
                 for w, ll in sorted(log_lossit.items())
             ])
-            df_ll["Erotus parhaaseen"] = df_ll["Log-loss"] - df_ll["Log-loss"].min()
+            df_ll["Diff to best"] = df_ll["Log-loss"] - df_ll["Log-loss"].min()
             st.dataframe(
                 df_ll.style.highlight_min(subset=["Log-loss"], color="#d4f4dd"),
                 hide_index=True, use_container_width=True, height=300,
             )
             st.caption(
-                "💡 Suositus tallennettu sessio-statiin. Sivupalkin Ensemble-paino "
-                "-slider kayttaa sita oletuksena seuraavalla pageloadilla."
+                "💡 Recommendation saved to session state. The sidebar Ensemble weight "
+                "slider will use it as default on next page load."
             )
         except Exception as e:
             prog.empty()
-            st.error(f"Optimointi epaonnistui: {e}")
+            st.error(f"Optimization failed: {e}")
 
 
 # ---------------------------------------------------------------------------
 # 🎰 EHDOTETTU VETO — kaikkien markkinoiden value-laskenta
 # ---------------------------------------------------------------------------
 st.divider()
-with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
+with st.expander("🎰 Suggested bet — all markets", expanded=True):
     st.caption(
-        "Syota markkinakertoimet alle. Sovellus laskee value-prosentin ja Kelly-suosituksen "
-        "kaikille markkinoille. Vihrealla korostettu = paras value (>5%, Kelly>0)."
+        "Enter market odds below. The app calculates value % and Kelly recommendation "
+        "for all markets. Highlighted in green = best value (>5%, Kelly>0)."
     )
 
     st.markdown("**1X2**")
     e1, e2, e3 = st.columns(3)
-    eh = e1.number_input("1 (kotivoitto)", 1.01, value=2.10, step=0.05, format="%.2f", key="eh_1")
-    ed = e2.number_input("X (tasapeli)", 1.01, value=3.40, step=0.05, format="%.2f", key="eh_x")
-    ea = e3.number_input("2 (vierasvoitto)", 1.01, value=3.50, step=0.05, format="%.2f", key="eh_2")
+    eh = e1.number_input("1 (home win)", 1.01, value=2.10, step=0.05, format="%.2f", key="eh_1")
+    ed = e2.number_input("X (draw)", 1.01, value=3.40, step=0.05, format="%.2f", key="eh_x")
+    ea = e3.number_input("2 (away win)", 1.01, value=3.50, step=0.05, format="%.2f", key="eh_2")
 
-    st.markdown("**Over / Under 2.5 maalia**")
+    st.markdown("**Over / Under 2.5 goals**")
     eo, eu = st.columns(2)
-    eyli = eo.number_input("Yli 2.5", 1.01, value=1.90, step=0.05, format="%.2f", key="eh_yli")
-    ealle = eu.number_input("Alle 2.5", 1.01, value=1.90, step=0.05, format="%.2f", key="eh_alle")
+    eyli = eo.number_input("Over 2.5", 1.01, value=1.90, step=0.05, format="%.2f", key="eh_yli")
+    ealle = eu.number_input("Under 2.5", 1.01, value=1.90, step=0.05, format="%.2f", key="eh_alle")
 
     st.markdown("**BTTS — Both Teams To Score**")
     eb1, eb2 = st.columns(2)
-    ebtts_y = eb1.number_input("Kylla", 1.01, value=1.85, step=0.05, format="%.2f", key="eh_btts_y")
-    ebtts_n = eb2.number_input("Ei", 1.01, value=1.90, step=0.05, format="%.2f", key="eh_btts_n")
+    ebtts_y = eb1.number_input("Yes", 1.01, value=1.85, step=0.05, format="%.2f", key="eh_btts_y")
+    ebtts_n = eb2.number_input("No", 1.01, value=1.90, step=0.05, format="%.2f", key="eh_btts_n")
 
     st.markdown("---")
-    st.markdown("**📊 Value-laskelma**")
+    st.markdown("**📊 Value calculation**")
 
     def _value(p_malli, kerroin):
         return (p_malli * kerroin - 1.0) * 100.0
@@ -1789,20 +1789,20 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
     rivit_value = []
     for nimi, p, k in [
         (f"1 - {koti}", kaytetty_p["home"], eh),
-        ("X - tasapeli", kaytetty_p["draw"], ed),
+        ("X - Draw", kaytetty_p["draw"], ed),
         (f"2 - {vieras}", kaytetty_p["away"], ea),
-        ("Yli 2.5 maalia", ou["over"], eyli),
-        ("Alle 2.5 maalia", ou["under"], ealle),
-        ("BTTS Kylla", btts["btts_yes"], ebtts_y),
-        ("BTTS Ei", btts["btts_no"], ebtts_n),
+        ("Over 2.5 goals", ou["over"], eyli),
+        ("Under 2.5 goals", ou["under"], ealle),
+        ("BTTS Yes", btts["btts_yes"], ebtts_y),
+        ("BTTS No", btts["btts_no"], ebtts_n),
     ]:
         v = _value(p, k)
         kel = _kelly_25(p, k)
         rivit_value.append({
-            "Markkina": nimi,
-            "Mallin %": round(p * 100, 1),
-            "Kerroin": round(k, 2),
-            "Reilu kerroin": round(1.0 / p, 2) if p > 0 else 0,
+            "Market": nimi,
+            "Model %": round(p * 100, 1),
+            "Odds": round(k, 2),
+            "Fair odds": round(1.0 / p, 2) if p > 0 else 0,
             "Value %": round(v, 2),
             "Kelly 1/4 %": round(kel * 100, 2),
         })
@@ -1822,29 +1822,29 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
     )
     if not parhaat.empty:
         viestit = "\n\n".join([
-            f"- **{r['Markkina']}** @ {r['Kerroin']:.2f} — value {r['Value %']:.1f}%, "
-            f"Kelly 1/4 = {r['Kelly 1/4 %']:.2f}% bankrollistä"
+            f"- **{r['Market']}** @ {r['Odds']:.2f} — value {r['Value %']:.1f}%, "
+            f"Kelly 1/4 = {r['Kelly 1/4 %']:.2f}% of bankroll"
             for _, r in parhaat.iterrows()
         ])
-        st.success("**🎯 Suositellut value-vedot:**\n\n" + viestit)
+        st.success("**🎯 Recommended value bets:**\n\n" + viestit)
     else:
         st.info(
-            "Mallin mukaan kaikki markkinat ovat tehokkaasti hinnoiteltuja "
-            "(value < 5%). Ei suositusta tahan otteluun."
+            "Model considers all markets efficiently priced "
+            "(value < 5%). No recommendation for this match."
         )
 
     st.caption(
-        "💡 Value % = (mallin_p × kerroin − 1) × 100. "
-        "Kelly 1/4 = optimaalinen panostuskoko bankrollistä, kun otat 1/4 Kelly-fraktiosta. "
-        "Korostettu rivi = value > 5%."
+        "💡 Value % = (model_p × odds − 1) × 100. "
+        "Kelly 1/4 = optimal stake from bankroll when using 1/4 of the Kelly fraction. "
+        "Highlighted row = value > 5%."
     )
 
-    # #12 — Interaktiivinen Kelly-laskuri (HTML/JS)
+    # #12 — Interactive Kelly calculator (HTML/JS)
     st.markdown("---")
-    st.markdown("**💼 Interaktiivinen Kelly-laskuri**")
+    st.markdown("**💼 Interactive Kelly calculator**")
     st.caption(
-        "Saada bankroll-slider niin nakee suositellut panostukset reaaliajassa. "
-        "Ei vaadi sivun uudelleenlatauksia — koko laskenta tapahtuu selaimessa."
+        "Drag the bankroll slider to see recommended stakes in real time. "
+        "No page reloads — everything calculated in the browser."
     )
 
     import streamlit.components.v1 as components
@@ -1854,9 +1854,9 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
     kelly_rivit_js = []
     for _, r in df_value.iterrows():
         kelly_rivit_js.append({
-            "markkina": r["Markkina"],
-            "p": r["Mallin %"] / 100.0,
-            "k": r["Kerroin"],
+            "markkina": r["Market"],
+            "p": r["Model %"] / 100.0,
+            "k": r["Odds"],
             "value": r["Value %"],
             "kelly_pct": r["Kelly 1/4 %"],
         })
@@ -1911,8 +1911,8 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
   <div id="kelly-rows"></div>
 
   <div style="margin-top: 12px; font-size: 12px; opacity: 0.7;">
-    💡 Vihrealla rivilla on value > 5% — Kelly 1/4 -metodi suosittelee turvallisen panostuksen.
-    Harmaat rivit = ei value:a, ei suositusta.
+    💡 Green rows have value > 5% — Kelly 1/4 method recommends a safe stake.
+    Grey rows = no value, no recommendation.
   </div>
 </div>
 
@@ -1942,7 +1942,7 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
           <div class="kelly-row-stat">@ ${{r.k.toFixed(2)}} · value ${{r.value.toFixed(1)}}%</div>
           <div class="kelly-stake ${{stakeClass}}">
             ${{isValue ? stake.toFixed(0) + ' €' : '—'}}
-            ${{isValue ? `<div style="font-size:11px;font-weight:400;opacity:0.7">tuotto +${{tuotto.toFixed(0)}} €</div>` : ''}}
+            ${{isValue ? `<div style="font-size:11px;font-weight:400;opacity:0.7">profit +${{tuotto.toFixed(0)}} €</div>` : ''}}
           </div>
         </div>
       `;
@@ -1957,6 +1957,6 @@ with st.expander("🎰 Ehdotettu veto — kaikki markkinat", expanded=True):
     )
 
 st.caption(
-    "Vastuuvapaus: tama on oppimismalli, ei sijoitusneuvo. "
-    "Markkinat hinnoittelevat usein piirteita joita avoin data ei kata."
+    "Disclaimer: this is an educational model, not investment advice. "
+    "Markets often price in factors that open data does not capture."
 )

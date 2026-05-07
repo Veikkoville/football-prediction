@@ -30,44 +30,44 @@ from src.models.backtest import (
 from src.models.calibration import kalibroi_walk_forward
 
 st.set_page_config(page_title="Backtest", page_icon="🔬", layout="wide")
-st.title("🔬 Backtest, kalibrointi ja historialliset ennusteet")
+st.title("🔬 Backtest, calibration and historical predictions")
 st.caption(
-    "Walk-forward -arviointi: jokaiselle ottelulle malli sovitetaan "
-    "VAIN sitä edeltävällä datalla. Tämä on rehellinen mittari mallin "
-    "todelliselle ennustekyvylle."
+    "Walk-forward evaluation: for each match the model is fitted "
+    "ONLY on data preceding it. This is an honest measure of the model's "
+    "true predictive power."
 )
 
-st.sidebar.header("Backtestin asetukset")
+st.sidebar.header("Backtest settings")
 liigat = st.sidebar.multiselect(
-    "Liigat",
+    "Leagues",
     options=["ENG-Premier League", "ESP-La Liga", "GER-Bundesliga", "ITA-Serie A", "FRA-Ligue 1"],
     default=["ENG-Premier League"],
 )
 kaudet = st.sidebar.multiselect(
-    "Kaudet", options=["2122", "2223", "2324", "2425"],
+    "Seasons", options=["2122", "2223", "2324", "2425"],
     default=["2425"],
 )
 min_train = st.sidebar.slider(
-    "Minimi treenikoko", 30, 1500, 380, 10,
-    help="Kuinka monta ottelua skipataan ennen kuin aletaan ennustaa. "
-         "380 = yksi PL-kausi -> arviointi vasta sitten kun malli on vakaa. "
-         "Useamman kauden datalla suosittele 380-760.",
+    "Minimum train size", 30, 1500, 380, 10,
+    help="How many matches to skip before starting predictions. "
+         "380 = one PL season -> evaluation only after the model is stable. "
+         "With multiple seasons of data, recommend 380-760.",
 )
-refit_days = st.sidebar.slider("Sovita malli uudelleen joka N päivä", 1, 30, 7, 1)
+refit_days = st.sidebar.slider("Refit model every N days", 1, 30, 7, 1)
 
 st.sidebar.divider()
 kaytä_ensemble = st.sidebar.toggle(
-    "🤝 Käytä Ensemble (DC + LightGBM)",
+    "🤝 Use Ensemble (DC + LightGBM)",
     value=False,
-    help="LightGBM tarvitsee xG-piirteet — toimii vain Top-5 -liigoille. "
-         "Hitaampi (LGB sovittuu uudelleen joka refit) mutta usein parempi.",
+    help="LightGBM requires xG features — works only for Top-5 leagues. "
+         "Slower (LGB refits on each refit cycle) but usually better.",
 )
 ens_paino = st.sidebar.slider(
-    "Ensemble: Dixon-Coles paino", 0.0, 1.0, 0.5, 0.05,
+    "Ensemble: Dixon-Coles weight", 0.0, 1.0, 0.5, 0.05,
     disabled=not kaytä_ensemble,
 )
 
-if st.sidebar.button("▶️ Aja backtest", type="primary"):
+if st.sidebar.button("▶️ Run backtest", type="primary"):
     st.session_state["aja_backtest"] = True
 
 
@@ -81,7 +81,7 @@ def cached_backtest(liigat: tuple, kaudet: tuple, min_train: int, refit_days: in
     # Ensemble vaatii xG-sarakkeet sailytetylla (home_xg, away_xg jo nimettyna oikein Understatissa)
     matches["date"] = pd.to_datetime(matches["date"])
 
-    progress = st.progress(0.0, text="Walk-forward käynnissä...")
+    progress = st.progress(0.0, text="Walk-forward running...")
     def cb(i, n):
         progress.progress(min(i / max(n, 1), 1.0), text=f"Walk-forward: {i}/{n}")
 
@@ -105,30 +105,30 @@ def cached_backtest(liigat: tuple, kaudet: tuple, min_train: int, refit_days: in
 
 
 if not st.session_state.get("aja_backtest"):
-    st.info("👈 Valitse asetukset sivupalkista ja paina **Aja backtest**. "
-            "Ensimmäinen ajo voi kestää 1–5 minuuttia.")
+    st.info("👈 Select settings in the sidebar and click **Run backtest**. "
+            "First run may take 1–5 minutes.")
     st.stop()
 
 if not liigat or not kaudet:
-    st.warning("Valitse liiga ja kausi.")
+    st.warning("Select league and season.")
     st.stop()
 
 bt = cached_backtest(tuple(liigat), tuple(kaudet), min_train, refit_days, kaytä_ensemble, ens_paino)
 
 if bt.empty:
-    st.error("Backtest ei tuottanut yhtään ennustetta. Vähennä `min_train`-arvoa.")
+    st.error("Backtest produced no predictions. Lower `min_train`.")
     st.stop()
 
 # ---------------------------------------------------------------------------
 # METRIIKAT
 # ---------------------------------------------------------------------------
-# Kalibroi tulokset (oletus: paalla)
+# Calibrate results (default: on)
 kalibroi = st.checkbox(
-    "🎯 Kalibroi todennakoisyydet (Platt/isotoninen)",
+    "🎯 Calibrate probabilities (Platt/isotonic)",
     value=True,
-    help="Korjaa malllin yli-/ali-itsevarmuuden. Tekee kalibrointipisteet nojaamaan diagonaaliin.",
+    help="Corrects model over-/under-confidence. Pulls calibration points toward the diagonal.",
 )
-kal_method = st.radio("Kalibrointimetodi", ["isotonic", "platt"], horizontal=True)
+kal_method = st.radio("Calibration method", ["isotonic", "platt"], horizontal=True)
 
 bt_kal = bt.copy()
 if kalibroi and len(bt) >= 50:
@@ -142,75 +142,75 @@ if kalibroi and len(bt) >= 50:
 metr_raaka = laske_metriikat(bt)
 metr = laske_metriikat(bt_kal) if kalibroi else metr_raaka
 
-st.subheader("📈 Suorituskykymittarit")
+st.subheader("📈 Performance metrics")
 if kalibroi:
     st.caption(
-        f"Raaka log loss: {metr_raaka['log_loss']:.3f} -> kalibroitu: {metr['log_loss']:.3f}. "
+        f"Raw log loss: {metr_raaka['log_loss']:.3f} -> calibrated: {metr['log_loss']:.3f}. "
         f"Brier: {metr_raaka['brier']:.3f} -> {metr['brier']:.3f}."
     )
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("Otteluita ennustettu", metr["n"])
+m1.metric("Matches predicted", metr["n"])
 m2.metric("Log loss", f"{metr['log_loss']:.3f}",
-          help="Pieni = hyvä. Pelkkä tasajako tuottaa ~1.099.")
+          help="Lower = better. Uniform distribution gives ~1.099.")
 m3.metric("Accuracy (1X2)", f"{metr['accuracy']*100:.1f} %",
-          help="Suurin todennäköisyys = ennuste. Sattuma = ~33%, kotietuus ~46%.")
+          help="Largest probability = prediction. Random = ~33%, home advantage ~46%.")
 m4.metric("Brier score", f"{metr['brier']:.3f}",
-          help="Pieni = hyvä. 0 = täydellinen, 0.667 = naiivi.")
+          help="Lower = better. 0 = perfect, 0.667 = naive.")
 
 st.divider()
 
 # ---------------------------------------------------------------------------
-# KALIBROINTIKUVAAJA
+# CALIBRATION CHART
 # ---------------------------------------------------------------------------
-st.subheader("📐 Kalibrointi (reliability diagram)")
+st.subheader("📐 Calibration (reliability diagram)")
 st.caption(
-    "Hyvin kalibroitu malli: kun malli sanoo 'voitto 60 %', toteumassa "
-    "voittaa 60 % ajasta. Diagonaali = täydellinen kalibrointi."
+    "A well-calibrated model: when the model says 'win 60%', the team wins "
+    "60% of the time in reality. Diagonal = perfect calibration."
 )
 
 kal = kalibrointi_data(bt_kal if kalibroi else bt, n_bins=10)
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines",
-                         name="Täydellinen kalibrointi", line=dict(dash="dash", color="gray")))
+                         name="Perfect calibration", line=dict(dash="dash", color="gray")))
 fig.add_trace(go.Scatter(x=kal["ennustettu"], y=kal["toteutunut"],
-                         mode="lines+markers", name="Mallin kalibrointi",
+                         mode="lines+markers", name="Model calibration",
                          marker=dict(size=12)))
 fig.update_layout(
-    xaxis_title="Mallin ennustama todennäköisyys",
-    yaxis_title="Toteutunut osuus",
+    xaxis_title="Model predicted probability",
+    yaxis_title="Realized fraction",
     xaxis=dict(range=[0, 1]), yaxis=dict(range=[0, 1]),
     height=500,
 )
 st.plotly_chart(fig, use_container_width=True)
 
 st.caption(
-    f"Otoskoko per bin: {', '.join(str(int(n)) for n in kal['n'])}. "
-    "Mitä useampi havainto per bin, sitä luotettavampi piste."
+    f"Sample size per bin: {', '.join(str(int(n)) for n in kal['n'])}. "
+    "More observations per bin = more reliable point."
 )
 
 st.divider()
 
 # ---------------------------------------------------------------------------
-# HISTORIALLISET ENNUSTEET
+# HISTORICAL PREDICTIONS
 # ---------------------------------------------------------------------------
-st.subheader("📜 Historialliset ennusteet vs toteutumat")
-st.caption("Mitä malli sanoi ennen ottelua ja mikä lopputulos oli.")
+st.subheader("📜 Historical predictions vs outcomes")
+st.caption("What the model said before the match and what the result was.")
 
 bt_show = (bt_kal if kalibroi else bt).copy()
-bt_show["Tulos"] = bt_show["home_score"].astype(str) + "-" + bt_show["away_score"].astype(str)
-bt_show["Toteutunut"] = bt_show["actual_1x2"].map({0: "1", 1: "X", 2: "2"})
+bt_show["Score"] = bt_show["home_score"].astype(str) + "-" + bt_show["away_score"].astype(str)
+bt_show["Actual"] = bt_show["actual_1x2"].map({0: "1", 1: "X", 2: "2"})
 
-# Mallin valinta = suurin p
-bt_show["Mallin veikkaus"] = bt_show[["p_home", "p_draw", "p_away"]].values.argmax(axis=1)
-bt_show["Mallin veikkaus"] = bt_show["Mallin veikkaus"].map({0: "1", 1: "X", 2: "2"})
-bt_show["Oikein?"] = (bt_show["Mallin veikkaus"] == bt_show["Toteutunut"]).map({True: "✅", False: "❌"})
+# Model pick = highest p
+bt_show["Model pick"] = bt_show[["p_home", "p_draw", "p_away"]].values.argmax(axis=1)
+bt_show["Model pick"] = bt_show["Model pick"].map({0: "1", 1: "X", 2: "2"})
+bt_show["Correct?"] = (bt_show["Model pick"] == bt_show["Actual"]).map({True: "✅", False: "❌"})
 
 bt_show["1 %"] = (bt_show["p_home"] * 100).round(1)
 bt_show["X %"] = (bt_show["p_draw"] * 100).round(1)
 bt_show["2 %"] = (bt_show["p_away"] * 100).round(1)
 
-# Suodatin
-suodatin = st.text_input("Suodata joukkueella (vapaa teksti)", "")
+# Filter
+suodatin = st.text_input("Filter by team (free text)", "")
 if suodatin:
     mask = (
         bt_show["home_team"].str.contains(suodatin, case=False, na=False) |
@@ -220,8 +220,8 @@ if suodatin:
 
 st.dataframe(
     bt_show[[
-        "date", "home_team", "away_team", "Tulos", "Toteutunut",
-        "1 %", "X %", "2 %", "Mallin veikkaus", "Oikein?",
+        "date", "home_team", "away_team", "Score", "Actual",
+        "1 %", "X %", "2 %", "Model pick", "Correct?",
     ]].sort_values("date", ascending=False),
     hide_index=True, use_container_width=True, height=500,
 )
@@ -230,10 +230,10 @@ st.dataframe(
 # PROFIITTISIMULAATIO (jos olisi panostettu mallin suurimman p:n mukaan)
 # ---------------------------------------------------------------------------
 st.divider()
-st.subheader("💸 Naiivi vetokalkyyli (jos olisi panostettu mallin valintaan)")
+st.subheader("💸 Naive betting calculation (if you had bet the model's pick)")
 st.caption(
-    "Kuvitteellinen 1.0 yksikön panos jokaiseen otteluun mallin suurimmalle "
-    "todennäköisyydelle, oletetaan reilu kerroin = 1/p."
+    "Hypothetical 1.0 unit stake on each match's highest model probability, "
+    "assuming fair odds = 1/p."
 )
 
 bt2 = bt.copy()
@@ -250,16 +250,15 @@ bt2["markkina_kerroin"] = bt2["reilu_kerroin"] * (1 - 0.06)
 bt2["markkina_voitto"] = bt2.apply(lambda r: (r["markkina_kerroin"] - 1.0) if r["voitti"] else -1.0, axis=1)
 
 s1, s2, s3 = st.columns(3)
-s1.metric("Otteluita", len(bt2))
-s2.metric("Reilun kertoimen kumulatiivinen ROI",
-          f"{bt2['voitto_yks'].sum():.1f} yks", delta=f"{bt2['voitto_yks'].mean()*100:.1f} % per veto")
-s3.metric("Markkina (6 % marginaali) ROI",
-          f"{bt2['markkina_voitto'].sum():.1f} yks", delta=f"{bt2['markkina_voitto'].mean()*100:.1f} % per veto")
+s1.metric("Matches", len(bt2))
+s2.metric("Fair-odds cumulative ROI",
+          f"{bt2['voitto_yks'].sum():.1f} units", delta=f"{bt2['voitto_yks'].mean()*100:.1f} % per bet")
+s3.metric("Market (6 % margin) ROI",
+          f"{bt2['markkina_voitto'].sum():.1f} units", delta=f"{bt2['markkina_voitto'].mean()*100:.1f} % per bet")
 
 st.caption(
-    "💡 Markkina-arvio olettaa että vetomyyjä hinnoittelee oman näkemyksensä +6% "
-    "Markkina-arvio olettaa etta vetomyyja hinnoittelee oman nakemyksensa +6% "
-    "marginaalilla. Jos malli on yhta hyva kuin markkina, ROI on noin -6 % "
-    "(haviat marginaalin). Positiivinen ROI = mallisi peittosi markkinan tassa "
-    "otoksessa, mutta yksi kausi ei viela riita todistamaan voitollista mallia."
+    "💡 The market estimate assumes the bookmaker prices their view with a "
+    "+6% margin. If your model is as good as the market, ROI is around -6 % "
+    "(you lose the margin). Positive ROI = your model beat the market in "
+    "this sample, but one season is not enough to prove a profitable model."
 )

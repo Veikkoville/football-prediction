@@ -15,70 +15,70 @@ import streamlit as st
 from src.data.footballdata import lataa as lataa_fd
 from src.models.betting_backtest import aja_vetokerroin_roi, laske_roi_metriikat
 
-st.set_page_config(page_title="Vetokerroin-ROI", page_icon="💰", layout="wide")
-st.title("💰 Vetokerroin-ROI — historiallinen simulaatio")
+st.set_page_config(page_title="Odds ROI", page_icon="💰", layout="wide")
+st.title("💰 Odds ROI — historical simulation")
 st.caption(
-    "Walk-forward: malli ennustaa joka ottelulle, vertaa Bet365/Pinnacle-kertoimiin, "
-    "panostaa value-vetoihin Kelly-fraktiolla. Lopussa ROI-prosentti."
+    "Walk-forward: model predicts each match, compares to Bet365/Pinnacle odds, "
+    "stakes value bets via Kelly fraction. Final result is ROI %."
 )
 
-st.sidebar.header("Asetukset")
+st.sidebar.header("Settings")
 liiga = st.sidebar.selectbox(
-    "Liiga", [
+    "League", [
         "ENG-Premier League", "ENG-Championship", "ESP-La Liga",
         "GER-Bundesliga", "ITA-Serie A", "FRA-Ligue 1",
         "POR-Primeira Liga", "NED-Eredivisie", "SCO-Premiership",
     ],
 )
 kaudet = st.sidebar.multiselect(
-    "Kaudet (mainstream-tiedostot)",
+    "Seasons (mainstream files)",
     options=["2122", "2223", "2324", "2425"],
     default=["2223", "2324", "2425"],
 )
 min_train = st.sidebar.slider("Min train size", 100, 1500, 380, 50)
-refit_days = st.sidebar.slider("Refit-välit (pv)", 1, 30, 14, 1)
-value_threshold = st.sidebar.slider("Value-kynnys (%)", 0, 30, 5, 1) / 100.0
+refit_days = st.sidebar.slider("Refit interval (days)", 1, 30, 14, 1)
+value_threshold = st.sidebar.slider("Value threshold (%)", 0, 30, 5, 1) / 100.0
 kelly_kerroin = st.sidebar.slider(
-    "Kelly-fraktio", 0.05, 1.0, 0.25, 0.05,
-    help="0.25 = 1/4 Kelly (suositeltava). 1.0 = täysi Kelly (riskialtis).",
+    "Kelly fraction", 0.05, 1.0, 0.25, 0.05,
+    help="0.25 = 1/4 Kelly (recommended). 1.0 = full Kelly (high-risk).",
 )
 odds_source = st.sidebar.radio(
-    "Vetomyyjä", ["Bet365 (odds_home/draw/away)", "Pinnacle (ps_home/draw/away)"],
+    "Bookmaker", ["Bet365 (odds_home/draw/away)", "Pinnacle (ps_home/draw/away)"],
 )
 odds_lahde = "ps_home" if "Pinnacle" in odds_source else "odds_home"
 
-if st.sidebar.button("▶️ Aja simulaatio", type="primary"):
+if st.sidebar.button("▶️ Run simulation", type="primary"):
     st.session_state["aja"] = True
 
 if not st.session_state.get("aja"):
-    st.info("👈 Valitse asetukset ja paina **Aja simulaatio**.")
+    st.info("👈 Choose settings and click **Run simulation**.")
     st.stop()
 
 if not kaudet:
-    st.warning("Valitse vähintään yksi kausi.")
+    st.warning("Select at least one season.")
     st.stop()
 
 
-@st.cache_data(show_spinner="Ladataan dataa...")
+@st.cache_data(show_spinner="Loading data...")
 def lataa(liiga, kaudet):
     return lataa_fd(liiga, list(kaudet))
 
 
 df = lataa(liiga, tuple(kaudet))
 if df.empty:
-    st.error("Ei dataa.")
+    st.error("No data.")
     st.stop()
 
-st.success(f"Datassa {len(df)} ottelua.")
+st.success(f"Data has {len(df)} matches.")
 oc_check = ["ps_home", "ps_draw", "ps_away"] if odds_lahde == "ps_home" else ["odds_home", "odds_draw", "odds_away"]
 puuttuvat = [c for c in oc_check if c not in df.columns]
 if puuttuvat:
-    st.error(f"Vetomyyjän kertoimet puuttuvat datasta: {puuttuvat}. Vaihda vetomyyjää tai liigaa.")
+    st.error(f"Bookmaker odds missing from data: {puuttuvat}. Switch bookmaker or league.")
     st.stop()
 df_kertoimilla = df.dropna(subset=oc_check)
-st.caption(f"Kertoimet löytyvät {len(df_kertoimilla)} ottelulle.")
+st.caption(f"Odds available for {len(df_kertoimilla)} matches.")
 
-with st.spinner("Walk-forward simulaatio käynnissä..."):
+with st.spinner("Walk-forward simulation running..."):
     progress = st.progress(0.0)
     def cb(i, n):
         progress.progress(min(i / max(n, 1), 1.0))
@@ -90,50 +90,50 @@ with st.spinner("Walk-forward simulaatio käynnissä..."):
     progress.empty()
 
 if panostukset.empty:
-    st.warning("Ei panostuksia syntynyt — value-kynnys liian korkea tai data puuttuu.")
+    st.warning("No bets generated — value threshold too high or data missing.")
     st.stop()
 
 metr = laske_roi_metriikat(panostukset)
 
-st.subheader("📊 Tulokset")
+st.subheader("📊 Results")
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("Panostuksia", metr["n_panoksia"])
-m2.metric("Voittoprosentti", f"{metr['voittoprosentti']:.1f} %")
+m1.metric("Bets placed", metr["n_panoksia"])
+m2.metric("Win rate", f"{metr['voittoprosentti']:.1f} %")
 m3.metric("ROI", f"{metr['roi_pct']:.2f} %",
-          delta=f"{metr['kokonaistuotto']:+.1f} yks")
-m4.metric("Max drawdown", f"{metr['max_drawdown']:.1f} yks")
+          delta=f"{metr['kokonaistuotto']:+.1f} units")
+m4.metric("Max drawdown", f"{metr['max_drawdown']:.1f} units")
 
 if metr["roi_pct"] > 0:
     st.success(
-        f"🎉 Malli olisi tehnyt **+{metr['roi_pct']:.2f}% ROI** {metr['n_panoksia']} "
-        f"panostuksella. Varauma: yksi kausi/liiga ei vielä todista voittavaa mallia "
-        f"— tarvitaan >2000 panostusta tilastollista merkitsevyyttä varten."
+        f"🎉 Model would have made **+{metr['roi_pct']:.2f}% ROI** with {metr['n_panoksia']} "
+        f"bets. Caveat: one season/league is not enough to prove a winning model "
+        f"— need >2000 bets for statistical significance."
     )
 else:
     st.warning(
-        f"Malli olisi hävinnyt **{metr['roi_pct']:.2f}% ROI** {metr['n_panoksia']} "
-        "panostuksella. Tämä on yleisin tulos (~94% julkaistuista vetomalleista häviää "
-        "markkinaa pitkässä juoksussa)."
+        f"Model would have lost **{metr['roi_pct']:.2f}% ROI** with {metr['n_panoksia']} "
+        "bets. This is the most common result (~94% of published betting models lose "
+        "to the market in the long run)."
     )
 
 st.divider()
 
-# Kumulatiivinen tuotto
-st.subheader("📈 Kumulatiivinen tuotto")
+# Cumulative profit
+st.subheader("📈 Cumulative profit")
 kum = panostukset.copy()
 kum = kum.sort_values("date").reset_index(drop=True)
 kum["kum_tuotto"] = kum["tuotto"].cumsum()
 kum["panos_n"] = range(1, len(kum) + 1)
 fig = px.line(kum, x="panos_n", y="kum_tuotto",
-              labels={"panos_n": "Panostus #", "kum_tuotto": "Kumulatiivinen tuotto (yks)"},
-              title=f"ROI {metr['roi_pct']:.2f}% • {metr['n_panoksia']} panostusta")
+              labels={"panos_n": "Bet #", "kum_tuotto": "Cumulative profit (units)"},
+              title=f"ROI {metr['roi_pct']:.2f}% • {metr['n_panoksia']} bets")
 fig.add_hline(y=0, line_dash="dash", line_color="gray")
 st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 
-# Panostustaulukko
-st.subheader("📋 Yksittäiset panostukset")
+# Bets table
+st.subheader("📋 Individual bets")
 nayta = panostukset.copy()
 nayta["date"] = nayta["date"].dt.strftime("%Y-%m-%d")
 nayta["mallin_p"] = (nayta["mallin_p"] * 100).round(1)

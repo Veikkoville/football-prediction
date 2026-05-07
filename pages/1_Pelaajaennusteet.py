@@ -16,9 +16,9 @@ from scipy.stats import poisson
 import config
 from src.data.fbref import lataa_pelaajat_kausi
 
-st.set_page_config(page_title="Pelaajaennusteet", page_icon="⭐", layout="wide")
-st.title("⭐ Pelaajatason ennusteet")
-st.caption("Per-90 -arvot → odotetut maalit ja anytime scorer -%.")
+st.set_page_config(page_title="Player predictions", page_icon="⭐", layout="wide")
+st.title("⭐ Player-level predictions")
+st.caption("Per-90 values → expected goals and anytime scorer %.")
 
 
 def _flatten(df: pd.DataFrame) -> pd.DataFrame:
@@ -30,7 +30,7 @@ def _flatten(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-@st.cache_data(show_spinner="Ladataan pelaajadataa FBref:stä...")
+@st.cache_data(show_spinner="Loading player data from FBref...")
 def lataa(liigat: tuple, kaudet: tuple) -> pd.DataFrame:
     """Yritetään ensin standard, jos xG puuttuu yritetään myös shooting."""
     try:
@@ -40,7 +40,7 @@ def lataa(liigat: tuple, kaudet: tuple) -> pd.DataFrame:
             cache_dir=config.RAW_DATA_DIR / "fbref",
         ))
     except Exception as e:
-        st.error(f"FBref-haku epäonnistui: {e}")
+        st.error(f"FBref fetch failed: {e}")
         return pd.DataFrame()
 
     # Jos xG-saraketta ei löydy, kokeile yhdistää shooting-data
@@ -57,7 +57,7 @@ def lataa(liigat: tuple, kaudet: tuple) -> pd.DataFrame:
             if avaimet:
                 std = std.merge(sh, on=avaimet, how="outer", suffixes=("", "_sh"))
         except Exception as e:
-            st.warning(f"Shooting-data ei latautunut: {e}")
+            st.warning(f"Shooting data did not load: {e}")
     return std
 
 
@@ -118,9 +118,9 @@ def loyda_gls(df: pd.DataFrame) -> str | None:
 # ---------------------------------------------------------------------------
 # UI
 # ---------------------------------------------------------------------------
-st.sidebar.header("Datan valinta")
+st.sidebar.header("Data selection")
 liigat = st.sidebar.multiselect(
-    "Liigat",
+    "Leagues",
     options=["ENG-Premier League", "ESP-La Liga", "GER-Bundesliga",
              "ITA-Serie A", "FRA-Ligue 1",
              "ENG-Championship", "ENG-League One", "ENG-League Two",
@@ -128,18 +128,18 @@ liigat = st.sidebar.multiselect(
              "NOR-Eliteserien", "DEN-Superliga"],
     default=["ENG-Premier League"],
 )
-kaudet = st.sidebar.multiselect("Kaudet", ["2324", "2425", "2526"], default=["2425"])
+kaudet = st.sidebar.multiselect("Seasons", ["2324", "2425", "2526"], default=["2425"])
 
 if not liigat or not kaudet:
-    st.warning("Valitse liiga ja kausi.")
+    st.warning("Select league and season.")
     st.stop()
 
 pelaajat = lataa(tuple(liigat), tuple(kaudet))
 if pelaajat.empty:
-    st.error("Pelaajadata on tyhjä.")
+    st.error("Player data is empty.")
     st.stop()
 
-st.caption(f"Latautui **{len(pelaajat)}** pelaajariviä, **{len(pelaajat.columns)}** saraketta.")
+st.caption(f"Loaded **{len(pelaajat)}** player rows, **{len(pelaajat.columns)}** columns.")
 
 col_minutes = loyda_min(pelaajat)
 col_xg = loyda_xg(pelaajat)
@@ -157,24 +157,24 @@ if col_xg:
     metriikka_nimi = "xG"
 elif col_gls:
     metriikka = col_gls
-    metriikka_nimi = "Goals (xG ei saatavilla)"
+    metriikka_nimi = "Goals (xG not available)"
 
 if not col_minutes or not metriikka:
-    with st.expander("🔍 Sarakediagnostiikka", expanded=True):
-        st.warning("Tarvittava sarake puuttuu:")
+    with st.expander("🔍 Column diagnostics", expanded=True):
+        st.warning("Required column missing:")
         st.json({
             "minutes": col_minutes, "xG": col_xg, "xA": col_xa,
             "Gls (fallback)": col_gls,
             "team": col_team, "player": col_player,
         })
-        st.markdown("**Kaikki sarakkeet:**")
+        st.markdown("**All columns:**")
         st.code("\n".join(str(c) for c in pelaajat.columns))
     st.stop()
 
 if not col_xg:
     st.info(
-        "ℹ️ xG-saraketta ei löytynyt FBref-datasta — käytetään **todellisia maaleja**. "
-        "Tämä on raakempi proxy, sopii niukassa otoksessa."
+        "ℹ️ No xG column found in FBref data — using **actual goals**. "
+        "This is a coarser proxy, suitable when sample is small."
     )
 
 # Per-90
@@ -184,7 +184,7 @@ df[metriikka] = pd.to_numeric(df[metriikka], errors="coerce")
 df = df[df[col_minutes].fillna(0) >= 270].copy()
 
 if df.empty:
-    st.warning("Ei pelaajia ≥ 270 min.")
+    st.warning("No players ≥ 270 min.")
     st.stop()
 
 df["primary_per90"] = df[metriikka].fillna(0) * 90.0 / df[col_minutes]
@@ -200,12 +200,12 @@ joukkue_def = st.session_state.get("koti", joukkueet[0])
 joukkue_idx = joukkueet.index(joukkue_def) if joukkue_def in joukkueet else 0
 
 c1, c2 = st.columns(2)
-joukkue = c1.selectbox("Joukkue", joukkueet, index=joukkue_idx)
-odotetut_minuutit = c2.slider("Odotetut minuutit", 30, 90, 75, 5)
+joukkue = c1.selectbox("Team", joukkueet, index=joukkue_idx)
+odotetut_minuutit = c2.slider("Expected minutes", 30, 90, 75, 5)
 
 joukkueen_pelaajat = df[df[col_team] == joukkue].copy().sort_values("primary_per90", ascending=False)
 
-st.subheader(f"Ennusteet — {joukkue}")
+st.subheader(f"Predictions — {joukkue}")
 skaala = odotetut_minuutit / 90.0
 joukkueen_pelaajat["expected_primary"] = joukkueen_pelaajat["primary_per90"] * skaala
 joukkueen_pelaajat["expected_xA"] = joukkueen_pelaajat["xA_per90"] * skaala
@@ -219,16 +219,16 @@ if col_pos:
 show += [col_minutes, "primary_per90", "xA_per90",
          "expected_primary", "expected_xA", "anytime_scorer_%"]
 nayta = joukkueen_pelaajat[show].copy()
-new_names = ["Pelaaja"] + (["Pelipaikka"] if col_pos else []) + [
+new_names = ["Player"] + (["Position"] if col_pos else []) + [
     "Min", f"{metriikka_nimi}/90", "xA/90",
-    f"Odotettu {metriikka_nimi}", "Odotettu xA", "Anytime %"]
+    f"Expected {metriikka_nimi}", "Expected xA", "Anytime %"]
 nayta.columns = new_names
 nayta = nayta.round(3)
 st.dataframe(nayta.head(20), hide_index=True, use_container_width=True)
 
-# #13 — Pelaajakortit kuvilla (FPL API)
-st.markdown("### 🏃 Top-8 maalintekijaa — kuvakortit")
-st.caption("Kuvat haetaan Premier Leaguen virallisesta CDN:sta (FPL). Kortit ilmestyvat jos joukkue on PL.")
+# #13 — Player cards with photos (FPL API)
+st.markdown("### 🏃 Top-8 scorers — photo cards")
+st.caption("Photos from the Premier League official CDN (FPL). Cards appear if the team is in the PL.")
 
 try:
     from src.viz.player_photos import hae_pelaaja_kortti_html
@@ -239,20 +239,20 @@ try:
         for i, (_, rivi) in enumerate(top8.iloc[row_start:row_start + cols_per_row].iterrows()):
             with cols[i]:
                 kortti_html = hae_pelaaja_kortti_html(
-                    rivi["Pelaaja"],
+                    rivi["Player"],
                     joukkue=joukkue,
-                    xg=float(rivi[f"Odotettu {metriikka_nimi}"]),
-                    stat_label=f"Odotettu {metriikka_nimi}",
+                    xg=float(rivi[f"Expected {metriikka_nimi}"]),
+                    stat_label=f"Expected {metriikka_nimi}",
                 )
                 st.markdown(kortti_html, unsafe_allow_html=True)
 except Exception as e:
-    st.caption(f"Pelaajakorttien lataus epaonnistui: {e}")
+    st.caption(f"Player cards failed to load: {e}")
 
 st.markdown("### Top-10 anytime scorers")
-top10 = nayta.head(10).set_index("Pelaaja")["Anytime %"]
+top10 = nayta.head(10).set_index("Player")["Anytime %"]
 st.bar_chart(top10, height=300)
 
 st.caption(
-    f"💡 Käytetty primaarimetriikka: **{metriikka_nimi}** (sarake `{metriikka}`). "
-    f"Anytime % = 1 − exp(−odotettu {metriikka_nimi})."
+    f"💡 Primary metric used: **{metriikka_nimi}** (column `{metriikka}`). "
+    f"Anytime % = 1 − exp(−expected {metriikka_nimi})."
 )
