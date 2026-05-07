@@ -111,6 +111,26 @@ app.add_middleware(
 _MODEL_CACHE: dict[tuple, DixonColesModel] = {}
 
 
+# ---------------------------------------------------------------------------
+# Lämmitys käynnistyksessä — sovittaa oletusmallin (PL 24/25 + 25/26) taustalla
+# jotta ensimmäinen /api/predict kutsu on nopea (ei 5-15s mallin sovitusta)
+# ---------------------------------------------------------------------------
+@app.on_event("startup")
+def _warmup_default_model():
+    import threading
+
+    def _fit():
+        try:
+            print("[Warmup] Pre-fitting default Premier League DC model...")
+            _saa_malli(("ENG-Premier League",), ("2425", "2526"))
+            print("[Warmup] Default model ready.")
+        except Exception as e:
+            print(f"[Warmup] Failed: {e}")
+
+    # Taustasaikeessa jotta server starttaa heti (Render odottaa portin avautumista)
+    threading.Thread(target=_fit, daemon=True).start()
+
+
 def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
                decay: float = 0.0035, bayes_shrinkage: float = 2.0) -> DixonColesModel:
     """Hae cached DC-malli tai sovita uusi jos ei välimuistissa."""
