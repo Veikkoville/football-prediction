@@ -587,6 +587,27 @@ async def stripe_webhook(request: Request):
     return {"received": True}
 
 
+@app.get("/api/debug/load")
+def debug_load(
+    leagues: list[str] = Query(default=["INT-FIFA World Cup"]),
+    seasons: list[str] = Query(default=["2022"]),
+):
+    """
+    Debug-endpoint: yritä ladata otteludata ja palauta tarkat virheviestit
+    per datalähde. Auttaa selvittämään miksi joku liiga ei toimi.
+    """
+    from src.data.loader import lataa_otteludata_yksityiskohtaisesti
+    tulos = lataa_otteludata_yksityiskohtaisesti(leagues, seasons)
+    return {
+        "requested_leagues": leagues,
+        "requested_seasons": seasons,
+        "rows_loaded": int(len(tulos.data)),
+        "successes_per_league": tulos.onnistui,
+        "errors_per_league": tulos.virheet,
+        "sample_columns": list(tulos.data.columns) if not tulos.data.empty else [],
+    }
+
+
 @app.get("/api/stripe-config")
 def stripe_config():
     """Diagnostiikka: tarkista että Stripe on konfiguroitu (älä paljasta avaimia)."""
