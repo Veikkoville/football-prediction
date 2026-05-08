@@ -128,13 +128,17 @@ def _warmup_default_model():
             print(f"[Warmup] Premier League failed: {e}")
 
     def _fit_world_cup():
-        try:
-            print("[Warmup] Pre-fitting World Cup model (FIFA WC 2022 data)...")
-            _saa_malli(("INT-FIFA World Cup",), ("2223",))
-            print("[Warmup] World Cup model ready.")
-        except Exception as e:
-            # Ei kaada palvelinta — WC-data voi olla vasta tulossa, ei kriittinen
-            print(f"[Warmup] World Cup failed (non-critical): {e}")
+        # Kokeile useita season-formaatteja — soccerdata kayttaa eri formaatteja
+        # eri turnauksille (vuosi, season-koodi, jne.)
+        for season in ("2022", "2223", "2122-2223", "2018"):
+            try:
+                print(f"[Warmup] Trying World Cup model with season={season!r}...")
+                _saa_malli(("INT-FIFA World Cup",), (season,))
+                print(f"[Warmup] World Cup model ready (season={season}).")
+                return
+            except Exception as e:
+                print(f"[Warmup] WC season {season!r} failed: {e}")
+        print("[Warmup] World Cup pre-warm skipped — no working season format.")
 
     # Molemmat taustasaikeissa rinnakkain
     threading.Thread(target=_fit_premier_league, daemon=True).start()
@@ -269,7 +273,7 @@ def list_leagues():
             "INT-FIFA World Cup": {
                 "label": "World Cup 2026",
                 "icon": "🏆",
-                "seasons": ["2223"],
+                "seasons": ["2022"],
                 "note": "Predictions based on 2022 World Cup historical data. Live tournament data adds June 2026.",
             },
         },
