@@ -127,22 +127,12 @@ def _warmup_default_model():
         except Exception as e:
             print(f"[Warmup] Premier League failed: {e}")
 
-    def _fit_world_cup():
-        # Kokeile useita season-formaatteja — soccerdata kayttaa eri formaatteja
-        # eri turnauksille (vuosi, season-koodi, jne.)
-        for season in ("2022", "2223", "2122-2223", "2018"):
-            try:
-                print(f"[Warmup] Trying World Cup model with season={season!r}...")
-                _saa_malli(("INT-World Cup",), (season,))
-                print(f"[Warmup] World Cup model ready (season={season}).")
-                return
-            except Exception as e:
-                print(f"[Warmup] WC season {season!r} failed: {e}")
-        print("[Warmup] World Cup pre-warm skipped — no working season format.")
+    # World Cup pre-warm poistettu launchin ajaksi —
+    # soccerdata vaatii Chromen WC-sivuille jota Renderissä ei ole.
+    # WC-tuki lisätään launchin jälkeen joko hardcoded-JSON:lla tai
+    # Chromen asennuksella Starter-tasolla.
 
-    # Molemmat taustasaikeissa rinnakkain
     threading.Thread(target=_fit_premier_league, daemon=True).start()
-    threading.Thread(target=_fit_world_cup, daemon=True).start()
 
 
 def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
@@ -259,9 +249,6 @@ def list_leagues():
         "uefa_tournaments": [
             "INT-Champions League", "INT-Europa League", "INT-Conference League",
         ],
-        "international_tournaments": [
-            "INT-World Cup",
-        ],
         "available_seasons": ["2122", "2223", "2324", "2425", "2526"],
         # Selitykset mobiilia varten — joukkueiden valinta liigan mukaan
         "league_presets": {
@@ -270,13 +257,16 @@ def list_leagues():
                 "icon": "⚽",
                 "seasons": ["2425", "2526"],
             },
-            "INT-World Cup": {
+        },
+        "coming_soon": [
+            {
+                "code": "INT-World Cup",
                 "label": "World Cup 2026",
                 "icon": "🏆",
-                "seasons": ["2022"],
-                "note": "Predictions based on 2022 World Cup historical data. Live tournament data adds June 2026.",
+                "available_from": "2026-06-11",
+                "note": "World Cup predictions launching when the tournament starts on June 11, 2026.",
             },
-        },
+        ],
     }
 
 
