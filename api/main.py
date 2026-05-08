@@ -587,6 +587,35 @@ async def stripe_webhook(request: Request):
     return {"received": True}
 
 
+@app.get("/api/debug/seasons")
+def debug_seasons(league: str = Query(default="INT-World Cup")):
+    """
+    Listaa kaikki seasonit jotka soccerdata FBref tunnistaa annetulle liigalle.
+    Auttaa selvittämään oikean season-formaatin.
+    """
+    try:
+        import soccerdata as sd
+        # available_leagues() palauttaa kaikki tuetut liigat
+        all_leagues = sd.FBref.available_leagues()
+        # Yritä luoda FBref-instanssi pelkalla liigalla -> tuottaa virheen jossa
+        # season-vaatimukset näkyvät
+        result = {"league": league, "league_valid": league in all_leagues}
+        # Haetaan saatavilla olevat seasonit suoraan
+        try:
+            # Kokeile tehdä instanssi ilman seasonia — antaa default-listan
+            inst = sd.FBref(leagues=[league])
+            # _selected_seasons sisältää seasonit jotka instanssi tunnistaa
+            seasons = inst.seasons if hasattr(inst, "seasons") else None
+            if seasons is None and hasattr(inst, "_selected_seasons"):
+                seasons = inst._selected_seasons
+            result["available_seasons_default"] = list(seasons) if seasons else "?"
+        except Exception as e:
+            result["seasons_error"] = f"{type(e).__name__}: {str(e)[:300]}"
+        return result
+    except Exception as e:
+        return {"error": f"{type(e).__name__}: {str(e)[:500]}"}
+
+
 @app.get("/api/debug/load")
 def debug_load(
     leagues: list[str] = Query(default=["INT-World Cup"]),
