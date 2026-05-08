@@ -502,18 +502,36 @@ async def stripe_webhook(request: Request):
         # voimassa current_period_end -paivaan asti
         user_id = obj.get("metadata", {}).get("user_id")
         if user_id:
-            cancel_at_end = obj.get("cancel_at_period_end", False)
-            period_end_ts = obj.get("current_period_end")  # unix timestamp tai null
+            from datetime import datetime, timezone
+
+            # Stripe API:n eri versiot tallentavat cancel-tiedot eri tavoin:
+            # - Vanhempi: cancel_at_period_end (boolean) + current_period_end juuressa
+            # - Uudempi (2026+): cancel_at (timestamp) + current_period_end items[0]:ssa
+            cancel_at_end_bool = obj.get("cancel_at_period_end", False)
+            cancel_at_ts = obj.get("cancel_at")  # uudempi: timestamp tai None
+            is_canceled = bool(cancel_at_end_bool) or bool(cancel_at_ts)
+
+            # period_end: kokeile juurikenttaa, sitten cancel_at-timestampia,
+            # viimeiseksi items[0].current_period_end (uudempi API)
+            period_end_ts = obj.get("current_period_end") or cancel_at_ts
+            if not period_end_ts:
+                items = obj.get("items") or {}
+                items_data = items.get("data") if isinstance(items, dict) else None
+                if items_data:
+                    period_end_ts = items_data[0].get("current_period_end")
+
             period_end_iso = None
             if period_end_ts:
-                from datetime import datetime, timezone
-                period_end_iso = datetime.fromtimestamp(period_end_ts, tz=timezone.utc).isoformat()
+                period_end_iso = datetime.fromtimestamp(
+                    period_end_ts, tz=timezone.utc
+                ).isoformat()
             print(
                 f"[Stripe webhook] subscription.updated user_id={user_id} "
-                f"cancel_at_period_end={cancel_at_end} period_end={period_end_iso}"
+                f"is_canceled={is_canceled} (bool={cancel_at_end_bool} ts={cancel_at_ts}) "
+                f"period_end={period_end_iso}"
             )
             _update_profile(user_id, {
-                "subscription_cancel_at_period_end": cancel_at_end,
+                "subscription_cancel_at_period_end": is_canceled,
                 "subscription_current_period_end": period_end_iso,
             })
         else:
