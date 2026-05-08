@@ -133,7 +133,7 @@ def _warmup_default_model():
         for season in ("2022", "2223", "2122-2223", "2018"):
             try:
                 print(f"[Warmup] Trying World Cup model with season={season!r}...")
-                _saa_malli(("INT-FIFA World Cup",), (season,))
+                _saa_malli(("INT-World Cup",), (season,))
                 print(f"[Warmup] World Cup model ready (season={season}).")
                 return
             except Exception as e:
@@ -260,7 +260,7 @@ def list_leagues():
             "INT-Champions League", "INT-Europa League", "INT-Conference League",
         ],
         "international_tournaments": [
-            "INT-FIFA World Cup",
+            "INT-World Cup",
         ],
         "available_seasons": ["2122", "2223", "2324", "2425", "2526"],
         # Selitykset mobiilia varten — joukkueiden valinta liigan mukaan
@@ -270,7 +270,7 @@ def list_leagues():
                 "icon": "⚽",
                 "seasons": ["2425", "2526"],
             },
-            "INT-FIFA World Cup": {
+            "INT-World Cup": {
                 "label": "World Cup 2026",
                 "icon": "🏆",
                 "seasons": ["2022"],
@@ -589,7 +589,7 @@ async def stripe_webhook(request: Request):
 
 @app.get("/api/debug/load")
 def debug_load(
-    leagues: list[str] = Query(default=["INT-FIFA World Cup"]),
+    leagues: list[str] = Query(default=["INT-World Cup"]),
     seasons: list[str] = Query(default=["2022"]),
 ):
     """
