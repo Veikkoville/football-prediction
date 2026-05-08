@@ -119,16 +119,26 @@ _MODEL_CACHE: dict[tuple, DixonColesModel] = {}
 def _warmup_default_model():
     import threading
 
-    def _fit():
+    def _fit_premier_league():
         try:
-            print("[Warmup] Pre-fitting default Premier League DC model...")
+            print("[Warmup] Pre-fitting Premier League DC model...")
             _saa_malli(("ENG-Premier League",), ("2425", "2526"))
-            print("[Warmup] Default model ready.")
+            print("[Warmup] Premier League model ready.")
         except Exception as e:
-            print(f"[Warmup] Failed: {e}")
+            print(f"[Warmup] Premier League failed: {e}")
 
-    # Taustasaikeessa jotta server starttaa heti (Render odottaa portin avautumista)
-    threading.Thread(target=_fit, daemon=True).start()
+    def _fit_world_cup():
+        try:
+            print("[Warmup] Pre-fitting World Cup model (FIFA WC 2022 data)...")
+            _saa_malli(("INT-FIFA World Cup",), ("2223",))
+            print("[Warmup] World Cup model ready.")
+        except Exception as e:
+            # Ei kaada palvelinta — WC-data voi olla vasta tulossa, ei kriittinen
+            print(f"[Warmup] World Cup failed (non-critical): {e}")
+
+    # Molemmat taustasaikeissa rinnakkain
+    threading.Thread(target=_fit_premier_league, daemon=True).start()
+    threading.Thread(target=_fit_world_cup, daemon=True).start()
 
 
 def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
@@ -245,7 +255,24 @@ def list_leagues():
         "uefa_tournaments": [
             "INT-Champions League", "INT-Europa League", "INT-Conference League",
         ],
+        "international_tournaments": [
+            "INT-FIFA World Cup",
+        ],
         "available_seasons": ["2122", "2223", "2324", "2425", "2526"],
+        # Selitykset mobiilia varten — joukkueiden valinta liigan mukaan
+        "league_presets": {
+            "ENG-Premier League": {
+                "label": "Premier League",
+                "icon": "⚽",
+                "seasons": ["2425", "2526"],
+            },
+            "INT-FIFA World Cup": {
+                "label": "World Cup 2026",
+                "icon": "🏆",
+                "seasons": ["2223"],
+                "note": "Predictions based on 2022 World Cup historical data. Live tournament data adds June 2026.",
+            },
+        },
     }
 
 
