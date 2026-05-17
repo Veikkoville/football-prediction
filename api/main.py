@@ -15,6 +15,7 @@ Sitten avaa selain:
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 import sys
@@ -187,6 +188,45 @@ class PredictionRequest(BaseModel):
     is_derby: bool = Field(default=False)
 
 
+class PredictWCRequest(BaseModel):
+    """
+    WC-ennustepyyntö — kansainväliset joukkueet, ei seurajoukkueet.
+
+    Defaults:
+      - leagues: ["INT-World Cup"]
+      - seasons: ["2018", "2022", "2026"] — 4-digit year format, normalisoidaan
+        sisäisesti 2-digit-formaattiin loader-yhteensopivuuden vuoksi
+        (football_data_org._kausi_to_year tulkitsee "2018" → "2020", joten
+        meidän on muunnettava ne "18", "22", "26" ennen lähetystä).
+
+    Datalähde: football-data.org / ML Pack Light -tier
+      (avaa "10 seasons of history" → WC 2018, 2022 FINISHED-ottelut).
+    """
+    home_team: str = Field(..., description="Home team (e.g., 'Argentina')",
+                            examples=["Argentina"])
+    away_team: str = Field(..., description="Away team (e.g., 'France')",
+                            examples=["France"])
+    leagues: list[str] = Field(
+        default=["INT-World Cup"],
+        description="Käytä oletusta — WC-endpoint tukee vain tätä koodia",
+    )
+    seasons: list[str] = Field(
+        default=["2018", "2022", "2026"],
+        description="WC-kaudet (4-digit years).",
+    )
+    # WC-otteluissa ei perinteistä kotietua → decay pienempi (vanha data
+    # arvokkaampaa kun kausia on 3 eri vuotta) ja shrinkage suurempi
+    # (uudet kvalifioituneet maajoukkueet kohti kv-keskiarvoa).
+    decay: float = Field(default=0.0010, ge=0.0, le=0.020)
+    bayes_shrinkage: float = Field(default=3.0, ge=0.0, le=10.0)
+    # Manuaaliset säädöt — samat kuin /api/predict
+    home_injury_pct: float = Field(default=0.0, ge=-30.0, le=0.0)
+    away_injury_pct: float = Field(default=0.0, ge=-30.0, le=0.0)
+    home_motivation_pct: float = Field(default=0.0, ge=-15.0, le=15.0)
+    away_motivation_pct: float = Field(default=0.0, ge=-15.0, le=15.0)
+    is_derby: bool = Field(default=False)
+
+
 class PredictionResponse(BaseModel):
     """Ennustevastaus 1X2, O/U 2.5, BTTS."""
     home_team: str
@@ -327,6 +367,111 @@ def predict(req: PredictionRequest):
     )
 
     # Ennusteet
+    lam, mu = dc.expected_goals(req.home_team, req.away_team, adjustments=saadot)
+    p_1x2 = dc.predict_1x2(req.home_team, req.away_team, adjustments=saadot)
+    p_ou = dc.predict_over_under(req.home_team, req.away_team, line=2.5, adjustments=saadot)
+    p_btts = dc.predict_btts(req.home_team, req.away_team, adjustments=saadot)
+    top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=5, adjustments=saadot)
+
+    return PredictionResponse(
+        home_team=req.home_team,
+        away_team=req.away_team,
+        expected_goals_home=round(float(lam), 3),
+        expected_goals_away=round(float(mu), 3),
+        p_home_win=round(p_1x2["home"], 4),
+        p_draw=round(p_1x2["draw"], 4),
+        p_away_win=round(p_1x2["away"], 4),
+        fair_odds_home=round(1.0 / max(p_1x2["home"], 0.001), 2),
+        fair_odds_draw=round(1.0 / max(p_1x2["draw"], 0.001), 2),
+        fair_odds_away=round(1.0 / max(p_1x2["away"], 0.001), 2),
+        p_over_2_5=round(p_ou["over"], 4),
+        p_under_2_5=round(p_ou["under"], 4),
+        p_btts_yes=round(p_btts["btts_yes"], 4),
+        p_btts_no=round(p_btts["btts_no"], 4),
+        top_scores=[{"score": s, "probability": round(p, 4)} for s, p in top],
+    )
+
+
+# ---------------------------------------------------------------------------
+# WC-endpoint — kansainväliset joukkueet
+# ---------------------------------------------------------------------------
+def _wc_seasons_to_loader_format(seasons: list[str]) -> list[str]:
+    """
+    Muunna 4-digit WC-vuodet ('2018', '2022', '2026') 2-digit-formaattiin
+    ('18', '22', '26'), jonka football_data_org._kausi_to_year tulkitsee
+    oikein vuosiksi 2018, 2022, 2026.
+
+    Tämä kerros suojaa muita endpointteja: emme muuta loaderin
+    _kausi_to_year-funktiota, joka tällä hetkellä on suunniteltu
+    seurakausi-formaatille '2425' → '2024'.
+    """
+    out = []
+    for s in seasons:
+        s = s.strip()
+        if len(s) == 4 and s.startswith("20"):
+            out.append(s[2:])  # '2018' → '18'
+        elif len(s) == 2:
+            out.append(s)
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid WC season '{s}'. Use 4-digit year like '2018'.",
+            )
+    return out
+
+
+@app.post("/api/predict-wc", response_model=PredictionResponse)
+def predict_wc(req: PredictWCRequest):
+    """
+    Tee 1X2, O/U 2.5, BTTS -ennuste kansainvälisten joukkueiden välille
+    WC-historiadatan pohjalta (WC 2018 + 2022 + 2026 fixtures).
+
+    Datalähde: football-data.org ML Pack Light -tier.
+    Env: FOOTBALL_DATA_API_KEY pakollinen.
+    """
+    if req.leagues != ["INT-World Cup"]:
+        raise HTTPException(
+            status_code=400,
+            detail="WC endpoint supports only leagues=['INT-World Cup']. "
+                   "Use /api/predict for other leagues.",
+        )
+
+    loader_seasons = _wc_seasons_to_loader_format(req.seasons)
+
+    dc_cached = _saa_malli(
+        tuple(req.leagues), tuple(loader_seasons),
+        decay=req.decay, bayes_shrinkage=req.bayes_shrinkage,
+    )
+
+    # WC-otteluita pelataan neutraalilla maalla (Qatar 2022, USA/CAN/MEX 2026).
+    # DC-malli oppii datasta noin ~1.5x kotietu-kerroin koska data on kirjattu
+    # home/away-rakenteena, vaikka kentällä koti-rooli on satunnainen ja
+    # merkityksetön. Nollataan kotietu shallow-kopiolla — alkuperäinen
+    # cache-objekti säilyy ennallaan muille mahdollisille kutsujille.
+    dc = copy.copy(dc_cached)
+    dc.home_advantage = 0.0
+    dc.home_advantage_per_team = {t: 0.0 for t in dc.teams_}
+
+    if req.home_team not in dc.attack:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Home team '{req.home_team}' not found in WC model. "
+                   f"First 10 available: {sorted(dc.teams_)[:10]}.",
+        )
+    if req.away_team not in dc.attack:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Away team '{req.away_team}' not found in WC model.",
+        )
+
+    saadot = apply_match_adjustments(
+        home_injury_pct=req.home_injury_pct,
+        away_injury_pct=req.away_injury_pct,
+        home_motivation_pct=req.home_motivation_pct,
+        away_motivation_pct=req.away_motivation_pct,
+        is_derby=req.is_derby,
+    )
+
     lam, mu = dc.expected_goals(req.home_team, req.away_team, adjustments=saadot)
     p_1x2 = dc.predict_1x2(req.home_team, req.away_team, adjustments=saadot)
     p_ou = dc.predict_over_under(req.home_team, req.away_team, line=2.5, adjustments=saadot)
