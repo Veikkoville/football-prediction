@@ -27,6 +27,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+import pandas as pd
 import stripe
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -332,6 +333,94 @@ def list_teams(
         teams=sorted(dc.teams_),
         n_matches=n,
     )
+
+
+# ---------------------------------------------------------------------------
+# ENDPOINT: joukkue-detail (T1)
+# ---------------------------------------------------------------------------
+@app.get("/api/team/{team_name}")
+def team_detail(
+    team_name: str,
+    leagues: list[str] = Query(default=["ENG-Premier League"]),
+    seasons: list[str] = Query(default=["2425", "2526"]),
+):
+    """
+    Joukkueen detail-tiedot DC-mallin koulutusdatasta.
+
+    Käyttää samaa lataa_otteludata-funktiota kuin /api/predict — palauttaa
+    cachetetun ottelut-DataFramen liiga+kausi-yhdistelmälle.
+
+    Returns:
+      - last_5_matches: 5 viimeisintä ottelua (date, home/away, score, location)
+      - form: list of 5 chars ("W"|"D"|"L"), uusin ensin
+      - home_stats: kotiotteluiden avg goals for/against + matches_played
+      - away_stats: vierasotteluiden avg goals for/against + matches_played
+      - total_matches: kokonaisottelumäärä joukkueelle datasetissä
+    """
+    df = lataa_otteludata(list(leagues), list(seasons))
+    if df.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No match data for leagues={leagues} seasons={seasons}",
+        )
+
+    home_matches = df[df["home_team"] == team_name].sort_values("date", ascending=False)
+    away_matches = df[df["away_team"] == team_name].sort_values("date", ascending=False)
+    all_matches = pd.concat([home_matches, away_matches]).sort_values("date", ascending=False)
+
+    if all_matches.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Team '{team_name}' not found in dataset for "
+                   f"leagues={leagues} seasons={seasons}. "
+                   f"Use /api/teams to list available teams.",
+        )
+
+    last_5_records = all_matches.head(5).to_dict("records")
+    last_5_clean = [
+        {
+            "date": str(m["date"])[:10],
+            "home_team": m["home_team"],
+            "away_team": m["away_team"],
+            "home_score": int(m["home_score"]),
+            "away_score": int(m["away_score"]),
+            "location": "home" if m["home_team"] == team_name else "away",
+        }
+        for m in last_5_records
+    ]
+
+    def _result(m, team):
+        h, a = int(m["home_score"]), int(m["away_score"])
+        is_home = m["home_team"] == team
+        if h == a:
+            return "D"
+        if (is_home and h > a) or (not is_home and a > h):
+            return "W"
+        return "L"
+
+    form = [_result(m, team_name) for m in last_5_records]
+
+    def _venue_stats(matches, is_home: bool):
+        if matches.empty:
+            return None
+        goals_for_col = "home_score" if is_home else "away_score"
+        goals_against_col = "away_score" if is_home else "home_score"
+        return {
+            "avg_goals_for": round(float(matches[goals_for_col].mean()), 2),
+            "avg_goals_against": round(float(matches[goals_against_col].mean()), 2),
+            "matches_played": int(len(matches)),
+        }
+
+    return {
+        "team_name": team_name,
+        "leagues": leagues,
+        "seasons": seasons,
+        "last_5_matches": last_5_clean,
+        "form": form,
+        "home_stats": _venue_stats(home_matches, True),
+        "away_stats": _venue_stats(away_matches, False),
+        "total_matches": int(len(all_matches)),
+    }
 
 
 # ---------------------------------------------------------------------------
