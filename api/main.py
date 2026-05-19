@@ -336,6 +336,96 @@ def list_teams(
 
 
 # ---------------------------------------------------------------------------
+# ENDPOINT: liiga-taulukko (T3)
+# ---------------------------------------------------------------------------
+
+# Frontend lähettää PredictScreenistä "ENG-Premier League" (Understat-pohjaista
+# data-koodia DC-mallin koulutukseen), mutta /api/standings tarvitsee
+# football-data.org:n -FD-suffiksin saadakseen kilpailukoodin "PL". Muut
+# liigat tulevat frontendiltä jo "X-Y-FD"-muodossa.
+STANDINGS_LEAGUE_ALIASES = {
+    "ENG-Premier League": "ENG-Premier League-FD",
+}
+
+
+@app.get("/api/standings")
+def league_standings(
+    league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
+    season: str = Query(default="2526", description="Kausi YYYY tai YY:YY muodossa (esim. '2526' → 2025)"),
+):
+    """
+    Liigan tabletti suoraan football-data.org:n /competitions/{id}/standings:ista.
+
+    Returns:
+      - rows: lista riveistä järjestyksessä sijan mukaan
+        (position, team_name, team_short_name, team_crest, played_games,
+         won, draw, lost, goals_for, goals_against, goal_difference, points)
+    """
+    from src.data.football_data_org import COMPETITION_CODES, _api_key, _kausi_to_year
+
+    league_for_fd = STANDINGS_LEAGUE_ALIASES.get(league, league)
+    code = COMPETITION_CODES.get(league_for_fd)
+    if not code:
+        raise HTTPException(
+            status_code=404,
+            detail=f"League '{league}' not supported by football-data.org. "
+                   f"Supported: {sorted(COMPETITION_CODES.keys())}",
+        )
+
+    api_key = _api_key()
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="FOOTBALL_DATA_API_KEY not configured on server",
+        )
+
+    year = _kausi_to_year(season)
+    url = f"https://api.football-data.org/v4/competitions/{code}/standings?season={year}"
+    try:
+        r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Upstream error contacting football-data.org: {type(e).__name__}: {e}",
+        )
+    if r.status_code != 200:
+        raise HTTPException(
+            status_code=r.status_code,
+            detail=f"football-data.org returned {r.status_code}: {r.text[:200]}",
+        )
+
+    data = r.json()
+    total = next(
+        (s for s in data.get("standings", []) if s.get("type") == "TOTAL"),
+        None,
+    )
+    if not total:
+        return {"league": league, "season": season, "rows": []}
+
+    return {
+        "league": league,
+        "season": season,
+        "rows": [
+            {
+                "position": row["position"],
+                "team_name": row["team"]["name"],
+                "team_short_name": row["team"].get("shortName"),
+                "team_crest": row["team"].get("crest"),
+                "played_games": row["playedGames"],
+                "won": row["won"],
+                "draw": row["draw"],
+                "lost": row["lost"],
+                "goals_for": row["goalsFor"],
+                "goals_against": row["goalsAgainst"],
+                "goal_difference": row["goalDifference"],
+                "points": row["points"],
+            }
+            for row in total["table"]
+        ],
+    }
+
+
+# ---------------------------------------------------------------------------
 # ENDPOINT: joukkue-detail (T1)
 # ---------------------------------------------------------------------------
 @app.get("/api/team/{team_name}")
