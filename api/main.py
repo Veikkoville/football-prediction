@@ -245,6 +245,9 @@ class PredictionResponse(BaseModel):
     p_btts_yes: float
     p_btts_no: float
     top_scores: list[dict]  # [{score: "2-1", probability: 0.087}, ...]
+    # T5: viimeiset 5 keskinaista kohtaamista (vain /api/predict — /api/predict-wc
+    # tayttaa kentan tyhjana koska WC-otteluissa parit harvoin toistuvat)
+    h2h: list[dict] = Field(default_factory=list)
 
 
 class TeamsResponse(BaseModel):
@@ -552,6 +555,25 @@ def predict(req: PredictionRequest):
     p_btts = dc.predict_btts(req.home_team, req.away_team, adjustments=saadot)
     top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=5, adjustments=saadot)
 
+    # T5: 5 viimeista keskinaista kohtaamista (molemmat venue-jarjestykset).
+    # Lataa_otteludata on sama kuin _saa_malli kayttaa sisaisesti — loader
+    # cachettaa DataFrame:n joten tama on kayatannossa lookup.
+    df = lataa_otteludata(list(req.leagues), list(req.seasons))
+    h2h_df = df[
+        ((df["home_team"] == req.home_team) & (df["away_team"] == req.away_team))
+        | ((df["home_team"] == req.away_team) & (df["away_team"] == req.home_team))
+    ].sort_values("date", ascending=False).head(5)
+    h2h = [
+        {
+            "date": str(m["date"])[:10],
+            "home_team": m["home_team"],
+            "away_team": m["away_team"],
+            "home_score": int(m["home_score"]),
+            "away_score": int(m["away_score"]),
+        }
+        for _, m in h2h_df.iterrows()
+    ]
+
     return PredictionResponse(
         home_team=req.home_team,
         away_team=req.away_team,
@@ -568,6 +590,7 @@ def predict(req: PredictionRequest):
         p_btts_yes=round(p_btts["btts_yes"], 4),
         p_btts_no=round(p_btts["btts_no"], 4),
         top_scores=[{"score": s, "probability": round(p, 4)} for s, p in top],
+        h2h=h2h,
     )
 
 
