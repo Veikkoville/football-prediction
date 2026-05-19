@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoalIQ — Frequently Asked Questions</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #8b5cf6;
+      --accent2: #a78bfa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    h1 {
+      color: var(--accent);
+      font-size: 32px;
+      letter-spacing: -0.6px;
+      margin-bottom: 4px;
+    }
+    .updated { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+    p, li { color: var(--text); font-size: 15px; }
+    a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+    a:hover { text-decoration: underline; }
+    details {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 12px 0;
+      transition: border-color 0.15s;
+    }
+    details[open] { border-color: rgba(139,92,246,0.30); }
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--accent2);
+      letter-spacing: -0.1px;
+      outline: none;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::before {
+      content: "+";
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      background: rgba(139,92,246,0.15);
+      color: var(--accent2);
+      text-align: center;
+      line-height: 22px;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    details[open] summary::before { content: "−"; }
+    details > div { padding-top: 12px; padding-left: 32px; }
+    details ul { padding-left: 18px; margin: 8px 0; }
+    details li { margin-bottom: 4px; }
+    .contact-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin: 28px 0 0;
+    }
+    .contact-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 22px;
+      background: var(--accent);
+      color: white;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .contact-btn:hover {
+      background: var(--accent2);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Frequently Asked Questions</h1>
+    <p class="updated">Last updated: 19 May 2026</p>
+
+    <p>
+      Quick answers to the most common questions about GoalIQ. If you can't
+      find what you're looking for, get in touch using the form at the bottom
+      of this page.
+    </p>
+
+    <details>
+      <summary>What is GoalIQ?</summary>
+      <div>
+        <p>
+          GoalIQ is a statistical football match prediction tool. You select
+          two teams and the app uses machine learning models (Dixon-Coles +
+          LightGBM ensemble) to estimate match outcomes, expected goals (xG),
+          and likely scorelines.
+        </p>
+        <p>
+          <strong>GoalIQ is not a betting platform.</strong> It is an analytics
+          tool for football fans who want to understand match probabilities.
+          Predictions are statistical estimates, never guarantees.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Which leagues are supported?</summary>
+      <div>
+        <ul>
+          <li><strong>Premier League</strong> — all current-season matchups, available now.</li>
+          <li><strong>FIFA World Cup 2026</strong> — launches 11 June 2026 when the tournament begins.</li>
+        </ul>
+        <p>
+          We plan to add La Liga, Bundesliga and Serie A after launch.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>How much does Premium cost and what does it include?</summary>
+      <div>
+        <p>
+          GoalIQ Premium is <strong>€3.99 / month</strong>, billed through
+          Stripe. You can cancel anytime.
+        </p>
+        <p>Premium unlocks:</p>
+        <ul>
+          <li>Total goals (over/under) probabilities</li>
+          <li>Both Teams To Score probabilities</li>
+          <li>Top-5 most likely exact scorelines</li>
+          <li>Statistical fair value estimates</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>How do I cancel my Premium subscription?</summary>
+      <div>
+        <ol>
+          <li>Open GoalIQ and go to the <strong>Profile</strong> tab.</li>
+          <li>Tap <strong>Manage subscription</strong>.</li>
+          <li>The Stripe Customer Portal opens — tap <strong>Cancel plan</strong> and confirm.</li>
+        </ol>
+        <p>
+          Your Premium access remains active until the end of the current
+          billing period. You will not be charged again, and you can re-subscribe
+          at any time.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>How accurate are the predictions?</summary>
+      <div>
+        <p>
+          Predictions are probabilistic, not deterministic. A 60 % home-win
+          probability means that, across many similar matches, the home team
+          would win roughly 60 % of the time — it does not mean this specific
+          match will be a home win.
+        </p>
+        <p>
+          The underlying models are trained on historical match data (results,
+          xG, recent form) and validated against past seasons. We tune the
+          model continuously as more data arrives.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Is there an iOS version?</summary>
+      <div>
+        <p>
+          Not yet. GoalIQ is currently available only on Android via Google
+          Play. An iOS version is planned but does not have a release date.
+          If you would like to be notified when iOS launches, get in touch via
+          the contact form below.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>What data do you collect?</summary>
+      <div>
+        <p>
+          We collect the minimum needed to run the app: account email,
+          subscription status, and anonymised usage analytics (PostHog).
+          We do not sell data or share it with advertisers.
+        </p>
+        <p>
+          For the full breakdown, see our
+          <a href="https://veikkoville.github.io/football-prediction/privacy.html">Privacy Policy</a>.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>How do I delete my account?</summary>
+      <div>
+        <p>
+          See the
+          <a href="https://veikkoville.github.io/football-prediction/delete-account.html">Delete Account</a>
+          page for the full process. In short: email us from your account
+          email address and we will delete your data within 30 days.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>The app shows a different price than what I was charged. Why?</summary>
+      <div>
+        <p>
+          All charges go through Stripe at the price displayed in the app at
+          the time of purchase (€3.99 / month). If you see a discrepancy on
+          your card statement, please contact us with the transaction details
+          and we will investigate within 7 days.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Can I use GoalIQ for betting?</summary>
+      <div>
+        <p>
+          GoalIQ is an analytics tool, not a betting platform. We do not
+          place bets, accept wagers, or partner with bookmakers. What you
+          choose to do with the statistical estimates is up to you — but we
+          recommend treating them as one data point among many, not as
+          guaranteed outcomes.
+        </p>
+      </div>
+    </details>
+
+    <div class="contact-card">
+      <h2 style="margin-top: 0; color: var(--accent2); font-size: 18px;">Still need help?</h2>
+      <p style="margin: 0 0 6px 0;">
+        Send us a message and we will respond within a few business days.
+      </p>
+      <a class="contact-btn"
+         href="https://forms.gle/wTfsB3Kvuukodtd26">
+        Contact support
+      </a>
+      <p style="margin: 16px 0 0 0; font-size: 13px; color: var(--muted);">
+        Or email
+        <a href="mailto:veikkoville@protonmail.com">veikkoville@protonmail.com</a>
+        directly.
+      </p>
+    </div>
+
+    <p class="updated" style="margin-top: 40px; text-align: center;">
+      © 2026 Veikkoville · GoalIQ
+    </p>
+  </div>
+</body>
+</html>
