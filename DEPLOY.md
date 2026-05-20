@@ -88,10 +88,10 @@ Click **"Advanced settings..."** before pressing Deploy.
 Under **Secrets**, paste in TOML format:
 
 ```toml
-FOOTBALL_DATA_API_KEY = "4e793bdedcf64ed5b91a7d38ae157c99"
+FOOTBALL_DATA_API_KEY = "your_api_key_here"
 ```
 
-(Use your own key, the one in your `.env` file.)
+(Use your own key from your local `.env` file — never commit the real key.)
 
 Click **"Save"**.
 
