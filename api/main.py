@@ -187,6 +187,9 @@ class PredictionRequest(BaseModel):
     home_motivation_pct: float = Field(default=0.0, ge=-15.0, le=15.0)
     away_motivation_pct: float = Field(default=0.0, ge=-15.0, le=15.0)
     is_derby: bool = Field(default=False)
+    # T6: todennakoisimpien tulosten maara (5 free, 10 premium)
+    top_n: int = Field(default=5, ge=1, le=10,
+                       description="Number of most-likely scorelines to return")
 
 
 class PredictWCRequest(BaseModel):
@@ -553,7 +556,7 @@ def predict(req: PredictionRequest):
     p_1x2 = dc.predict_1x2(req.home_team, req.away_team, adjustments=saadot)
     p_ou = dc.predict_over_under(req.home_team, req.away_team, line=2.5, adjustments=saadot)
     p_btts = dc.predict_btts(req.home_team, req.away_team, adjustments=saadot)
-    top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=5, adjustments=saadot)
+    top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=req.top_n, adjustments=saadot)
 
     # T5: 5 viimeista keskinaista kohtaamista (molemmat venue-jarjestykset).
     # Lataa_otteludata on sama kuin _saa_malli kayttaa sisaisesti — loader
