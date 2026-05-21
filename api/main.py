@@ -531,7 +531,7 @@ def team_detail(
 @app.get("/api/fixtures")
 def upcoming_fixtures(
     league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
-    days: int = Query(default=7, ge=1, le=30, description="Montako päivää eteenpäin haetaan"),
+    days: int = Query(default=7, ge=1, le=60, description="Montako päivää eteenpäin haetaan (turnauksilla laajempi ikkuna)"),
 ):
     """
     Tulevat ottelut football-data.org:n /competitions/{id}/matches:ista.
