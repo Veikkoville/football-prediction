@@ -251,6 +251,11 @@ class PredictionResponse(BaseModel):
     # T5: viimeiset 5 keskinaista kohtaamista (vain /api/predict — /api/predict-wc
     # tayttaa kentan tyhjana koska WC-otteluissa parit harvoin toistuvat)
     h2h: list[dict] = Field(default_factory=list)
+    # T7: premium-visualisoinnit (vain /api/predict). h2h_summary = W/D/L-jakauma
+    # kaikista ladatun kausi-ikkunan keskinaisista kohtaamisista. form_trend =
+    # kummankin joukkueen viimeisimmat ottelut momentum-kayraa varten.
+    h2h_summary: dict = Field(default_factory=dict)
+    form_trend: dict = Field(default_factory=dict)
 
 
 class TeamsResponse(BaseModel):
@@ -604,6 +609,76 @@ def upcoming_fixtures(
 
 
 # ---------------------------------------------------------------------------
+# T7-apufunktiot: premium-H2H-jakauma + joukkueen muoto-trendi
+# ---------------------------------------------------------------------------
+def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str) -> dict:
+    """
+    Keskinaisten kohtaamisten voitto/tasapeli/haviö-jakauma (T7 premium).
+
+    'Kaikista' tarkoittaa ladatun kausi-ikkunan sisalta — vastaus EI vaita
+    olevansa taydellinen historia. total_matches kertoo todellisen maaran
+    jota frontend kayttaa rehellisessa labelissa ("All N meetings").
+    """
+    if h2h_all.empty:
+        return {"total_matches": 0, "home_team_wins": 0, "draws": 0, "away_team_wins": 0}
+
+    home_wins = away_wins = draws = 0
+    for _, m in h2h_all.iterrows():
+        h, a = int(m["home_score"]), int(m["away_score"])
+        if h == a:
+            draws += 1
+            continue
+        winner = m["home_team"] if h > a else m["away_team"]
+        if winner == home_team:
+            home_wins += 1
+        elif winner == away_team:
+            away_wins += 1
+    return {
+        "total_matches": int(len(h2h_all)),
+        "home_team_wins": home_wins,
+        "draws": draws,
+        "away_team_wins": away_wins,
+    }
+
+
+def _team_recent_form(df: pd.DataFrame, team: str, n: int = 8) -> list[dict]:
+    """
+    Joukkueen n viimeisinta ottelua momentum-visualisointia varten (T7).
+
+    Palautetaan aikajarjestyksessa (vanhin ensin) jotta frontend piirtaa
+    tuloskayran luonnollisesti vasemmalta oikealle. Yhden joukkueen otteluita
+    on ladatussa 2 kauden datassa runsaasti (~75) — toisin kuin H2H-paria,
+    joten muoto-trendi on taysin katettu nykydatalla.
+    """
+    matches = df[
+        (df["home_team"] == team) | (df["away_team"] == team)
+    ].sort_values("date", ascending=False).head(n)
+
+    out = []
+    for _, m in matches.iterrows():
+        is_home = m["home_team"] == team
+        scored = int(m["home_score"] if is_home else m["away_score"])
+        conceded = int(m["away_score"] if is_home else m["home_score"])
+        if scored > conceded:
+            result, points = "W", 3
+        elif scored == conceded:
+            result, points = "D", 1
+        else:
+            result, points = "L", 0
+        out.append({
+            "date": str(m["date"])[:10],
+            "opponent": m["away_team"] if is_home else m["home_team"],
+            "location": "home" if is_home else "away",
+            "scored": scored,
+            "conceded": conceded,
+            "result": result,
+            "points": points,
+        })
+    out.reverse()  # vanhin ensin
+    return out
+
+
+# ---------------------------------------------------------------------------
 # ENDPOINT: ennuste
 # ---------------------------------------------------------------------------
 @app.post("/api/predict", response_model=PredictionResponse)
@@ -646,10 +721,10 @@ def predict(req: PredictionRequest):
     # Lataa_otteludata on sama kuin _saa_malli kayttaa sisaisesti — loader
     # cachettaa DataFrame:n joten tama on kayatannossa lookup.
     df = lataa_otteludata(list(req.leagues), list(req.seasons))
-    h2h_df = df[
+    h2h_all = df[
         ((df["home_team"] == req.home_team) & (df["away_team"] == req.away_team))
         | ((df["home_team"] == req.away_team) & (df["away_team"] == req.home_team))
-    ].sort_values("date", ascending=False).head(5)
+    ].sort_values("date", ascending=False)
     h2h = [
         {
             "date": str(m["date"])[:10],
@@ -658,8 +733,16 @@ def predict(req: PredictionRequest):
             "home_score": int(m["home_score"]),
             "away_score": int(m["away_score"]),
         }
-        for _, m in h2h_df.iterrows()
+        for _, m in h2h_all.head(5).iterrows()
     ]
+
+    # T7: premium-visualisoinnit — H2H-jakauma + kummankin joukkueen muoto.
+    # Kaytetaan jo ladattua df:aa, ei lisalatauskustannuksia.
+    h2h_summary = _h2h_summary(h2h_all, req.home_team, req.away_team)
+    form_trend = {
+        "home_team": _team_recent_form(df, req.home_team),
+        "away_team": _team_recent_form(df, req.away_team),
+    }
 
     return PredictionResponse(
         home_team=req.home_team,
@@ -678,6 +761,8 @@ def predict(req: PredictionRequest):
         p_btts_no=round(p_btts["btts_no"], 4),
         top_scores=[{"score": s, "probability": round(p, 4)} for s, p in top],
         h2h=h2h,
+        h2h_summary=h2h_summary,
+        form_trend=form_trend,
     )
 
 
