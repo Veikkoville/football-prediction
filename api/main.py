@@ -346,10 +346,11 @@ def list_teams(
 # ---------------------------------------------------------------------------
 
 # Frontend lähettää PredictScreenistä "ENG-Premier League" (Understat-pohjaista
-# data-koodia DC-mallin koulutukseen), mutta /api/standings tarvitsee
-# football-data.org:n -FD-suffiksin saadakseen kilpailukoodin "PL". Muut
-# liigat tulevat frontendiltä jo "X-Y-FD"-muodossa.
-STANDINGS_LEAGUE_ALIASES = {
+# data-koodia DC-mallin koulutukseen), mutta football-data.org -pohjaiset
+# endpointit (/api/standings, /api/fixtures) tarvitsevat -FD-suffiksin
+# saadakseen kilpailukoodin "PL". Muut liigat tulevat frontendiltä jo
+# "X-Y-FD"-muodossa.
+FD_LEAGUE_ALIASES = {
     "ENG-Premier League": "ENG-Premier League-FD",
 }
 
@@ -369,7 +370,7 @@ def league_standings(
     """
     from src.data.football_data_org import COMPETITION_CODES, _api_key, _kausi_to_year
 
-    league_for_fd = STANDINGS_LEAGUE_ALIASES.get(league, league)
+    league_for_fd = FD_LEAGUE_ALIASES.get(league, league)
     code = COMPETITION_CODES.get(league_for_fd)
     if not code:
         raise HTTPException(
@@ -517,6 +518,89 @@ def team_detail(
         "away_stats": _venue_stats(away_matches, False),
         "total_matches": int(len(all_matches)),
     }
+
+
+# ---------------------------------------------------------------------------
+# ENDPOINT: tulevat ottelut (T4)
+# ---------------------------------------------------------------------------
+@app.get("/api/fixtures")
+def upcoming_fixtures(
+    league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
+    days: int = Query(default=7, ge=1, le=30, description="Montako päivää eteenpäin haetaan"),
+):
+    """
+    Tulevat ottelut football-data.org:n /competitions/{id}/matches:ista.
+
+    Hakee SCHEDULED + TIMED -statuksen ottelut tästä päivästä `days` päivää
+    eteenpäin. Huom: kauden loppupuolella (touko-kesäkuu) lista voi olla tyhjä
+    jos liiga on jo pelannut kautensa loppuun — se ei ole virhe.
+
+    Returns:
+      - league, days: echo
+      - fixtures: lista otteluita aikajärjestyksessä (date, datetime,
+        home_team, away_team, home_team_short_name, away_team_short_name,
+        matchday)
+    """
+    from datetime import datetime, timedelta, timezone
+    from src.data.football_data_org import COMPETITION_CODES, _api_key
+
+    league_for_fd = FD_LEAGUE_ALIASES.get(league, league)
+    code = COMPETITION_CODES.get(league_for_fd)
+    if not code:
+        raise HTTPException(
+            status_code=404,
+            detail=f"League '{league}' not supported by football-data.org. "
+                   f"Supported: {sorted(COMPETITION_CODES.keys())}",
+        )
+
+    api_key = _api_key()
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="FOOTBALL_DATA_API_KEY not configured on server",
+        )
+
+    today = datetime.now(timezone.utc).date()
+    date_to = today + timedelta(days=days)
+    url = (
+        f"https://api.football-data.org/v4/competitions/{code}/matches"
+        f"?status=SCHEDULED,TIMED"
+        f"&dateFrom={today.isoformat()}&dateTo={date_to.isoformat()}"
+    )
+    try:
+        r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Upstream error contacting football-data.org: {type(e).__name__}: {e}",
+        )
+    if r.status_code != 200:
+        raise HTTPException(
+            status_code=r.status_code,
+            detail=f"football-data.org returned {r.status_code}: {r.text[:200]}",
+        )
+
+    data = r.json()
+    fixtures = []
+    for m in data.get("matches", []):
+        home = m.get("homeTeam") or {}
+        away = m.get("awayTeam") or {}
+        # Ohita ottelut joista vastustaja ei ole vielä ratkennut (yleistä
+        # CL-karsinnoissa: homeTeam/awayTeam name on tällöin None)
+        if not home.get("name") or not away.get("name"):
+            continue
+        fixtures.append({
+            "date": (m.get("utcDate") or "")[:10],
+            "datetime": m.get("utcDate"),
+            "home_team": home.get("name"),
+            "away_team": away.get("name"),
+            "home_team_short_name": home.get("shortName"),
+            "away_team_short_name": away.get("shortName"),
+            "matchday": m.get("matchday"),
+        })
+
+    fixtures.sort(key=lambda f: f["datetime"] or "")
+    return {"league": league, "days": days, "fixtures": fixtures}
 
 
 # ---------------------------------------------------------------------------
