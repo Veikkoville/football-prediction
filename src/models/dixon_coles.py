@@ -32,7 +32,7 @@ class DixonColesModel:
             decay=0.0, date_col=None, l2_per_team=2.0,
             l2_attack_defence=2.0, team_priors=None,
             home_xg_col=None, away_xg_col=None, xg_weight=0.0,
-            model_type="dc"):
+            model_type="dc", shrink_defence_to_mean=False):
         """
         Sovita malli.
 
@@ -70,6 +70,19 @@ class DixonColesModel:
             "dc" (oletus) = Dixon-Coles tau-korjauksella, "bivariate_poisson" =
             Bivariate Poisson -malli (jaettu Z-komponentti). Bivariate Poisson
             on matemaattisesti elegantimpi ratkaisu maalien korrelaatioon.
+        shrink_defence_to_mean
+            False (oletus) = `defence`-parametrit shrinkataan kohti 0:aa
+            (tai team_priors-arvoa) — vanha kayttaytyminen.
+
+            True = `defence` shrinkataan kohti **omaa keskiarvoaan**, ei 0:aa.
+            Syy (#61): `attack` on summarajoitettu 0:aan, joten sen
+            shrinkkaaminen kohti 0:aa kaventaa vain joukkue-eroja. `defence`
+            sen sijaan **ei ole summarajoitettu** — se kantaa maalitason
+            absoluuttisen baselinen. Kohti 0:aa shrinkkaaminen vetaa siis koko
+            maalitason alas (deflatoi ennustetut maalit). Kohti keskiarvoa
+            shrinkkaaminen kaventaa vain joukkueiden valisia puolustuseroja ja
+            jattaa tason vapaaksi likelihoodin maaritettavaksi. Ekvivalentti
+            shrinkkaamattomalle interceptille + sum(defence)=0 -rajoitteelle.
         """
         df = matches.dropna(subset=[home_goals_col, away_goals_col]).copy()
         df[home_goals_col] = df[home_goals_col].astype(int)
@@ -200,7 +213,13 @@ class DixonColesModel:
             # prior_weight skaalaa per-joukkue shrinkage-vahvuuden.
             if l2_attack_defence > 0:
                 a_diff2 = prior_weight * (attack - prior_attack) ** 2
-                d_diff2 = prior_weight * (defence - prior_defence) ** 2
+                # #61: shrink_defence_to_mean → shrinkkaa puolustuksen HAJONTAA,
+                # ei absoluuttista tasoa. Ks. fit()-docstring.
+                if shrink_defence_to_mean:
+                    d_target = np.mean(defence)
+                else:
+                    d_target = prior_defence
+                d_diff2 = prior_weight * (defence - d_target) ** 2
                 nll += l2_attack_defence * (np.sum(a_diff2) + np.sum(d_diff2))
             return nll
 

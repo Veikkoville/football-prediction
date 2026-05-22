@@ -138,9 +138,22 @@ def _warmup_default_model():
 
 
 def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
-               decay: float = 0.0035, bayes_shrinkage: float = 2.0) -> DixonColesModel:
-    """Hae cached DC-malli tai sovita uusi jos ei välimuistissa."""
-    key = (liigat, kaudet, round(decay, 4), round(bayes_shrinkage, 2))
+               decay: float = 0.0035, bayes_shrinkage: float = 2.0,
+               per_team_home_adv: bool = True,
+               shrink_defence_to_mean: bool = False) -> DixonColesModel:
+    """
+    Hae cached DC-malli tai sovita uusi jos ei välimuistissa.
+
+    per_team_home_adv
+        False = älä sovita joukkuekohtaisia kotietu-parametreja (n kpl).
+        WC-malli (`/api/predict-wc`) nollaa kotiedun joka tapauksessa, joten
+        näiden sovittaminen on n hukkaparametria pienelle WC-datalle (#61).
+    shrink_defence_to_mean
+        True = shrinkkaa puolustuksen joukkue-eroja, ei maalitasoa (#61).
+        Estää bayes_shrinkagea deflatoimasta ennustettuja maaleja.
+    """
+    key = (liigat, kaudet, round(decay, 4), round(bayes_shrinkage, 2),
+           per_team_home_adv, shrink_defence_to_mean)
     if key not in _MODEL_CACHE:
         df = lataa_otteludata(list(liigat), list(kaudet))
         if df.empty:
@@ -149,12 +162,13 @@ def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
                 detail=f"No match data found for leagues={liigat}, seasons={kaudet}",
             )
         try:
-            dc = DixonColesModel().fit(
+            dc = DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
                 df,
                 home_team_col="home_team", away_team_col="away_team",
                 home_goals_col="home_score", away_goals_col="away_score",
                 decay=decay, date_col="date",
                 l2_attack_defence=bayes_shrinkage,
+                shrink_defence_to_mean=shrink_defence_to_mean,
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
@@ -218,11 +232,16 @@ class PredictWCRequest(BaseModel):
         default=["2018", "2022", "2026"],
         description="WC-kaudet (4-digit years).",
     )
-    # WC-otteluissa ei perinteistä kotietua → decay pienempi (vanha data
-    # arvokkaampaa kun kausia on 3 eri vuotta) ja shrinkage suurempi
-    # (uudet kvalifioituneet maajoukkueet kohti kv-keskiarvoa).
-    decay: float = Field(default=0.0010, ge=0.0, le=0.020)
-    bayes_shrinkage: float = Field(default=3.0, ge=0.0, le=10.0)
+    # WC-otteluissa ei perinteistä kotietua. decay=0 (#61): WC-dataa on vain
+    # ~128 ottelua kahdelta turnaukselta — aikapainotus pudottaisi efektiivisen
+    # otoskoon ~75:een (WC 2018 paino ~0.2), mikä pahentaa yliparametrisointia.
+    # decay=0 → ESS 128, eikä WC 2018:n dataa heitetä hukkaan.
+    decay: float = Field(default=0.0, ge=0.0, le=0.020)
+    # bayes_shrinkage=8 (#61): WC-malli on yliparametrisoitu (82 par. / 128
+    # ottelua) → vahva shrinkage kaventaa hyökkäys/puolustus-hajontaa ja
+    # rajaa marquee-ottelujen P(over2.5)-vinoumaa. Toimii yhdessä
+    # shrink_defence_to_mean-korjauksen kanssa (ei deflatoi maalitasoa).
+    bayes_shrinkage: float = Field(default=8.0, ge=0.0, le=10.0)
     # Manuaaliset säädöt — samat kuin /api/predict
     home_injury_pct: float = Field(default=0.0, ge=-30.0, le=0.0)
     away_injury_pct: float = Field(default=0.0, ge=-30.0, le=0.0)
@@ -815,14 +834,26 @@ def predict_wc(req: PredictWCRequest):
     dc_cached = _saa_malli(
         tuple(req.leagues), tuple(loader_seasons),
         decay=req.decay, bayes_shrinkage=req.bayes_shrinkage,
+        per_team_home_adv=False,  # #61: predict-wc nollaa kotiedun → ei hukkaparametreja
+        shrink_defence_to_mean=True,  # #61: estä maalitason deflaatio
     )
 
     # WC-otteluita pelataan neutraalilla maalla (Qatar 2022, USA/CAN/MEX 2026).
-    # DC-malli oppii datasta noin ~1.5x kotietu-kerroin koska data on kirjattu
-    # home/away-rakenteena, vaikka kentällä koti-rooli on satunnainen ja
-    # merkityksetön. Nollataan kotietu shallow-kopiolla — alkuperäinen
-    # cache-objekti säilyy ennallaan muille mahdollisille kutsujille.
+    # DC-malli oppii datasta globaalin kotiedun (home_advantage = γ) koska data
+    # on kirjattu home/away-rakenteena.
+    #
+    # #61 (2b-1): neutralointi ei ole home_advantage=0 vaan PUOLET kotiedusta
+    # molemmille. Mallissa lam saa kotiboostin γ, mu ei saa mitään → pelkkä
+    # nollaus ennustaisi BOLEMMAT joukkueet vierasvauhtia (kokonaistaso
+    # deflatoituu ~exp(γ/2)). Oikea neutraali = kotidatan ja vierasdatan
+    # geometrinen keskiarvo: molemmat saavat γ/2.
+    #
+    # γ/2 viedään defence-parametriin, koska defence esiintyy SEKÄ lam:ssa
+    # (defence[away]) ETTÄ mu:ssa (defence[home]) → boost osuu molempiin.
+    # Shallow-kopio: defence-dict KORVATAAN uudella, alkuperäinen cache säilyy.
     dc = copy.copy(dc_cached)
+    half_home_adv = dc_cached.home_advantage / 2.0
+    dc.defence = {t: v + half_home_adv for t, v in dc_cached.defence.items()}
     dc.home_advantage = 0.0
     dc.home_advantage_per_team = {t: 0.0 for t in dc.teams_}
 
