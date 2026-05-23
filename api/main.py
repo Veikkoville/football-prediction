@@ -19,6 +19,7 @@ import copy
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -111,6 +112,10 @@ app.add_middleware(
 # Mallin välimuisti — sovitetaan kerran liiga+kausi-yhdistelmälle
 # ---------------------------------------------------------------------------
 _MODEL_CACHE: dict[tuple, DixonColesModel] = {}
+# #69: turnauskoodia (WC/EC) sisältävät avaimet tarvitsevat refit:n kun
+# uusi turnausdata on saatavilla. Tallennetaan fit-aikaleima ja refit:taan
+# jos loaderin turnausdataa on haettu sen jälkeen uudelleen.
+_MODEL_FITTED_AT: dict[tuple, float] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -137,6 +142,31 @@ def _warmup_default_model():
     threading.Thread(target=_fit_premier_league, daemon=True).start()
 
 
+def _liigat_sisaltavat_turnauksen(liigat: tuple[str, ...]) -> bool:
+    """#69: True jos jokin liiga mappautuu live-turnauskoodiin (WC/EC)."""
+    from src.data.football_data_org import COMPETITION_CODES, _LIVE_TOURNAMENT_CODES
+    for liiga in liigat:
+        if COMPETITION_CODES.get(liiga) in _LIVE_TOURNAMENT_CODES:
+            return True
+    return False
+
+
+def _malli_vanhentunut(key: tuple, liigat: tuple[str, ...]) -> bool:
+    """
+    #69: invalidoi cached DC-malli jos avaimessa on turnauskoodi (WC/EC)
+    ja malli on TTL:n verran vanha. Refit kutsuu loaderia → loader-TTL
+    laukeaa rinnakkain → API-haku tuoreelle datalle.
+
+    Domestic-only avaimille palauttaa aina False → /api/predict ei saa
+    lisälatenssia kuin yhden cheap dict-lookupin verran.
+    """
+    if not _liigat_sisaltavat_turnauksen(liigat):
+        return False
+    from src.data.football_data_org import TOURNAMENT_TTL_SEC
+    fitted_at = _MODEL_FITTED_AT.get(key, 0.0)
+    return (time.time() - fitted_at) >= TOURNAMENT_TTL_SEC
+
+
 def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
                decay: float = 0.0035, bayes_shrinkage: float = 2.0,
                per_team_home_adv: bool = True,
@@ -154,25 +184,27 @@ def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
     """
     key = (liigat, kaudet, round(decay, 4), round(bayes_shrinkage, 2),
            per_team_home_adv, shrink_defence_to_mean)
-    if key not in _MODEL_CACHE:
-        df = lataa_otteludata(list(liigat), list(kaudet))
-        if df.empty:
-            raise HTTPException(
-                status_code=404,
-                detail=f"No match data found for leagues={liigat}, seasons={kaudet}",
-            )
-        try:
-            dc = DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
-                df,
-                home_team_col="home_team", away_team_col="away_team",
-                home_goals_col="home_score", away_goals_col="away_score",
-                decay=decay, date_col="date",
-                l2_attack_defence=bayes_shrinkage,
-                shrink_defence_to_mean=shrink_defence_to_mean,
-            )
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
-        _MODEL_CACHE[key] = dc
+    if key in _MODEL_CACHE and not _malli_vanhentunut(key, liigat):
+        return _MODEL_CACHE[key]
+    df = lataa_otteludata(list(liigat), list(kaudet))
+    if df.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No match data found for leagues={liigat}, seasons={kaudet}",
+        )
+    try:
+        dc = DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
+            df,
+            home_team_col="home_team", away_team_col="away_team",
+            home_goals_col="home_score", away_goals_col="away_score",
+            decay=decay, date_col="date",
+            l2_attack_defence=bayes_shrinkage,
+            shrink_defence_to_mean=shrink_defence_to_mean,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
+    _MODEL_CACHE[key] = dc
+    _MODEL_FITTED_AT[key] = time.time()
     return _MODEL_CACHE[key]
 
 
@@ -908,9 +940,13 @@ def predict_wc(req: PredictWCRequest):
 @app.post("/api/admin/clear-cache")
 def clear_cache():
     """Tyhjennä mallin välimuisti — pakottaa uudelleen-sovituksen."""
+    from src.data.football_data_org import _TOURNAMENT_MEM_CACHE
     n = len(_MODEL_CACHE)
     _MODEL_CACHE.clear()
-    return {"cleared_models": n}
+    _MODEL_FITTED_AT.clear()
+    cleared_tournament = len(_TOURNAMENT_MEM_CACHE)
+    _TOURNAMENT_MEM_CACHE.clear()
+    return {"cleared_models": n, "cleared_tournament_data": cleared_tournament}
 
 
 # ---------------------------------------------------------------------------

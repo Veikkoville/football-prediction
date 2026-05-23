@@ -15,6 +15,7 @@ Ilmaisen tier:n rajat:
 
 from __future__ import annotations
 import os
+from datetime import datetime
 from pathlib import Path
 import json
 import time
@@ -25,6 +26,17 @@ import config
 
 CACHE_DIR = config.RAW_DATA_DIR / "football-data-org"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+# #69: Käynnissä olevien turnausten datalle (esim. WC 2026) tarvitaan
+# uudelleenhakua jotta uudet joukkueet + tulokset päivittyvät malliin
+# turnauksen edetessä. Levypohjainen cache on Renderillä efemeerinen ja
+# muuttumaton instanssin elinkaaren aikana → in-memory TTL-cache vain
+# turnauskoodeille jonka kausi vastaa kuluvaa vuotta. Domestic-liigat
+# ja menneet turnauskaudet (WC 2018, 2022) säilyttävät levycachen
+# pysyvänä (niiden data ei muutu).
+TOURNAMENT_TTL_SEC = 6 * 3600  # 6 h
+_LIVE_TOURNAMENT_CODES = {"WC", "EC"}
+_TOURNAMENT_MEM_CACHE: dict[tuple[str, str], tuple[float, dict]] = {}
 
 # Liiga -> football-data.org -kilpailukoodi
 COMPETITION_CODES = {
@@ -78,13 +90,25 @@ FREE_TIER = {"CL", "PL", "BL1", "PD", "FL1", "SA", "ELC", "DED",
              "PPL", "EC", "WC", "BSA", "CLI"}
 
 
-def _hae_kausi(code: str, kausi: str, api_key: str) -> dict | None:
-    cache = CACHE_DIR / f"{code}_{kausi}.json"
-    if cache.exists() and cache.stat().st_size > 100:
-        try:
-            return json.loads(cache.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+def _is_live_tournament(code: str, kausi: str) -> bool:
+    """True jos koodi on käynnissä-oleva turnaus ja kausi-vuosi == kuluva vuosi."""
+    if code not in _LIVE_TOURNAMENT_CODES:
+        return False
+    try:
+        year = int(kausi)
+    except (TypeError, ValueError):
+        return False
+    return year == datetime.utcnow().year
+
+
+def tournament_last_refresh() -> float:
+    """#69: paras (uusin) muistissa-olevan turnausdatan haku-aikaleima."""
+    if not _TOURNAMENT_MEM_CACHE:
+        return 0.0
+    return max(ts for ts, _ in _TOURNAMENT_MEM_CACHE.values())
+
+
+def _fetch_from_api(code: str, kausi: str, api_key: str) -> dict:
     if code not in FREE_TIER:
         return {"_error": (
             f"Kilpailu {code} ei sisally ilmaiseen tier:iin. "
@@ -104,11 +128,50 @@ def _hae_kausi(code: str, kausi: str, api_key: str) -> dict | None:
             )}
         if r.status_code != 200:
             return {"_error": f"HTTP {r.status_code}: {r.text[:200]}"}
-        data = r.json()
-        cache.write_bytes(r.content)
-        return data
+        return r.json()
     except Exception as e:
         return {"_error": f"{type(e).__name__}: {e}"}
+
+
+def _hae_kausi(code: str, kausi: str, api_key: str) -> dict | None:
+    cache = CACHE_DIR / f"{code}_{kausi}.json"
+
+    if _is_live_tournament(code, kausi):
+        now = time.time()
+        entry = _TOURNAMENT_MEM_CACHE.get((code, kausi))
+        if entry and (now - entry[0]) < TOURNAMENT_TTL_SEC:
+            return entry[1]
+        data = _fetch_from_api(code, kausi, api_key)
+        if isinstance(data, dict) and "_error" not in data:
+            _TOURNAMENT_MEM_CACHE[(code, kausi)] = (now, data)
+            try:
+                cache.write_text(json.dumps(data), encoding="utf-8")
+            except Exception:
+                pass
+            return data
+        # API epäonnistui → levyfallback → vanha muistissa-oleva → virhe
+        if cache.exists() and cache.stat().st_size > 100:
+            try:
+                return json.loads(cache.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        if entry:
+            return entry[1]
+        return data
+
+    # Ei-live (domestic-liigat, menneet turnauskaudet) — levycache pysyvä.
+    if cache.exists() and cache.stat().st_size > 100:
+        try:
+            return json.loads(cache.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    data = _fetch_from_api(code, kausi, api_key)
+    if isinstance(data, dict) and "_error" not in data:
+        try:
+            cache.write_text(json.dumps(data), encoding="utf-8")
+        except Exception:
+            pass
+    return data
 
 
 def _kausi_to_year(kausi: str) -> str:
