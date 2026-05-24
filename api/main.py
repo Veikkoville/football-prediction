@@ -117,6 +117,13 @@ _MODEL_CACHE: dict[tuple, DixonColesModel] = {}
 # uusi turnausdata on saatavilla. Tallennetaan fit-aikaleima ja refit:taan
 # jos loaderin turnausdataa on haettu sen jälkeen uudelleen.
 _MODEL_FITTED_AT: dict[tuple, float] = {}
+# #72: stale-while-revalidate. Kun #69:n TTL umpeutuu, palautetaan vanha
+# malli ja triggataan tausta-refit. _REFIT_IN_PROGRESS estaa tuplarefit
+# samalle avaimelle. _MODEL_LOCK suojaa _MODEL_CACHE / _MODEL_FITTED_AT /
+# _REFIT_IN_PROGRESS check-then-set -sekvenssit (warmup-thread,
+# tausta-refit-thread ja pyyntö-säikeet ajaa rinnakkain).
+_REFIT_IN_PROGRESS: set[tuple] = set()
+_MODEL_LOCK = threading.Lock()
 
 # #71: DataFrame-välimuisti — /api/predict kutsuu lataa_otteludata kahdesti
 # per request (mallia varten + H2H/form-trend-laskuun). Understat-loaderin
@@ -163,8 +170,9 @@ def _lataa_otteludata_cached(liigat, kaudet) -> pd.DataFrame:
 # fitattiin lazy ensimmäisellä /api/teams-kutsulla → mobiili näki "server took
 # too long" -timeoutin (#71). Sarjallinen jotta CPU ei ylikuormiu ja
 # football-data.org rate-limit (6.5 s väli) säilyy alle 10/min rajan.
-# WC ei warmup-listalla — WC-malli refit:ataan TTL:n ehdoilla (#69) eikä
-# launch-päivänä #71-fixin yhteydessä haluta lisäkomplikaatioita.
+# #72: WC lisattiin viimeiseksi jotta launch-paivan domestic-liigaliikenne
+# saa CPU:n ensin. WC-fit on 30 s -luokkaa, joten sen jattaminen lazyksi
+# blokkasi mobiili-WC-tabin ensimmaisen klikkauksen.
 # ---------------------------------------------------------------------------
 WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
     (("ENG-Premier League",),    ("2425", "2526")),
@@ -174,6 +182,14 @@ WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
     (("FRA-Ligue 1-FD",),        ("2425", "2526")),
     (("INT-Champions League",),  ("2425", "2526")),
 ]
+
+# #72: WC-warmup parametrit matchaavat /api/predict-wc:n cache-keyhyn
+# (decay=0, bayes=8, per_team_home_adv=False, shrink_defence_to_mean=True).
+# Kausi-muoto on jo loader-formaatissa ("18","22","26") koska /api/predict-wc
+# kutsuu _wc_seasons_to_loader_format ennen _saa_malli:a.
+WC_WARMUP: tuple[tuple[str, ...], tuple[str, ...]] = (
+    ("INT-World Cup",), ("18", "22", "26"),
+)
 
 
 @app.on_event("startup")
@@ -186,6 +202,17 @@ def _warmup_default_models():
                 print(f"[Warmup] {liigat[0]} ready in {time.time()-t0:.1f}s")
             except Exception as e:
                 print(f"[Warmup] {liigat[0]} failed: {type(e).__name__}: {e}")
+        # #72: WC viimeiseksi — domestic-liigat lampenevat ensin.
+        try:
+            t0 = time.time()
+            _saa_malli(
+                WC_WARMUP[0], WC_WARMUP[1],
+                decay=0.0, bayes_shrinkage=8.0,
+                per_team_home_adv=False, shrink_defence_to_mean=True,
+            )
+            print(f"[Warmup] {WC_WARMUP[0][0]} ready in {time.time()-t0:.1f}s")
+        except Exception as e:
+            print(f"[Warmup] {WC_WARMUP[0][0]} failed: {type(e).__name__}: {e}")
 
     threading.Thread(target=_fit_all, daemon=True).start()
 
@@ -215,12 +242,66 @@ def _malli_vanhentunut(key: tuple, liigat: tuple[str, ...]) -> bool:
     return (time.time() - fitted_at) >= TOURNAMENT_TTL_SEC
 
 
+def _fit_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
+               decay: float, bayes_shrinkage: float,
+               per_team_home_adv: bool,
+               shrink_defence_to_mean: bool) -> DixonColesModel:
+    """Sovita DixonColesModel annetuilla parametreilla. Heittaa HTTPException."""
+    df = _lataa_otteludata_cached(list(liigat), list(kaudet))
+    if df.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No match data found for leagues={liigat}, seasons={kaudet}",
+        )
+    try:
+        return DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
+            df,
+            home_team_col="home_team", away_team_col="away_team",
+            home_goals_col="home_score", away_goals_col="away_score",
+            decay=decay, date_col="date",
+            l2_attack_defence=bayes_shrinkage,
+            shrink_defence_to_mean=shrink_defence_to_mean,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
+
+
+def _taustarefit(key: tuple, liigat: tuple[str, ...], kaudet: tuple[str, ...],
+                  decay: float, bayes_shrinkage: float,
+                  per_team_home_adv: bool,
+                  shrink_defence_to_mean: bool) -> None:
+    """#72: refit:taa mallin taustasaikeessa, vapauttaa _REFIT_IN_PROGRESS-lipun.
+
+    Pyynnot tarjoillaan vanhalla cachetetulla mallilla kunnes uusi valmis.
+    Virheet logataan mutta ei propagoida — pyyntotie pysyy ehjana ja
+    seuraava TTL-tarkistus yrittaa uudelleen.
+    """
+    try:
+        dc = _fit_malli(liigat, kaudet, decay, bayes_shrinkage,
+                        per_team_home_adv, shrink_defence_to_mean)
+        with _MODEL_LOCK:
+            _MODEL_CACHE[key] = dc
+            _MODEL_FITTED_AT[key] = time.time()
+        print(f"[Refit] {liigat[0]} ready")
+    except Exception as e:
+        print(f"[Refit] {liigat[0]} failed: {type(e).__name__}: {e}")
+    finally:
+        with _MODEL_LOCK:
+            _REFIT_IN_PROGRESS.discard(key)
+
+
 def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
                decay: float = 0.0035, bayes_shrinkage: float = 2.0,
                per_team_home_adv: bool = True,
                shrink_defence_to_mean: bool = False) -> DixonColesModel:
     """
     Hae cached DC-malli tai sovita uusi jos ei välimuistissa.
+
+    #72: turnausmalleille (WC/EC) #69:n TTL-tarkistus on stale-while-
+    revalidate — vanhentunut malli palautetaan heti, ja tausta-saie
+    refit:taa uudella datalla. Yksikaan pyynto ei blokkaudu 30 s fitin
+    taakse. Cold-cold (ei cachea ollenkaan) sovittaa synkronisesti —
+    warmup-saie estaa taman kaytannossa.
 
     per_team_home_adv
         False = älä sovita joukkuekohtaisia kotietu-parametreja (n kpl).
@@ -232,28 +313,41 @@ def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
     """
     key = (liigat, kaudet, round(decay, 4), round(bayes_shrinkage, 2),
            per_team_home_adv, shrink_defence_to_mean)
-    if key in _MODEL_CACHE and not _malli_vanhentunut(key, liigat):
-        return _MODEL_CACHE[key]
-    df = _lataa_otteludata_cached(list(liigat), list(kaudet))
-    if df.empty:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No match data found for leagues={liigat}, seasons={kaudet}",
-        )
-    try:
-        dc = DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
-            df,
-            home_team_col="home_team", away_team_col="away_team",
-            home_goals_col="home_score", away_goals_col="away_score",
-            decay=decay, date_col="date",
-            l2_attack_defence=bayes_shrinkage,
-            shrink_defence_to_mean=shrink_defence_to_mean,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
-    _MODEL_CACHE[key] = dc
-    _MODEL_FITTED_AT[key] = time.time()
-    return _MODEL_CACHE[key]
+
+    # Lukon alla: peek cache + arvioi tuoreus. _malli_vanhentunut lukee
+    # _MODEL_FITTED_AT:ia, joten se kuuluu kriittiseen alueeseen.
+    with _MODEL_LOCK:
+        cached = _MODEL_CACHE.get(key)
+        stale = cached is not None and _malli_vanhentunut(key, liigat)
+
+    if cached is not None and not stale:
+        return cached
+
+    if cached is not None and stale:
+        # Stale-while-revalidate: kaynnista tausta-refit vain jos ei jo kaynnissa.
+        with _MODEL_LOCK:
+            start_thread = key not in _REFIT_IN_PROGRESS
+            if start_thread:
+                _REFIT_IN_PROGRESS.add(key)
+        if start_thread:
+            threading.Thread(
+                target=_taustarefit,
+                args=(key, liigat, kaudet, decay, bayes_shrinkage,
+                      per_team_home_adv, shrink_defence_to_mean),
+                daemon=True,
+            ).start()
+        return cached
+
+    # Cold-cold: ei cachea ollenkaan -> synk fit. Warmup hoitaa taman
+    # kaytannossa Renderissa; lazy-tie on jaljella vain epatavallisille
+    # liiga+kausi-yhdistelmille (esim. /api/team -kutsuille muille kuin
+    # warmup-listalle).
+    dc = _fit_malli(liigat, kaudet, decay, bayes_shrinkage,
+                    per_team_home_adv, shrink_defence_to_mean)
+    with _MODEL_LOCK:
+        _MODEL_CACHE[key] = dc
+        _MODEL_FITTED_AT[key] = time.time()
+    return dc
 
 
 # ---------------------------------------------------------------------------
@@ -990,13 +1084,16 @@ def predict_wc(req: PredictWCRequest):
 def clear_cache():
     """Tyhjennä mallin välimuisti — pakottaa uudelleen-sovituksen."""
     from src.data.football_data_org import _TOURNAMENT_MEM_CACHE
-    n = len(_MODEL_CACHE)
-    _MODEL_CACHE.clear()
-    _MODEL_FITTED_AT.clear()
+    with _MODEL_LOCK:
+        n = len(_MODEL_CACHE)
+        _MODEL_CACHE.clear()
+        _MODEL_FITTED_AT.clear()
+        _REFIT_IN_PROGRESS.clear()
     cleared_tournament = len(_TOURNAMENT_MEM_CACHE)
     _TOURNAMENT_MEM_CACHE.clear()
-    cleared_data = len(_DATA_CACHE)
-    _DATA_CACHE.clear()
+    with _DATA_CACHE_LOCK:
+        cleared_data = len(_DATA_CACHE)
+        _DATA_CACHE.clear()
     return {
         "cleared_models": n,
         "cleared_tournament_data": cleared_tournament,
