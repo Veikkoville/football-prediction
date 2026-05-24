@@ -15,6 +15,7 @@ Ilmaisen tier:n rajat:
 
 from __future__ import annotations
 import os
+import threading
 from datetime import datetime
 from pathlib import Path
 import json
@@ -37,6 +38,33 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 TOURNAMENT_TTL_SEC = 6 * 3600  # 6 h
 _LIVE_TOURNAMENT_CODES = {"WC", "EC"}
 _TOURNAMENT_MEM_CACHE: dict[tuple[str, str], tuple[float, dict]] = {}
+
+# #71: rate-limit aikaleima — sleep vain peräkkäisten API-kutsujen välissä,
+# ei cache-hitillä. Aiempi `time.sleep(7)` ehdoton-per-kausi `lataa()`-tasolla
+# nielei 14 s joka kutsussa myös kun data tuli levyltä. football-data.org
+# rajoittaa 10 pyyntöä/min → 6.5 s väli antaa varmuusmarginaalin.
+#
+# Lukko on välttämätön: warmup-daemon-thread (api/main.py) ja FastAPIn
+# pyyntö-säikeet voivat osua _await_rate_limit:iin yhtä aikaa. Ilman lukkoa
+# read+sleep+write ei ole atominen → kaksi säiettä voi lukea saman
+# aikaleiman, molemmat sleeppaa lyhyemmin kuin tulisi → 10/min raja rikkoutuu
+# ja kohdataan HTTP 429.
+_FDORG_MIN_INTERVAL_SEC = 6.5
+_FDORG_LAST_CALL_AT: list[float] = [0.0]
+_FDORG_RATE_LIMIT_LOCK = threading.Lock()
+
+
+def _await_rate_limit() -> None:
+    """Odota tarvittaessa jotta edellisestä API-kutsusta on >= 6.5 s.
+
+    Lukon alla luettu + sleepattu + päivitetty atomisesti, jotta rinnakkaiset
+    säikeet eivät pääse rikkomaan 10/min rate-limitiä (#71).
+    """
+    with _FDORG_RATE_LIMIT_LOCK:
+        elapsed = time.time() - _FDORG_LAST_CALL_AT[0]
+        if 0 < elapsed < _FDORG_MIN_INTERVAL_SEC:
+            time.sleep(_FDORG_MIN_INTERVAL_SEC - elapsed)
+        _FDORG_LAST_CALL_AT[0] = time.time()
 
 # Liiga -> football-data.org -kilpailukoodi
 COMPETITION_CODES = {
@@ -114,12 +142,15 @@ def _fetch_from_api(code: str, kausi: str, api_key: str) -> dict:
             f"Kilpailu {code} ei sisally ilmaiseen tier:iin. "
             f"Tier One -tilaus (€10/kk) avaa Europa Leaguen ja Conference Leaguen."
         )}
+    _await_rate_limit()
     url = f"{BASE}/competitions/{code}/matches?season={kausi}"
     headers = {"X-Auth-Token": api_key}
     try:
         r = requests.get(url, headers=headers, timeout=20)
         if r.status_code == 429:
             time.sleep(8)
+            with _FDORG_RATE_LIMIT_LOCK:
+                _FDORG_LAST_CALL_AT[0] = time.time()
             r = requests.get(url, headers=headers, timeout=20)
         if r.status_code == 403:
             return {"_error": (
@@ -224,12 +255,13 @@ def lataa(liiga: str, kaudet: list[str]) -> pd.DataFrame:
     palaset = []
     for k in kaudet:
         year = _kausi_to_year(k)
+        # #71: rate-limit-sleep on siirretty _fetch_from_api:n alkuun
+        # (_await_rate_limit). Cache-hit ei enää aiheuta sleeppejä.
         data = _hae_kausi(code, year, api_key)
         if data and "_error" not in data:
             df = _parse_matches(data, liiga, k)
             if not df.empty:
                 palaset.append(df)
-        time.sleep(7)  # rate limit (10/min, kaytamme reilusti alle)
     return pd.concat(palaset, ignore_index=True) if palaset else pd.DataFrame()
 
 

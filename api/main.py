@@ -19,6 +19,7 @@ import copy
 import json
 import os
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Optional
@@ -117,29 +118,76 @@ _MODEL_CACHE: dict[tuple, DixonColesModel] = {}
 # jos loaderin turnausdataa on haettu sen jälkeen uudelleen.
 _MODEL_FITTED_AT: dict[tuple, float] = {}
 
+# #71: DataFrame-välimuisti — /api/predict kutsuu lataa_otteludata kahdesti
+# per request (mallia varten + H2H/form-trend-laskuun). Understat-loaderin
+# read_schedule() voi tehdä HTTP-kutsuja → PL:n /api/predict warm-aika oli
+# 44 s vaikka malli oli cachetettu. Cache ohitetaan turnauskaudille jotta
+# #69:n TTL-logiikka pysyy ehjänä (loader hoitaa turnausten freshnessin).
+# Lukko: warmup-thread + pyyntö-säikeet voivat ajaa rinnakkain → double-
+# checked locking estää tuplakirjoituksen pitämättä lukkoa hidastavan
+# lataa_otteludata-kutsun ajan.
+_DATA_CACHE: dict[tuple, pd.DataFrame] = {}
+_DATA_CACHE_LOCK = threading.Lock()
+
+
+def _lataa_otteludata_cached(liigat, kaudet) -> pd.DataFrame:
+    """Muistissa-oleva DataFrame-cache lataa_otteludata-kutsuille.
+
+    Domestic-liigoille pysyvä prosessin keston ajan (data ei muutu). Turnaus-
+    liigoille (WC/EC live-kaudella) ohittaa cachen ja kutsuu loaderia joka
+    soveltaa #69:n TTL-logiikkaa.
+    """
+    if _liigat_sisaltavat_turnauksen(tuple(liigat)):
+        return lataa_otteludata(list(liigat), list(kaudet))
+    key = (tuple(liigat), tuple(kaudet))
+    with _DATA_CACHE_LOCK:
+        df = _DATA_CACHE.get(key)
+    if df is not None:
+        return df
+    # Cache miss → lataa lukon ulkopuolella (voi viedä sekunteja).
+    new_df = lataa_otteludata(list(liigat), list(kaudet))
+    with _DATA_CACHE_LOCK:
+        existing = _DATA_CACHE.get(key)
+        if existing is not None:
+            # Toinen säie ehti välissä — palautetaan sama instance kaikille.
+            return existing
+        _DATA_CACHE[key] = new_df
+        return new_df
+
 
 # ---------------------------------------------------------------------------
-# Lämmitys käynnistyksessä — sovittaa oletusmallin (PL 24/25 + 25/26) taustalla
-# jotta ensimmäinen /api/predict kutsu on nopea (ei 5-15s mallin sovitusta)
+# Lämmitys käynnistyksessä — sovittaa kaikkien tarjottujen liigojen mallit
+# taustalla jotta ensimmäinen /api/teams + /api/predict on nopea.
+#
+# Aiemmin warmup koski vain PL:ää → muut 5 liigaa (PD, BL1, SA, FL1, CL)
+# fitattiin lazy ensimmäisellä /api/teams-kutsulla → mobiili näki "server took
+# too long" -timeoutin (#71). Sarjallinen jotta CPU ei ylikuormiu ja
+# football-data.org rate-limit (6.5 s väli) säilyy alle 10/min rajan.
+# WC ei warmup-listalla — WC-malli refit:ataan TTL:n ehdoilla (#69) eikä
+# launch-päivänä #71-fixin yhteydessä haluta lisäkomplikaatioita.
 # ---------------------------------------------------------------------------
+WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
+    (("ENG-Premier League",),    ("2425", "2526")),
+    (("ESP-La Liga-FD",),        ("2425", "2526")),
+    (("GER-Bundesliga-FD",),     ("2425", "2526")),
+    (("ITA-Serie A-FD",),        ("2425", "2526")),
+    (("FRA-Ligue 1-FD",),        ("2425", "2526")),
+    (("INT-Champions League",),  ("2425", "2526")),
+]
+
+
 @app.on_event("startup")
-def _warmup_default_model():
-    import threading
+def _warmup_default_models():
+    def _fit_all():
+        for liigat, kaudet in WARMUP_LEAGUES:
+            try:
+                t0 = time.time()
+                _saa_malli(liigat, kaudet)
+                print(f"[Warmup] {liigat[0]} ready in {time.time()-t0:.1f}s")
+            except Exception as e:
+                print(f"[Warmup] {liigat[0]} failed: {type(e).__name__}: {e}")
 
-    def _fit_premier_league():
-        try:
-            print("[Warmup] Pre-fitting Premier League DC model...")
-            _saa_malli(("ENG-Premier League",), ("2425", "2526"))
-            print("[Warmup] Premier League model ready.")
-        except Exception as e:
-            print(f"[Warmup] Premier League failed: {e}")
-
-    # World Cup pre-warm poistettu launchin ajaksi —
-    # soccerdata vaatii Chromen WC-sivuille jota Renderissä ei ole.
-    # WC-tuki lisätään launchin jälkeen joko hardcoded-JSON:lla tai
-    # Chromen asennuksella Starter-tasolla.
-
-    threading.Thread(target=_fit_premier_league, daemon=True).start()
+    threading.Thread(target=_fit_all, daemon=True).start()
 
 
 def _liigat_sisaltavat_turnauksen(liigat: tuple[str, ...]) -> bool:
@@ -186,7 +234,7 @@ def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
            per_team_home_adv, shrink_defence_to_mean)
     if key in _MODEL_CACHE and not _malli_vanhentunut(key, liigat):
         return _MODEL_CACHE[key]
-    df = lataa_otteludata(list(liigat), list(kaudet))
+    df = _lataa_otteludata_cached(list(liigat), list(kaudet))
     if df.empty:
         raise HTTPException(
             status_code=404,
@@ -510,7 +558,7 @@ def team_detail(
       - away_stats: vierasotteluiden avg goals for/against + matches_played
       - total_matches: kokonaisottelumäärä joukkueelle datasetissä
     """
-    df = lataa_otteludata(list(leagues), list(seasons))
+    df = _lataa_otteludata_cached(list(leagues), list(seasons))
     if df.empty:
         raise HTTPException(
             status_code=404,
@@ -769,9 +817,10 @@ def predict(req: PredictionRequest):
     top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=req.top_n, adjustments=saadot)
 
     # T5: 5 viimeista keskinaista kohtaamista (molemmat venue-jarjestykset).
-    # Lataa_otteludata on sama kuin _saa_malli kayttaa sisaisesti — loader
-    # cachettaa DataFrame:n joten tama on kayatannossa lookup.
-    df = lataa_otteludata(list(req.leagues), list(req.seasons))
+    # #71: lataa_otteludata-tason DataFrame-cache eliminoi tuplakutsun cold-
+    # latauskustannuksen. Domestic-liigoille pysyva, turnausliigoille
+    # ohitettu (#69:n TTL-logiikka).
+    df = _lataa_otteludata_cached(list(req.leagues), list(req.seasons))
     h2h_all = df[
         ((df["home_team"] == req.home_team) & (df["away_team"] == req.away_team))
         | ((df["home_team"] == req.away_team) & (df["away_team"] == req.home_team))
@@ -946,7 +995,13 @@ def clear_cache():
     _MODEL_FITTED_AT.clear()
     cleared_tournament = len(_TOURNAMENT_MEM_CACHE)
     _TOURNAMENT_MEM_CACHE.clear()
-    return {"cleared_models": n, "cleared_tournament_data": cleared_tournament}
+    cleared_data = len(_DATA_CACHE)
+    _DATA_CACHE.clear()
+    return {
+        "cleared_models": n,
+        "cleared_tournament_data": cleared_tournament,
+        "cleared_match_data": cleared_data,
+    }
 
 
 # ---------------------------------------------------------------------------
