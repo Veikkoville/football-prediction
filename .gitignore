@@ -64,3 +64,6 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+# Kehitystyokalun konfiguraatio
+CLAUDE.md
