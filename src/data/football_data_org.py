@@ -222,11 +222,26 @@ def _parse_matches(data: dict, liiga: str, kausi: str) -> pd.DataFrame:
     for m in data["matches"]:
         if m.get("status") != "FINISHED":
             continue
-        score = m.get("score", {}).get("fullTime", {})
+        score_obj = m.get("score", {})
+        score = score_obj.get("fullTime", {})
         h = score.get("home")
         a = score.get("away")
         if h is None or a is None:
             continue
+        # #25: näytettävä tulos ilman rangaistuspotkuja. football-data.org
+        # summaa shootoutin fullTimeen kun duration == PENALTY_SHOOTOUT (esim.
+        # WC 2022 -finaali fullTime 7-5 = 3-3 jatkoajan jälkeen + pakat 4-2).
+        # Ottelun todellinen tulos on reg + jatkoaika ILMAN pakkoja → tästä
+        # erilliset *_disp-sarakkeet H2H-näyttöä varten. home_score/away_score
+        # (mallin syöte) jätetään fullTimeen → mallidatan pakkais-inflaatio
+        # käsitellään erikseen (#70), tämä ei muuta mallia.
+        if score_obj.get("duration") == "PENALTY_SHOOTOUT" and score_obj.get("regularTime"):
+            reg = score_obj.get("regularTime") or {}
+            et = score_obj.get("extraTime") or {}
+            h_disp = int(reg.get("home", h)) + int(et.get("home", 0) or 0)
+            a_disp = int(reg.get("away", a)) + int(et.get("away", 0) or 0)
+        else:
+            h_disp, a_disp = int(h), int(a)
         # Pakota tz-naive (poista UTC-merkinta) yhteneva muu data
         d = pd.to_datetime(m.get("utcDate"), errors="coerce", utc=True)
         if pd.notna(d):
@@ -236,6 +251,7 @@ def _parse_matches(data: dict, liiga: str, kausi: str) -> pd.DataFrame:
             "home_team": (m.get("homeTeam") or {}).get("name", "?"),
             "away_team": (m.get("awayTeam") or {}).get("name", "?"),
             "home_score": int(h), "away_score": int(a),
+            "home_score_disp": h_disp, "away_score_disp": a_disp,
             "league": liiga, "season": kausi,
             "home_xg": pd.NA, "away_xg": pd.NA,
             "lahde": "football-data.org",

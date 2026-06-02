@@ -1058,6 +1058,35 @@ def predict_wc(req: PredictWCRequest):
     p_btts = dc.predict_btts(req.home_team, req.away_team, adjustments=saadot)
     top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=5, adjustments=saadot)
 
+    # T5/T7 (#25): H2H + form-trend WC-historiadatasta (sama WC-loader jota malli
+    # kayttaa). Mirror domestic /api/predict -polusta — _h2h_summary +
+    # _team_recent_form ovat geneerisia (df + nimet). df ladataan loader_seasons-
+    # formaatissa (#69:n turnaus-TTL hoitaa cachen).
+    df = _lataa_otteludata_cached(list(req.leagues), loader_seasons)
+    h2h_all = df[
+        ((df["home_team"] == req.home_team) & (df["away_team"] == req.away_team))
+        | ((df["home_team"] == req.away_team) & (df["away_team"] == req.home_team))
+    ].sort_values("date", ascending=False)
+    h2h = [
+        {
+            "date": str(m["date"])[:10],
+            "home_team": m["home_team"],
+            "away_team": m["away_team"],
+            # #25: näytä ottelun tulos ilman rangaistuspotkuja (reg+jatkoaika).
+            # *_disp on loaderin laskema; fallback fullTimeen jos puuttuu.
+            "home_score": int(m.get("home_score_disp", m["home_score"])),
+            "away_score": int(m.get("away_score_disp", m["away_score"])),
+        }
+        for _, m in h2h_all.head(5).iterrows()
+    ]
+    # W/D/L-summary lasketaan fullTimesta (home_score/away_score) → voittaja on
+    # oikea myös pakkapelissä (esim. Argentina voitti 2022-finaalin pakoilla).
+    h2h_summary = _h2h_summary(h2h_all, req.home_team, req.away_team)
+    form_trend = {
+        "home_team": _team_recent_form(df, req.home_team),
+        "away_team": _team_recent_form(df, req.away_team),
+    }
+
     return PredictionResponse(
         home_team=req.home_team,
         away_team=req.away_team,
@@ -1074,6 +1103,9 @@ def predict_wc(req: PredictWCRequest):
         p_btts_yes=round(p_btts["btts_yes"], 4),
         p_btts_no=round(p_btts["btts_no"], 4),
         top_scores=[{"score": s, "probability": round(p, 4)} for s, p in top],
+        h2h=h2h,
+        h2h_summary=h2h_summary,
+        form_trend=form_trend,
     )
 
 
