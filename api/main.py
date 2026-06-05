@@ -46,6 +46,13 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 
+# RevenueCat (Google Play Billing) -webhookin jaettu salaisuus. Arvo on sama
+# merkkijono joka asetetaan RevenueCat-dashboardin webhook-asetuksiin
+# (Authorization header value) — RevenueCat lahettaa sen sellaisenaan
+# Authorization-headerissa. Tyhja => webhook ei kasittele (ei luvattomia
+# is_premium-kirjoituksia).
+REVENUECAT_WEBHOOK_AUTH = os.getenv("REVENUECAT_WEBHOOK_AUTH", "")
+
 # Supabase-konfiguraatio webhook-päivityksiä varten.
 # SUPABASE_SERVICE_ROLE_KEY on backend-only-key (ei saa koskaan vuotaa frontille);
 # se ohittaa Row Level Securityn, jotta webhook voi päivittää profiilin.
@@ -1345,6 +1352,115 @@ async def stripe_webhook(request: Request):
         print(f"[Stripe webhook] ignored event_type={event_type}")
 
     return {"received": True}
+
+
+@app.post("/api/revenuecat/webhook")
+async def revenuecat_webhook(request: Request):
+    """
+    Vastaanottaa RevenueCat-webhookit (Google Play Billing). Paivittaa
+    Supabase profiles.is_premium app_user_id:n (= Supabase auth user id)
+    perusteella.
+
+    Eventit:
+      INITIAL_PURCHASE / RENEWAL / UNCANCELLATION / PRODUCT_CHANGE /
+      NON_RENEWING_PURCHASE -> is_premium=True (access voimassa)
+      CANCELLATION -> is_premium pysyy True, mutta merkitaan
+        cancel_at_period_end=True (auto-renew pois; access jatkuu
+        expiration-paivaan asti). Lopullinen access-poisto tulee
+        EXPIRATION-eventissa.
+      EXPIRATION -> is_premium=False (access paattyi)
+
+    Autentikointi: RevenueCat lahettaa dashboardiin asetetun salaisuuden
+    Authorization-headerissa. REVENUECAT_WEBHOOK_AUTH-env-muuttuja on
+    pakollinen — jos puuttuu, webhook ei kirjoita mitaan.
+    """
+    if not REVENUECAT_WEBHOOK_AUTH:
+        # Ei konfiguroitu — palauta 200 ettei RevenueCat retry-loopaa, mutta
+        # ALA kirjoita Supabaseen (turvallinen oletus).
+        return {"received": True, "warning": "REVENUECAT_WEBHOOK_AUTH not configured"}
+
+    auth_header = request.headers.get("authorization", "")
+    if auth_header != REVENUECAT_WEBHOOK_AUTH:
+        raise HTTPException(status_code=401, detail="Invalid authorization")
+
+    payload = await request.body()
+    try:
+        data = json.loads(payload)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+
+    event = data.get("event", {}) or {}
+    event_type = event.get("type", "")
+    user_id = event.get("app_user_id", "") or ""
+
+    # Ohita anonyymit / RevenueCatin generoimat id:t — vain Supabase-auth-id:lla
+    # voidaan paivittaa profiili.
+    if not user_id or user_id.startswith("$RCAnonymousID:"):
+        print(f"[RevenueCat webhook] skip event_type={event_type} app_user_id={user_id!r}")
+        return {"received": True}
+
+    # expiration_at_ms = milloin access paattyy (renewal-/cancel-tieto).
+    from datetime import datetime, timezone
+
+    expiration_ms = event.get("expiration_at_ms")
+    period_end_iso = None
+    if expiration_ms:
+        try:
+            period_end_iso = datetime.fromtimestamp(
+                int(expiration_ms) / 1000, tz=timezone.utc
+            ).isoformat()
+        except (ValueError, OSError, OverflowError):
+            period_end_iso = None
+
+    active_events = {
+        "INITIAL_PURCHASE",
+        "RENEWAL",
+        "UNCANCELLATION",
+        "PRODUCT_CHANGE",
+        "NON_RENEWING_PURCHASE",
+    }
+
+    if event_type in active_events:
+        print(f"[RevenueCat webhook] {event_type} user_id={user_id} period_end={period_end_iso}")
+        _update_profile(user_id, {
+            "is_premium": True,
+            "subscription_cancel_at_period_end": False,
+            "subscription_current_period_end": period_end_iso,
+        })
+    elif event_type == "CANCELLATION":
+        # Auto-renew pois paalta; access jatkuu expiration-paivaan asti.
+        cancel_reason = event.get("cancel_reason", "")
+        print(
+            f"[RevenueCat webhook] CANCELLATION user_id={user_id} "
+            f"reason={cancel_reason} period_end={period_end_iso}"
+        )
+        _update_profile(user_id, {
+            "is_premium": True,
+            "subscription_cancel_at_period_end": True,
+            "subscription_current_period_end": period_end_iso,
+        })
+    elif event_type == "EXPIRATION":
+        print(f"[RevenueCat webhook] EXPIRATION user_id={user_id}")
+        _update_profile(user_id, {
+            "is_premium": False,
+            "subscription_cancel_at_period_end": False,
+            "subscription_current_period_end": None,
+        })
+    else:
+        # BILLING_ISSUE, TEST, TRANSFER ym. — ei muutosta is_premiumiin.
+        print(f"[RevenueCat webhook] ignored event_type={event_type} user_id={user_id}")
+
+    return {"received": True}
+
+
+@app.get("/api/revenuecat-config")
+def revenuecat_config():
+    """Diagnostiikka: onko RevenueCat-webhook konfiguroitu (ei paljasta arvoja)."""
+    return {
+        "webhook_auth_set": bool(REVENUECAT_WEBHOOK_AUTH),
+        "supabase_url_set": bool(SUPABASE_URL),
+        "supabase_service_role_key_set": bool(SUPABASE_SERVICE_ROLE_KEY),
+    }
 
 
 @app.get("/api/debug/seasons")
