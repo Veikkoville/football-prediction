@@ -1,0 +1,245 @@
+code,name,elo
+ES,Spain,2155
+AR,Argentina,2113
+FR,France,2062
+EN,England,2020
+BR,Brazil,1988
+PT,Portugal,1984
+CO,Colombia,1977
+NL,Netherlands,1944
+EC,Ecuador,1935
+DE,Germany,1925
+NO,Norway,1917
+HR,Croatia,1908
+TR,Turkey,1906
+JP,Japan,1906
+CH,Switzerland,1894
+BE,Belgium,1893
+UY,Uruguay,1892
+MX,Mexico,1875
+SN,Senegal,1867
+DK,Denmark,1864
+IT,Italy,1859
+PY,Paraguay,1833
+AT,Austria,1830
+MA,Morocco,1824
+CA,Canada,1788
+UA,Ukraine,1785
+AU,Australia,1774
+IR,Iran,1772
+SQ,Scotland,1770
+NG,Nigeria,1770
+RU,Russia,1770
+DZ,Algeria,1760
+KR,South Korea,1758
+GR,Greece,1754
+CZ,Czechia,1740
+RS,Serbia,1734
+PA,Panama,1734
+US,United States,1733
+VE,Venezuela,1727
+UZ,Uzbekistan,1718
+KO,Kosovo,1714
+SE,Sweden,1712
+PL,Poland,1710
+CL,Chile,1710
+HU,Hungary,1707
+PE,Peru,1701
+EG,Egypt,1699
+IE,Ireland,1699
+CI,Ivory Coast,1695
+WA,Wales,1691
+SI,Slovenia,1685
+JO,Jordan,1685
+SK,Slovakia,1667
+CD,DR Congo,1661
+GE,Georgia,1654
+IL,Israel,1647
+BO,Bolivia,1645
+AL,Albania,1633
+RO,Romania,1630
+TN,Tunisia,1628
+IQ,Iraq,1618
+CM,Cameroon,1613
+CR,Costa Rica,1611
+EI,Northern Ireland,1607
+BA,Bosnia and Herzegovina,1591
+NM,North Macedonia,1589
+ML,Mali,1588
+CV,Cape Verde,1576
+HN,Honduras,1571
+SA,Saudi Arabia,1569
+IS,Iceland,1569
+NZ,New Zealand,1563
+HT,Haiti,1548
+AE,United Arab Emirates,1540
+AO,Angola,1537
+FI,Finland,1536
+JM,Jamaica,1527
+BF,Burkina Faso,1526
+BY,Belarus,1525
+ZA,South Africa,1518
+GH,Ghana,1510
+GT,Guatemala,1507
+SY,Syria,1479
+PS,Palestine,1469
+GN,Guinea,1463
+ME,Montenegro,1460
+OM,Oman,1459
+BG,Bulgaria,1458
+NS,Northern Cyprus,1457
+CW,Curaçao,1433
+LU,Luxembourg,1433
+SR,Suriname,1431
+KZ,Kazakhstan,1430
+CN,China,1428
+BJ,Benin,1428
+KD,Kurdistan,1425
+QA,Qatar,1423
+LY,Libya,1420
+GM,Gambia,1419
+BH,Bahrain,1414
+GA,Gabon,1401
+NE,Niger,1394
+UG,Uganda,1394
+GQ,Equatorial Guinea,1391
+TT,Trinidad and Tobago,1388
+FO,Faroe Islands,1381
+MG,Madagascar,1380
+AM,Armenia,1379
+KP,North Korea,1375
+ZW,Zimbabwe,1372
+MZ,Mozambique,1372
+TH,Thailand,1372
+ZM,Zambia,1371
+KM,Comoros,1363
+ID,Indonesia,1362
+TG,Togo,1356
+KE,Kenya,1352
+VN,Vietnam,1351
+SD,Sudan,1350
+SL,Sierra Leone,1348
+RE,Reunion,1345
+SV,El Salvador,1340
+EE,Estonia,1339
+GP,Guadeloupe,1338
+RW,Rwanda,1337
+NI,Nicaragua,1333
+KW,Kuwait,1331
+AZ,Azerbaijan,1321
+ZN,Zanzibar,1321
+MR,Mauritania,1317
+TZ,Tanzania,1313
+MQ,Martinique,1312
+CY,Cyprus,1310
+LV,Latvia,1305
+NA,Namibia,1303
+LR,Liberia,1297
+MY,Malaysia,1293
+GY,Guyana,1292
+KG,Kyrgyzstan,1291
+TJ,Tajikistan,1290
+LB,Lebanon,1288
+NC,New Caledonia,1286
+LT,Lithuania,1286
+BI,Burundi,1285
+ET,Ethiopia,1285
+DO,Dominican Republic,1283
+BW,Botswana,1267
+MD,Moldova,1265
+MT,Malta,1255
+GW,Guinea-Bissau,1248
+CF,Central African Republic,1241
+MW,Malawi,1241
+CU,Cuba,1239
+GF,French Guiana,1223
+YT,Mayotte,1216
+TM,Turkmenistan,1209
+LS,Lesotho,1209
+CG,Congo,1207
+ER,Eritrea,1201
+YE,Yemen,1195
+TI,Tahiti,1176
+PH,Philippines,1169
+SW,Eswatini,1149
+VC,Saint Vincent and the Grenadines,1141
+PG,Papua New Guinea,1135
+PR,Puerto Rico,1135
+SG,Singapore,1134
+HK,Hong Kong,1122
+IN,India,1122
+VU,Vanuatu,1121
+BM,Bermuda,1119
+SS,South Sudan,1109
+FJ,Fiji,1101
+GD,Grenada,1098
+AD,Andorra,1081
+MU,Mauritius,1073
+TD,Chad,1073
+BZ,Belize,1073
+SB,Solomon Islands,1054
+MF,Saint Martin,1042
+ST,Sao Tome and Principe,1035
+KN,Saint Kitts and Nevis,1029
+AF,Afghanistan,1023
+GI,Gibraltar,1006
+JS,Somaliland,1005
+LC,Saint Lucia,1003
+EH,Western Sahara,996
+MM,Myanmar,993
+AW,Aruba,979
+SO,Somalia,979
+SX,Sint Maarten,975
+MS,Montserrat,971
+GL,Greenland,946
+BD,Bangladesh,942
+DJ,Djibouti,940
+DM,Dominica,934
+MC,Monaco,903
+LI,Liechtenstein,899
+BB,Barbados,898
+AG,Antigua and Barbuda,894
+NP,Nepal,893
+SC,Seychelles,853
+KH,Cambodia,849
+PK,Pakistan,847
+BQ,Bonaire,836
+LK,Sri Lanka,827
+SM,San Marino,826
+TW,Taiwan,821
+KY,Cayman Islands,805
+MV,Maldives,801
+HG,Chagos Islands,782
+TV,Tuvalu,756
+EU,Sint Eustatius,737
+LA,Laos,734
+WS,Samoa,728
+MN,Mongolia,725
+BL,Saint Barthelemy,725
+VG,British Virgin Islands,723
+TL,East Timor,714
+GU,Guam,705
+WF,Wallis and Futuna,699
+VA,Vatican,692
+AB,Saba,691
+BS,Bahamas,685
+PM,Saint Pierre and Miquelon,677
+TC,Turks and Caicos Islands,657
+AI,Anguilla,646
+BT,Bhutan,631
+TE,Tibet,629
+VI,US Virgin Islands,628
+CK,Cook Islands,622
+BN,Brunei,592
+MO,Macao,588
+CX,Christmas Island,578
+FK,Falkland Islands,571
+FM,FS Micronesia,563
+MH,Marshall Islands,559
+KI,Kiribati,544
+TO,Tonga,520
+NU,Niue,496
+MP,Northern Mariana Islands,432
+CC,Cocos Islands,422
+PW,Palau,402
+AS,Eastern Samoa,369

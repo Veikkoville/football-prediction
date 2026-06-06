@@ -29,6 +29,16 @@ WC_MODEL_PATH = config.DATA_DIR / "wc_model.json"
 WC_FIT_DECAY: float = 0.0
 WC_FIT_BAYES: float = 1.0
 
+# #79 konfederaatio-kalibrointikorjaus: World Football Elo -priori ankkuroi
+# attack/defencen cross-confederation-uskottavaan skaalaan (esim. Japani-tyyppinen
+# heikon konfederaation karsintainflaatio pois — Japani #5→#11). Arvot
+# tune_wc_elo-gridistä (paras out-of-sample log-loss + konfederaatio-sanity läpi):
+#   beta=0.004, weight=16, shrink_defence_to_mean=False (Elo-priori ankkuroi
+#   defencen → ei tarvita keskiarvo-shrinkkausta, joka jätti Japanin top-5:een).
+ELO_PRIOR_BETA: float = 0.004
+ELO_PRIOR_WEIGHT: float = 16.0
+WC_SHRINK_DEFENCE: bool = False
+
 # Loader-liigatunnus jolla tämä lähde reititetään (sama kuin ennen → frontend
 # + cache-avaimet pysyvät yhteensopivina; vain datalähde vaihtuu).
 LEAGUE_LABEL = "INT-World Cup"

@@ -23,8 +23,9 @@ from src.data.international_results import (
     lataa, save_wc_model,
     COMPETITION_WEIGHTS, DEFAULT_COMPETITION_WEIGHT,
     DEFAULT_WINDOW_START, DEFAULT_INCLUDE, WC_FIT_DECAY, WC_FIT_BAYES,
-    WC_MODEL_PATH,
+    WC_MODEL_PATH, ELO_PRIOR_BETA, ELO_PRIOR_WEIGHT, WC_SHRINK_DEFENCE,
 )
+from src.data.elo import build_team_priors
 from src.models.dixon_coles import DixonColesModel
 
 
@@ -33,20 +34,27 @@ def main() -> int:
     print(f"Treenidata: {len(df)} ottelua, "
           f"{len(set(df['home_team']) | set(df['away_team']))} maata "
           f"(window={DEFAULT_WINDOW_START}, include={DEFAULT_INCLUDE})")
+    # #79: Elo-priori ankkuroi cross-confederation-skaalan (konfederaatio-bias pois).
+    teams = sorted(set(df["home_team"]) | set(df["away_team"]))
+    priors = build_team_priors(teams, beta=ELO_PRIOR_BETA, weight=ELO_PRIOR_WEIGHT)
     t0 = time.time()
     dc = DixonColesModel(per_team_home_adv=False).fit(
         df, decay=WC_FIT_DECAY, date_col="date",
-        l2_attack_defence=WC_FIT_BAYES, shrink_defence_to_mean=True,
+        l2_attack_defence=WC_FIT_BAYES, shrink_defence_to_mean=WC_SHRINK_DEFENCE,
+        team_priors=priors,
         competition_col="tournament", competition_weights=COMPETITION_WEIGHTS,
         default_competition_weight=DEFAULT_COMPETITION_WEIGHT,
     )
     el = time.time() - t0
     meta = {
-        "source": "martj42/international_results (CC0)",
+        "source": "martj42/international_results (CC0) + eloratings.net prior",
         "window_start": DEFAULT_WINDOW_START,
         "include": DEFAULT_INCLUDE,
         "decay": WC_FIT_DECAY,
         "bayes_shrinkage": WC_FIT_BAYES,
+        "elo_prior_beta": ELO_PRIOR_BETA,
+        "elo_prior_weight": ELO_PRIOR_WEIGHT,
+        "shrink_defence_to_mean": WC_SHRINK_DEFENCE,
         "n_train_matches": len(df),
         "n_teams": len(dc.teams_),
         "fit_seconds": round(el, 2),

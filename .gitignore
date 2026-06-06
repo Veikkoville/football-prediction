@@ -31,6 +31,8 @@ raw_data/
 !/data/international_results.README.md
 # Esirakennettu WC-malli (#79) — vendoroitu, ladataan ajossa (ei fittiä Renderillä).
 !/data/wc_model.json
+# Vendoroitu World Football Elo -snapshot (#79 konfederaatio-kalibrointi).
+!/data/elo_ratings.csv
 downloaded_files/
 ~/soccerdata/
 
