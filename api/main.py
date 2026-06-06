@@ -190,22 +190,10 @@ WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
     (("INT-Champions League",),  ("2425", "2526")),
 ]
 
-# #72: WC-warmup parametrit matchaavat /api/predict-wc:n cache-keyhyn
-# (decay, bayes, per_team_home_adv=False, shrink_defence_to_mean=True).
-# Kausi-muoto on jo loader-formaatissa ("18","22","26") koska /api/predict-wc
-# kutsuu _wc_seasons_to_loader_format ennen _saa_malli:a.
-WC_WARMUP: tuple[tuple[str, ...], tuple[str, ...]] = (
-    ("INT-World Cup",), ("18", "22", "26"),
-)
-
-# #79: WC-mallin fit-parametrit. Käytetään SEKÄ warmupissa ETTÄ
-# PredictWCRequest-defaulteissa → cache-avain täsmää (warmup-malli = serving-malli).
-# Arvot vaiheen 5 backtestistä (window=2022, include=any, tuore martj42-otos):
-# decay=0.0 + bayes=1.0 minimoi log-lossin (NEW 1.0251 < OLD 1.0365) ja antaa
-# järkevät marquee-todennäköisyydet. Suurempi data (~2000 ott./~50 per maa) sietää
-# kevyemmän shrinkagen kuin vanha WC 2018/22 (~128 ott. → bayes=8 oli pakko).
-WC_FIT_DECAY: float = 0.0
-WC_FIT_BAYES: float = 1.0
+# #79: WC-mallin fit-parametrit (kanoninen lähde = international_results).
+# PredictWCRequest käyttää näitä defaultteina (vain dokumentaatio/compat — serving
+# lataa esirakennetun JSON-mallin, ei fittaa näillä ajossa).
+from src.data.international_results import WC_FIT_DECAY, WC_FIT_BAYES
 
 
 @app.on_event("startup")
@@ -218,17 +206,17 @@ def _warmup_default_models():
                 print(f"[Warmup] {liigat[0]} ready in {time.time()-t0:.1f}s")
             except Exception as e:
                 print(f"[Warmup] {liigat[0]} failed: {type(e).__name__}: {e}")
-        # #72: WC viimeiseksi — domestic-liigat lampenevat ensin.
+        # #79: WC-malli on ESIRAKENNETTU (data/wc_model.json) — Render Starter ei
+        # jaksa fitata "any"-mallia ajossa. Esiladataan lru-cacheen (instant);
+        # ei fittiä, ei livelock-riskiä.
         try:
+            from src.data.international_results import load_wc_model
             t0 = time.time()
-            _saa_malli(
-                WC_WARMUP[0], WC_WARMUP[1],
-                decay=WC_FIT_DECAY, bayes_shrinkage=WC_FIT_BAYES,
-                per_team_home_adv=False, shrink_defence_to_mean=True,
-            )
-            print(f"[Warmup] {WC_WARMUP[0][0]} ready in {time.time()-t0:.1f}s")
+            dc = load_wc_model()
+            print(f"[Warmup] WC model (prebuilt) loaded: {len(dc.teams_)} teams "
+                  f"in {time.time()-t0:.2f}s")
         except Exception as e:
-            print(f"[Warmup] {WC_WARMUP[0][0]} failed: {type(e).__name__}: {e}")
+            print(f"[Warmup] WC prebuilt model load failed: {type(e).__name__}: {e}")
 
     threading.Thread(target=_fit_all, daemon=True).start()
 
@@ -554,6 +542,14 @@ def list_teams(
     seasons: list[str] = Query(default=["2425", "2526"]),
 ):
     """Lista joukkueista jotka mallissa esiintyvät annetussa liiga+kausi-yhdistelmässä."""
+    # #79: WC-lista on 48 WC2026-maata — palautetaan suoraan ILMAN mallin fittausta
+    # (Render Starter ei jaksa fitata "any"-mallia ajossa; malli on esirakennettu).
+    if leagues == ["INT-World Cup"]:
+        from src.data.wc_teams import WC2026_TEAMS
+        return TeamsResponse(
+            leagues=leagues, seasons=seasons,
+            teams=sorted(WC2026_TEAMS), n_matches=len(WC2026_TEAMS),
+        )
     dc = _saa_malli(tuple(leagues), tuple(seasons))
     n = 0
     try:
@@ -562,11 +558,6 @@ def list_teams(
     except Exception:
         pass
     teams = sorted(dc.teams_)
-    # #79: WC-malli sisältää myös ~150 ei-WC-sparrausvastustajaa (any-moodi) —
-    # frontendille tarjotaan vain 48 WC2026-osallistujaa.
-    if leagues == ["INT-World Cup"]:
-        from src.data.wc_teams import WC2026_TEAMS_SET
-        teams = sorted(set(teams) & WC2026_TEAMS_SET)
     return TeamsResponse(
         leagues=leagues,
         seasons=seasons,
@@ -1027,11 +1018,12 @@ def _wc_seasons_to_loader_format(seasons: list[str]) -> list[str]:
 @app.post("/api/predict-wc", response_model=PredictionResponse)
 def predict_wc(req: PredictWCRequest):
     """
-    Tee 1X2, O/U 2.5, BTTS -ennuste kansainvälisten joukkueiden välille
-    WC-historiadatan pohjalta (WC 2018 + 2022 + 2026 fixtures).
+    Tee 1X2, O/U 2.5, BTTS -ennuste kansainvälisten joukkueiden välille.
 
-    Datalähde: football-data.org ML Pack Light -tier.
-    Env: FOOTBALL_DATA_API_KEY pakollinen.
+    #79: datalähde = martj42 maaotteludata (kaikkien 48 WC-maan tuoreet ottelut).
+    Malli on ESIRAKENNETTU (data/wc_model.json) ja ladataan ajossa — Render
+    Starter ei jaksa fitata "any"-mallia (195 maata) ajossa ilman timeoutia.
+    H2H/form-trend ladataan martj42-datasta (cachetettu CSV-suodatus).
     """
     if req.leagues != ["INT-World Cup"]:
         raise HTTPException(
@@ -1059,12 +1051,17 @@ def predict_wc(req: PredictWCRequest):
 
     loader_seasons = _wc_seasons_to_loader_format(req.seasons)
 
-    dc_cached = _saa_malli(
-        tuple(req.leagues), tuple(loader_seasons),
-        decay=req.decay, bayes_shrinkage=req.bayes_shrinkage,
-        per_team_home_adv=False,  # #61: predict-wc nollaa kotiedun → ei hukkaparametreja
-        shrink_defence_to_mean=True,  # #61: estä maalitason deflaatio
-    )
+    # #79: lataa esirakennettu WC-malli (ei fittiä ajossa). JSON-lataus on
+    # lru-cachetettu → ~ms. req.decay/req.bayes_shrinkage jätetään huomiotta
+    # (malli on rakennettu WC_FIT_DECAY/WC_FIT_BAYES-arvoilla offline).
+    from src.data.international_results import load_wc_model
+    try:
+        dc_cached = load_wc_model()
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"WC model unavailable: {type(e).__name__}",
+        )
 
     # WC-otteluita pelataan neutraalilla maalla (Qatar 2022, USA/CAN/MEX 2026).
     # DC-malli oppii datasta globaalin kotiedun (home_advantage = γ) koska data

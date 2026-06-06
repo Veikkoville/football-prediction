@@ -29,6 +29,8 @@ raw_data/
 # buildaa gitistä, ei live-pullia ajossa.
 !/data/international_results.csv
 !/data/international_results.README.md
+# Esirakennettu WC-malli (#79) — vendoroitu, ladataan ajossa (ei fittiä Renderillä).
+!/data/wc_model.json
 downloaded_files/
 ~/soccerdata/
 

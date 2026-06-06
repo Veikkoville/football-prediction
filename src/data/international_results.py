@@ -19,6 +19,16 @@ from src.data.wc_teams import WC2026_TEAMS_SET, resolve_wc_name
 
 CSV_PATH = config.DATA_DIR / "international_results.csv"
 
+# Esirakennettu WC-malli (JSON). Render Starterin ~0.5 vCPU ei jaksa fitata
+# "any"-mallia (195 maata / 302 param SLSQP) ajossa ilman timeoutia → malli
+# rakennetaan offline (scripts/build_wc_model.py) ja ladataan ajossa.
+WC_MODEL_PATH = config.DATA_DIR / "wc_model.json"
+
+# WC-mallin fit-parametrit (vaiheen 5 backtestin voittaja: window=2022, any,
+# decay=0.0, bayes=1.0). Kanoninen lähde — build-skripti + api.main lukevat tästä.
+WC_FIT_DECAY: float = 0.0
+WC_FIT_BAYES: float = 1.0
+
 # Loader-liigatunnus jolla tämä lähde reititetään (sama kuin ennen → frontend
 # + cache-avaimet pysyvät yhteensopivina; vain datalähde vaihtuu).
 LEAGUE_LABEL = "INT-World Cup"
@@ -77,6 +87,44 @@ def _read_raw() -> pd.DataFrame:
     df = pd.read_csv(CSV_PATH, encoding="utf-8")
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     return df
+
+
+def save_wc_model(dc, meta: dict) -> None:
+    """Sarjallista fitattu DixonColesModel JSONiksi (vain dict/float/list-kentät)."""
+    import json
+    payload = {
+        "meta": meta,
+        "attack": dc.attack,
+        "defence": dc.defence,
+        "home_advantage": dc.home_advantage,
+        "home_advantage_per_team": dc.home_advantage_per_team,
+        "rho": dc.rho,
+        "teams_": list(dc.teams_),
+        "per_team_home_adv": dc.per_team_home_adv,
+        "model_type_": getattr(dc, "model_type_", "dc"),
+    }
+    with open(WC_MODEL_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+
+
+@lru_cache(maxsize=1)
+def load_wc_model():
+    """Lataa esirakennettu WC-malli JSONista → DixonColesModel. EI fittiä ajossa.
+    Cachetettu (lru) — tiedosto on staattinen vendoroitu snapshot."""
+    import json
+    from src.models.dixon_coles import DixonColesModel
+    with open(WC_MODEL_PATH, encoding="utf-8") as f:
+        d = json.load(f)
+    return DixonColesModel(
+        attack=d["attack"],
+        defence=d["defence"],
+        home_advantage=d["home_advantage"],
+        home_advantage_per_team=d["home_advantage_per_team"],
+        rho=d["rho"],
+        teams_=d["teams_"],
+        per_team_home_adv=d.get("per_team_home_adv", False),
+        model_type_=d.get("model_type_", "dc"),
+    )
 
 
 def wc2026_participants(raw: pd.DataFrame | None = None) -> set[str]:
