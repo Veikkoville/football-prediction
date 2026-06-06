@@ -53,6 +53,26 @@ def lataa_otteludata_yksityiskohtaisesti(liigat: Iterable[str], kaudet: Iterable
     palaset = []
 
     for liiga in liigat:
+        # 0. #79: WC-malli kansainvälisestä maaotteludatasta (martj42, vendoroitu
+        #    CSV). Reititetään ENNEN football-data.org-haaraa — "INT-World Cup" ei
+        #    enää tule FD:n WC-kilpailusta vaan kaikkien 48 WC-maan tuoreista
+        #    maaotteluista (karsinnat/NL/konfederaatiokisat/friendlyt).
+        from src.data.international_results import (
+            LEAGUE_LABEL as INTL_LEAGUE,
+            lataa as lataa_intl,
+        )
+        if liiga == INTL_LEAGUE:
+            try:
+                intl = lataa_intl(kaudet)
+                if not intl.empty:
+                    palaset.append(intl)
+                    tulos.onnistui[liiga] = len(intl)
+                else:
+                    tulos.virheet[liiga] = "international_results: tyhjä datasetti."
+            except Exception as e:
+                tulos.virheet[liiga] = f"international_results: {type(e).__name__}: {e}"
+            continue
+
         # 1. Understat (xG-data) — kokeile ensin, fallback football-data.co.uk:hon
         understat_onnistui = False
         if liiga in UNDERSTAT_LEAGUES:

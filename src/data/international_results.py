@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from functools import lru_cache
+
 import config
 from src.data.wc_teams import WC2026_TEAMS_SET, resolve_wc_name
 
@@ -65,9 +67,16 @@ COMPETITION_WEIGHTS: dict[str, float] = {
 DEFAULT_COMPETITION_WEIGHT = 0.5
 
 
+@lru_cache(maxsize=1)
 def _read_raw() -> pd.DataFrame:
-    """Lue vendoroitu CSV (UTF-8). 'NA'-tulokset → NaN."""
-    return pd.read_csv(CSV_PATH, encoding="utf-8")
+    """Lue vendoroitu CSV (UTF-8) ja parsi päivät. 'NA'-tulokset → NaN.
+
+    Cachetettu prosessin keston ajaksi — CSV on staattinen snapshot. Kutsujat
+    EIVÄT mutatoi paluuarvoa (lataa() rakentaa uuden DataFramen). Sama jaettu-
+    instanssi-malli kuin domestic _DATA_CACHE."""
+    df = pd.read_csv(CSV_PATH, encoding="utf-8")
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    return df
 
 
 def wc2026_participants(raw: pd.DataFrame | None = None) -> set[str]:
@@ -88,10 +97,15 @@ def lataa(
     """Palauta WC-mallin treenidata loaderin vakioskeemassa + tournament/neutral.
 
     `kaudet` jätetään tietoisesti huomiotta (aikaikkuna ohjaa otosta) — säilytetään
-    silti signatuurissa loader-yhteensopivuuden + cache-avaimen vuoksi.
-    """
-    raw = _read_raw()
-    raw["date"] = pd.to_datetime(raw["date"], errors="coerce")
+    silti signatuurissa loader-yhteensopivuuden + cache-avaimen vuoksi. Tulos
+    cachetetaan (window_start, include) -avaimella → predict-wc:n per-pyyntö-H2H ei
+    suodata 49k riviä joka kerta."""
+    return _build(window_start, include)
+
+
+@lru_cache(maxsize=8)
+def _build(window_start: str, include: str) -> pd.DataFrame:
+    raw = _read_raw()  # cachetettu, parsittu date — EI mutatoida tässä
     played = raw[raw["home_score"].notna() & raw["away_score"].notna()].copy()
     played = played[played["date"] >= pd.Timestamp(window_start)]
 

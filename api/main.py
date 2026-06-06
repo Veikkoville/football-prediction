@@ -191,12 +191,18 @@ WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
 ]
 
 # #72: WC-warmup parametrit matchaavat /api/predict-wc:n cache-keyhyn
-# (decay=0, bayes=8, per_team_home_adv=False, shrink_defence_to_mean=True).
+# (decay, bayes, per_team_home_adv=False, shrink_defence_to_mean=True).
 # Kausi-muoto on jo loader-formaatissa ("18","22","26") koska /api/predict-wc
 # kutsuu _wc_seasons_to_loader_format ennen _saa_malli:a.
 WC_WARMUP: tuple[tuple[str, ...], tuple[str, ...]] = (
     ("INT-World Cup",), ("18", "22", "26"),
 )
+
+# #79: WC-mallin fit-parametrit. Käytetään SEKÄ warmupissa ETTÄ
+# PredictWCRequest-defaulteissa → cache-avain täsmää (warmup-malli = serving-malli).
+# Lopulliset arvot virittää vaiheen 5 backtest (tuore martj42-otos).
+WC_FIT_DECAY: float = 0.0
+WC_FIT_BAYES: float = 8.0
 
 
 @app.on_event("startup")
@@ -214,7 +220,7 @@ def _warmup_default_models():
             t0 = time.time()
             _saa_malli(
                 WC_WARMUP[0], WC_WARMUP[1],
-                decay=0.0, bayes_shrinkage=8.0,
+                decay=WC_FIT_DECAY, bayes_shrinkage=WC_FIT_BAYES,
                 per_team_home_adv=False, shrink_defence_to_mean=True,
             )
             print(f"[Warmup] {WC_WARMUP[0][0]} ready in {time.time()-t0:.1f}s")
@@ -431,12 +437,12 @@ class PredictWCRequest(BaseModel):
     # ~128 ottelua kahdelta turnaukselta — aikapainotus pudottaisi efektiivisen
     # otoskoon ~75:een (WC 2018 paino ~0.2), mikä pahentaa yliparametrisointia.
     # decay=0 → ESS 128, eikä WC 2018:n dataa heitetä hukkaan.
-    decay: float = Field(default=0.0, ge=0.0, le=0.020)
-    # bayes_shrinkage=8 (#61): WC-malli on yliparametrisoitu (82 par. / 128
-    # ottelua) → vahva shrinkage kaventaa hyökkäys/puolustus-hajontaa ja
-    # rajaa marquee-ottelujen P(over2.5)-vinoumaa. Toimii yhdessä
-    # shrink_defence_to_mean-korjauksen kanssa (ei deflatoi maalitasoa).
-    bayes_shrinkage: float = Field(default=8.0, ge=0.0, le=10.0)
+    decay: float = Field(default=WC_FIT_DECAY, ge=0.0, le=0.020)
+    # #79: WC-malli treenataan nyt tuoreesta maaotteludatasta (martj42, ~2000
+    # ottelua) eikä vain WC 2018/22 (~128) → decay/shrinkage virittää vaiheen 5
+    # backtest. Arvot tulevat WC_FIT_DECAY/WC_FIT_BAYES-vakioista (sama kuin
+    # warmup → cache-avain täsmää).
+    bayes_shrinkage: float = Field(default=WC_FIT_BAYES, ge=0.0, le=10.0)
     # Manuaaliset säädöt — samat kuin /api/predict
     home_injury_pct: float = Field(default=0.0, ge=-30.0, le=0.0)
     away_injury_pct: float = Field(default=0.0, ge=-30.0, le=0.0)
@@ -552,10 +558,16 @@ def list_teams(
         n = len(dc.attack)
     except Exception:
         pass
+    teams = sorted(dc.teams_)
+    # #79: WC-malli sisältää myös ~150 ei-WC-sparrausvastustajaa (any-moodi) —
+    # frontendille tarjotaan vain 48 WC2026-osallistujaa.
+    if leagues == ["INT-World Cup"]:
+        from src.data.wc_teams import WC2026_TEAMS_SET
+        teams = sorted(set(teams) & WC2026_TEAMS_SET)
     return TeamsResponse(
         leagues=leagues,
         seasons=seasons,
-        teams=sorted(dc.teams_),
+        teams=teams,
         n_matches=n,
     )
 
@@ -1025,6 +1037,23 @@ def predict_wc(req: PredictWCRequest):
                    "Use /api/predict for other leagues.",
         )
 
+    # #79: resolvoi joukkuenimet FD-kanoniseen muotoon (frontend voi lähettää
+    # FD-, martj42- tai varianttinimiä). resolve_wc_name palauttaa None jos ei
+    # WC2026-maa → 404. Mallin sisäiset nimet + H2H-data ovat kanonisia.
+    from src.data.wc_teams import resolve_wc_name
+    home_canon = resolve_wc_name(req.home_team)
+    away_canon = resolve_wc_name(req.away_team)
+    if home_canon is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Home team '{req.home_team}' is not a World Cup 2026 team.",
+        )
+    if away_canon is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Away team '{req.away_team}' is not a World Cup 2026 team.",
+        )
+
     loader_seasons = _wc_seasons_to_loader_format(req.seasons)
 
     dc_cached = _saa_malli(
@@ -1053,16 +1082,17 @@ def predict_wc(req: PredictWCRequest):
     dc.home_advantage = 0.0
     dc.home_advantage_per_team = {t: 0.0 for t in dc.teams_}
 
-    if req.home_team not in dc.attack:
+    # Sekundaarivahti: maa on validi WC-maa mutta sillä ei ole dataa ikkunassa
+    # (käytännössä ei tapahdu — min ~22-38 ottelua/maa). Kanoniset nimet.
+    if home_canon not in dc.attack:
         raise HTTPException(
             status_code=404,
-            detail=f"Home team '{req.home_team}' not found in WC model. "
-                   f"First 10 available: {sorted(dc.teams_)[:10]}.",
+            detail=f"No recent international data for '{req.home_team}'.",
         )
-    if req.away_team not in dc.attack:
+    if away_canon not in dc.attack:
         raise HTTPException(
             status_code=404,
-            detail=f"Away team '{req.away_team}' not found in WC model.",
+            detail=f"No recent international data for '{req.away_team}'.",
         )
 
     saadot = apply_match_adjustments(
@@ -1073,11 +1103,11 @@ def predict_wc(req: PredictWCRequest):
         is_derby=req.is_derby,
     )
 
-    lam, mu = dc.expected_goals(req.home_team, req.away_team, adjustments=saadot)
-    p_1x2 = dc.predict_1x2(req.home_team, req.away_team, adjustments=saadot)
-    p_ou = dc.predict_over_under(req.home_team, req.away_team, line=2.5, adjustments=saadot)
-    p_btts = dc.predict_btts(req.home_team, req.away_team, adjustments=saadot)
-    top = dc.todennakoisin_tulos(req.home_team, req.away_team, top_n=5, adjustments=saadot)
+    lam, mu = dc.expected_goals(home_canon, away_canon, adjustments=saadot)
+    p_1x2 = dc.predict_1x2(home_canon, away_canon, adjustments=saadot)
+    p_ou = dc.predict_over_under(home_canon, away_canon, line=2.5, adjustments=saadot)
+    p_btts = dc.predict_btts(home_canon, away_canon, adjustments=saadot)
+    top = dc.todennakoisin_tulos(home_canon, away_canon, top_n=5, adjustments=saadot)
 
     # T5/T7 (#25): H2H + form-trend WC-historiadatasta (sama WC-loader jota malli
     # kayttaa). Mirror domestic /api/predict -polusta — _h2h_summary +
@@ -1085,8 +1115,8 @@ def predict_wc(req: PredictWCRequest):
     # formaatissa (#69:n turnaus-TTL hoitaa cachen).
     df = _lataa_otteludata_cached(list(req.leagues), loader_seasons)
     h2h_all = df[
-        ((df["home_team"] == req.home_team) & (df["away_team"] == req.away_team))
-        | ((df["home_team"] == req.away_team) & (df["away_team"] == req.home_team))
+        ((df["home_team"] == home_canon) & (df["away_team"] == away_canon))
+        | ((df["home_team"] == away_canon) & (df["away_team"] == home_canon))
     ].sort_values("date", ascending=False)
     h2h = [
         {
@@ -1102,10 +1132,10 @@ def predict_wc(req: PredictWCRequest):
     ]
     # W/D/L-summary lasketaan fullTimesta (home_score/away_score) → voittaja on
     # oikea myös pakkapelissä (esim. Argentina voitti 2022-finaalin pakoilla).
-    h2h_summary = _h2h_summary(h2h_all, req.home_team, req.away_team)
+    h2h_summary = _h2h_summary(h2h_all, home_canon, away_canon)
     form_trend = {
-        "home_team": _team_recent_form(df, req.home_team),
-        "away_team": _team_recent_form(df, req.away_team),
+        "home_team": _team_recent_form(df, home_canon),
+        "away_team": _team_recent_form(df, away_canon),
     }
 
     return PredictionResponse(
