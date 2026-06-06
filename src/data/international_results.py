@@ -13,6 +13,7 @@ from __future__ import annotations
 import pandas as pd
 
 import config
+from src.data.wc_teams import WC2026_TEAMS_SET, resolve_wc_name
 
 CSV_PATH = config.DATA_DIR / "international_results.csv"
 
@@ -94,9 +95,17 @@ def lataa(
     played = raw[raw["home_score"].notna() & raw["away_score"].notna()].copy()
     played = played[played["date"] >= pd.Timestamp(window_start)]
 
-    teams = wc2026_participants(raw)
-    h_in = played["home_team"].isin(teams)
-    a_in = played["away_team"].isin(teams)
+    # Kanonisoi 48 WC-maan nimet martj42 → FD (4 todellista eroa). Ei-WC-
+    # vastustajat säilyttävät martj42-nimensä (vain sparrausdataa, ei kyselyä).
+    def _canon(name: str) -> str:
+        r = resolve_wc_name(name)
+        return r if r is not None else name
+
+    played["home_team"] = played["home_team"].map(_canon)
+    played["away_team"] = played["away_team"].map(_canon)
+
+    h_in = played["home_team"].isin(WC2026_TEAMS_SET)
+    a_in = played["away_team"].isin(WC2026_TEAMS_SET)
     played = played[(h_in & a_in) if include == "both" else (h_in | a_in)]
 
     out = pd.DataFrame(
