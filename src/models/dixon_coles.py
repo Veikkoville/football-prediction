@@ -32,7 +32,9 @@ class DixonColesModel:
             decay=0.0, date_col=None, l2_per_team=2.0,
             l2_attack_defence=2.0, team_priors=None,
             home_xg_col=None, away_xg_col=None, xg_weight=0.0,
-            model_type="dc", shrink_defence_to_mean=False):
+            model_type="dc", shrink_defence_to_mean=False,
+            competition_col=None, competition_weights=None,
+            default_competition_weight=1.0):
         """
         Sovita malli.
 
@@ -70,6 +72,12 @@ class DixonColesModel:
             "dc" (oletus) = Dixon-Coles tau-korjauksella, "bivariate_poisson" =
             Bivariate Poisson -malli (jaettu Z-komponentti). Bivariate Poisson
             on matemaattisesti elegantimpi ratkaisu maalien korrelaatioon.
+        competition_col, competition_weights, default_competition_weight
+            **Kilpailu-paino** (#79). Jos `competition_col` ja `competition_weights`
+            on annettu ja sarake loytyy datasta, jokaisen ottelun decay-paino
+            kerrotaan kilpailun painolla (esim. WC-karsinta 1.0 > friendly 0.5).
+            Tuntematon kilpailu -> `default_competition_weight`. None (oletus) =
+            ei vaikutusta -> `painot` pysyy bittitarkasti ennallaan (domestic-polku).
         shrink_defence_to_mean
             False (oletus) = `defence`-parametrit shrinkataan kohti 0:aa
             (tai team_priors-arvoa) — vanha kayttaytyminen.
@@ -97,6 +105,17 @@ class DixonColesModel:
             painot = np.exp(-decay * paivaa)
         else:
             painot = np.ones(len(df))
+
+        # Kilpailu-paino (#79): kerro per-ottelu-paino tournament-sarakkeesta.
+        # No-op kun competition_col=None → domestic-polku bittitarkasti ennallaan.
+        if (competition_col is not None and competition_weights
+                and competition_col in df.columns):
+            comp_w = (
+                df[competition_col].astype(str)
+                .map(lambda c: competition_weights.get(c, default_competition_weight))
+                .to_numpy(dtype=float)
+            )
+            painot = painot * comp_w
 
         h_idx = df[home_team_col].map(idx).values
         a_idx = df[away_team_col].map(idx).values

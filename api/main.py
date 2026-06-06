@@ -260,6 +260,19 @@ def _fit_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
             status_code=404,
             detail=f"No match data found for leagues={liigat}, seasons={kaudet}",
         )
+    # #79: kansainvälinen WC-data tuo "tournament"-sarakkeen → kilpailu-paino.
+    # Domestic-datassa saraketta ei ole → fit_kwargs tyhjä → bittitarkasti ennallaan.
+    fit_kwargs: dict = {}
+    if "tournament" in df.columns:
+        from src.data.international_results import (
+            COMPETITION_WEIGHTS,
+            DEFAULT_COMPETITION_WEIGHT,
+        )
+        fit_kwargs = dict(
+            competition_col="tournament",
+            competition_weights=COMPETITION_WEIGHTS,
+            default_competition_weight=DEFAULT_COMPETITION_WEIGHT,
+        )
     try:
         return DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
             df,
@@ -268,6 +281,7 @@ def _fit_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
             decay=decay, date_col="date",
             l2_attack_defence=bayes_shrinkage,
             shrink_defence_to_mean=shrink_defence_to_mean,
+            **fit_kwargs,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
