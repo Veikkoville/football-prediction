@@ -22,8 +22,13 @@ __pycache__/
 
 # Datavalimuisti — voi olla iso, ei kuulu repoon
 # Huom: /data/ alussa = vain projektin juuren data/, EI src/data/
+# /data/* ignoroi sisällön mutta sallii poikkeukset (vendoroitu WC-data #79).
 raw_data/
-/data/
+/data/*
+# Poikkeukset: vendoroitu martj42-maaotteludata (CC0) kuuluu repoon — Render
+# buildaa gitistä, ei live-pullia ajossa.
+!/data/international_results.csv
+!/data/international_results.README.md
 downloaded_files/
 ~/soccerdata/
 
