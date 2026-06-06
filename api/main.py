@@ -200,9 +200,12 @@ WC_WARMUP: tuple[tuple[str, ...], tuple[str, ...]] = (
 
 # #79: WC-mallin fit-parametrit. Käytetään SEKÄ warmupissa ETTÄ
 # PredictWCRequest-defaulteissa → cache-avain täsmää (warmup-malli = serving-malli).
-# Lopulliset arvot virittää vaiheen 5 backtest (tuore martj42-otos).
+# Arvot vaiheen 5 backtestistä (window=2022, include=any, tuore martj42-otos):
+# decay=0.0 + bayes=1.0 minimoi log-lossin (NEW 1.0251 < OLD 1.0365) ja antaa
+# järkevät marquee-todennäköisyydet. Suurempi data (~2000 ott./~50 per maa) sietää
+# kevyemmän shrinkagen kuin vanha WC 2018/22 (~128 ott. → bayes=8 oli pakko).
 WC_FIT_DECAY: float = 0.0
-WC_FIT_BAYES: float = 8.0
+WC_FIT_BAYES: float = 1.0
 
 
 @app.on_event("startup")
