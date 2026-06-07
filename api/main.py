@@ -1435,12 +1435,29 @@ async def revenuecat_webhook(request: Request):
 
     event = data.get("event", {}) or {}
     event_type = event.get("type", "")
-    user_id = event.get("app_user_id", "") or ""
 
-    # Ohita anonyymit / RevenueCatin generoimat id:t — vain Supabase-auth-id:lla
-    # voidaan paivittaa profiili.
-    if not user_id or user_id.startswith("$RCAnonymousID:"):
-        print(f"[RevenueCat webhook] skip event_type={event_type} app_user_id={user_id!r}")
+    # Resolvoi Supabase-auth-id alias-joukosta. Osto saattoi tapahtua anonyymilla
+    # id:lla ennen logIn:ia → RevenueCat aliasoi anonyymin + Supabase-id:n samaan
+    # subscriberiin. Webhook-eventin app_user_id voi olla kumpi tahansa: erityisesti
+    # EXPIRATION kantaa usein original_app_user_id:n (= anonyymin), jolloin pelkka
+    # app_user_id:n lukeminen skippasi downgraden vaarin. Kay lapi kaikki kandidaatit
+    # (app_user_id, original_app_user_id, aliases) ja valitse ensimmainen ei-anonyymi.
+    candidate_ids = [
+        event.get("app_user_id") or "",
+        event.get("original_app_user_id") or "",
+        *(event.get("aliases") or []),
+    ]
+    user_id = next(
+        (cid for cid in candidate_ids if cid and not cid.startswith("$RCAnonymousID:")),
+        "",
+    )
+
+    # Ei yhtaan ei-anonyymia Supabase-id:ta → ei voida paivittaa profiilia.
+    if not user_id:
+        print(
+            f"[RevenueCat webhook] skip event_type={event_type} "
+            f"candidates={candidate_ids!r}"
+        )
         return {"received": True}
 
     # expiration_at_ms = milloin access paattyy (renewal-/cancel-tieto).
