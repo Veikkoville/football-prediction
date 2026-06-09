@@ -1,0 +1,5 @@
+# GoalIQ - all crawlers welcome, including AI engines (GPTBot, Google-Extended, PerplexityBot, ClaudeBot, etc.)
+User-agent: *
+Allow: /
+
+Sitemap: https://veikkoville.github.io/football-prediction/sitemap.xml
