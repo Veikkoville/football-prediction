@@ -58,6 +58,39 @@ NORDIC_LEAGUES = [
 DEFAULT_SEASONS = ["2122", "2223", "2324", "2425", "2526"]
 
 
+def current_season(today: "datetime.date | None" = None) -> str:
+    """Aktiivinen eurooppalainen kausi YYMM-muodossa (esim. '2526').
+
+    Sääntö: elo-touko = kausi. Kuukausi >= 8 → uusi kausi alkaa (1.8. → '2627'),
+    kuukaudet 1-7 → edellisenä syksynä alkanut kausi (31.7. → '2526').
+    Sama algoritmi frontendissä: goaliq-app lib/season.ts (pidä synkassa).
+    """
+    import datetime
+    d = today or datetime.date.today()
+    start = d.year if d.month >= 8 else d.year - 1
+    return f"{start % 100:02d}{(start + 1) % 100:02d}"
+
+
+def current_season_pair(today: "datetime.date | None" = None) -> list[str]:
+    """[edellinen, aktiivinen] kausi — DC-mallien treeni-ikkuna (esim.
+    ['2425', '2526']). Endpoint-defaultit + warmup käyttävät tätä."""
+    cur = current_season(today)
+    prev_start = (int(cur[:2]) - 1) % 100
+    return [f"{prev_start:02d}{cur[:2]}", cur]
+
+
+def seasons_since(first: str = "2122", today: "datetime.date | None" = None) -> list[str]:
+    """Kaudet first..aktiivinen nousevassa järjestyksessä (/api/leagues)."""
+    out = [first]
+    cur = current_season(today)
+    while out[-1] != cur:
+        start = (int(out[-1][:2]) + 1) % 100
+        out.append(f"{start:02d}{(start + 1) % 100:02d}")
+        if len(out) > 50:  # vahti: ei ikuista silmukkaa jos cur on menneisyydessä
+            raise ValueError(f"seasons_since: '{cur}' ei saavutettavissa '{first}':sta")
+    return out
+
+
 # ---------------------------------------------------------------------------
 # MALLIN ASETUKSET
 # ---------------------------------------------------------------------------

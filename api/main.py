@@ -181,13 +181,19 @@ def _lataa_otteludata_cached(liigat, kaudet) -> pd.DataFrame:
 # saa CPU:n ensin. WC-fit on 30 s -luokkaa, joten sen jattaminen lazyksi
 # blokkasi mobiili-WC-tabin ensimmaisen klikkauksen.
 # ---------------------------------------------------------------------------
+# Kausi-ikkuna resolvoidaan dynaamisesti (config.current_season_pair):
+# elo-touko-sääntö → 1.8. alkaen warmup + endpoint-defaultit siirtyvät uuteen
+# kauteen ilman koodimuutosta. Prosessin käynnistyshetki määrää warmup-avaimet
+# (Render restarttaa deployssa); per-pyyntö-defaultit resolvoidaan pyynnössä.
+_DOMESTIC_SEASONS: tuple[str, ...] = tuple(config.current_season_pair())
+
 WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
-    (("ENG-Premier League",),    ("2425", "2526")),
-    (("ESP-La Liga-FD",),        ("2425", "2526")),
-    (("GER-Bundesliga-FD",),     ("2425", "2526")),
-    (("ITA-Serie A-FD",),        ("2425", "2526")),
-    (("FRA-Ligue 1-FD",),        ("2425", "2526")),
-    (("INT-Champions League",),  ("2425", "2526")),
+    (("ENG-Premier League",),    _DOMESTIC_SEASONS),
+    (("ESP-La Liga-FD",),        _DOMESTIC_SEASONS),
+    (("GER-Bundesliga-FD",),     _DOMESTIC_SEASONS),
+    (("ITA-Serie A-FD",),        _DOMESTIC_SEASONS),
+    (("FRA-Ligue 1-FD",),        _DOMESTIC_SEASONS),
+    (("INT-Champions League",),  _DOMESTIC_SEASONS),
 ]
 
 # #79: WC-mallin fit-parametrit (kanoninen lähde = international_results).
@@ -380,8 +386,8 @@ class PredictionRequest(BaseModel):
         description="Leagues to use for training the model",
     )
     seasons: list[str] = Field(
-        default=["2425", "2526"],
-        description="Seasons (YYMM format)",
+        default_factory=config.current_season_pair,
+        description="Seasons (YYMM format). Default: edellinen + aktiivinen kausi.",
     )
     decay: float = Field(default=0.0035, ge=0.0, le=0.020,
                           description="Time-decay weight (0=no decay)")
@@ -512,13 +518,13 @@ def list_leagues():
         "uefa_tournaments": [
             "INT-Champions League", "INT-Europa League", "INT-Conference League",
         ],
-        "available_seasons": ["2122", "2223", "2324", "2425", "2526"],
+        "available_seasons": config.seasons_since("2122"),
         # Selitykset mobiilia varten — joukkueiden valinta liigan mukaan
         "league_presets": {
             "ENG-Premier League": {
                 "label": "Premier League",
                 "icon": "⚽",
-                "seasons": ["2425", "2526"],
+                "seasons": config.current_season_pair(),
             },
         },
         "coming_soon": [
@@ -539,9 +545,12 @@ def list_leagues():
 @app.get("/api/teams", response_model=TeamsResponse)
 def list_teams(
     leagues: list[str] = Query(default=["ENG-Premier League"]),
-    seasons: list[str] = Query(default=["2425", "2526"]),
+    seasons: list[str] | None = Query(default=None,
+        description="Default: edellinen + aktiivinen kausi (dynaaminen)"),
 ):
     """Lista joukkueista jotka mallissa esiintyvät annetussa liiga+kausi-yhdistelmässä."""
+    if seasons is None:
+        seasons = config.current_season_pair()
     # #79: WC-lista on 48 WC2026-maata — palautetaan suoraan ILMAN mallin fittausta
     # (Render Starter ei jaksa fitata "any"-mallia ajossa; malli on esirakennettu).
     if leagues == ["INT-World Cup"]:
@@ -583,7 +592,7 @@ FD_LEAGUE_ALIASES = {
 @app.get("/api/standings")
 def league_standings(
     league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
-    season: str = Query(default="2526", description="Kausi YYYY tai YY:YY muodossa (esim. '2526' → 2025)"),
+    season: str | None = Query(default=None, description="Kausi YYMM-muodossa (esim. '2526' → 2025). Default: aktiivinen kausi (dynaaminen)."),
 ):
     """
     Liigan tabletti suoraan football-data.org:n /competitions/{id}/standings:ista.
@@ -595,6 +604,8 @@ def league_standings(
     """
     from src.data.football_data_org import COMPETITION_CODES, _api_key, _kausi_to_year
 
+    if season is None:
+        season = config.current_season()
     league_for_fd = FD_LEAGUE_ALIASES.get(league, league)
     code = COMPETITION_CODES.get(league_for_fd)
     if not code:
@@ -664,7 +675,8 @@ def league_standings(
 def team_detail(
     team_name: str,
     leagues: list[str] = Query(default=["ENG-Premier League"]),
-    seasons: list[str] = Query(default=["2425", "2526"]),
+    seasons: list[str] | None = Query(default=None,
+        description="Default: edellinen + aktiivinen kausi (dynaaminen)"),
 ):
     """
     Joukkueen detail-tiedot DC-mallin koulutusdatasta.
@@ -679,6 +691,8 @@ def team_detail(
       - away_stats: vierasotteluiden avg goals for/against + matches_played
       - total_matches: kokonaisottelumäärä joukkueelle datasetissä
     """
+    if seasons is None:
+        seasons = config.current_season_pair()
     df = _lataa_otteludata_cached(list(leagues), list(seasons))
     if df.empty:
         raise HTTPException(
@@ -1177,7 +1191,7 @@ class ParlayLeg(BaseModel):
     home_team: str = Field(..., examples=["Arsenal"])
     away_team: str = Field(..., examples=["Liverpool"])
     leagues: list[str] = Field(default=["ENG-Premier League"])
-    seasons: list[str] = Field(default=["2425", "2526"])
+    seasons: list[str] = Field(default_factory=config.current_season_pair)
     pick: Literal["1", "X", "2"] = Field(
         ..., description="1 = home win, X = draw, 2 = away win")
 
