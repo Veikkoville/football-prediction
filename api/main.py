@@ -22,7 +22,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 # Lisää projektin juuri Python-polkuun jotta `src.*` -importit toimivat
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -33,7 +33,7 @@ import pandas as pd
 import stripe
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 import config
 from src.data.loader import lataa_otteludata
@@ -1157,6 +1157,148 @@ def predict_wc(req: PredictWCRequest):
         h2h=h2h,
         h2h_summary=h2h_summary,
         form_trend=form_trend,
+    )
+
+
+# ---------------------------------------------------------------------------
+# ENDPOINT: parlay — P(kaikki valinnat oikein) tulona (vC23, premium-UI)
+#
+# Gambling-turvallinen linja: EI kertoimia, EI "odds"/"betting"-sanastoa —
+# vain "model-implied probability that all N predictions are correct".
+# Riippumattomuusoletus sanotaan vastauksessa eksplisiittisesti.
+#
+# Reuse ilman tuplafittiä: domestic-leg osuu _saa_malli-cacheen (warmup
+# esifittaa 6 liigaa) ja WC-leg lru-cachettuun load_wc_model():iin. Leg laskee
+# VAIN predict_1x2:n — ei H2H/form/top_scores-kuormaa. predict()/predict_wc()
+# -funktioihin ei kosketa (domestic bit-exact, regressiosuite vahtii).
+# ---------------------------------------------------------------------------
+class ParlayLeg(BaseModel):
+    """Yksi parlay-valinta: ottelu + käyttäjän 1/X/2-pick."""
+    home_team: str = Field(..., examples=["Arsenal"])
+    away_team: str = Field(..., examples=["Liverpool"])
+    leagues: list[str] = Field(default=["ENG-Premier League"])
+    seasons: list[str] = Field(default=["2425", "2526"])
+    pick: Literal["1", "X", "2"] = Field(
+        ..., description="1 = home win, X = draw, 2 = away win")
+
+
+class ParlayRequest(BaseModel):
+    legs: list[ParlayLeg] = Field(..., min_length=2, max_length=5)
+
+    @field_validator("legs")
+    @classmethod
+    def _no_duplicate_matches(cls, v: list[ParlayLeg]) -> list[ParlayLeg]:
+        # Sama ottelu kahdesti rikkoisi riippumattomuustulon (p*p != p).
+        seen = set()
+        for leg in v:
+            key = (leg.home_team, leg.away_team, tuple(leg.leagues))
+            if key in seen:
+                raise ValueError(
+                    f"Duplicate match in parlay: {leg.home_team} vs {leg.away_team}")
+            seen.add(key)
+        return v
+
+
+class ParlayLegResult(BaseModel):
+    home_team: str
+    away_team: str
+    leagues: list[str]
+    pick: str
+    p_home_win: float
+    p_draw: float
+    p_away_win: float
+    pick_probability: float
+
+
+class ParlayResponse(BaseModel):
+    legs: list[ParlayLegResult]
+    n_legs: int
+    # Tulo pyöristetyistä per-leg-arvoista (4 dp) → näytetyistä luvuista
+    # laskettavissa käsin. 6 dp riittää 5 legille (min ~1e-5-tasoa).
+    combined_probability: float
+    assumes_independence: bool = True
+    note: str
+    disclaimer: str
+
+
+def _parlay_leg_1x2(leg: ParlayLeg, idx: int) -> dict:
+    """Palauta legin 1X2-jakauma lämpimästä mallista. HTTPException jos
+    joukkue/malli puuttuu — virheviesti kantaa leg-numeron (1-pohjainen)."""
+    if leg.leagues == ["INT-World Cup"]:
+        from src.data.wc_teams import resolve_wc_name
+        from src.data.international_results import load_wc_model
+        home = resolve_wc_name(leg.home_team)
+        away = resolve_wc_name(leg.away_team)
+        if home is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Leg {idx + 1}: '{leg.home_team}' is not a World Cup 2026 team.")
+        if away is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Leg {idx + 1}: '{leg.away_team}' is not a World Cup 2026 team.")
+        try:
+            dc_cached = load_wc_model()
+        except Exception as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"WC model unavailable: {type(e).__name__}")
+        # #61 (2b-1): neutraali venue = γ/2 molemmille defenceen — sama
+        # neutralointi kuin predict_wc():ssä (kopio, jotta sitä ei kosketa).
+        dc = copy.copy(dc_cached)
+        half = dc_cached.home_advantage / 2.0
+        dc.defence = {t: v + half for t, v in dc_cached.defence.items()}
+        dc.home_advantage = 0.0
+        dc.home_advantage_per_team = {t: 0.0 for t in dc.teams_}
+        if home not in dc.attack or away not in dc.attack:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Leg {idx + 1}: no recent international data for this pair.")
+        return dc.predict_1x2(home, away)
+
+    dc = _saa_malli(tuple(leg.leagues), tuple(leg.seasons))
+    if leg.home_team not in dc.attack:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Leg {idx + 1}: home team '{leg.home_team}' not found in model. "
+                   f"Use /api/teams to list available teams.")
+    if leg.away_team not in dc.attack:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Leg {idx + 1}: away team '{leg.away_team}' not found in model.")
+    return dc.predict_1x2(leg.home_team, leg.away_team)
+
+
+@app.post("/api/parlay", response_model=ParlayResponse)
+def parlay(req: ParlayRequest):
+    """
+    Model-implied probability that all N predictions are correct.
+
+    2-5 ottelua, kullekin käyttäjän 1/X/2-valinta → per-leg P(valittu
+    lopputulos) + kumulatiivinen tulo. Olettaa ottelut riippumattomiksi
+    (assumes_independence: true) — sanottu rehellisesti vastauksessa.
+    """
+    pick_key = {"1": "home", "X": "draw", "2": "away"}
+    results: list[ParlayLegResult] = []
+    combined = 1.0
+    for i, leg in enumerate(req.legs):
+        p = _parlay_leg_1x2(leg, i)
+        ph, pd_, pa = round(p["home"], 4), round(p["draw"], 4), round(p["away"], 4)
+        pick_p = {"1": ph, "X": pd_, "2": pa}[leg.pick]
+        combined *= pick_p
+        results.append(ParlayLegResult(
+            home_team=leg.home_team, away_team=leg.away_team,
+            leagues=leg.leagues, pick=leg.pick,
+            p_home_win=ph, p_draw=pd_, p_away_win=pa,
+            pick_probability=pick_p,
+        ))
+    return ParlayResponse(
+        legs=results,
+        n_legs=len(results),
+        combined_probability=round(combined, 6),
+        assumes_independence=True,
+        note="Combined probability assumes each match is independent.",
+        disclaimer="Model prediction, not betting advice.",
     )
 
 
