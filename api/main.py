@@ -589,20 +589,50 @@ FD_LEAGUE_ALIASES = {
 }
 
 
+def _fd_standings_row(row: dict) -> dict:
+    """FD:n table-rivi → API:n rivi. Jaettu domestic- ja WC-polun kesken —
+    domestic-output pysyy bittitarkasti ennallaan (samat avaimet, sama järjestys)."""
+    return {
+        "position": row["position"],
+        "team_name": row["team"]["name"],
+        "team_short_name": row["team"].get("shortName"),
+        "team_crest": row["team"].get("crest"),
+        "played_games": row["playedGames"],
+        "won": row["won"],
+        "draw": row["draw"],
+        "lost": row["lost"],
+        "goals_for": row["goalsFor"],
+        "goals_against": row["goalsAgainst"],
+        "goal_difference": row["goalDifference"],
+        "points": row["points"],
+    }
+
+
 @app.get("/api/standings")
 def league_standings(
     league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
-    season: str | None = Query(default=None, description="Kausi YYMM-muodossa (esim. '2526' → 2025). Default: aktiivinen kausi (dynaaminen)."),
+    season: str | None = Query(default=None, description="Kausi YYMM-muodossa (esim. '2526' → 2025). Default: aktiivinen kausi (dynaaminen). Turnaukset (WC) ignoroivat tämän."),
 ):
     """
     Liigan tabletti suoraan football-data.org:n /competitions/{id}/standings:ista.
 
-    Returns:
+    Returns (domestic):
       - rows: lista riveistä järjestyksessä sijan mukaan
         (position, team_name, team_short_name, team_crest, played_games,
          won, draw, lost, goals_for, goals_against, goal_difference, points)
+
+    Returns (turnaus, esim. INT-World Cup, #19):
+      - groups: [{group: "Group A", rows: [rivi + form]}] — FD palauttaa
+        lohkoitetun standingsin VAIN ilman season-paramia (verifioitu 12.6.:
+        ?season=2026 antaa litteän 48 maan taulukon group=null, ?season=2025
+        404:n). Siksi turnaushaara kutsuu FD:tä ilman seasonia.
     """
-    from src.data.football_data_org import COMPETITION_CODES, _api_key, _kausi_to_year
+    from src.data.football_data_org import (
+        COMPETITION_CODES,
+        _LIVE_TOURNAMENT_CODES,
+        _api_key,
+        _kausi_to_year,
+    )
 
     if season is None:
         season = config.current_season()
@@ -622,8 +652,13 @@ def league_standings(
             detail="FOOTBALL_DATA_API_KEY not configured on server",
         )
 
-    year = _kausi_to_year(season)
-    url = f"https://api.football-data.org/v4/competitions/{code}/standings?season={year}"
+    # Turnaushaara (#19): WC/EC → lohkoitettu standings ilman season-paramia.
+    is_tournament = code in _LIVE_TOURNAMENT_CODES
+    if is_tournament:
+        url = f"https://api.football-data.org/v4/competitions/{code}/standings"
+    else:
+        year = _kausi_to_year(season)
+        url = f"https://api.football-data.org/v4/competitions/{code}/standings?season={year}"
     try:
         r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
     except Exception as e:
@@ -638,6 +673,24 @@ def league_standings(
         )
 
     data = r.json()
+
+    if is_tournament:
+        # Kaikki TOTAL-elementit = lohkot (group: "Group A"… kun FD on
+        # lohkomoodissa; jos FD palauttaisi litteän group=null -muodon,
+        # groups jää [{group: None, ...}] → frontend fallbackaa staattiseen).
+        groups = [
+            {
+                "group": s.get("group"),
+                "rows": [
+                    {**_fd_standings_row(row), "form": row.get("form")}
+                    for row in s.get("table", [])
+                ],
+            }
+            for s in data.get("standings", [])
+            if s.get("type") == "TOTAL" and s.get("group")
+        ]
+        return {"league": league, "season": None, "groups": groups}
+
     total = next(
         (s for s in data.get("standings", []) if s.get("type") == "TOTAL"),
         None,
@@ -648,23 +701,7 @@ def league_standings(
     return {
         "league": league,
         "season": season,
-        "rows": [
-            {
-                "position": row["position"],
-                "team_name": row["team"]["name"],
-                "team_short_name": row["team"].get("shortName"),
-                "team_crest": row["team"].get("crest"),
-                "played_games": row["playedGames"],
-                "won": row["won"],
-                "draw": row["draw"],
-                "lost": row["lost"],
-                "goals_for": row["goalsFor"],
-                "goals_against": row["goalsAgainst"],
-                "goal_difference": row["goalDifference"],
-                "points": row["points"],
-            }
-            for row in total["table"]
-        ],
+        "rows": [_fd_standings_row(row) for row in total["table"]],
     }
 
 
