@@ -875,6 +875,38 @@ def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str) -> dict:
     }
 
 
+def _h2h_item(m) -> dict:
+    """Yksi h2h-rivi API-vastaukseen (#77b).
+
+    Näyttöscore = reg + jatkoaika ILMAN rangaistuspotkuja (*_disp, jonka
+    FD-loader johtaa duration == PENALTY_SHOOTOUT -kentästä). FD summaa
+    shootoutin fullTimeen (esim. CL-finaali 30.5.2026 fullTime 5-4 = 1-1 +
+    pakat 4-3), joten fullTime != disp <=> PENALTY_SHOOTOUT — additiivinen
+    penalties-lippu on durationista johdettu, ei heuristiikka.
+
+    Lähteissä ilman disp-sarakkeita (understat-PL, martj42-WC) penalties jää
+    Falseksi: pakkatietoa ei ole datassa (WC-puutteen korjaus = shootouts.csv-
+    vendorointi, ks. #77-raportti 12.6.).
+    """
+    h_full, a_full = int(m["home_score"]), int(m["away_score"])
+    hd = m.get("home_score_disp")
+    ad = m.get("away_score_disp")
+    h_disp = h_full if hd is None or pd.isna(hd) else int(hd)
+    a_disp = a_full if ad is None or pd.isna(ad) else int(ad)
+    item = {
+        "date": str(m["date"])[:10],
+        "home_team": m["home_team"],
+        "away_team": m["away_team"],
+        "home_score": h_disp,
+        "away_score": a_disp,
+        "penalties": (h_full, a_full) != (h_disp, a_disp),
+    }
+    if item["penalties"]:
+        # Shootoutissa fullTime ei voi olla tasan -> voittaja vertailusta.
+        item["penalty_winner"] = "home" if h_full > a_full else "away"
+    return item
+
+
 def _team_recent_form(df: pd.DataFrame, team: str, n: int = 8) -> list[dict]:
     """
     Joukkueen n viimeisinta ottelua momentum-visualisointia varten (T7).
@@ -960,19 +992,14 @@ def predict(req: PredictionRequest):
         ((df["home_team"] == req.home_team) & (df["away_team"] == req.away_team))
         | ((df["home_team"] == req.away_team) & (df["away_team"] == req.home_team))
     ].sort_values("date", ascending=False)
-    h2h = [
-        {
-            "date": str(m["date"])[:10],
-            "home_team": m["home_team"],
-            "away_team": m["away_team"],
-            "home_score": int(m["home_score"]),
-            "away_score": int(m["away_score"]),
-        }
-        for _, m in h2h_all.head(5).iterrows()
-    ]
+    # #77b: rivit _h2h_item-helperilla -> nayttoscore ilman pakkoja (CL-
+    # shootoutit eivat enaa nayta fullTime 5-4 vaan 1-1 + penalties-lippu).
+    h2h = [_h2h_item(m) for _, m in h2h_all.head(5).iterrows()]
 
     # T7: premium-visualisoinnit — H2H-jakauma + kummankin joukkueen muoto.
     # Kaytetaan jo ladattua df:aa, ei lisalatauskustannuksia.
+    # HUOM: summary lasketaan fullTimesta -> pakkapelivoittaja kirjautuu
+    # voitoksi (FD-lahteet); h2h-rivin "(pens)"-merkinta selittaa eron.
     h2h_summary = _h2h_summary(h2h_all, req.home_team, req.away_team)
     form_trend = {
         "home_team": _team_recent_form(df, req.home_team),
@@ -1132,20 +1159,14 @@ def predict_wc(req: PredictWCRequest):
         ((df["home_team"] == home_canon) & (df["away_team"] == away_canon))
         | ((df["home_team"] == away_canon) & (df["away_team"] == home_canon))
     ].sort_values("date", ascending=False)
-    h2h = [
-        {
-            "date": str(m["date"])[:10],
-            "home_team": m["home_team"],
-            "away_team": m["away_team"],
-            # #25: näytä ottelun tulos ilman rangaistuspotkuja (reg+jatkoaika).
-            # *_disp on loaderin laskema; fallback fullTimeen jos puuttuu.
-            "home_score": int(m.get("home_score_disp", m["home_score"])),
-            "away_score": int(m.get("away_score_disp", m["away_score"])),
-        }
-        for _, m in h2h_all.head(5).iterrows()
-    ]
-    # W/D/L-summary lasketaan fullTimesta (home_score/away_score) → voittaja on
-    # oikea myös pakkapelissä (esim. Argentina voitti 2022-finaalin pakoilla).
+    # #25/#77b: rivit _h2h_item-helperilla (näyttöscore ilman pakkoja +
+    # penalties-lippu). martj42-datassa ei ole disp-/shootout-sarakkeita ->
+    # penalties jää aina Falseksi tällä polulla.
+    h2h = [_h2h_item(m) for _, m in h2h_all.head(5).iterrows()]
+    # HUOM (#77, todettu 12.6.): martj42-scoret ovat reg + jatkoaika ILMAN
+    # pakkoja -> summary kirjaa pakkapelivoitot TASAPELEIKSI (esim. Argentina-
+    # France 2022 = draw). Tunnettu rajoite; faktinen korjaus vaatisi martj42
+    # shootouts.csv:n vendoroinnin (h2h-only lookup, Villen päätös).
     h2h_summary = _h2h_summary(h2h_all, home_canon, away_canon)
     form_trend = {
         "home_team": _team_recent_form(df, home_canon),
