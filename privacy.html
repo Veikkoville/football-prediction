@@ -72,7 +72,7 @@
 <body>
   <div class="wrap">
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 8 May 2026</p>
+    <p class="updated">Last updated: 14 June 2026</p>
 
     <p>
       This Privacy Policy describes how <strong>Veikkoville</strong>
@@ -112,31 +112,37 @@
 
     <h3>2.2 Subscription and payment information</h3>
     <p>
-      When you upgrade to GoalIQ Premium, payment is processed by
-      <a href="https://stripe.com" target="_blank">Stripe, Inc.</a>
-      We do not see, store, or have access to your full payment card details.
-      We receive only:
+      When you upgrade to GoalIQ Premium, your payment is processed by the app
+      store you purchased through — the Apple App Store (on iOS) or Google Play
+      (on Android) — and your subscription is managed through
+      <a href="https://www.revenuecat.com" target="_blank">RevenueCat</a>, our
+      subscription management provider. We do not see, store, or have access to
+      your payment card details. We receive only:
     </p>
     <ul>
       <li>Subscription status (active / cancelled)</li>
       <li>Subscription start and end dates</li>
-      <li>A Stripe customer ID linked to your account</li>
+      <li>An anonymised subscriber ID linked to your account</li>
     </ul>
     <p>
-      Stripe processes your payment data under their own
-      <a href="https://stripe.com/privacy" target="_blank">privacy policy</a>.
+      RevenueCat processes this data under its own
+      <a href="https://www.revenuecat.com/privacy" target="_blank">privacy policy</a>.
+      Apple and Google process your payment under their respective privacy policies.
     </p>
 
     <h3>2.3 Usage data</h3>
     <p>
-      We do not currently collect analytics, advertising IDs,
-      device identifiers, or location data. We do not use third-party
-      tracking SDKs.
+      We use <a href="https://posthog.com" target="_blank">PostHog</a>, a
+      product-analytics service, to understand how the app is used so we can
+      improve it. We collect pseudonymised events such as which screens you
+      open, which features you use (for example making a prediction or viewing
+      fixtures), and a user identifier associated with your account. We do not
+      collect advertising identifiers, we do not use this data for advertising,
+      and we do not sell it. PostHog processes this data under its own
+      <a href="https://posthog.com/privacy" target="_blank">privacy policy</a>.
     </p>
     <p>
-      Recent prediction queries you make in the App are stored
-      <strong>locally on your device only</strong> (in the App's storage)
-      and never transmitted to our servers for tracking purposes.
+      Recent prediction queries you make are also stored locally on your device.
     </p>
 
     <h2>3. How we use your information</h2>
@@ -157,13 +163,17 @@
     <p>The App relies on the following third-party services:</p>
     <ul>
       <li>
-        <strong>Supabase</strong> (hosted in EU) — authentication and user
+        <strong>Supabase</strong> (hosted in the EU) — authentication and user
         profile storage.
         <a href="https://supabase.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
-        <strong>Stripe</strong> — subscription and payment processing.
-        <a href="https://stripe.com/privacy" target="_blank">Privacy policy</a>
+        <strong>RevenueCat</strong> — subscription management.
+        <a href="https://www.revenuecat.com/privacy" target="_blank">Privacy policy</a>
+      </li>
+      <li>
+        <strong>PostHog</strong> (hosted in the US) — product analytics.
+        <a href="https://posthog.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
         <strong>Render</strong> — backend API hosting.
@@ -213,9 +223,8 @@
     <p>
       Upon deletion, your account email, password hash, profile data
       and any locally cached predictions will be permanently removed.
-      Active Stripe subscriptions must be cancelled separately through
-      the App's "Manage subscription" feature or directly in Stripe's
-      Customer Portal.
+      Active subscriptions must be cancelled separately in your device's
+      subscription settings (App Store or Google Play).
     </p>
 
     <h2>8. Security</h2>
@@ -237,11 +246,11 @@
 
     <h2>10. International data transfers</h2>
     <p>
-      Your data is primarily stored within the European Union (Supabase EU
-      region). Some third-party services (such as Stripe and Render) may
-      process data outside the EU. In such cases, those providers comply
-      with GDPR-approved data transfer mechanisms (Standard Contractual
-      Clauses).
+      Your account data is primarily stored within the European Union (Supabase
+      EU region). Some service providers, including PostHog (analytics) and
+      Render (API hosting), process data in the United States. In those cases
+      the providers rely on GDPR-approved transfer mechanisms such as Standard
+      Contractual Clauses.
     </p>
 
     <h2>11. Changes to this policy</h2>
