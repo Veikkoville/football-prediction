@@ -96,6 +96,88 @@ def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
     return _update_profile(user_id, {"is_premium": is_premium})
 
 
+def _verify_supabase_token(access_token: str) -> Optional[str]:
+    """
+    Vahvista Supabase-kayttajan access_token ja palauta hanen auth-id:nsa.
+
+    Kutsuu Supabasen /auth/v1/user-endpointia kayttajan omalla tokenilla
+    (service-role apikey + Bearer = kayttajan token). Supabase vahvistaa
+    allekirjoituksen + voimassaolon ja palauttaa kayttajan. Palauttaa user_id:n
+    tai None jos token on virheellinen/vanhentunut tai config puuttuu.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY or not access_token:
+        return None
+    try:
+        resp = requests.get(
+            f"{SUPABASE_URL}/auth/v1/user",
+            headers={
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+                "Authorization": f"Bearer {access_token}",
+            },
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            print(f"[delete-account] token verify failed status={resp.status_code}")
+            return None
+        user_id = (resp.json() or {}).get("id")
+        return user_id or None
+    except Exception as e:
+        print(f"[delete-account] token verify EXCEPTION: {e}")
+        return None
+
+
+def _delete_supabase_user(user_id: str) -> bool:
+    """
+    Poista kayttaja + hanen datansa pysyvasti (5.1.1(v) in-app account deletion).
+
+    Jarjestys: predictions-rivit -> profiles-rivi -> auth.users-rivi
+    (admin-API). Service-role-key ohittaa RLS:n. Palauttaa True jos auth-user
+    saatiin poistettua (datapoistot logataan mutta eivat blokkaa).
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        print(f"[delete-account] missing env vars, cannot delete user_id={user_id}")
+        return False
+
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        "Content-Type": "application/json",
+    }
+    # 1) Kayttajan ennusteet (best-effort — ei blokkaa auth-poistoa).
+    try:
+        requests.delete(
+            f"{SUPABASE_URL}/rest/v1/predictions?user_id=eq.{user_id}",
+            headers=headers, timeout=10,
+        )
+    except Exception as e:
+        print(f"[delete-account] predictions delete EXCEPTION user_id={user_id}: {e}")
+    # 2) Profiili.
+    try:
+        requests.delete(
+            f"{SUPABASE_URL}/rest/v1/profiles?id=eq.{user_id}",
+            headers=headers, timeout=10,
+        )
+    except Exception as e:
+        print(f"[delete-account] profile delete EXCEPTION user_id={user_id}: {e}")
+    # 3) Auth-kayttaja (admin-API) — talla poisto on lopullinen.
+    try:
+        resp = requests.delete(
+            f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
+            headers=headers, timeout=10,
+        )
+        if resp.status_code in (200, 204):
+            print(f"[delete-account] deleted user_id={user_id}")
+            return True
+        print(
+            f"[delete-account] auth delete FAILED status={resp.status_code} "
+            f"body={resp.text[:200]} user_id={user_id}"
+        )
+        return False
+    except Exception as e:
+        print(f"[delete-account] auth delete EXCEPTION user_id={user_id}: {e}")
+        return False
+
+
 # ---------------------------------------------------------------------------
 # FastAPI -instanssi
 # ---------------------------------------------------------------------------
@@ -1726,6 +1808,36 @@ async def revenuecat_webhook(request: Request):
         print(f"[RevenueCat webhook] ignored event_type={event_type} user_id={user_id}")
 
     return {"received": True}
+
+
+@app.post("/api/delete-account")
+async def delete_account(request: Request):
+    """
+    In-app tilin poisto (App Store 5.1.1(v) / Google Play). Kayttaja poistaa
+    tilinsa + datansa itse appista ILMAN sahkopostia tai asiakaspalvelua.
+
+    Autentikointi: kayttaja lahettaa oman Supabase-access-tokeninsa
+    Authorization: Bearer -headerissa. Backend vahvistaa tokenin Supabasella
+    ja poistaa VAIN tokenin omistaman kayttajan (ei voi poistaa muita).
+
+    Vastaukset:
+      200 {"deleted": true}  -> tili + data poistettu
+      401                    -> token puuttuu / virheellinen / vanhentunut
+      500                    -> poisto epaonnistui (config/Supabase-virhe)
+    """
+    auth_header = request.headers.get("authorization", "")
+    token = auth_header[7:].strip() if auth_header.lower().startswith("bearer ") else ""
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing bearer token")
+
+    user_id = _verify_supabase_token(token)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    if not _delete_supabase_user(user_id):
+        raise HTTPException(status_code=500, detail="Account deletion failed")
+
+    return {"deleted": True}
 
 
 @app.get("/api/revenuecat-config")
