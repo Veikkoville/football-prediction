@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -59,6 +60,14 @@ CANDIDATE_PATH = config.DATA_DIR / "wc_model.candidate.json"
 PORT = 8765
 BASE = f"http://localhost:{PORT}"
 METRICS = ("logloss", "brier", "rps")
+
+# CI-portti (#100 knockout-automaatio): GitHub Actions ei aja luotettavasti
+# live-uvicornia + domestic-datahakua (understat/FD-flakeus → väärä NO-GO). G3:n
+# invariantti on RAKENTEELLINEN: WC-virkistys kirjoittaa vain WC-datatiedostot
+# eikä domestic /api/predict lue niitä → ohitettavissa CI:ssä turvallisesti
+# (G3 ajetaan silti lokaalisti pre-push). G1+G2 (cross-confed-sanity) = offline,
+# safety-kriittinen → AINA ajossa. Lokaali oletus (env unset) = ennallaan (#79).
+SKIP_DOMESTIC_LIVE = os.getenv("REFRESH_SKIP_DOMESTIC_LIVE") == "1"
 
 MARQUEE = [("Netherlands", "Japan"), ("France", "Australia"), ("Belgium", "Mexico"),
            ("Brazil", "South Korea"), ("Spain", "Iran"), ("England", "United States"),
@@ -252,8 +261,13 @@ def main() -> int:
 
     try:
         # Domestic "before" PUHTAASTA tilasta ennen mitään muutoksia.
-        print("\n[0/4] Domestic before-snapshot (vanha tila)...")
-        before = _domestic_snapshot()
+        before = None
+        if SKIP_DOMESTIC_LIVE:
+            print("\n[0/4] Domestic before-snapshot OHITETTU "
+                  "(REFRESH_SKIP_DOMESTIC_LIVE=1, CI-portti).")
+        else:
+            print("\n[0/4] Domestic before-snapshot (vanha tila)...")
+            before = _domestic_snapshot()
 
         print("\n[1/4] martj42-snapshotin virkistys...")
         update_international_results.main()
@@ -282,9 +296,17 @@ def main() -> int:
         # G1+G2 auki → kirjoita kandidaatti liveksi ja todista G3 uudella tilalla.
         # Jos G3 kaatuu, kaikki (ml. wc_model.json) palautuu backupista.
         shutil.copy2(CANDIDATE_PATH, WC_MODEL_PATH)
-        print("\nG1+G2 OK -> kandidaatti asennettu väliaikaisesti, ajetaan G3...")
-        after = _domestic_snapshot()
-        g3 = _gate_domestic(before, after)
+        if SKIP_DOMESTIC_LIVE:
+            print("\nG3 DOMESTIC-LIVE OHITETTU (CI-portti): invariantti rakenteellinen — "
+                  "WC-virkistys kirjoittaa VAIN WC-datatiedostot (international_results.csv, "
+                  "elo_ratings.csv, wc_model.json); domestic /api/predict lukee understat/FD-"
+                  "loaderit, EI näitä. G1+G2 (cross-confed-sanity) ajettu ja PASS. "
+                  "G3 verifioidaan lokaalisti pre-push (tests/test_domestic_golden.py).")
+            g3 = True
+        else:
+            print("\nG1+G2 OK -> kandidaatti asennettu väliaikaisesti, ajetaan G3...")
+            after = _domestic_snapshot()
+            g3 = _gate_domestic(before, after)
 
         if not g3:
             print("\n" + "=" * 60)

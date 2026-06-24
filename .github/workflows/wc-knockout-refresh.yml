@@ -1,0 +1,109 @@
+# WC knockout-mallirefresh SERVER-SIDE (#100 / #79) — Villen koneesta riippumaton.
+#
+# MIKSI: lohkovaihe päättyy 28.6. (viim. kickoff 28.6 02:00Z) ja R32 alkaa
+# 28.6 19:00Z — koko virkistysikkuna osuu Villen reissulle (27.6.–4.7.). Lokaali
+# Task Scheduler ei aja luotettavasti → tämä ajaa GitHubin pilvessä.
+#
+# MITÄ: ajaa #79 ship-gate-putken (scripts/refresh_wc_model.py):
+#   refit (martj42 + eloratings, julkiset URLit, EI API-avainta)
+#   → G1 backtest (logloss/Brier/RPS: uusi <= vanha)
+#   → G2 cross-confed-sanity (15.6. NO-GO:n syy: NED>JPN, ei AFC/CONCACAF top-6, …)
+#   Exit 0 = PASS, 1 = NO-GO, 2 = infra-virhe.
+# CI-portti REFRESH_SKIP_DOMESTIC_LIVE=1 ohittaa G3:n live-uvicornin (invariantti
+#   rakenteellinen: WC-refresh ei kosketa domestic /api/predict -polkua; G3
+#   ajetaan lokaalisti pre-push). G1+G2 = offline, safety-kriittinen → AINA ajossa.
+#
+# FAIL-SAFE: VAIN PASS committaa mallin mainiin → Render auto-deploy. NO-GO/infra
+#   → EI deployta (refresh palauttaa backupin), avataan alert-issue + job punainen.
+#   ÄLÄ KOSKAAN auto-deployta mallia joka failaa sanityn.
+
+name: wc-knockout-refresh
+
+on:
+  schedule:
+    - cron: "0 10 28 6 *"   # 28.6. 10:00 UTC — lohko-FT:n jälkeen, ~9 h ennen R32:ta
+  workflow_dispatch: {}
+
+concurrency:
+  group: wc-knockout-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # commit + push main (PASS)
+  issues: write     # alert-issue (FAIL)
+  actions: write    # dispatch accuracy-log (PASS)
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Refit + ship-gate (G1 backtest + G2 cross-confed sanity)
+        id: refresh
+        env:
+          REFRESH_SKIP_DOMESTIC_LIVE: "1"   # G3 live ohi CI:ssä (invariantti rakenteellinen)
+        run: |
+          set +e
+          python -m scripts.refresh_wc_model 2>&1 | tee refresh.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          echo "Ship-gate exit code: $code"
+          exit 0
+
+      - name: PASS → commit refreshed model to main (Render auto-deploy)
+        if: steps.refresh.outputs.exit_code == '0'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/international_results.csv data/elo_ratings.csv data/wc_model.json
+          if git diff --cached --quiet; then
+            echo "Ei mallimuutoksia (data identtinen) — ei committia."
+          else
+            git commit -m "data(#100): WC knockout model refresh — ship-gate PASS (G1+G2) [auto]"
+            git push origin HEAD:main
+            echo "Refreshed model pushed to main → Render auto-deploy."
+          fi
+
+      - name: PASS → dispatch accuracy-log (R32 pre-match logataan tuoreella mallilla)
+        if: steps.refresh.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run accuracy-log.yml --ref main || echo "dispatch best-effort (ei estä)"
+
+      - name: FAIL → alert-issue, EI deployta (vanha malli jää)
+        if: steps.refresh.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          code="${{ steps.refresh.outputs.exit_code }}"
+          gh issue create \
+            --title "WC knockout refresh NO-GO (exit $code) — mallia EI deployattu" \
+            --body "Ship-gate failasi (exit $code: 1=NO-GO sanity/backtest, 2=infra). Live-malliin EI koskettu → fallback: knockoutit nykymallilla, manuaalirefresh paluun jälkeen. Loki = run-artifact 'wc-refresh-log'. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            || echo "issue create best-effort"
+
+      - name: Upload ship-gate log (aina)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wc-refresh-log
+          path: refresh.log
+          if-no-files-found: warn
+
+      - name: Mark job failed on NO-GO (näkyvyys)
+        if: steps.refresh.outputs.exit_code != '0'
+        run: |
+          echo "Ship-gate NO-GO (exit ${{ steps.refresh.outputs.exit_code }}) — job merkitään punaiseksi."
+          exit 1
