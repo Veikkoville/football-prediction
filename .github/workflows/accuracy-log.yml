@@ -78,6 +78,11 @@ jobs:
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
           else
             git commit -m "chore(accuracy): auto-log pre-match + reconcile [skip ci]"
-            git push origin accuracy/auto-log
+            # --force-with-lease: haara rakennetaan joka ajossa deterministisesti
+            # (restore accumulated origin/accuracy/auto-log → log+reconcile → recompute),
+            # joten commit on remoten SUPERSET, ei datahäviötä. Plain push hylkäytyisi
+            # non-fast-forwardina (uusi haara mainista ≠ remoten historia). Lease suojaa
+            # silti rinnakkaisen ajon pushilta — concurrency-group estää senkin.
+            git push --force-with-lease origin accuracy/auto-log
             echo "Talletettu accuracy/auto-log-haaraan. Merge mainiin = Villen päätös."
           fi
