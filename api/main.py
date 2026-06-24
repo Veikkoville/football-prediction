@@ -1850,6 +1850,24 @@ def revenuecat_config():
     }
 
 
+@app.get("/api/accuracy")
+def model_accuracy():
+    """Mallin verifioitava tarkkuus-track-record (#100).
+
+    Palauttaa committatun aggregaatin (data/accuracy.json) — rolling N +
+    all-time 1X2 %, exact-score %, kalibraatio, Brier, n + viimeisimmät
+    ottelut rehellistä missit-näyttöä varten. Aggregaatti rakennetaan
+    LOKAALISTI ajastetulla putkella (scripts/accuracy_pipeline.py) joka
+    logaa pre-match-ennusteet ja reconciloi FT-tulokset; tämä endpoint vain
+    lukee tiedoston (ei laskentaa pyynnössä). Jos tiedostoa ei ole vielä
+    committattu → n=0-runko.
+
+    Gambling-turvallinen: pelkkä mallin osumatarkkuus, EI vedonlyönti-ROI:ta.
+    """
+    from src.models.accuracy import load_aggregate
+    return load_aggregate()
+
+
 @app.get("/api/debug/seasons")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """

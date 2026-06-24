@@ -1,0 +1,83 @@
+# Tarkkuus-track-record (#100): knockout-pre-matchien ROBUSTI talteenotto.
+#
+# MIKSI: pre-match-ennustetta EI voi backfillata jälkikäteen luotettavasti (malli
+# voi muuttua). Knockoutit alkavat ~28.6. ja Villen lokaali Task Scheduler EI aja
+# luotettavasti reissun aikana (27.6.–4.7., epävarma verkko). Tämä workflow ajaa
+# GitHubin pilvessä — riippumaton Villen koneesta — ja LOGAA pre-match-ennusteet
+# ennen kickoffeja + reconciloi FT-tulokset.
+#
+# SHIP-GATE: EI pushia mainiin → EI Render-autodeployta. Tulokset committoidaan
+# erilliseen `accuracy/auto-log`-haaraan = DURABLE TALTEENOTTO ilman julkaisua.
+# Tuotantoon vienti (merge mainiin → Render serveeraa /api/accuracy) on aina
+# VILLEN MANUAALINEN päätös, kuten wc_daily_refresh-sääntö edellyttää.
+#
+# KERTALUONTOINEN SETUP (Ville, GitHub-UI):
+#   1. Settings → Secrets and variables → Actions → New repository secret:
+#        FOOTBALL_DATA_API_KEY = <sama avain kuin Renderissä>
+#   2. Pushaa tämä workflow mainiin (aktivoi schedulen).
+#   Reissun jälkeen: `git merge accuracy/auto-log` (vain data/*.json diffaa) →
+#   push main → Render serveeraa knockout-track-recordin.
+
+name: accuracy-log
+
+on:
+  schedule:
+    # Joka 6. tunti → varma pre-match-ikkuna kaikille knockout-kickoffeille
+    # (WC2026-ottelut iltapäivä/ilta UTC). Reconcile täyttää tulokset jälkikäteen.
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}   # manuaalinen laukaisu (testaus / kiinniotto)
+
+# Vältä päällekkäiset ajot (commit-kilpailu accuracy/auto-log-haarassa).
+concurrency:
+  group: accuracy-log
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # commit + push accuracy/auto-log-haaraan
+
+jobs:
+  log-and-reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Restore accumulated log from accuracy/auto-log (jos olemassa)
+        run: |
+          git fetch origin accuracy/auto-log || true
+          if git show-ref --verify --quiet refs/remotes/origin/accuracy/auto-log; then
+            echo "Palautetaan kertynyt loki edellisistä ajoista."
+            git checkout origin/accuracy/auto-log -- data/prediction_log.json data/accuracy.json || true
+          else
+            echo "Ei aiempaa accuracy/auto-log-haaraa — aloitetaan mainin seed-logista."
+          fi
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Log pre-match + reconcile + recompute aggregate
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+        run: python -m scripts.accuracy_pipeline run
+
+      - name: Commit to accuracy/auto-log (EI mainiin → ei Render-deployta)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B accuracy/auto-log
+          git add data/prediction_log.json data/accuracy.json
+          if git diff --cached --quiet; then
+            echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
+          else
+            git commit -m "chore(accuracy): auto-log pre-match + reconcile [skip ci]"
+            git push origin accuracy/auto-log
+            echo "Talletettu accuracy/auto-log-haaraan. Merge mainiin = Villen päätös."
+          fi
