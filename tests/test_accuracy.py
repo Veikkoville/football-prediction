@@ -102,9 +102,37 @@ def test_compute_aggregate_metrics():
     assert at["exact_n"] == 2              # vain f1, f2 (mls tunnetaan)
     assert at["exact_correct"] == 1        # f1
     assert at["brier_n"] == 2              # vain täydet jakaumat
-    assert at["brier"] is not None
+    # MIN_DISPLAY_N-gate: exact_n/brier_n (2) < 30 → näytettävä arvo nullataan,
+    # ali-otoskoot säilyvät raportoituina (data kertyy taustalla).
+    assert at["pct_exact"] is None
+    assert at["brier"] is None
     assert agg["pending"] == 0
     assert agg["logged_total"] == 3
+
+
+def test_small_sample_exact_brier_gated():
+    """exact/Brier nullataan kun ali-otos < MIN_DISPLAY_N, näkyy rajalla."""
+    # Alle rajan (1 täysi-jakauma-rivi) → molemmat null, 1X2 ennallaan
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("a", "home", mls="2-1", p=(0.6, 0.25, 0.15)))
+    acc.set_result(log, "a", 2, 1)
+    at = acc.compute_aggregate(log)["all_time"]
+    assert at["pct_1x2"] is not None       # 1X2 ei koskaan gateta
+    assert at["pct_exact"] is None
+    assert at["brier"] is None
+    assert at["exact_n"] == 1 and at["brier_n"] == 1  # ali-otos yhä raportoitu
+
+    # >= MIN_DISPLAY_N täysi-jakauma-rivillä → exact + Brier näkyvät
+    log = acc.empty_log()
+    for i in range(acc.MIN_DISPLAY_N):
+        acc.upsert_prediction(log, _entry(f"f{i}", "home", mls="2-1",
+                                          p=(0.6, 0.25, 0.15), date=f"2026-06-{i % 28 + 1:02d}"))
+        acc.set_result(log, f"f{i}", 2, 1)
+    at = acc.compute_aggregate(log)["all_time"]
+    assert at["exact_n"] == acc.MIN_DISPLAY_N
+    assert at["brier_n"] == acc.MIN_DISPLAY_N
+    assert at["pct_exact"] is not None
+    assert at["brier"] is not None
 
 
 def test_empty_aggregate_shape():

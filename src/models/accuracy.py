@@ -42,6 +42,11 @@ AGGREGATE_PATH: Path = config.DATA_DIR / "accuracy.json"
 LOG_VERSION = 1
 DEFAULT_ROLLING_WINDOW = 100
 DEFAULT_RECENT_N = 20
+# Pieni-otoksiset metriikat (exact-score, Brier) eivät ole tilastollisesti
+# mielekkäitä pienellä n:llä → näytetään vasta kun ali-otos >= tämä. Alle rajan
+# pct_exact/brier = null (frontend → "Coming soon"/"—"), ettei näytetä
+# harhaanjohtavaa "0 %"/"0.30" muutamasta ottelusta. Koskee all_time + rolling.
+MIN_DISPLAY_N = 30
 
 
 def _now_iso() -> str:
@@ -235,6 +240,13 @@ def _metrics_block(rows: list[dict]) -> dict:
     brier = _brier(rows)
     block["brier"] = brier["brier"]
     block["brier_n"] = brier["n"]
+
+    # Gate pieni-otoksiset metriikat (ks. MIN_DISPLAY_N). exact_n/brier_n säilyvät
+    # raportoituina (data kertyy taustalla), vain näytettävä arvo nullataan.
+    if block["exact_n"] < MIN_DISPLAY_N:
+        block["pct_exact"] = None
+    if block["brier_n"] < MIN_DISPLAY_N:
+        block["brier"] = None
     return block
 
 

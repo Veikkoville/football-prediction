@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-25T07:19:37+00:00",
+  "updated_at": "2026-06-25T09:06:17+00:00",
   "logged_total": 72,
   "pending": 20,
   "all_time": {
@@ -11,8 +11,8 @@
     "pct_decisive": 0.8421,
     "exact_n": 4,
     "exact_correct": 0,
-    "pct_exact": 0.0,
-    "brier": 0.2984,
+    "pct_exact": null,
+    "brier": null,
     "brier_n": 4
   },
   "rolling": {
@@ -24,8 +24,8 @@
     "pct_decisive": 0.8421,
     "exact_n": 4,
     "exact_correct": 0,
-    "pct_exact": 0.0,
-    "brier": 0.2984,
+    "pct_exact": null,
+    "brier": null,
     "brier_n": 4,
     "window": 100
   },
