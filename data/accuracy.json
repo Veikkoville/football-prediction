@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-25T09:06:17+00:00",
+  "updated_at": "2026-06-25T09:21:03+00:00",
   "logged_total": 72,
   "pending": 20,
   "all_time": {
@@ -29,44 +29,7 @@
     "brier_n": 4,
     "window": 100
   },
-  "calibration": [
-    {
-      "bin_mid": 0.0944,
-      "predicted": 0.0944,
-      "actual": 0.0,
-      "n": 1
-    },
-    {
-      "bin_mid": 0.1609,
-      "predicted": 0.1609,
-      "actual": 0.0,
-      "n": 2
-    },
-    {
-      "bin_mid": 0.2596,
-      "predicted": 0.2596,
-      "actual": 0.0,
-      "n": 5
-    },
-    {
-      "bin_mid": 0.4551,
-      "predicted": 0.4551,
-      "actual": 1.0,
-      "n": 2
-    },
-    {
-      "bin_mid": 0.665,
-      "predicted": 0.665,
-      "actual": 1.0,
-      "n": 1
-    },
-    {
-      "bin_mid": 0.7103,
-      "predicted": 0.7103,
-      "actual": 1.0,
-      "n": 1
-    }
-  ],
+  "calibration": [],
   "recent": [
     {
       "date": "2026-06-24",

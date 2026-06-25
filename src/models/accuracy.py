@@ -290,9 +290,14 @@ def _brier(rows: list[dict]) -> dict:
 
 
 def _calibration(rows: list[dict], n_bins: int = 10) -> list[dict]:
-    """Reliability-data täyden jakauman riveiltä (reuse backtest.kalibrointi_data)."""
+    """Reliability-data täyden jakauman riveiltä (reuse backtest.kalibrointi_data).
+
+    Gate: pieni otos tuottaa sparse-bineja (n=1,2…) jotka ovat harhaanjohtavia →
+    palauta [] kunnes täysi-jakauma-otos >= MIN_DISPLAY_N (sama raja kuin
+    exact/Brier). Frontend renderöi kalibraatiokortin vain jos length > 0.
+    """
     full = _full_prob_rows(rows)
-    if not full:
+    if len(full) < MIN_DISPLAY_N:
         return []
     try:
         import pandas as pd
