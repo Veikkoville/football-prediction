@@ -24,6 +24,16 @@
 # KERTALUONTOINEN SETUP (Ville, GitHub-UI):
 #   Settings → Secrets and variables → Actions → New repository secret:
 #     FOOTBALL_DATA_API_KEY = <sama avain kuin Renderissä>
+#
+# LUOTETTAVUUS: GitHub-schedule on best-effort — ajot driftaavat ja jäävät väliin
+# kuormassa (havaittu: 19:27Z vs odotettu 18:00Z, 09:00Z-tikki puuttui kokonaan).
+# Reissun knockout-ikkunan (27.6.–4.7.) yli tämä on riski → repository_dispatch
+# antaa ULKOISEN luotettavan triggerin:
+#   Ulkoinen cron (esim. cron-job.org, joka 1–3 h) →
+#     POST https://api.github.com/repos/Veikkoville/football-prediction/dispatches
+#     -H "Authorization: Bearer <fine-grained PAT: Actions=write, Contents=read>"
+#     -d '{"event_type":"accuracy-log"}'
+#   Schedule jää varatriggeriksi. wc-knockout-refresh dispatchaa tämän 28.6 (R32).
 
 name: accuracy-log
 
@@ -31,8 +41,12 @@ on:
   schedule:
     # Joka 3. tunti — tihennetty knockouteille: pre-match-ikkuna on kireä (R32+
     # kickoffit illalla UTC) ja reconcile täyttää FT-tulokset pian ottelun jälkeen.
+    # HUOM: best-effort, voi driftata/jäädä väliin → repository_dispatch alla on
+    # luotettavampi primääritrigger reissun aikana.
     - cron: "0 */3 * * *"
-  workflow_dispatch: {}   # manuaalinen laukaisu + wc-knockout-refresh dispatchaa tämän
+  repository_dispatch:
+    types: [accuracy-log]   # ulkoinen luotettava cron (ks. SETUP yllä)
+  workflow_dispatch: {}     # manuaalinen laukaisu + wc-knockout-refresh dispatchaa tämän
 
 # Vältä päällekkäiset ajot (commit-kilpailu mainissa). cancel-in-progress: false
 # → rinnakkaiset laukaisut (cron + knockout-refresh-dispatch) jonottavat, eivät kaadu.
