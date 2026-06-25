@@ -31,7 +31,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import pandas as pd
 import stripe
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
@@ -1851,7 +1851,7 @@ def revenuecat_config():
 
 
 @app.get("/api/accuracy")
-def model_accuracy():
+def model_accuracy(response: Response):
     """Mallin verifioitava tarkkuus-track-record (#100).
 
     Palauttaa committatun aggregaatin (data/accuracy.json) — rolling N +
@@ -1865,6 +1865,12 @@ def model_accuracy():
     Gambling-turvallinen: pelkkä mallin osumatarkkuus, EI vedonlyönti-ROI:ta.
     """
     from src.models.accuracy import load_aggregate
+    # #103: ei välimuistitusta. Track record päivittyy palvelinpäästä (cron → main
+    # → Render), ja mobiili (lib/api.ts fetchAccuracy) hakee bare-URL:n ilman
+    # cache-bustia oletus-fetch-cachella → CDN/edge/OS/RN-HTTP-cache voi tarjota
+    # vanhentunutta snapshotia (oire: stale n=48 ~17 h). no-store estää kaikki
+    # välimuistitasot, korjaus tulee voimaan ilman app-buildia.
+    response.headers["Cache-Control"] = "no-store"
     return load_aggregate()
 
 
