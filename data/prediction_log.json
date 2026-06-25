@@ -1121,7 +1121,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 3,
+        "actual_score": "0-3",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-25T11:41:34+00:00"
+      }
     },
     {
       "match_id": "fd-537332",
@@ -1139,7 +1147,15 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 0,
+        "actual_score": "1-0",
+        "actual_outcome": "home",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-25T11:41:34+00:00"
+      }
     },
     {
       "match_id": "fd-537355",
@@ -1664,6 +1680,24 @@
         "exact_hit": null,
         "reconciled_at": "2026-06-24T16:22:47+00:00"
       }
+    },
+    {
+      "match_id": "fd-537417",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-06-28",
+      "kickoff": "2026-06-28T19:00:00Z",
+      "home_team": "South Africa",
+      "away_team": "Canada",
+      "p_home": 0.1354,
+      "p_draw": 0.2429,
+      "p_away": 0.6217,
+      "xg_home": 0.698,
+      "xg_away": 1.763,
+      "most_likely_score": "0-1",
+      "predicted_winner": "away",
+      "logged_at": "2026-06-25T11:41:34+00:00",
+      "result": null
     }
   ]
 }
