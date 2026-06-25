@@ -6,34 +6,42 @@
 # GitHubin pilvessä — riippumaton Villen koneesta — ja LOGAA pre-match-ennusteet
 # ennen kickoffeja + reconciloi FT-tulokset.
 #
-# SHIP-GATE: EI pushia mainiin → EI Render-autodeployta. Tulokset committoidaan
-# erilliseen `accuracy/auto-log`-haaraan = DURABLE TALTEENOTTO ilman julkaisua.
-# Tuotantoon vienti (merge mainiin → Render serveeraa /api/accuracy) on aina
-# VILLEN MANUAALINEN päätös, kuten wc_daily_refresh-sääntö edellyttää.
+# JULKAISU: committoi SUORAAN mainiin → Render auto-deploy → GET /api/accuracy
+# näyttää tuoreen track-recordin ILMAN manuaalista mergeä (Villen päätös #103:
+# track record päivittyy joka ajolla automaattisesti reissun aikana). Pipeline
+# koskee VAIN data/prediction_log.json + data/accuracy.json — EI mallikoodia eikä
+# /api/predict-polkua, joten julkaisu on matalan riskin (ei ship-gate-tarvetta).
+# Mallin oma ship-gate (G1/G2 sanity) elää erikseen wc-knockout-refresh.yml:ssä.
+#
+# YKSI TOTUUDEN LÄHDE: main on akkumulaattori. Pipeline upsertaa (ei koskaan
+# poista) → manuaaliset backfillit (esim. hubup-* MD2) säilyvät. EI enää
+# erillistä accuracy/auto-log-haaraa, joka aiemmin ylikirjoitti mainin backfillin.
+#
+# GUARDRAILIT: concurrency (ei päällekkäisajoa), skip-if-no-diff (ei tyhjiä
+# committeja), [skip ci] (ei CI-spämmiä data-committeista), rebase+retry (main on
+# jaettu wc-knockout-refreshin kanssa → ei kilpailukorruptiota).
 #
 # KERTALUONTOINEN SETUP (Ville, GitHub-UI):
-#   1. Settings → Secrets and variables → Actions → New repository secret:
-#        FOOTBALL_DATA_API_KEY = <sama avain kuin Renderissä>
-#   2. Pushaa tämä workflow mainiin (aktivoi schedulen).
-#   Reissun jälkeen: `git merge accuracy/auto-log` (vain data/*.json diffaa) →
-#   push main → Render serveeraa knockout-track-recordin.
+#   Settings → Secrets and variables → Actions → New repository secret:
+#     FOOTBALL_DATA_API_KEY = <sama avain kuin Renderissä>
 
 name: accuracy-log
 
 on:
   schedule:
-    # Joka 6. tunti → varma pre-match-ikkuna kaikille knockout-kickoffeille
-    # (WC2026-ottelut iltapäivä/ilta UTC). Reconcile täyttää tulokset jälkikäteen.
-    - cron: "0 */6 * * *"
-  workflow_dispatch: {}   # manuaalinen laukaisu (testaus / kiinniotto)
+    # Joka 3. tunti — tihennetty knockouteille: pre-match-ikkuna on kireä (R32+
+    # kickoffit illalla UTC) ja reconcile täyttää FT-tulokset pian ottelun jälkeen.
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {}   # manuaalinen laukaisu + wc-knockout-refresh dispatchaa tämän
 
-# Vältä päällekkäiset ajot (commit-kilpailu accuracy/auto-log-haarassa).
+# Vältä päällekkäiset ajot (commit-kilpailu mainissa). cancel-in-progress: false
+# → rinnakkaiset laukaisut (cron + knockout-refresh-dispatch) jonottavat, eivät kaadu.
 concurrency:
   group: accuracy-log
   cancel-in-progress: false
 
 permissions:
-  contents: write   # commit + push accuracy/auto-log-haaraan
+  contents: write   # commit + push main
 
 jobs:
   log-and-reconcile:
@@ -43,17 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
-
-      - name: Restore accumulated log from accuracy/auto-log (jos olemassa)
-        run: |
-          git fetch origin accuracy/auto-log || true
-          if git show-ref --verify --quiet refs/remotes/origin/accuracy/auto-log; then
-            echo "Palautetaan kertynyt loki edellisistä ajoista."
-            git checkout origin/accuracy/auto-log -- data/prediction_log.json data/accuracy.json || true
-          else
-            echo "Ei aiempaa accuracy/auto-log-haaraa — aloitetaan mainin seed-logista."
-          fi
+          fetch-depth: 0   # rebase tarvitsee historian
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
@@ -68,21 +66,31 @@ jobs:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
         run: python -m scripts.accuracy_pipeline run
 
-      - name: Commit to accuracy/auto-log (EI mainiin → ei Render-deployta)
+      - name: Commit + push to main (Render auto-deploy → /api/accuracy)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B accuracy/auto-log
           git add data/prediction_log.json data/accuracy.json
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
-          else
-            git commit -m "chore(accuracy): auto-log pre-match + reconcile [skip ci]"
-            # --force-with-lease: haara rakennetaan joka ajossa deterministisesti
-            # (restore accumulated origin/accuracy/auto-log → log+reconcile → recompute),
-            # joten commit on remoten SUPERSET, ei datahäviötä. Plain push hylkäytyisi
-            # non-fast-forwardina (uusi haara mainista ≠ remoten historia). Lease suojaa
-            # silti rinnakkaisen ajon pushilta — concurrency-group estää senkin.
-            git push --force-with-lease origin accuracy/auto-log
-            echo "Talletettu accuracy/auto-log-haaraan. Merge mainiin = Villen päätös."
+            exit 0
           fi
+          git commit -m "chore(accuracy): auto-log pre-match + reconcile [skip ci]"
+          # main on jaettu (wc-knockout-refresh voi pushata samaan ikkunaan 28.6).
+          # Eri tiedostot (data/*.json vs wc_model.json/elo/intl) → rebase aina puhdas.
+          # Rebase tuoreimman origin/main päälle + retry kilpailun varalta.
+          for i in 1 2 3 4 5; do
+            git fetch origin main || true
+            if git rebase origin/main; then
+              if git push origin HEAD:main; then
+                echo "Pushed to main (yritys $i) → Render auto-deploy."
+                exit 0
+              fi
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
+            echo "Push-yritys $i epäonnistui (kilpailu?) — rebase + retry."
+            sleep 5
+          done
+          echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
+          exit 1
