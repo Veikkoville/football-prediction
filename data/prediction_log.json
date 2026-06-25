@@ -1173,7 +1173,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 1,
+        "actual_score": "2-1",
+        "actual_outcome": "home",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-25T22:22:50+00:00"
+      }
     },
     {
       "match_id": "fd-537356",
@@ -1191,7 +1199,15 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 2,
+        "actual_score": "0-2",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-25T22:22:50+00:00"
+      }
     },
     {
       "match_id": "fd-537361",
