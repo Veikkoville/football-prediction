@@ -1,36 +1,121 @@
 {
-  "updated_at": "2026-06-24T16:22:47+00:00",
-  "logged_total": 48,
-  "pending": 0,
+  "updated_at": "2026-06-25T07:19:37+00:00",
+  "logged_total": 72,
+  "pending": 20,
   "all_time": {
-    "n": 48,
-    "correct_1x2": 28,
-    "pct_1x2": 0.5833,
-    "decisive_n": 34,
-    "decisive_correct": 28,
-    "pct_decisive": 0.8235,
-    "exact_n": 0,
+    "n": 52,
+    "correct_1x2": 32,
+    "pct_1x2": 0.6154,
+    "decisive_n": 38,
+    "decisive_correct": 32,
+    "pct_decisive": 0.8421,
+    "exact_n": 4,
     "exact_correct": 0,
-    "pct_exact": null,
-    "brier": null,
-    "brier_n": 0
+    "pct_exact": 0.0,
+    "brier": 0.2984,
+    "brier_n": 4
   },
   "rolling": {
-    "n": 48,
-    "correct_1x2": 28,
-    "pct_1x2": 0.5833,
-    "decisive_n": 34,
-    "decisive_correct": 28,
-    "pct_decisive": 0.8235,
-    "exact_n": 0,
+    "n": 52,
+    "correct_1x2": 32,
+    "pct_1x2": 0.6154,
+    "decisive_n": 38,
+    "decisive_correct": 32,
+    "pct_decisive": 0.8421,
+    "exact_n": 4,
     "exact_correct": 0,
-    "pct_exact": null,
-    "brier": null,
-    "brier_n": 0,
+    "pct_exact": 0.0,
+    "brier": 0.2984,
+    "brier_n": 4,
     "window": 100
   },
-  "calibration": [],
+  "calibration": [
+    {
+      "bin_mid": 0.0944,
+      "predicted": 0.0944,
+      "actual": 0.0,
+      "n": 1
+    },
+    {
+      "bin_mid": 0.1609,
+      "predicted": 0.1609,
+      "actual": 0.0,
+      "n": 2
+    },
+    {
+      "bin_mid": 0.2596,
+      "predicted": 0.2596,
+      "actual": 0.0,
+      "n": 5
+    },
+    {
+      "bin_mid": 0.4551,
+      "predicted": 0.4551,
+      "actual": 1.0,
+      "n": 2
+    },
+    {
+      "bin_mid": 0.665,
+      "predicted": 0.665,
+      "actual": 1.0,
+      "n": 1
+    },
+    {
+      "bin_mid": 0.7103,
+      "predicted": 0.7103,
+      "actual": 1.0,
+      "n": 1
+    }
+  ],
   "recent": [
+    {
+      "date": "2026-06-24",
+      "home_team": "Scotland",
+      "away_team": "Brazil",
+      "predicted_winner": "away",
+      "p_winner": 0.665,
+      "most_likely_score": "0-2",
+      "actual_score": "0-3",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
+    {
+      "date": "2026-06-24",
+      "home_team": "Morocco",
+      "away_team": "Haiti",
+      "predicted_winner": "home",
+      "p_winner": 0.7103,
+      "most_likely_score": "2-0",
+      "actual_score": "4-2",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
+    {
+      "date": "2026-06-24",
+      "home_team": "Bosnia-Herzegovina",
+      "away_team": "Qatar",
+      "predicted_winner": "home",
+      "p_winner": 0.4472,
+      "most_likely_score": "1-1",
+      "actual_score": "3-1",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
+    {
+      "date": "2026-06-24",
+      "home_team": "Switzerland",
+      "away_team": "Canada",
+      "predicted_winner": "home",
+      "p_winner": 0.463,
+      "most_likely_score": "1-1",
+      "actual_score": "2-1",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
     {
       "date": "2026-06-24",
       "home_team": "Colombia",
@@ -221,54 +306,6 @@
       "actual_score": "5-1",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": null
-    },
-    {
-      "date": null,
-      "home_team": "Turkey",
-      "away_team": "Paraguay",
-      "predicted_winner": "home",
-      "p_winner": 0.382,
-      "most_likely_score": null,
-      "actual_score": "0-1",
-      "actual_outcome": "away",
-      "hit_1x2": false,
-      "exact_hit": null
-    },
-    {
-      "date": null,
-      "home_team": "Brazil",
-      "away_team": "Haiti",
-      "predicted_winner": "home",
-      "p_winner": 0.905,
-      "most_likely_score": null,
-      "actual_score": "3-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": null
-    },
-    {
-      "date": null,
-      "home_team": "Scotland",
-      "away_team": "Morocco",
-      "predicted_winner": "away",
-      "p_winner": 0.422,
-      "most_likely_score": null,
-      "actual_score": "0-1",
-      "actual_outcome": "away",
-      "hit_1x2": true,
-      "exact_hit": null
-    },
-    {
-      "date": null,
-      "home_team": "United States",
-      "away_team": "Australia",
-      "predicted_winner": "away",
-      "p_winner": 0.362,
-      "most_likely_score": null,
-      "actual_score": "2-0",
-      "actual_outcome": "home",
-      "hit_1x2": false,
       "exact_hit": null
     }
   ]
