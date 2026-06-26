@@ -1277,7 +1277,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 3,
+        "away_score": 2,
+        "actual_score": "3-2",
+        "actual_outcome": "home",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-26T09:29:35+00:00"
+      }
     },
     {
       "match_id": "fd-537350",
@@ -1295,7 +1303,15 @@
       "most_likely_score": "0-0",
       "predicted_winner": "home",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 0,
+        "actual_score": "0-0",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": true,
+        "reconciled_at": "2026-06-26T09:29:35+00:00"
+      }
     },
     {
       "match_id": "fd-537395",
@@ -1729,6 +1745,60 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-25T11:41:34+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537423",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-06-29",
+      "kickoff": "2026-06-29T17:00:00Z",
+      "home_team": "Brazil",
+      "away_team": "Japan",
+      "p_home": 0.4513,
+      "p_draw": 0.2832,
+      "p_away": 0.2656,
+      "xg_home": 1.438,
+      "xg_away": 1.046,
+      "most_likely_score": "1-1",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-26T09:29:35+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537418",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-06-30",
+      "kickoff": "2026-06-30T01:00:00Z",
+      "home_team": "Netherlands",
+      "away_team": "Morocco",
+      "p_home": 0.4545,
+      "p_draw": 0.2949,
+      "p_away": 0.2505,
+      "xg_home": 1.356,
+      "xg_away": 0.94,
+      "most_likely_score": "1-1",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-26T09:29:35+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537421",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-02",
+      "kickoff": "2026-07-02T00:00:00Z",
+      "home_team": "United States",
+      "away_team": "Bosnia-Herzegovina",
+      "p_home": 0.6228,
+      "p_draw": 0.2316,
+      "p_away": 0.1456,
+      "xg_home": 1.891,
+      "xg_away": 0.805,
+      "most_likely_score": "2-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-26T09:29:35+00:00",
       "result": null
     }
   ]
