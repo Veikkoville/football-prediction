@@ -32,7 +32,7 @@ ottelut ovat mukana.
 `date, home_team, away_team, home_score, away_score, tournament, city, country, neutral`
 
 - `home_score`/`away_score`: lopputulos jatkoajan jälkeen, **ilman rangaistuspotkuja**
-  (shootout-tulokset erillisessä shootouts.csv:ssä, ei käytössä) → ei pakkais-inflaatiota (#70).
+  (shootout-tulokset erillisessä `international_shootouts.csv`:ssä) → ei pakkais-inflaatiota (#70).
 - `neutral`: TRUE/FALSE → venue-tieto (γ/2-neutralointi WC-otteluille).
 - Tulevien ottelujen `home_score`/`away_score` = `NA` → loader suodattaa pois.
 
@@ -40,3 +40,14 @@ ottelut ovat mukana.
 
 `src/data/international_results.py` lukee tämän, suodattaa (pelatut + aikaikkuna +
 48 WC-maata) ja palauttaa loaderin vakioskeeman + `tournament`/`neutral`-sarakkeet.
+
+## Pakkapeli-täydennys: `international_shootouts.csv` (#16b)
+
+- **Raaka-CSV:** https://raw.githubusercontent.com/martj42/international_results/master/shootouts.csv
+- **Lisenssi:** CC0-1.0 (sama repo). **Snapshot otettu:** 2026-06-06 (sama kuin results).
+- **Skeema:** `date, home_team, away_team, winner, first_shooter`
+- **Käyttö:** `load_wc_shootouts()` rakentaa **H2H-only** lookupin (date + joukkueparit
+  → kanoninen voittaja). Vain `/api/predict-wc`:n h2h-näyttö + h2h_summary käyttävät
+  sitä (reg+ET-tasapeli joka ratkesi pakoilla → `penalties: true` + `penalty_winner`,
+  summary kirjaa voittajalle eikä tasapeliksi). **EI lisätä treenidf:ään** → WC-malli
+  pysyy pakka-inflaatiosta vapaana (#70) ja domestic/WC-ennusteet bittitarkasti ennallaan.

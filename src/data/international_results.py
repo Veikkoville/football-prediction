@@ -19,6 +19,13 @@ from src.data.wc_teams import WC2026_TEAMS_SET, resolve_wc_name
 
 CSV_PATH = config.DATA_DIR / "international_results.csv"
 
+# #16b: vendoroitu martj42 shootouts.csv (CC0, sama repo). results.csv kirjaa
+# pelkän reg+ET-tuloksen (pakkapeli erikseen) → h2h_summary laski pakkapelivoiton
+# tasapeliksi (Argentina 2022-finaali = draw). Tämä on H2H-ONLY lookup: EI lisätä
+# saraketta treenidf:ään (malli pysyy pakka-inflaatiosta vapaana, #70), vain
+# näyttö-/summary-polun pakkapelivoittajan oikea kirjaus.
+SHOOTOUTS_CSV_PATH = config.DATA_DIR / "international_shootouts.csv"
+
 # Esirakennettu WC-malli (JSON). Render Starterin ~0.5 vCPU ei jaksa fitata
 # "any"-mallia (195 maata / 302 param SLSQP) ajossa ilman timeoutia → malli
 # rakennetaan offline (scripts/build_wc_model.py) ja ladataan ajossa.
@@ -145,6 +152,36 @@ def wc2026_participants(raw: pd.DataFrame | None = None) -> set[str]:
     d = pd.to_datetime(raw["date"], errors="coerce")
     wc = raw[(raw["tournament"] == "FIFA World Cup") & (d.dt.year >= 2026)]
     return set(wc["home_team"]) | set(wc["away_team"])
+
+
+@lru_cache(maxsize=1)
+def load_wc_shootouts() -> dict:
+    """H2H-only pakkapelivoittaja-lookup vendoroidusta shootouts.csv:stä (#16b).
+
+    Avain: (date 'YYYY-MM-DD', frozenset({canon_home, canon_away})) → kanoninen
+    voittajanimi. Joukkuenimet kanonisoidaan samalla resolve_wc_name-logiikalla
+    kuin _build() → täsmää h2h-rivien kanssa orientaatiosta riippumatta.
+
+    Skeema: date, home_team, away_team, winner, first_shooter (CC0).
+    Lookup koskee VAIN näyttö-/summary-polkua — treenidataan ei kosketa, joten
+    domestic + WC-malli pysyvät bittitarkasti ennallaan (#70 pakka-inflaatio pois).
+    """
+    if not SHOOTOUTS_CSV_PATH.exists():
+        return {}
+    df = pd.read_csv(SHOOTOUTS_CSV_PATH, encoding="utf-8")
+
+    def _canon(name: str) -> str:
+        r = resolve_wc_name(name)
+        return r if r is not None else name
+
+    out: dict = {}
+    for _, r in df.iterrows():
+        home = _canon(str(r["home_team"]))
+        away = _canon(str(r["away_team"]))
+        winner = _canon(str(r["winner"]))
+        key = (str(r["date"])[:10], frozenset({home, away}))
+        out[key] = winner
+    return out
 
 
 def lataa(

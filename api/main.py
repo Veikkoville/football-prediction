@@ -964,13 +964,18 @@ def upcoming_fixtures(
 # ---------------------------------------------------------------------------
 # T7-apufunktiot: premium-H2H-jakauma + joukkueen muoto-trendi
 # ---------------------------------------------------------------------------
-def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str) -> dict:
+def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str,
+                 shootout_lookup=None) -> dict:
     """
     Keskinaisten kohtaamisten voitto/tasapeli/haviö-jakauma (T7 premium).
 
     'Kaikista' tarkoittaa ladatun kausi-ikkunan sisalta — vastaus EI vaita
     olevansa taydellinen historia. total_matches kertoo todellisen maaran
     jota frontend kayttaa rehellisessa labelissa ("All N meetings").
+
+    #16b: jos shootout_lookup annetaan (WC-polku), reg+ET-tasapeli joka ratkesi
+    pakoilla kirjataan pakkapelivoittajalle EIKÄ tasapeliksi (esim. Argentina
+    2022-finaali). shootout_lookup=None (domestic) → käytös ennallaan.
     """
     if h2h_all.empty:
         return {"total_matches": 0, "home_team_wins": 0, "draws": 0, "away_team_wins": 0}
@@ -979,7 +984,15 @@ def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str) -> dict:
     for _, m in h2h_all.iterrows():
         h, a = int(m["home_score"]), int(m["away_score"])
         if h == a:
-            draws += 1
+            # #16b: tasapeli voi olla pakkapelivoitto vendoroidussa lookupissa.
+            pen = _shootout_winner(m, shootout_lookup)
+            pen_team = m["home_team"] if pen == "home" else m["away_team"] if pen == "away" else None
+            if pen_team == home_team:
+                home_wins += 1
+            elif pen_team == away_team:
+                away_wins += 1
+            else:
+                draws += 1
             continue
         winner = m["home_team"] if h > a else m["away_team"]
         if winner == home_team:
@@ -994,8 +1007,29 @@ def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str) -> dict:
     }
 
 
-def _h2h_item(m) -> dict:
-    """Yksi h2h-rivi API-vastaukseen (#77b).
+def _shootout_winner(m, shootout_lookup) -> str | None:
+    """Palauta 'home'/'away' jos ottelu ratkesi pakoilla (#16b), muuten None.
+
+    Käyttö VAIN lähteissä joissa score on reg+ET ilman disp-sarakkeita (martj42-
+    WC): tasapeli + osuma vendoroidussa shootouts-lookupissa → pakkapelivoittaja.
+    Lookup-avain on orientaatioriippumaton (frozenset), joten home/away-järjestys
+    rivillä ei vaikuta osumaan; voittaja-tiimi mäpätään riviin home/away-rooliin.
+    """
+    if not shootout_lookup:
+        return None
+    key = (str(m["date"])[:10], frozenset({m["home_team"], m["away_team"]}))
+    winner = shootout_lookup.get(key)
+    if winner is None:
+        return None
+    if winner == m["home_team"]:
+        return "home"
+    if winner == m["away_team"]:
+        return "away"
+    return None  # nimi-mismatch (ei pitäisi tapahtua kanonisoinnin jälkeen)
+
+
+def _h2h_item(m, shootout_lookup=None) -> dict:
+    """Yksi h2h-rivi API-vastaukseen (#77b, #16b).
 
     Näyttöscore = reg + jatkoaika ILMAN rangaistuspotkuja (*_disp, jonka
     FD-loader johtaa duration == PENALTY_SHOOTOUT -kentästä). FD summaa
@@ -1003,9 +1037,11 @@ def _h2h_item(m) -> dict:
     pakat 4-3), joten fullTime != disp <=> PENALTY_SHOOTOUT — additiivinen
     penalties-lippu on durationista johdettu, ei heuristiikka.
 
-    Lähteissä ilman disp-sarakkeita (understat-PL, martj42-WC) penalties jää
-    Falseksi: pakkatietoa ei ole datassa (WC-puutteen korjaus = shootouts.csv-
-    vendorointi, ks. #77-raportti 12.6.).
+    Lähteissä ilman disp-sarakkeita (understat-PL, martj42-WC) disp == fullTime
+    → penalties Falseksi disp-polulta. #16b: jos kutsuja antaa shootout_lookupin
+    (WC-polku), tasapeli + osuma vendoroidussa shootouts.csv:ssä → penalties:true
+    + penalty_winner ilman uutta df-saraketta. shootout_lookup=None (domestic) →
+    käytös bittitarkasti #77b:n mukainen.
     """
     h_full, a_full = int(m["home_score"]), int(m["away_score"])
     hd = m.get("home_score_disp")
@@ -1023,6 +1059,13 @@ def _h2h_item(m) -> dict:
     if item["penalties"]:
         # Shootoutissa fullTime ei voi olla tasan -> voittaja vertailusta.
         item["penalty_winner"] = "home" if h_full > a_full else "away"
+    elif h_disp == a_disp:
+        # #16b: disp ei paljastanut pakkoja (lähteessä ei disp-saraketta).
+        # Vain tasapeli voi ratketa pakoilla → tarkista vendoroitu lookup.
+        pen = _shootout_winner(m, shootout_lookup)
+        if pen is not None:
+            item["penalties"] = True
+            item["penalty_winner"] = pen
     return item
 
 
@@ -1278,15 +1321,17 @@ def predict_wc(req: PredictWCRequest):
         ((df["home_team"] == home_canon) & (df["away_team"] == away_canon))
         | ((df["home_team"] == away_canon) & (df["away_team"] == home_canon))
     ].sort_values("date", ascending=False)
-    # #25/#77b: rivit _h2h_item-helperilla (näyttöscore ilman pakkoja +
-    # penalties-lippu). martj42-datassa ei ole disp-/shootout-sarakkeita ->
-    # penalties jää aina Falseksi tällä polulla.
-    h2h = [_h2h_item(m) for _, m in h2h_all.head(5).iterrows()]
-    # HUOM (#77, todettu 12.6.): martj42-scoret ovat reg + jatkoaika ILMAN
-    # pakkoja -> summary kirjaa pakkapelivoitot TASAPELEIKSI (esim. Argentina-
-    # France 2022 = draw). Tunnettu rajoite; faktinen korjaus vaatisi martj42
-    # shootouts.csv:n vendoroinnin (h2h-only lookup, Villen päätös).
-    h2h_summary = _h2h_summary(h2h_all, home_canon, away_canon)
+    # #25/#77b/#16b: rivit _h2h_item-helperilla (näyttöscore ilman pakkoja +
+    # penalties-lippu). martj42-datassa score on reg+ET ilman disp-sarakkeita ->
+    # penalties johdetaan vendoroidusta shootouts-lookupista (h2h-only, EI uutta
+    # df-saraketta -> WC-malli pysyy pakka-inflaatiosta vapaana, #70).
+    from src.data.international_results import load_wc_shootouts
+    shootout_lookup = load_wc_shootouts()
+    h2h = [_h2h_item(m, shootout_lookup) for _, m in h2h_all.head(5).iterrows()]
+    # #16b: summary kirjaa pakkapelivoiton voittajalle (ei tasapeliksi); h2h-rivin
+    # "(pens)"-merkintä erottaa pakkavoiton reg-voitosta (esim. Argentina–France
+    # 2022 = Argentina-voitto pakoilla, EI draw).
+    h2h_summary = _h2h_summary(h2h_all, home_canon, away_canon, shootout_lookup)
     form_trend = {
         "home_team": _team_recent_form(df, home_canon),
         "away_team": _team_recent_form(df, away_canon),

@@ -1,14 +1,19 @@
-"""#77b — h2h-rivien pakkapelikäsittely: näyttöscore ilman pakkoja + penalties-lippu.
+"""#77b/#16b — h2h-rivien pakkapelikäsittely: näyttöscore ilman pakkoja + penalties-lippu.
 
-Ankkuritapaus: PSG-Arsenal CL-finaali 30.5.2026 (FD fullTime 5-4 = 1-1 + pakat
+Ankkuritapaus #77b: PSG-Arsenal CL-finaali 30.5.2026 (FD fullTime 5-4 = 1-1 + pakat
 4-3) -> h2h-rivin pitää näyttää 1-1 + penalties: true + penalty_winner: home.
+
+Ankkuritapaus #16b: WC-polku (martj42, ei disp-saraketta) -> reg+ET-tasapeli joka
+ratkesi pakoilla luetaan vendoroidusta shootouts.csv:stä. Argentina-France 2022-
+finaali (reg 3-3, Argentina voitti pakoilla) -> penalties: true + penalty_winner +
+summary kirjaa Argentina-voiton EIKÄ tasapeliä.
 """
 from __future__ import annotations
 
 import pandas as pd
 import pytest
 
-from api.main import _h2h_item
+from api.main import _h2h_item, _h2h_summary, _shootout_winner
 
 
 def _row(**kw):
@@ -72,13 +77,77 @@ def test_psg_arsenal_cl_final_via_api(client):
     assert m["penalty_winner"] == "home"  # PSG voitti pakoilla 4-3
 
 
-def test_wc_h2h_has_penalties_field_false(client):
-    """WC-polku (martj42): kenttä mukana muodon vuoksi, aina false (ei dataa)."""
+# --- #16b: vendoroitu shootouts-lookup (WC-polku) ---------------------------
+
+_LOOKUP = {("2022-12-18", frozenset({"Argentina", "France"})): "Argentina"}
+
+
+def _wc_row(home, away, hs, aws, date="2022-12-18"):
+    """martj42-tyylinen rivi: reg+ET-score, EI disp-saraketta."""
+    return pd.Series(dict(date=pd.Timestamp(date), home_team=home, away_team=away,
+                          home_score=hs, away_score=aws))
+
+
+def test_shootout_winner_orientation_independent():
+    """Lookup täsmää joukkuepariin kummassakin home/away-järjestyksessä."""
+    assert _shootout_winner(_wc_row("Argentina", "France", 3, 3), _LOOKUP) == "home"
+    assert _shootout_winner(_wc_row("France", "Argentina", 3, 3), _LOOKUP) == "away"
+
+
+def test_shootout_winner_none_without_lookup():
+    """Ei lookupia (domestic) -> None, ei pakkapeli-kirjausta."""
+    assert _shootout_winner(_wc_row("Argentina", "France", 3, 3), None) is None
+    assert _shootout_winner(_wc_row("Argentina", "France", 3, 3), {}) is None
+
+
+def test_h2h_item_shootout_lookup_marks_penalties():
+    """martj42-tasapeli + osuma lookupissa -> penalties true + penalty_winner."""
+    item = _h2h_item(_wc_row("Argentina", "France", 3, 3), _LOOKUP)
+    assert (item["home_score"], item["away_score"]) == (3, 3)
+    assert item["penalties"] is True
+    assert item["penalty_winner"] == "home"
+
+
+def test_h2h_item_shootout_lookup_no_match_stays_false():
+    """Tasapeli ilman lookup-osumaa -> penalties false (esim. ryhmävaihe-draw)."""
+    item = _h2h_item(_wc_row("Argentina", "France", 1, 1, date="2050-01-01"), _LOOKUP)
+    assert item["penalties"] is False
+    assert "penalty_winner" not in item
+
+
+def test_h2h_item_non_draw_ignores_lookup():
+    """Ei-tasapeli ei koskaan kysy lookupia (pakat vain tasapelistä)."""
+    item = _h2h_item(_wc_row("Argentina", "France", 2, 1), _LOOKUP)
+    assert item["penalties"] is False and "penalty_winner" not in item
+
+
+def test_h2h_summary_shootout_counts_winner_not_draw():
+    """#16b: pakkapelivoitto kirjautuu voittajalle eikä tasapeliksi."""
+    h2h_all = pd.DataFrame([_wc_row("Argentina", "France", 3, 3).to_dict()])
+    # Ilman lookupia (vanha käytös): tasapeli.
+    old = _h2h_summary(h2h_all, "Argentina", "France")
+    assert old["draws"] == 1 and old["home_team_wins"] == 0
+    # Lookupilla (#16b): Argentina-voitto.
+    fixed = _h2h_summary(h2h_all, "Argentina", "France", _LOOKUP)
+    assert fixed["home_team_wins"] == 1 and fixed["draws"] == 0
+    assert fixed["total_matches"] == 1
+
+
+@pytest.mark.slow
+def test_wc_h2h_argentina_france_2022_penalty_via_api(client):
+    """End-to-end WC: 2022-finaali 3-3 näkyy penalties=true + Argentina-voitto."""
     r = client.post("/api/predict-wc", json={
         "home_team": "Argentina", "away_team": "France",
         "leagues": ["INT-World Cup"], "seasons": ["2018", "2022"],
     })
     assert r.status_code == 200
-    h2h = r.json()["h2h"]
-    assert h2h, "Argentina-France h2h puuttuu"
-    assert all(m["penalties"] is False for m in h2h)
+    data = r.json()
+    rows = [m for m in data["h2h"] if m["date"] == "2022-12-18"]
+    assert rows, "Argentina-France 2022-finaali puuttuu h2h-listalta"
+    m = rows[0]
+    assert (m["home_score"], m["away_score"]) == (3, 3)
+    assert m["penalties"] is True
+    assert m["penalty_winner"] == "home"  # Argentina (koti) voitti pakoilla 4-2
+    # summary: pakkapelivoitto Argentinalle, ei tasapeliksi.
+    s = data["h2h_summary"]
+    assert s["home_team_wins"] >= 1 and s["draws"] == 0
