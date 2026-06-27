@@ -1433,7 +1433,15 @@
       "most_likely_score": "0-2",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 5,
+        "actual_score": "1-5",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-27T08:37:42+00:00"
+      }
     },
     {
       "match_id": "fd-537368",
@@ -1451,7 +1459,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 1,
+        "actual_score": "1-1",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": true,
+        "reconciled_at": "2026-06-27T08:37:42+00:00"
+      }
     },
     {
       "match_id": "fd-537413",
@@ -1831,6 +1847,96 @@
       "most_likely_score": "2-0",
       "predicted_winner": "home",
       "logged_at": "2026-06-26T09:29:35+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537415",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-06-29",
+      "kickoff": "2026-06-29T20:30:00Z",
+      "home_team": "Germany",
+      "away_team": "Paraguay",
+      "p_home": 0.5153,
+      "p_draw": 0.269,
+      "p_away": 0.2157,
+      "xg_home": 1.588,
+      "xg_away": 0.945,
+      "most_likely_score": "1-1",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-27T08:37:42+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537424",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-06-30",
+      "kickoff": "2026-06-30T17:00:00Z",
+      "home_team": "Ivory Coast",
+      "away_team": "Norway",
+      "p_home": 0.1345,
+      "p_draw": 0.224,
+      "p_away": 0.6415,
+      "xg_home": 0.779,
+      "xg_away": 1.947,
+      "most_likely_score": "0-2",
+      "predicted_winner": "away",
+      "logged_at": "2026-06-27T08:37:42+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537416",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-06-30",
+      "kickoff": "2026-06-30T21:00:00Z",
+      "home_team": "France",
+      "away_team": "Sweden",
+      "p_home": 0.7389,
+      "p_draw": 0.17,
+      "p_away": 0.0912,
+      "xg_home": 2.45,
+      "xg_away": 0.765,
+      "most_likely_score": "2-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-27T08:37:42+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537428",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-03",
+      "kickoff": "2026-07-03T18:00:00Z",
+      "home_team": "Australia",
+      "away_team": "Egypt",
+      "p_home": 0.4286,
+      "p_draw": 0.3299,
+      "p_away": 0.2415,
+      "xg_home": 1.129,
+      "xg_away": 0.776,
+      "most_likely_score": "1-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-27T08:37:42+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537427",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-03",
+      "kickoff": "2026-07-03T22:00:00Z",
+      "home_team": "Argentina",
+      "away_team": "Cape Verde Islands",
+      "p_home": 0.8873,
+      "p_draw": 0.0923,
+      "p_away": 0.0204,
+      "xg_home": 2.905,
+      "xg_away": 0.325,
+      "most_likely_score": "2-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-27T08:37:42+00:00",
       "result": null
     }
   ]
