@@ -1485,7 +1485,15 @@
       "most_likely_score": "0-2",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 2,
+        "actual_score": "0-2",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": true,
+        "reconciled_at": "2026-06-28T03:55:21+00:00"
+      }
     },
     {
       "match_id": "fd-537414",
@@ -1503,7 +1511,15 @@
       "most_likely_score": "2-0",
       "predicted_winner": "home",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 1,
+        "actual_score": "2-1",
+        "actual_outcome": "home",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-28T03:55:21+00:00"
+      }
     },
     {
       "match_id": "fd-537407",
@@ -1521,7 +1537,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 0,
+        "actual_score": "0-0",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-28T03:55:21+00:00"
+      }
     },
     {
       "match_id": "fd-537408",
@@ -1539,7 +1563,15 @@
       "most_likely_score": "0-0",
       "predicted_winner": "away",
       "logged_at": "2026-06-24T12:13:46+00:00",
-      "result": null
+      "result": {
+        "home_score": 3,
+        "away_score": 1,
+        "actual_score": "3-1",
+        "actual_outcome": "home",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-28T03:55:21+00:00"
+      }
     },
     {
       "match_id": "fd-537401",
@@ -1937,6 +1969,24 @@
       "most_likely_score": "2-0",
       "predicted_winner": "home",
       "logged_at": "2026-06-27T08:37:42+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537425",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-01",
+      "kickoff": "2026-07-01T01:00:00Z",
+      "home_team": "Mexico",
+      "away_team": "Ecuador",
+      "p_home": 0.2398,
+      "p_draw": 0.3528,
+      "p_away": 0.4075,
+      "xg_home": 0.702,
+      "xg_away": 1.004,
+      "most_likely_score": "0-0",
+      "predicted_winner": "away",
+      "logged_at": "2026-06-28T03:55:21+00:00",
       "result": null
     }
   ]
