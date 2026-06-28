@@ -1,36 +1,48 @@
 {
-  "updated_at": "2026-06-28T19:22:06+00:00",
+  "updated_at": "2026-06-28T22:03:34+00:00",
   "logged_total": 88,
-  "pending": 16,
+  "pending": 15,
   "all_time": {
-    "n": 72,
-    "correct_1x2": 43,
-    "pct_1x2": 0.5972,
-    "decisive_n": 52,
-    "decisive_correct": 43,
-    "pct_decisive": 0.8269,
-    "exact_n": 24,
-    "exact_correct": 5,
+    "n": 73,
+    "correct_1x2": 44,
+    "pct_1x2": 0.6027,
+    "decisive_n": 53,
+    "decisive_correct": 44,
+    "pct_decisive": 0.8302,
+    "exact_n": 25,
+    "exact_correct": 6,
     "pct_exact": null,
     "brier": null,
-    "brier_n": 24
+    "brier_n": 25
   },
   "rolling": {
-    "n": 72,
-    "correct_1x2": 43,
-    "pct_1x2": 0.5972,
-    "decisive_n": 52,
-    "decisive_correct": 43,
-    "pct_decisive": 0.8269,
-    "exact_n": 24,
-    "exact_correct": 5,
+    "n": 73,
+    "correct_1x2": 44,
+    "pct_1x2": 0.6027,
+    "decisive_n": 53,
+    "decisive_correct": 44,
+    "pct_decisive": 0.8302,
+    "exact_n": 25,
+    "exact_correct": 6,
     "pct_exact": null,
     "brier": null,
-    "brier_n": 24,
+    "brier_n": 25,
     "window": 100
   },
   "calibration": [],
   "recent": [
+    {
+      "date": "2026-06-28",
+      "home_team": "South Africa",
+      "away_team": "Canada",
+      "predicted_winner": "away",
+      "p_winner": 0.6217,
+      "most_likely_score": "0-1",
+      "actual_score": "0-1",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": true
+    },
     {
       "date": "2026-06-28",
       "home_team": "Algeria",
@@ -257,18 +269,6 @@
       "actual_score": "1-0",
       "actual_outcome": "home",
       "hit_1x2": false,
-      "exact_hit": false
-    },
-    {
-      "date": "2026-06-25",
-      "home_team": "Czechia",
-      "away_team": "Mexico",
-      "predicted_winner": "away",
-      "p_winner": 0.4548,
-      "most_likely_score": "1-1",
-      "actual_score": "0-3",
-      "actual_outcome": "away",
-      "hit_1x2": true,
       "exact_hit": false
     }
   ]
