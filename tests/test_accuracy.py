@@ -6,6 +6,8 @@ WC pre-match -helperin neutraali-venue-symmetrian (peili predict_wc:stä).
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from src.models import accuracy as acc
@@ -148,8 +150,13 @@ def test_empty_aggregate_shape():
 # Seed-parsinta WC-hubista = julkaistu 21/40
 # ---------------------------------------------------------------------------
 def test_seed_parse_matches_published_record():
-    from scripts.accuracy_pipeline import WC_HUB_HTML, parse_seed_rows
-    rows = parse_seed_rows(WC_HUB_HTML.read_text(encoding="utf-8"))
+    # 21/40 = ryhmävaiheen JULKAISTU track-record = immutaabeli historia. Pinnataan
+    # arkistoituun ryhmävaihe-hubiin (tests/fixtures/) EIKÄ live-WC_HUB_HTML:ään:
+    # live-hub rullaa kierroksittain eteenpäin (R32 → predictions-taulu, ei enää 40
+    # ryhmävaiherivin track-recordia), joten golden-check ei saa riippua siitä.
+    from scripts.accuracy_pipeline import parse_seed_rows
+    fixture = Path(__file__).parent / "fixtures" / "wc-hub-groupstage.html"
+    rows = parse_seed_rows(fixture.read_text(encoding="utf-8"))
     assert len(rows) == 40, f"odotettiin 40 seed-riviä, saatiin {len(rows)}"
 
     log = acc.empty_log()
