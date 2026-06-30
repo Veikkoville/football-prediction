@@ -1963,7 +1963,15 @@
       "most_likely_score": "0-2",
       "predicted_winner": "away",
       "logged_at": "2026-06-27T08:37:42+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 2,
+        "actual_score": "1-2",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-06-30T20:00:25+00:00"
+      }
     },
     {
       "match_id": "fd-537416",
@@ -2161,6 +2169,24 @@
       "most_likely_score": "0-0",
       "predicted_winner": "away",
       "logged_at": "2026-06-30T09:38:19+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537377",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-05",
+      "kickoff": "2026-07-05T20:00:00Z",
+      "home_team": "Brazil",
+      "away_team": "Norway",
+      "p_home": 0.4866,
+      "p_draw": 0.258,
+      "p_away": 0.2553,
+      "xg_home": 1.68,
+      "xg_away": 1.161,
+      "most_likely_score": "1-1",
+      "predicted_winner": "home",
+      "logged_at": "2026-06-30T20:00:25+00:00",
       "result": null
     }
   ]
