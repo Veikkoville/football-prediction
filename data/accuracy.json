@@ -1,36 +1,48 @@
 {
-  "updated_at": "2026-06-29T22:09:37+00:00",
+  "updated_at": "2026-06-30T03:43:06+00:00",
   "logged_total": 88,
-  "pending": 14,
+  "pending": 13,
   "all_time": {
-    "n": 74,
+    "n": 75,
     "correct_1x2": 45,
-    "pct_1x2": 0.6081,
+    "pct_1x2": 0.6,
     "decisive_n": 54,
     "decisive_correct": 45,
     "pct_decisive": 0.8333,
-    "exact_n": 26,
-    "exact_correct": 6,
+    "exact_n": 27,
+    "exact_correct": 7,
     "pct_exact": null,
     "brier": null,
-    "brier_n": 26
+    "brier_n": 27
   },
   "rolling": {
-    "n": 74,
+    "n": 75,
     "correct_1x2": 45,
-    "pct_1x2": 0.6081,
+    "pct_1x2": 0.6,
     "decisive_n": 54,
     "decisive_correct": 45,
     "pct_decisive": 0.8333,
-    "exact_n": 26,
-    "exact_correct": 6,
+    "exact_n": 27,
+    "exact_correct": 7,
     "pct_exact": null,
     "brier": null,
-    "brier_n": 26,
+    "brier_n": 27,
     "window": 100
   },
   "calibration": [],
   "recent": [
+    {
+      "date": "2026-06-29",
+      "home_team": "Germany",
+      "away_team": "Paraguay",
+      "predicted_winner": "home",
+      "p_winner": 0.5153,
+      "most_likely_score": "1-1",
+      "actual_score": "1-1",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": true
+    },
     {
       "date": "2026-06-29",
       "home_team": "Brazil",
@@ -257,18 +269,6 @@
       "actual_score": "0-2",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
-    },
-    {
-      "date": "2026-06-25",
-      "home_team": "Ecuador",
-      "away_team": "Germany",
-      "predicted_winner": "away",
-      "p_winner": 0.3715,
-      "most_likely_score": "1-1",
-      "actual_score": "2-1",
-      "actual_outcome": "home",
-      "hit_1x2": false,
       "exact_hit": false
     }
   ]
