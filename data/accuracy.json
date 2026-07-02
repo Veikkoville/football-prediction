@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-01T22:18:38+00:00",
-  "logged_total": 91,
+  "updated_at": "2026-07-02T03:39:36+00:00",
+  "logged_total": 93,
   "pending": 11,
   "all_time": {
-    "n": 80,
-    "correct_1x2": 48,
-    "pct_1x2": 0.6,
-    "decisive_n": 58,
-    "decisive_correct": 48,
-    "pct_decisive": 0.8276,
-    "exact_n": 32,
-    "exact_correct": 8,
-    "pct_exact": 0.25,
-    "brier": 0.464,
-    "brier_n": 32
+    "n": 82,
+    "correct_1x2": 50,
+    "pct_1x2": 0.6098,
+    "decisive_n": 60,
+    "decisive_correct": 50,
+    "pct_decisive": 0.8333,
+    "exact_n": 34,
+    "exact_correct": 9,
+    "pct_exact": 0.2647,
+    "brier": 0.4579,
+    "brier_n": 34
   },
   "rolling": {
-    "n": 80,
-    "correct_1x2": 48,
-    "pct_1x2": 0.6,
-    "decisive_n": 58,
-    "decisive_correct": 48,
-    "pct_decisive": 0.8276,
-    "exact_n": 32,
-    "exact_correct": 8,
-    "pct_exact": 0.25,
-    "brier": 0.464,
-    "brier_n": 32,
+    "n": 82,
+    "correct_1x2": 50,
+    "pct_1x2": 0.6098,
+    "decisive_n": 60,
+    "decisive_correct": 50,
+    "pct_decisive": 0.8333,
+    "exact_n": 34,
+    "exact_correct": 9,
+    "pct_exact": 0.2647,
+    "brier": 0.4579,
+    "brier_n": 34,
     "window": 100
   },
   "calibration": [
@@ -37,28 +37,28 @@
       "n": 6
     },
     {
-      "bin_mid": 0.1526,
-      "predicted": 0.1526,
-      "actual": 0.0667,
-      "n": 15
-    },
-    {
-      "bin_mid": 0.2579,
-      "predicted": 0.2579,
-      "actual": 0.2121,
-      "n": 33
-    },
-    {
-      "bin_mid": 0.3437,
-      "predicted": 0.3437,
-      "actual": 0.25,
+      "bin_mid": 0.1521,
+      "predicted": 0.1521,
+      "actual": 0.0625,
       "n": 16
     },
     {
-      "bin_mid": 0.4552,
-      "predicted": 0.4552,
-      "actual": 0.6667,
-      "n": 9
+      "bin_mid": 0.2574,
+      "predicted": 0.2574,
+      "actual": 0.2,
+      "n": 35
+    },
+    {
+      "bin_mid": 0.3417,
+      "predicted": 0.3417,
+      "actual": 0.2353,
+      "n": 17
+    },
+    {
+      "bin_mid": 0.4518,
+      "predicted": 0.4518,
+      "actual": 0.7,
+      "n": 10
     },
     {
       "bin_mid": 0.5312,
@@ -67,10 +67,10 @@
       "n": 3
     },
     {
-      "bin_mid": 0.6366,
-      "predicted": 0.6366,
-      "actual": 0.75,
-      "n": 8
+      "bin_mid": 0.6351,
+      "predicted": 0.6351,
+      "actual": 0.7778,
+      "n": 9
     },
     {
       "bin_mid": 0.7213,
@@ -86,6 +86,30 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-02",
+      "home_team": "United States",
+      "away_team": "Bosnia-Herzegovina",
+      "predicted_winner": "home",
+      "p_winner": 0.6228,
+      "most_likely_score": "2-0",
+      "actual_score": "2-0",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": true
+    },
+    {
+      "date": "2026-07-01",
+      "home_team": "Belgium",
+      "away_team": "Senegal",
+      "predicted_winner": "home",
+      "p_winner": 0.4221,
+      "most_likely_score": "1-1",
+      "actual_score": "3-2",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
     {
       "date": "2026-07-01",
       "home_team": "England",
@@ -301,30 +325,6 @@
       "actual_outcome": "away",
       "hit_1x2": true,
       "exact_hit": true
-    },
-    {
-      "date": "2026-06-26",
-      "home_team": "Senegal",
-      "away_team": "Iraq",
-      "predicted_winner": "home",
-      "p_winner": 0.543,
-      "most_likely_score": "1-0",
-      "actual_score": "5-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false
-    },
-    {
-      "date": "2026-06-26",
-      "home_team": "Norway",
-      "away_team": "France",
-      "predicted_winner": "away",
-      "p_winner": 0.4906,
-      "most_likely_score": "1-1",
-      "actual_score": "1-4",
-      "actual_outcome": "away",
-      "hit_1x2": true,
-      "exact_hit": false
     }
   ]
 }
