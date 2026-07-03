@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-03T19:24:39+00:00",
+  "updated_at": "2026-07-03T22:06:03+00:00",
   "logged_total": 94,
-  "pending": 9,
+  "pending": 8,
   "all_time": {
-    "n": 85,
+    "n": 86,
     "correct_1x2": 53,
-    "pct_1x2": 0.6235,
+    "pct_1x2": 0.6163,
     "decisive_n": 63,
     "decisive_correct": 53,
     "pct_decisive": 0.8413,
-    "exact_n": 37,
+    "exact_n": 38,
     "exact_correct": 9,
-    "pct_exact": 0.2432,
-    "brier": 0.4449,
-    "brier_n": 37
+    "pct_exact": 0.2368,
+    "brier": 0.4514,
+    "brier_n": 38
   },
   "rolling": {
-    "n": 85,
+    "n": 86,
     "correct_1x2": 53,
-    "pct_1x2": 0.6235,
+    "pct_1x2": 0.6163,
     "decisive_n": 63,
     "decisive_correct": 53,
     "pct_decisive": 0.8413,
-    "exact_n": 37,
+    "exact_n": 38,
     "exact_correct": 9,
-    "pct_exact": 0.2432,
-    "brier": 0.4449,
-    "brier_n": 37,
+    "pct_exact": 0.2368,
+    "brier": 0.4514,
+    "brier_n": 38,
     "window": 100
   },
   "calibration": [
@@ -43,22 +43,22 @@
       "n": 17
     },
     {
-      "bin_mid": 0.2551,
-      "predicted": 0.2551,
-      "actual": 0.175,
-      "n": 40
+      "bin_mid": 0.2548,
+      "predicted": 0.2548,
+      "actual": 0.1707,
+      "n": 41
     },
     {
-      "bin_mid": 0.3417,
-      "predicted": 0.3417,
-      "actual": 0.2353,
-      "n": 17
+      "bin_mid": 0.3411,
+      "predicted": 0.3411,
+      "actual": 0.2778,
+      "n": 18
     },
     {
-      "bin_mid": 0.4537,
-      "predicted": 0.4537,
-      "actual": 0.7273,
-      "n": 11
+      "bin_mid": 0.4516,
+      "predicted": 0.4516,
+      "actual": 0.6667,
+      "n": 12
     },
     {
       "bin_mid": 0.5326,
@@ -96,6 +96,18 @@
       "actual_score": "2-0",
       "actual_outcome": "home",
       "hit_1x2": true,
+      "exact_hit": false
+    },
+    {
+      "date": "2026-07-03",
+      "home_team": "Australia",
+      "away_team": "Egypt",
+      "predicted_winner": "home",
+      "p_winner": 0.4286,
+      "most_likely_score": "1-0",
+      "actual_score": "1-1",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
       "exact_hit": false
     },
     {
@@ -312,18 +324,6 @@
       "actual_score": "0-2",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": true
-    },
-    {
-      "date": "2026-06-27",
-      "home_team": "Egypt",
-      "away_team": "Iran",
-      "predicted_winner": "away",
-      "p_winner": 0.3913,
-      "most_likely_score": "1-1",
-      "actual_score": "1-1",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
       "exact_hit": true
     }
   ]

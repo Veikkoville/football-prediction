@@ -2023,7 +2023,15 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-06-27T08:37:42+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 1,
+        "actual_score": "1-1",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-03T22:06:03+00:00"
+      }
     },
     {
       "match_id": "fd-537427",
