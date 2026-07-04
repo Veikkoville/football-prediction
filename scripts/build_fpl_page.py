@@ -44,6 +44,8 @@ BASE = "https://goaliq.app"
 CANONICAL = f"{BASE}/fpl.html"
 PLAY_URL = "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"
 APPSTORE_URL = "https://apps.apple.com/app/id6780047163"
+X_URL = "https://x.com/goaliqapp"
+ORG_ID = BASE + "/#organization"
 
 # FDR-väriasteikko GoalIQ:n kanonisesta brändipaletista (brand-tokens.md,
 # täsmähexit, EI approksimaatioita): 1 helpoin = Teal → Gold → Gold Deep →
@@ -296,6 +298,22 @@ def fdr_grid_html(c: dict) -> str:
 # 3. JSON-LD
 # ---------------------------------------------------------------------------
 def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
+    # Entiteetti-disambiguaatio (GEO): goaliq.app = kanoninen GoalIQ-entiteetti.
+    # Google sekoittaa GoalIQ:n samannimiseen Benisse-appiin + YouTube/IG-tileihin
+    # → Organization + sameAs VAIN virallisiin kanaviin (Play, App Store, X).
+    org = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": ORG_ID,
+        "name": "GoalIQ",
+        "url": BASE + "/",
+        "description": (
+            "GoalIQ is a free football prediction app and analytics publisher "
+            "built by an independent developer in Finland. It runs a Dixon-Coles "
+            "match model with a public, pre-match-logged prediction track record."
+        ),
+        "sameAs": [PLAY_URL, APPSTORE_URL, X_URL],
+    }
     app = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -307,8 +325,9 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "win probability, expected goals (xG) and the most likely score, using "
             "a Dixon-Coles model with an expected-goals ensemble."
         ),
-        "url": PLAY_URL,
-        "sameAs": [APPSTORE_URL],
+        "url": BASE + "/",
+        "downloadUrl": [PLAY_URL, APPSTORE_URL],
+        "author": {"@id": ORG_ID},
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
     }
     faq_ld = {
@@ -340,7 +359,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "isAccessibleForFree": True,
         "dateModified": c["iso_date"],
         "temporalCoverage": "2026-08/2027-05",
-        "creator": {"@type": "Organization", "name": "GoalIQ", "url": BASE + "/"},
+        "creator": {"@id": ORG_ID},
         "keywords": [
             "FPL clean sheets",
             "fixture difficulty rating",
@@ -351,7 +370,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
     }
     return "".join(
         f'<script type="application/ld+json">\n{json.dumps(b, ensure_ascii=False, indent=1)}\n</script>\n'
-        for b in (app, faq_ld, dataset)
+        for b in (org, app, faq_ld, dataset)
     )
 
 
