@@ -1874,6 +1874,24 @@ def model_accuracy(response: Response):
     return load_aggregate()
 
 
+@app.get("/api/fantasy")
+def fantasy_phase0(response: Response):
+    """FPL Phase 0 — clean sheet -% + mallipohjainen FDR per PL-joukkue/GW (free-tier).
+
+    Palauttaa committatun projektion (data/fpl_projections_phase0.json).
+    Projektio rakennetaan ajastetulla refresh-jobilla
+    (scripts/build_fpl_phase0.py, sanity-gaten takana) — tämä endpoint vain
+    lukee tiedoston, EI laskentaa pyynnössä (Render 0.5 vCPU -budjetti).
+    Jos tiedostoa ei ole vielä committattu → available=False-runko.
+
+    Sama no-store-perustelu kuin /api/accuracy (#103): refresh päivittyy
+    palvelinpäästä, välimuistitasot eivät saa tarjota stalea snapshotia.
+    """
+    from src.models.fpl_phase0 import load_phase0
+    response.headers["Cache-Control"] = "no-store"
+    return load_phase0()
+
+
 @app.get("/api/debug/seasons")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """

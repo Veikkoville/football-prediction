@@ -36,6 +36,8 @@ raw_data/
 # Tarkkuus-track-record (#100): ajastettu putki ylläpitää, Render lukee gitistä.
 !/data/prediction_log.json
 !/data/accuracy.json
+# FPL Phase 0 -projektio: ajastettu refresh ylläpitää, Render lukee gitistä (/api/fantasy).
+!/data/fpl_projections_phase0.json
 downloaded_files/
 ~/soccerdata/
 
