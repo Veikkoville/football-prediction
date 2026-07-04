@@ -1,46 +1,46 @@
 {
-  "updated_at": "2026-07-04T02:58:57+00:00",
-  "logged_total": 94,
-  "pending": 7,
+  "updated_at": "2026-07-04T06:26:46+00:00",
+  "logged_total": 96,
+  "pending": 8,
   "all_time": {
-    "n": 87,
-    "correct_1x2": 54,
-    "pct_1x2": 0.6207,
-    "decisive_n": 64,
-    "decisive_correct": 54,
-    "pct_decisive": 0.8438,
-    "exact_n": 39,
+    "n": 88,
+    "correct_1x2": 55,
+    "pct_1x2": 0.625,
+    "decisive_n": 65,
+    "decisive_correct": 55,
+    "pct_decisive": 0.8462,
+    "exact_n": 40,
     "exact_correct": 9,
-    "pct_exact": 0.2308,
-    "brier": 0.4403,
-    "brier_n": 39
+    "pct_exact": 0.225,
+    "brier": 0.4303,
+    "brier_n": 40
   },
   "rolling": {
-    "n": 87,
-    "correct_1x2": 54,
-    "pct_1x2": 0.6207,
-    "decisive_n": 64,
-    "decisive_correct": 54,
-    "pct_decisive": 0.8438,
-    "exact_n": 39,
+    "n": 88,
+    "correct_1x2": 55,
+    "pct_1x2": 0.625,
+    "decisive_n": 65,
+    "decisive_correct": 55,
+    "pct_decisive": 0.8462,
+    "exact_n": 40,
     "exact_correct": 9,
-    "pct_exact": 0.2308,
-    "brier": 0.4403,
-    "brier_n": 39,
+    "pct_exact": 0.225,
+    "brier": 0.4303,
+    "brier_n": 40,
     "window": 100
   },
   "calibration": [
     {
-      "bin_mid": 0.0729,
-      "predicted": 0.0729,
+      "bin_mid": 0.0689,
+      "predicted": 0.0689,
       "actual": 0.0,
-      "n": 8
+      "n": 9
     },
     {
-      "bin_mid": 0.1495,
-      "predicted": 0.1495,
-      "actual": 0.0588,
-      "n": 17
+      "bin_mid": 0.1476,
+      "predicted": 0.1476,
+      "actual": 0.0556,
+      "n": 18
     },
     {
       "bin_mid": 0.2548,
@@ -79,13 +79,25 @@
       "n": 5
     },
     {
-      "bin_mid": 0.8643,
-      "predicted": 0.8643,
+      "bin_mid": 0.8586,
+      "predicted": 0.8586,
       "actual": 1.0,
-      "n": 2
+      "n": 3
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-04",
+      "home_team": "Colombia",
+      "away_team": "Ghana",
+      "predicted_winner": "home",
+      "p_winner": 0.8472,
+      "most_likely_score": "2-0",
+      "actual_score": "1-0",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
     {
       "date": "2026-07-03",
       "home_team": "Switzerland",
@@ -312,18 +324,6 @@
       "actual_score": "0-0",
       "actual_outcome": "draw",
       "hit_1x2": false,
-      "exact_hit": false
-    },
-    {
-      "date": "2026-06-27",
-      "home_team": "Croatia",
-      "away_team": "Ghana",
-      "predicted_winner": "home",
-      "p_winner": 0.7495,
-      "most_likely_score": "2-0",
-      "actual_score": "2-1",
-      "actual_outcome": "home",
-      "hit_1x2": true,
       "exact_hit": false
     }
   ]
