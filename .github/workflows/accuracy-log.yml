@@ -80,11 +80,26 @@ jobs:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
         run: python -m scripts.accuracy_pipeline run
 
+      # Recent-form-sync (4.7.→, Villen GO): täytä pelattujen knockouttien
+      # FT-tulokset international_results.csv:n NA-fixtureihin (sama FD-lähde
+      # ja tahti kuin reconcile yllä) → /api/team last_5/form pysyy tuoreena
+      # turnauksen loppuun. Fill/append-only (regen-suoja skriptissä).
+      # continue-on-error: results-sync ei saa kaataa accuracy-lokia.
+      # HUOM: wc-knockout-refresh (8.7 QF) kirjoittaa samaa CSV:tä — alla oleva
+      # rebase-retry hoitaa kilpailun; konfliktissa tämä ajo skippaa ja
+      # seuraava 3 h -tikki paikkaa. Post-WC (20.7.→) step on no-op (ei uusia
+      # WC-otteluita) — voi siivota pois turnauksen jälkeen.
+      - name: Backfill knockout FT results (recent-form)
+        continue-on-error: true
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+        run: python -m scripts.backfill_knockout_results
+
       - name: Commit + push to main (Render auto-deploy → /api/accuracy)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/prediction_log.json data/accuracy.json
+          git add data/prediction_log.json data/accuracy.json data/international_results.csv
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
             exit 0
