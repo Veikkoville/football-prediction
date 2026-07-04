@@ -3,11 +3,16 @@
 > GoalIQ is an AI football prediction app. It uses a Dixon-Coles statistical model with a machine-learning expected-goals (xG) ensemble to estimate win, draw and win probability, expected goals and the most likely scoreline for any match. It is an analytics and entertainment tool, not a betting service.
 
 ## World Cup 2026 predictions
-- [World Cup 2026 predictions, all 12 groups](https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html): GoalIQ's model win probability, expected goals (xG) and most likely score for every World Cup 2026 group-stage match.
+- [World Cup 2026 predictions, all 12 groups](https://goaliq.app/world-cup-2026-predictions.html): GoalIQ's model win probability, expected goals (xG) and most likely score for every World Cup 2026 group-stage match.
 - Per-group pages: world-cup-2026-group-a-predictions.html through world-cup-2026-group-l-predictions.html cover each group's matches, probabilities and scorelines.
 
+## FPL clean sheet odds and fixture difficulty (Premier League 2026/27)
+- [FPL Clean Sheet Odds and Fixture Difficulty](https://goaliq.app/fpl.html): GoalIQ's model clean sheet probability for every Premier League team and a model fixture difficulty rating (1 to 5, lower is easier) for the next six gameweeks. Baked into static HTML, updated every gameweek. Free.
+- GoalIQ's FDR is derived from the match model's win and clean sheet probabilities. It is independent of the official FPL fixture difficulty.
+- The page includes GoalIQ's published prediction track record: every prediction is logged before kickoff, hits and misses.
+
 ## About GoalIQ
-- [GoalIQ home](https://veikkoville.github.io/football-prediction/)
+- [GoalIQ home](https://goaliq.app/)
 - [Get the app on Google Play (free, Android)](https://play.google.com/store/apps/details?id=com.veikkoville.goaliq)
 - Method: a Dixon-Coles statistical model combined with a machine-learning xG ensemble, trained on thousands of real international and club matches. World Cup predictions are computed on a neutral-venue basis and refresh as the tournament progresses.
 

@@ -6,25 +6,25 @@
 <title>GoalIQ — AI Football Predictions</title>
 <meta name="description" content="GoalIQ predicts win probability, expected goals and the most likely scorelines for Europe's top leagues, the Champions League and the 2026 World Cup. Free on Google Play." />
 <meta name="google-site-verification" content="cDKUnkdbiFULwQFPp9ws_mlwsmAA4CLT5xpmQP9x5Kw" />
-<link rel="canonical" href="https://veikkoville.github.io/football-prediction/" />
+<link rel="canonical" href="https://goaliq.app/" />
 
 <!-- Open Graph / social preview -->
 <meta property="og:title" content="GoalIQ — AI Football Predictions" />
 <meta property="og:description" content="Pick two teams. GoalIQ predicts the match with AI — probabilities, xG and scorelines. Built for the 2026 World Cup." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://veikkoville.github.io/football-prediction/" />
+<meta property="og:url" content="https://goaliq.app/" />
 
 <style>
   :root {
-    --bg: #0c1118;
-    --bg-alt: #121a25;
-    --card: #182230;
-    --line: #243040;
-    --text: #e7edf4;
-    --muted: #93a2b5;
-    --green: #2fd47a;
-    --green-dim: #1f9a59;
-    --violet: #8b7dff;
+    --bg: #0A0820;
+    --bg-alt: #140F1E;
+    --card: rgba(255,255,255,0.05);
+    --line: rgba(255,255,255,0.10);
+    --text: #FFF6EC;
+    --muted: #C9C3DA;
+    --green: #FF2E7E;
+    --green-dim: #D6006E;
+    --violet: #19E3D2;
     --radius: 16px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,6 +41,8 @@
   h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
   a { color: inherit; }
 
+  .bar { height: 6px; background: var(--green); }
+
   /* Nav */
   nav {
     display: flex; align-items: center; justify-content: space-between;
@@ -51,18 +53,18 @@
     width: 32px; height: 32px; border-radius: 9px;
     background: linear-gradient(135deg, var(--green), var(--green-dim));
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 900; color: #07120b;
+    font-size: 18px; font-weight: 900; color: #ffffff;
   }
   .nav-cta {
-    background: var(--green); color: #07120b; font-weight: 700;
+    background: var(--green); color: #ffffff; font-weight: 700;
     padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px;
   }
 
   /* Hero */
   .hero { padding: 64px 0 72px; text-align: center; }
   .badge {
-    display: inline-block; background: rgba(139,125,255,0.14);
-    color: var(--violet); border: 1px solid rgba(139,125,255,0.35);
+    display: inline-block; background: rgba(25,227,210,0.12);
+    color: var(--violet); border: 1px solid rgba(25,227,210,0.35);
     padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
     margin-bottom: 24px;
   }
@@ -71,11 +73,11 @@
   .hero p.sub { font-size: 19px; color: var(--muted); max-width: 600px; margin: 0 auto 36px; }
   .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
   .btn-primary {
-    background: var(--green); color: #07120b; font-weight: 800; font-size: 16px;
+    background: var(--green); color: #ffffff; font-weight: 800; font-size: 16px;
     padding: 16px 30px; border-radius: 999px; text-decoration: none;
     display: inline-flex; align-items: center; gap: 10px;
   }
-  .btn-primary:hover { background: #43e58c; }
+  .btn-primary:hover { background: #FF4D90; }
   .btn-ghost {
     color: var(--text); font-weight: 600; font-size: 15px;
     padding: 16px 22px; border-radius: 999px; text-decoration: none;
@@ -97,7 +99,7 @@
 
   /* World Cup band */
   .wc {
-    background: linear-gradient(135deg, #1a1430, #131a26);
+    background: linear-gradient(135deg, #140F1E, #0A0820);
     border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
   }
   .wc .wc-inner { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
@@ -106,7 +108,7 @@
   .wc p { color: var(--muted); font-size: 16px; margin-bottom: 10px; }
   .wc .kickoff {
     margin-top: 22px; display: inline-flex; align-items: center; gap: 10px;
-    background: rgba(139,125,255,0.12); border: 1px solid rgba(139,125,255,0.3);
+    background: rgba(25,227,210,0.12); border: 1px solid rgba(25,227,210,0.3);
     padding: 12px 18px; border-radius: 12px; font-weight: 600; color: var(--violet);
   }
   .wc-visual {
@@ -117,7 +119,7 @@
   .matchrow .team { font-weight: 700; font-size: 15px; }
   .prob-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 16px 0 8px; }
   .prob-bar .home { background: var(--green); }
-  .prob-bar .draw { background: #3a4862; }
+  .prob-bar .draw { background: #3A3550; }
   .prob-bar .away { background: var(--violet); }
   .prob-legend { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 
@@ -131,7 +133,7 @@
     padding: 28px;
   }
   .step .n {
-    width: 38px; height: 38px; border-radius: 10px; background: rgba(47,212,122,0.14);
+    width: 38px; height: 38px; border-radius: 10px; background: rgba(255,46,126,0.14);
     color: var(--green); font-weight: 800; display: flex; align-items: center;
     justify-content: center; margin-bottom: 16px; font-size: 17px;
   }
@@ -148,7 +150,7 @@
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 12px 22px; font-weight: 600; font-size: 15px;
   }
-  .league-chip.wc-chip { border-color: rgba(139,125,255,0.5); color: var(--violet); }
+  .league-chip.wc-chip { border-color: rgba(25,227,210,0.5); color: var(--violet); }
 
   /* Features */
   .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -163,8 +165,8 @@
   /* Premium */
   .premium { background: var(--bg-alt); }
   .premium-card {
-    background: linear-gradient(135deg, #182230, #1d1838);
-    border: 1px solid rgba(139,125,255,0.35); border-radius: 22px;
+    background: linear-gradient(135deg, #140F1E, #0A0820);
+    border: 1px solid rgba(25,227,210,0.35); border-radius: 22px;
     padding: 44px; max-width: 640px; margin: 0 auto; text-align: center;
   }
   .premium-card .price { font-size: 44px; font-weight: 800; margin: 8px 0; }
@@ -190,10 +192,10 @@
   }
   .wl-form input[type=email]:focus { outline: none; border-color: var(--green); }
   .wl-form button {
-    background: var(--green); color: #07120b; font-weight: 800; font-size: 15px;
+    background: var(--green); color: #ffffff; font-weight: 800; font-size: 15px;
     border: none; padding: 14px 26px; border-radius: 12px; cursor: pointer;
   }
-  .wl-form button:hover { background: #43e58c; }
+  .wl-form button:hover { background: #FF4D90; }
 
   /* Footer */
   footer { border-top: 1px solid var(--line); padding: 40px 0; }
@@ -213,6 +215,7 @@
 </head>
 <body>
 
+<div class="bar"></div>
 <div class="wrap">
   <nav>
     <div class="logo"><span class="logo-mark">G</span> GoalIQ</div>
@@ -245,7 +248,7 @@
       <h2>The <span class="accent">World Cup 2026</span>, predicted</h2>
       <p>GoalIQ's tournament model is trained on past World Cup data and recalibrated for 2026 — neutral-venue, no home advantage.</p>
       <p>Coverage grows as the tournament unfolds and more teams play their first matches.</p>
-      <p><a href="https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html" style="color:var(--violet);font-weight:700;">See every Matchday 1 prediction →</a></p>
+      <p><a href="world-cup-2026-predictions.html" style="color:var(--violet);font-weight:700;">See every Matchday 1 prediction →</a></p>
       <div class="kickoff">📅 Kick-off — June 11, 2026</div>
     </div>
     <div class="wc-visual">
@@ -368,11 +371,13 @@
   <div class="wrap foot-inner">
     <div>© 2026 GoalIQ · Made in Lahti, Finland 🇫🇮</div>
     <div>
-      <a href="https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html">World Cup 2026 predictions</a>
+      <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a>
       &nbsp;·&nbsp;
-      <a href="https://veikkoville.github.io/football-prediction/privacy.html">Privacy</a>
+      <a href="fpl.html">FPL clean sheets &amp; FDR</a>
       &nbsp;·&nbsp;
-      <a href="https://veikkoville.github.io/football-prediction/faq.html">FAQ</a>
+      <a href="privacy.html">Privacy</a>
+      &nbsp;·&nbsp;
+      <a href="faq.html">FAQ</a>
       &nbsp;·&nbsp;
       <a href="#get">Get the app</a>
     </div>

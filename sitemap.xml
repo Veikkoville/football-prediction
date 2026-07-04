@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://veikkoville.github.io/football-prediction/</loc>
+    <loc>https://goaliq.app/</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html</loc>
+    <loc>https://goaliq.app/world-cup-2026-predictions.html</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-round-of-32-predictions.html</loc><lastmod>2026-06-28</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-a-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-b-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-c-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-d-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-e-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-f-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-g-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-h-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-i-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-j-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-k-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://veikkoville.github.io/football-prediction/world-cup-2026-group-l-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-round-of-32-predictions.html</loc><lastmod>2026-06-28</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-a-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-b-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-c-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-d-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-e-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-f-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-g-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-h-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-i-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-j-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-k-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://goaliq.app/world-cup-2026-group-l-predictions.html</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
   <url>
-    <loc>https://veikkoville.github.io/football-prediction/faq.html</loc>
+    <loc>https://goaliq.app/faq.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://veikkoville.github.io/football-prediction/privacy.html</loc>
+    <loc>https://goaliq.app/privacy.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://veikkoville.github.io/football-prediction/delete-account.html</loc>
+    <loc>https://goaliq.app/delete-account.html</loc>
     <lastmod>2026-06-09</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://goaliq.app/fpl.html</loc>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>

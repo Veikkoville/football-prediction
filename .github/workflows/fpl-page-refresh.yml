@@ -1,0 +1,84 @@
+# FPL-landing-sivun (fpl.html) viikoittainen data-refresh — SEO/GEO-freshness.
+#
+# MIKSI: fpl.html:n taulut (CS% + FDR) ja track record on BAKATTU staattiseen
+# HTML:ään (crawlerit + AI-moottorit lukevat initial HTML:n, ei JS-fetchiä).
+# Tämä workflow regeneroi sivun mainissa olevasta datasta ja committaa →
+# GitHub Pages servaa tuoreen version. Tuore sisältö = SEO/GEO-freshness-signaali.
+#
+# DATAKETJU (ei laskentaa täällä, stdlib-only, ei pip installia):
+#   - data/fpl_projections_phase0.json: Villen lokaali Task Scheduler
+#     (GoalIQ-FPL-Phase0-refresh, ma 09:00 EEST) buildaa + Ville pushaa
+#     manuaalisesti (builderissa EI auto-pushia, sanity-gate).
+#   - data/accuracy.json: accuracy-log.yml päivittää mainiin 3 h välein.
+#   → Tämä ajo (ma 09:30 UTC) poimii tuoreimman mainista. Vaikka FPL-JSON ei
+#     olisi päivittynyt, track record + lastmod päivittyvät viikoittain.
+#
+# FAIL-SAFE: build_fpl_page.py exit 2 jos FPL-data ei available / sanity_gate
+# FAIL → sivua ei kirjoiteta, vanha jää voimaan. continue-on-error alla estää
+# workflow-failure-spämmin; commit-step on diff-vartioitu.
+#
+# HUOM: [skip ci] commit-viestissä — data-commit, ei CI-tarvetta, ja Render
+# ignoroi (fpl.html ei kuulu API:in). Rebase-retry sama kuin accuracy-log.yml
+# (main jaettu accuracy-login kanssa).
+
+name: fpl-page-refresh
+
+on:
+  schedule:
+    # Ma 09:30 UTC — Villen lokaalin FPL-refreshin (ma 09:00 EEST = 06:00 UTC)
+    # ja mahdollisen manuaalipushin jälkeen. Best-effort, voi driftata.
+    - cron: "30 9 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fpl-page-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  bake-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Stdlib-only — EI pip installia (nopea, ei riippuvuusriskiä).
+      - name: Bake fpl.html from repo data
+        continue-on-error: true
+        run: python scripts/build_fpl_page.py
+
+      - name: Commit + push to main (Pages serves fresh page)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fpl.html sitemap.xml
+          if git diff --cached --quiet; then
+            echo "Ei muutoksia (data ennallaan tai bake fail-safe) — ohitetaan commit."
+            exit 0
+          fi
+          git commit -m "geo(fpl): weekly FPL-landing data refresh [skip ci]"
+          for i in 1 2 3 4 5; do
+            git fetch origin main || true
+            if git rebase origin/main; then
+              if git push origin HEAD:main; then
+                echo "Pushed to main (yritys $i) → Pages päivittyy."
+                exit 0
+              fi
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
+            echo "Push-yritys $i epäonnistui (kilpailu?) — rebase + retry."
+            sleep 5
+          done
+          echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
+          exit 1

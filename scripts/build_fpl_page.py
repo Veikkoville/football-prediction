@@ -1,0 +1,635 @@
+"""
+FPL-landing-sivun (fpl.html) bake-builderi — SEO + GEO (#SEO-runway, 4.7.2026).
+
+Generoi KOKO staattisen fpl.html:n repossa olevasta datasta:
+  - data/fpl_projections_phase0.json  (sama tiedosto jonka /api/fantasy servaa;
+    builderi scripts/build_fpl_phase0.py, sanity-gaten takana)
+  - data/accuracy.json                (sama jonka /api/accuracy servaa;
+    accuracy-log.yml päivittää mainiin 3 h välein)
+
+MIKSI staattinen bake eikä client-JS-fetch: crawlerit + AI-vastausmoottorit
+(GPTBot, PerplexityBot, ClaudeBot) lukevat initial HTML:n — JS-renderöity data
+jää usein indeksoimatta, ja GEO vaatii tekstiksi purettavat taulut.
+
+STDLIB-ONLY (json, datetime, html, re, pathlib) — GH Actions -refresh
+(fpl-page-refresh.yml) ajaa tämän ilman pip installia.
+
+Fail-safe: jos FPL-data ei ole available tai sanity_gate != PASS → exit 2,
+sivua EI kirjoiteta (vanha versio jää voimaan). Sama konventio kuin
+build_fpl_phase0.py.
+
+Päivittää myös sitemap.xml:n fpl.html-entryn <lastmod>-arvon.
+EI auto-pushia: git-komennot tulostetaan (workflow hoitaa commitin).
+"""
+
+from __future__ import annotations
+
+import datetime as _dt
+import json
+import re
+import sys
+from html import escape
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+FPL_PATH = ROOT / "data" / "fpl_projections_phase0.json"
+ACC_PATH = ROOT / "data" / "accuracy.json"
+OUT_PATH = ROOT / "fpl.html"
+SITEMAP_PATH = ROOT / "sitemap.xml"
+
+# Custom domain (goaliq.app, Cloudflare, rekisteröity 4.7.2026). GitHub Pages
+# servaa CNAME:n kautta juuresta → EI /football-prediction-polkuprefiksiä.
+# Vanhat veikkoville.github.io/football-prediction/* -URLit redirectaavat.
+BASE = "https://goaliq.app"
+CANONICAL = f"{BASE}/fpl.html"
+PLAY_URL = "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"
+APPSTORE_URL = "https://apps.apple.com/app/id6780047163"
+
+# FDR-väriasteikko GoalIQ:n kanonisesta brändipaletista (brand-tokens.md,
+# täsmähexit, EI approksimaatioita): 1 helpoin = Teal → Gold → Gold Deep →
+# Coral → 5 vaikein = Magenta Deep. Tekstiväri kontrastin mukaan (1-4 ink,
+# 5 valkoinen) — arvot CSS:ssä.
+FDR_COLORS = {1: "#19E3D2", 2: "#FFC93C", 3: "#F4A800", 4: "#FF6A3D", 5: "#D6006E"}
+
+
+# ---------------------------------------------------------------------------
+# 1. Data
+# ---------------------------------------------------------------------------
+def load_data() -> tuple[dict, dict]:
+    fpl = json.loads(FPL_PATH.read_text(encoding="utf-8"))
+    acc = json.loads(ACC_PATH.read_text(encoding="utf-8"))
+    meta = fpl.get("meta", {})
+    if not meta.get("available", False):
+        print("FAIL: FPL-data ei available — sivua ei kirjoiteta.")
+        sys.exit(2)
+    if meta.get("sanity_gate") != "PASS":
+        print("FAIL: FPL sanity_gate != PASS — sivua ei kirjoiteta.")
+        sys.exit(2)
+    if not fpl.get("teams") or not fpl.get("fixtures"):
+        print("FAIL: FPL-datasta puuttuu teams/fixtures — sivua ei kirjoiteta.")
+        sys.exit(2)
+    return fpl, acc
+
+
+def fmt_pct(x: float, decimals: int = 1) -> str:
+    return f"{x:.{decimals}f}".rstrip("0").rstrip(".") + "%"
+
+
+def gw_date_label(fixtures: list[dict], gw: int) -> str:
+    """Aikaisimman kickoffin päivämäärä, esim. 'Friday 21 August 2026'."""
+    gws = [f for f in fixtures if f.get("gameweek") == gw and f.get("kickoff_ms")]
+    if not gws:
+        return ""
+    first = min(gws, key=lambda f: f["kickoff_ms"])
+    dt = _dt.datetime.fromtimestamp(first["kickoff_ms"] / 1000, tz=_dt.timezone.utc)
+    return dt.strftime("%A %d %B %Y").replace(" 0", " ")
+
+
+def build_context(fpl: dict, acc: dict) -> dict:
+    meta = fpl["meta"]
+    teams = fpl["teams"]
+    fixtures = fpl["fixtures"]
+    next_gw = meta.get("next_gameweek") or min(
+        f["gameweek"] for f in fixtures if f.get("gameweek")
+    )
+
+    # CS-taulun rivit: per joukkue, next_gw:n fixture
+    cs_rows = []
+    for t in teams:
+        fx = next((f for f in t["fixtures"] if f["gw"] == next_gw), None)
+        if not fx:
+            continue
+        cs_rows.append(
+            {
+                "team": t["name"],
+                "cs_pct": fx["cs_pct"],
+                "opponent": fx["opponent"],
+                "venue": fx["venue"],
+                "fdr": fx["fdr"],
+            }
+        )
+    cs_rows.sort(key=lambda r: r["cs_pct"], reverse=True)
+
+    # FDR-gridin rivit: per joukkue, kaikki horisontin GW:t
+    gws = sorted({f["gw"] for t in teams for f in t["fixtures"]})
+    fdr_rows = []
+    for t in teams:
+        by_gw = {f["gw"]: f for f in t["fixtures"]}
+        fdr_rows.append(
+            {
+                "team": t["name"],
+                "cells": [by_gw.get(g) for g in gws],
+                "avg_fdr": t["next_avg_fdr"],
+                "avg_cs": t["next_avg_cs_pct"],
+            }
+        )
+    fdr_rows.sort(key=lambda r: r["avg_fdr"])
+
+    # Track record (/api/accuracy-datan peili)
+    at = acc.get("all_time", {})
+    n = at.get("n", 0)
+    pct_1x2 = at.get("pct_1x2", 0.0) * 100
+    dec_n = at.get("decisive_n", 0)
+    dec_c = at.get("decisive_correct", 0)
+    pct_dec = at.get("pct_decisive", 0.0) * 100
+    logged = acc.get("logged_total", n)
+
+    gen_dt = _dt.datetime.fromisoformat(meta["generated_at"])
+    acc_dt = _dt.datetime.fromisoformat(acc["updated_at"])
+
+    return {
+        "season": meta.get("season", "2026/27"),
+        "next_gw": next_gw,
+        "gw_label": gw_date_label(fixtures, next_gw),
+        "cs_rows": cs_rows,
+        "fdr_rows": fdr_rows,
+        "gws": gws,
+        "top3": cs_rows[:3],
+        "acc_n": n,
+        "acc_pct_1x2": pct_1x2,
+        "acc_dec_n": dec_n,
+        "acc_dec_c": dec_c,
+        "acc_pct_dec": pct_dec,
+        "acc_logged": logged,
+        "data_date": gen_dt.strftime("%d %B %Y").lstrip("0"),
+        "acc_date": acc_dt.strftime("%d %B %Y").lstrip("0"),
+        "iso_date": max(gen_dt.date(), acc_dt.date()).isoformat(),
+        "fixture_source": meta.get("fixture_source", "premierleague.com"),
+    }
+
+
+# ---------------------------------------------------------------------------
+# 2. Sisältöpalat (copy + data → HTML ja plain-tekstiversiot GEO/JSON-LD:hen)
+# ---------------------------------------------------------------------------
+def venue_txt(v: str) -> str:
+    return "home" if v == "H" else "away"
+
+
+def track_record_sentences(c: dict) -> list[str]:
+    """Sitaatinkelpoiset faktalauseet, käytetään sekä sivulla että FAQ:ssa."""
+    return [
+        (
+            f"The GoalIQ model logged {c['acc_logged']} pre-match predictions "
+            f"live during the 2026 World Cup, before kickoff, with no edits afterwards."
+        ),
+        (
+            f"Across the {c['acc_n']} matches already played, the model called the "
+            f"result correctly in {fmt_pct(c['acc_pct_1x2'])} of matches."
+        ),
+        (
+            f"When the model named a clear winner rather than a draw, it was right "
+            f"{fmt_pct(c['acc_pct_dec'])} of the time ({c['acc_dec_c']} of {c['acc_dec_n']})."
+        ),
+    ]
+
+
+def build_faq(c: dict) -> list[tuple[str, str]]:
+    """(kysymys, vastaus-plain) -parit. Sama teksti näkyvään FAQ:hun ja JSON-LD:hen."""
+    top3 = c["top3"]
+    top3_txt = "; ".join(
+        f"{r['team']} at {fmt_pct(r['cs_pct'])} ({venue_txt(r['venue'])} against {r['opponent']})"
+        for r in top3
+    )
+    tr = track_record_sentences(c)
+    return [
+        (
+            f"Which teams are most likely to keep a clean sheet in Gameweek {c['next_gw']}?",
+            (
+                f"On GoalIQ's model the top clean sheet chances in Gameweek {c['next_gw']} "
+                f"of the {c['season']} Premier League season are {top3_txt}. "
+                f"These are pre-season projections and will sharpen once {c['season']} "
+                f"results arrive."
+            ),
+        ),
+        (
+            "What is fixture difficulty rating (FDR)?",
+            (
+                "GoalIQ's fixture difficulty rating comes from the match model's win "
+                "and clean sheet probabilities, on a 1 to 5 scale. A lower number is "
+                "an easier fixture. It is model-derived and independent of the "
+                "official FPL fixture difficulty."
+            ),
+        ),
+        (
+            "Is GoalIQ free?",
+            (
+                "Yes. Clean sheet odds and fixture difficulty are free, on the web "
+                "and in the GoalIQ app for Android and iOS."
+            ),
+        ),
+        (
+            "How accurate is the GoalIQ model?",
+            (
+                f"{tr[0]} {tr[1]} {tr[2]} "
+                "Every prediction is logged, hits and misses."
+            ),
+        ),
+        (
+            "Does GoalIQ give betting tips?",
+            (
+                "No. GoalIQ publishes model predictions and analytics, not betting "
+                "advice. It is not a gambling service and has no odds or bookmaker links."
+            ),
+        ),
+    ]
+
+
+def cs_table_html(c: dict) -> str:
+    rows = []
+    for r in c["cs_rows"]:
+        fdr = r["fdr"]
+        rows.append(
+            "<tr>"
+            f'<td class="team">{escape(r["team"])}</td>'
+            f'<td class="num">{fmt_pct(r["cs_pct"])}</td>'
+            f'<td>{escape(r["opponent"])} ({r["venue"]})</td>'
+            f'<td class="num"><span class="fdr fdr{fdr}">{fdr}</span></td>'
+            "</tr>"
+        )
+    return (
+        '<div class="scroll"><table>'
+        f"<caption>Model clean sheet probability for every Premier League team, "
+        f"Gameweek {c['next_gw']}, {c['season']} season. Sorted by clean sheet chance.</caption>"
+        "<thead><tr>"
+        '<th scope="col">Team</th><th scope="col" class="num">Clean sheet %</th>'
+        '<th scope="col">Next opponent</th><th scope="col" class="num">FDR</th>'
+        "</tr></thead><tbody>"
+        + "".join(rows)
+        + "</tbody></table></div>"
+    )
+
+
+def fdr_grid_html(c: dict) -> str:
+    head = "".join(f'<th scope="col" class="num">GW{g}</th>' for g in c["gws"])
+    rows = []
+    for r in c["fdr_rows"]:
+        cells = []
+        for fx in r["cells"]:
+            if fx is None:
+                cells.append('<td class="num">-</td>')
+            else:
+                cells.append(
+                    f'<td class="num"><span class="fdr fdr{fx["fdr"]}" '
+                    f'title="{escape(fx["opponent"])} ({fx["venue"]})">'
+                    f'{escape(fx["opponent_short"])} {fx["fdr"]}</span></td>'
+                )
+        rows.append(
+            "<tr>"
+            f'<td class="team">{escape(r["team"])}</td>'
+            + "".join(cells)
+            + f'<td class="num"><strong>{r["avg_fdr"]:.2f}</strong></td>'
+            "</tr>"
+        )
+    return (
+        '<div class="scroll"><table>'
+        f"<caption>Model fixture difficulty (1 easiest, 5 hardest) for the next "
+        f"{len(c['gws'])} gameweeks, with opponent and average. Sorted by easiest run.</caption>"
+        "<thead><tr>"
+        '<th scope="col">Team</th>' + head + '<th scope="col" class="num">Avg</th>'
+        "</tr></thead><tbody>"
+        + "".join(rows)
+        + "</tbody></table></div>"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 3. JSON-LD
+# ---------------------------------------------------------------------------
+def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
+    app = {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "GoalIQ: Football Predictions",
+        "operatingSystem": "Android, iOS",
+        "applicationCategory": "SportsApplication",
+        "description": (
+            "Free football prediction app. Pick any two teams and GoalIQ predicts "
+            "win probability, expected goals (xG) and the most likely score, using "
+            "a Dixon-Coles model with an expected-goals ensemble."
+        ),
+        "url": PLAY_URL,
+        "sameAs": [APPSTORE_URL],
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    }
+    faq_ld = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": q,
+                "acceptedAnswer": {"@type": "Answer", "text": a},
+            }
+            for q, a in faq
+        ],
+    }
+    dataset = {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": (
+            f"GoalIQ FPL clean sheet odds and fixture difficulty, "
+            f"Premier League {c['season']}"
+        ),
+        "description": (
+            f"Model clean sheet probability for every Premier League team and a "
+            f"model fixture difficulty rating (1 to 5) for the next {len(c['gws'])} "
+            f"gameweeks of the {c['season']} season, from GoalIQ's Dixon-Coles "
+            f"match model. Updated every gameweek."
+        ),
+        "url": CANONICAL,
+        "isAccessibleForFree": True,
+        "dateModified": c["iso_date"],
+        "temporalCoverage": "2026-08/2027-05",
+        "creator": {"@type": "Organization", "name": "GoalIQ", "url": BASE + "/"},
+        "keywords": [
+            "FPL clean sheets",
+            "fixture difficulty rating",
+            "Premier League predictions",
+            "clean sheet odds",
+            "FDR",
+        ],
+    }
+    return "".join(
+        f'<script type="application/ld+json">\n{json.dumps(b, ensure_ascii=False, indent=1)}\n</script>\n'
+        for b in (app, faq_ld, dataset)
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4. Sivu
+# ---------------------------------------------------------------------------
+# Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) — täsmähexit.
+# Hero = tumma (Ink) + magenta, sisältö = vaalea (Cream/Paper) + ink-teksti.
+CSS = """
+  :root{ --magenta:#FF2E7E; --magenta-deep:#D6006E; --coral:#FF6A3D; --gold:#FFC93C; --gold-deep:#F4A800; --teal:#19E3D2; --ink:#0A0820; --ink2:#140F1E; --cream:#FFF6EC; --paper:#F6F4FF; --ink-muted:#54506B; --hero-muted:#C9C3DA; --line:#E7DDCF; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--cream); color:var(--ink); line-height:1.6; font-size:17px; }
+  .dark{ background:linear-gradient(165deg,var(--ink2),var(--ink)); color:var(--cream); }
+  .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
+  .bar{ height:6px; background:var(--magenta); }
+  .nav{ max-width:960px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .brand{ font-size:24px; font-weight:800; letter-spacing:.5px; }
+  .brand a{ color:#fff; text-decoration:none; }
+  .brand span{ color:var(--magenta); }
+  .cta{ display:inline-block; background:var(--magenta); color:#fff; text-decoration:none; padding:14px 24px; border-radius:30px; font-weight:800; min-height:48px; }
+  .cta:hover{ background:var(--magenta-deep); }
+  .cta.secondary{ background:transparent; border:2px solid var(--magenta); color:inherit; }
+  .cta-row{ display:flex; flex-wrap:wrap; gap:12px; margin:26px 0 8px; }
+  .hero{ padding:44px 0 52px; }
+  .hero h1{ font-size:36px; line-height:1.15; margin:0 0 14px; color:#fff; }
+  .hero .lede{ font-size:19px; color:var(--hero-muted); max-width:720px; }
+  .hero .meta,.hero .note{ color:var(--hero-muted); }
+  .meta{ font-size:14px; margin-top:10px; }
+  .note{ color:var(--ink-muted); font-size:14px; }
+  h2{ font-size:25px; margin:54px 0 10px; }
+  .content{ padding-bottom:70px; }
+  .content a{ color:var(--magenta-deep); }
+  .content a.cta{ color:#fff; }
+  .content a.cta.secondary{ color:var(--ink); }
+  .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:4px 12px 10px; }
+  table{ width:100%; border-collapse:collapse; min-width:560px; }
+  caption{ caption-side:bottom; color:var(--ink-muted); font-size:13px; text-align:left; padding:10px 2px 4px; }
+  th,td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); font-size:15px; }
+  tbody tr:last-child td{ border-bottom:none; }
+  th{ color:var(--ink-muted); font-weight:600; font-size:13px; }
+  th.num,td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.team{ font-weight:700; white-space:nowrap; }
+  .fdr{ display:inline-block; min-width:34px; padding:3px 8px; border-radius:8px; color:var(--ink); font-weight:700; text-align:center; font-size:13px; }
+  .fdr1{ background:#19E3D2; } .fdr2{ background:#FFC93C; } .fdr3{ background:#F4A800; } .fdr4{ background:#FF6A3D; } .fdr5{ background:#D6006E; color:#fff; }
+  .legend{ color:var(--ink-muted); font-size:14px; margin:8px 0 0; }
+  .stat-row{ display:flex; flex-wrap:wrap; gap:14px; margin:18px 0; }
+  .stat{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:16px 20px; flex:1 1 180px; }
+  .stat b{ display:block; font-size:30px; color:var(--magenta-deep); font-variant-numeric:tabular-nums; }
+  .stat span{ color:var(--ink-muted); font-size:14px; }
+  .faq dt{ font-weight:700; margin-top:20px; }
+  .faq dd{ margin:6px 0 0; }
+  .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:12px; padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
+  footer{ padding:30px 0 40px; font-size:14px; }
+  footer .wrap{ color:var(--hero-muted); }
+  footer a{ color:var(--cream); }
+  footer a:hover{ color:var(--magenta); }
+  @media (max-width:640px){ .hero h1{ font-size:29px; } .hero .lede{ font-size:17px; } .nav{ padding:14px 16px; } .hero{ padding:30px 0 40px; } }
+"""
+
+
+def render_page(c: dict) -> str:
+    faq = build_faq(c)
+    tr = track_record_sentences(c)
+    jsonld = jsonld_blocks(c, faq)
+    cs_table = cs_table_html(c)
+    fdr_grid = fdr_grid_html(c)
+
+    title = "FPL Clean Sheet Odds and Fixture Difficulty – GoalIQ Model Predictions"
+    meta_desc = (
+        "Clean sheet odds and fixture difficulty for every Premier League team, "
+        "from GoalIQ's match model. Updated every gameweek. Free, with a public track record."
+    )
+
+    faq_html = "".join(
+        f"<dt>{escape(q)}</dt><dd>{escape(a)}</dd>" for q, a in faq
+    )
+
+    stats = (
+        '<div class="stat-row">'
+        f'<div class="stat"><b>{fmt_pct(c["acc_pct_1x2"])}</b>'
+        f'<span>correct results across {c["acc_n"]} completed predictions</span></div>'
+        f'<div class="stat"><b>{fmt_pct(c["acc_pct_dec"])}</b>'
+        f'<span>hit rate when the model called a winner ({c["acc_dec_c"]} of {c["acc_dec_n"]})</span></div>'
+        f'<div class="stat"><b>{c["acc_logged"]}</b>'
+        f'<span>predictions logged before kickoff, hits and misses</span></div>'
+        "</div>"
+    )
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content="{meta_desc}">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="{CANONICAL}">
+<link rel="alternate" hreflang="en" href="{CANONICAL}">
+<link rel="alternate" hreflang="x-default" href="{CANONICAL}">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="FPL Clean Sheet Odds &amp; Fixture Difficulty by GoalIQ">
+<meta property="og:description" content="{meta_desc}">
+<meta property="og:url" content="{CANONICAL}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@goaliqapp">
+<meta name="twitter:title" content="FPL Clean Sheet Odds &amp; Fixture Difficulty by GoalIQ">
+<meta name="twitter:description" content="{meta_desc}">
+
+{jsonld}
+<meta name="theme-color" content="#0A0820">
+<style>{CSS}</style>
+</head>
+<body>
+<header class="dark">
+  <div class="bar"></div>
+  <div class="nav">
+    <div class="brand"><a href="./">Goal<span>IQ</span></a></div>
+    <a class="cta" href="{PLAY_URL}">Get the free app</a>
+  </div>
+</header>
+
+<main>
+<article>
+
+<section class="hero dark">
+<div class="wrap">
+<h1>FPL Clean Sheet Odds and Fixture Difficulty, by the GoalIQ Model</h1>
+<p class="lede">GoalIQ runs a football match model that estimates how likely each
+Premier League team is to keep a clean sheet, and how hard their next six
+fixtures are. The numbers update every gameweek. Everything on this page is free.</p>
+<p class="meta">Season {c["season"]}. Data updated {c["data_date"]}.
+Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
+
+<div class="cta-row">
+  <a class="cta" href="{PLAY_URL}">Google Play</a>
+  <a class="cta secondary" href="{APPSTORE_URL}">App Store</a>
+</div>
+<p class="note">Free download. Predict any fixture yourself in the app.</p>
+</div>
+</section>
+
+<div class="wrap content">
+
+<h2 id="track-record">The model publishes its prediction record</h2>
+<p>{escape(tr[0])} {escape(tr[1])} {escape(tr[2])}</p>
+{stats}
+<p class="note">Source: GoalIQ prediction log, updated {c["acc_date"]}. The full
+log, including every miss, is served live by the same model that produces the
+tables below.</p>
+
+<h2 id="clean-sheets">Gameweek {c["next_gw"]} clean sheet odds</h2>
+<p>Model clean sheet probability for all 20 Premier League teams in
+Gameweek {c["next_gw"]} ({c["gw_label"]}). FDR is GoalIQ's model fixture
+difficulty for that match, 1 easiest to 5 hardest.</p>
+{cs_table}
+<p class="note">Pre-season projection: team strengths use 2024/25 and 2025/26
+results as priors, and newly promoted sides use an empirical promoted-team
+baseline. The numbers sharpen as {c["season"]} results arrive.</p>
+
+<h2 id="fixture-difficulty">Fixture difficulty for the next six gameweeks</h2>
+<p>GoalIQ's fixture difficulty rating per team and gameweek. Each cell shows the
+opponent and the model FDR. A lower number is an easier fixture. This is
+model-derived, not the official FPL difficulty.</p>
+{fdr_grid}
+<p class="legend">FDR scale: <span class="fdr fdr1">1</span>
+<span class="fdr fdr2">2</span> <span class="fdr fdr3">3</span>
+<span class="fdr fdr4">4</span> <span class="fdr fdr5">5</span>
+(1 easiest, 5 hardest). Venue in cell tooltip: H home, A away.</p>
+
+<h2 id="methodology">Methodology</h2>
+<p>A Dixon-Coles style match model, tau corrected, trained on recent results.
+Clean sheet probability comes from the score matrix: the chance the opponent
+scores zero. Fixture difficulty is derived from win and clean sheet
+probabilities, ranked across every team fixture of the season and bucketed
+into five tiers. Fixture data comes from the official Premier League fantasy
+API, with premierleague.com as the fixture source until the FPL game opens
+for {c["season"]}.</p>
+
+<h2 id="about">About GoalIQ</h2>
+<p>GoalIQ is a free football prediction app built by an independent developer
+in Finland. The same model powers the app and this page. The methodology is
+public, and every published prediction is logged before kickoff so the record
+cannot be edited after the fact. If the model has a bad week, the log shows it.</p>
+
+<h2 id="faq">FAQ</h2>
+<dl class="faq">
+{faq_html}
+</dl>
+
+<div class="cta-row">
+  <a class="cta" href="{PLAY_URL}">Predict any fixture in the GoalIQ app</a>
+  <a class="cta secondary" href="{APPSTORE_URL}">Download on the App Store</a>
+</div>
+
+<p class="disclaimer"><strong>Disclaimer:</strong> GoalIQ provides model
+predictions and analytics. Not betting advice.</p>
+
+</div>
+</article>
+</main>
+
+<footer class="dark">
+  <div class="wrap">
+  <p><a href="./">GoalIQ home</a> &middot;
+  <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
+  <a href="faq.html">App FAQ</a> &middot;
+  <a href="privacy.html">Privacy</a></p>
+  <p>&copy; 2026 GoalIQ. Premier League is a trademark of the Football
+  Association Premier League Limited. GoalIQ is not affiliated with or endorsed
+  by the Premier League. Data on this page is a statistical model output for
+  informational purposes.</p>
+  </div>
+</footer>
+</body>
+</html>
+"""
+
+
+# ---------------------------------------------------------------------------
+# 5. Sitemap lastmod
+# ---------------------------------------------------------------------------
+def update_sitemap(iso_date: str) -> bool:
+    xml = SITEMAP_PATH.read_text(encoding="utf-8")
+    entry = (
+        "  <url>\n"
+        f"    <loc>{CANONICAL}</loc>\n"
+        f"    <lastmod>{iso_date}</lastmod>\n"
+        "    <changefreq>weekly</changefreq>\n"
+        "    <priority>0.9</priority>\n"
+        "  </url>\n"
+    )
+    if CANONICAL in xml:
+        # korvaa olemassa oleva fpl.html-blokki
+        new = re.sub(
+            r"  <url>\s*<loc>" + re.escape(CANONICAL) + r"</loc>.*?</url>\n",
+            entry,
+            xml,
+            flags=re.S,
+        )
+    else:
+        new = xml.replace("</urlset>", entry + "</urlset>")
+    if new != xml:
+        SITEMAP_PATH.write_text(new, encoding="utf-8")
+        return True
+    return False
+
+
+# ---------------------------------------------------------------------------
+# main
+# ---------------------------------------------------------------------------
+def main() -> None:
+    fpl, acc = load_data()
+    c = build_context(fpl, acc)
+    html_out = render_page(c)
+    OUT_PATH.write_text(html_out, encoding="utf-8")
+    sitemap_changed = update_sitemap(c["iso_date"])
+
+    print("=" * 64)
+    print("FPL-LANDING BAKE OK")
+    print("=" * 64)
+    print(f"  fpl.html          : {len(html_out)} merkkiä")
+    print(f"  sitemap.xml       : {'päivitetty' if sitemap_changed else 'ei muutosta'}")
+    print(f"  GW                : {c['next_gw']} ({c['gw_label']})")
+    print(f"  CS-rivejä         : {len(c['cs_rows'])}")
+    print(f"  FDR-rivejä        : {len(c['fdr_rows'])} x {len(c['gws'])} GW")
+    print(f"  Track record      : {fmt_pct(c['acc_pct_1x2'])} 1X2 (n={c['acc_n']}), "
+          f"decisive {fmt_pct(c['acc_pct_dec'])} ({c['acc_dec_c']}/{c['acc_dec_n']}), "
+          f"logged {c['acc_logged']}")
+    print(f"  Top-3 CS% GW{c['next_gw']}   : "
+          + "; ".join(f"{r['team']} {fmt_pct(r['cs_pct'])}" for r in c["top3"]))
+    print(f"  Lähteet           : {FPL_PATH.name} ({c['data_date']}), "
+          f"{ACC_PATH.name} ({c['acc_date']})")
+    print("\nJulkaisu (Villen GO vaaditaan, Pages servaa mainista):")
+    print("  git add fpl.html sitemap.xml")
+    print('  git commit -m "geo(fpl): FPL-landing data-refresh"')
+    print("  git push")
+
+
+if __name__ == "__main__":
+    main()

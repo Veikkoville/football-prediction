@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://veikkoville.github.io/football-prediction/sitemap.xml
+Sitemap: https://goaliq.app/sitemap.xml
