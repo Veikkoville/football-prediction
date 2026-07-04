@@ -1,40 +1,40 @@
 {
-  "updated_at": "2026-07-03T22:06:03+00:00",
+  "updated_at": "2026-07-04T02:58:57+00:00",
   "logged_total": 94,
-  "pending": 8,
+  "pending": 7,
   "all_time": {
-    "n": 86,
-    "correct_1x2": 53,
-    "pct_1x2": 0.6163,
-    "decisive_n": 63,
-    "decisive_correct": 53,
-    "pct_decisive": 0.8413,
-    "exact_n": 38,
+    "n": 87,
+    "correct_1x2": 54,
+    "pct_1x2": 0.6207,
+    "decisive_n": 64,
+    "decisive_correct": 54,
+    "pct_decisive": 0.8438,
+    "exact_n": 39,
     "exact_correct": 9,
-    "pct_exact": 0.2368,
-    "brier": 0.4514,
-    "brier_n": 38
+    "pct_exact": 0.2308,
+    "brier": 0.4403,
+    "brier_n": 39
   },
   "rolling": {
-    "n": 86,
-    "correct_1x2": 53,
-    "pct_1x2": 0.6163,
-    "decisive_n": 63,
-    "decisive_correct": 53,
-    "pct_decisive": 0.8413,
-    "exact_n": 38,
+    "n": 87,
+    "correct_1x2": 54,
+    "pct_1x2": 0.6207,
+    "decisive_n": 64,
+    "decisive_correct": 54,
+    "pct_decisive": 0.8438,
+    "exact_n": 39,
     "exact_correct": 9,
-    "pct_exact": 0.2368,
-    "brier": 0.4514,
-    "brier_n": 38,
+    "pct_exact": 0.2308,
+    "brier": 0.4403,
+    "brier_n": 39,
     "window": 100
   },
   "calibration": [
     {
-      "bin_mid": 0.0784,
-      "predicted": 0.0784,
+      "bin_mid": 0.0729,
+      "predicted": 0.0729,
       "actual": 0.0,
-      "n": 6
+      "n": 8
     },
     {
       "bin_mid": 0.1495,
@@ -79,10 +79,10 @@
       "n": 5
     },
     {
-      "bin_mid": 0.8413,
-      "predicted": 0.8413,
+      "bin_mid": 0.8643,
+      "predicted": 0.8643,
       "actual": 1.0,
-      "n": 1
+      "n": 2
     }
   ],
   "recent": [
@@ -94,6 +94,18 @@
       "p_winner": 0.5367,
       "most_likely_score": "1-1",
       "actual_score": "2-0",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
+    {
+      "date": "2026-07-03",
+      "home_team": "Argentina",
+      "away_team": "Cape Verde Islands",
+      "predicted_winner": "home",
+      "p_winner": 0.8873,
+      "most_likely_score": "2-0",
+      "actual_score": "3-2",
       "actual_outcome": "home",
       "hit_1x2": true,
       "exact_hit": false
@@ -313,18 +325,6 @@
       "actual_outcome": "home",
       "hit_1x2": true,
       "exact_hit": false
-    },
-    {
-      "date": "2026-06-27",
-      "home_team": "Panama",
-      "away_team": "England",
-      "predicted_winner": "away",
-      "p_winner": 0.7063,
-      "most_likely_score": "0-2",
-      "actual_score": "0-2",
-      "actual_outcome": "away",
-      "hit_1x2": true,
-      "exact_hit": true
     }
   ]
 }
