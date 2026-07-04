@@ -591,7 +591,39 @@ predictions and analytics. Not betting advice.</p>
 
 
 # ---------------------------------------------------------------------------
-# 5. Sitemap lastmod
+# 5. Etusivun track record -markerit (index.html, homepage-update 4.7)
+# ---------------------------------------------------------------------------
+INDEX_PATH = ROOT / "index.html"
+
+
+def update_index(c: dict) -> bool:
+    """Täytä index.html:n GEN:ACC-markerit tuoreilla accuracy-luvuilla.
+    Sama lähde ja refresh-tahti kuin fpl.html (ei staleja kovakoodauksia)."""
+    if not INDEX_PATH.exists():
+        return False
+    s = INDEX_PATH.read_text(encoding="utf-8")
+    chip = (
+        f'<div class="num">{fmt_pct(c["acc_pct_1x2"])}</div>'
+        f'<div class="lbl">result accuracy across {c["acc_n"]} logged matches</div>'
+    )
+    proof = (
+        f"The model logs every prediction before kickoff. "
+        f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} matches played."
+    )
+    new = re.sub(
+        r"(<!-- GEN:ACC-CHIP-START -->).*?(<!-- GEN:ACC-CHIP-END -->)",
+        lambda m: m.group(1) + chip + m.group(2), s, flags=re.S)
+    new = re.sub(
+        r"(<!-- GEN:ACC-PROOF-START -->).*?(<!-- GEN:ACC-PROOF-END -->)",
+        lambda m: m.group(1) + proof + m.group(2), new, flags=re.S)
+    if new != s:
+        INDEX_PATH.write_text(new, encoding="utf-8")
+        return True
+    return False
+
+
+# ---------------------------------------------------------------------------
+# 6. Sitemap lastmod
 # ---------------------------------------------------------------------------
 def update_sitemap(iso_date: str) -> bool:
     xml = SITEMAP_PATH.read_text(encoding="utf-8")
@@ -628,12 +660,14 @@ def main() -> None:
     html_out = render_page(c)
     OUT_PATH.write_text(html_out, encoding="utf-8")
     sitemap_changed = update_sitemap(c["iso_date"])
+    index_changed = update_index(c)
 
     print("=" * 64)
     print("FPL-LANDING BAKE OK")
     print("=" * 64)
     print(f"  fpl.html          : {len(html_out)} merkkiä")
     print(f"  sitemap.xml       : {'päivitetty' if sitemap_changed else 'ei muutosta'}")
+    print(f"  index.html        : {'accuracy-markerit päivitetty' if index_changed else 'ei muutosta'}")
     print(f"  GW                : {c['next_gw']} ({c['gw_label']})")
     print(f"  CS-rivejä         : {len(c['cs_rows'])}")
     print(f"  FDR-rivejä        : {len(c['fdr_rows'])} x {len(c['gws'])} GW")

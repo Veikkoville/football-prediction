@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GoalIQ — AI Football Predictions</title>
-<meta name="description" content="GoalIQ predicts win probability, expected goals and the most likely scorelines for Europe's top leagues, the Champions League and the 2026 World Cup. Free on Google Play." />
+<title>GoalIQ – AI Football Predictions</title>
+<meta name="description" content="GoalIQ predicts win probability and expected goals for Europe's top leagues, with free FPL clean sheet odds and fixture difficulty on the web. Free on Google Play and the App Store." />
 <meta name="google-site-verification" content="cDKUnkdbiFULwQFPp9ws_mlwsmAA4CLT5xpmQP9x5Kw" />
 <link rel="canonical" href="https://goaliq.app/" />
 
 <!-- Open Graph / social preview -->
-<meta property="og:title" content="GoalIQ — AI Football Predictions" />
-<meta property="og:description" content="Pick two teams. GoalIQ predicts the match with AI — probabilities, xG and scorelines. Built for the 2026 World Cup." />
+<meta property="og:title" content="GoalIQ – AI Football Predictions" />
+<meta property="og:description" content="Pick two teams and GoalIQ predicts the match: probabilities and xG. Free FPL clean sheet odds and fixture difficulty on the web." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://goaliq.app/" />
 
@@ -101,6 +101,8 @@
 
   /* Hero */
   .hero { padding: 64px 0 72px; text-align: center; }
+  a.badge { text-decoration: none; }
+  .cta-note { color: var(--muted); font-size: 14px; margin-top: 14px; }
   .badge {
     display: inline-block; background: rgba(25,227,210,0.12);
     color: var(--violet); border: 1px solid rgba(25,227,210,0.35);
@@ -197,7 +199,7 @@
     background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
     padding: 24px;
   }
-  .feat .ico { font-size: 24px; margin-bottom: 12px; }
+  .feat .ico { color: var(--green); margin-bottom: 12px; display: flex; }
   .feat h3 { font-size: 17px; margin-bottom: 6px; }
   .feat p { color: var(--muted); font-size: 14px; }
 
@@ -216,25 +218,6 @@
     content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 800;
   }
   .premium-card small { color: var(--muted); font-size: 13px; }
-
-  /* Waitlist */
-  .waitlist-card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 22px;
-    padding: 44px; max-width: 560px; margin: 0 auto; text-align: center;
-  }
-  .waitlist-card h2 { font-size: 30px; margin-bottom: 10px; }
-  .waitlist-card p { color: var(--muted); margin-bottom: 26px; }
-  .wl-form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-  .wl-form input[type=email] {
-    flex: 1; min-width: 220px; background: var(--bg); border: 1px solid var(--line);
-    color: var(--text); padding: 14px 18px; border-radius: 12px; font-size: 15px;
-  }
-  .wl-form input[type=email]:focus { outline: none; border-color: var(--green); }
-  .wl-form button {
-    background: var(--green); color: #ffffff; font-weight: 800; font-size: 15px;
-    border: none; padding: 14px 26px; border-radius: 12px; cursor: pointer;
-  }
-  .wl-form button:hover { background: #FF4D90; }
 
   /* Footer */
   footer { border-top: 1px solid var(--line); padding: 40px 0; }
@@ -265,46 +248,38 @@
 <!-- HERO -->
 <div class="wrap">
   <header class="hero">
-    <span class="badge">⚽ Built for the 2026 World Cup</span>
+    <a class="badge" href="fpl.html">New: free FPL clean sheet odds and fixture difficulty</a>
     <h1>AI football predictions, <span class="accent">match by match</span></h1>
-    <p class="sub">Pick two teams. GoalIQ predicts the win probability, expected goals and most likely scorelines — across six top leagues, the Champions League and the World Cup.</p>
+    <p class="sub">Pick two teams and GoalIQ gives the win probability, expected goals, and a fixture read across the top leagues. Free FPL clean sheet odds and fixture difficulty on the web.</p>
     <div class="cta-row" id="get">
-      <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">▶ Get it on Google Play</a>
-      <a class="btn-ghost" href="#waitlist">On iPhone? Join the waitlist</a>
+      <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4.5v15l13-7.5z"/></svg> Get it on Google Play</a>
+      <a class="btn-ghost" href="https://apps.apple.com/app/id6780047163">Download on the App Store</a>
     </div>
+    <p class="cta-note">Free download. Predict any fixture yourself in the app.</p>
     <div class="stat-strip">
-      <div class="stat"><div class="num">7</div><div class="lbl">leagues &amp; competitions</div></div>
+      <div class="stat"><!-- GEN:ACC-CHIP-START --><div class="num">62.9%</div><div class="lbl">result accuracy across 89 logged matches</div><!-- GEN:ACC-CHIP-END --></div>
       <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
       <div class="stat"><div class="num">€3.99</div><div class="lbl">Premium / month</div></div>
     </div>
   </header>
 </div>
 
-<!-- WORLD CUP -->
+<!-- FPL -->
 <section class="wc">
   <div class="wrap wc-inner">
     <div>
-      <h2>The <span class="accent">World Cup 2026</span>, predicted</h2>
-      <p>GoalIQ's tournament model is trained on past World Cup data and recalibrated for 2026 — neutral-venue, no home advantage.</p>
-      <p>Coverage grows as the tournament unfolds and more teams play their first matches.</p>
-      <p><a href="world-cup-2026-predictions.html" style="color:var(--violet);font-weight:700;">See every Matchday 1 prediction →</a></p>
-      <div class="kickoff">📅 Kick-off — June 11, 2026</div>
+      <h2>Free <span class="accent">FPL tools</span> on the web</h2>
+      <p>GoalIQ's model gives clean sheet probability and fixture difficulty for every Premier League team, updated every gameweek.</p>
+      <p>Free on the web, no sign-in.</p>
+      <p style="margin-top:22px;"><a class="btn-primary" href="fpl.html">See the FPL clean sheet odds</a></p>
     </div>
     <div class="wc-visual">
       <div class="matchrow">
-        <span class="team">Brazil</span>
-        <span style="color:var(--muted);font-size:13px;">neutral venue</span>
-        <span class="team">France</span>
+        <span class="team">Published track record</span>
+        <span style="color:var(--muted);font-size:13px;">hits and misses</span>
       </div>
-      <div class="prob-bar">
-        <div class="home" style="width:42%"></div>
-        <div class="draw" style="width:24%"></div>
-        <div class="away" style="width:34%"></div>
-      </div>
-      <div class="prob-legend">
-        <span>Win 42%</span><span>Draw 24%</span><span>Win 34%</span>
-      </div>
-      <p style="color:var(--muted);font-size:13px;margin-top:14px;">Illustrative example. Live predictions update inside the app.</p>
+      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 62.9% correct results across 89 matches played.<!-- GEN:ACC-PROOF-END --></p>
+      <p style="margin-top:12px;"><a href="fpl.html#track-record" style="color:var(--violet);font-weight:700;">See the full record →</a></p>
     </div>
   </div>
 </section>
@@ -363,12 +338,12 @@
       <p>GoalIQ is a full match-analysis companion.</p>
     </div>
     <div class="feat-grid">
-      <div class="feat"><div class="ico">📊</div><h3>Outcome probabilities</h3><p>Home, draw and away likelihood for every fixture.</p></div>
-      <div class="feat"><div class="ico">🎯</div><h3>Expected goals (xG)</h3><p>Projected goals for both sides, not just a result.</p></div>
-      <div class="feat"><div class="ico">🔢</div><h3>Scoreline predictions</h3><p>The most likely exact scores, ranked by probability.</p></div>
-      <div class="feat"><div class="ico">📋</div><h3>League tables</h3><p>Live standings with European and relegation markers.</p></div>
-      <div class="feat"><div class="ico">📅</div><h3>This week's fixtures</h3><p>Upcoming matches with one-tap prediction.</p></div>
-      <div class="feat"><div class="ico">⚔️</div><h3>Head-to-head &amp; form</h3><p>Recent meetings and each team's momentum trend.</p></div>
+      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div><h3>Outcome probabilities</h3><p>Home, draw and away likelihood for every fixture.</p></div>
+      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.5"/></svg></div><h3>Expected goals (xG)</h3><p>Projected goals for both sides, not just a result.</p></div>
+      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14M7.5 10v4M16.5 10v4"/></svg></div><h3>Scoreline predictions</h3><p>The most likely exact scores, ranked by probability.</p></div>
+      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="4" cy="6" r="0.5"/><circle cx="4" cy="12" r="0.5"/><circle cx="4" cy="18" r="0.5"/></svg></div><h3>League tables</h3><p>Live standings with European and relegation markers.</p></div>
+      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><h3>This week's fixtures</h3><p>Upcoming matches with one-tap prediction.</p></div>
+      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h13m0 0-3-3m3 3-3 3M20 17H7m0 0 3-3m-3 3 3 3"/></svg></div><h3>Head-to-head &amp; form</h3><p>Recent meetings and each team's momentum trend.</p></div>
     </div>
   </div>
 </section>
@@ -386,21 +361,7 @@
         <li>Head-to-head records</li>
         <li>A full week of fixture predictions</li>
       </ul>
-      <small>Cancel anytime. Billed monthly through Google Play.</small>
-    </div>
-  </div>
-</section>
-
-<!-- WAITLIST -->
-<section id="waitlist">
-  <div class="wrap">
-    <div class="waitlist-card">
-      <h2>On iPhone? Get in line.</h2>
-      <p>GoalIQ is on Android today. Leave your email and we'll tell you the moment the iOS version is ready.</p>
-      <form class="wl-form" action="https://formspree.io/f/mdajygnl" method="POST">
-        <input type="email" name="email" placeholder="you@example.com" required />
-        <button type="submit">Notify me</button>
-      </form>
+      <small>Cancel anytime. Billed monthly through your app store.</small>
     </div>
   </div>
 </section>
@@ -408,7 +369,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="wrap foot-inner">
-    <div>© 2026 GoalIQ · Made in Lahti, Finland 🇫🇮</div>
+    <div>© 2026 GoalIQ · Made in Lahti, Finland</div>
     <div>
       <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a>
       &nbsp;·&nbsp;
