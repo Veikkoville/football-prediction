@@ -82,3 +82,30 @@ jobs:
           done
           echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
           exit 1
+
+      # Deploy-verify (P1 5.7): Pages-deploy failaa transientisti (~40 %
+      # 4.-5.7) → varmista että live goaliq.app todella servaa HEADin
+      # fpl.html+index.html:n ennen kuin workflow on vihreä. Hash-vertailu
+      # kestää superseeding-deployt (myöhempi commit ei muuta näitä
+      # tiedostoja → hash sama). Fail → punainen workflow + Pages-failuren
+      # oma deployment_status laukaisee pages-deploy-autoheal-rerunin.
+      - name: Deploy-verify — live servaa HEAD-sisällön
+        run: |
+          set -e
+          want_fpl=$(md5sum fpl.html | cut -d' ' -f1)
+          want_idx=$(md5sum index.html | cut -d' ' -f1)
+          echo "Odotetut hashit: fpl=$want_fpl index=$want_idx"
+          for i in $(seq 1 24); do
+            got_fpl=$(curl -sf --max-time 20 "https://goaliq.app/fpl.html"   | md5sum | cut -d' ' -f1 || echo "fetch-fail")
+            got_idx=$(curl -sf --max-time 20 "https://goaliq.app/index.html" | md5sum | cut -d' ' -f1 || echo "fetch-fail")
+            if [ "$got_fpl" = "$want_fpl" ] && [ "$got_idx" = "$want_idx" ]; then
+              echo "OK (yritys $i): live-sisältö = HEAD. Deploy verifioitu."
+              exit 0
+            fi
+            echo "Yritys $i/24: live != HEAD (fpl=$got_fpl idx=$got_idx) — odotetaan 20 s..."
+            sleep 20
+          done
+          echo "VIRHE: goaliq.app ei servaa HEAD-sisältöä 8 min kuluttua."
+          echo "Pages-deploy todennäköisesti failannut — autoheal rerunaa;"
+          echo "jos tämä toistuu, tarkista Actions: pages build and deployment."
+          exit 1

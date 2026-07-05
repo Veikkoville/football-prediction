@@ -1,0 +1,74 @@
+# GitHub Pages -deployn auto-heal — goaliq.app-luotettavuus (P1, 5.7.2026).
+#
+# ONGELMA: Pagesin "pages build and deployment" failaa transientisti
+# ("Deployment failed, try again later") — 5/12 deploysta 4.-5.7. Korjaantuu
+# aina rerunilla. Riski: fpl-page-refresh ajaa maanantaisin VALVOMATTA →
+# hiljainen fail jättäisi goaliq.app:n staleksi julkisella SEO/GEO-pinnalla.
+#
+# MEKANISMI: Pagesin deploy postaa deployment_status-eventin environmentille
+# "github-pages". HUOM: workflow_run-triggeri EI toimi tähän — Pagesin
+# workflow on GitHubin dynaaminen (ei repo-tiedosto), eikä workflow_run
+# laukea siitä. deployment_status laukeaa.
+#
+# RETRY-CAP (EHDOTON, ei looppia): rerun vain jos runin run_attempt <= 2
+# → max 2 auto-rerunia per alkuperäinen deploy (attemptit 1→2→3). Jos cap
+# täynnä ja yhä failure → tämä workflow exitaa 1 (punainen = näkyvä hälytys:
+# fail EI ole transientti).
+#
+# TOKEN: GITHUB_TOKEN + permissions: actions: write riittää rerun-API:in
+# omassa repossa — ei PAT-secretiä.
+
+name: pages-deploy-autoheal
+
+on:
+  deployment_status: {}
+
+permissions:
+  actions: write
+
+concurrency:
+  group: pages-autoheal-${{ github.event.deployment.sha }}
+  cancel-in-progress: false
+
+jobs:
+  rerun-failed-pages-deploy:
+    # Vain github-pages-environmentin failure/error-tilat. Onnistumiset ja
+    # in_progress-tilat eivät käynnistä mitään.
+    if: >
+      github.event.deployment.environment == 'github-pages' &&
+      (github.event.deployment_status.state == 'failure' ||
+       github.event.deployment_status.state == 'error')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rerun failed Pages build (retry-cap 2)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.deployment.sha }}
+        run: |
+          echo "Pages-deploy failure commitille $SHA — etsitään run..."
+          run_json=$(gh api "repos/$REPO/actions/runs?head_sha=$SHA" \
+            --jq '[.workflow_runs[] | select(.name == "pages build and deployment")] | first')
+          if [ -z "$run_json" ] || [ "$run_json" = "null" ]; then
+            echo "VIRHE: pages build and deployment -runia ei löytynyt SHA:lle $SHA."
+            exit 1
+          fi
+          run_id=$(echo "$run_json"    | jq -r '.id')
+          attempt=$(echo "$run_json"   | jq -r '.run_attempt')
+          conclusion=$(echo "$run_json" | jq -r '.conclusion')
+          echo "run_id=$run_id attempt=$attempt conclusion=$conclusion"
+
+          if [ "$conclusion" != "failure" ]; then
+            echo "Run ei ole failure-tilassa (conclusion=$conclusion) — ei rerunia."
+            echo "(Esim. myöhempi attempt ehti jo onnistua.)"
+            exit 0
+          fi
+          if [ "$attempt" -gt 2 ]; then
+            echo "RETRY-CAP TÄYNNÄ: attempt=$attempt (>2) ja yhä failure."
+            echo "Fail EI ole transientti — vaatii ihmisen. Exit 1 = näkyvä hälytys."
+            exit 1
+          fi
+          echo "Rerun (auto-heal $attempt/2)..."
+          gh api -X POST "repos/$REPO/actions/runs/$run_id/rerun-failed-jobs"
+          echo "Rerun käynnistetty. Jos failaa uudelleen, uusi deployment_status"
+          echo "laukaisee tämän workflown → cap pysäyttää attempt 3:n jälkeen."
