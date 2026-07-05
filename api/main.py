@@ -21,6 +21,7 @@ import os
 import sys
 import threading
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal, Optional
 
@@ -97,6 +98,93 @@ def _update_profile(user_id: str, fields: dict) -> bool:
 def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
     """Yksinkertaistettu wrapper vain is_premium -kentalle."""
     return _update_profile(user_id, {"is_premium": is_premium})
+
+
+def _web_subscription_active(user_id: str) -> bool:
+    """Onko käyttäjällä aktiivinen WEB-tilaus (web_subscriptions).
+
+    NO-CLOBBER-synkan (web-v1 #7) ydin: mobiilipolut (RC EXPIRATION,
+    mobiili-Stripen deleted) EIVÄT saa nollata profiles.is_premiumia jos
+    web-tilaus on voimassa. current_period_end NULL = aktiivinen (period
+    täyttyy subscription.updated-eventissä).
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return False
+    url = (f"{SUPABASE_URL}/rest/v1/web_subscriptions"
+           f"?user_id=eq.{user_id}&status=eq.active"
+           f"&select=current_period_end")
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+    }
+    try:
+        rows = requests.get(url, headers=headers, timeout=10).json()
+        for r in rows if isinstance(rows, list) else []:
+            end = r.get("current_period_end")
+            if end is None:
+                return True
+            try:
+                if datetime.fromisoformat(end) > datetime.now(timezone.utc):
+                    return True
+            except ValueError:
+                return True  # epäselvä timestamp -> älä nollaa premiumia
+        return False
+    except Exception as e:
+        # Verkkovirhe: fail-safe premiumin SÄILYTTÄMISEN suuntaan (parempi
+        # että churnannut saa hetken ekstraa kuin että maksava menettää).
+        print(f"[Supabase] web_subscription_active EXCEPTION: {e}")
+        return True
+
+
+def _get_web_subscription(match_field: str, match_value: str) -> dict | None:
+    """Hae web-tilausrivi (esim. stripe_subscription_id:llä -> user_id)."""
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return None
+    url = (f"{SUPABASE_URL}/rest/v1/web_subscriptions"
+           f"?{match_field}=eq.{match_value}&select=*&limit=1")
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+    }
+    try:
+        rows = requests.get(url, headers=headers, timeout=10).json()
+        return rows[0] if isinstance(rows, list) and rows else None
+    except Exception:
+        return None
+
+
+def _mobile_possibly_active(user_id: str, web_period_end: str | None) -> bool:
+    """Heuristiikka: onko käyttäjällä todennäköisesti aktiivinen MOBIILI-
+    tilaus (RC/Play/App Store)? profiles.subscription_current_period_end
+    tulevaisuudessa JA eri kuin web-subin period_end → toinen lähde elää.
+    Käytetään VAIN web-peruutuksen no-clobber-guardina; RC-renewal
+    re-assertoi is_premium=True kuukausittain joten väärä True tässä on
+    itsekorjautuva, väärä False veisi maksavalta premiumin."""
+    end = _get_profile_period_end(user_id)
+    if not end:
+        return False
+    try:
+        if datetime.fromisoformat(end) <= datetime.now(timezone.utc):
+            return False
+    except ValueError:
+        return True
+    return end != web_period_end
+
+
+def _get_profile_period_end(user_id: str) -> str | None:
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return None
+    url = (f"{SUPABASE_URL}/rest/v1/profiles?id=eq.{user_id}"
+           f"&select=subscription_current_period_end")
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+    }
+    try:
+        rows = requests.get(url, headers=headers, timeout=10).json()
+        return rows[0].get("subscription_current_period_end") if rows else None
+    except Exception:
+        return None
 
 
 def _upsert_web_subscription(fields: dict, match: dict | None = None) -> bool:
@@ -1719,11 +1807,16 @@ async def stripe_webhook(request: Request):
         user_id = obj.get("metadata", {}).get("user_id")
         if user_id:
             print(f"[Stripe webhook] subscription.deleted user_id={user_id}")
-            _update_profile(user_id, {
-                "is_premium": False,
-                "subscription_cancel_at_period_end": False,
-                "subscription_current_period_end": None,
-            })
+            # 🔒 NO-CLOBBER (#7): aktiivinen WEB-tilaus pitää premiumin.
+            if _web_subscription_active(user_id):
+                print(f"[Stripe webhook] web-sub aktiivinen user_id={user_id} "
+                      f"— is_premium säilyy (no-clobber)")
+            else:
+                _update_profile(user_id, {
+                    "is_premium": False,
+                    "subscription_cancel_at_period_end": False,
+                    "subscription_current_period_end": None,
+                })
         else:
             print(f"[Stripe webhook] subscription.deleted no user_id in metadata sub_id={obj.get('id')}")
 
@@ -1837,11 +1930,20 @@ async def revenuecat_webhook(request: Request):
         })
     elif event_type == "EXPIRATION":
         print(f"[RevenueCat webhook] EXPIRATION user_id={user_id}")
-        _update_profile(user_id, {
-            "is_premium": False,
-            "subscription_cancel_at_period_end": False,
-            "subscription_current_period_end": None,
-        })
+        # 🔒 NO-CLOBBER (#7): mobiilitilauksen päättyminen EI saa nollata
+        # premiumia jos käyttäjällä on aktiivinen WEB-tilaus.
+        if _web_subscription_active(user_id):
+            print(f"[RevenueCat webhook] web-sub aktiivinen user_id={user_id} "
+                  f"— is_premium säilyy (no-clobber)")
+            _update_profile(user_id, {
+                "subscription_cancel_at_period_end": False,
+            })
+        else:
+            _update_profile(user_id, {
+                "is_premium": False,
+                "subscription_cancel_at_period_end": False,
+                "subscription_current_period_end": None,
+            })
     else:
         # BILLING_ISSUE, TEST, TRANSFER ym. — ei muutosta is_premiumiin.
         print(f"[RevenueCat webhook] ignored event_type={event_type} user_id={user_id}")
@@ -1968,20 +2070,56 @@ async def stripe_web_webhook(request: Request):
             "stripe_customer_id": obj.get("customer"),
             "stripe_subscription_id": obj.get("subscription"),
         })
+        # Cross-platform (#7): web-tilaus avaa myös MOBIILIAPPIN premiumin —
+        # appi gateaa profiles.is_premium-kentällä ensisijaisesti.
+        profile_fields = {"is_premium": True,
+                          "subscription_cancel_at_period_end": False}
+        if period_end:
+            profile_fields["subscription_current_period_end"] = period_end
+        _update_profile(user_id, profile_fields)
     elif event_type == "customer.subscription.updated":
         # Vain web-tilausrivit päivittyvät (match stripe_subscription_id:llä —
         # mobiilin vanhat Stripe-subit eivät ole web_subscriptions-taulussa).
         # Uusissa Stripe-API-versioissa current_period_end on itemeillä.
         _items = (obj.get("items") or {}).get("data") or [{}]
         period_end = obj.get("current_period_end") or _items[0].get("current_period_end")
+        period_end_iso = (datetime.fromtimestamp(period_end, timezone.utc).isoformat()
+                          if period_end else None)
         fields = {"status": "active" if obj.get("status") == "active" else obj.get("status", "past_due")}
-        if period_end:
-            fields["current_period_end"] = datetime.fromtimestamp(
-                period_end, timezone.utc).isoformat()
+        if period_end_iso:
+            fields["current_period_end"] = period_end_iso
         _upsert_web_subscription(fields, match={"stripe_subscription_id": obj["id"]})
+        # Cross-platform: aktiivinen web-sub pitää profiles-premiumin tuoreena.
+        if fields["status"] == "active":
+            row = _get_web_subscription("stripe_subscription_id", obj["id"])
+            if row and row.get("user_id"):
+                pf = {"is_premium": True}
+                if period_end_iso:
+                    pf["subscription_current_period_end"] = period_end_iso
+                _update_profile(row["user_id"], pf)
     elif event_type == "customer.subscription.deleted":
         _upsert_web_subscription({"status": "cancelled"},
                                  match={"stripe_subscription_id": obj["id"]})
+        # 🔒 NO-CLOBBER: is_premium=False VAIN jos toisessa lähteessä (mobiili)
+        # ei ole aktiivista tilausta. Mobiili-aktiivisuuden heuristiikka:
+        # profiles.subscription_current_period_end on tulevaisuudessa JA eri
+        # kuin tämän web-subin period_end (RC-renewal re-assertoi Truen joka
+        # tapauksessa kuukausittain → virhe tähän suuntaan itsekorjautuva).
+        row = _get_web_subscription("stripe_subscription_id", obj["id"])
+        uid = (row or {}).get("user_id")
+        if uid:
+            if _web_subscription_active(uid):
+                print(f"[Stripe web] deleted mutta toinen web-sub aktiivinen "
+                      f"user_id={uid} — is_premium säilyy")
+            elif _mobile_possibly_active(uid, (row or {}).get("current_period_end")):
+                print(f"[Stripe web] deleted mutta mobiilitilaus näyttää "
+                      f"aktiiviselta user_id={uid} — NO-CLOBBER, is_premium säilyy")
+            else:
+                _update_profile(uid, {
+                    "is_premium": False,
+                    "subscription_cancel_at_period_end": False,
+                    "subscription_current_period_end": None,
+                })
 
     return {"received": True}
 

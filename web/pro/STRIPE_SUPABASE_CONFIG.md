@@ -29,6 +29,18 @@ README/scaffold oletti **kausi = one-time** (`STRIPE_PRICE_SEASON_ID` one-time).
    - `SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API)
 3. **Lokaali e2e (CC/terminaali):** `pip install -r web/pro/requirements.txt` → `streamlit run web/pro/app.py` → luo tili → Season pass → testikortti 4242 4242 4242 4242 → "Premium active" → xP aukeaa.
 
+## ✅ STRIPE LIVE -HINNAT LUOTU 5.7 (CoS, selain) — GO-liveä varten
+
+Live-tuote **"GoalIQ Pro (web)"** + 2 recurring-hintaa (LIVE-mode). Nämä LIVE-price-id:t menevät **hostin (Render) live-env:iin**, EI lokaaliin test-`.env`:iin:
+
+| Env-muuttuja (LIVE) | Arvo | Hinta |
+|---|---|---|
+| (product) | `prod_UpYw5IUJddKOXm` | GoalIQ Pro (web) LIVE |
+| `STRIPE_PRICE_MONTHLY_ID` | `price_1TptoiFLROrR5x8wBmeFiizv` | 3,99 €/kk LIVE |
+| `STRIPE_PRICE_SEASON_ID` | `price_1TptqDFLROrR5x8wQvsKpCMy` | 25 €/vuosi LIVE |
+
+Live-avaimet (`sk_live_`, webhook `whsec_`) = Villen kättä, hostin secreteihin GO-liveessä.
+
 ## 🔒 GO-REQUIRED (ei ilman Villen lupaa)
 - Webhook Stripe-dashboardiin `https://goaliq-api.onrender.com/api/webhook/stripe-web` + Render-env `STRIPE_WEB_WEBHOOK_SECRET` (backend-deploy).
 - Live-avaimet + live-hinnat (test → live).

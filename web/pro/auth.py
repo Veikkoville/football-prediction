@@ -109,11 +109,17 @@ def _do_auth(mode: str, email: str, pw: str) -> None:
 # Subscription-status (web_subscriptions-taulu)
 # ---------------------------------------------------------------------------
 def subscription(user_id: str) -> dict | None:
-    """Aktiivinen web-tilaus tai None. Kevyt session-cache."""
+    """Aktiivinen premium tai None. Kevyt session-cache.
+
+    Cross-platform (#7): web_subscriptions TAI profiles.is_premium —
+    mobiilitilaaja (RC/Play/App Store asettaa profiles.is_premium) saa
+    web-premiumin ilman uutta ostoa, ja toisinpäin.
+    """
     cached = st.session_state.get("giq_sub")
     if cached is not None:
         return cached or None
     sb = _service_client() or _client()
+    sub = None
     try:
         rows = (
             sb.table("web_subscriptions")
@@ -127,6 +133,20 @@ def subscription(user_id: str) -> dict | None:
         sub = rows.data[0] if rows.data else None
     except Exception:
         sub = None
+    if sub is None:
+        try:
+            prof = (
+                sb.table("profiles")
+                .select("is_premium")
+                .eq("id", user_id)
+                .limit(1)
+                .execute()
+            )
+            if prof.data and prof.data[0].get("is_premium"):
+                sub = {"status": "active", "plan": "app",
+                       "current_period_end": None}
+        except Exception:
+            pass
     st.session_state["giq_sub"] = sub or False
     return sub
 
@@ -152,6 +172,18 @@ def upsert_subscription(user_id: str, plan: str, status: str,
             },
             on_conflict="user_id",
         ).execute()
+        # Cross-platform (#7): web-tilaus avaa myös mobiiliappin premiumin
+        # (appi gateaa profiles.is_premium-kentällä). Sama kirjoitus tapahtuu
+        # myös backend-webhookissa — idempotentti.
+        if status == "active":
+            try:
+                pf = {"is_premium": True,
+                      "subscription_cancel_at_period_end": False}
+                if period_end:
+                    pf["subscription_current_period_end"] = period_end
+                sb.table("profiles").update(pf).eq("id", user_id).execute()
+            except Exception:
+                pass  # webhook varmistaa; ei kaadeta ostoflowta tähän
         st.session_state.pop("giq_sub", None)
         return True
     except Exception as e:

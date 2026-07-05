@@ -112,6 +112,103 @@ def test_subscription_deleted_marks_cancelled(client, monkeypatch):
     assert calls[0][1] == {"stripe_subscription_id": "sub_x"}
 
 
+def test_checkout_completed_also_sets_profile_premium(client, monkeypatch):
+    """Cross-platform (#7): web-osto avaa mobiilipremiumin (profiles)."""
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    monkeypatch.setattr(m, "_upsert_web_subscription", lambda *a, **k: True)
+    profile_calls: list[tuple[str, dict]] = []
+    monkeypatch.setattr(m, "_update_profile",
+                        lambda uid, fields: profile_calls.append((uid, fields)) or True)
+    payload = {"type": "checkout.session.completed",
+               "data": {"object": {"client_reference_id": "user-123",
+                                   "metadata": {"plan": "season"},
+                                   "customer": "cus_x", "subscription": "sub_x",
+                                   "payment_status": "paid"}}}
+    body, sig = _signed(payload, secret)
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 200
+    assert profile_calls and profile_calls[0][0] == "user-123"
+    assert profile_calls[0][1]["is_premium"] is True
+
+
+def test_web_deleted_no_clobber_when_mobile_active(client, monkeypatch):
+    """🔒 NO-CLOBBER: web-peruutus EI nollaa premiumia jos mobiili aktiivinen."""
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    monkeypatch.setattr(m, "_upsert_web_subscription", lambda *a, **k: True)
+    monkeypatch.setattr(m, "_get_web_subscription",
+                        lambda f, v: {"user_id": "user-123",
+                                      "current_period_end": "2026-08-01T00:00:00+00:00"})
+    monkeypatch.setattr(m, "_web_subscription_active", lambda uid: False)
+    monkeypatch.setattr(m, "_mobile_possibly_active", lambda uid, we: True)
+    profile_calls: list = []
+    monkeypatch.setattr(m, "_update_profile",
+                        lambda uid, fields: profile_calls.append((uid, fields)) or True)
+    payload = {"type": "customer.subscription.deleted",
+               "data": {"object": {"id": "sub_x", "status": "canceled"}}}
+    body, sig = _signed(payload, secret)
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 200
+    assert profile_calls == []  # is_premium EI nollattu
+
+
+def test_web_deleted_clears_premium_when_no_other_source(client, monkeypatch):
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    monkeypatch.setattr(m, "_upsert_web_subscription", lambda *a, **k: True)
+    monkeypatch.setattr(m, "_get_web_subscription",
+                        lambda f, v: {"user_id": "user-123",
+                                      "current_period_end": None})
+    monkeypatch.setattr(m, "_web_subscription_active", lambda uid: False)
+    monkeypatch.setattr(m, "_mobile_possibly_active", lambda uid, we: False)
+    profile_calls: list = []
+    monkeypatch.setattr(m, "_update_profile",
+                        lambda uid, fields: profile_calls.append((uid, fields)) or True)
+    payload = {"type": "customer.subscription.deleted",
+               "data": {"object": {"id": "sub_x", "status": "canceled"}}}
+    body, sig = _signed(payload, secret)
+    client.post("/api/webhook/stripe-web", content=body,
+                headers={"stripe-signature": sig})
+    assert profile_calls and profile_calls[0][1]["is_premium"] is False
+
+
+def test_rc_expiration_no_clobber_when_web_active(client, monkeypatch):
+    """🔒 NO-CLOBBER: RC EXPIRATION ei nollaa premiumia jos web-sub aktiivinen."""
+    import api.main as m
+    monkeypatch.setattr(m, "REVENUECAT_WEBHOOK_AUTH", "rc-secret")
+    monkeypatch.setattr(m, "_web_subscription_active", lambda uid: True)
+    profile_calls: list = []
+    monkeypatch.setattr(m, "_update_profile",
+                        lambda uid, fields: profile_calls.append((uid, fields)) or True)
+    r = client.post("/api/revenuecat/webhook",
+                    json={"event": {"type": "EXPIRATION",
+                                    "app_user_id": "user-123"}},
+                    headers={"Authorization": "rc-secret"})
+    assert r.status_code == 200
+    assert all(f.get("is_premium") is not False for _, f in profile_calls)
+
+
+def test_rc_expiration_clears_premium_when_no_web(client, monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m, "REVENUECAT_WEBHOOK_AUTH", "rc-secret")
+    monkeypatch.setattr(m, "_web_subscription_active", lambda uid: False)
+    profile_calls: list = []
+    monkeypatch.setattr(m, "_update_profile",
+                        lambda uid, fields: profile_calls.append((uid, fields)) or True)
+    r = client.post("/api/revenuecat/webhook",
+                    json={"event": {"type": "EXPIRATION",
+                                    "app_user_id": "user-123"}},
+                    headers={"Authorization": "rc-secret"})
+    assert r.status_code == 200
+    assert profile_calls and profile_calls[0][1]["is_premium"] is False
+
+
 def test_checkout_without_user_ref_is_ignored(client, monkeypatch):
     import api.main as m
     secret = "whsec_test"

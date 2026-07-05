@@ -150,6 +150,10 @@ def upgrade_box(user: dict) -> None:
     for col, plan in ((c1, "season"), (c2, "monthly")):
         with col:
             primary = plan == "season"
+            if primary:
+                st.caption("Best value — under 2.10 €/month")
+            else:
+                st.caption("Flexible — try it for a month")
             if st.button(PLANS[plan]["label"], type="primary" if primary else "secondary",
                          use_container_width=True, key=f"buy_{plan}"):
                 url = checkout_url(user, plan)
