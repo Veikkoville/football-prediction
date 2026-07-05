@@ -38,6 +38,8 @@ raw_data/
 !/data/accuracy.json
 # FPL Phase 0 -projektio: ajastettu refresh ylläpitää, Render lukee gitistä (/api/fantasy).
 !/data/fpl_projections_phase0.json
+# FPL Phase 1 xP -projektio: sama refresh-konventio (/api/fantasy/xp).
+!/data/fpl_xp_projections.json
 downloaded_files/
 ~/soccerdata/
 

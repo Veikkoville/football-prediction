@@ -1892,6 +1892,24 @@ def fantasy_phase0(response: Response):
     return load_phase0()
 
 
+@app.get("/api/fantasy/xp")
+def fantasy_xp(response: Response):
+    """FPL Phase 1 — xP (expected points) per pelaaja per GW (premium-ydin).
+
+    Palauttaa committatun projektion (data/fpl_xp_projections.json).
+    Projektio rakennetaan ajastetulla refresh-jobilla (scripts/build_fpl_xp.py,
+    sanity-gaten + walk-forward-ship-gaten takana) — tämä endpoint vain lukee
+    tiedoston, EI laskentaa pyynnössä (Render 0.5 vCPU -budjetti).
+    Jos tiedostoa ei ole committattu → available=False-runko.
+
+    Premium-portitus hoidetaan frontendissä (backend palauttaa datan) —
+    sama malli kuin /api/fantasy. no-store-perustelu sama kuin /api/accuracy.
+    """
+    from src.models.fpl_xp import load_xp
+    response.headers["Cache-Control"] = "no-store"
+    return load_xp()
+
+
 @app.get("/api/debug/seasons")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """
