@@ -45,6 +45,9 @@ import requests
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+# GoalIQ Pro (web/pro) -Checkoutin OMA webhook-endpoint-secret — eri kuin
+# mobiilin STRIPE_WEBHOOK_SECRET (Stripe-dashboardissa 2 eri endpointtia).
+STRIPE_WEB_WEBHOOK_SECRET = os.getenv("STRIPE_WEB_WEBHOOK_SECRET", "")
 
 # RevenueCat (Google Play Billing) -webhookin jaettu salaisuus. Arvo on sama
 # merkkijono joka asetetaan RevenueCat-dashboardin webhook-asetuksiin
@@ -94,6 +97,42 @@ def _update_profile(user_id: str, fields: dict) -> bool:
 def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
     """Yksinkertaistettu wrapper vain is_premium -kentalle."""
     return _update_profile(user_id, {"is_premium": is_premium})
+
+
+def _upsert_web_subscription(fields: dict, match: dict | None = None) -> bool:
+    """GoalIQ Pro (web/pro) -tilausten kirjaus web_subscriptions-tauluun.
+
+    match=None → upsert user_id-avaimella (checkout.completed).
+    match={"stripe_subscription_id": ...} → PATCH olemassa olevaan riviin
+    (subscription.updated/deleted, joissa user_id ei ole payloadissa).
+    Sama service-role-REST-kuvio kuin _update_profile.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        print("[Supabase] WARNING: missing env vars, cannot write web_subscriptions")
+        return False
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal,resolution=merge-duplicates",
+    }
+    try:
+        if match:
+            key, val = next(iter(match.items()))
+            url = f"{SUPABASE_URL}/rest/v1/web_subscriptions?{key}=eq.{val}"
+            resp = requests.patch(url, json=fields, headers=headers, timeout=10)
+        else:
+            url = f"{SUPABASE_URL}/rest/v1/web_subscriptions?on_conflict=user_id"
+            resp = requests.post(url, json=fields, headers=headers, timeout=10)
+        if resp.status_code in (200, 201, 204):
+            print(f"[Supabase] web_subscriptions ok fields={list(fields)}")
+            return True
+        print(f"[Supabase] web_subscriptions FAILED status={resp.status_code} "
+              f"body={resp.text[:200]}")
+        return False
+    except Exception as e:
+        print(f"[Supabase] web_subscriptions EXCEPTION: {e}")
+        return False
 
 
 def _verify_supabase_token(access_token: str) -> Optional[str]:
@@ -1872,6 +1911,73 @@ def model_accuracy(response: Response):
     # välimuistitasot, korjaus tulee voimaan ilman app-buildia.
     response.headers["Cache-Control"] = "no-store"
     return load_aggregate()
+
+
+@app.post("/api/webhook/stripe-web")
+async def stripe_web_webhook(request: Request):
+    """GoalIQ Pro (web/pro, pro.goaliq.app) -Checkoutin webhook.
+
+    Kirjaa web-tilaukset Supabasen web_subscriptions-tauluun (EI kosketa
+    mobiilin profiles.is_premium-polkuun — web-billing on erillinen tuote).
+    Streamlit-appi tekee saman merkinnän myös success-redirect-verifyllä →
+    tämä on idempotentti varmistuspolku (upsert per user_id).
+
+    Sama konventio kuin /api/webhook/stripe: secret puuttuu → 200 + warning
+    (Stripe ei jää retry-looppiin ennen kuin env on konfiguroitu).
+    """
+    from datetime import datetime, timezone
+
+    if not STRIPE_WEB_WEBHOOK_SECRET:
+        return {"received": True, "warning": "STRIPE_WEB_WEBHOOK_SECRET not configured"}
+
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature", "")
+    try:
+        stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEB_WEBHOOK_SECRET)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    event = json.loads(payload)
+    event_type = event["type"]
+    obj = event["data"]["object"]
+
+    if event_type == "checkout.session.completed":
+        user_id = obj.get("client_reference_id") or (obj.get("metadata") or {}).get("user_id")
+        if not user_id:
+            print("[Stripe web] checkout.completed ilman user_id-referenssiä — ohitetaan")
+            return {"received": True}
+        plan = (obj.get("metadata") or {}).get("plan", "season")
+        if plan == "season":
+            # Kausipassi: voimassa kauden loppuun (30.6.) ostohetkestä.
+            today = datetime.now(timezone.utc).date()
+            year = today.year + 1 if today.month >= 7 else today.year
+            period_end = f"{year}-06-30T23:59:59+00:00"
+        else:
+            period_end = None  # subscription.updated tuo current_period_endin
+        _upsert_web_subscription({
+            "user_id": user_id,
+            "plan": plan,
+            "status": "active",
+            "current_period_end": period_end,
+            "stripe_customer_id": obj.get("customer"),
+            "stripe_subscription_id": obj.get("subscription"),
+        })
+    elif event_type == "customer.subscription.updated":
+        # Vain web-tilausrivit päivittyvät (match stripe_subscription_id:llä —
+        # mobiilin vanhat Stripe-subit eivät ole web_subscriptions-taulussa).
+        period_end = obj.get("current_period_end")
+        fields = {"status": "active" if obj.get("status") == "active" else obj.get("status", "past_due")}
+        if period_end:
+            fields["current_period_end"] = datetime.fromtimestamp(
+                period_end, timezone.utc).isoformat()
+        _upsert_web_subscription(fields, match={"stripe_subscription_id": obj["id"]})
+    elif event_type == "customer.subscription.deleted":
+        _upsert_web_subscription({"status": "cancelled"},
+                                 match={"stripe_subscription_id": obj["id"]})
+
+    return {"received": True}
 
 
 @app.get("/api/fantasy")
