@@ -45,9 +45,19 @@ from scripts.build_fpl_phase0 import (
     map_name,
     short_name,
 )
-from scripts.backtest_fpl_xp import fixture_contexts, neutral_lambda
 from src.data import fpl_api
+from src.data.loader import lataa_otteludata
 from src.models import fpl_xp as xp
+from src.models.fpl_context import (
+    PROMOTED_HOME_OPENER_ATT_BOOST,
+    build_context,
+    fixture_adjustments,
+    fixture_contexts,
+    load_overrides,
+    neutral_lambda,
+    promoted_teams,
+    xmins_multiplier,
+)
 
 OUT_PATH = config.PROJECT_ROOT / "data" / "fpl_xp_projections.json"
 
@@ -163,7 +173,7 @@ def main() -> int:
     priors = xp.position_priors(acc_by_player, pos_by_player)
     all_rounds = sorted({rnd for mr in mins_by_round.values() for rnd in mr})
 
-    print("[5/6] xP per pelaaja per GW (horisontti)...")
+    print("[5/6] xP per pelaaja per GW (horisontti + Phase 1b -konteksti)...")
     # Tulevat fixturet per GW mallinimillä
     upcoming = [f for f in src["fixtures"] if f["gameweek"] and not f["finished"]]
     next_gw = min(f["gameweek"] for f in upcoming) if upcoming else None
@@ -172,6 +182,28 @@ def main() -> int:
         return 1
     horizon = [g for g in range(next_gw, next_gw + HORIZON_GW)]
     lam_avg = neutral_lambda(dc, fixture_teams)
+
+    # Phase 1b -kontekstikerros: nousijat (fixture-joukkueet − edellisen
+    # PL-kauden joukkueet) + koti-avaus-buusti + manuaaliset yliajot.
+    y = int(SEASON_LABEL[:4])
+    prev_key = f"{(y - 1) % 100:02d}{y % 100:02d}"
+    prev_matches = lataa_otteludata(["ENG-Premier League"], [prev_key])
+    promoted = promoted_teams(set(fixture_teams), set(prev_matches["home_team"]))
+    model_fixtures = [{"gameweek": f["gameweek"], "home": map_name(f["home"]),
+                       "away": map_name(f["away"])}
+                      for f in src["fixtures"] if f["gameweek"]]
+    overrides = load_overrides()
+    cfg = build_context(promoted, model_fixtures, overrides)
+    print(f"      nousijat: {sorted(promoted)} (koti-avaus-buusti "
+          f"x{PROMOTED_HOME_OPENER_ATT_BOOST}), yliajoja: {len(overrides)}")
+    ctx_notes: list[str] = []
+    for f in model_fixtures:
+        if f["gameweek"] not in horizon:
+            continue
+        _, notes = fixture_adjustments(f["home"], f["away"], f["gameweek"], cfg)
+        ctx_notes.extend(f"GW{f['gameweek']}: {n}" for n in notes)
+    for n in ctx_notes:
+        print(f"      konteksti: {n}")
 
     # fixture_contexts odottaa FPL-muotoisia fixtureita (team_h/team_a-id:t) —
     # rakennetaan kevyt id-avaruus mallinimistä (toimii myös pulselive-lähteellä).
@@ -186,12 +218,13 @@ def main() -> int:
             h, a = map_name(f["home"]), map_name(f["away"])
             if h not in name_to_fid or a not in name_to_fid:
                 continue
-            fxs.append({"team_h": name_to_fid[h], "team_a": name_to_fid[a]})
+            fxs.append({"team_h": name_to_fid[h], "team_a": name_to_fid[a],
+                        "event": g})
             opp_by_gw.setdefault(g, defaultdict(list))
             opp_by_gw[g][name_to_fid[h]].append({"opp": short_name(a), "venue": "H"})
             opp_by_gw[g][name_to_fid[a]].append({"opp": short_name(h), "venue": "A"})
         fid_to_model = {v: k for k, v in name_to_fid.items()}
-        ctx_by_gw[g] = fixture_contexts(dc, fxs, fid_to_model, lam_avg)
+        ctx_by_gw[g] = fixture_contexts(dc, fxs, fid_to_model, lam_avg, cfg=cfg)
 
     # FPL-joukkue (25/26) → mallinimi → fixture-id. Joukkueet joita ei ole
     # tulevan kauden fixtureissa (putoajat) jäävät pois; nousijoilla ei ole
@@ -219,14 +252,19 @@ def main() -> int:
         avail = availability_factor(e)
         xmins, p60, p1_59 = xmins * avail, p60 * avail, p1_59 * avail
 
+        model_team_name = [n for n, i in name_to_fid.items() if i == fid][0]
         gws = []
         total = 0.0
         for g in horizon:
             ctxs = ctx_by_gw.get(g, {}).get(fid, [])
             opps = opp_by_gw.get(g, {}).get(fid, [])
+            # Phase 1b: minuuttikerroin (MM-väsymys yms.) per joukkue/GW
+            mm = xmins_multiplier(model_team_name, g, cfg)
+            xm_g = min(xmins * mm, 90.0)
+            p60_g, p1_g = min(p60 * mm, 1.0), min(p1_59 * mm, 1.0)
             gw_xp = 0.0
             for c in ctxs:
-                gw_xp += xp.xp_components(pos, rates, xmins, p60, p1_59, c)["total"]
+                gw_xp += xp.xp_components(pos, rates, xm_g, p60_g, p1_g, c)["total"]
             total += gw_xp
             gws.append({
                 "gw": g,
@@ -235,12 +273,11 @@ def main() -> int:
             })
         if total < MIN_XP_TOTAL:
             continue
-        model_team = [n for n, i in name_to_fid.items() if i == fid][0]
         players.append({
             "id": pid,
             "web_name": e["web_name"],
-            "team": model_team,
-            "team_short": short_name(model_team),
+            "team": model_team_name,
+            "team_short": short_name(model_team_name),
             "pos": xp.POS_NAME[pos],
             "xmins": round(xmins, 1),
             "xp_per_gw": round(total / max(len(horizon), 1), 2),
@@ -294,6 +331,15 @@ def main() -> int:
             ),
             "promoted_baseline_teams": missing,
             "promoted_baseline_values": baseline,
+            "context_layer": {
+                "promoted_teams": sorted(promoted),
+                "promoted_home_opener_att_boost": PROMOTED_HOME_OPENER_ATT_BOOST,
+                "manual_overrides": len(overrides),
+                "applied_in_horizon": ctx_notes,
+                "note": ("Phase 1b: nousija-koti-avaus-buusti + manuaaliset "
+                         "yliajot (data/fpl_manual_overrides.csv) + "
+                         "MM-väsymyskertoimet (täytetään ~20.7)"),
+            },
             "sanity_gate": "PASS",
             "next_gameweek": next_gw,
             "deadline_utc": src["deadline_utc"],

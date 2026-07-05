@@ -3,12 +3,21 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-07-04T17:50:31",
+    "generated_at": "2026-07-05T13:20:21",
     "season": "2026/27",
     "source": "pulselive-fallback",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2425', '2526'] (sama fit-config kuin /api/predict: decay=0.0035, bayes=2.0)",
     "cs_method": "P(vastustaja 0 maalia) DC-score-matriisista (tau-korjattu)",
+    "context_layer": {
+      "promoted_teams": [
+        "Coventry",
+        "Hull",
+        "Ipswich"
+      ],
+      "manual_overrides": 0,
+      "note": "Phase 1b: nousija-koti-avaus-buusti + manuaaliset yliajot (data/fpl_manual_overrides.csv)"
+    },
     "fdr_method": "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), kvintiilibucket koko kauden joukkue-fixtureiden yli",
     "caveat": "Pre-season: 26/27 team-voimat = viime kauden priorit, suuntaa-antava. Nousijat ilman ylätason dataa = empiirinen promoted baseline.",
     "promoted_baseline_teams": [
@@ -291,69 +300,6 @@
       "next_n": 6
     },
     {
-      "name": "Manchester United",
-      "short": "MUN",
-      "fixtures": [
-        {
-          "gw": 1,
-          "opponent": "Hull",
-          "opponent_short": "HUL",
-          "venue": "A",
-          "kickoff_ms": 1787398200000.0,
-          "cs_pct": 43.3,
-          "fdr": 1
-        },
-        {
-          "gw": 2,
-          "opponent": "Ipswich",
-          "opponent_short": "IPS",
-          "venue": "H",
-          "kickoff_ms": 1788012000000.0,
-          "cs_pct": 41.1,
-          "fdr": 1
-        },
-        {
-          "gw": 3,
-          "opponent": "Everton",
-          "opponent_short": "EVE",
-          "venue": "A",
-          "kickoff_ms": 1788616800000.0,
-          "cs_pct": 26.8,
-          "fdr": 3
-        },
-        {
-          "gw": 4,
-          "opponent": "Manchester City",
-          "opponent_short": "MCI",
-          "venue": "H",
-          "kickoff_ms": 1789221600000.0,
-          "cs_pct": 23.5,
-          "fdr": 3
-        },
-        {
-          "gw": 5,
-          "opponent": "Fulham",
-          "opponent_short": "FUL",
-          "venue": "A",
-          "kickoff_ms": 1789826400000.0,
-          "cs_pct": 26.0,
-          "fdr": 3
-        },
-        {
-          "gw": 6,
-          "opponent": "Tottenham",
-          "opponent_short": "TOT",
-          "venue": "H",
-          "kickoff_ms": 1791640800000.0,
-          "cs_pct": 32.1,
-          "fdr": 2
-        }
-      ],
-      "next_avg_cs_pct": 32.1,
-      "next_avg_fdr": 2.17,
-      "next_n": 6
-    },
-    {
       "name": "Nottingham Forest",
       "short": "NFO",
       "fixtures": [
@@ -414,6 +360,69 @@
       ],
       "next_avg_cs_pct": 31.2,
       "next_avg_fdr": 2.5,
+      "next_n": 6
+    },
+    {
+      "name": "Manchester United",
+      "short": "MUN",
+      "fixtures": [
+        {
+          "gw": 1,
+          "opponent": "Hull",
+          "opponent_short": "HUL",
+          "venue": "A",
+          "kickoff_ms": 1787398200000.0,
+          "cs_pct": 33.7,
+          "fdr": 1
+        },
+        {
+          "gw": 2,
+          "opponent": "Ipswich",
+          "opponent_short": "IPS",
+          "venue": "H",
+          "kickoff_ms": 1788012000000.0,
+          "cs_pct": 41.1,
+          "fdr": 1
+        },
+        {
+          "gw": 3,
+          "opponent": "Everton",
+          "opponent_short": "EVE",
+          "venue": "A",
+          "kickoff_ms": 1788616800000.0,
+          "cs_pct": 26.8,
+          "fdr": 3
+        },
+        {
+          "gw": 4,
+          "opponent": "Manchester City",
+          "opponent_short": "MCI",
+          "venue": "H",
+          "kickoff_ms": 1789221600000.0,
+          "cs_pct": 23.5,
+          "fdr": 3
+        },
+        {
+          "gw": 5,
+          "opponent": "Fulham",
+          "opponent_short": "FUL",
+          "venue": "A",
+          "kickoff_ms": 1789826400000.0,
+          "cs_pct": 26.0,
+          "fdr": 3
+        },
+        {
+          "gw": 6,
+          "opponent": "Tottenham",
+          "opponent_short": "TOT",
+          "venue": "H",
+          "kickoff_ms": 1791640800000.0,
+          "cs_pct": 32.1,
+          "fdr": 2
+        }
+      ],
+      "next_avg_cs_pct": 30.5,
+      "next_avg_fdr": 2.17,
       "next_n": 6
     },
     {
@@ -606,69 +615,6 @@
       "next_n": 6
     },
     {
-      "name": "Sunderland",
-      "short": "SUN",
-      "fixtures": [
-        {
-          "gw": 1,
-          "opponent": "Ipswich",
-          "opponent_short": "IPS",
-          "venue": "A",
-          "kickoff_ms": 1787407200000.0,
-          "cs_pct": 41.7,
-          "fdr": 1
-        },
-        {
-          "gw": 2,
-          "opponent": "Fulham",
-          "opponent_short": "FUL",
-          "venue": "H",
-          "kickoff_ms": 1788012000000.0,
-          "cs_pct": 38.7,
-          "fdr": 2
-        },
-        {
-          "gw": 3,
-          "opponent": "Brentford",
-          "opponent_short": "BRE",
-          "venue": "A",
-          "kickoff_ms": 1788616800000.0,
-          "cs_pct": 19.5,
-          "fdr": 4
-        },
-        {
-          "gw": 4,
-          "opponent": "Arsenal",
-          "opponent_short": "ARS",
-          "venue": "H",
-          "kickoff_ms": 1789221600000.0,
-          "cs_pct": 24.0,
-          "fdr": 4
-        },
-        {
-          "gw": 5,
-          "opponent": "Manchester City",
-          "opponent_short": "MCI",
-          "venue": "A",
-          "kickoff_ms": 1789826400000.0,
-          "cs_pct": 12.0,
-          "fdr": 5
-        },
-        {
-          "gw": 6,
-          "opponent": "Brighton",
-          "opponent_short": "BHA",
-          "venue": "H",
-          "kickoff_ms": 1791640800000.0,
-          "cs_pct": 31.2,
-          "fdr": 3
-        }
-      ],
-      "next_avg_cs_pct": 27.8,
-      "next_avg_fdr": 3.17,
-      "next_n": 6
-    },
-    {
       "name": "Leeds",
       "short": "LEE",
       "fixtures": [
@@ -792,6 +738,69 @@
       ],
       "next_avg_cs_pct": 26.2,
       "next_avg_fdr": 2.67,
+      "next_n": 6
+    },
+    {
+      "name": "Sunderland",
+      "short": "SUN",
+      "fixtures": [
+        {
+          "gw": 1,
+          "opponent": "Ipswich",
+          "opponent_short": "IPS",
+          "venue": "A",
+          "kickoff_ms": 1787407200000.0,
+          "cs_pct": 32.1,
+          "fdr": 2
+        },
+        {
+          "gw": 2,
+          "opponent": "Fulham",
+          "opponent_short": "FUL",
+          "venue": "H",
+          "kickoff_ms": 1788012000000.0,
+          "cs_pct": 38.7,
+          "fdr": 2
+        },
+        {
+          "gw": 3,
+          "opponent": "Brentford",
+          "opponent_short": "BRE",
+          "venue": "A",
+          "kickoff_ms": 1788616800000.0,
+          "cs_pct": 19.5,
+          "fdr": 4
+        },
+        {
+          "gw": 4,
+          "opponent": "Arsenal",
+          "opponent_short": "ARS",
+          "venue": "H",
+          "kickoff_ms": 1789221600000.0,
+          "cs_pct": 24.0,
+          "fdr": 4
+        },
+        {
+          "gw": 5,
+          "opponent": "Manchester City",
+          "opponent_short": "MCI",
+          "venue": "A",
+          "kickoff_ms": 1789826400000.0,
+          "cs_pct": 12.0,
+          "fdr": 5
+        },
+        {
+          "gw": 6,
+          "opponent": "Brighton",
+          "opponent_short": "BHA",
+          "venue": "H",
+          "kickoff_ms": 1791640800000.0,
+          "cs_pct": 31.2,
+          "fdr": 3
+        }
+      ],
+      "next_avg_cs_pct": 26.2,
+      "next_avg_fdr": 3.33,
       "next_n": 6
     },
     {
@@ -1110,69 +1119,6 @@
       "next_n": 6
     },
     {
-      "name": "Hull",
-      "short": "HUL",
-      "fixtures": [
-        {
-          "gw": 1,
-          "opponent": "Manchester United",
-          "opponent_short": "MUN",
-          "venue": "H",
-          "kickoff_ms": 1787398200000.0,
-          "cs_pct": 13.7,
-          "fdr": 5
-        },
-        {
-          "gw": 2,
-          "opponent": "Coventry",
-          "opponent_short": "COV",
-          "venue": "A",
-          "kickoff_ms": 1788012000000.0,
-          "cs_pct": 28.9,
-          "fdr": 3
-        },
-        {
-          "gw": 3,
-          "opponent": "Aston Villa",
-          "opponent_short": "AVL",
-          "venue": "H",
-          "kickoff_ms": 1788616800000.0,
-          "cs_pct": 17.4,
-          "fdr": 5
-        },
-        {
-          "gw": 4,
-          "opponent": "Chelsea",
-          "opponent_short": "CHE",
-          "venue": "A",
-          "kickoff_ms": 1789221600000.0,
-          "cs_pct": 13.1,
-          "fdr": 5
-        },
-        {
-          "gw": 5,
-          "opponent": "Newcastle United",
-          "opponent_short": "NEW",
-          "venue": "A",
-          "kickoff_ms": 1789826400000.0,
-          "cs_pct": 6.8,
-          "fdr": 5
-        },
-        {
-          "gw": 6,
-          "opponent": "Everton",
-          "opponent_short": "EVE",
-          "venue": "H",
-          "kickoff_ms": 1791640800000.0,
-          "cs_pct": 22.5,
-          "fdr": 4
-        }
-      ],
-      "next_avg_cs_pct": 17.1,
-      "next_avg_fdr": 4.5,
-      "next_n": 6
-    },
-    {
       "name": "Coventry",
       "short": "COV",
       "fixtures": [
@@ -1192,7 +1138,7 @@
           "venue": "H",
           "kickoff_ms": 1788012000000.0,
           "cs_pct": 30.2,
-          "fdr": 3
+          "fdr": 2
         },
         {
           "gw": 3,
@@ -1232,7 +1178,7 @@
         }
       ],
       "next_avg_cs_pct": 16.4,
-      "next_avg_fdr": 4.5,
+      "next_avg_fdr": 4.33,
       "next_n": 6
     },
     {
@@ -1297,6 +1243,69 @@
       "next_avg_cs_pct": 16.1,
       "next_avg_fdr": 4.67,
       "next_n": 6
+    },
+    {
+      "name": "Hull",
+      "short": "HUL",
+      "fixtures": [
+        {
+          "gw": 1,
+          "opponent": "Manchester United",
+          "opponent_short": "MUN",
+          "venue": "H",
+          "kickoff_ms": 1787398200000.0,
+          "cs_pct": 13.7,
+          "fdr": 5
+        },
+        {
+          "gw": 2,
+          "opponent": "Coventry",
+          "opponent_short": "COV",
+          "venue": "A",
+          "kickoff_ms": 1788012000000.0,
+          "cs_pct": 19.9,
+          "fdr": 4
+        },
+        {
+          "gw": 3,
+          "opponent": "Aston Villa",
+          "opponent_short": "AVL",
+          "venue": "H",
+          "kickoff_ms": 1788616800000.0,
+          "cs_pct": 17.4,
+          "fdr": 5
+        },
+        {
+          "gw": 4,
+          "opponent": "Chelsea",
+          "opponent_short": "CHE",
+          "venue": "A",
+          "kickoff_ms": 1789221600000.0,
+          "cs_pct": 13.1,
+          "fdr": 5
+        },
+        {
+          "gw": 5,
+          "opponent": "Newcastle United",
+          "opponent_short": "NEW",
+          "venue": "A",
+          "kickoff_ms": 1789826400000.0,
+          "cs_pct": 6.8,
+          "fdr": 5
+        },
+        {
+          "gw": 6,
+          "opponent": "Everton",
+          "opponent_short": "EVE",
+          "venue": "H",
+          "kickoff_ms": 1791640800000.0,
+          "cs_pct": 22.5,
+          "fdr": 4
+        }
+      ],
+      "next_avg_cs_pct": 15.6,
+      "next_avg_fdr": 4.67,
+      "next_n": 6
     }
   ],
   "fixtures": [
@@ -1328,13 +1337,13 @@
       "away": "Manchester United",
       "home_short": "HUL",
       "away_short": "MUN",
-      "xg_home": 0.836,
+      "xg_home": 1.087,
       "xg_away": 1.989,
-      "p_home_win": 0.1378,
-      "p_draw": 0.2307,
-      "p_away_win": 0.6315,
+      "p_home_win": 0.1907,
+      "p_draw": 0.2384,
+      "p_away_win": 0.571,
       "cs_home_pct": 13.7,
-      "cs_away_pct": 43.3,
+      "cs_away_pct": 33.7,
       "fdr_home": 5,
       "fdr_away": 1
     },
@@ -1366,15 +1375,15 @@
       "away": "Sunderland",
       "home_short": "IPS",
       "away_short": "SUN",
-      "xg_home": 0.874,
+      "xg_home": 1.136,
       "xg_away": 1.49,
-      "p_home_win": 0.2063,
-      "p_draw": 0.2916,
-      "p_away_win": 0.502,
+      "p_home_win": 0.2746,
+      "p_draw": 0.2865,
+      "p_away_win": 0.4388,
       "cs_home_pct": 22.5,
-      "cs_away_pct": 41.7,
+      "cs_away_pct": 32.1,
       "fdr_home": 4,
-      "fdr_away": 1
+      "fdr_away": 2
     },
     {
       "gameweek": 1,
@@ -1556,15 +1565,15 @@
       "away": "Hull",
       "home_short": "COV",
       "away_short": "HUL",
-      "xg_home": 1.242,
+      "xg_home": 1.615,
       "xg_away": 1.197,
-      "p_home_win": 0.3586,
-      "p_draw": 0.3047,
-      "p_away_win": 0.3368,
+      "p_home_win": 0.4571,
+      "p_draw": 0.2736,
+      "p_away_win": 0.2693,
       "cs_home_pct": 30.2,
-      "cs_away_pct": 28.9,
-      "fdr_home": 3,
-      "fdr_away": 3
+      "cs_away_pct": 19.9,
+      "fdr_home": 2,
+      "fdr_away": 4
     },
     {
       "gameweek": 2,

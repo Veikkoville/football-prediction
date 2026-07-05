@@ -40,6 +40,8 @@ raw_data/
 !/data/fpl_projections_phase0.json
 # FPL Phase 1 xP -projektio: sama refresh-konventio (/api/fantasy/xp).
 !/data/fpl_xp_projections.json
+# FPL Phase 1b: manuaaliset konteksti-yliajot (versioitu input, builderit lukevat).
+!/data/fpl_manual_overrides.csv
 downloaded_files/
 ~/soccerdata/
 

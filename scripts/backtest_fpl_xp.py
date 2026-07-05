@@ -40,6 +40,7 @@ from src.data import fpl_api
 from src.data.loader import lataa_otteludata
 from src.models import fpl_xp as xp
 from src.models.dixon_coles import DixonColesModel
+from src.models.fpl_context import build_context, fixture_contexts, neutral_lambda, promoted_teams
 
 FORM_WINDOW = 5          # baseline: viim. 5 joukkuekierroksen pistekeskiarvo
 GW_FIRST_EVAL = 2        # GW1:lle ei ole kummallakaan menetelmällä dataa
@@ -87,49 +88,8 @@ def build_structures(boot: dict, fixtures: list, summaries: dict[int, list[dict]
             fixtures_by_event, team_rounds, rows_by_round, mins_by_round, pts_by_round)
 
 
-def neutral_lambda(dc: DixonColesModel, teams: list[str]) -> dict[str, float]:
-    """Joukkueen neutraali maaliodotus: keskiarvo koti+vieras kaikkia muita
-    kauden joukkueita vastaan. Kerroin goal_mult = fixture-λ / tämä."""
-    out = {}
-    for t in teams:
-        vals = []
-        for o in teams:
-            if o == t:
-                continue
-            lam_h, _ = dc.expected_goals(t, o)
-            _, mu_a = dc.expected_goals(o, t)
-            vals.extend([lam_h, mu_a])
-        out[t] = float(np.mean(vals)) if vals else 1.0
-    return out
-
-
-def fixture_contexts(dc: DixonColesModel, fxs: list[dict],
-                     tid_to_model: dict[int, str],
-                     lam_avg: dict[str, float]) -> dict[int, list[dict]]:
-    """Per joukkue-id: lista fixture-konteksteja (DGW:ssä useampi)."""
-    ctx_by_team: dict[int, list[dict]] = defaultdict(list)
-    for f in fxs:
-        h = tid_to_model.get(f["team_h"])
-        a = tid_to_model.get(f["team_a"])
-        if h not in dc.attack or a not in dc.attack:
-            continue
-        lam, mu = dc.expected_goals(h, a)
-        m = dc.score_matrix(h, a)
-        home_goals_dist = m.sum(axis=1)   # P(koti tekee i)
-        away_goals_dist = m.sum(axis=0)   # P(vieras tekee j)
-        ctx_by_team[f["team_h"]].append({
-            "goal_mult": lam / max(lam_avg.get(h, 1.0), 1e-9),
-            "cs_prob": float(m[:, 0].sum()),
-            "conceded_dist": [float(p) for p in away_goals_dist],
-            "opp_goal_mult": mu / max(lam_avg.get(a, 1.0), 1e-9),
-        })
-        ctx_by_team[f["team_a"]].append({
-            "goal_mult": mu / max(lam_avg.get(a, 1.0), 1e-9),
-            "cs_prob": float(m[0, :].sum()),
-            "conceded_dist": [float(p) for p in home_goals_dist],
-            "opp_goal_mult": lam / max(lam_avg.get(h, 1.0), 1e-9),
-        })
-    return ctx_by_team
+# neutral_lambda + fixture_contexts siirretty src/models/fpl_context.py:hyn
+# (Phase 1b) — sama koodi backtestissä ja tuotanto-buildereissa.
 
 
 # ---------------------------------------------------------------------------
@@ -149,7 +109,7 @@ def rho(pred: list[float], actual: list[float]) -> float:
 # ---------------------------------------------------------------------------
 # Backtest
 # ---------------------------------------------------------------------------
-def run_backtest(force_refresh: bool = False) -> dict:
+def run_backtest(force_refresh: bool = False, use_context: bool = True) -> dict:
     print("[1/4] FPL-data (bootstrap + fixtures + 841 element-historiaa)...")
     boot = fpl_api.fetch_bootstrap(force=force_refresh)
     fixtures = fpl_api.fetch_fixtures(force=force_refresh)
@@ -172,8 +132,36 @@ def run_backtest(force_refresh: bool = False) -> dict:
     events = sorted(fixtures_by_event)
     fpl_team_names = [tid_to_model[t["id"]] for t in boot["teams"]]
 
+    # Phase 1b -kontekstikerros: nousijat (tämä kausi − edellinen kausi
+    # otteludatasta) + ensimmäisen kotipelin GW → koti-avaus-buusti.
+    # Walk-forward-laillista (tiedossa ennen kautta). Manuaalisia yliajoja
+    # EI ladata backtestissä (ne ovat tulevan kauden inputteja).
+    ctx_cfg = None
+    promoted: set[str] = set()
+    if use_context:
+        seasons_str = matches["season"].astype(str)
+        cur_s, prev_s = max(seasons_str.unique()), min(seasons_str.unique())
+        promoted = promoted_teams(
+            set(matches[seasons_str == cur_s]["home_team"]),
+            set(matches[seasons_str == prev_s]["home_team"]))
+        model_fixtures = [{"gameweek": f.get("event"),
+                           "home": tid_to_model.get(f["team_h"]),
+                           "away": tid_to_model.get(f["team_a"])}
+                          for f in fixtures if f.get("event")]
+        ctx_cfg = build_context(promoted, model_fixtures)
+        print(f"      kontekstikerros PÄÄLLÄ: nousijat {sorted(promoted)}, "
+              f"koti-avaus-buusti")
+    else:
+        # Slice-raportointi tarvitsee nousijalistan myös raa'assa ajossa
+        seasons_str = matches["season"].astype(str)
+        cur_s, prev_s = max(seasons_str.unique()), min(seasons_str.unique())
+        promoted = promoted_teams(
+            set(matches[seasons_str == cur_s]["home_team"]),
+            set(matches[seasons_str == prev_s]["home_team"]))
+        print("      kontekstikerros POIS (raaka DC, Phase 1 -käyttäytyminen)")
+
     per_gw: list[dict] = []
-    obs_rows: list[dict] = []  # per pelaaja-GW: diagnoosiin
+    obs_rows: list[dict] = []  # per pelaaja-GW: diagnoosiin + sliceihin
 
     print(f"[3/4] Walk-forward GW{GW_FIRST_EVAL}-{max(events)} "
           f"(DC-fit per GW, vain edeltävä data)...")
@@ -196,7 +184,15 @@ def run_backtest(force_refresh: bool = False) -> dict:
         if missing:
             add_promoted_baseline(dc, missing)
         lam_avg = neutral_lambda(dc, fpl_team_names)
-        ctx_by_team = fixture_contexts(dc, fxs, tid_to_model, lam_avg)
+        ctx_by_team = fixture_contexts(dc, fxs, tid_to_model, lam_avg, cfg=ctx_cfg)
+
+        # Vastustajat per joukkue-id tälle GW:lle (slice: vs nousija)
+        opps_by_tid: dict[int, list[str]] = defaultdict(list)
+        for f in fxs:
+            h, a = tid_to_model.get(f["team_h"]), tid_to_model.get(f["team_a"])
+            if h and a:
+                opps_by_tid[f["team_h"]].append(a)
+                opps_by_tid[f["team_a"]].append(h)
 
         # Kumulatiiviset accit + positiopriorit kierroksilta < g
         acc_by_player: dict[int, dict] = {}
@@ -237,7 +233,9 @@ def run_backtest(force_refresh: bool = False) -> dict:
             gw_played.append(played)
             gw_pos.append(pos)
             obs_rows.append({"gw": g, "pid": pid, "pos": pos, "pred": pred,
-                             "base": base, "actual": actual, "played": played})
+                             "base": base, "actual": actual, "played": played,
+                             "vs_promoted": any(o in promoted
+                                                for o in opps_by_tid.get(tid, ()))})
 
         idx_played = [i for i, p in enumerate(gw_played) if p]
         entry = {"gw": g, "n_all": len(gw_actual), "n_played": len(idx_played)}
@@ -257,7 +255,8 @@ def run_backtest(force_refresh: bool = False) -> dict:
                   f"base={entry.get('played_mae_base', float('nan')):.3f}")
 
     print("[4/4] Aggregointi + ship-gate...")
-    return aggregate_and_gate(per_gw, obs_rows, season_key)
+    return aggregate_and_gate(per_gw, obs_rows, season_key,
+                              use_context=use_context)
 
 
 def _agg(per_gw: list[dict], tag: str, gw_from: int, gw_to: int) -> dict:
@@ -274,8 +273,24 @@ def _agg(per_gw: list[dict], tag: str, gw_from: int, gw_to: int) -> dict:
     }
 
 
+def _slice_stats(obs: list[dict]) -> dict:
+    """MAE/rho + signed bias (pred − actual) molemmille malleille."""
+    if len(obs) < 10:
+        return {"n": len(obs)}
+    preds = [o["pred"] for o in obs]
+    bases = [o["base"] for o in obs]
+    ys = [o["actual"] for o in obs]
+    return {
+        "n": len(obs),
+        "mae_xp": mae(preds, ys), "mae_base": mae(bases, ys),
+        "rho_xp": rho(preds, ys), "rho_base": rho(bases, ys),
+        "bias_xp": float(np.mean(np.array(preds) - np.array(ys))),
+        "bias_base": float(np.mean(np.array(bases) - np.array(ys))),
+    }
+
+
 def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
-                       season_key: str) -> dict:
+                       season_key: str, use_context: bool = True) -> dict:
     gw_max = max(e["gw"] for e in per_gw)
     agg = {
         "played_full": _agg(per_gw, "played", GW_FIRST_EVAL, gw_max),
@@ -308,9 +323,25 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
     rho_clear = p["rho_xp"] >= p["rho_base"] + 0.02
     gate_pass = mae_ok and rho_ok and (mae_clear or rho_clear)
 
+    # §1b-slicet (pelanneet): nousijavastustaja + early season + leikkaus.
+    # bias > 0 = xP yliarvioi (CS-inflaatio nousijaa vastaan näkyisi tässä
+    # erityisesti GKP/DEF-bias_xp:ssä).
+    played = [o for o in obs_rows if o["played"]]
+    slices = {
+        "vs_promoted": _slice_stats([o for o in played if o["vs_promoted"]]),
+        "vs_promoted_def_gkp": _slice_stats(
+            [o for o in played if o["vs_promoted"] and o["pos"] in (1, 2)]),
+        "vs_promoted_early_gw2_6": _slice_stats(
+            [o for o in played if o["vs_promoted"] and o["gw"] <= 6]),
+        "early_gw2_6": _slice_stats([o for o in played if o["gw"] <= 6]),
+        "muut (ei nousijaa, GW7+)": _slice_stats(
+            [o for o in played if not o["vs_promoted"] and o["gw"] > 6]),
+    }
+
     report = {
         "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
         "season": season_key,
+        "context_layer": use_context,
         "baseline": (f"form{FORM_WINDOW} (viim. {FORM_WINDOW} joukkuekierroksen "
                      "pistekeskiarvo; FPL:n historiallista ep_next:iä ei ole "
                      "API:ssa saatavilla)"),
@@ -323,6 +354,7 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
         },
         "aggregates": agg,
         "by_position": by_pos,
+        "slices": slices,
         "per_gw": per_gw,
     }
 
@@ -344,6 +376,12 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
     for pname, s in by_pos.items():
         print(f"      {pname}: MAE {s['mae_xp']:.3f} vs {s['mae_base']:.3f}, "
               f"rho {s['rho_xp']:.3f} vs {s['rho_base']:.3f}  (n={s['n']})")
+    print("  Slicet (pelanneet; bias = pred - actual, + = yliarvio):")
+    for sname, s in slices.items():
+        if "mae_xp" not in s:
+            continue
+        print(f"      {sname}: MAE {s['mae_xp']:.3f} vs base {s['mae_base']:.3f}, "
+              f"bias xP {s['bias_xp']:+.3f} / base {s['bias_base']:+.3f}  (n={s['n']})")
     print(f"\n  GATE: {'PASS' if gate_pass else 'FAIL'}")
     print("=" * 72)
     return report
@@ -353,13 +391,16 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true",
                     help="pakota FPL-datan uudelleenhaku (ohita välimuisti)")
+    ap.add_argument("--raw", action="store_true",
+                    help="aja ILMAN Phase 1b -kontekstikerrosta (vertailuajo)")
     args = ap.parse_args()
 
-    report = run_backtest(force_refresh=args.refresh)
+    report = run_backtest(force_refresh=args.refresh, use_context=not args.raw)
 
     out_dir = config.PROJECT_ROOT / "logs"
     out_dir.mkdir(exist_ok=True)
-    out = out_dir / f"fpl_xp_backtest_{_dt.date.today().isoformat()}.json"
+    suffix = "_raw" if args.raw else ""
+    out = out_dir / f"fpl_xp_backtest_{_dt.date.today().isoformat()}{suffix}.json"
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2),
                    encoding="utf-8")
     print(f"\nRaportti: {out}")

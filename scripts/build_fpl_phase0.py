@@ -295,17 +295,25 @@ def add_promoted_baseline(dc: DixonColesModel, needed: list[str]) -> dict:
 # ---------------------------------------------------------------------------
 # 4. Laske per-fixture CS% + win% + xG + FDR
 # ---------------------------------------------------------------------------
-def compute_fixtures(dc: DixonColesModel, fixtures: list[dict]) -> list[dict]:
+def compute_fixtures(dc: DixonColesModel, fixtures: list[dict],
+                     ctx_cfg: dict | None = None) -> list[dict]:
     """CS-% luetaan DC-score-matriisista (tau-korjattu): koti-CS = P(vieras 0)
-    = m[:,0].sum() — sama matriisi josta tuotannon 1X2/BTTS lasketaan."""
+    = m[:,0].sum() — sama matriisi josta tuotannon 1X2/BTTS lasketaan.
+
+    ctx_cfg (Phase 1b, src/models/fpl_context.py): nousija-koti-avaus-buusti +
+    manuaaliset yliajot sovelletaan DC:n adjustments-mekanismilla ennen
+    matriisia. None = raaka DC (alkuperäinen Phase 0 -käyttäytyminen)."""
+    from src.models.fpl_context import fixture_adjustments
+
     rows = []
     for f in fixtures:
         h = map_name(f["home"])
         a = map_name(f["away"])
         if h not in dc.attack or a not in dc.attack:
             continue  # ei pitäisi tapahtua (baseline lisätty) — ohita turvallisesti
-        lam, mu = dc.expected_goals(h, a)  # lam=koti xG, mu=vieras xG
-        m = dc.score_matrix(h, a)
+        adj, _ = fixture_adjustments(h, a, f.get("gameweek"), ctx_cfg)
+        lam, mu = dc.expected_goals(h, a, adjustments=adj)  # lam=koti, mu=vieras
+        m = dc.score_matrix(h, a, adjustments=adj)
         cs_home = float(m[:, 0].sum())  # vieras tekee 0
         cs_away = float(m[0, :].sum())  # koti tekee 0
         p_home = float(np.tril(m, -1).sum())
@@ -462,8 +470,25 @@ def main() -> int:
     baseline = add_promoted_baseline(dc, missing)
     print(f"      promoted baseline: {baseline}")
 
-    print("[4/5] Lasketaan CS% + win% + FDR per fixture...")
-    rows = compute_fixtures(dc, src["fixtures"])
+    print("[4/5] Lasketaan CS% + win% + FDR per fixture (Phase 1b -konteksti)...")
+    # Phase 1b -kontekstikerros (sama kuin xP-builderissa): nousijat =
+    # fixture-joukkueet − edellisen PL-kauden joukkueet; koti-avaus-buusti +
+    # manuaaliset yliajot data/fpl_manual_overrides.csv:stä.
+    from src.data.loader import lataa_otteludata as _lataa
+    from src.models.fpl_context import build_context, load_overrides, promoted_teams
+
+    y = int(SEASON_LABEL[:4])
+    prev_key = f"{(y - 1) % 100:02d}{y % 100:02d}"
+    prev_matches = _lataa(["ENG-Premier League"], [prev_key])
+    fixture_team_names = {map_name(t) for t in src["teams"]}
+    promoted = promoted_teams(fixture_team_names, set(prev_matches["home_team"]))
+    model_fixtures = [{"gameweek": f["gameweek"], "home": map_name(f["home"]),
+                       "away": map_name(f["away"])}
+                      for f in src["fixtures"] if f["gameweek"]]
+    ctx_cfg = build_context(promoted, model_fixtures, load_overrides())
+    print(f"      nousijat: {sorted(promoted)}, yliajoja: {len(ctx_cfg['overrides'])}")
+
+    rows = compute_fixtures(dc, src["fixtures"], ctx_cfg=ctx_cfg)
     add_fdr(rows)
     next_gw = next_gameweek(rows)
     if next_gw is None:
@@ -502,6 +527,12 @@ def main() -> int:
                 f"(sama fit-config kuin /api/predict: decay={FIT_DECAY}, bayes={FIT_BAYES})"
             ),
             "cs_method": "P(vastustaja 0 maalia) DC-score-matriisista (tau-korjattu)",
+            "context_layer": {
+                "promoted_teams": sorted(promoted),
+                "manual_overrides": len(ctx_cfg["overrides"]),
+                "note": ("Phase 1b: nousija-koti-avaus-buusti + manuaaliset "
+                         "yliajot (data/fpl_manual_overrides.csv)"),
+            },
             "fdr_method": (
                 "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), "
                 "kvintiilibucket koko kauden joukkue-fixtureiden yli"

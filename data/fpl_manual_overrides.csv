@@ -1,0 +1,23 @@
+# FPL Phase 1b — manuaaliset konteksti-yliajot (builderit lukevat ennen JSONin kirjoitusta).
+# Kommenttirivit (#) ohitetaan. Joukkuenimet = MALLINIMET (Understat, esim. "Manchester United",
+# "Hull", "Coventry" — ks. scripts/build_fpl_phase0.py SHORT_MAP).
+#
+# Sarakkeet:
+#   scope        manual | wc_fatigue (raportointilabel)
+#   team         joukkue johon rivi kohdistuu (pakollinen)
+#   opponent     valinnainen suodatin (tyhja = kaikki vastustajat)
+#   venue        H/A joukkueen nakokulmasta (tyhja = molemmat)
+#   gw_from,gw_to  GW-vali (tyhja = koko horisontti)
+#   attack_mult  kertoo JOUKKUEEN maaliodotuksen (1.0 = ei muutosta)
+#   defence_mult kertoo VASTUSTAJAN maaliodotuksen (>1 = puolustus vuotaa enemman)
+#   xmins_mult   kertoo joukkueen pelaajien minuuttiodotuksen (vaatii tyhjan
+#                opponent+venue-kentan; kaytetaan MM-vasymykseen)
+#   note         vapaa selite (nakyy builderin lokissa)
+#
+# MM-2026-VASYMYS (TAYTA ~20.7 FINAALIN JALKEEN): pelaajakohtaisia MM-minuutteja
+# ei ole ilmaisessa datassa -> seura-tason kertoimet kasin. Esimerkkipohja:
+#   wc_fatigue,Manchester City,,,1,3,0.92,1.05,0.90,paljon syvalle edenneita (tayta oikeat luvut)
+#
+# Esimerkki manuaalisesta fixture-korjauksesta:
+#   manual,Hull,Manchester United,H,1,1,1.15,,,tuntuma: avaus kotona kovempaa kuin baseline
+scope,team,opponent,venue,gw_from,gw_to,attack_mult,defence_mult,xmins_mult,note
