@@ -255,6 +255,10 @@ def main() -> int:
         model_team_name = [n for n, i in name_to_fid.items() if i == fid][0]
         gws = []
         total = 0.0
+        # #3 OSA A: komponenttierittely headline-GW:lle (next_gw). Kertyy
+        # TÄSMÄLLEEN samoista xp_components-dicteistä joista totalit lasketaan
+        # → pelkkä emittointi, ei laskennan muutosta (xp-arvot identtiset).
+        headline_comps: dict[str, float] = {}
         for g in horizon:
             ctxs = ctx_by_gw.get(g, {}).get(fid, [])
             opps = opp_by_gw.get(g, {}).get(fid, [])
@@ -264,7 +268,12 @@ def main() -> int:
             p60_g, p1_g = min(p60 * mm, 1.0), min(p1_59 * mm, 1.0)
             gw_xp = 0.0
             for c in ctxs:
-                gw_xp += xp.xp_components(pos, rates, xm_g, p60_g, p1_g, c)["total"]
+                comp = xp.xp_components(pos, rates, xm_g, p60_g, p1_g, c)
+                gw_xp += comp["total"]
+                if g == next_gw:
+                    for k, v in comp.items():
+                        if k != "total":
+                            headline_comps[k] = headline_comps.get(k, 0.0) + v
             total += gw_xp
             gws.append({
                 "gw": g,
@@ -273,7 +282,15 @@ def main() -> int:
             })
         if total < MIN_XP_TOTAL:
             continue
-        players.append({
+        # Promptin kenttänimet (def_contribution -> defensive_contribution,
+        # cards -> yellows). Emitoidaan vain jos headline-GW:llä oli fixture.
+        components = None
+        if headline_comps:
+            key_map = {"def_contribution": "defensive_contribution",
+                       "cards": "yellows"}
+            components = {key_map.get(k, k): round(v, 2)
+                          for k, v in headline_comps.items()}
+        player_row = {
             "id": pid,
             "web_name": e["web_name"],
             "team": model_team_name,
@@ -283,7 +300,11 @@ def main() -> int:
             "xp_per_gw": round(total / max(len(horizon), 1), 2),
             "xp_horizon_total": round(total, 2),
             "gameweeks": gws,
-        })
+        }
+        if components is not None:
+            player_row["components"] = components
+            player_row["components_gw"] = next_gw
+        players.append(player_row)
     players.sort(key=lambda p: -p["xp_horizon_total"])
     print(f"      {len(players)} pelaajaa (xP >= {MIN_XP_TOTAL} horisontissa), "
           f"GW{next_gw}-{horizon[-1]}")

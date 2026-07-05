@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-05T13:20:30",
+    "generated_at": "2026-07-06T00:09:22",
     "season": "2026/27",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
     "player_source": "FPL official API (bootstrap + element-summary history)",
@@ -125,7 +125,19 @@
           ],
           "xp": 5.95
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.82,
+        "goals": 1.58,
+        "assists": 1.06,
+        "clean_sheet": 0.3,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.14,
+        "bonus": 0.9
+      },
+      "components_gw": 1
     },
     {
       "id": 430,
@@ -197,7 +209,19 @@
           ],
           "xp": 4.68
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 2.68,
+        "assists": 0.22,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.95
+      },
+      "components_gw": 1
     },
     {
       "id": 291,
@@ -269,7 +293,19 @@
           ],
           "xp": 5.27
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.45,
+        "assists": 0.19,
+        "clean_sheet": 1.35,
+        "conceded": -0.3,
+        "saves": 0.0,
+        "defensive_contribution": 1.08,
+        "yellows": -0.2,
+        "bonus": 0.29
+      },
+      "components_gw": 1
     },
     {
       "id": 136,
@@ -341,7 +377,19 @@
           ],
           "xp": 4.17
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.97,
+        "goals": 2.77,
+        "assists": 0.2,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.18,
+        "bonus": 0.57
+      },
+      "components_gw": 1
     },
     {
       "id": 517,
@@ -413,7 +461,19 @@
           ],
           "xp": 4.64
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.97,
+        "goals": 0.38,
+        "assists": 0.33,
+        "clean_sheet": 0.35,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 1.25,
+        "yellows": -0.2,
+        "bonus": 0.4
+      },
+      "components_gw": 1
     },
     {
       "id": 5,
@@ -485,7 +545,19 @@
           ],
           "xp": 4.69
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.58,
+        "goals": 0.64,
+        "assists": 0.2,
+        "clean_sheet": 1.83,
+        "conceded": -0.07,
+        "saves": 0.0,
+        "defensive_contribution": 0.54,
+        "yellows": -0.11,
+        "bonus": 0.62
+      },
+      "components_gw": 1
     },
     {
       "id": 515,
@@ -557,7 +629,19 @@
           ],
           "xp": 4.42
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.89,
+        "goals": 1.17,
+        "assists": 0.21,
+        "clean_sheet": 0.34,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.06,
+        "bonus": 0.43
+      },
+      "components_gw": 1
     },
     {
       "id": 21,
@@ -629,7 +713,19 @@
           ],
           "xp": 4.41
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.82,
+        "goals": 0.66,
+        "assists": 0.81,
+        "clean_sheet": 0.54,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.67,
+        "yellows": -0.1,
+        "bonus": 0.52
+      },
+      "components_gw": 1
     },
     {
       "id": 260,
@@ -701,7 +797,19 @@
           ],
           "xp": 3.49
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.62,
+        "assists": 0.19,
+        "clean_sheet": 1.21,
+        "conceded": -0.27,
+        "saves": 0.0,
+        "defensive_contribution": 0.54,
+        "yellows": -0.15,
+        "bonus": 0.31
+      },
+      "components_gw": 1
     },
     {
       "id": 303,
@@ -773,7 +881,19 @@
           ],
           "xp": 4.42
         }
-      ]
+      ],
+      "components": {
+        "appearance": 2.0,
+        "goals": 0.38,
+        "assists": 0.54,
+        "clean_sheet": 0.35,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.97,
+        "yellows": -0.29,
+        "bonus": 0.34
+      },
+      "components_gw": 1
     },
     {
       "id": 72,
@@ -845,7 +965,19 @@
           ],
           "xp": 4.35
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.89,
+        "goals": 0.17,
+        "assists": 0.24,
+        "clean_sheet": 0.44,
+        "conceded": -0.78,
+        "saves": 0.0,
+        "defensive_contribution": 1.23,
+        "yellows": -0.2,
+        "bonus": 0.32
+      },
+      "components_gw": 1
     },
     {
       "id": 373,
@@ -917,7 +1049,19 @@
           ],
           "xp": 3.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 2.0,
+        "goals": 0.53,
+        "assists": 0.11,
+        "clean_sheet": 0.6,
+        "conceded": -0.7,
+        "saves": 0.0,
+        "defensive_contribution": 0.81,
+        "yellows": -0.12,
+        "bonus": 0.25
+      },
+      "components_gw": 1
     },
     {
       "id": 119,
@@ -989,7 +1133,19 @@
           ],
           "xp": 4.55
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 1.7,
+        "assists": 0.45,
+        "clean_sheet": 0.28,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.12,
+        "bonus": 0.37
+      },
+      "components_gw": 1
     },
     {
       "id": 237,
@@ -1061,7 +1217,19 @@
           ],
           "xp": 4.14
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.82,
+        "goals": 1.23,
+        "assists": 0.49,
+        "clean_sheet": 0.22,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.13,
+        "yellows": -0.24,
+        "bonus": 0.44
+      },
+      "components_gw": 1
     },
     {
       "id": 82,
@@ -1133,7 +1301,19 @@
           ],
           "xp": 3.62
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 1.43,
+        "assists": 0.27,
+        "clean_sheet": 0.3,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.17,
+        "yellows": -0.17,
+        "bonus": 0.41
+      },
+      "components_gw": 1
     },
     {
       "id": 387,
@@ -1205,7 +1385,19 @@
           ],
           "xp": 3.8
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.89,
+        "goals": 0.59,
+        "assists": 0.48,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.5,
+        "yellows": -0.2,
+        "bonus": 0.5
+      },
+      "components_gw": 1
     },
     {
       "id": 1,
@@ -1277,7 +1469,19 @@
           ],
           "xp": 4.25
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.89,
+        "goals": 0.0,
+        "assists": 0.01,
+        "clean_sheet": 2.28,
+        "conceded": -0.09,
+        "saves": 0.35,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 684,
@@ -1349,7 +1553,19 @@
           ],
           "xp": 4.46
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.76,
+        "goals": 0.87,
+        "assists": 0.11,
+        "clean_sheet": 0.65,
+        "conceded": -0.5,
+        "saves": 0.0,
+        "defensive_contribution": 0.61,
+        "yellows": -0.12,
+        "bonus": 0.29
+      },
+      "components_gw": 1
     },
     {
       "id": 287,
@@ -1421,7 +1637,19 @@
           ],
           "xp": 4.58
         }
-      ]
+      ],
+      "components": {
+        "appearance": 2.0,
+        "goals": 0.0,
+        "assists": 0.02,
+        "clean_sheet": 1.38,
+        "conceded": -0.31,
+        "saves": 0.82,
+        "defensive_contribution": 0.0,
+        "yellows": -0.1,
+        "bonus": 0.27
+      },
+      "components_gw": 1
     },
     {
       "id": 64,
@@ -1493,7 +1721,19 @@
           ],
           "xp": 4.27
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.82,
+        "goals": 1.2,
+        "assists": 0.08,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.11,
+        "bonus": 0.63
+      },
+      "components_gw": 1
     },
     {
       "id": 151,
@@ -1565,7 +1805,19 @@
           ],
           "xp": 3.87
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.84,
+        "goals": 0.51,
+        "assists": 0.13,
+        "clean_sheet": 1.16,
+        "conceded": -0.32,
+        "saves": 0.0,
+        "defensive_contribution": 0.64,
+        "yellows": -0.22,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 249,
@@ -1637,7 +1889,19 @@
           ],
           "xp": 3.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.71,
+        "goals": 1.4,
+        "assists": 0.14,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.13,
+        "bonus": 0.7
+      },
+      "components_gw": 1
     },
     {
       "id": 457,
@@ -1709,7 +1973,19 @@
           ],
           "xp": 4.02
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.83,
+        "assists": 0.3,
+        "clean_sheet": 0.26,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.67,
+        "yellows": -0.21,
+        "bonus": 0.45
+      },
+      "components_gw": 1
     },
     {
       "id": 139,
@@ -1781,7 +2057,19 @@
           ],
           "xp": 3.87
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 1.23,
+        "conceded": -0.34,
+        "saves": 0.69,
+        "defensive_contribution": 0.0,
+        "yellows": -0.08,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 257,
@@ -1853,7 +2141,19 @@
           ],
           "xp": 3.56
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.76,
+        "goals": 0.34,
+        "assists": 0.07,
+        "clean_sheet": 0.84,
+        "conceded": -0.42,
+        "saves": 0.0,
+        "defensive_contribution": 0.95,
+        "yellows": -0.12,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 299,
@@ -1925,7 +2225,19 @@
           ],
           "xp": 3.9
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.96,
+        "assists": 0.39,
+        "clean_sheet": 0.29,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.31,
+        "yellows": -0.08,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 547,
@@ -1997,7 +2309,19 @@
           ],
           "xp": 3.85
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.82,
+        "goals": 0.89,
+        "assists": 0.59,
+        "clean_sheet": 0.28,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.41,
+        "yellows": -0.14,
+        "bonus": 0.38
+      },
+      "components_gw": 1
     },
     {
       "id": 314,
@@ -2069,7 +2393,19 @@
           ],
           "xp": 4.38
         }
-      ]
+      ],
+      "components": {
+        "appearance": 2.0,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 1.06,
+        "conceded": -0.43,
+        "saves": 0.8,
+        "defensive_contribution": 0.0,
+        "yellows": -0.08,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 47,
@@ -2141,7 +2477,19 @@
           ],
           "xp": 3.97
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.67,
+        "assists": 0.26,
+        "clean_sheet": 0.22,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.18,
+        "bonus": 0.41
+      },
+      "components_gw": 1
     },
     {
       "id": 295,
@@ -2213,7 +2561,19 @@
           ],
           "xp": 4.15
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.4,
+        "assists": 0.06,
+        "clean_sheet": 1.06,
+        "conceded": -0.24,
+        "saves": 0.0,
+        "defensive_contribution": 0.73,
+        "yellows": -0.05,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 508,
@@ -2285,7 +2645,19 @@
           ],
           "xp": 3.92
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.87,
+        "goals": 0.28,
+        "assists": 0.26,
+        "clean_sheet": 1.3,
+        "conceded": -0.27,
+        "saves": 0.0,
+        "defensive_contribution": 0.25,
+        "yellows": -0.16,
+        "bonus": 0.35
+      },
+      "components_gw": 1
     },
     {
       "id": 101,
@@ -2357,7 +2729,19 @@
           ],
           "xp": 3.36
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.0,
+        "assists": 0.02,
+        "clean_sheet": 1.18,
+        "conceded": -0.36,
+        "saves": 0.9,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.27
+      },
+      "components_gw": 1
     },
     {
       "id": 411,
@@ -2429,7 +2813,19 @@
           ],
           "xp": 2.96
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.58,
+        "goals": 0.92,
+        "assists": 0.21,
+        "clean_sheet": 0.99,
+        "conceded": -0.23,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.13,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 74,
@@ -2501,7 +2897,19 @@
           ],
           "xp": 3.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.15,
+        "assists": 0.16,
+        "clean_sheet": 0.45,
+        "conceded": -0.8,
+        "saves": 0.0,
+        "defensive_contribution": 0.6,
+        "yellows": -0.14,
+        "bonus": 0.43
+      },
+      "components_gw": 1
     },
     {
       "id": 16,
@@ -2573,7 +2981,19 @@
           ],
           "xp": 3.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 1.38,
+        "assists": 0.77,
+        "clean_sheet": 0.36,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.25,
+        "yellows": -0.07,
+        "bonus": 0.39
+      },
+      "components_gw": 1
     },
     {
       "id": 505,
@@ -2645,7 +3065,19 @@
           ],
           "xp": 3.84
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.97,
+        "goals": 0.14,
+        "assists": 0.06,
+        "clean_sheet": 1.42,
+        "conceded": -0.28,
+        "saves": 0.0,
+        "defensive_contribution": 0.67,
+        "yellows": -0.16,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 120,
@@ -2717,7 +3149,19 @@
           ],
           "xp": 3.17
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.71,
+        "goals": 1.92,
+        "assists": 0.24,
+        "clean_sheet": 0.24,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.16,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 691,
@@ -2789,7 +3233,19 @@
           ],
           "xp": 2.87
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 1.18,
+        "assists": 0.07,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.09,
+        "bonus": 0.49
+      },
+      "components_gw": 1
     },
     {
       "id": 293,
@@ -2861,7 +3317,19 @@
           ],
           "xp": 4.07
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.92,
+        "goals": 0.31,
+        "assists": 0.1,
+        "clean_sheet": 1.31,
+        "conceded": -0.28,
+        "saves": 0.0,
+        "defensive_contribution": 0.34,
+        "yellows": -0.16,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 84,
@@ -2933,7 +3401,19 @@
           ],
           "xp": 3.55
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.75,
+        "assists": 0.24,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.17,
+        "yellows": -0.15,
+        "bonus": 0.33
+      },
+      "components_gw": 1
     },
     {
       "id": 329,
@@ -3005,7 +3485,19 @@
           ],
           "xp": 3.75
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.85,
+        "assists": 0.41,
+        "clean_sheet": 0.21,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.17,
+        "bonus": 0.47
+      },
+      "components_gw": 1
     },
     {
       "id": 106,
@@ -3077,7 +3569,19 @@
           ],
           "xp": 2.99
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.76,
+        "goals": 0.46,
+        "assists": 0.18,
+        "clean_sheet": 1.02,
+        "conceded": -0.32,
+        "saves": 0.0,
+        "defensive_contribution": 0.79,
+        "yellows": -0.18,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 90,
@@ -3149,7 +3653,19 @@
           ],
           "xp": 3.51
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.35,
+        "assists": 0.16,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.7,
+        "yellows": -0.13,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 488,
@@ -3221,7 +3737,19 @@
           ],
           "xp": 3.44
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.47,
+        "goals": 0.88,
+        "assists": 0.47,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.26,
+        "yellows": -0.15,
+        "bonus": 0.48
+      },
+      "components_gw": 1
     },
     {
       "id": 384,
@@ -3293,7 +3821,19 @@
           ],
           "xp": 3.18
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.76,
+        "goals": 0.96,
+        "assists": 0.33,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.1,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 6,
@@ -3365,7 +3905,19 @@
           ],
           "xp": 3.69
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.55,
+        "goals": 0.24,
+        "assists": 0.15,
+        "clean_sheet": 1.77,
+        "conceded": -0.07,
+        "saves": 0.0,
+        "defensive_contribution": 0.24,
+        "yellows": -0.07,
+        "bonus": 0.28
+      },
+      "components_gw": 1
     },
     {
       "id": 670,
@@ -3437,7 +3989,19 @@
           ],
           "xp": 3.63
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.84,
+        "goals": 0.0,
+        "assists": 0.01,
+        "clean_sheet": 1.18,
+        "conceded": -0.32,
+        "saves": 1.14,
+        "defensive_contribution": 0.0,
+        "yellows": -0.1,
+        "bonus": 0.29
+      },
+      "components_gw": 1
     },
     {
       "id": 354,
@@ -3509,7 +4073,19 @@
           ],
           "xp": 3.13
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.28,
+        "assists": 0.15,
+        "clean_sheet": 0.27,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.89,
+        "yellows": -0.24,
+        "bonus": 0.28
+      },
+      "components_gw": 1
     },
     {
       "id": 242,
@@ -3581,7 +4157,19 @@
           ],
           "xp": 3.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.58,
+        "goals": 0.65,
+        "assists": 0.46,
+        "clean_sheet": 0.26,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.26,
+        "yellows": -0.15,
+        "bonus": 0.41
+      },
+      "components_gw": 1
     },
     {
       "id": 253,
@@ -3653,7 +4241,19 @@
           ],
           "xp": 3.29
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.89,
+        "goals": 0.0,
+        "assists": 0.01,
+        "clean_sheet": 0.91,
+        "conceded": -0.45,
+        "saves": 1.02,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 148,
@@ -3725,7 +4325,19 @@
           ],
           "xp": 3.34
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.84,
+        "goals": 0.33,
+        "assists": 0.25,
+        "clean_sheet": 1.13,
+        "conceded": -0.31,
+        "saves": 0.0,
+        "defensive_contribution": 0.15,
+        "yellows": -0.16,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 382,
@@ -3797,7 +4409,19 @@
           ],
           "xp": 3.1
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.58,
+        "goals": 0.78,
+        "assists": 0.36,
+        "clean_sheet": 0.11,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.05,
+        "bonus": 0.38
+      },
+      "components_gw": 1
     },
     {
       "id": 733,
@@ -3869,7 +4493,19 @@
           ],
           "xp": 3.37
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 1.14,
+        "conceded": -0.27,
+        "saves": 0.9,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 450,
@@ -3941,7 +4577,19 @@
           ],
           "xp": 3.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.61,
+        "goals": 1.02,
+        "assists": 0.32,
+        "clean_sheet": 0.25,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.11,
+        "bonus": 0.33
+      },
+      "components_gw": 1
     },
     {
       "id": 374,
@@ -4013,7 +4661,19 @@
           ],
           "xp": 3.06
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.84,
+        "goals": 0.19,
+        "assists": 0.08,
+        "clean_sheet": 0.54,
+        "conceded": -0.64,
+        "saves": 0.0,
+        "defensive_contribution": 0.66,
+        "yellows": -0.18,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 694,
@@ -4085,7 +4745,19 @@
           ],
           "xp": 3.61
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.34,
+        "assists": 0.26,
+        "clean_sheet": 1.05,
+        "conceded": -0.28,
+        "saves": 0.0,
+        "defensive_contribution": 0.65,
+        "yellows": -0.14,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 67,
@@ -4157,7 +4829,19 @@
           ],
           "xp": 3.45
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.45,
+        "conceded": -0.81,
+        "saves": 1.02,
+        "defensive_contribution": 0.0,
+        "yellows": -0.08,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 443,
@@ -4229,7 +4913,19 @@
           ],
           "xp": 3.45
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.97,
+        "goals": 0.17,
+        "assists": 0.19,
+        "clean_sheet": 1.31,
+        "conceded": -0.3,
+        "saves": 0.0,
+        "defensive_contribution": 0.29,
+        "yellows": -0.22,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 113,
@@ -4301,7 +4997,19 @@
           ],
           "xp": 2.79
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.65,
+        "assists": 0.16,
+        "clean_sheet": 0.96,
+        "conceded": -0.3,
+        "saves": 0.0,
+        "defensive_contribution": 0.6,
+        "yellows": -0.08,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 343,
@@ -4373,7 +5081,19 @@
           ],
           "xp": 2.44
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.34,
+        "assists": 0.05,
+        "clean_sheet": 0.97,
+        "conceded": -0.31,
+        "saves": 0.0,
+        "defensive_contribution": 0.63,
+        "yellows": -0.13,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 283,
@@ -4445,7 +5165,19 @@
           ],
           "xp": 3.16
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 1.32,
+        "assists": 0.1,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.35
+      },
+      "components_gw": 1
     },
     {
       "id": 83,
@@ -4517,7 +5249,19 @@
           ],
           "xp": 2.93
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.47,
+        "goals": 1.26,
+        "assists": 0.41,
+        "clean_sheet": 0.19,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.13,
+        "yellows": -0.13,
+        "bonus": 0.36
+      },
+      "components_gw": 1
     },
     {
       "id": 26,
@@ -4589,7 +5333,19 @@
           ],
           "xp": 3.32
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.61,
+        "assists": 0.29,
+        "clean_sheet": 0.49,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.35,
+        "yellows": -0.12,
+        "bonus": 0.24
+      },
+      "components_gw": 1
     },
     {
       "id": 178,
@@ -4661,7 +5417,19 @@
           ],
           "xp": 3.06
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.61,
+        "goals": 1.32,
+        "assists": 0.12,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.45
+      },
+      "components_gw": 1
     },
     {
       "id": 32,
@@ -4733,7 +5501,19 @@
           ],
           "xp": 3.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.73,
+        "conceded": -0.42,
+        "saves": 0.86,
+        "defensive_contribution": 0.0,
+        "yellows": -0.05,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 407,
@@ -4805,7 +5585,19 @@
           ],
           "xp": 2.65
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.61,
+        "goals": 0.09,
+        "assists": 0.18,
+        "clean_sheet": 1.07,
+        "conceded": -0.24,
+        "saves": 0.0,
+        "defensive_contribution": 0.23,
+        "yellows": -0.13,
+        "bonus": 0.34
+      },
+      "components_gw": 1
     },
     {
       "id": 736,
@@ -4877,7 +5669,19 @@
           ],
           "xp": 2.66
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.0,
+        "assists": 0.01,
+        "clean_sheet": 1.18,
+        "conceded": -0.26,
+        "saves": 0.47,
+        "defensive_contribution": 0.0,
+        "yellows": -0.17,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 292,
@@ -4949,7 +5753,19 @@
           ],
           "xp": 3.69
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.09,
+        "assists": 0.21,
+        "clean_sheet": 1.2,
+        "conceded": -0.27,
+        "saves": 0.0,
+        "defensive_contribution": 0.38,
+        "yellows": -0.16,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 220,
@@ -5021,7 +5837,19 @@
           ],
           "xp": 3.08
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.76,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.85,
+        "conceded": -0.4,
+        "saves": 0.94,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 226,
@@ -5093,7 +5921,19 @@
           ],
           "xp": 3.12
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.21,
+        "assists": 0.08,
+        "clean_sheet": 0.77,
+        "conceded": -0.38,
+        "saves": 0.0,
+        "defensive_contribution": 0.69,
+        "yellows": -0.1,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 390,
@@ -5165,7 +6005,19 @@
           ],
           "xp": 3.03
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.82,
+        "goals": 0.28,
+        "assists": 0.18,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.36,
+        "yellows": -0.14,
+        "bonus": 0.41
+      },
+      "components_gw": 1
     },
     {
       "id": 110,
@@ -5237,7 +6089,19 @@
           ],
           "xp": 2.61
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.95,
+        "goals": 0.29,
+        "assists": 0.29,
+        "clean_sheet": 1.18,
+        "conceded": -0.35,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.2,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 258,
@@ -5309,7 +6173,19 @@
           ],
           "xp": 2.94
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.87,
+        "goals": 0.23,
+        "assists": 0.17,
+        "clean_sheet": 0.86,
+        "conceded": -0.44,
+        "saves": 0.0,
+        "defensive_contribution": 0.33,
+        "yellows": -0.16,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 666,
@@ -5381,7 +6257,19 @@
           ],
           "xp": 3.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.47,
+        "goals": 1.84,
+        "assists": 0.22,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.39
+      },
+      "components_gw": 1
     },
     {
       "id": 146,
@@ -5453,7 +6341,19 @@
           ],
           "xp": 3.08
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.3,
+        "assists": 0.06,
+        "clean_sheet": 1.03,
+        "conceded": -0.29,
+        "saves": 0.0,
+        "defensive_contribution": 0.42,
+        "yellows": -0.24,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 273,
@@ -5525,7 +6425,19 @@
           ],
           "xp": 3.04
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.61,
+        "goals": 0.23,
+        "assists": 0.49,
+        "clean_sheet": 0.18,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.44,
+        "yellows": -0.11,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 414,
@@ -5597,7 +6509,19 @@
           ],
           "xp": 2.76
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.42,
+        "goals": 0.8,
+        "assists": 0.38,
+        "clean_sheet": 0.2,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.17,
+        "yellows": -0.11,
+        "bonus": 0.29
+      },
+      "components_gw": 1
     },
     {
       "id": 348,
@@ -5669,7 +6593,19 @@
           ],
           "xp": 2.31
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.18,
+        "assists": 0.04,
+        "clean_sheet": 1.0,
+        "conceded": -0.33,
+        "saves": 0.0,
+        "defensive_contribution": 0.52,
+        "yellows": -0.1,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 668,
@@ -5741,7 +6677,19 @@
           ],
           "xp": 3.15
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.26,
+        "assists": 0.39,
+        "clean_sheet": 0.27,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.63,
+        "yellows": -0.2,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 381,
@@ -5813,7 +6761,19 @@
           ],
           "xp": 2.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.32,
+        "goals": 0.91,
+        "assists": 0.37,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.05,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 440,
@@ -5885,7 +6845,19 @@
           ],
           "xp": 3.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.35,
+        "assists": 0.23,
+        "clean_sheet": 0.99,
+        "conceded": -0.25,
+        "saves": 0.0,
+        "defensive_contribution": 0.19,
+        "yellows": -0.13,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 236,
@@ -5957,7 +6929,19 @@
           ],
           "xp": 3.02
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.53,
+        "assists": 0.45,
+        "clean_sheet": 0.19,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.07,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 502,
@@ -6029,7 +7013,19 @@
           ],
           "xp": 3.18
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.58,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 1.11,
+        "conceded": -0.22,
+        "saves": 0.62,
+        "defensive_contribution": 0.0,
+        "yellows": -0.05,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 485,
@@ -6101,7 +7097,19 @@
           ],
           "xp": 2.91
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 1.25,
+        "assists": 0.32,
+        "clean_sheet": 0.11,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.09,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 97,
@@ -6173,7 +7181,19 @@
           ],
           "xp": 3.0
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.78,
+        "assists": 0.08,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 235,
@@ -6245,7 +7265,19 @@
           ],
           "xp": 2.96
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 1.11,
+        "assists": 0.18,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.12,
+        "yellows": -0.12,
+        "bonus": 0.25
+      },
+      "components_gw": 1
     },
     {
       "id": 38,
@@ -6317,7 +7349,19 @@
           ],
           "xp": 3.16
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.16,
+        "assists": 0.05,
+        "clean_sheet": 0.81,
+        "conceded": -0.45,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.04,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 267,
@@ -6389,7 +7433,19 @@
           ],
           "xp": 2.87
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.29,
+        "goals": 1.15,
+        "assists": 0.11,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.07,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 337,
@@ -6461,7 +7517,19 @@
           ],
           "xp": 3.15
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.55,
+        "goals": 1.35,
+        "assists": 0.09,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.24
+      },
+      "components_gw": 1
     },
     {
       "id": 487,
@@ -6533,7 +7601,19 @@
           ],
           "xp": 2.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 1.02,
+        "assists": 0.27,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.05,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 318,
@@ -6605,7 +7685,19 @@
           ],
           "xp": 3.43
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.53,
+        "goals": 0.3,
+        "assists": 0.05,
+        "clean_sheet": 0.78,
+        "conceded": -0.32,
+        "saves": 0.0,
+        "defensive_contribution": 0.42,
+        "yellows": -0.13,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 452,
@@ -6677,7 +7769,19 @@
           ],
           "xp": 3.13
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 0.82,
+        "assists": 0.42,
+        "clean_sheet": 0.2,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.07,
+        "bonus": 0.19
+      },
+      "components_gw": 1
     },
     {
       "id": 36,
@@ -6749,7 +7853,19 @@
           ],
           "xp": 3.1
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.15,
+        "assists": 0.17,
+        "clean_sheet": 0.78,
+        "conceded": -0.45,
+        "saves": 0.0,
+        "defensive_contribution": 0.11,
+        "yellows": -0.22,
+        "bonus": 0.19
+      },
+      "components_gw": 1
     },
     {
       "id": 386,
@@ -6821,7 +7937,19 @@
           ],
           "xp": 2.72
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.49,
+        "assists": 0.15,
+        "clean_sheet": 0.11,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.22,
+        "yellows": -0.17,
+        "bonus": 0.24
+      },
+      "components_gw": 1
     },
     {
       "id": 417,
@@ -6893,7 +8021,19 @@
           ],
           "xp": 2.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.56,
+        "assists": 0.63,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.12,
+        "yellows": -0.05,
+        "bonus": 0.32
+      },
+      "components_gw": 1
     },
     {
       "id": 532,
@@ -6965,7 +8105,19 @@
           ],
           "xp": 3.18
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.84,
+        "goals": 0.46,
+        "assists": 0.21,
+        "clean_sheet": 1.08,
+        "conceded": -0.3,
+        "saves": 0.0,
+        "defensive_contribution": 0.15,
+        "yellows": -0.22,
+        "bonus": 0.17
+      },
+      "components_gw": 1
     },
     {
       "id": 241,
@@ -7037,7 +8189,19 @@
           ],
           "xp": 2.85
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.22,
+        "assists": 0.18,
+        "clean_sheet": 0.19,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.61,
+        "yellows": -0.25,
+        "bonus": 0.25
+      },
+      "components_gw": 1
     },
     {
       "id": 568,
@@ -7109,7 +8273,19 @@
           ],
           "xp": 2.27
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.71,
+        "goals": 0.17,
+        "assists": 0.3,
+        "clean_sheet": 0.45,
+        "conceded": -0.61,
+        "saves": 0.0,
+        "defensive_contribution": 0.42,
+        "yellows": -0.24,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 350,
@@ -7181,7 +8357,19 @@
           ],
           "xp": 2.41
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.44,
+        "assists": 0.21,
+        "clean_sheet": 0.21,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.17,
+        "yellows": -0.09,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 121,
@@ -7253,7 +8441,19 @@
           ],
           "xp": 2.62
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 0.48,
+        "assists": 0.52,
+        "clean_sheet": 0.18,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.3,
+        "yellows": -0.03,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 565,
@@ -7325,7 +8525,19 @@
           ],
           "xp": 2.42
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.45,
+        "conceded": -0.61,
+        "saves": 0.97,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 526,
@@ -7397,7 +8609,19 @@
           ],
           "xp": 2.84
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.61,
+        "goals": 0.66,
+        "assists": 0.09,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.35
+      },
+      "components_gw": 1
     },
     {
       "id": 469,
@@ -7469,7 +8693,19 @@
           ],
           "xp": 3.26
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.42,
+        "goals": 0.04,
+        "assists": 0.0,
+        "clean_sheet": 0.55,
+        "conceded": -0.41,
+        "saves": 0.7,
+        "defensive_contribution": 0.0,
+        "yellows": -0.05,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 531,
@@ -7541,7 +8777,19 @@
           ],
           "xp": 3.01
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.47,
+        "assists": 0.08,
+        "clean_sheet": 0.74,
+        "conceded": -0.22,
+        "saves": 0.0,
+        "defensive_contribution": 0.66,
+        "yellows": -0.11,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 126,
@@ -7613,7 +8861,19 @@
           ],
           "xp": 2.55
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.63,
+        "goals": 0.43,
+        "assists": 0.58,
+        "clean_sheet": 0.21,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.22,
+        "yellows": -0.09,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 342,
@@ -7685,7 +8945,19 @@
           ],
           "xp": 1.91
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.68,
+        "goals": 0.24,
+        "assists": 0.17,
+        "clean_sheet": 0.97,
+        "conceded": -0.3,
+        "saves": 0.0,
+        "defensive_contribution": 0.15,
+        "yellows": -0.15,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 575,
@@ -7757,7 +9029,19 @@
           ],
           "xp": 2.13
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.41,
+        "assists": 0.04,
+        "clean_sheet": 0.48,
+        "conceded": -0.67,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.22,
+        "bonus": 0.25
+      },
+      "components_gw": 1
     },
     {
       "id": 20,
@@ -7829,7 +9113,19 @@
           ],
           "xp": 2.84
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.32,
+        "goals": 1.03,
+        "assists": 0.41,
+        "clean_sheet": 0.32,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.07,
+        "bonus": 0.25
+      },
+      "components_gw": 1
     },
     {
       "id": 256,
@@ -7901,7 +9197,19 @@
           ],
           "xp": 2.58
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 0.32,
+        "assists": 0.25,
+        "clean_sheet": 0.63,
+        "conceded": -0.32,
+        "saves": 0.0,
+        "defensive_contribution": 0.35,
+        "yellows": -0.16,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 160,
@@ -7973,7 +9281,19 @@
           ],
           "xp": 2.62
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.5,
+        "goals": 0.51,
+        "assists": 0.38,
+        "clean_sheet": 0.2,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.09,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 673,
@@ -8045,7 +9365,19 @@
           ],
           "xp": 2.64
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.42,
+        "goals": 0.36,
+        "assists": 0.08,
+        "clean_sheet": 0.08,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.55,
+        "yellows": -0.18,
+        "bonus": 0.37
+      },
+      "components_gw": 1
     },
     {
       "id": 416,
@@ -8117,7 +9449,19 @@
           ],
           "xp": 2.46
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.71,
+        "goals": 0.41,
+        "assists": 0.34,
+        "clean_sheet": 0.27,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.12,
+        "yellows": -0.22,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 129,
@@ -8189,7 +9533,19 @@
           ],
           "xp": 2.59
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.3,
+        "assists": 0.18,
+        "clean_sheet": 0.23,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.53,
+        "yellows": -0.17,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 310,
@@ -8261,7 +9617,19 @@
           ],
           "xp": 2.78
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.5,
+        "goals": 0.99,
+        "assists": 0.05,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.08,
+        "bonus": 0.26
+      },
+      "components_gw": 1
     },
     {
       "id": 330,
@@ -8333,7 +9701,19 @@
           ],
           "xp": 2.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.79,
+        "goals": 0.3,
+        "assists": 0.17,
+        "clean_sheet": 0.23,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.14,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 311,
@@ -8405,7 +9785,19 @@
           ],
           "xp": 2.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 1.02,
+        "assists": 0.04,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.34
+      },
+      "components_gw": 1
     },
     {
       "id": 169,
@@ -8477,7 +9869,19 @@
           ],
           "xp": 2.58
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 0.8,
+        "assists": 0.16,
+        "clean_sheet": 0.19,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.17,
+        "yellows": -0.2,
+        "bonus": 0.22
+      },
+      "components_gw": 1
     },
     {
       "id": 324,
@@ -8549,7 +9953,19 @@
           ],
           "xp": 2.86
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.5,
+        "goals": 0.34,
+        "assists": 0.4,
+        "clean_sheet": 0.2,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.09,
+        "bonus": 0.31
+      },
+      "components_gw": 1
     },
     {
       "id": 714,
@@ -8621,7 +10037,19 @@
           ],
           "xp": 2.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.42,
+        "goals": 0.92,
+        "assists": 0.15,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.32
+      },
+      "components_gw": 1
     },
     {
       "id": 224,
@@ -8693,7 +10121,19 @@
           ],
           "xp": 2.59
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.61,
+        "goals": 0.32,
+        "assists": 0.21,
+        "clean_sheet": 0.72,
+        "conceded": -0.36,
+        "saves": 0.0,
+        "defensive_contribution": 0.15,
+        "yellows": -0.19,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 597,
@@ -8765,7 +10205,19 @@
           ],
           "xp": 2.56
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.87,
+        "assists": 0.11,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.41
+      },
+      "components_gw": 1
     },
     {
       "id": 266,
@@ -8837,7 +10289,19 @@
           ],
           "xp": 2.69
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.96,
+        "assists": 0.32,
+        "clean_sheet": 0.3,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.05,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 7,
@@ -8909,7 +10373,19 @@
           ],
           "xp": 2.76
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.16,
+        "goals": 0.69,
+        "assists": 0.1,
+        "clean_sheet": 1.2,
+        "conceded": -0.05,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.12,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 712,
@@ -8981,7 +10457,19 @@
           ],
           "xp": 2.52
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 0.53,
+        "assists": 0.4,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.11,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 107,
@@ -9053,7 +10541,19 @@
           ],
           "xp": 2.14
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.5,
+        "goals": 0.56,
+        "assists": 0.24,
+        "clean_sheet": 0.67,
+        "conceded": -0.21,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.05,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 475,
@@ -9125,7 +10625,19 @@
           ],
           "xp": 2.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.32,
+        "assists": 0.09,
+        "clean_sheet": 0.41,
+        "conceded": -0.31,
+        "saves": 0.0,
+        "defensive_contribution": 0.52,
+        "yellows": -0.07,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 476,
@@ -9197,7 +10709,19 @@
           ],
           "xp": 2.9
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 0.22,
+        "assists": 0.05,
+        "clean_sheet": 0.49,
+        "conceded": -0.37,
+        "saves": 0.0,
+        "defensive_contribution": 0.49,
+        "yellows": -0.2,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 473,
@@ -9269,7 +10793,19 @@
           ],
           "xp": 2.86
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 0.21,
+        "assists": 0.25,
+        "clean_sheet": 0.47,
+        "conceded": -0.37,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.11,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 408,
@@ -9341,7 +10877,19 @@
           ],
           "xp": 2.05
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.29,
+        "goals": 0.12,
+        "assists": 0.07,
+        "clean_sheet": 0.85,
+        "conceded": -0.19,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.09,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 366,
@@ -9413,7 +10961,19 @@
           ],
           "xp": 2.19
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.37,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.41,
+        "conceded": -0.48,
+        "saves": 0.67,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.19
+      },
+      "components_gw": 1
     },
     {
       "id": 54,
@@ -9485,7 +11045,19 @@
           ],
           "xp": 2.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 0.31,
+        "assists": 0.24,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.13,
+        "bonus": 0.17
+      },
+      "components_gw": 1
     },
     {
       "id": 100,
@@ -9557,7 +11129,19 @@
           ],
           "xp": 2.44
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.58,
+        "assists": 0.08,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.11,
+        "bonus": 0.31
+      },
+      "components_gw": 1
     },
     {
       "id": 725,
@@ -9629,7 +11213,19 @@
           ],
           "xp": 2.56
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.08,
+        "goals": 0.12,
+        "assists": 0.18,
+        "clean_sheet": 1.08,
+        "conceded": -0.05,
+        "saves": 0.0,
+        "defensive_contribution": 0.32,
+        "yellows": -0.06,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 77,
@@ -9701,7 +11297,19 @@
           ],
           "xp": 2.48
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.32,
+        "goals": 0.1,
+        "assists": 0.06,
+        "clean_sheet": 0.27,
+        "conceded": -0.49,
+        "saves": 0.0,
+        "defensive_contribution": 0.63,
+        "yellows": -0.12,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 418,
@@ -9773,7 +11381,19 @@
           ],
           "xp": 2.17
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.39,
+        "assists": 0.42,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.29
+      },
+      "components_gw": 1
     },
     {
       "id": 325,
@@ -9845,7 +11465,19 @@
           ],
           "xp": 2.55
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.47,
+        "goals": 0.66,
+        "assists": 0.13,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.05,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 552,
@@ -9917,7 +11549,19 @@
           ],
           "xp": 2.46
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.74,
+        "goals": 0.32,
+        "assists": 0.19,
+        "clean_sheet": 0.28,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.22,
+        "yellows": -0.22,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 654,
@@ -9989,7 +11633,19 @@
           ],
           "xp": 2.27
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.53,
+        "goals": 0.59,
+        "assists": 0.09,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.1,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 388,
@@ -10061,7 +11717,19 @@
           ],
           "xp": 2.19
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.37,
+        "goals": 0.3,
+        "assists": 0.2,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.07,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 228,
@@ -10133,7 +11801,19 @@
           ],
           "xp": 2.25
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.45,
+        "goals": 0.22,
+        "assists": 0.19,
+        "clean_sheet": 0.57,
+        "conceded": -0.3,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.09,
+        "bonus": 0.17
+      },
+      "components_gw": 1
     },
     {
       "id": 50,
@@ -10205,7 +11885,19 @@
           ],
           "xp": 2.41
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.33,
+        "assists": 0.14,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.15,
+        "yellows": -0.14,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 427,
@@ -10277,7 +11969,19 @@
           ],
           "xp": 2.04
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.61,
+        "assists": 0.2,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.07,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 521,
@@ -10349,7 +12053,19 @@
           ],
           "xp": 2.31
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.32,
+        "goals": 0.18,
+        "assists": 0.14,
+        "clean_sheet": 0.21,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.42,
+        "yellows": -0.13,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 166,
@@ -10421,7 +12137,19 @@
           ],
           "xp": 2.21
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.26,
+        "goals": 0.39,
+        "assists": 0.12,
+        "clean_sheet": 0.17,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.25,
+        "yellows": -0.05,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 173,
@@ -10493,7 +12221,19 @@
           ],
           "xp": 2.2
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.29,
+        "assists": 0.16,
+        "clean_sheet": 0.17,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.5,
+        "yellows": -0.17,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 730,
@@ -10565,7 +12305,19 @@
           ],
           "xp": 2.29
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.37,
+        "goals": 0.89,
+        "assists": 0.08,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.13,
+        "bonus": 0.32
+      },
+      "components_gw": 1
     },
     {
       "id": 371,
@@ -10637,7 +12389,19 @@
           ],
           "xp": 2.02
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.5,
+        "goals": 0.22,
+        "assists": 0.06,
+        "clean_sheet": 0.36,
+        "conceded": -0.46,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.11,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 489,
@@ -10709,7 +12473,19 @@
           ],
           "xp": 2.2
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.32,
+        "goals": 0.49,
+        "assists": 0.25,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.07,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 344,
@@ -10781,7 +12557,19 @@
           ],
           "xp": 1.72
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.16,
+        "goals": 0.11,
+        "assists": 0.05,
+        "clean_sheet": 0.63,
+        "conceded": -0.2,
+        "saves": 0.0,
+        "defensive_contribution": 0.5,
+        "yellows": -0.1,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 328,
@@ -10853,7 +12641,19 @@
           ],
           "xp": 2.33
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.28,
+        "assists": 0.17,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.25,
+        "yellows": -0.03,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 442,
@@ -10925,7 +12725,19 @@
           ],
           "xp": 2.29
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.11,
+        "goals": 0.21,
+        "assists": 0.06,
+        "clean_sheet": 0.67,
+        "conceded": -0.16,
+        "saves": 0.0,
+        "defensive_contribution": 0.39,
+        "yellows": -0.08,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 163,
@@ -10997,7 +12809,19 @@
           ],
           "xp": 2.09
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.6,
+        "assists": 0.19,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.03,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 706,
@@ -11069,7 +12893,19 @@
           ],
           "xp": 1.62
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.2,
+        "assists": 0.07,
+        "clean_sheet": 0.6,
+        "conceded": -0.2,
+        "saves": 0.0,
+        "defensive_contribution": 0.21,
+        "yellows": -0.1,
+        "bonus": 0.19
+      },
+      "components_gw": 1
     },
     {
       "id": 585,
@@ -11141,7 +12977,19 @@
           ],
           "xp": 2.09
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.15,
+        "assists": 0.09,
+        "clean_sheet": 0.08,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.59,
+        "yellows": -0.16,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 225,
@@ -11213,7 +13061,19 @@
           ],
           "xp": 2.12
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.26,
+        "goals": 0.16,
+        "assists": 0.21,
+        "clean_sheet": 0.49,
+        "conceded": -0.27,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.1,
+        "bonus": 0.24
+      },
+      "components_gw": 1
     },
     {
       "id": 37,
@@ -11285,7 +13145,19 @@
           ],
           "xp": 2.28
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.32,
+        "goals": 0.09,
+        "assists": 0.17,
+        "clean_sheet": 0.45,
+        "conceded": -0.27,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.09,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 319,
@@ -11357,7 +13229,19 @@
           ],
           "xp": 2.51
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.29,
+        "goals": 0.26,
+        "assists": 0.13,
+        "clean_sheet": 0.53,
+        "conceded": -0.23,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.1,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 322,
@@ -11429,7 +13313,19 @@
           ],
           "xp": 2.49
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.08,
+        "goals": 0.17,
+        "assists": 0.13,
+        "clean_sheet": 0.53,
+        "conceded": -0.23,
+        "saves": 0.0,
+        "defensive_contribution": 0.35,
+        "yellows": -0.07,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 158,
@@ -11501,7 +13397,19 @@
           ],
           "xp": 2.04
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.29,
+        "goals": 0.4,
+        "assists": 0.23,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 444,
@@ -11573,7 +13481,19 @@
           ],
           "xp": 2.2
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.29,
+        "goals": 0.24,
+        "assists": 0.07,
+        "clean_sheet": 0.6,
+        "conceded": -0.16,
+        "saves": 0.0,
+        "defensive_contribution": 0.18,
+        "yellows": -0.05,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 271,
@@ -11645,7 +13565,19 @@
           ],
           "xp": 2.03
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.23,
+        "assists": 0.23,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.25,
+        "yellows": -0.09,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 693,
@@ -11717,7 +13649,19 @@
           ],
           "xp": 2.11
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.21,
+        "goals": 0.25,
+        "assists": 0.25,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.05,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 108,
@@ -11789,7 +13733,19 @@
           ],
           "xp": 1.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.21,
+        "goals": 0.16,
+        "assists": 0.09,
+        "clean_sheet": 0.61,
+        "conceded": -0.2,
+        "saves": 0.0,
+        "defensive_contribution": 0.43,
+        "yellows": -0.1,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 59,
@@ -11861,7 +13817,19 @@
           ],
           "xp": 2.11
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.19,
+        "assists": 0.06,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.33,
+        "yellows": -0.08,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 441,
@@ -11933,7 +13901,19 @@
           ],
           "xp": 2.15
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.05,
+        "goals": 0.38,
+        "assists": 0.15,
+        "clean_sheet": 0.5,
+        "conceded": -0.14,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.11,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 39,
@@ -12005,7 +13985,19 @@
           ],
           "xp": 2.15
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.14,
+        "assists": 0.13,
+        "clean_sheet": 0.4,
+        "conceded": -0.24,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.06,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 341,
@@ -12077,7 +14069,19 @@
           ],
           "xp": 1.65
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.11,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.66,
+        "conceded": -0.21,
+        "saves": 0.46,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 86,
@@ -12149,7 +14153,19 @@
           ],
           "xp": 2.0
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.11,
+        "goals": 0.44,
+        "assists": 0.16,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.13,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 145,
@@ -12221,7 +14237,19 @@
           ],
           "xp": 1.92
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.08,
+        "goals": 0.24,
+        "assists": 0.27,
+        "clean_sheet": 0.4,
+        "conceded": -0.14,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.06,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 713,
@@ -12293,7 +14321,19 @@
           ],
           "xp": 2.06
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.42,
+        "goals": 0.12,
+        "assists": 0.09,
+        "clean_sheet": 0.29,
+        "conceded": -0.54,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.22,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 491,
@@ -12365,7 +14405,19 @@
           ],
           "xp": 1.98
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.22,
+        "goals": 0.26,
+        "assists": 0.22,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.16,
+        "yellows": -0.09,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 48,
@@ -12437,7 +14489,19 @@
           ],
           "xp": 2.06
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.15,
+        "assists": 0.19,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.12,
+        "yellows": -0.03,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 421,
@@ -12509,7 +14573,19 @@
           ],
           "xp": 1.8
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.97,
+        "goals": 0.21,
+        "assists": 0.21,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.36,
+        "yellows": -0.08,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 124,
@@ -12581,7 +14657,19 @@
           ],
           "xp": 1.83
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.15,
+        "assists": 0.25,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.16,
+        "yellows": -0.14,
+        "bonus": 0.14
+      },
+      "components_gw": 1
     },
     {
       "id": 365,
@@ -12653,7 +14741,19 @@
           ],
           "xp": 1.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.53,
+        "assists": 0.08,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.02,
+        "bonus": 0.2
+      },
+      "components_gw": 1
     },
     {
       "id": 573,
@@ -12725,7 +14825,19 @@
           ],
           "xp": 1.5
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.37,
+        "goals": 0.15,
+        "assists": 0.13,
+        "clean_sheet": 0.32,
+        "conceded": -0.45,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.11,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 403,
@@ -12797,7 +14909,19 @@
           ],
           "xp": 1.53
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.33,
+        "assists": 0.06,
+        "clean_sheet": 0.51,
+        "conceded": -0.12,
+        "saves": 0.0,
+        "defensive_contribution": 0.17,
+        "yellows": -0.06,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 272,
@@ -12869,7 +14993,19 @@
           ],
           "xp": 1.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.21,
+        "goals": 0.25,
+        "assists": 0.12,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.15,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 316,
@@ -12941,7 +15077,19 @@
           ],
           "xp": 2.17
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.0,
+        "goals": 0.19,
+        "assists": 0.13,
+        "clean_sheet": 0.45,
+        "conceded": -0.19,
+        "saves": 0.0,
+        "defensive_contribution": 0.21,
+        "yellows": -0.11,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 458,
@@ -13013,7 +15161,19 @@
           ],
           "xp": 1.9
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.16,
+        "goals": 0.15,
+        "assists": 0.14,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.28,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 332,
@@ -13085,7 +15245,19 @@
           ],
           "xp": 1.96
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.13,
+        "goals": 0.36,
+        "assists": 0.18,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.16,
+        "yellows": -0.19,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 541,
@@ -13157,7 +15329,19 @@
           ],
           "xp": 2.02
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.21,
+        "goals": 0.07,
+        "assists": 0.08,
+        "clean_sheet": 0.71,
+        "conceded": -0.2,
+        "saves": 0.0,
+        "defensive_contribution": 0.23,
+        "yellows": -0.16,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 584,
@@ -13229,7 +15413,19 @@
           ],
           "xp": 1.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.13,
+        "goals": 0.3,
+        "assists": 0.17,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.05,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 783,
@@ -13301,7 +15497,19 @@
           ],
           "xp": 1.72
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.92,
+        "goals": 0.22,
+        "assists": 0.28,
+        "clean_sheet": 0.14,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.11,
+        "yellows": -0.06,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 580,
@@ -13373,7 +15581,19 @@
           ],
           "xp": 1.74
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.26,
+        "goals": 0.3,
+        "assists": 0.11,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.13,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 125,
@@ -13445,7 +15665,19 @@
           ],
           "xp": 1.68
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.05,
+        "goals": 0.21,
+        "assists": 0.23,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.31,
+        "yellows": -0.16,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 304,
@@ -13517,7 +15749,19 @@
           ],
           "xp": 1.83
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.15,
+        "assists": 0.09,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.32,
+        "yellows": -0.18,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 423,
@@ -13589,7 +15833,19 @@
           ],
           "xp": 1.65
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.08,
+        "goals": 0.16,
+        "assists": 0.12,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.32,
+        "yellows": -0.13,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 85,
@@ -13661,7 +15917,19 @@
           ],
           "xp": 1.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.16,
+        "goals": 0.1,
+        "assists": 0.06,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.33,
+        "yellows": -0.17,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 41,
@@ -13733,7 +16001,19 @@
           ],
           "xp": 1.87
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.15,
+        "assists": 0.03,
+        "clean_sheet": 0.43,
+        "conceded": -0.25,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.05,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 560,
@@ -13805,7 +16085,19 @@
           ],
           "xp": 1.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.08,
+        "goals": 0.66,
+        "assists": 0.05,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.19
+      },
+      "components_gw": 1
     },
     {
       "id": 335,
@@ -13877,7 +16169,19 @@
           ],
           "xp": 1.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.36,
+        "assists": 0.09,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.09,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 511,
@@ -13949,7 +16253,19 @@
           ],
           "xp": 1.81
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.92,
+        "goals": 0.17,
+        "assists": 0.02,
+        "clean_sheet": 0.54,
+        "conceded": -0.11,
+        "saves": 0.0,
+        "defensive_contribution": 0.32,
+        "yellows": -0.11,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 406,
@@ -14021,7 +16337,19 @@
           ],
           "xp": 1.43
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.12,
+        "assists": 0.09,
+        "clean_sheet": 0.48,
+        "conceded": -0.12,
+        "saves": 0.0,
+        "defensive_contribution": 0.23,
+        "yellows": -0.06,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 726,
@@ -14093,7 +16421,19 @@
           ],
           "xp": 1.69
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.24,
+        "goals": 0.32,
+        "assists": 0.11,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.08,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 724,
@@ -14165,7 +16505,19 @@
           ],
           "xp": 1.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.18,
+        "goals": 0.17,
+        "assists": 0.09,
+        "clean_sheet": 0.57,
+        "conceded": -0.17,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.07,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 723,
@@ -14237,7 +16589,19 @@
           ],
           "xp": 1.62
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.18,
+        "assists": 0.03,
+        "clean_sheet": 0.33,
+        "conceded": -0.17,
+        "saves": 0.0,
+        "defensive_contribution": 0.37,
+        "yellows": -0.07,
+        "bonus": 0.16
+      },
+      "components_gw": 1
     },
     {
       "id": 167,
@@ -14309,7 +16673,19 @@
           ],
           "xp": 1.67
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.21,
+        "goals": 0.17,
+        "assists": 0.09,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.19,
+        "yellows": -0.12,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 570,
@@ -14381,7 +16757,19 @@
           ],
           "xp": 1.41
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.1,
+        "assists": 0.03,
+        "clean_sheet": 0.22,
+        "conceded": -0.33,
+        "saves": 0.0,
+        "defensive_contribution": 0.53,
+        "yellows": -0.16,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 486,
@@ -14453,7 +16841,19 @@
           ],
           "xp": 1.68
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.13,
+        "goals": 0.3,
+        "assists": 0.17,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 17,
@@ -14525,7 +16925,19 @@
           ],
           "xp": 1.73
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.92,
+        "goals": 0.3,
+        "assists": 0.38,
+        "clean_sheet": 0.17,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.03,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 52,
@@ -14597,7 +17009,19 @@
           ],
           "xp": 1.67
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.08,
+        "goals": 0.25,
+        "assists": 0.16,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.11,
+        "yellows": -0.08,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 478,
@@ -14669,7 +17093,19 @@
           ],
           "xp": 1.95
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.06,
+        "assists": 0.18,
+        "clean_sheet": 0.37,
+        "conceded": -0.27,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.08,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 593,
@@ -14741,7 +17177,19 @@
           ],
           "xp": 1.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.23,
+        "assists": 0.1,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.19,
+        "yellows": -0.08,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 453,
@@ -14813,7 +17261,19 @@
           ],
           "xp": 1.61
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.37,
+        "assists": 0.23,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.06,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 18,
@@ -14885,7 +17345,19 @@
           ],
           "xp": 1.64
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.92,
+        "goals": 0.28,
+        "assists": 0.29,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.18
+      },
+      "components_gw": 1
     },
     {
       "id": 697,
@@ -14957,7 +17429,19 @@
           ],
           "xp": 1.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.22,
+        "assists": 0.09,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.06,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 500,
@@ -15029,7 +17513,19 @@
           ],
           "xp": 1.54
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.53,
+        "assists": 0.06,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.02,
+        "bonus": 0.23
+      },
+      "components_gw": 1
     },
     {
       "id": 358,
@@ -15101,7 +17597,19 @@
           ],
           "xp": 1.39
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.0,
+        "goals": 0.15,
+        "assists": 0.08,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.13,
+        "yellows": -0.04,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 19,
@@ -15173,7 +17681,19 @@
           ],
           "xp": 1.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.89,
+        "goals": 0.68,
+        "assists": 0.16,
+        "clean_sheet": 0.08,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 40,
@@ -15245,7 +17765,19 @@
           ],
           "xp": 1.65
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.82,
+        "goals": 0.14,
+        "assists": 0.03,
+        "clean_sheet": 0.33,
+        "conceded": -0.2,
+        "saves": 0.0,
+        "defensive_contribution": 0.21,
+        "yellows": -0.04,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 683,
@@ -15317,7 +17849,19 @@
           ],
           "xp": 1.67
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.17,
+        "assists": 0.05,
+        "clean_sheet": 0.52,
+        "conceded": -0.14,
+        "saves": 0.0,
+        "defensive_contribution": 0.3,
+        "yellows": -0.08,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 270,
@@ -15389,7 +17933,19 @@
           ],
           "xp": 1.49
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.16,
+        "goals": 0.18,
+        "assists": 0.14,
+        "clean_sheet": 0.08,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.15,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 246,
@@ -15461,7 +18017,19 @@
           ],
           "xp": 1.52
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.0,
+        "goals": 0.25,
+        "assists": 0.08,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.09,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 591,
@@ -15533,7 +18101,19 @@
           ],
           "xp": 1.46
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.03,
+        "goals": 0.22,
+        "assists": 0.11,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.11,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 300,
@@ -15605,7 +18185,19 @@
           ],
           "xp": 1.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.89,
+        "goals": 0.23,
+        "assists": 0.16,
+        "clean_sheet": 0.11,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.11,
+        "yellows": -0.04,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 22,
@@ -15677,7 +18269,19 @@
           ],
           "xp": 1.53
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.57,
+        "assists": 0.17,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.04,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 544,
@@ -15749,7 +18353,19 @@
           ],
           "xp": 1.53
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.92,
+        "goals": 0.52,
+        "assists": 0.12,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.13,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 665,
@@ -15821,7 +18437,19 @@
           ],
           "xp": 1.21
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.5,
+        "conceded": -0.16,
+        "saves": 0.31,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 727,
@@ -15893,7 +18521,19 @@
           ],
           "xp": 1.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.3,
+        "assists": 0.25,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 455,
@@ -15965,7 +18605,19 @@
           ],
           "xp": 1.51
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.25,
+        "assists": 0.15,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.05,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 250,
@@ -16037,7 +18689,19 @@
           ],
           "xp": 1.43
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.95,
+        "goals": 0.42,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 402,
@@ -16109,7 +18773,19 @@
           ],
           "xp": 1.19
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.1,
+        "assists": 0.14,
+        "clean_sheet": 0.37,
+        "conceded": -0.09,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.05,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 437,
@@ -16181,7 +18857,19 @@
           ],
           "xp": 1.45
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.06,
+        "assists": 0.06,
+        "clean_sheet": 0.43,
+        "conceded": -0.12,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.03,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 669,
@@ -16253,7 +18941,19 @@
           ],
           "xp": 1.41
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.89,
+        "goals": 0.15,
+        "assists": 0.11,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.04,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 519,
@@ -16325,7 +19025,19 @@
           ],
           "xp": 1.4
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.92,
+        "goals": 0.19,
+        "assists": 0.07,
+        "clean_sheet": 0.08,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 424,
@@ -16397,7 +19109,19 @@
           ],
           "xp": 1.43
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.23,
+        "assists": 0.17,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.04,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 152,
@@ -16469,7 +19193,19 @@
           ],
           "xp": 1.32
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.17,
+        "assists": 0.03,
+        "clean_sheet": 0.3,
+        "conceded": -0.11,
+        "saves": 0.0,
+        "defensive_contribution": 0.15,
+        "yellows": -0.1,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 493,
@@ -16541,7 +19277,19 @@
           ],
           "xp": 1.16
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.82,
+        "goals": 0.14,
+        "assists": 0.1,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.05,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 372,
@@ -16613,7 +19361,19 @@
           ],
           "xp": 1.21
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.15,
+        "assists": 0.09,
+        "clean_sheet": 0.14,
+        "conceded": -0.24,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.03,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 807,
@@ -16685,7 +19445,19 @@
           ],
           "xp": 1.31
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.22,
+        "assists": 0.1,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.04,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 338,
@@ -16757,7 +19529,19 @@
           ],
           "xp": 1.34
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.44,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.05,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 681,
@@ -16829,7 +19613,19 @@
           ],
           "xp": 1.37
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.58,
+        "goals": 0.55,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.21
+      },
+      "components_gw": 1
     },
     {
       "id": 507,
@@ -16901,7 +19697,19 @@
           ],
           "xp": 1.35
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.06,
+        "assists": 0.05,
+        "clean_sheet": 0.52,
+        "conceded": -0.1,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.06,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 525,
@@ -16973,7 +19781,19 @@
           ],
           "xp": 1.3
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.39,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.02,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 447,
@@ -17045,7 +19865,19 @@
           ],
           "xp": 1.31
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.08,
+        "assists": 0.03,
+        "clean_sheet": 0.36,
+        "conceded": -0.09,
+        "saves": 0.0,
+        "defensive_contribution": 0.22,
+        "yellows": -0.05,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 44,
@@ -17117,7 +19949,19 @@
           ],
           "xp": 1.32
         }
-      ]
+      ],
+      "components": {
+        "appearance": 1.0,
+        "goals": 0.02,
+        "assists": 0.02,
+        "clean_sheet": 0.24,
+        "conceded": -0.15,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.1,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 796,
@@ -17189,7 +20033,19 @@
           ],
           "xp": 1.19
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.76,
+        "goals": 0.18,
+        "assists": 0.07,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.11,
+        "yellows": -0.06,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 662,
@@ -17261,7 +20117,19 @@
           ],
           "xp": 1.3
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.06,
+        "assists": 0.08,
+        "clean_sheet": 0.51,
+        "conceded": -0.03,
+        "saves": 0.0,
+        "defensive_contribution": 0.11,
+        "yellows": -0.08,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 685,
@@ -17333,7 +20201,19 @@
           ],
           "xp": 1.28
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.82,
+        "goals": 0.02,
+        "assists": 0.02,
+        "clean_sheet": 0.16,
+        "conceded": -0.31,
+        "saves": 0.0,
+        "defensive_contribution": 0.2,
+        "yellows": -0.04,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 415,
@@ -17405,7 +20285,19 @@
           ],
           "xp": 1.11
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.3,
+        "assists": 0.12,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.05,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 438,
@@ -17477,7 +20369,19 @@
           ],
           "xp": 1.27
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.06,
+        "assists": 0.04,
+        "clean_sheet": 0.36,
+        "conceded": -0.09,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.07,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 731,
@@ -17549,7 +20453,19 @@
           ],
           "xp": 1.28
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.21,
+        "assists": 0.13,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.04,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 494,
@@ -17621,7 +20537,19 @@
           ],
           "xp": 1.21
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.23,
+        "assists": 0.11,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.07,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 81,
@@ -17693,7 +20621,19 @@
           ],
           "xp": 1.21
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.76,
+        "goals": 0.19,
+        "assists": 0.08,
+        "clean_sheet": 0.03,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.09,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 55,
@@ -17765,7 +20705,19 @@
           ],
           "xp": 1.26
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.15,
+        "assists": 0.07,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.04,
+        "bonus": 0.1
+      },
+      "components_gw": 1
     },
     {
       "id": 459,
@@ -17837,7 +20789,19 @@
           ],
           "xp": 1.24
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.15,
+        "assists": 0.05,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.16,
+        "yellows": -0.04,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 370,
@@ -17909,7 +20873,19 @@
           ],
           "xp": 1.09
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.82,
+        "goals": 0.08,
+        "assists": 0.09,
+        "clean_sheet": 0.16,
+        "conceded": -0.21,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.04,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 302,
@@ -17981,7 +20957,19 @@
           ],
           "xp": 1.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.64,
+        "goals": 0.17,
+        "assists": 0.09,
+        "clean_sheet": 0.11,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.13,
+        "yellows": -0.03,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 586,
@@ -18053,7 +21041,19 @@
           ],
           "xp": 1.14
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.84,
+        "goals": 0.17,
+        "assists": 0.05,
+        "clean_sheet": 0.03,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.05,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 321,
@@ -18125,7 +21125,19 @@
           ],
           "xp": 1.35
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.04,
+        "assists": 0.05,
+        "clean_sheet": 0.28,
+        "conceded": -0.12,
+        "saves": 0.0,
+        "defensive_contribution": 0.29,
+        "yellows": -0.1,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 276,
@@ -18197,7 +21209,19 @@
           ],
           "xp": 1.14
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.24,
+        "assists": 0.05,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.02,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 466,
@@ -18269,7 +21293,19 @@
           ],
           "xp": 1.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.34,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.05,
+        "bonus": 0.12
+      },
+      "components_gw": 1
     },
     {
       "id": 596,
@@ -18341,7 +21377,19 @@
           ],
           "xp": 1.12
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.35,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 331,
@@ -18413,7 +21461,19 @@
           ],
           "xp": 1.18
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.82,
+        "goals": 0.19,
+        "assists": 0.08,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.06,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 88,
@@ -18485,7 +21545,19 @@
           ],
           "xp": 1.12
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.68,
+        "goals": 0.05,
+        "assists": 0.04,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.26,
+        "yellows": -0.04,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 413,
@@ -18557,7 +21629,19 @@
           ],
           "xp": 1.02
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.3,
+        "assists": 0.07,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.05,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 73,
@@ -18629,7 +21713,19 @@
           ],
           "xp": 1.15
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.02,
+        "assists": 0.02,
+        "clean_sheet": 0.13,
+        "conceded": -0.26,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 677,
@@ -18701,7 +21797,19 @@
           ],
           "xp": 1.08
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.19,
+        "assists": 0.07,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.02,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 561,
@@ -18773,7 +21881,19 @@
           ],
           "xp": 1.12
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.36,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.02,
+        "bonus": 0.13
+      },
+      "components_gw": 1
     },
     {
       "id": 456,
@@ -18845,7 +21965,19 @@
           ],
           "xp": 1.14
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.76,
+        "goals": 0.09,
+        "assists": 0.1,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.02,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 574,
@@ -18917,7 +22049,19 @@
           ],
           "xp": 0.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.05,
+        "assists": 0.06,
+        "clean_sheet": 0.19,
+        "conceded": -0.29,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.09,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 674,
@@ -18989,7 +22133,19 @@
           ],
           "xp": 1.26
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.23,
+        "conceded": -0.17,
+        "saves": 0.23,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 405,
@@ -19061,7 +22217,19 @@
           ],
           "xp": 0.91
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.63,
+        "goals": 0.1,
+        "assists": 0.04,
+        "clean_sheet": 0.26,
+        "conceded": -0.06,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.03,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 699,
@@ -19133,7 +22301,19 @@
           ],
           "xp": 1.09
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.76,
+        "goals": 0.09,
+        "assists": 0.08,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.06,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 719,
@@ -19205,7 +22385,19 @@
           ],
           "xp": 1.08
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.05,
+        "assists": 0.02,
+        "clean_sheet": 0.24,
+        "conceded": -0.14,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.02,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 301,
@@ -19277,7 +22469,19 @@
           ],
           "xp": 1.04
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.17,
+        "assists": 0.06,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.07,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 686,
@@ -19349,7 +22553,19 @@
           ],
           "xp": 0.94
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.63,
+        "goals": 0.14,
+        "assists": 0.11,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.02,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 170,
@@ -19421,7 +22637,19 @@
           ],
           "xp": 0.96
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.16,
+        "assists": 0.07,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.05,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 116,
@@ -19493,7 +22721,19 @@
           ],
           "xp": 0.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.09,
+        "assists": 0.03,
+        "clean_sheet": 0.22,
+        "conceded": -0.07,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 135,
@@ -19565,7 +22805,19 @@
           ],
           "xp": 0.95
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.36,
+        "assists": 0.04,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 499,
@@ -19637,7 +22889,19 @@
           ],
           "xp": 0.92
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.58,
+        "goals": 0.28,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.02,
+        "bonus": 0.11
+      },
+      "components_gw": 1
     },
     {
       "id": 672,
@@ -19709,7 +22973,19 @@
           ],
           "xp": 0.96
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.06,
+        "assists": 0.04,
+        "clean_sheet": 0.23,
+        "conceded": -0.14,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.12,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 551,
@@ -19781,7 +23057,19 @@
           ],
           "xp": 0.96
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.17,
+        "assists": 0.1,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 367,
@@ -19853,7 +23141,19 @@
           ],
           "xp": 0.83
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.5,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.14,
+        "conceded": -0.18,
+        "saves": 0.33,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 527,
@@ -19925,7 +23225,19 @@
           ],
           "xp": 0.95
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.5,
+        "goals": 0.27,
+        "assists": 0.04,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 10,
@@ -19997,7 +23309,19 @@
           ],
           "xp": 0.97
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.06,
+        "assists": 0.04,
+        "clean_sheet": 0.32,
+        "conceded": -0.02,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.06,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 320,
@@ -20069,7 +23393,19 @@
           ],
           "xp": 1.08
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.55,
+        "goals": 0.13,
+        "assists": 0.02,
+        "clean_sheet": 0.22,
+        "conceded": -0.1,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.05,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 728,
@@ -20141,7 +23477,19 @@
           ],
           "xp": 0.93
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.58,
+        "goals": 0.13,
+        "assists": 0.05,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.02,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 232,
@@ -20213,7 +23561,19 @@
           ],
           "xp": 0.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.04,
+        "assists": 0.03,
+        "clean_sheet": 0.18,
+        "conceded": -0.11,
+        "saves": 0.0,
+        "defensive_contribution": 0.13,
+        "yellows": -0.05,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 233,
@@ -20285,7 +23645,19 @@
           ],
           "xp": 0.88
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.08,
+        "assists": 0.02,
+        "clean_sheet": 0.18,
+        "conceded": -0.09,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.03,
+        "bonus": 0.08
+      },
+      "components_gw": 1
     },
     {
       "id": 8,
@@ -20357,7 +23729,19 @@
           ],
           "xp": 0.94
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.36,
+        "goals": 0.24,
+        "assists": 0.04,
+        "clean_sheet": 0.4,
+        "conceded": -0.02,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.03,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 30,
@@ -20429,7 +23813,19 @@
           ],
           "xp": 0.9
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.45,
+        "goals": 0.48,
+        "assists": 0.06,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.09
+      },
+      "components_gw": 1
     },
     {
       "id": 385,
@@ -20501,7 +23897,19 @@
           ],
           "xp": 0.84
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.71,
+        "goals": 0.11,
+        "assists": 0.04,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 181,
@@ -20573,7 +23981,19 @@
           ],
           "xp": 0.83
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.2,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.06
+      },
+      "components_gw": 1
     },
     {
       "id": 376,
@@ -20645,7 +24065,19 @@
           ],
           "xp": 0.8
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.68,
+        "goals": 0.05,
+        "assists": 0.04,
+        "clean_sheet": 0.08,
+        "conceded": -0.12,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.06,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 522,
@@ -20717,7 +24149,19 @@
           ],
           "xp": 0.86
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.66,
+        "goals": 0.08,
+        "assists": 0.04,
+        "clean_sheet": 0.03,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.05,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 143,
@@ -20789,7 +24233,19 @@
           ],
           "xp": 0.82
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.47,
+        "goals": 0.03,
+        "assists": 0.04,
+        "clean_sheet": 0.23,
+        "conceded": -0.07,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.04,
+        "bonus": 0.07
+      },
+      "components_gw": 1
     },
     {
       "id": 353,
@@ -20861,7 +24317,19 @@
           ],
           "xp": 0.71
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.58,
+        "goals": 0.09,
+        "assists": 0.04,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.02,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 351,
@@ -20933,7 +24401,19 @@
           ],
           "xp": 0.71
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.63,
+        "goals": 0.06,
+        "assists": 0.05,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.05,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 98,
@@ -21005,7 +24485,19 @@
           ],
           "xp": 0.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.1,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 305,
@@ -21077,7 +24569,19 @@
           ],
           "xp": 0.77
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.47,
+        "goals": 0.13,
+        "assists": 0.04,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.02,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 734,
@@ -21149,7 +24653,19 @@
           ],
           "xp": 0.73
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.47,
+        "goals": 0.08,
+        "assists": 0.06,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.03,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 735,
@@ -21221,7 +24737,19 @@
           ],
           "xp": 0.73
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.5,
+        "goals": 0.12,
+        "assists": 0.05,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 539,
@@ -21293,7 +24821,19 @@
           ],
           "xp": 0.74
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.47,
+        "goals": 0.05,
+        "assists": 0.02,
+        "clean_sheet": 0.2,
+        "conceded": -0.06,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.03,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 31,
@@ -21365,7 +24905,19 @@
           ],
           "xp": 0.69
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.39,
+        "goals": 0.36,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 410,
@@ -21437,7 +24989,19 @@
           ],
           "xp": 0.56
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.39,
+        "goals": 0.04,
+        "assists": 0.07,
+        "clean_sheet": 0.15,
+        "conceded": -0.04,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 263,
@@ -21509,7 +25073,19 @@
           ],
           "xp": 0.62
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.42,
+        "goals": 0.06,
+        "assists": 0.04,
+        "clean_sheet": 0.15,
+        "conceded": -0.08,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.03,
+        "bonus": 0.04
+      },
+      "components_gw": 1
     },
     {
       "id": 243,
@@ -21581,7 +25157,19 @@
           ],
           "xp": 0.65
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.45,
+        "goals": 0.09,
+        "assists": 0.07,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 409,
@@ -21653,7 +25241,19 @@
           ],
           "xp": 0.54
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.37,
+        "goals": 0.02,
+        "assists": 0.02,
+        "clean_sheet": 0.18,
+        "conceded": -0.04,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.02,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 572,
@@ -21725,7 +25325,19 @@
           ],
           "xp": 0.53
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.39,
+        "goals": 0.05,
+        "assists": 0.01,
+        "clean_sheet": 0.07,
+        "conceded": -0.11,
+        "saves": 0.0,
+        "defensive_contribution": 0.14,
+        "yellows": -0.02,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 49,
@@ -21797,7 +25409,19 @@
           ],
           "xp": 0.65
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.42,
+        "goals": 0.06,
+        "assists": 0.06,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.03,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 587,
@@ -21869,7 +25493,19 @@
           ],
           "xp": 0.59
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.42,
+        "goals": 0.08,
+        "assists": 0.03,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.06,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 33,
@@ -21941,7 +25577,19 @@
           ],
           "xp": 0.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.34,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.14,
+        "conceded": -0.09,
+        "saves": 0.17,
+        "defensive_contribution": 0.0,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 431,
@@ -22013,7 +25661,19 @@
           ],
           "xp": 0.6
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.32,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.21,
+        "conceded": -0.05,
+        "saves": 0.17,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 262,
@@ -22085,7 +25745,19 @@
           ],
           "xp": 0.56
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.39,
+        "goals": 0.05,
+        "assists": 0.02,
+        "clean_sheet": 0.15,
+        "conceded": -0.08,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.04,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 362,
@@ -22157,7 +25829,19 @@
           ],
           "xp": 0.53
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.45,
+        "goals": 0.08,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 567,
@@ -22229,7 +25913,19 @@
           ],
           "xp": 0.48
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.37,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.1,
+        "conceded": -0.14,
+        "saves": 0.18,
+        "defensive_contribution": 0.0,
+        "yellows": -0.02,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 345,
@@ -22301,7 +25997,19 @@
           ],
           "xp": 0.47
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.42,
+        "goals": 0.03,
+        "assists": 0.01,
+        "clean_sheet": 0.13,
+        "conceded": -0.05,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.02,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 808,
@@ -22373,7 +26081,19 @@
           ],
           "xp": 0.59
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.34,
+        "goals": 0.13,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.05
+      },
+      "components_gw": 1
     },
     {
       "id": 707,
@@ -22445,7 +26165,19 @@
           ],
           "xp": 0.56
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.42,
+        "goals": 0.06,
+        "assists": 0.03,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 510,
@@ -22517,7 +26249,19 @@
           ],
           "xp": 0.57
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.34,
+        "goals": 0.04,
+        "assists": 0.01,
+        "clean_sheet": 0.15,
+        "conceded": -0.04,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.02,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 813,
@@ -22589,7 +26333,19 @@
           ],
           "xp": 0.53
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.34,
+        "goals": 0.12,
+        "assists": 0.04,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.02,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 426,
@@ -22661,7 +26417,19 @@
           ],
           "xp": 0.5
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.39,
+        "goals": 0.04,
+        "assists": 0.03,
+        "clean_sheet": 0.01,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.02,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 721,
@@ -22733,7 +26501,19 @@
           ],
           "xp": 0.5
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.29,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.05,
+        "conceded": -0.09,
+        "saves": 0.0,
+        "defensive_contribution": 0.1,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 715,
@@ -22805,7 +26585,19 @@
           ],
           "xp": 0.5
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.26,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.19,
+        "conceded": -0.04,
+        "saves": 0.07,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 252,
@@ -22877,7 +26669,19 @@
           ],
           "xp": 0.46
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.29,
+        "goals": 0.13,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 732,
@@ -22949,7 +26753,19 @@
           ],
           "xp": 0.46
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.37,
+        "goals": 0.06,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 296,
@@ -23021,7 +26837,19 @@
           ],
           "xp": 0.48
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.26,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.11,
+        "conceded": -0.02,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 182,
@@ -23093,7 +26921,19 @@
           ],
           "xp": 0.36
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.21,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.15,
+        "conceded": -0.03,
+        "saves": 0.07,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 814,
@@ -23165,7 +27005,19 @@
           ],
           "xp": 0.44
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.26,
+        "goals": 0.02,
+        "assists": 0.02,
+        "clean_sheet": 0.11,
+        "conceded": -0.03,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 221,
@@ -23237,7 +27089,19 @@
           ],
           "xp": 0.38
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.24,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.1,
+        "conceded": -0.05,
+        "saves": 0.11,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 111,
@@ -23309,7 +27173,19 @@
           ],
           "xp": 0.34
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.21,
+        "goals": 0.03,
+        "assists": 0.02,
+        "clean_sheet": 0.13,
+        "conceded": -0.03,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.02,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 229,
@@ -23381,7 +27257,19 @@
           ],
           "xp": 0.37
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.29,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.08,
+        "conceded": -0.06,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 535,
@@ -23453,7 +27341,19 @@
           ],
           "xp": 0.35
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.26,
+        "goals": 0.03,
+        "assists": 0.01,
+        "clean_sheet": 0.07,
+        "conceded": -0.03,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.03,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 244,
@@ -23525,7 +27425,19 @@
           ],
           "xp": 0.33
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.24,
+        "goals": 0.04,
+        "assists": 0.03,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 164,
@@ -23597,7 +27509,19 @@
           ],
           "xp": 0.31
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.18,
+        "goals": 0.08,
+        "assists": 0.02,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.01,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 27,
@@ -23669,7 +27593,19 @@
           ],
           "xp": 0.31
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.26,
+        "goals": 0.05,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 812,
@@ -23741,7 +27677,19 @@
           ],
           "xp": 0.32
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.16,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.1,
+        "conceded": -0.03,
+        "saves": 0.09,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.03
+      },
+      "components_gw": 1
     },
     {
       "id": 400,
@@ -23813,7 +27761,19 @@
           ],
           "xp": 0.32
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.16,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.11,
+        "conceded": -0.02,
+        "saves": 0.06,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 700,
@@ -23885,7 +27845,19 @@
           ],
           "xp": 0.3
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.18,
+        "goals": 0.1,
+        "assists": 0.03,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 336,
@@ -23957,7 +27929,19 @@
           ],
           "xp": 0.28
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.21,
+        "goals": 0.02,
+        "assists": 0.02,
+        "clean_sheet": 0.01,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.0,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 801,
@@ -24029,7 +28013,19 @@
           ],
           "xp": 0.25
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.21,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 391,
@@ -24101,7 +28097,19 @@
           ],
           "xp": 0.25
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.21,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 227,
@@ -24173,7 +28181,19 @@
           ],
           "xp": 0.23
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.13,
+        "goals": 0.01,
+        "assists": 0.01,
+        "clean_sheet": 0.05,
+        "conceded": -0.03,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 369,
@@ -24245,7 +28265,19 @@
           ],
           "xp": 0.2
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.13,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.03,
+        "conceded": -0.04,
+        "saves": 0.08,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 805,
@@ -24317,7 +28349,19 @@
           ],
           "xp": 0.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.13,
+        "goals": 0.06,
+        "assists": 0.0,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     },
     {
       "id": 24,
@@ -24389,7 +28433,19 @@
           ],
           "xp": 0.22
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.18,
+        "goals": 0.03,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 422,
@@ -24461,7 +28517,19 @@
           ],
           "xp": 0.2
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.16,
+        "goals": 0.03,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 149,
@@ -24533,7 +28601,19 @@
           ],
           "xp": 0.19
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.13,
+        "goals": 0.01,
+        "assists": 0.0,
+        "clean_sheet": 0.03,
+        "conceded": -0.01,
+        "saves": 0.0,
+        "defensive_contribution": 0.02,
+        "yellows": -0.0,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 389,
@@ -24605,7 +28685,19 @@
           ],
           "xp": 0.18
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.13,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 239,
@@ -24677,7 +28769,19 @@
           ],
           "xp": 0.17
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.12,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.01
+      },
+      "components_gw": 1
     },
     {
       "id": 396,
@@ -24749,7 +28853,19 @@
           ],
           "xp": 0.17
         }
-      ]
+      ],
+      "components": {
+        "appearance": 0.16,
+        "goals": 0.01,
+        "assists": 0.0,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.0
+      },
+      "components_gw": 1
     }
   ]
 }
