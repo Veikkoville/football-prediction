@@ -20,7 +20,7 @@ README/scaffold oletti **kausi = one-time** (`STRIPE_PRICE_SEASON_ID` one-time).
 
 ## 🔒 Villen jäljellä (secretit — CoS EI voi käsitellä)
 
-1. **Supabase SQL:** aja `web/pro/sql/web_subscriptions.sql` SQL-editorissa (CoS ei voinut: editori auto-sulkee sulkeet + Supabasella oli häiriö/"Unhealthy" 5.7 → paras kun projekti terve. Kopioi tiedosto → liitä → Run, ~30 s).
+1. ✅ **Supabase SQL AJETTU 5.7** (Ville liitti + Run, "Success. No rows returned" → `web_subscriptions`-taulu + trigger + RLS + "own subscription read" -policy luotu). CoS-automaatio ei taipunut (editorin auto-close + laajennuksen ctrl+v ei injektoinut leikepöytää + Supabase-häiriö) → tehtiin CoS-ohjatulla Villen Ctrl+V:llä.
 2. **Secretit `.env`:iin / hostin secret-manageriin** (test-avaimet):
    - `STRIPE_SECRET_KEY` = sk_test_… (Stripe → Developers → API keys)
    - `STRIPE_PUBLISHABLE_KEY` = pk_test_51TUSSEFLROrR5x8w… (sama sivu)

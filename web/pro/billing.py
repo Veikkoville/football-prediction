@@ -89,32 +89,52 @@ def handle_success_redirect() -> None:
         return
     user = st.session_state.get("giq_user")
     stripe.api_key = _env("STRIPE_SECRET_KEY")
+    import json as _json
+
     try:
-        session = stripe.checkout.Session.retrieve(sid)
+        # HUOM: stripe v15:n resurssiobjektit eivät käyttäydy dictinä
+        # (.get()/dict() kaatuvat) → parsi raaka-JSONiksi (__str__ = JSON),
+        # sama tekniikka kuin backendin mobiiliwebhookissa.
+        session = _json.loads(str(stripe.checkout.Session.retrieve(sid)))
     except Exception as e:
         st.error(f"Could not verify payment: {e}")
         return
     if session.get("payment_status") != "paid":
         st.warning("Payment not completed.")
         return
+    metadata = session.get("metadata") or {}
     uid = (session.get("client_reference_id")
-           or (session.get("metadata") or {}).get("user_id")
+           or metadata.get("user_id")
            or (user or {}).get("id"))
     if not uid:
         st.error("Paid session without user reference — contact support.")
         return
-    plan = (session.get("metadata") or {}).get("plan", "season")
-    stripe_sub = session.get("subscription")
+    plan = metadata.get("plan", "season")
+    sub_field = session.get("subscription")
+    stripe_sub = (sub_field.get("id") if isinstance(sub_field, dict)
+                  else sub_field)
+    period_end = None
     if stripe_sub:
         # Molemmat planit ovat recurring-subscriptioneita (kausi = yearly).
-        sub = stripe.Subscription.retrieve(stripe_sub)
-        period_end = _dt.datetime.fromtimestamp(
-            sub["current_period_end"], _dt.timezone.utc).isoformat()
-    else:
-        # Defensiivinen fallback (ei pitäisi tapahtua subscription-modessa)
+        try:
+            sub = _json.loads(str(stripe.Subscription.retrieve(stripe_sub)))
+            # Uusissa Stripe-API-versioissa current_period_end siirtyi
+            # itemeille -> lue top-level TAI items.data[0].
+            items = (sub.get("items") or {}).get("data") or [{}]
+            ts = sub.get("current_period_end") or items[0].get("current_period_end")
+            if ts:
+                period_end = _dt.datetime.fromtimestamp(
+                    ts, _dt.timezone.utc).isoformat()
+        except Exception:
+            period_end = None
+    if period_end is None:
+        # Defensiivinen fallback (esim. period-kenttä puuttuu API-versiosta)
         period_end = _season_end_iso()
+    cust_field = session.get("customer")
+    customer_id = (cust_field.get("id") if isinstance(cust_field, dict)
+                   else cust_field)
     if upsert_subscription(uid, plan, "active", period_end,
-                           session.get("customer"), stripe_sub):
+                           customer_id, stripe_sub):
         st.query_params.clear()
         st.success("Premium active — welcome aboard!")
         st.balloons()

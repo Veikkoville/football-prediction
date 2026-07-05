@@ -14,6 +14,10 @@ auth/billing näyttää config-ohjeen — ks. README.md + .env.example).
 """
 from __future__ import annotations
 
+import envload
+
+envload.load()  # lokaali .env -> os.environ ENNEN auth/billing-importteja
+
 import pandas as pd
 import streamlit as st
 
@@ -61,11 +65,11 @@ def free_views() -> None:
         return
 
     acc = fetch_accuracy()
-    agg = acc.get("aggregate", acc) if isinstance(acc, dict) else {}
-    n = agg.get("n_1x2") or agg.get("n") or None
-    pct = agg.get("accuracy_1x2_pct") or agg.get("accuracy_pct") or None
+    all_time = acc.get("all_time") or {}
+    n = all_time.get("n")
+    pct = all_time.get("pct_1x2")
     if n and pct:
-        st.success(f"Track record: {pct:.1f} % correct 1X2 across {n} "
+        st.success(f"Track record: {pct * 100:.1f} % correct 1X2 across {n} "
                    f"pre-match-logged predictions · "
                    f"[methodology](https://goaliq.app/fpl.html#track-record)")
 

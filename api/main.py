@@ -1971,7 +1971,9 @@ async def stripe_web_webhook(request: Request):
     elif event_type == "customer.subscription.updated":
         # Vain web-tilausrivit päivittyvät (match stripe_subscription_id:llä —
         # mobiilin vanhat Stripe-subit eivät ole web_subscriptions-taulussa).
-        period_end = obj.get("current_period_end")
+        # Uusissa Stripe-API-versioissa current_period_end on itemeillä.
+        _items = (obj.get("items") or {}).get("data") or [{}]
+        period_end = obj.get("current_period_end") or _items[0].get("current_period_end")
         fields = {"status": "active" if obj.get("status") == "active" else obj.get("status", "past_due")}
         if period_end:
             fields["current_period_end"] = datetime.fromtimestamp(
