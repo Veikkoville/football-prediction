@@ -312,6 +312,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "built by an independent developer in Finland. It runs a Dixon-Coles "
             "match model with a public, pre-match-logged prediction track record."
         ),
+        "logo": BASE + "/assets/brand/goaliq-appicon-512.png",
         "sameAs": [PLAY_URL, APPSTORE_URL, X_URL],
     }
     app = {
@@ -388,8 +389,9 @@ CSS = """
   .bar{ height:6px; background:var(--magenta); }
   .nav{ max-width:960px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .brand{ font-size:24px; font-weight:800; letter-spacing:.5px; }
-  .brand a{ color:#fff; text-decoration:none; }
+  .brand a{ color:#fff; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
   .brand span{ color:var(--magenta); }
+  .brand-icon{ width:26px; height:26px; border-radius:7px; display:block; }
   .cta{ display:inline-block; background:var(--magenta); color:#fff; text-decoration:none; padding:14px 24px; border-radius:30px; font-weight:800; min-height:48px; }
   .cta:hover{ background:var(--magenta-deep); }
   .cta.secondary{ background:transparent; border:2px solid var(--magenta); color:inherit; }
@@ -470,6 +472,9 @@ def render_page(c: dict) -> str:
 <link rel="canonical" href="{CANONICAL}">
 <link rel="alternate" hreflang="en" href="{CANONICAL}">
 <link rel="alternate" hreflang="x-default" href="{CANONICAL}">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="FPL Clean Sheet Odds &amp; Fixture Difficulty by GoalIQ">
@@ -488,7 +493,7 @@ def render_page(c: dict) -> str:
 <header class="dark">
   <div class="bar"></div>
   <div class="nav">
-    <div class="brand"><a href="./">Goal<span>IQ</span></a></div>
+    <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="26" height="26" alt="">Goal<span>IQ</span></a></div>
     <a class="cta" href="{PLAY_URL}">Get the free app</a>
   </div>
 </header>
