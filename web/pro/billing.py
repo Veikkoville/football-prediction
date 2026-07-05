@@ -28,9 +28,9 @@ PLANS = {
     # UI-oletus = kausi. Villen päätös 5.7 (tarkennettu): 25 €/vuosi VUOSITTAIN
     # UUSIUTUVA subscription (ei one-time) — Stripe-hinta luotu recurring-
     # yearlyna (ks. STRIPE_SUPABASE_CONFIG.md). MOLEMMAT mode='subscription'.
-    "season": {"label": "Season pass — 25 €/year", "env": "STRIPE_PRICE_SEASON_ID",
+    "season": {"label": "Season pass: 25 €/year", "env": "STRIPE_PRICE_SEASON_ID",
                "mode": "subscription"},
-    "monthly": {"label": "Monthly — 3.99 €/mo", "env": "STRIPE_PRICE_MONTHLY_ID",
+    "monthly": {"label": "Monthly: 3.99 €/mo", "env": "STRIPE_PRICE_MONTHLY_ID",
                 "mode": "subscription"},
 }
 
@@ -107,7 +107,7 @@ def handle_success_redirect() -> None:
            or metadata.get("user_id")
            or (user or {}).get("id"))
     if not uid:
-        st.error("Paid session without user reference — contact support.")
+        st.error("Paid session without user reference. Contact support.")
         return
     plan = metadata.get("plan", "season")
     sub_field = session.get("subscription")
@@ -136,7 +136,9 @@ def handle_success_redirect() -> None:
     if upsert_subscription(uid, plan, "active", period_end,
                            customer_id, stripe_sub):
         st.query_params.clear()
-        st.success("Premium active — welcome aboard!")
+        st.success("Premium active, welcome aboard! Pro is now active on the "
+                   "web AND in the GoalIQ app (iOS and Android). Just sign in "
+                   "with the same account on your phone.")
         st.balloons()
 
 
@@ -144,16 +146,18 @@ def upgrade_box(user: dict) -> None:
     """Paywall-CTA: kausi oletuksena, kuukausi rinnalla."""
     st.markdown("#### Unlock GoalIQ Pro")
     st.caption("Player expected points (xP), captain ranker and per-gameweek "
-               "breakdowns. Season pass renews yearly, monthly renews monthly — "
-               "cancel anytime.")
+               "breakdowns. Season pass renews yearly, monthly renews monthly, "
+               "cancel anytime. One subscription covers web, iOS and Android.")
+    st.caption("Already subscribed in the GoalIQ app? Sign in with the same "
+               "account and Pro is already active here.")
     c1, c2 = st.columns(2)
     for col, plan in ((c1, "season"), (c2, "monthly")):
         with col:
             primary = plan == "season"
             if primary:
-                st.caption("Best value — under 2.10 €/month")
+                st.caption("Best value, under 2.10 €/month")
             else:
-                st.caption("Flexible — try it for a month")
+                st.caption("Flexible, try it for a month")
             if st.button(PLANS[plan]["label"], type="primary" if primary else "secondary",
                          use_container_width=True, key=f"buy_{plan}"):
                 url = checkout_url(user, plan)

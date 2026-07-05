@@ -25,13 +25,13 @@ import auth
 import billing
 from data import fetch_accuracy, fetch_fantasy, fetch_xp
 
-st.set_page_config(page_title="GoalIQ Pro — FPL tools", page_icon="⚽",
+st.set_page_config(page_title="GoalIQ Pro | FPL tools", page_icon="⚽",
                    layout="wide")
 
 MAGENTA = "#FF2E7E"
 FDR_COLORS = {1: "#00C48C", 2: "#00B8B8", 3: "#F4A800", 4: "#FF6B5E", 5: "#D6006E"}
 
-DISCLAIMER = ("GoalIQ model expected points — a model prediction, not betting "
+DISCLAIMER = ("GoalIQ model expected points: a model prediction, not betting "
               "advice, and not a gambling service.")
 
 
@@ -61,7 +61,7 @@ def free_views() -> None:
     data = fetch_fantasy()
     meta = data.get("meta", {})
     if not meta.get("available"):
-        st.info("Projections go live before Gameweek 1 — check back soon.")
+        st.info("Projections go live before Gameweek 1. Check back soon.")
         return
 
     acc = fetch_accuracy()
@@ -73,7 +73,7 @@ def free_views() -> None:
                    f"pre-match-logged predictions · "
                    f"[methodology](https://goaliq.app/fpl.html#track-record)")
 
-    st.markdown(f"### Clean sheet outlook — next {meta.get('horizon_gw', 6)} gameweeks")
+    st.markdown(f"### Clean sheet outlook, next {meta.get('horizon_gw', 6)} gameweeks")
     st.caption("Free · P(clean sheet) from the GoalIQ Dixon-Coles match engine. "
                "Model-based fixture difficulty (FDR) 1 = easiest, 5 = hardest.")
 
@@ -114,7 +114,7 @@ def premium_views() -> None:
     players = data.get("players", [])
     next_gw = meta.get("next_gameweek")
 
-    st.markdown("### Captain ranker — top xP for the next gameweek")
+    st.markdown("### Captain ranker: top xP for the next gameweek")
     cap = sorted(
         (p for p in players),
         key=lambda p: -next((g["xp"] for g in p["gameweeks"] if g["gw"] == next_gw), 0.0),
@@ -130,7 +130,7 @@ def premium_views() -> None:
     } for i, p in enumerate(cap)]
     st.dataframe(pd.DataFrame(cap_rows), use_container_width=True, hide_index=True)
 
-    st.markdown(f"### Player expected points — next {meta.get('horizon_gw', 6)} gameweeks")
+    st.markdown(f"### Player expected points, next {meta.get('horizon_gw', 6)} gameweeks")
     c1, c2 = st.columns([1, 2])
     with c1:
         pos = st.selectbox("Position", ["All", "GKP", "DEF", "MID", "FWD"])
@@ -177,29 +177,36 @@ def main() -> None:
     with tab_pro:
         if not auth_ready:
             st.warning("Sign-in is not configured yet in this environment "
-                       "(missing Supabase secrets — see README).")
+                       "(missing Supabase secrets, see README).")
             st.markdown(f"*{DISCLAIMER}*")
             return
         user = auth.current_user()
         if not user:
             st.markdown("#### Sign in to continue")
             st.caption("Expected points (xP) is part of GoalIQ Pro. "
-                       "Sign in or create an account first.")
+                       "Sign in or create an account first. Already subscribed "
+                       "in the GoalIQ app? Sign in with the same account and "
+                       "Pro is already active here.")
             auth.login_box()
         else:
             sub = auth.subscription(user["id"])
             if sub:
                 plan = sub.get("plan", "")
-                st.caption(f"GoalIQ Pro active ({plan}) · thank you for the support!")
+                if plan == "app":
+                    # Cross-platform-comms (#8): premium tuli appista
+                    st.success("Your GoalIQ app subscription is active here too. Welcome.")
+                else:
+                    st.caption(f"GoalIQ Pro active ({plan}) · thank you for the support!")
                 premium_views()
             elif billing_ready:
                 billing.upgrade_box(user)
             else:
                 st.warning("Checkout is not configured yet in this environment "
-                           "(missing Stripe secrets — see README).")
+                           "(missing Stripe secrets, see README).")
 
     st.divider()
-    st.caption(f"{DISCLAIMER} · [Privacy](https://goaliq.app/privacy.html) · "
+    st.caption(f"One account, premium on web, iOS and Android. · {DISCLAIMER} · "
+               f"[Privacy](https://goaliq.app/privacy.html) · "
                f"[FAQ](https://goaliq.app/faq.html) · Built by an independent "
                f"developer in Finland.")
 
