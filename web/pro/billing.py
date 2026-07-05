@@ -22,6 +22,7 @@ try:
 except ImportError:  # pragma: no cover
     stripe = None
 
+import analytics
 from auth import upsert_subscription
 
 PLANS = {
@@ -135,6 +136,11 @@ def handle_success_redirect() -> None:
                    else cust_field)
     if upsert_subscription(uid, plan, "active", period_end,
                            customer_id, stripe_sub):
+        # Web-funnel (#12): toteutunut osto (kerran per sessio; query-param
+        # tyhjennetään alla joten redirect ei toistu muutenkaan)
+        analytics.capture("purchase_completed",
+                          {"source": "web", "plan": plan},
+                          once_key=f"purchase_{sid}")
         st.query_params.clear()
         st.success("Premium active, welcome aboard! Pro is now active on the "
                    "web AND in the GoalIQ app (iOS and Android). Just sign in "
@@ -144,6 +150,11 @@ def handle_success_redirect() -> None:
 
 def upgrade_box(user: dict) -> None:
     """Paywall-CTA: kausi oletuksena, kuukausi rinnalla."""
+    # Web-funnel (#12): paywall renderöityy (kerran per sessio,
+    # sama eventtinimi kuin mobiili -> yhteinen funnel platform-propilla)
+    analytics.capture("paywall_shown",
+                      {"source": "pro_web", "plans": ["season", "monthly"]},
+                      once_key="paywall_shown")
     st.markdown("#### Unlock GoalIQ Pro")
     st.caption("Player expected points (xP), captain ranker and per-gameweek "
                "breakdowns. Season pass renews yearly, monthly renews monthly, "
@@ -160,6 +171,12 @@ def upgrade_box(user: dict) -> None:
                 st.caption("Flexible, try it for a month")
             if st.button(PLANS[plan]["label"], type="primary" if primary else "secondary",
                          use_container_width=True, key=f"buy_{plan}"):
+                # Web-funnel (#12): osto-intentti ennen Stripe-redirectiä.
+                # Ei once-guardia: st.button palauttaa True vain aidosta
+                # klikkauksesta (ei rerun-tuplausta).
+                analytics.capture("upgrade_tapped",
+                                  {"source": "pro_web", "plan": plan,
+                                   "price": 25.0 if plan == "season" else 3.99})
                 url = checkout_url(user, plan)
                 if url:
                     st.link_button("Continue to secure checkout →", url,

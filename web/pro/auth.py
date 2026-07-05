@@ -17,6 +17,8 @@ import os
 
 import streamlit as st
 
+import analytics
+
 try:
     from supabase import Client, create_client
 except ImportError:  # pragma: no cover - requirements asentaa
@@ -100,6 +102,11 @@ def _do_auth(mode: str, email: str, pw: str) -> None:
             return
         st.session_state["giq_user"] = {"id": user.id, "email": user.email}
         st.session_state.pop("giq_sub", None)
+        # Web-funnel (#12): anon->user-alias + email person-propiksi;
+        # signup_completed vain uudelle tilille (sama eventtinimi kuin mobiili)
+        analytics.identify_user(user.id, user.email)
+        if mode == "sign_up":
+            analytics.capture("signup_completed", once_key="signup")
         st.rerun()
     except Exception as e:
         st.error(f"Authentication failed: {e}")

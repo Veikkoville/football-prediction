@@ -24,6 +24,7 @@ envload.load()  # lokaali .env -> os.environ ENNEN auth/billing-importteja
 import pandas as pd
 import streamlit as st
 
+import analytics
 import auth
 import billing
 from data import fetch_accuracy, fetch_fantasy, fetch_xp
@@ -227,6 +228,8 @@ def premium_views() -> None:
 # Main
 # ---------------------------------------------------------------------------
 def main() -> None:
+    # Web-funnel (#12): sivulataus kerran per sessio
+    analytics.capture("pro_page_viewed", once_key="page_viewed")
     header()
     billing_ready = billing.is_configured()
     auth_ready = auth.is_configured()
