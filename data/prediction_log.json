@@ -2301,7 +2301,15 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-01T03:58:44+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 1,
+        "actual_score": "0-1",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": true,
+        "reconciled_at": "2026-07-05T03:29:04+00:00"
+      }
     },
     {
       "match_id": "fd-537378",
@@ -2391,6 +2399,24 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-04T06:26:46+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537383",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-09",
+      "kickoff": "2026-07-09T20:00:00Z",
+      "home_team": "France",
+      "away_team": "Morocco",
+      "p_home": 0.5385,
+      "p_draw": 0.2851,
+      "p_away": 0.1764,
+      "xg_home": 1.455,
+      "xg_away": 0.721,
+      "most_likely_score": "1-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-07-05T03:29:04+00:00",
       "result": null
     }
   ]

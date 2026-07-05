@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-04T21:59:39+00:00",
-  "logged_total": 96,
+  "updated_at": "2026-07-05T03:29:04+00:00",
+  "logged_total": 97,
   "pending": 7,
   "all_time": {
-    "n": 89,
-    "correct_1x2": 56,
-    "pct_1x2": 0.6292,
-    "decisive_n": 66,
-    "decisive_correct": 56,
-    "pct_decisive": 0.8485,
-    "exact_n": 41,
-    "exact_correct": 9,
-    "pct_exact": 0.2195,
-    "brier": 0.4333,
-    "brier_n": 41
+    "n": 90,
+    "correct_1x2": 57,
+    "pct_1x2": 0.6333,
+    "decisive_n": 67,
+    "decisive_correct": 57,
+    "pct_decisive": 0.8507,
+    "exact_n": 42,
+    "exact_correct": 10,
+    "pct_exact": 0.2381,
+    "brier": 0.4296,
+    "brier_n": 42
   },
   "rolling": {
-    "n": 89,
-    "correct_1x2": 56,
-    "pct_1x2": 0.6292,
-    "decisive_n": 66,
-    "decisive_correct": 56,
-    "pct_decisive": 0.8485,
-    "exact_n": 41,
-    "exact_correct": 9,
-    "pct_exact": 0.2195,
-    "brier": 0.4333,
-    "brier_n": 41,
+    "n": 90,
+    "correct_1x2": 57,
+    "pct_1x2": 0.6333,
+    "decisive_n": 67,
+    "decisive_correct": 57,
+    "pct_decisive": 0.8507,
+    "exact_n": 42,
+    "exact_correct": 10,
+    "pct_exact": 0.2381,
+    "brier": 0.4296,
+    "brier_n": 42,
     "window": 100
   },
   "calibration": [
@@ -37,16 +37,16 @@
       "n": 9
     },
     {
-      "bin_mid": 0.1476,
-      "predicted": 0.1476,
-      "actual": 0.0556,
-      "n": 18
+      "bin_mid": 0.1482,
+      "predicted": 0.1482,
+      "actual": 0.0526,
+      "n": 19
     },
     {
-      "bin_mid": 0.2554,
-      "predicted": 0.2554,
-      "actual": 0.1667,
-      "n": 42
+      "bin_mid": 0.2557,
+      "predicted": 0.2557,
+      "actual": 0.1628,
+      "n": 43
     },
     {
       "bin_mid": 0.3429,
@@ -61,10 +61,10 @@
       "n": 12
     },
     {
-      "bin_mid": 0.5326,
-      "predicted": 0.5326,
-      "actual": 0.75,
-      "n": 4
+      "bin_mid": 0.541,
+      "predicted": 0.541,
+      "actual": 0.8,
+      "n": 5
     },
     {
       "bin_mid": 0.6404,
@@ -86,6 +86,18 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-04",
+      "home_team": "Paraguay",
+      "away_team": "France",
+      "predicted_winner": "away",
+      "p_winner": 0.5744,
+      "most_likely_score": "0-1",
+      "actual_score": "0-1",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": true
+    },
     {
       "date": "2026-07-04",
       "home_team": "Canada",
@@ -312,18 +324,6 @@
       "actual_score": "1-3",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
-    },
-    {
-      "date": "2026-06-27",
-      "home_team": "Congo DR",
-      "away_team": "Uzbekistan",
-      "predicted_winner": "away",
-      "p_winner": 0.3716,
-      "most_likely_score": "0-0",
-      "actual_score": "3-1",
-      "actual_outcome": "home",
-      "hit_1x2": false,
       "exact_hit": false
     }
   ]
