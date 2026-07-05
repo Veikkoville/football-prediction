@@ -14,6 +14,9 @@ auth/billing näyttää config-ohjeen — ks. README.md + .env.example).
 """
 from __future__ import annotations
 
+import base64
+from pathlib import Path
+
 import envload
 
 envload.load()  # lokaali .env -> os.environ ENNEN auth/billing-importteja
@@ -25,26 +28,88 @@ import auth
 import billing
 from data import fetch_accuracy, fetch_fantasy, fetch_xp
 
-st.set_page_config(page_title="GoalIQ Pro | FPL tools", page_icon="⚽",
+_APP_DIR = Path(__file__).parent
+_ICON_PATH = _APP_DIR / "assets" / "goaliq-appicon-192.png"
+
+st.set_page_config(page_title="GoalIQ Pro | FPL tools",
+                   page_icon=str(_ICON_PATH) if _ICON_PATH.exists() else "⚽",
                    layout="wide")
 
+# Brändipaletti (goaliq-app/assets/brand/brand-tokens.md — TÄSMÄHEXIT)
 MAGENTA = "#FF2E7E"
-FDR_COLORS = {1: "#00C48C", 2: "#00B8B8", 3: "#F4A800", 4: "#FF6B5E", 5: "#D6006E"}
+MAGENTA_DEEP = "#D6006E"
+INK = "#0A0820"
+INK2 = "#140F1E"
+CREAM = "#FFF6EC"
+TEAL = "#19E3D2"
+TEAL_DEEP = "#00C2AD"
+GOLD_DEEP = "#F4A800"
+CORAL = "#FF6A3D"
+# FDR 1-5 brändiasteikko Teal → Gold → Coral → MagentaDeep (sama kuin fpl.html)
+FDR_COLORS = {1: TEAL_DEEP, 2: TEAL, 3: GOLD_DEEP, 4: CORAL, 5: MAGENTA_DEEP}
 
 DISCLAIMER = ("GoalIQ model expected points: a model prediction, not betting "
               "advice, and not a gambling service.")
+
+# Brändi-CSS (#10): Space Grotesk -otsikot, magenta-aksentit, Ink-hero,
+# Streamlitin deploy-toolbarin piilotus tuotantopinnasta.
+_BRAND_CSS = f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+html, body, [data-testid="stAppViewContainer"] * {{
+  font-family: 'Space Grotesk', -apple-system, 'Segoe UI', sans-serif;
+}}
+[data-testid="stToolbar"] {{ visibility: hidden; }}
+h1, h2, h3 {{ letter-spacing: -0.4px; }}
+.giq-hero {{
+  background: linear-gradient(165deg, {INK2}, {INK});
+  border: 1px solid {MAGENTA}33;
+  border-radius: 16px;
+  padding: 18px 22px 14px;
+  margin-bottom: 6px;
+}}
+.giq-hero .brand {{ display: flex; align-items: center; gap: 12px; }}
+.giq-hero img {{ width: 44px; height: 44px; border-radius: 11px; display: block; }}
+.giq-hero .word {{ font-size: 28px; font-weight: 700; color: {CREAM}; line-height: 1; }}
+.giq-hero .word span {{ color: {MAGENTA}; }}
+.giq-hero .tag {{ color: #C9C3DA; font-size: 13px; margin-top: 6px; }}
+.giq-hero a {{ color: {TEAL}; text-decoration: none; }}
+[data-testid="stButton"] button[kind="primary"] {{
+  background: {MAGENTA}; border: none; border-radius: 24px; font-weight: 700;
+}}
+[data-testid="stButton"] button[kind="primary"]:hover {{ background: {MAGENTA_DEEP}; }}
+[data-testid="stButton"] button[kind="secondary"] {{
+  border: 2px solid {MAGENTA}; border-radius: 24px; font-weight: 700;
+}}
+[data-baseweb="tab-highlight"] {{ background-color: {MAGENTA}; }}
+</style>
+"""
+
+
+def _icon_b64() -> str | None:
+    try:
+        return base64.b64encode(_ICON_PATH.read_bytes()).decode()
+    except Exception:
+        return None
 
 
 # ---------------------------------------------------------------------------
 # Header + auth-tila
 # ---------------------------------------------------------------------------
 def header() -> None:
+    st.markdown(_BRAND_CSS, unsafe_allow_html=True)
     left, right = st.columns([3, 1])
     with left:
-        st.markdown(f"## Goal<span style='color:{MAGENTA}'>IQ</span> Pro",
-                    unsafe_allow_html=True)
-        st.caption("Fantasy Premier League tools from the GoalIQ match model · "
-                   "[goaliq.app](https://goaliq.app)")
+        icon = _icon_b64()
+        icon_html = (f'<img src="data:image/png;base64,{icon}" alt="">'
+                     if icon else "")
+        st.markdown(
+            f'<div class="giq-hero"><div class="brand">{icon_html}'
+            f'<div class="word">Goal<span>IQ</span> Pro</div></div>'
+            f'<div class="tag">Fantasy Premier League tools from the GoalIQ '
+            f'match model · <a href="https://goaliq.app">goaliq.app</a></div></div>',
+            unsafe_allow_html=True,
+        )
     with right:
         user = auth.current_user()
         if user:

@@ -1,0 +1,15 @@
+# GoalIQ Pro -teema — brand-tokens.md:n TÄSMÄHEXIT (QUEUE #10).
+# Ink-pohja + magenta-primary = sama look kuin goaliq.app/fpl.html-hero.
+[theme]
+base = "dark"
+primaryColor = "#FF2E7E"
+backgroundColor = "#0A0820"
+secondaryBackgroundColor = "#140F1E"
+textColor = "#FFF6EC"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
