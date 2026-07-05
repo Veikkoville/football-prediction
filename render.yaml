@@ -18,3 +18,40 @@ services:
       # API-avain football-data.org:lle (asetetaan Render-dashboardissa secrets:eihin)
       - key: FOOTBALL_DATA_API_KEY
         sync: false             # sync: false = aseta käsin Render UI:ssa, ei pushata
+
+  # GoalIQ Pro -web-dashboard (web/pro, Streamlit) — pro.goaliq.app.
+  # HUOM: olemassa oleva goaliq-api-service on luotu käsin dashboardista →
+  # helpoin polku tälle on MYÖS luoda service käsin (samat asetukset,
+  # step-by-step: web/pro/DEPLOY_RENDER.md). Tämä blueprint-entry toimii
+  # dokumentaationa + vaihtoehtona jos siirrytään blueprint-hallintaan.
+  - type: web
+    name: goaliq-pro-web
+    runtime: python
+    region: frankfurt
+    plan: free                  # riittää alkuun; starter jos cold-start haittaa
+    buildCommand: pip install -r web/pro/requirements.txt
+    startCommand: >-
+      streamlit run web/pro/app.py --server.port $PORT
+      --server.address 0.0.0.0 --server.headless true
+      --server.fileWatcherType none --browser.gatherUsageStats false
+    healthCheckPath: /_stcore/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      # Kaikki alla asetetaan käsin Render UI:ssa (LIVE-arvot;
+      # checklist: web/pro/DEPLOY_RENDER.md)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PRICE_MONTHLY_ID
+        sync: false
+      - key: STRIPE_PRICE_SEASON_ID
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
