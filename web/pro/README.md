@@ -10,7 +10,7 @@ Erillinen tuote: EI liity vanhaan vville-football-Streamlitiin (betting, parkiss
 |---|---|
 | `app.py` | Päänäkymä: free (CS%+FDR+track record) + Pro (xP-lista, kapteeni-ranker) + paywall |
 | `auth.py` | Supabase-login (sama tili kuin mobiilissa) + `web_subscriptions`-status |
-| `billing.py` | Stripe Checkout (kausi 25 € oletus + 3,99 €/kk) + success-redirect-verify |
+| `billing.py` | Stripe Checkout (kausi 25 €/vuosi [recurring, UI-oletus] + 3,99 €/kk — MOLEMMAT subscriptioneita) + success-redirect-verify |
 | `data.py` | API-fetchit + cache (15 min) |
 | `sql/web_subscriptions.sql` | Supabase-taulu + RLS (aja SQL-editorissa) |
 | `.env.example` | Kaikki tarvittavat secretit dokumentoituna |
@@ -25,8 +25,8 @@ Tilauksen aktivointi on kaksipolkuinen ja idempotentti:
 ## Villen setup ennen test-modea (~15 min)
 
 1. **Supabase** (sama projekti): aja `sql/web_subscriptions.sql` SQL-editorissa.
-2. **Stripe (test-mode):** luo tuote "GoalIQ Pro (web)" + 2 hintaa
-   (25 EUR one-time → `STRIPE_PRICE_SEASON_ID`; 3.99 EUR/kk → `STRIPE_PRICE_MONTHLY_ID`).
+2. **Stripe (test-mode):** ✅ TEHTY (CoS 5.7) — tuote "GoalIQ Pro (web)" + 2
+   recurring-hintaa (25 €/vuosi + 3,99 €/kk), id:t `STRIPE_SUPABASE_CONFIG.md`:ssä.
 3. **Secretit:** kopioi `.env.example` → täytä (test-avaimet!) → lokaalisti
    `.env`/ympäristö TAI hostin secret-dashboard.
 4. **Aja:** `pip install -r web/pro/requirements.txt` →

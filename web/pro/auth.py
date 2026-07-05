@@ -45,7 +45,9 @@ def _client() -> "Client":
 
 @st.cache_resource
 def _service_client() -> "Client | None":
-    key = _env("SUPABASE_SERVICE_KEY")
+    # Sama env-nimi kuin backendin Renderissä (SUPABASE_SERVICE_ROLE_KEY);
+    # SUPABASE_SERVICE_KEY hyväksytään aliaksena.
+    key = _env("SUPABASE_SERVICE_ROLE_KEY") or _env("SUPABASE_SERVICE_KEY")
     if not key:
         return None
     return create_client(_env("SUPABASE_URL"), key)

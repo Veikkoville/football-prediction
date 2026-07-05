@@ -1949,13 +1949,17 @@ async def stripe_web_webhook(request: Request):
             print("[Stripe web] checkout.completed ilman user_id-referenssiä — ohitetaan")
             return {"received": True}
         plan = (obj.get("metadata") or {}).get("plan", "season")
-        if plan == "season":
-            # Kausipassi: voimassa kauden loppuun (30.6.) ostohetkestä.
+        if obj.get("subscription"):
+            # Molemmat planit recurring (kausi = 25 e/vuosi yearly, Villen
+            # tarkennus 5.7) -> customer.subscription.updated tuo
+            # current_period_endin, checkoutissa ei arvata.
+            period_end = None
+        else:
+            # Defensiivinen fallback jos subscription-id puuttuu: kauden
+            # loppu (30.6.) ostohetkestä.
             today = datetime.now(timezone.utc).date()
             year = today.year + 1 if today.month >= 7 else today.year
             period_end = f"{year}-06-30T23:59:59+00:00"
-        else:
-            period_end = None  # subscription.updated tuo current_period_endin
         _upsert_web_subscription({
             "user_id": user_id,
             "plan": plan,

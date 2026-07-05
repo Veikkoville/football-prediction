@@ -53,7 +53,7 @@ def test_checkout_completed_upserts_subscription(client, monkeypatch):
         "data": {"object": {
             "client_reference_id": "user-123",
             "metadata": {"plan": "season", "source": "pro-web"},
-            "customer": "cus_x", "subscription": None,
+            "customer": "cus_x", "subscription": "sub_test",
             "payment_status": "paid",
         }},
     }
@@ -67,7 +67,32 @@ def test_checkout_completed_upserts_subscription(client, monkeypatch):
     assert fields["user_id"] == "user-123"
     assert fields["plan"] == "season"
     assert fields["status"] == "active"
-    assert fields["current_period_end"].endswith("06-30T23:59:59+00:00")
+    # Recurring-kausi (#5): period_endin tuo subscription.updated, ei checkout
+    assert fields["current_period_end"] is None
+    assert fields["stripe_subscription_id"] == "sub_test"
+
+
+def test_checkout_without_subscription_falls_back_to_season_end(client, monkeypatch):
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    calls: list[tuple[dict, dict | None]] = []
+    monkeypatch.setattr(m, "_upsert_web_subscription",
+                        lambda fields, match=None: calls.append((fields, match)) or True)
+    payload = {
+        "type": "checkout.session.completed",
+        "data": {"object": {
+            "client_reference_id": "user-123",
+            "metadata": {"plan": "season"},
+            "customer": "cus_x", "subscription": None,
+            "payment_status": "paid",
+        }},
+    }
+    body, sig = _signed(payload, secret)
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 200
+    assert calls[0][0]["current_period_end"].endswith("06-30T23:59:59+00:00")
 
 
 def test_subscription_deleted_marks_cancelled(client, monkeypatch):

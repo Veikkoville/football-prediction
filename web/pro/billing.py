@@ -25,9 +25,11 @@ except ImportError:  # pragma: no cover
 from auth import upsert_subscription
 
 PLANS = {
-    # UI-oletus = kausi (Villen päätös 5.7: 25 €/kausi edellä, 3,99 €/kk rinnalla)
-    "season": {"label": "Season pass — 25 €", "env": "STRIPE_PRICE_SEASON_ID",
-               "mode": "payment"},
+    # UI-oletus = kausi. Villen päätös 5.7 (tarkennettu): 25 €/vuosi VUOSITTAIN
+    # UUSIUTUVA subscription (ei one-time) — Stripe-hinta luotu recurring-
+    # yearlyna (ks. STRIPE_SUPABASE_CONFIG.md). MOLEMMAT mode='subscription'.
+    "season": {"label": "Season pass — 25 €/year", "env": "STRIPE_PRICE_SEASON_ID",
+               "mode": "subscription"},
     "monthly": {"label": "Monthly — 3.99 €/mo", "env": "STRIPE_PRICE_MONTHLY_ID",
                 "mode": "subscription"},
 }
@@ -102,14 +104,15 @@ def handle_success_redirect() -> None:
         st.error("Paid session without user reference — contact support.")
         return
     plan = (session.get("metadata") or {}).get("plan", "season")
-    if plan == "monthly" and session.get("subscription"):
-        sub = stripe.Subscription.retrieve(session["subscription"])
+    stripe_sub = session.get("subscription")
+    if stripe_sub:
+        # Molemmat planit ovat recurring-subscriptioneita (kausi = yearly).
+        sub = stripe.Subscription.retrieve(stripe_sub)
         period_end = _dt.datetime.fromtimestamp(
             sub["current_period_end"], _dt.timezone.utc).isoformat()
-        stripe_sub = session["subscription"]
     else:
+        # Defensiivinen fallback (ei pitäisi tapahtua subscription-modessa)
         period_end = _season_end_iso()
-        stripe_sub = None
     if upsert_subscription(uid, plan, "active", period_end,
                            session.get("customer"), stripe_sub):
         st.query_params.clear()
@@ -121,7 +124,8 @@ def upgrade_box(user: dict) -> None:
     """Paywall-CTA: kausi oletuksena, kuukausi rinnalla."""
     st.markdown("#### Unlock GoalIQ Pro")
     st.caption("Player expected points (xP), captain ranker and per-gameweek "
-               "breakdowns. One-off season pass or monthly — cancel anytime.")
+               "breakdowns. Season pass renews yearly, monthly renews monthly — "
+               "cancel anytime.")
     c1, c2 = st.columns(2)
     for col, plan in ((c1, "season"), (c2, "monthly")):
         with col:
