@@ -171,6 +171,62 @@ def free_views() -> None:
 # ---------------------------------------------------------------------------
 # Premium: xP-lista + kapteeni-ranker
 # ---------------------------------------------------------------------------
+# #13: labelit = mobiilin XpComponentSplit-pariteetti (goaliq-app lib/i18n/en.ts)
+_COMPONENT_LABELS = {
+    "appearance": "Appearance", "goals": "Goals", "assists": "Assists",
+    "clean_sheet": "Clean sheet", "conceded": "Conceded", "saves": "Saves",
+    "defensive_contribution": "Def. contribution", "yellows": "Cards",
+    "bonus": "Bonus",
+}
+
+
+def _component_breakdown(p: dict) -> None:
+    """Headline-GW:n xP-komponenttisplit yhdelle pelaajalle (#13).
+
+    Sama esitysjärjestys kuin mobiilin XpComponentSplit: nollasta poikkeavat
+    suurin ensin. Bar skaalataan suurimpaan positiiviseen komponenttiin;
+    negatiiviset (conceded/cards) näytetään ilman baria coral-arvolla.
+    """
+    comps = p.get("components") or {}
+    parts = [(k, float(v)) for k, v in comps.items()
+             if isinstance(v, (int, float)) and abs(float(v)) >= 0.005]
+    parts.sort(key=lambda kv: -kv[1])
+    if not parts:
+        st.caption("No component breakdown available for this player.")
+        return
+    # GW total = taulukon virallinen per-GW-xp (komponenttien 2 desim
+    # pyöristyssumma voi heittää ±0.01 siitä — ei näytetä kahta eri lukua).
+    comp_gw = p.get("components_gw")
+    gw_xp = next((g["xp"] for g in p.get("gameweeks", [])
+                  if g.get("gw") == comp_gw), None)
+    if gw_xp is None:
+        gw_xp = sum(v for _, v in parts)
+    max_pos = max((v for _, v in parts if v > 0), default=1.0)
+    rows = []
+    for key, val in parts:
+        label = _COMPONENT_LABELS.get(key, key.replace("_", " ").title())
+        width = max(round(val / max_pos * 100), 2) if val > 0 else 0
+        share = f" · {val / gw_xp:.0%}" if gw_xp > 0 and val > 0 else ""
+        color = TEAL_DEEP if val > 0 else CORAL
+        rows.append(
+            f'<div style="display:flex;align-items:center;gap:10px;'
+            f'margin:3px 0;font-size:14px;">'
+            f'<span style="width:150px;flex:none;">{label}</span>'
+            f'<div style="flex:1;background:{INK}14;border-radius:4px;'
+            f'height:10px;"><div style="width:{width}%;background:{color};'
+            f'border-radius:4px;height:10px;"></div></div>'
+            f'<span style="width:110px;flex:none;text-align:right;'
+            f'color:{color};font-weight:700;">{val:+.2f}{share}</span></div>')
+    st.markdown(
+        f'<div style="max-width:560px;">{"".join(rows)}'
+        f'<div style="display:flex;justify-content:space-between;'
+        f'max-width:560px;margin-top:6px;padding-top:6px;'
+        f'border-top:1px solid {INK}22;font-size:14px;font-weight:700;">'
+        f'<span>GW total</span><span>{gw_xp:.2f} xP</span></div></div>',
+        unsafe_allow_html=True,
+    )
+
+
 def premium_views() -> None:
     data = fetch_xp()
     meta = data.get("meta", {})
@@ -219,9 +275,30 @@ def premium_views() -> None:
         rows.append(row)
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True,
                  height=700)
-    st.caption("Per-gameweek xP columns = the per-GW breakdown. Component split "
-               "(goals/CS/defcon) lands when the backend ships it. "
-               "Differentials (xP vs ownership) come in Phase 2.")
+
+    # #13: komponenttierittely headline-GW:lle. Defensiivinen: renderöityy
+    # vain kun backend tuo components-kentän — ilman sitä näkymä ennallaan.
+    comp_pool = [p for p in pool if p.get("components")]
+    if comp_pool:
+        comp_gw = comp_pool[0].get("components_gw", next_gw)
+        st.markdown(f"#### Where the GW{comp_gw} xP comes from")
+        st.caption("GoalIQ model expected points, split by scoring component. "
+                   "Defensive contribution is where the model finds edges "
+                   "the eye test misses.")
+        sel = st.selectbox(
+            "Player", range(len(comp_pool)),
+            format_func=lambda i: (f'{comp_pool[i]["web_name"]} '
+                                   f'({comp_pool[i]["team_short"]}, '
+                                   f'{comp_pool[i]["pos"]})'),
+            key="xp_component_player",
+        )
+        _component_breakdown(comp_pool[sel])
+        st.caption("Per-gameweek xP columns above = the per-GW breakdown. "
+                   "Differentials (xP vs ownership) come in Phase 2.")
+    else:
+        st.caption("Per-gameweek xP columns = the per-GW breakdown. Component "
+                   "split (goals/CS/defcon) lands when the backend ships it. "
+                   "Differentials (xP vs ownership) come in Phase 2.")
 
 
 # ---------------------------------------------------------------------------
