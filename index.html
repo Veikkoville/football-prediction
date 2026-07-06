@@ -16,6 +16,12 @@
 <meta property="og:description" content="Pick two teams and GoalIQ predicts the match: probabilities and xG. Free FPL clean sheet odds and fixture difficulty on the web." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://goaliq.app/" />
+<meta property="og:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@goaliqapp" />
+<meta name="twitter:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
 
 <script type="application/ld+json">
 {
@@ -89,6 +95,9 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
+  /* Mobiiliylivuodon vahti (#15): mikään hajayksittäinen elementti ei saa
+     avata vaakascrollia kapealla laitteella */
+  html, body { overflow-x: clip; }
   body {
     background: var(--bg);
     color: var(--text);
@@ -139,6 +148,9 @@
     color: var(--text); font-weight: 600; font-size: 15px;
     padding: 16px 22px; border-radius: 999px; text-decoration: none;
     border: 1px solid var(--line);
+    /* inline-flex: pilleri ei katkea rivien yli mobiilissa (Villen
+       laitelöydös 6.7 — inline-ankkuri hajosi kahdelle riville) */
+    display: inline-flex; align-items: center; justify-content: center;
   }
   .btn-ghost:hover { border-color: var(--green); }
 
@@ -249,6 +261,13 @@
     .steps, .feat-grid { grid-template-columns: 1fr; }
     .section-head h2, .wc h2 { font-size: 28px; }
   }
+  /* Kapea mobiili: CTA-napit pinoon täysleveinä (ei vaakaylivuotoa) */
+  @media (max-width: 520px) {
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .cta-row .btn-primary, .cta-row .btn-ghost {
+      width: 100%; justify-content: center; text-align: center;
+    }
+  }
 </style>
 </head>
 <body>
@@ -274,7 +293,7 @@
     </div>
     <p class="cta-note">Free download. Predict any fixture yourself in the app. One account, premium on web, iOS and Android.</p>
     <div class="stat-strip">
-      <div class="stat"><!-- GEN:ACC-CHIP-START --><div class="num">63.3%</div><div class="lbl">result accuracy across 90 logged matches</div><!-- GEN:ACC-CHIP-END --></div>
+      <div class="stat"><!-- GEN:ACC-CHIP-START --><div class="num">63%</div><div class="lbl">result accuracy across 92 logged matches</div><!-- GEN:ACC-CHIP-END --></div>
       <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
       <div class="stat"><div class="num">€3.99</div><div class="lbl">Premium / month</div></div>
     </div>
@@ -288,15 +307,17 @@
       <h2>Free <span class="accent">FPL tools</span> on the web</h2>
       <p>GoalIQ's model gives clean sheet probability and fixture difficulty for every Premier League team, updated every gameweek.</p>
       <p>Free on the web, no sign-in. Want player expected points (xP) and a captain ranker on top? That is <a href="https://pro.goaliq.app" style="color:var(--violet);font-weight:700;">GoalIQ Pro on the web</a>.</p>
-      <p style="margin-top:22px;"><a class="btn-primary" href="fpl.html">See the FPL clean sheet odds</a>
-      <a class="btn-ghost" href="https://pro.goaliq.app">Open GoalIQ Pro</a></p>
+      <div class="cta-row" style="margin-top:22px; justify-content:flex-start;">
+        <a class="btn-primary" href="fpl.html">See the FPL clean sheet odds</a>
+        <a class="btn-ghost" href="https://pro.goaliq.app">Open GoalIQ Pro</a>
+      </div>
     </div>
     <div class="wc-visual">
       <div class="matchrow">
         <span class="team">Published track record</span>
         <span style="color:var(--muted);font-size:13px;">hits and misses</span>
       </div>
-      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 63.3% correct results across 90 matches played.<!-- GEN:ACC-PROOF-END --></p>
+      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 63% correct results across 92 matches played.<!-- GEN:ACC-PROOF-END --></p>
       <p style="margin-top:12px;"><a href="fpl.html#track-record" style="color:var(--violet);font-weight:700;">See the full record →</a></p>
     </div>
   </div>

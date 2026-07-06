@@ -448,6 +448,12 @@ CSS = """
   footer a{ color:var(--cream); }
   footer a:hover{ color:var(--magenta); }
   @media (max-width:640px){ .hero h1{ font-size:29px; } .hero .lede{ font-size:17px; } .nav{ padding:14px 16px; } .hero{ padding:30px 0 40px; } }
+  /* Kapea mobiili: CTA-napit pinoon täysleveinä, pitkä label ei ylivuoda (#15) */
+  @media (max-width:520px){
+    .cta-row{ flex-direction:column; align-items:stretch; }
+    .cta{ max-width:100%; text-align:center; }
+  }
+  html,body{ overflow-x:clip; }
 """
 
 
@@ -498,10 +504,14 @@ def render_page(c: dict) -> str:
 <meta property="og:title" content="FPL Clean Sheet Odds &amp; Fixture Difficulty by GoalIQ">
 <meta property="og:description" content="{meta_desc}">
 <meta property="og:url" content="{CANONICAL}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@goaliqapp">
 <meta name="twitter:title" content="FPL Clean Sheet Odds &amp; Fixture Difficulty by GoalIQ">
 <meta name="twitter:description" content="{meta_desc}">
+<meta name="twitter:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
 
 {jsonld}
 <meta name="theme-color" content="#0A0820">
