@@ -2283,7 +2283,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-06-30T20:00:25+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 2,
+        "actual_score": "1-2",
+        "actual_outcome": "away",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-06T03:36:53+00:00"
+      }
     },
     {
       "match_id": "fd-537375",
@@ -2327,7 +2335,15 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-02T03:39:36+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 3,
+        "actual_score": "2-3",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-06T03:36:53+00:00"
+      }
     },
     {
       "match_id": "fd-537380",
@@ -2417,6 +2433,24 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-07-05T03:29:04+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537385",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-11",
+      "kickoff": "2026-07-11T21:00:00Z",
+      "home_team": "Norway",
+      "away_team": "England",
+      "p_home": 0.2732,
+      "p_draw": 0.2811,
+      "p_away": 0.4457,
+      "xg_home": 1.082,
+      "xg_away": 1.448,
+      "most_likely_score": "1-1",
+      "predicted_winner": "away",
+      "logged_at": "2026-07-06T03:36:53+00:00",
       "result": null
     }
   ]
