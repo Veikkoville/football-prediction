@@ -2379,7 +2379,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-03T09:20:05+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 1,
+        "actual_score": "0-1",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-06T22:14:34+00:00"
+      }
     },
     {
       "match_id": "fd-537381",
