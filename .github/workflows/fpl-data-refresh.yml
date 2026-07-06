@@ -1,0 +1,150 @@
+# FPL-projektioiden päivittäinen data-refresh (QUEUE #16) — deadline-tuoreus.
+#
+# MIKSI: xP-malli huomioi saatavuuden (status/chance_of_playing →
+# availability_factor → xMins → xP), mutta viikkorefreshillä (lokaali Task
+# Scheduler ma 09:00) viikonlopun deadlinella saatavuustieto voi olla 5-6 pv
+# vanha. FPL team news rikkoutuu to-la ja deadline on ~90 min ennen ottelua →
+# päivittäinen ajo = saatavuus <=24 h tuore, deadline-aamun lisäajo tuoreempi.
+# CI-ajo poistaa myös riippuvuuden Villen koneen päälläolosta.
+#
+# DATAKETJU: builderit hakevat FPL-API:n (bootstrap + element-summary,
+# julkinen JSON) + fixturet (FPL/pulselive) + Understat-datan DC-fittiin
+# (soccerdata; cache viikkoavaimella → joukkuevoimat päivittyvät viikoittain,
+# saatavuus joka ajolla — tarkoituksellinen jako). Committaa muuttuneet
+# data/fpl_projections_phase0.json + data/fpl_xp_projections.json → push
+# mainiin → Render auto-deployaa → /api/fantasy + /api/fantasy/xp tarjoilevat
+# tuoreet luvut.
+#
+# TURVA: data-only (EI malligatea — availability ei muuta mallia; muisti:
+# "results data decoupled from model gate"). Builderien omat sanity-gatet
+# ovat fail-safe: gate FAIL → exit 2 → EI committia → vanha data jää voimaan
+# ja workflow on punainen (näkyvä signaali, ei hiljaista stalenessia).
+# Rebase-retry-push sama pattern kuin accuracy-log.yml (jaettu main).
+# [skip ci] estää test-workflowt data-commiteista; Render EI skippaa
+# (tarkoitus — API servaa committatut JSONit levyltä).
+
+name: fpl-data-refresh
+
+on:
+  schedule:
+    # Päivittäin 06:00 UTC — max ~24 h staleness kaikkina deadline-päivinä.
+    - cron: "0 6 * * *"
+    # Deadline-aamun boost 09:15 UTC — ajetaan vain jos tämän päivän aikana
+    # on GW-deadline (guard-step alla; tyypillinen la-deadline ~12:30 UTC →
+    # perjantain lehdistötilaisuuksien team news ehtii mukaan).
+    - cron: "15 9 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fpl-data-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # 09:15-ajo vain deadline-päivinä; 06:00 + dispatch ajavat aina.
+      # FPL bootstrap events[].deadline_time on julkinen JSON.
+      - name: Deadline-day guard (only for 09:15 run)
+        id: guard
+        run: |
+          if [ "${{ github.event.schedule }}" != "15 9 * * *" ]; then
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+            echo "06:00/dispatch-ajo — ajetaan aina."
+            exit 0
+          fi
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, urllib.request, datetime
+          try:
+              boot = json.load(urllib.request.urlopen(
+                  "https://fantasy.premierleague.com/api/bootstrap-static/",
+                  timeout=30))
+              today = datetime.datetime.now(datetime.timezone.utc).date()
+              is_deadline_day = any(
+                  e.get("deadline_time", "").startswith(str(today))
+                  for e in boot.get("events", []))
+              print(f"proceed={'true' if is_deadline_day else 'false'}")
+          except Exception as e:
+              # Guard-haun kaatuminen ei saa estää refreshiä — aja varmuudeksi.
+              print("proceed=true")
+          EOF
+
+      - name: Setup Python 3.11
+        if: steps.guard.outputs.proceed == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Understat-cache VIIKKOAVAIMELLA (ei restore-keys-fallbackia →
+      # viikon vaihtuessa täysi kylmähaku): päivittäiset ajot osuvat cacheen
+      # (nopea, ei scrape-kuormaa understat.comiin), viikoittain täysi haku →
+      # DC-joukkuevoimat päivittyvät viikoittain (= nykyinen cadence),
+      # saatavuus FPL-API:sta joka ajolla (= tihennyksen pointti).
+      - name: Compute cache week
+        if: steps.guard.outputs.proceed == 'true'
+        id: week
+        run: echo "week=$(date -u +%G-%V)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache soccerdata (Understat)
+        if: steps.guard.outputs.proceed == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/soccerdata
+          key: soccerdata-understat-${{ steps.week.outputs.week }}
+
+      # Minimaalinen dep-setti (EI koko requirements.txt:tä — jupyterlab/
+      # streamlit/plotly turhia CI:ssä). soccerdata tuo omat riippuvuutensa.
+      - name: Install builder deps
+        if: steps.guard.outputs.proceed == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install "pandas>=2.1" "numpy>=1.26" "scipy>=1.11" \
+            "statsmodels>=0.14" "requests>=2.31" "soccerdata>=1.8" \
+            "python-dotenv>=1.0" "tqdm>=4.66"
+
+      # Sanity-gatet fail-safena: exit 2 → step fail → ei committia,
+      # vanha data jää voimaan, workflow punainen (näkyvä signaali).
+      - name: Build Phase 0 projections (CS% + FDR)
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.build_fpl_phase0
+
+      - name: Build Phase 1 xP projections
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.build_fpl_xp
+
+      - name: Commit + push to main (Render serves fresh data)
+        if: steps.guard.outputs.proceed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json
+          if git diff --cached --quiet; then
+            echo "Ei muutoksia (data ennallaan) — ohitetaan commit."
+            exit 0
+          fi
+          git commit -m "chore(fpl): daily projections refresh (availability) [skip ci]"
+          for i in 1 2 3 4 5; do
+            git fetch origin main || true
+            if git rebase origin/main; then
+              if git push origin HEAD:main; then
+                echo "Pushed to main (yritys $i) → Render deployaa tuoreet projektiot."
+                exit 0
+              fi
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
+            echo "Push-yritys $i epäonnistui (kilpailu accuracy-cronin kanssa?) — retry."
+            sleep 5
+          done
+          echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
+          exit 1
