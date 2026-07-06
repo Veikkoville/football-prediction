@@ -25,10 +25,18 @@
 	});
 </script>
 
+<!-- min-height varaa taulukkoalueen tilan ennen API-vastausta → sisältö ei
+     hyppää (Lighthouse CLS -fix, QUEUE #15: 0.136-0.784 → tavoite <0.1) -->
+<div class="free-view">
 {#if error}
 	<p class="banner error">Could not load projections right now. Please try again shortly.</p>
 {:else if !data}
-	<p class="muted">Loading fixtures…</p>
+	<div class="skeleton" aria-hidden="true">
+		<p class="muted">Loading fixtures…</p>
+		{#each Array(12) as _, i (i)}
+			<div class="skel-row" style="width: {92 - (i % 4) * 6}%"></div>
+		{/each}
+	</div>
 {:else if !data.meta?.available}
 	<p class="banner success">Projections go live before Gameweek 1. Check back soon.</p>
 {:else}
@@ -80,3 +88,17 @@
 		</table>
 	</div>
 {/if}
+</div>
+
+<style>
+	.free-view {
+		min-height: 82vh;
+	}
+	.skel-row {
+		height: 34px;
+		border-radius: var(--radius-sm);
+		background: var(--surface);
+		border: 1px solid var(--border);
+		margin: var(--s-2) 0;
+	}
+</style>
