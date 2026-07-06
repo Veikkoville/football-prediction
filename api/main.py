@@ -49,6 +49,21 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 # GoalIQ Pro (web/pro) -Checkoutin OMA webhook-endpoint-secret — eri kuin
 # mobiilin STRIPE_WEBHOOK_SECRET (Stripe-dashboardissa 2 eri endpointtia).
 STRIPE_WEB_WEBHOOK_SECRET = os.getenv("STRIPE_WEB_WEBHOOK_SECRET", "")
+# GoalIQ Pro -webin hinnat (QUEUE #14: SPA ei voi pitää salaisuuksia →
+# checkout-session luodaan täällä). SAMAT env-nimet kuin goaliq-pro-web-
+# Streamlit-palvelussa → arvot voi kopioida sellaisenaan API-serviceen.
+STRIPE_PRICE_MONTHLY_ID = os.getenv("STRIPE_PRICE_MONTHLY_ID", "")
+STRIPE_PRICE_SEASON_ID = os.getenv("STRIPE_PRICE_SEASON_ID", "")
+# Sallitut SPA-originit success/cancel-redirecteille (avoin redirect estetty:
+# origin validoidaan tätä listaa vasten). Laajenna envillä tarvittaessa.
+WEB_CHECKOUT_ORIGINS = [
+    o.strip().rstrip("/")
+    for o in os.getenv(
+        "WEB_CHECKOUT_ORIGINS",
+        "https://pro.goaliq.app,https://pro-next.goaliq.app,http://localhost:4173,http://localhost:5173",
+    ).split(",")
+    if o.strip()
+]
 
 # RevenueCat (Google Play Billing) -webhookin jaettu salaisuus. Arvo on sama
 # merkkijono joka asetetaan RevenueCat-dashboardin webhook-asetuksiin
@@ -250,6 +265,35 @@ def _verify_supabase_token(access_token: str) -> Optional[str]:
         return user_id or None
     except Exception as e:
         print(f"[delete-account] token verify EXCEPTION: {e}")
+        return None
+
+
+def _get_supabase_user(access_token: str) -> Optional[dict]:
+    """Vahvista Supabase-token ja palauta {id, email} (QUEUE #14 web-checkout).
+
+    Sama mekanismi kuin _verify_supabase_token, mutta palauttaa myös emailin
+    (Stripe-kuitti). None jos token virheellinen/vanhentunut tai config puuttuu.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY or not access_token:
+        return None
+    try:
+        resp = requests.get(
+            f"{SUPABASE_URL}/auth/v1/user",
+            headers={
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+                "Authorization": f"Bearer {access_token}",
+            },
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            print(f"[web-checkout] token verify failed status={resp.status_code}")
+            return None
+        data = resp.json() or {}
+        if not data.get("id"):
+            return None
+        return {"id": data["id"], "email": data.get("email")}
+    except Exception as e:
+        print(f"[web-checkout] token verify EXCEPTION: {e}")
         return None
 
 
@@ -1713,6 +1757,90 @@ def create_portal_session(req: PortalRequest):
         )
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+
+class WebCheckoutRequest(BaseModel):
+    """GoalIQ Pro SPA:n checkout-pyyntö (QUEUE #14)."""
+    plan: str = Field(..., description="'monthly' tai 'season'")
+    origin: str = Field(
+        "", description="SPA:n origin success/cancel-redirecteille "
+                        "(validoidaan allowlistia vasten)")
+
+    @field_validator("plan")
+    @classmethod
+    def _plan_known(cls, v: str) -> str:
+        if v not in ("monthly", "season"):
+            raise ValueError("plan must be 'monthly' or 'season'")
+        return v
+
+
+class WebCheckoutResponse(BaseModel):
+    url: str
+
+
+def _web_checkout_base_url(origin: str) -> str:
+    """Validoi SPA-origin avointa redirectiä vastaan.
+
+    Sallittu: WEB_CHECKOUT_ORIGINS-lista + https://*.pages.dev
+    (Cloudflare Pages per-branch previewt). Muu → oletusorigin.
+    """
+    o = (origin or "").rstrip("/")
+    if o in WEB_CHECKOUT_ORIGINS:
+        return o
+    if o.startswith("https://") and o.endswith(".pages.dev") and "/" not in o[8:]:
+        return o
+    return "https://pro.goaliq.app"
+
+
+@app.post("/api/web/checkout", response_model=WebCheckoutResponse)
+def create_web_checkout_session(
+    req: WebCheckoutRequest, request: Request
+) -> WebCheckoutResponse:
+    """GoalIQ Pro SPA (pro.goaliq.app, QUEUE #14) — Stripe Checkout -session.
+
+    Staattinen SPA ei voi pitää STRIPE_SECRET_KEY:tä → session luodaan täällä.
+    Auth = Supabase-JWT (Authorization: Bearer) → user_id + email varmistetaan
+    Supabasesta, EI luoteta clientin lähettämiin arvoihin. Fulfillment =
+    olemassa oleva webhook /api/webhook/stripe-web (metadata-muoto identtinen
+    Streamlit-billingin kanssa: user_id + plan + source).
+    """
+    if not stripe.api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="Stripe not configured (STRIPE_SECRET_KEY missing)")
+    price_id = (STRIPE_PRICE_SEASON_ID if req.plan == "season"
+                else STRIPE_PRICE_MONTHLY_ID)
+    if not price_id:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Stripe price not configured for plan '{req.plan}' "
+                   f"(STRIPE_PRICE_{'SEASON' if req.plan == 'season' else 'MONTHLY'}_ID missing)")
+
+    auth_header = request.headers.get("authorization", "")
+    token = auth_header[7:] if auth_header.lower().startswith("bearer ") else ""
+    supa_user = _get_supabase_user(token)
+    if not supa_user:
+        raise HTTPException(status_code=401, detail="Invalid or expired session")
+
+    base = _web_checkout_base_url(req.origin)
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            customer_email=supa_user.get("email"),
+            client_reference_id=supa_user["id"],
+            metadata={"user_id": supa_user["id"], "plan": req.plan,
+                      "source": "pro-web"},
+            success_url=f"{base}/?checkout=success&session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{base}/?checkout=cancelled",
+            allow_promotion_codes=True,
+        )
+        return WebCheckoutResponse(url=session.url or "")
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400,
+                            detail=f"Stripe error: {e.user_message or str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
 

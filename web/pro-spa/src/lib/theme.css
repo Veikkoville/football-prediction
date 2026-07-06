@@ -1,0 +1,264 @@
+/* GoalIQ Pro — brändi-tokenit (goaliq-app/assets/brand/brand-tokens.md,
+   TÄSMÄHEXIT) + mittakaavat. Tumma Ink-teema = tuotteen oletusilme
+   (pariteetti Streamlit-pron + mobiilin kanssa). */
+:root {
+	/* brändi */
+	--giq-magenta: #ff2e7e;
+	--giq-magenta-deep: #d6006e;
+	--giq-magenta-light: #ff4d90;
+	--giq-coral: #ff6a3d;
+	--giq-gold: #ffc93c;
+	--giq-gold-deep: #f4a800;
+	--giq-teal: #19e3d2;
+	--giq-teal-deep: #00c2ad;
+	--giq-ink: #0a0820;
+	--giq-ink-2: #140f1e;
+	--giq-cream: #fff6ec;
+	--giq-paper: #f6f4ff;
+
+	/* roolit (tumma pohja) */
+	--bg: var(--giq-ink);
+	--surface: #16112b;
+	--surface-2: #1e1838;
+	--border: #2c2547;
+	--text: var(--giq-cream);
+	--text-muted: #b4aecb;
+	--accent: var(--giq-magenta);
+	--accent-contrast: #ffffff;
+	--positive: var(--giq-teal);
+	--negative: var(--giq-coral);
+
+	/* FDR 1-5 brändiasteikko (sama kuin fpl.html + Streamlit) */
+	--fdr-1: var(--giq-teal-deep);
+	--fdr-2: var(--giq-teal);
+	--fdr-3: var(--giq-gold-deep);
+	--fdr-4: var(--giq-coral);
+	--fdr-5: var(--giq-magenta-deep);
+
+	/* typografia */
+	--font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--step--1: clamp(0.82rem, 0.8rem + 0.1vw, 0.88rem);
+	--step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1rem);
+	--step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.3rem);
+	--step-2: clamp(1.4rem, 1.28rem + 0.6vw, 1.7rem);
+	--step-3: clamp(1.75rem, 1.5rem + 1.2vw, 2.3rem);
+
+	/* tila (4px-pohja) */
+	--s-1: 0.25rem;
+	--s-2: 0.5rem;
+	--s-3: 0.75rem;
+	--s-4: 1rem;
+	--s-6: 1.5rem;
+	--s-8: 2rem;
+	--s-12: 3rem;
+
+	--radius: 12px;
+	--radius-sm: 7px;
+	--shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.25);
+	--shell: 1180px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	color-scheme: dark;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-sans);
+	font-size: var(--step-0);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.15;
+	letter-spacing: -0.4px;
+	font-weight: 700;
+	margin: 0 0 var(--s-3);
+}
+
+h1 {
+	font-size: var(--step-3);
+}
+h2 {
+	font-size: var(--step-2);
+	margin-top: var(--s-8);
+}
+h3 {
+	font-size: var(--step-1);
+	margin-top: var(--s-6);
+}
+
+p {
+	margin: 0 0 var(--s-3);
+}
+
+a {
+	color: var(--giq-teal);
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+small,
+.muted {
+	color: var(--text-muted);
+	font-size: var(--step--1);
+}
+
+button {
+	font-family: inherit;
+	font-size: var(--step-0);
+	cursor: pointer;
+	border-radius: 999px;
+	border: 2px solid transparent;
+	padding: 0.6em 1.4em;
+	font-weight: 700;
+	min-height: 44px;
+	transition:
+		background 150ms ease-out,
+		border-color 150ms ease-out,
+		color 150ms ease-out;
+}
+
+button.primary {
+	background: var(--accent);
+	color: var(--accent-contrast);
+}
+button.primary:hover {
+	background: var(--giq-magenta-deep);
+}
+
+button.secondary {
+	background: transparent;
+	color: var(--text);
+	border-color: var(--accent);
+}
+button.secondary:hover {
+	background: rgba(255, 46, 126, 0.12);
+}
+
+button.ghost {
+	background: transparent;
+	color: var(--text-muted);
+	border-color: var(--border);
+	font-weight: 500;
+}
+button.ghost:hover {
+	color: var(--text);
+	border-color: var(--text-muted);
+}
+
+button:disabled {
+	opacity: 0.55;
+	cursor: default;
+}
+
+input,
+select {
+	font-family: inherit;
+	font-size: var(--step-0);
+	background: var(--surface-2);
+	color: var(--text);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	padding: 0.55em 0.8em;
+	min-height: 44px;
+}
+
+label {
+	display: block;
+	font-size: var(--step--1);
+	color: var(--text-muted);
+	margin-bottom: var(--s-1);
+}
+
+:focus-visible {
+	outline: 2px solid var(--giq-teal);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+/* taulukot */
+.table-wrap {
+	overflow-x: auto;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--surface);
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: var(--step--1);
+	white-space: nowrap;
+}
+
+th,
+td {
+	padding: 0.5em 0.75em;
+	text-align: left;
+	border-bottom: 1px solid var(--border);
+}
+
+td.num,
+th.num {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+thead th {
+	position: sticky;
+	top: 0;
+	background: var(--surface-2);
+	color: var(--text-muted);
+	font-weight: 500;
+	z-index: 1;
+}
+
+tbody tr:last-child td {
+	border-bottom: none;
+}
+
+tbody tr:hover td {
+	background: rgba(255, 255, 255, 0.03);
+}
+
+/* apuluokat */
+.card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: var(--s-6);
+}
+
+.banner {
+	border-radius: var(--radius);
+	padding: var(--s-3) var(--s-4);
+	font-size: var(--step--1);
+}
+.banner.success {
+	background: rgba(25, 227, 210, 0.1);
+	border: 1px solid rgba(25, 227, 210, 0.35);
+	color: var(--giq-teal);
+}
+.banner.error {
+	background: rgba(255, 106, 61, 0.1);
+	border: 1px solid rgba(255, 106, 61, 0.4);
+	color: var(--giq-coral);
+}
