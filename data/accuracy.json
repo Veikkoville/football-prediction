@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-06T22:14:35+00:00",
-  "logged_total": 98,
+  "updated_at": "2026-07-07T03:27:35+00:00",
+  "logged_total": 99,
   "pending": 5,
   "all_time": {
-    "n": 93,
-    "correct_1x2": 59,
-    "pct_1x2": 0.6344,
-    "decisive_n": 70,
-    "decisive_correct": 59,
-    "pct_decisive": 0.8429,
-    "exact_n": 45,
+    "n": 94,
+    "correct_1x2": 60,
+    "pct_1x2": 0.6383,
+    "decisive_n": 71,
+    "decisive_correct": 60,
+    "pct_decisive": 0.8451,
+    "exact_n": 46,
     "exact_correct": 10,
-    "pct_exact": 0.2222,
-    "brier": 0.437,
-    "brier_n": 45
+    "pct_exact": 0.2174,
+    "brier": 0.436,
+    "brier_n": 46
   },
   "rolling": {
-    "n": 93,
-    "correct_1x2": 59,
-    "pct_1x2": 0.6344,
-    "decisive_n": 70,
-    "decisive_correct": 59,
-    "pct_decisive": 0.8429,
-    "exact_n": 45,
+    "n": 94,
+    "correct_1x2": 60,
+    "pct_1x2": 0.6383,
+    "decisive_n": 71,
+    "decisive_correct": 60,
+    "pct_decisive": 0.8451,
+    "exact_n": 46,
     "exact_correct": 10,
-    "pct_exact": 0.2222,
-    "brier": 0.437,
-    "brier_n": 45,
+    "pct_exact": 0.2174,
+    "brier": 0.436,
+    "brier_n": 46,
     "window": 100
   },
   "calibration": [
@@ -43,10 +43,10 @@
       "n": 20
     },
     {
-      "bin_mid": 0.2567,
-      "predicted": 0.2567,
-      "actual": 0.1667,
-      "n": 48
+      "bin_mid": 0.2566,
+      "predicted": 0.2566,
+      "actual": 0.16,
+      "n": 50
     },
     {
       "bin_mid": 0.3429,
@@ -55,10 +55,10 @@
       "n": 20
     },
     {
-      "bin_mid": 0.4565,
-      "predicted": 0.4565,
-      "actual": 0.6429,
-      "n": 14
+      "bin_mid": 0.4588,
+      "predicted": 0.4588,
+      "actual": 0.6667,
+      "n": 15
     },
     {
       "bin_mid": 0.5357,
@@ -86,6 +86,18 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-07",
+      "home_team": "United States",
+      "away_team": "Belgium",
+      "predicted_winner": "away",
+      "p_winner": 0.4911,
+      "most_likely_score": "1-1",
+      "actual_score": "1-4",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": false
+    },
     {
       "date": "2026-07-06",
       "home_team": "Portugal",
@@ -313,18 +325,6 @@
       "actual_outcome": "draw",
       "hit_1x2": false,
       "exact_hit": true
-    },
-    {
-      "date": "2026-06-29",
-      "home_team": "Brazil",
-      "away_team": "Japan",
-      "predicted_winner": "home",
-      "p_winner": 0.4513,
-      "most_likely_score": "1-1",
-      "actual_score": "2-1",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false
     }
   ]
 }

@@ -2361,7 +2361,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-02T03:39:36+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 4,
+        "actual_score": "1-4",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-07T03:27:35+00:00"
+      }
     },
     {
       "match_id": "fd-537379",
@@ -2459,6 +2467,24 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-06T03:36:53+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537384",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-10",
+      "kickoff": "2026-07-10T19:00:00Z",
+      "home_team": "Spain",
+      "away_team": "Belgium",
+      "p_home": 0.6337,
+      "p_draw": 0.2277,
+      "p_away": 0.1387,
+      "xg_home": 1.918,
+      "xg_away": 0.785,
+      "most_likely_score": "2-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-07-07T03:27:35+00:00",
       "result": null
     }
   ]
