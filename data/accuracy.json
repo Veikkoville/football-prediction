@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-07T19:56:58+00:00",
+  "updated_at": "2026-07-07T22:11:56+00:00",
   "logged_total": 99,
-  "pending": 4,
+  "pending": 3,
   "all_time": {
-    "n": 95,
+    "n": 96,
     "correct_1x2": 61,
-    "pct_1x2": 0.6421,
+    "pct_1x2": 0.6354,
     "decisive_n": 72,
     "decisive_correct": 61,
     "pct_decisive": 0.8472,
-    "exact_n": 47,
+    "exact_n": 48,
     "exact_correct": 10,
-    "pct_exact": 0.2128,
-    "brier": 0.4286,
-    "brier_n": 47
+    "pct_exact": 0.2083,
+    "brier": 0.4375,
+    "brier_n": 48
   },
   "rolling": {
-    "n": 95,
+    "n": 96,
     "correct_1x2": 61,
-    "pct_1x2": 0.6421,
+    "pct_1x2": 0.6354,
     "decisive_n": 72,
     "decisive_correct": 61,
     "pct_decisive": 0.8472,
-    "exact_n": 47,
+    "exact_n": 48,
     "exact_correct": 10,
-    "pct_exact": 0.2128,
-    "brier": 0.4286,
-    "brier_n": 47,
+    "pct_exact": 0.2083,
+    "brier": 0.4375,
+    "brier_n": 48,
     "window": 100
   },
   "calibration": [
@@ -43,10 +43,10 @@
       "n": 21
     },
     {
-      "bin_mid": 0.2566,
-      "predicted": 0.2566,
-      "actual": 0.16,
-      "n": 50
+      "bin_mid": 0.2561,
+      "predicted": 0.2561,
+      "actual": 0.1731,
+      "n": 52
     },
     {
       "bin_mid": 0.3429,
@@ -61,10 +61,10 @@
       "n": 15
     },
     {
-      "bin_mid": 0.5357,
-      "predicted": 0.5357,
-      "actual": 0.8333,
-      "n": 6
+      "bin_mid": 0.5326,
+      "predicted": 0.5326,
+      "actual": 0.7143,
+      "n": 7
     },
     {
       "bin_mid": 0.6404,
@@ -86,6 +86,18 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-07",
+      "home_team": "Switzerland",
+      "away_team": "Colombia",
+      "predicted_winner": "away",
+      "p_winner": 0.5139,
+      "most_likely_score": "1-1",
+      "actual_score": "0-0",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false
+    },
     {
       "date": "2026-07-07",
       "home_team": "Argentina",
@@ -313,18 +325,6 @@
       "actual_outcome": "away",
       "hit_1x2": true,
       "exact_hit": false
-    },
-    {
-      "date": "2026-06-30",
-      "home_team": "Netherlands",
-      "away_team": "Morocco",
-      "predicted_winner": "home",
-      "p_winner": 0.4545,
-      "most_likely_score": "1-1",
-      "actual_score": "1-1",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": true
     }
   ]
 }
