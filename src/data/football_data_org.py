@@ -80,6 +80,22 @@ COMPETITION_CODES = {
     "FRA-Ligue 1-FD": "FL1",
 }
 
+# #25: fixtures/standings-VAIN-koodit — nämä free-tier-liigat saavat
+# OTTELULISTAT ja SARJATAULUKOT football-data.org:sta, mutta HISTORIADATA
+# (DC-fit) tulee edelleen football-data.co.uk:sta. ÄLÄ siirrä näitä
+# COMPETITION_CODES:iin ilman nimimappaus-työtä: loader preferoi FD.orgia
+# COMPETITION_CODES-liigoille, jolloin mallin joukkuenimet flippaisivat
+# ("Birmingham" → "Birmingham City FC") ja rikkoisivat H2H:n/teamMetan.
+# HUOM BRA-Serie A: kalenterivuosikausi → /api/standings vaatii eksplisiittisen
+# season-paramin ("26"); fixtures toimii suoraan (dateFrom/dateTo, ei seasonia).
+FIXTURE_STANDINGS_CODES = {
+    **COMPETITION_CODES,
+    "ENG-Championship": "ELC",
+    "NED-Eredivisie": "DED",
+    "POR-Primeira Liga": "PPL",
+    "BRA-Serie A": "BSA",
+}
+
 BASE = "https://api.football-data.org/v4"
 
 
