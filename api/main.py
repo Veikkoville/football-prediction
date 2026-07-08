@@ -881,7 +881,7 @@ def league_standings(
         404:n). Siksi turnaushaara kutsuu FD:tä ilman seasonia.
     """
     from src.data.football_data_org import (
-        COMPETITION_CODES,
+        FIXTURE_STANDINGS_CODES,
         _LIVE_TOURNAMENT_CODES,
         _api_key,
         _kausi_to_year,
@@ -890,12 +890,12 @@ def league_standings(
     if season is None:
         season = config.current_season()
     league_for_fd = FD_LEAGUE_ALIASES.get(league, league)
-    code = COMPETITION_CODES.get(league_for_fd)
+    code = FIXTURE_STANDINGS_CODES.get(league_for_fd)
     if not code:
         raise HTTPException(
             status_code=404,
             detail=f"League '{league}' not supported by football-data.org. "
-                   f"Supported: {sorted(COMPETITION_CODES.keys())}",
+                   f"Supported: {sorted(FIXTURE_STANDINGS_CODES.keys())}",
         )
 
     api_key = _api_key()
@@ -1071,15 +1071,15 @@ def upcoming_fixtures(
         matchday)
     """
     from datetime import datetime, timedelta, timezone
-    from src.data.football_data_org import COMPETITION_CODES, _api_key
+    from src.data.football_data_org import FIXTURE_STANDINGS_CODES, _api_key
 
     league_for_fd = FD_LEAGUE_ALIASES.get(league, league)
-    code = COMPETITION_CODES.get(league_for_fd)
+    code = FIXTURE_STANDINGS_CODES.get(league_for_fd)
     if not code:
         raise HTTPException(
             status_code=404,
             detail=f"League '{league}' not supported by football-data.org. "
-                   f"Supported: {sorted(COMPETITION_CODES.keys())}",
+                   f"Supported: {sorted(FIXTURE_STANDINGS_CODES.keys())}",
         )
 
     api_key = _api_key()

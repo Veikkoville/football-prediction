@@ -171,3 +171,26 @@ def test_domestic_standings_no_total(client, monkeypatch):
     )
     assert r.status_code == 200
     assert r.json() == {"league": "ENG-Premier League", "season": "2526", "rows": []}
+
+
+# ---------------------------------------------------------------------------
+# #25: free-tier-lisäliigat fixtures/standings-mappauksessa
+# ---------------------------------------------------------------------------
+def test_fixture_standings_codes_extend_without_touching_loader_codes():
+    """ELC/DED/PPL/BSA saavat fixtures+standings-koodit, mutta EIVÄT saa
+    ilmestyä COMPETITION_CODES:iin — se flippaisi loaderin historialähteen
+    FD.orgiin ja vaihtaisi mallin joukkuenimet (ks. kommentti moduulissa)."""
+    from src.data.football_data_org import COMPETITION_CODES, FIXTURE_STANDINGS_CODES
+
+    extra = {
+        "ENG-Championship": "ELC",
+        "NED-Eredivisie": "DED",
+        "POR-Primeira Liga": "PPL",
+        "BRA-Serie A": "BSA",
+    }
+    for liiga, code in extra.items():
+        assert FIXTURE_STANDINGS_CODES[liiga] == code
+        assert liiga not in COMPETITION_CODES  # loader-lähde ei muutu
+    # vanhat mappaukset säilyvät sellaisenaan
+    for liiga, code in COMPETITION_CODES.items():
+        assert FIXTURE_STANDINGS_CODES[liiga] == code
