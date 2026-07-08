@@ -2461,7 +2461,10 @@
         "actual_outcome": "draw",
         "hit_1x2": false,
         "exact_hit": false,
-        "reconciled_at": "2026-07-07T22:11:55+00:00"
+        "reconciled_at": "2026-07-07T22:11:55+00:00",
+        "duration": "PENALTY_SHOOTOUT",
+        "regular_score": "0-0",
+        "regraded_at": "2026-07-08T14:25:39+00:00"
       }
     },
     {

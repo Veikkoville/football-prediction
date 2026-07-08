@@ -1,31 +1,31 @@
 {
-  "updated_at": "2026-07-08T14:09:46+00:00",
+  "updated_at": "2026-07-08T14:25:40+00:00",
   "logged_total": 100,
   "pending": 4,
   "all_time": {
     "n": 96,
-    "correct_1x2": 61,
-    "pct_1x2": 0.6354,
-    "decisive_n": 72,
-    "decisive_correct": 61,
-    "pct_decisive": 0.8472,
+    "correct_1x2": 59,
+    "pct_1x2": 0.6146,
+    "decisive_n": 70,
+    "decisive_correct": 59,
+    "pct_decisive": 0.8429,
     "exact_n": 48,
     "exact_correct": 10,
     "pct_exact": 0.2083,
-    "brier": 0.4375,
+    "brier": 0.4752,
     "brier_n": 48
   },
   "rolling": {
     "n": 96,
-    "correct_1x2": 61,
-    "pct_1x2": 0.6354,
-    "decisive_n": 72,
-    "decisive_correct": 61,
-    "pct_decisive": 0.8472,
+    "correct_1x2": 59,
+    "pct_1x2": 0.6146,
+    "decisive_n": 70,
+    "decisive_correct": 59,
+    "pct_decisive": 0.8429,
     "exact_n": 48,
     "exact_correct": 10,
     "pct_exact": 0.2083,
-    "brier": 0.4375,
+    "brier": 0.4752,
     "brier_n": 48,
     "window": 100
   },
@@ -33,7 +33,7 @@
     {
       "bin_mid": 0.0676,
       "predicted": 0.0676,
-      "actual": 0.0,
+      "actual": 0.1,
       "n": 10
     },
     {
@@ -51,13 +51,13 @@
     {
       "bin_mid": 0.3429,
       "predicted": 0.3429,
-      "actual": 0.3,
+      "actual": 0.35,
       "n": 20
     },
     {
       "bin_mid": 0.4588,
       "predicted": 0.4588,
-      "actual": 0.6667,
+      "actual": 0.6,
       "n": 15
     },
     {
@@ -81,7 +81,7 @@
     {
       "bin_mid": 0.8586,
       "predicted": 0.8586,
-      "actual": 1.0,
+      "actual": 0.6667,
       "n": 3
     }
   ],
@@ -96,7 +96,9 @@
       "actual_score": "0-0",
       "actual_outcome": "draw",
       "hit_1x2": false,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": "PENALTY_SHOOTOUT",
+      "regular_score": "0-0"
     },
     {
       "date": "2026-07-07",
@@ -108,7 +110,9 @@
       "actual_score": "3-2",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-07",
@@ -120,7 +124,9 @@
       "actual_score": "1-4",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-06",
@@ -132,7 +138,9 @@
       "actual_score": "0-1",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-06",
@@ -144,7 +152,9 @@
       "actual_score": "2-3",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-05",
@@ -156,7 +166,9 @@
       "actual_score": "1-2",
       "actual_outcome": "away",
       "hit_1x2": false,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-04",
@@ -168,7 +180,9 @@
       "actual_score": "0-1",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": true
+      "exact_hit": true,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-04",
@@ -180,7 +194,9 @@
       "actual_score": "0-3",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-04",
@@ -192,7 +208,9 @@
       "actual_score": "1-0",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-03",
@@ -204,7 +222,9 @@
       "actual_score": "2-0",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-03",
@@ -214,9 +234,11 @@
       "p_winner": 0.8873,
       "most_likely_score": "2-0",
       "actual_score": "3-2",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": "EXTRA_TIME",
+      "regular_score": "1-1"
     },
     {
       "date": "2026-07-03",
@@ -228,7 +250,9 @@
       "actual_score": "1-1",
       "actual_outcome": "draw",
       "hit_1x2": false,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": "PENALTY_SHOOTOUT",
+      "regular_score": "1-1"
     },
     {
       "date": "2026-07-02",
@@ -240,7 +264,9 @@
       "actual_score": "2-1",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-02",
@@ -252,7 +278,9 @@
       "actual_score": "3-0",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-02",
@@ -264,7 +292,9 @@
       "actual_score": "2-0",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": true
+      "exact_hit": true,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-01",
@@ -274,9 +304,11 @@
       "p_winner": 0.4221,
       "most_likely_score": "1-1",
       "actual_score": "3-2",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": "EXTRA_TIME",
+      "regular_score": "2-2"
     },
     {
       "date": "2026-07-01",
@@ -288,7 +320,9 @@
       "actual_score": "2-1",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-07-01",
@@ -300,7 +334,9 @@
       "actual_score": "2-0",
       "actual_outcome": "home",
       "hit_1x2": false,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-06-30",
@@ -312,7 +348,9 @@
       "actual_score": "3-0",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     },
     {
       "date": "2026-06-30",
@@ -324,7 +362,9 @@
       "actual_score": "1-2",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
     }
   ]
 }
