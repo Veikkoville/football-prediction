@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fetchFantasy, fetchAccuracy, type FantasyResponse, type AccuracyResponse } from '$lib/api';
+	import MethodNote from './MethodNote.svelte';
 
 	let data = $state<FantasyResponse | null>(null);
 	let acc = $state<AccuracyResponse | null>(null);
@@ -50,17 +51,37 @@
 
 	<h2>Clean sheet outlook, next {data.meta.horizon_gw ?? 6} gameweeks</h2>
 	<p class="muted">
-		Free · P(clean sheet) from the GoalIQ Dixon-Coles match engine. Model-based fixture
-		difficulty (FDR) 1 = easiest, 5 = hardest.
+		Free · <strong>Avg CS%</strong> = the team's average clean sheet probability over the
+		next {data.meta.horizon_gw ?? 6} gameweeks. <strong>Avg FDR</strong> = average fixture
+		difficulty, 1 = easiest, 5 = hardest. Each GW cell shows opponent, venue and that
+		fixture's FDR.
 	</p>
+
+	<MethodNote summary="How these numbers are calculated">
+		<p>
+			<strong>Clean sheet probability</strong> is the GoalIQ match model's chance that the
+			team concedes zero in that fixture. It comes from a Dixon-Coles score matrix
+			(tau-corrected) fitted on match data — the same engine behind our published,
+			pre-match logged track record.
+		</p>
+		<p>
+			<strong>Fixture difficulty (FDR 1–5)</strong> is derived from the same model, not
+			from FPL's official ratings: each fixture's expected outcome is scaled onto a 1–5
+			band, so a "2" here means the model itself rates the matchup favourable.
+		</p>
+		<p>
+			Projections refresh daily, including availability and injury flags. Model
+			projections for fun and planning, not betting advice.
+		</p>
+	</MethodNote>
 
 	<div class="table-wrap">
 		<table>
 			<thead>
 				<tr>
 					<th>Team</th>
-					<th class="num">Avg CS%</th>
-					<th class="num">Avg FDR</th>
+					<th class="num"><abbr title="Average clean sheet probability, next gameweeks">Avg CS%</abbr></th>
+					<th class="num"><abbr title="Average model-based fixture difficulty, 1 easiest to 5 hardest">Avg FDR</abbr></th>
 					{#each gwCols as gw (gw)}
 						<th>GW{gw}</th>
 					{/each}

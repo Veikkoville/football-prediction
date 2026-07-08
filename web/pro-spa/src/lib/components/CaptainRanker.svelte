@@ -10,7 +10,11 @@
 	);
 </script>
 
-<h2>Captain ranker: top xP for the next gameweek</h2>
+<h2>Captain ranker: top xP for GW{nextGw}</h2>
+<p class="muted">
+	The ten highest projected scores for the next gameweek only — a captaincy shortlist.
+	The full table below covers the whole horizon.
+</p>
 <div class="table-wrap">
 	<table>
 		<thead>
