@@ -2502,6 +2502,24 @@
       "predicted_winner": "home",
       "logged_at": "2026-07-07T03:27:35+00:00",
       "result": null
+    },
+    {
+      "match_id": "fd-537386",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-12",
+      "kickoff": "2026-07-12T01:00:00Z",
+      "home_team": "Argentina",
+      "away_team": "Switzerland",
+      "p_home": 0.6266,
+      "p_draw": 0.2381,
+      "p_away": 0.1353,
+      "xg_home": 1.807,
+      "xg_away": 0.718,
+      "most_likely_score": "1-0",
+      "predicted_winner": "home",
+      "logged_at": "2026-07-08T02:44:47+00:00",
+      "result": null
     }
   ]
 }
