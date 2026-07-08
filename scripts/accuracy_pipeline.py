@@ -11,6 +11,9 @@ Kolme vaihetta, kaikki idempotentteja:
   reconcile  Hae FT-tulokset (football-data.org FINISHED) ja täytä toteutuneet
              logattuihin ennusteisiin → laske aggregaatti uudelleen.
   run        log + reconcile (oletus päivittäisajoon).
+  regrade    Kertaluontoinen #24-integriteettikorjaus: re-gradaa jo
+             reconciloidut ottelut 90 min (regularTime) -tuloksella —
+             ET/rankkariottelu jonka 90 min oli tasan = 1X2-miss.
 
 Aja repojuuresta:
   python -m scripts.accuracy_pipeline run        # päivittäinen
@@ -146,7 +149,11 @@ def _fetch_wc_matches() -> list[dict] | None:
 
 
 def _disp_score(m: dict) -> tuple[int, int] | None:
-    """FT-tulos ilman rangaistuspotkuja (reg + jatkoaika). None jos puuttuu."""
+    """NÄYTETTÄVÄ FT-tulos ilman rangaistuspotkuja (reg + jatkoaika).
+
+    HUOM: tämä on näyttötulos, EI gradaustulos — 1X2-gradaus nojaa 90 min
+    regularTime-tulokseen (_regular_score), koska malli ennustaa 90 min 1X2:n.
+    """
     score = m.get("score") or {}
     ft = score.get("fullTime") or {}
     h, a = ft.get("home"), ft.get("away")
@@ -158,6 +165,30 @@ def _disp_score(m: dict) -> tuple[int, int] | None:
         h = int(reg.get("home", h)) + int(et.get("home", 0) or 0)
         a = int(reg.get("away", a)) + int(et.get("away", 0) or 0)
     return int(h), int(a)
+
+
+def _regular_score(m: dict) -> tuple[int, int] | None:
+    """90 min (score.regularTime) -tulos gradausta varten. None jos puuttuu."""
+    reg = (m.get("score") or {}).get("regularTime") or {}
+    h, a = reg.get("home"), reg.get("away")
+    if h is None or a is None:
+        return None
+    return int(h), int(a)
+
+
+def _grading_kwargs(m: dict, mid: str) -> dict:
+    """duration + 90 min -tulos set_result/regrade_resultille (#24)."""
+    duration = (m.get("score") or {}).get("duration") or "REGULAR"
+    if duration == "REGULAR":
+        return {}
+    reg = _regular_score(m)
+    if reg is None:
+        # football-data ei tarjonnut regularTimea → gradataan näyttötuloksella,
+        # mutta EI hiljaa: tämä inflatoisi ET-voitot takaisin osumiksi.
+        print(f"VAROITUS: {mid} duration={duration} mutta regularTime puuttuu "
+              f"— gradataan näyttötuloksella (tarkista käsin).")
+        return {"duration": duration}
+    return {"duration": duration, "regular_home": reg[0], "regular_away": reg[1]}
 
 
 def cmd_log(log: dict, matches: list[dict] | None) -> int:
@@ -237,16 +268,64 @@ def cmd_reconcile(log: dict, matches: list[dict] | None) -> int:
         disp = _disp_score(m)
         if disp is None:
             continue
-        if acc.set_result(log, mid, disp[0], disp[1]):
+        if acc.set_result(log, mid, disp[0], disp[1], **_grading_kwargs(m, mid)):
             reconciled += 1
     print(f"RECONCILE: {reconciled} ottelua täytetty FT-tuloksella.")
     return 0
 
 
+def cmd_regrade(log: dict, matches: list[dict] | None) -> int:
+    """Re-gradaa KAIKKI jo reconciloidut fd-ottelut 90 min -gradauksella (#24).
+
+    Kertaluontoinen integriteettikorjaus: ET-voitot gradattiin aiemmin
+    fullTime-tuloksella (jatkoajan maalit mukana) → 90 min tasan + ET-voitto
+    näkyi 1X2-osumana. Union-turvallinen: rivejä ei poisteta eikä ennusteisiin
+    kosketa — vain result-lohkon gradauskentät päivittyvät (n ei muutu).
+    """
+    if matches is None:
+        print("VIRHE: FD-haku epäonnistui — regrade vaatii ottelu-datan.")
+        return 2
+    by_id = {m.get("id"): m for m in matches}
+    n_before = len(log["predictions"])
+    checked = changed = 0
+    flips = []
+    for e in log["predictions"]:
+        if not e.get("result") or not e.get("match_id", "").startswith("fd-"):
+            continue
+        try:
+            m = by_id.get(int(e["match_id"][3:]))
+        except ValueError:
+            continue
+        if not m or m.get("status") != "FINISHED":
+            continue
+        disp = _disp_score(m)
+        if disp is None:
+            continue
+        checked += 1
+        old_hit = e["result"]["hit_1x2"]
+        if acc.regrade_result(log, e["match_id"], disp[0], disp[1],
+                              **_grading_kwargs(m, e["match_id"])):
+            changed += 1
+            if e["result"]["hit_1x2"] != old_hit:
+                flips.append(
+                    f"  {e.get('date')} {e['home_team']}-{e['away_team']}: "
+                    f"90min {e['result'].get('regular_score')}, "
+                    f"lopputulos {e['result']['actual_score']} "
+                    f"({e['result'].get('duration')}), "
+                    f"hit_1x2 {old_hit} -> {e['result']['hit_1x2']}"
+                )
+    assert len(log["predictions"]) == n_before, "regrade ei saa pudottaa rivejä"
+    print(f"REGRADE: {checked} tarkistettu, {changed} result-lohkoa päivittyi, "
+          f"{len(flips)} 1X2-gradausta kääntyi.")
+    for line in flips:
+        print(line)
+    return 0
+
+
 def main(argv: list[str]) -> int:
     cmd = argv[1] if len(argv) > 1 else "run"
-    if cmd not in ("seed", "log", "reconcile", "run"):
-        print(f"Tuntematon komento '{cmd}'. Käytä: seed | log | reconcile | run")
+    if cmd not in ("seed", "log", "reconcile", "run", "regrade"):
+        print(f"Tuntematon komento '{cmd}'. Käytä: seed | log | reconcile | run | regrade")
         return 2
 
     log = acc.load_log()
@@ -256,12 +335,14 @@ def main(argv: list[str]) -> int:
     if cmd == "seed":
         rc = cmd_seed(log)
     else:
-        if cmd in ("log", "reconcile", "run"):
+        if cmd in ("log", "reconcile", "run", "regrade"):
             matches = _fetch_wc_matches()
         if cmd in ("log", "run"):
             cmd_log(log, matches)
         if cmd in ("reconcile", "run"):
             cmd_reconcile(log, matches)
+        if cmd == "regrade":
+            rc = cmd_regrade(log, matches)
 
     acc.save_log(log)
     agg = acc.recompute_and_save(log)

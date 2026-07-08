@@ -172,36 +172,105 @@ def upsert_prediction(log: dict, entry: dict) -> bool:
     return True
 
 
+def _build_result(
+    entry: dict,
+    home_score: int,
+    away_score: int,
+    duration: str = "REGULAR",
+    regular_home: Optional[int] = None,
+    regular_away: Optional[int] = None,
+) -> dict:
+    """Rakenna result-lohko: näyttötulos + 90 min -gradaus.
+
+    home_score/away_score = NÄYTETTÄVÄ lopputulos (reg + jatkoaika, ilman
+    rangaistuspotkuja). Jos ottelu ratkesi jatkoajalla/rankkareilla
+    (duration != REGULAR) ja 90 min regularTime-tulos on annettu, GRADAUS
+    (1X2/decisive/exact/actual_outcome) nojaa siihen: malli ennustaa 90 min
+    lopputuloksen, joten ET-voitto EI ole 1X2-osuma — 90 min tasan = tasa.
+    """
+    if duration != "REGULAR" and regular_home is not None and regular_away is not None:
+        grade_h, grade_a = int(regular_home), int(regular_away)
+    else:
+        grade_h, grade_a = int(home_score), int(away_score)
+
+    actual = outcome_from_score(grade_h, grade_a)
+    pred_winner = entry.get("predicted_winner")
+    mls = entry.get("most_likely_score")
+    actual_score = f"{int(home_score)}-{int(away_score)}"
+    grade_score = f"{grade_h}-{grade_a}"
+
+    result = {
+        "home_score": int(home_score),
+        "away_score": int(away_score),
+        "actual_score": actual_score,
+        "actual_outcome": actual,
+        # headline-1X2: nimetty voittaja vs toteutunut 90 min (tasapeli = miss)
+        "hit_1x2": bool(pred_winner is not None and pred_winner == actual),
+        # exact-score vain jos most_likely_score tunnetaan (FD-rivit, ei seed);
+        # gradataan 90 min -tuloksella (= actual_score kun duration REGULAR)
+        "exact_hit": (None if mls is None else bool(mls == grade_score)),
+        "reconciled_at": _now_iso(),
+    }
+    if duration and duration != "REGULAR":
+        # a.e.t./pens-lippu + 90 min tulos näyttöä varten ("3-2 (a.e.t.)")
+        result["duration"] = duration
+        result["regular_score"] = grade_score
+    return result
+
+
 def set_result(
     log: dict,
     match_id: str,
     home_score: int,
     away_score: int,
+    duration: str = "REGULAR",
+    regular_home: Optional[int] = None,
+    regular_away: Optional[int] = None,
 ) -> bool:
     """Täytä toteutunut tulos logatulle ennusteelle. Idempotentti: jo
     reconciloitua ei muuteta. Palauttaa True jos tulos kirjattiin nyt.
+    Gradaussemantiikka: ks. _build_result (90 min -gradaus ET/rankkareissa).
     """
     idx = _index_by_id(log)
     entry = idx.get(match_id)
     if entry is None or entry.get("result") is not None:
         return False
+    entry["result"] = _build_result(
+        entry, home_score, away_score, duration, regular_home, regular_away
+    )
+    return True
 
-    actual = outcome_from_score(home_score, away_score)
-    pred_winner = entry.get("predicted_winner")
-    mls = entry.get("most_likely_score")
-    actual_score = f"{int(home_score)}-{int(away_score)}"
 
-    entry["result"] = {
-        "home_score": int(home_score),
-        "away_score": int(away_score),
-        "actual_score": actual_score,
-        "actual_outcome": actual,
-        # headline-1X2: nimetty voittaja vs toteutunut (tasapeli = miss)
-        "hit_1x2": bool(pred_winner is not None and pred_winner == actual),
-        # exact-score vain jos most_likely_score tunnetaan (FD-rivit, ei seed)
-        "exact_hit": (None if mls is None else bool(mls == actual_score)),
-        "reconciled_at": _now_iso(),
-    }
+def regrade_result(
+    log: dict,
+    match_id: str,
+    home_score: int,
+    away_score: int,
+    duration: str = "REGULAR",
+    regular_home: Optional[int] = None,
+    regular_away: Optional[int] = None,
+) -> bool:
+    """Re-gradaa JO reconciloitu tulos nykyisellä gradauslogiikalla (#24).
+
+    Union-turvallinen: ei koskaan poista riviä eikä koske ennustekenttiin —
+    vain result-lohko lasketaan uudelleen. Alkuperäinen reconciled_at
+    säilytetään; regraded_at kirjataan kun jokin kenttä muuttui. Palauttaa
+    True jos result-lohko muuttui.
+    """
+    idx = _index_by_id(log)
+    entry = idx.get(match_id)
+    if entry is None or entry.get("result") is None:
+        return False
+    old = entry["result"]
+    new = _build_result(
+        entry, home_score, away_score, duration, regular_home, regular_away
+    )
+    new["reconciled_at"] = old.get("reconciled_at")
+    keys = (set(new) | set(old)) - {"regraded_at"}
+    if all(new.get(k) == old.get(k) for k in keys):
+        return False
+    new["regraded_at"] = _now_iso()
+    entry["result"] = new
     return True
 
 
@@ -343,6 +412,9 @@ def _recent_view(rows: list[dict], recent_n: int) -> list[dict]:
             "actual_outcome": res["actual_outcome"],
             "hit_1x2": res["hit_1x2"],
             "exact_hit": res["exact_hit"],
+            # a.e.t./pens-annotointi frontendille ("3-2 (a.e.t.)"); None = 90 min
+            "duration": res.get("duration"),
+            "regular_score": res.get("regular_score"),
         })
     return out
 
