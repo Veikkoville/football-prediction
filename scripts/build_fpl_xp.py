@@ -70,7 +70,11 @@ MIN_XP_TOTAL = 1.0
 # ---------------------------------------------------------------------------
 def availability_factor(element: dict) -> float:
     """FPL status → minuuttikerroin. a=pelattavissa, d=epävarma (chance-%),
-    i/s/u/n = sivussa."""
+    i/s/u/n = sivussa.
+
+    #33: tuotantopolku käyttää nyt xp.apply_availability-porttia (sama
+    semantiikka p_start/p_sub-tasolla) — tämä säilyy refresh-testien
+    (test_fpl_availability.py) kiinnityspisteenä statussemantiikalle."""
     status = element.get("status", "a")
     if status == "a":
         return 1.0
@@ -125,6 +129,18 @@ def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str]) -> b
         checks.append((f"avaajien (xMins>=60) xP/GW-keskiarvo 2..6 (nyt {mean_xp:.2f})",
                        2.0 <= mean_xp <= 6.0))
 
+    # #33: sivussa oleva (i/s/u/n) ei saa olla top-xMins-listalla — saatavuus-
+    # portin pitää nollata minuutit ennen syvyys/ruuhka-modifioijia.
+    status_by_id = {e["id"]: e.get("status", "a") for e in boot["elements"]}
+    top_xm = sorted(players, key=lambda p: -p["xmins"])[:20]
+    bad = [p["web_name"] for p in top_xm
+           if status_by_id.get(p["id"]) in ("i", "s", "u", "n")]
+    checks.append((f"top-20 xMins ilman sivussa-olevia (nyt: {bad or 'puhdas'})",
+                   not bad))
+    # #33: predicted_starts-kenttä validi [0,100] kaikilla
+    ps_ok = all(0.0 <= p.get("predicted_starts", 0.0) <= 100.0 for p in players)
+    checks.append(("predicted_starts kaikilla valissa [0,100]", ps_ok))
+
     ok = True
     for label, passed in checks:
         print(f"  [{'OK ' if passed else 'FAIL'}] {label}")
@@ -159,6 +175,7 @@ def main() -> int:
     pos_by_player = {e["id"]: e["element_type"] for e in boot["elements"]}
     acc_by_player: dict[int, dict] = {}
     mins_by_round: dict[int, dict[int, float]] = {}
+    starts_by_round: dict[int, dict[int, int]] = {}
     for e in boot["elements"]:
         pid = e["id"]
         hist = summaries.get(pid, [])
@@ -166,12 +183,42 @@ def main() -> int:
         acc["dc_hits"] = xp.count_dc_hits(hist, pos_by_player[pid])
         acc_by_player[pid] = acc
         mr: dict[int, float] = defaultdict(float)
+        sr: dict[int, int] = defaultdict(int)
         for r in hist:
             if r.get("round") is not None:
                 mr[r["round"]] += r.get("minutes", 0) or 0
+                sr[r["round"]] += r.get("starts", 0) or 0
         mins_by_round[pid] = dict(mr)
+        starts_by_round[pid] = dict(sr)
     priors = xp.position_priors(acc_by_player, pos_by_player)
     all_rounds = sorted({rnd for mr in mins_by_round.values() for rnd in mr})
+
+    # #33: probabilistinen minuuttimalli — kaksi passia:
+    #   A) minutes_model + saatavuus-gate per pelaaja
+    #   B) syvyys-korjaus klubi+positio-ryhmittäin (Σp_start → historialliset
+    #      starttipaikat; availability-nollaama kilpailija nostaa muita capatusti)
+    mm_window = 6 if season_live else None
+    mm_by_player: dict[int, dict] = {}
+    for e in boot["elements"]:
+        pid = e["id"]
+        mm = xp.minutes_model(mins_by_round[pid], starts_by_round[pid],
+                              all_rounds, n_last=mm_window)
+        mm_by_player[pid] = xp.apply_availability(
+            mm, e.get("status", "a"), e.get("chance_of_playing_next_round"))
+    window_rounds = all_rounds if mm_window is None else all_rounds[-mm_window:]
+    groups: dict[tuple[int, int], list[int]] = defaultdict(list)
+    for e in boot["elements"]:
+        groups[(e["team"], e["element_type"])].append(e["id"])
+    for (_team, _pos), pids in groups.items():
+        # slots = ryhmän toteutuneet startit / kierros ikkunassa (itsekonsistentti)
+        slots = (sum(starts_by_round[p].get(rnd, 0)
+                     for p in pids for rnd in window_rounds)
+                 / max(len(window_rounds), 1))
+        # Syvyys nojaa RAAKAAN start-shareen (slots samasta datasta → konsistentti)
+        f = xp.depth_factor([mm_by_player[p]["p_start_raw"] for p in pids], slots)
+        if f != 1.0:
+            for p in pids:
+                mm_by_player[p] = xp.scale_p_start(mm_by_player[p], f)
 
     print("[5/6] xP per pelaaja per GW (horisontti + Phase 1b -konteksti)...")
     # Tulevat fixturet per GW mallinimillä
@@ -245,12 +292,11 @@ def main() -> int:
             continue  # putoaja tulevalta kaudelta
         pos = pos_by_player[pid]
         rates = xp.player_rates(acc_by_player[pid], pos, priors)
-        # Pre-season (lähdekausi päättynyt): koko kausi tasapainoin — kauden
-        # lopun rotaatio ei dominoi GW1-arviota. Live-kausi: last-5 (gate-polku).
-        xmins, p60, p1_59 = xp.minutes_form(
-            mins_by_round[pid], all_rounds, n_last=5 if season_live else None)
-        avail = availability_factor(e)
-        xmins, p60, p1_59 = xmins * avail, p60 * avail, p1_59 * avail
+        # #33: probabilistinen minuuttimalli (start%×xMins + saatavuus + syvyys)
+        # korvaa minutes_form+availability_factor-skalaarin. Pre-season: koko
+        # kausi tasapainoin (mm_window=None), live-kausi: last-6 recency.
+        mm = mm_by_player[pid]
+        xmins, p60, p1_59 = mm["xmins"], mm["p60"], mm["p1_59"]
 
         model_team_name = [n for n, i in name_to_fid.items() if i == fid][0]
         gws = []
@@ -263,9 +309,11 @@ def main() -> int:
             ctxs = ctx_by_gw.get(g, {}).get(fid, [])
             opps = opp_by_gw.get(g, {}).get(fid, [])
             # Phase 1b: minuuttikerroin (MM-väsymys yms.) per joukkue/GW
-            mm = xmins_multiplier(model_team_name, g, cfg)
-            xm_g = min(xmins * mm, 90.0)
-            p60_g, p1_g = min(p60 * mm, 1.0), min(p1_59 * mm, 1.0)
+            # + #33: tupla-GW-ruuhka → pieni rotaatioriski kärkipelaajille
+            mult = (xmins_multiplier(model_team_name, g, cfg)
+                    * xp.congestion_multiplier(len(ctxs), xmins))
+            xm_g = min(xmins * mult, 90.0)
+            p60_g, p1_g = min(p60 * mult, 1.0), min(p1_59 * mult, 1.0)
             gw_xp = 0.0
             for c in ctxs:
                 comp = xp.xp_components(pos, rates, xm_g, p60_g, p1_g, c)
@@ -297,6 +345,9 @@ def main() -> int:
             "team_short": short_name(model_team_name),
             "pos": xp.POS_NAME[pos],
             "xmins": round(xmins, 1),
+            # #33: probabilistinen kokoonpanoennuste + rehellinen epävarmuus
+            "predicted_starts": round(mm["p_start"] * 100.0, 1),
+            "minutes_confidence": mm["confidence"],
             "xp_per_gw": round(total / max(len(horizon), 1), 2),
             "xp_horizon_total": round(total, 2),
             "gameweeks": gws,
