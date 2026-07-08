@@ -1900,7 +1900,10 @@
         "actual_outcome": "draw",
         "hit_1x2": false,
         "exact_hit": true,
-        "reconciled_at": "2026-06-30T09:38:19+00:00"
+        "reconciled_at": "2026-06-30T09:38:19+00:00",
+        "duration": "PENALTY_SHOOTOUT",
+        "regular_score": "1-1",
+        "regraded_at": "2026-07-08T10:17:35+00:00"
       }
     },
     {
@@ -1952,7 +1955,10 @@
         "actual_outcome": "draw",
         "hit_1x2": false,
         "exact_hit": true,
-        "reconciled_at": "2026-06-30T03:43:05+00:00"
+        "reconciled_at": "2026-06-30T03:43:05+00:00",
+        "duration": "PENALTY_SHOOTOUT",
+        "regular_score": "1-1",
+        "regraded_at": "2026-07-08T10:17:35+00:00"
       }
     },
     {
@@ -2030,7 +2036,10 @@
         "actual_outcome": "draw",
         "hit_1x2": false,
         "exact_hit": false,
-        "reconciled_at": "2026-07-03T22:06:03+00:00"
+        "reconciled_at": "2026-07-03T22:06:03+00:00",
+        "duration": "PENALTY_SHOOTOUT",
+        "regular_score": "1-1",
+        "regraded_at": "2026-07-08T10:17:35+00:00"
       }
     },
     {
@@ -2053,10 +2062,13 @@
         "home_score": 3,
         "away_score": 2,
         "actual_score": "3-2",
-        "actual_outcome": "home",
-        "hit_1x2": true,
+        "actual_outcome": "draw",
+        "hit_1x2": false,
         "exact_hit": false,
-        "reconciled_at": "2026-07-04T02:58:56+00:00"
+        "reconciled_at": "2026-07-04T02:58:56+00:00",
+        "duration": "EXTRA_TIME",
+        "regular_score": "1-1",
+        "regraded_at": "2026-07-08T10:17:35+00:00"
       }
     },
     {
@@ -2131,10 +2143,13 @@
         "home_score": 3,
         "away_score": 2,
         "actual_score": "3-2",
-        "actual_outcome": "home",
-        "hit_1x2": true,
+        "actual_outcome": "draw",
+        "hit_1x2": false,
         "exact_hit": false,
-        "reconciled_at": "2026-07-02T03:39:36+00:00"
+        "reconciled_at": "2026-07-02T03:39:36+00:00",
+        "duration": "EXTRA_TIME",
+        "regular_score": "2-2",
+        "regraded_at": "2026-07-08T10:17:35+00:00"
       }
     },
     {

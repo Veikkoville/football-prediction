@@ -82,6 +82,64 @@ def test_exact_hit_none_without_mls():
 
 
 # ---------------------------------------------------------------------------
+# #24: ET/rankkari-gradaus 90 min -tuloksella (malli ennustaa 90 min 1X2:n)
+# ---------------------------------------------------------------------------
+def test_set_result_extra_time_win_graded_as_90min_draw():
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("m1", "home", mls="1-1"))
+    # 90 min 1-1, koti voitti jatkoajalla 3-2 (esim. Argentina-Cape Verde)
+    assert acc.set_result(log, "m1", 3, 2, duration="EXTRA_TIME",
+                          regular_home=1, regular_away=1) is True
+    res = log["predictions"][0]["result"]
+    assert res["actual_score"] == "3-2"          # näyttötulos säilyy
+    assert res["duration"] == "EXTRA_TIME"
+    assert res["regular_score"] == "1-1"
+    assert res["actual_outcome"] == "draw"       # 90 min -gradaus
+    assert res["hit_1x2"] is False               # ET-voitto ei ole 1X2-osuma
+    assert res["exact_hit"] is True              # mls 1-1 == 90 min 1-1
+
+
+def test_set_result_penalty_shootout_graded_as_90min():
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("m1", "away", mls="0-1"))
+    acc.set_result(log, "m1", 1, 1, duration="PENALTY_SHOOTOUT",
+                   regular_home=1, regular_away=1)
+    res = log["predictions"][0]["result"]
+    assert res["actual_outcome"] == "draw"
+    assert res["hit_1x2"] is False
+    assert res["exact_hit"] is False
+    assert res["duration"] == "PENALTY_SHOOTOUT"
+
+
+def test_regrade_flips_et_win_preserves_row_and_reconciled_at():
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("m1", "home", mls="2-0"))
+    acc.set_result(log, "m1", 3, 2)  # vanha bugi: gradattiin fullTimella
+    orig_reconciled = log["predictions"][0]["result"]["reconciled_at"]
+    assert log["predictions"][0]["result"]["hit_1x2"] is True
+
+    assert acc.regrade_result(log, "m1", 3, 2, duration="EXTRA_TIME",
+                              regular_home=1, regular_away=1) is True
+    assert len(log["predictions"]) == 1          # union: rivi ei putoa
+    res = log["predictions"][0]["result"]
+    assert res["hit_1x2"] is False               # gradaus kääntyi
+    assert res["actual_score"] == "3-2"
+    assert res["regular_score"] == "1-1"
+    assert res["reconciled_at"] == orig_reconciled
+    assert res["regraded_at"] is not None
+    # ennustekentät koskemattomat
+    assert log["predictions"][0]["predicted_winner"] == "home"
+
+
+def test_regrade_noop_for_regular_match():
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("m1", "home", mls="2-1"))
+    acc.set_result(log, "m1", 2, 1)
+    assert acc.regrade_result(log, "m1", 2, 1) is False  # ei muutosta
+    assert "regraded_at" not in log["predictions"][0]["result"]
+
+
+# ---------------------------------------------------------------------------
 # Aggregaatti (sis. Brier täysiltä riveiltä)
 # ---------------------------------------------------------------------------
 def test_compute_aggregate_metrics():
