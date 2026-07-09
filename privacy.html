@@ -30,7 +30,7 @@
  ]
 }
 </script>
-  <title>GoalIQ — Privacy Policy</title>
+  <title>GoalIQ – Privacy Policy</title>
   <style>
     :root {
       --magenta: #FF2E7E;
@@ -38,37 +38,40 @@
       --ink: #0A0820;
       --ink2: #140F1E;
       --cream: #FFF6EC;
-      --paper: #F6F4FF;
-      --ink-muted: #54506B;
+      --card: rgba(255,255,255,0.05);
+      --line: rgba(255,255,255,0.10);
+      --muted: #C9C3DA;
       --hero-muted: #C9C3DA;
-      --line: #E7DDCF;
+      --teal: #19E3D2;
+      --radius: 16px;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--cream);
-      color: var(--ink);
+      background: var(--ink);
+      color: var(--cream);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); }
+    .site-header { border-bottom: 1px solid var(--line); }
     .bar { height: 6px; background: var(--magenta); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-    .brand { font-size: 22px; font-weight: 800; letter-spacing: .5px; }
-    .brand a { color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-    .brand-icon { width: 26px; height: 26px; border-radius: 7px; display: block; }
+    .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
+    .brand a { color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
     .brand span { color: var(--magenta); }
     .nav-cta {
       display: inline-block; background: var(--magenta); color: #fff;
-      text-decoration: none; padding: 11px 20px; border-radius: 30px; font-weight: 800; font-size: 14px;
+      text-decoration: none; padding: 11px 20px; border-radius: 999px; font-weight: 800; font-size: 14px;
     }
-    .nav-cta:hover { background: var(--magenta-deep); }
-    .site-footer { background: linear-gradient(165deg, var(--ink2), var(--ink)); padding: 30px 0 40px; font-size: 14px; }
+    .nav-cta:hover { background: #FF4D90; }
+    .site-footer { border-top: 1px solid var(--line); padding: 30px 0 40px; font-size: 14px; }
     .site-footer .foot { max-width: 960px; margin: 0 auto; padding: 0 20px; color: var(--hero-muted); }
-    .site-footer a { color: var(--cream); }
+    .site-footer a { color: var(--hero-muted); }
     .site-footer a:hover { color: var(--magenta); }
 
     .wrap {
@@ -77,41 +80,41 @@
       padding: 40px 24px 80px;
     }
     h1 {
-      color: var(--ink);
+      color: var(--cream);
       font-size: 32px;
-      letter-spacing: -0.6px;
+      letter-spacing: -0.02em;
       margin-bottom: 4px;
     }
     h2 {
-      color: var(--magenta-deep);
+      color: var(--magenta);
       font-size: 20px;
       margin-top: 36px;
       margin-bottom: 10px;
       font-weight: 700;
     }
     h3 {
-      color: var(--ink);
+      color: var(--cream);
       font-size: 16px;
       margin-top: 20px;
       margin-bottom: 8px;
       font-weight: 700;
     }
-    .muted { color: var(--ink-muted); font-size: 14px; }
-    .updated { color: var(--ink-muted); font-size: 13px; margin-bottom: 24px; }
-    p, li { color: var(--ink); font-size: 15px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .updated { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+    p, li { color: var(--cream); font-size: 15px; }
     ul { padding-left: 20px; }
     li { margin-bottom: 4px; }
-    a { color: var(--magenta-deep); text-decoration: none; }
+    a { color: var(--magenta); text-decoration: none; }
     a:hover { text-decoration: underline; }
     .card {
-      background: var(--paper);
+      background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: var(--radius);
       padding: 16px 20px;
       margin: 20px 0;
     }
     code {
-      background: rgba(10,8,32,0.07);
+      background: rgba(255,255,255,0.08);
       padding: 1px 6px;
       border-radius: 4px;
       font-size: 13px;
@@ -158,8 +161,8 @@
     <h3>2.1 Account information</h3>
     <p>When you create an account, we collect:</p>
     <ul>
-      <li><strong>Email address</strong> — used for authentication and account recovery</li>
-      <li><strong>Password</strong> — stored as a salted hash, never in plain text</li>
+      <li><strong>Email address</strong>: used for authentication and account recovery</li>
+      <li><strong>Password</strong>: stored as a salted hash, never in plain text</li>
       <li><strong>Account creation date</strong></li>
     </ul>
     <p>
@@ -170,8 +173,8 @@
     <h3>2.2 Subscription and payment information</h3>
     <p>
       When you upgrade to GoalIQ Premium, your payment is processed by the app
-      store you purchased through — the Apple App Store (on iOS) or Google Play
-      (on Android) — and your subscription is managed through
+      store you purchased through: the Apple App Store (on iOS) or Google Play
+      (on Android). Your subscription is managed through
       <a href="https://www.revenuecat.com" target="_blank">RevenueCat</a>, our
       subscription management provider. We do not see, store, or have access to
       your payment card details. We receive only:
@@ -220,30 +223,30 @@
     <p>The App relies on the following third-party services:</p>
     <ul>
       <li>
-        <strong>Supabase</strong> (hosted in the EU) — authentication and user
+        <strong>Supabase</strong> (hosted in the EU): authentication and user
         profile storage.
         <a href="https://supabase.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
-        <strong>Stripe</strong> — payment processing for GoalIQ Pro web
+        <strong>Stripe</strong>: payment processing for GoalIQ Pro web
         subscriptions (pro.goaliq.app). Card details are entered on Stripe's
         secure checkout and never reach our servers.
         <a href="https://stripe.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
-        <strong>RevenueCat</strong> — subscription management.
+        <strong>RevenueCat</strong>: subscription management.
         <a href="https://www.revenuecat.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
-        <strong>PostHog</strong> (hosted in the US) — product analytics.
+        <strong>PostHog</strong> (hosted in the US): product analytics.
         <a href="https://posthog.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
-        <strong>Render</strong> — backend API hosting.
+        <strong>Render</strong>: backend API hosting.
         <a href="https://render.com/privacy" target="_blank">Privacy policy</a>
       </li>
       <li>
-        <strong>Expo / Expo Application Services</strong> — mobile app
+        <strong>Expo / Expo Application Services</strong>: mobile app
         delivery and over-the-air updates.
         <a href="https://expo.dev/privacy" target="_blank">Privacy policy</a>
       </li>
@@ -264,7 +267,7 @@
       active. If you delete your account, we will permanently remove your
       personal data within <strong>30 days</strong>, except where we are
       legally required to retain certain records (e.g., billing records
-      for tax purposes — typically 6 years under Finnish law).
+      for tax purposes, typically 6 years under Finnish law).
     </p>
 
     <h2>6. Your rights under GDPR</h2>
