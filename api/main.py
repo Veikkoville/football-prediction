@@ -2288,6 +2288,21 @@ def fantasy_xp(response: Response):
     return load_xp()
 
 
+@app.get("/api/fantasy/price-watch")
+def fantasy_price_watch(response: Response):
+    """FPL price watch (#43) — hinnanmuutosennuste (rising/falling) per pelaaja.
+
+    Palauttaa committatun ennusteen (data/fpl_price_watch.json). Rakennetaan
+    päivittäisellä fpl-data-refresh-cronilla (scripts/build_fpl_price_watch.py,
+    sanity-gaten takana) — endpoint vain lukee tiedoston, EI laskentaa
+    pyynnössä. Estimaatti, ei virallinen (disclaimer metassa). no-store kuten
+    muut fantasy-endpointit.
+    """
+    from src.models.fpl_price_watch import load_price_watch
+    response.headers["Cache-Control"] = "no-store"
+    return load_price_watch()
+
+
 @app.get("/api/fantasy/rate-team")
 def fantasy_rate_team(
     response: Response,

@@ -122,12 +122,18 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_xp
 
+      # #43: hinnanmuutosennuste samasta bootstrapista — hinnat liikkuvat öisin,
+      # päivittäinen cron riittää (ei omaa workflowta).
+      - name: Build price watch
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.build_fpl_price_watch
+
       - name: Commit + push to main (Render serves fresh data)
         if: steps.guard.outputs.proceed == 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json
+          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json
           if git diff --cached --quiet; then
             echo "Ei muutoksia (data ennallaan) — ohitetaan commit."
             exit 0
