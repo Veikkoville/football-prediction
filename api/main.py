@@ -2288,6 +2288,44 @@ def fantasy_xp(response: Response):
     return load_xp()
 
 
+@app.get("/api/fantasy/rate-team")
+def fantasy_rate_team(
+    response: Response,
+    entry: int | None = Query(default=None, description="Julkinen FPL entry-ID"),
+    gw: int | None = Query(default=None, ge=1, le=38),
+    players: str | None = Query(
+        default=None,
+        description="Esikausifallback: 15 FPL element-ID:tä pilkuilla"),
+    captain: int | None = Query(default=None),
+    bank: float | None = Query(default=None, ge=0, le=100,
+                               description="Pankki miljoonina (manual-moodi)"),
+):
+    """FPL rate-my-team (#34): tuo joukkue julkisella entry-ID:llä (tai 15
+    pelaaja-ID:llä ennen kautta) → xP-pohjainen tiimiarvio (percentiili vs
+    satunnaisotos laillisia budjettijoukkueita) + kapteeni- ja siirtosuositukset.
+
+    Lukee saman committatun xP-projektion kuin /api/fantasy/xp (ei laskentaa
+    mallipolulla); FPL-haut cachetetaan 10 min. Ei kirjautumista/salasanoja.
+    """
+    from src.models.fpl_rate_team import RateTeamError, rate_team
+    response.headers["Cache-Control"] = "no-store"
+    player_ids: list[int] | None = None
+    if players:
+        try:
+            player_ids = [int(x) for x in players.split(",") if x.strip()]
+        except ValueError:
+            raise HTTPException(status_code=400,
+                                detail="players must be comma-separated integers")
+    if not player_ids and entry is None:
+        raise HTTPException(status_code=400,
+                            detail="Provide either entry or players.")
+    try:
+        return rate_team(entry=entry, gw=gw, players=player_ids,
+                         captain=captain, bank=bank)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/debug/seasons")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """
