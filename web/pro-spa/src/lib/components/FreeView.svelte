@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { fetchFantasy, fetchAccuracy, type FantasyResponse, type AccuracyResponse } from '$lib/api';
 	import MethodNote from './MethodNote.svelte';
+	import RateTeam from './RateTeam.svelte';
+	import PriceWatch from './PriceWatch.svelte';
+
+	// #46: lukitun siirtosuositus-teaserin klikki nostaa tämän → +page vaihtaa
+	// Pro-tabiin, jossa Paywall elää (ei premium-sisältöä free-puolella).
+	let { onUpgrade }: { onUpgrade?: () => void } = $props();
 
 	let data = $state<FantasyResponse | null>(null);
 	let acc = $state<AccuracyResponse | null>(null);
@@ -61,7 +67,7 @@
 		<p>
 			<strong>Clean sheet probability</strong> is the GoalIQ match model's chance that the
 			team concedes zero in that fixture. It comes from a Dixon-Coles score matrix
-			(tau-corrected) fitted on match data — the same engine behind our published,
+			(tau-corrected) fitted on match data, the same engine behind our published,
 			pre-match logged track record.
 		</p>
 		<p>
@@ -109,6 +115,11 @@
 		</table>
 	</div>
 {/if}
+
+<!-- #46: FPL-työkalut (free-pinta) - rate-my-team ilman siirtosuosituksia
+     + price watch. Renderöityvät myös ilman fixture-dataa. -->
+<RateTeam {onUpgrade} />
+<PriceWatch />
 </div>
 
 <style>

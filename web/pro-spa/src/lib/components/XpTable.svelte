@@ -36,8 +36,17 @@
 		name: {
 			label: 'Name (A to Z)',
 			cmp: (a: XpPlayer, b: XpPlayer) => a.web_name.localeCompare(b.web_name)
+		},
+		starts: {
+			label: 'Start % (high to low)',
+			cmp: (a: XpPlayer, b: XpPlayer) =>
+				(b.predicted_starts ?? -1) - (a.predicted_starts ?? -1) ||
+				b.xp_horizon_total - a.xp_horizon_total
 		}
 	} as const;
+
+	// #33f: confidence-selite (mobiilipariteetti: sama merkitys, sama copy-henki).
+	const CONF_LABEL = { low: 'low', med: 'medium', high: 'high' } as const;
 
 	let pos = $state<(typeof POSITIONS)[number]>('All');
 	let sortBy = $state<keyof typeof SORTS>('total');
@@ -84,6 +93,8 @@
 		compPool.find((p) => p.id === selectedId) ?? compPool[0] ?? null
 	);
 	let compGw = $derived(compPool[0]?.components_gw ?? nextGw);
+	// #33f: Start %-sarake vain jos backend tuo kentän (defensiivinen).
+	let hasStarts = $derived(data.players.some((p) => typeof p.predicted_starts === 'number'));
 </script>
 
 <h2>Player expected points, {horizonLabel}</h2>
@@ -107,6 +118,15 @@
 		where the projections most often disagree with the eye test.
 	</p>
 	<p>
+		<strong>Expected minutes are probabilistic, not a guessed lineup.</strong> A minutes
+		model estimates each player's start probability (the Start % column) from recent
+		starts, availability and squad depth, and combines it with expected minutes when
+		starting. The confidence mark next to Start % reflects sample size and rotation
+		stability: <span class="conf conf-high">&#9679;</span> high,
+		<span class="conf conf-med">&#9679;</span> medium,
+		<span class="conf conf-low">&#9679;</span> low.
+	</p>
+	<p>
 		Honesty notes: these are GoalIQ model projections, not FPL's official expected points.
 		Pre-season projections lean on last season's baselines until the new season's data
 		arrives. Model projections for fun and planning, not betting advice.
@@ -125,7 +145,7 @@
 	<div>
 		<label for="sort">Sort by</label>
 		<select id="sort" bind:value={sortBy}>
-			{#each Object.entries(SORTS) as [key, s] (key)}
+			{#each Object.entries(SORTS).filter(([k]) => k !== 'starts' || hasStarts) as [key, s] (key)}
 				<option value={key}>{s.label}</option>
 			{/each}
 		</select>
@@ -145,6 +165,13 @@
 				<th>Team</th>
 				<th>Pos</th>
 				<th class="num"><abbr title="Expected minutes per gameweek">xMins</abbr></th>
+				{#if hasStarts}
+					<th class="num"
+						><abbr title="Start probability from the GoalIQ minutes model; the mark shows confidence"
+							>Start %</abbr
+						></th
+					>
+				{/if}
 				<th class="num"><abbr title="Average expected points per gameweek">xP/GW</abbr></th>
 				<th class="num"><abbr title="Sum of expected points, {horizonLabel}">Total xP</abbr></th>
 				{#each gwCols as gw (gw)}
@@ -156,7 +183,7 @@
 			{#each groups as g (g.team ?? '_all')}
 				{#if g.team}
 					<tr class="group-row">
-						<td colspan={7 + gwCols.length}>{g.team}</td>
+						<td colspan={(hasStarts ? 8 : 7) + gwCols.length}>{g.team}</td>
 					</tr>
 				{/if}
 				{#each g.players as p (p.id)}
@@ -169,6 +196,17 @@
 						<td>{p.team_short}</td>
 						<td>{p.pos}</td>
 						<td class="num">{p.xmins.toFixed(1)}</td>
+						{#if hasStarts}
+							<td class="num">
+								{#if typeof p.predicted_starts === 'number'}
+									<span
+										class="conf conf-{p.minutes_confidence ?? 'low'}"
+										title="{CONF_LABEL[p.minutes_confidence ?? 'low']} confidence"
+										>&#9679;</span
+									>{Math.round(p.predicted_starts)}
+								{/if}
+							</td>
+						{/if}
 						<td class="num">{p.xp_per_gw.toFixed(2)}</td>
 						<td class="num total-col">{p.xp_horizon_total.toFixed(2)}</td>
 						{#each gwCols as gw (gw)}
@@ -200,6 +238,17 @@
 	</select>
 	{#if selected}
 		<ComponentSplit player={selected} />
+		{#if typeof selected.predicted_starts === 'number'}
+			<p class="muted minutes-line">
+				Minutes outlook for {selected.web_name}: expected minutes
+				{Math.round(selected.xmins)} per GW, start probability
+				{Math.round(selected.predicted_starts)}%{#if selected.minutes_confidence}{' '}
+					(<span class="conf-text conf-{selected.minutes_confidence}"
+						>{CONF_LABEL[selected.minutes_confidence]} confidence</span
+					>){/if}. Model-based estimate; confidence reflects sample size and rotation
+				stability.
+			</p>
+		{/if}
 	{/if}
 	<p class="muted">Differentials (xP vs ownership) come in Phase 2.</p>
 {:else}
@@ -254,5 +303,27 @@
 	}
 	.comp-select {
 		margin-bottom: var(--s-3);
+	}
+	/* #33f: confidence-merkki — high=teal, med=neutraali, low=himmennetty */
+	.conf {
+		font-size: 0.65em;
+		vertical-align: 1px;
+		margin-right: 3px;
+	}
+	.conf-high {
+		color: var(--giq-teal-deep);
+	}
+	.conf-med {
+		color: var(--text-muted);
+	}
+	.conf-low {
+		color: var(--text-muted);
+		opacity: 0.45;
+	}
+	.conf-text.conf-high {
+		color: var(--giq-teal-deep);
+	}
+	.minutes-line {
+		margin-top: var(--s-3);
 	}
 </style>

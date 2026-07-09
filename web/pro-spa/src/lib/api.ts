@@ -51,6 +51,9 @@ export interface XpPlayer {
 	gameweeks: XpGameweek[];
 	components?: XpComponents;
 	components_gw?: number;
+	/** #33f: probabilistinen minuuttimalli (start-% 0-100) — defensiivinen. */
+	predicted_starts?: number;
+	minutes_confidence?: 'low' | 'med' | 'high';
 }
 
 export interface XpMeta {

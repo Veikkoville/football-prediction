@@ -7,6 +7,10 @@
 	import Paywall from './Paywall.svelte';
 	import CaptainRanker from './CaptainRanker.svelte';
 	import XpTable from './XpTable.svelte';
+	import RateTeam from './RateTeam.svelte';
+	import TransferPlanner from './TransferPlanner.svelte';
+	import Differentials from './Differentials.svelte';
+	import ComparePlayers from './ComparePlayers.svelte';
 
 	let xp = $state<XpResponse | null>(null);
 	let xpError = $state<string | null>(null);
@@ -14,7 +18,7 @@
 
 	onMount(() => {
 		// Checkout-paluu: ?checkout=success&session_id=... Fulfillment tekee
-		// webhook /api/webhook/stripe-web — täällä vain kuitataan + kysytään
+		// webhook /api/webhook/stripe-web - täällä vain kuitataan + kysytään
 		// tilaustila uudelleen (pienellä uusinnalla webhook-viivettä vastaan).
 		const params = new URLSearchParams(window.location.search);
 		if (params.get('checkout') === 'success') {
@@ -70,6 +74,12 @@
 	{:else}
 		<CaptainRanker data={xp} />
 		<XpTable data={xp} />
+		<!-- #46: premium-FPL-työkalut. Renderöityvät VAIN tässä haarassa
+		     (auth.user + auth.sub + xp saatavilla) → ei premium-vuotoa. -->
+		<RateTeam premium={true} />
+		<TransferPlanner />
+		<Differentials />
+		<ComparePlayers {xp} />
 	{/if}
 {:else}
 	<Paywall />
