@@ -1,6 +1,7 @@
 /* GoalIQ Pro: brändi-tokenit (goaliq-app/assets/brand/brand-tokens.md,
-   TÄSMÄHEXIT) + mittakaavat. Tumma Ink-teema = tuotteen oletusilme
-   (pariteetti Streamlit-pron + mobiilin kanssa). */
+   TÄSMÄHEXIT) + mittakaavat. Vaalea kanoninen brändi-ilme (#53):
+   kerma-pinnat, ink-teksti, magenta-aksentti (pariteetti mobiilin kanssa).
+   Muuttujien NIMET säilyvät, vain arvot vaihtuvat vaaleiksi. */
 :root {
 	/* brändi */
 	--giq-magenta: #ff2e7e;
@@ -16,19 +17,26 @@
 	--giq-cream: #fff6ec;
 	--giq-paper: #f6f4ff;
 
-	/* roolit (tumma pohja) */
-	--bg: var(--giq-ink);
-	--surface: #16112b;
-	--surface-2: #1e1838;
-	--border: #2c2547;
-	--text: var(--giq-cream);
-	--text-muted: #b4aecb;
+	/* roolit (vaalea pohja). Teksti-aksentit AA-kontrastilla kermalla:
+	   magenta-deep 4.8:1, positive 4.9:1, negative 4.8:1, muted 7.0:1. */
+	--bg: var(--giq-cream);
+	--surface: #ffffff;
+	--surface-2: var(--giq-paper);
+	--border: rgba(10, 8, 32, 0.14);
+	--text: var(--giq-ink);
+	--text-muted: #575170;
 	--accent: var(--giq-magenta);
+	/* aksentti TEKSTINÄ vaalealla pohjalla (magenta ei riitä pieneen tekstiin) */
+	--accent-strong: var(--giq-magenta-deep);
 	--accent-contrast: #ffffff;
-	--positive: var(--giq-teal);
-	--negative: var(--giq-coral);
+	/* syvennetyt teal/coral/kulta tekstikäyttöön vaalealla (teal-deep ja
+	   gold-deep jäävät alle AA:n leipätekstissä, siksi omat ink-sävyt) */
+	--positive: #007a6c;
+	--negative: #c2410c;
+	--warn-text: #946300;
 
-	/* FDR 1-5 brändiasteikko (sama kuin fpl.html + Streamlit) */
+	/* FDR 1-5 brändiasteikko (sama kuin fpl.html + Streamlit); käytetään
+	   vain ~14 % tint-taustoina vaalealla, joten kirkkaat hexit toimivat */
 	--fdr-1: var(--giq-teal-deep);
 	--fdr-2: var(--giq-teal);
 	--fdr-3: var(--giq-gold-deep);
@@ -54,7 +62,7 @@
 
 	--radius: 12px;
 	--radius-sm: 7px;
-	--shadow-1: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.25);
+	--shadow-1: 0 1px 2px rgba(10, 8, 32, 0.06), 0 2px 8px rgba(10, 8, 32, 0.08);
 	--shell: 1180px;
 }
 
@@ -63,7 +71,7 @@
 }
 
 html {
-	color-scheme: dark;
+	color-scheme: light;
 }
 
 body {
@@ -102,7 +110,7 @@ p {
 }
 
 a {
-	color: var(--giq-teal);
+	color: var(--accent-strong);
 	text-decoration: none;
 }
 a:hover {
@@ -151,7 +159,7 @@ button.secondary {
 	border-color: var(--accent);
 }
 button.secondary:hover {
-	background: rgba(255, 46, 126, 0.12);
+	background: rgba(255, 46, 126, 0.1);
 }
 
 button.ghost {
@@ -174,7 +182,7 @@ input,
 select {
 	font-family: inherit;
 	font-size: var(--step-0);
-	background: var(--surface-2);
+	background: var(--surface);
 	color: var(--text);
 	border: 1px solid var(--border);
 	border-radius: var(--radius-sm);
@@ -190,7 +198,7 @@ label {
 }
 
 :focus-visible {
-	outline: 2px solid var(--giq-teal);
+	outline: 2px solid var(--accent-strong);
 	outline-offset: 2px;
 }
 
@@ -243,7 +251,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover td {
-	background: rgba(255, 255, 255, 0.03);
+	background: rgba(10, 8, 32, 0.04);
 }
 
 /* apuluokat */
@@ -260,21 +268,21 @@ tbody tr:hover td {
 	font-size: var(--step--1);
 }
 .banner.success {
-	background: rgba(25, 227, 210, 0.1);
-	border: 1px solid rgba(25, 227, 210, 0.35);
-	color: var(--giq-teal);
+	background: rgba(0, 194, 173, 0.1);
+	border: 1px solid rgba(0, 148, 130, 0.4);
+	color: var(--positive);
 }
 .banner.error {
 	background: rgba(255, 106, 61, 0.1);
-	border: 1px solid rgba(255, 106, 61, 0.4);
-	color: var(--giq-coral);
+	border: 1px solid rgba(194, 65, 12, 0.4);
+	color: var(--negative);
 }
 
 /* #48: FPL-työkalupaneeli (dashboard-kortti segmenttinavin alla).
-   Sama radius/border-kieli kuin .table-wrap/.card; hieman bg:tä vaaleampi
-   pohja jolloin sisällä olevat surface-kortit ja taulukot erottuvat. */
+   Sama radius/border-kieli kuin .table-wrap/.card; paper-pohja jolloin
+   sisällä olevat valkoiset surface-kortit ja taulukot erottuvat. */
 .tool-card {
-	background: var(--giq-ink-2);
+	background: var(--giq-paper);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
 	padding: var(--s-6);

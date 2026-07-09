@@ -36,7 +36,7 @@
 	});
 </script>
 
-<h2>Differentials</h2>
+<h2><abbr title="A differential: low ownership, high projected points">Differentials</abbr></h2>
 <p class="muted">
 	Low-ownership players with high projected points: where the GoalIQ model disagrees with
 	the crowd. Ownership comes from the FPL game, projections from the GoalIQ model.

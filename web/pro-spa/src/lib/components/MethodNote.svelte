@@ -47,8 +47,8 @@
 		width: 18px;
 		height: 18px;
 		border-radius: 50%;
-		border: 1.5px solid var(--giq-teal);
-		color: var(--giq-teal);
+		border: 1.5px solid var(--positive);
+		color: var(--positive);
 		font-style: italic;
 		font-weight: 700;
 		font-size: 12px;

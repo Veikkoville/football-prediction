@@ -3,6 +3,7 @@
 	// kerrallaan näkyvissä. Renderöidään VAIN gatatusta haarasta (ProView:
 	// auth.user + auth.sub + xp) tai dev-esikatselusta (/dev-premium, DEV-only).
 	import type { XpResponse } from '$lib/api';
+	import Provenance from './Provenance.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
 	import CaptainRanker from './CaptainRanker.svelte';
 	import XpTable from './XpTable.svelte';
@@ -22,6 +23,8 @@
 	let segment = $state('players');
 </script>
 
+<!-- #50: mallin alkuperä-rivi myös pro-pinnalla (sama kiila kuin FreeView) -->
+<Provenance />
 <SegmentNav segments={SEGMENTS} bind:active={segment} label="Pro FPL tools" />
 
 {#if segment === 'players'}

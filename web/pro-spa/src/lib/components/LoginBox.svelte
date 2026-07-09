@@ -73,8 +73,8 @@
 		margin-bottom: var(--s-3);
 	}
 	.modes .active {
-		color: var(--giq-magenta);
-		border-color: var(--giq-magenta);
+		color: var(--giq-magenta-deep);
+		border-color: var(--giq-magenta-deep);
 	}
 	form {
 		max-width: 460px;

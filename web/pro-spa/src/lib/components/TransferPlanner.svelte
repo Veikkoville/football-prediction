@@ -47,7 +47,9 @@
 		/>
 	</div>
 	<div>
-		<label for="plan-horizon">Horizon (GWs)</label>
+		<label for="plan-horizon"
+			><abbr title="How many upcoming gameweeks the plan covers">Horizon</abbr> (GWs)</label
+		>
 		<select id="plan-horizon" bind:value={horizon}>
 			{#each HORIZONS as h (h)}
 				<option value={h}>{h}</option>
@@ -87,7 +89,11 @@
 					<span class="gw-xp">{g.gw_xp.toFixed(1)} xP</span>
 				</div>
 				{#if g.roll_transfer}
-					<p class="muted roll">Roll transfer</p>
+					<p class="muted roll">
+						<abbr title="Hold: keep the free transfer this week and bank it for the next one"
+							>Roll transfer</abbr
+						>
+					</p>
 				{:else}
 					<ul class="moves">
 						{#each g.transfers as t (t.out.id + '-' + t.in.id)}
@@ -157,7 +163,7 @@
 	.gw-xp {
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
-		color: var(--giq-teal);
+		color: var(--positive);
 	}
 	.moves {
 		list-style: none;
@@ -168,7 +174,7 @@
 		gap: var(--s-1);
 	}
 	.arrow {
-		color: var(--giq-magenta);
+		color: var(--giq-magenta-deep);
 		font-weight: 700;
 	}
 	.gain {
