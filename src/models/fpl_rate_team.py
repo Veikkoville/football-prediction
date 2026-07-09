@@ -18,7 +18,6 @@ koskemattomaksi — tämä moduuli vain LUKEE saman projektion.
 """
 from __future__ import annotations
 
-import random
 import threading
 import time
 
@@ -44,8 +43,6 @@ HOLD_THRESHOLD_XP = 2.0
 # Kapteenivaihtoehto näytetään jos ero kärkeen on alle tämän (GW-xP).
 CAPTAIN_ALT_MARGIN_XP = 0.5
 
-RATING_SAMPLE_N = 300
-RATING_SEED = 1926  # deterministinen otos → testattava + vakaa vastausten yli
 
 
 class RateTeamError(Exception):
@@ -66,6 +63,11 @@ _FPL_CACHE_LOCK = threading.Lock()
 
 
 def _fetch_fpl(path: str) -> dict:
+    """#52 deadline-resilienssi: TTL-cache + stale-fallback. FPL:n failatessa
+    (verkko / 5xx / 429 — tyypillistä juuri GW-deadlinen ruuhkassa) serveerataan
+    viimeisin onnistunut vastaus vaikka TTL olisi ohi — EI virhettä käyttäjälle.
+    404 on deterministinen (väärä entry) → nostetaan aina. Ilman cachea →
+    hallittu virhe kuten ennen."""
     now = time.time()
     with _FPL_CACHE_LOCK:
         hit = _FPL_CACHE.get(path)
@@ -75,12 +77,16 @@ def _fetch_fpl(path: str) -> dict:
         r = requests.get(f"{FPL_BASE}{path}", timeout=FPL_TIMEOUT_SEC,
                          headers={"User-Agent": "GoalIQ/1.0"})
     except requests.RequestException as e:
+        if hit:
+            return hit[1]  # stale > virhe (deadline-ilta)
         raise RateTeamError(
             503, "FPL API is not responding right now. Try again in a moment."
         ) from e
     if r.status_code == 404:
         raise RateTeamError(404, "Not found on the FPL API.")
     if r.status_code != 200:
+        if hit:
+            return hit[1]  # stale > virhe
         raise RateTeamError(
             503, f"FPL API returned an unexpected status ({r.status_code})."
         )
@@ -170,47 +176,66 @@ def _squad_clubs_ok(squad: list[dict]) -> bool:
     return all(c <= MAX_PER_CLUB for c in counts.values())
 
 
-_RATING_DIST_CACHE: dict[str, list[float]] = {}
+_OPTIMAL_XP_CACHE: dict[str, float] = {}
 
 
-def rating_distribution(pool: list[dict], cache_key: str) -> list[float]:
-    """Vertailujakauma: RATING_SAMPLE_N satunnaista laillista budjettijoukkuetta
-    (kiintiöt + max 3/klubi + ≤100.0m) projektiopoolista, kunkin optimaalisen
-    XI:n horisontti-xP. Deterministinen (kiinteä seed) → vakaa + testattava.
-    Pooli = projektiopelaajat (343 relevanttia) → 'kohtuullinen vertailujoukko'."""
-    hit = _RATING_DIST_CACHE.get(cache_key)
+def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
+    """#50: paras mahdollinen laillinen budjettijoukkue -benchmark (XI:n
+    horisontti-xP). Korvaa satunnaisotoksen: "300 random squads" antoi lähes
+    kaikille oikeille joukkueille ~100 % = ontto imartelu (Hub 2,0★ -oppi 4).
+
+    Heuristiikka (dokumentoitu, deterministinen — ei globaali optimi mutta kova
+    ja rehellinen benchmark):
+      1. Penkkireservi: halvin GKP + 3 halvinta kenttäpelaajaa (XI:n
+         ulkopuolinen raha minimiin) → XI-budjetti = 100.0m − reservi.
+      2. XI: ahne valinta horisontti-xP:llä; kiintiöt XI_MIN/MAX:n sisällä,
+         max 3/klubi, ja joka poiminnalla varmistetaan että loput XI-paikat
+         voi vielä täyttää halvimmalla mahdollisella (budjetti ei lukkiudu)."""
+    hit = _OPTIMAL_XP_CACHE.get(cache_key)
     if hit is not None:
         return hit
-    rng = random.Random(RATING_SEED)
     by_pos: dict[int, list[dict]] = {1: [], 2: [], 3: [], 4: []}
     for p in pool:
         by_pos[p["element_type"]].append(p)
-    totals: list[float] = []
-    attempts = 0
-    while len(totals) < RATING_SAMPLE_N and attempts < RATING_SAMPLE_N * 50:
-        attempts += 1
-        squad: list[dict] = []
-        for t, n in SQUAD_QUOTA.items():
-            if len(by_pos[t]) < n:
-                break
-            squad.extend(rng.sample(by_pos[t], n))
-        if len(squad) != 15:
+    if any(len(by_pos[t]) < n for t, n in SQUAD_QUOTA.items()):
+        return 0.0
+
+    cheapest_gk = min(p["price"] for p in by_pos[1])
+    outfield_prices = sorted(p["price"] for t in (2, 3, 4) for p in by_pos[t])
+    bench_reserve = cheapest_gk + sum(outfield_prices[:3])
+    xi_budget = BUDGET_TENTHS - bench_reserve
+    min_price = min(p["price"] for p in pool)
+
+    ranked = sorted(pool, key=lambda p: p["xp_horizon_total"], reverse=True)
+    xi: list[dict] = []
+    counts = {1: 0, 2: 0, 3: 0, 4: 0}
+    clubs: dict[int, int] = {}
+    cost = 0
+    for p in ranked:
+        if len(xi) == 11:
             break
-        if not _squad_clubs_ok(squad):
+        t = p["element_type"]
+        if counts[t] >= XI_MAX[t]:
             continue
-        if sum(p["price"] for p in squad) > BUDGET_TENTHS:
+        if clubs.get(p["club"], 0) >= MAX_PER_CLUB:
             continue
-        totals.append(sum(p["xp_horizon_total"] for p in optimal_xi(squad)))
-    totals.sort()
-    _RATING_DIST_CACHE[cache_key] = totals
-    return totals
-
-
-def _percentile(value: float, dist: list[float]) -> float:
-    if not dist:
-        return 50.0
-    below = sum(1 for x in dist if x < value)
-    return round(100.0 * below / len(dist), 1)
+        # Minimipaikkojen turvaus: jäljellä olevien pakollisten slotien on
+        # mahduttava vielä valinnan jälkeen.
+        need_min = sum(max(0, XI_MIN[q] - counts[q] - (1 if q == t else 0))
+                       for q in XI_MIN)
+        slots_left = 11 - len(xi) - 1
+        if need_min > slots_left:
+            continue
+        # Budjettiturvaus: loput paikat halvimmalla täytettävissä.
+        if cost + p["price"] + slots_left * min_price > xi_budget:
+            continue
+        xi.append(p)
+        counts[t] += 1
+        clubs[p["club"]] = clubs.get(p["club"], 0) + 1
+        cost += p["price"]
+    total = sum(p["xp_horizon_total"] for p in xi) if len(xi) == 11 else 0.0
+    _OPTIMAL_XP_CACHE[cache_key] = total
+    return total
 
 
 def _line_strength(xi: list[dict], pool: list[dict]) -> tuple[str, str]:
@@ -441,9 +466,16 @@ def rate_team(entry: int | None = None, gw: int | None = None,
     team_xp_horizon_c = team_xp_horizon + cap_player["xp_horizon_total"]
     team_xp_gw_c = team_xp_gw + _gw_xp(cap_player, target_gw)
 
+    # #50: rating = vertailu PARHAASEEN mahdolliseen budjettijoukkueeseen
+    # (satunnaisotos antoi kaikille ~100 % = ontto). percentile-kenttä säilyy
+    # yhteensopivuuden takia mutta tarkoittaa nyt "% of the best possible
+    # budget team" (clampattu 100:aan — ahne benchmark voi alittaa aidon
+    # optimin marginaalisesti).
     cache_key = str(xp_data["meta"].get("generated_at"))
-    dist = rating_distribution(pool, cache_key)
-    percentile = _percentile(team_xp_horizon, dist)  # vertailu ilman kapteenia
+    optimal_xp = optimal_budget_team_xp(pool, cache_key)
+    pct_of_optimal = (round(min(100.0, 100.0 * team_xp_horizon / optimal_xp), 1)
+                      if optimal_xp > 0 else 0.0)
+    gap_to_optimal = round(max(0.0, optimal_xp - team_xp_horizon), 2)
     strongest, weakest = _line_strength(xi, pool)
 
     transfers = transfer_suggestions(squad, pool, bank_tenths)
@@ -457,7 +489,7 @@ def rate_team(entry: int | None = None, gw: int | None = None,
             "season": xp_data["meta"].get("season"),
             "generated_at": xp_data["meta"].get("generated_at"),
             "horizon_gw": xp_data["meta"].get("horizon_gw"),
-            "sample_size": len(dist),
+            "rating_method": "vs_optimal_budget_team",
             "note": ("GoalIQ model projections, not FPL official expected "
                      "points. For fun and planning, not betting advice."),
         },
@@ -479,7 +511,9 @@ def rate_team(entry: int | None = None, gw: int | None = None,
             "team_xp_gw": round(team_xp_gw_c, 2),
             "team_xp_horizon": round(team_xp_horizon_c, 2),
             "team_xp_horizon_no_captain": round(team_xp_horizon, 2),
-            "percentile": percentile,
+            "percentile": pct_of_optimal,
+            "optimal_team_xp": round(optimal_xp, 2),
+            "gap_to_optimal_xp": gap_to_optimal,
             "strongest_line": strongest,
             "weakest_line": weakest,
         },
