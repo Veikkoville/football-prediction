@@ -32,7 +32,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import pandas as pd
 import stripe
-from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
@@ -49,6 +49,11 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 # GoalIQ Pro (web/pro) -Checkoutin OMA webhook-endpoint-secret — eri kuin
 # mobiilin STRIPE_WEBHOOK_SECRET (Stripe-dashboardissa 2 eri endpointtia).
 STRIPE_WEB_WEBHOOK_SECRET = os.getenv("STRIPE_WEB_WEBHOOK_SECRET", "")
+# #37: valinnaiset test-mode-secretit — Stripen test-eventit (E2E / #34-billing-
+# testaus) signeerataan omalla endpoint-secretillään. Live-secret kokeillaan
+# ensin; tyhjä test-secret = ei fallbackia (käyttäytyminen ennallaan).
+STRIPE_WEBHOOK_SECRET_TEST = os.getenv("STRIPE_WEBHOOK_SECRET_TEST", "")
+STRIPE_WEB_WEBHOOK_SECRET_TEST = os.getenv("STRIPE_WEB_WEBHOOK_SECRET_TEST", "")
 # GoalIQ Pro -webin hinnat (QUEUE #14: SPA ei voi pitää salaisuuksia →
 # checkout-session luodaan täällä). SAMAT env-nimet kuin goaliq-pro-web-
 # Streamlit-palvelussa → arvot voi kopioida sellaisenaan API-serviceen.
@@ -1845,14 +1850,31 @@ def create_web_checkout_session(
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
 
 
+def _verify_stripe_signature(payload: bytes, sig_header: str, *secrets: str) -> None:
+    """#37: verifioi Stripe-allekirjoitus — hyväksy ensimmäinen täsmäävä secret
+    (live ensin, sitten valinnainen test-mode-secret). Nostaa HTTPExceptionin
+    jos payload on rikki tai mikään secret ei täsmää."""
+    for secret in [s for s in secrets if s]:
+        try:
+            stripe.Webhook.construct_event(payload, sig_header, secret)
+            return
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid payload")
+        except stripe.error.SignatureVerificationError:
+            continue
+    raise HTTPException(status_code=400, detail="Invalid signature")
+
+
 @app.post("/api/webhook/stripe")
-async def stripe_webhook(request: Request):
+async def stripe_webhook(request: Request, background_tasks: BackgroundTasks):
     """
     Vastaanottaa Stripen webhookit. Päivittää Supabase profiles.is_premium
     kun maksu onnistuu / tilaus loppuu.
 
-    HUOM: Tama vaatii myöhemmin Supabase service-role-key:n (premium-statuksen
-    päivittäminen edellyttää backend-oikeuksia). Toteutetaan vaiheittain.
+    #37: allekirjoitus verifioidaan synkronisesti (nopea, ei I/O:ta), mutta
+    Supabase-kirjoitukset ajetaan BackgroundTasks-taustalla → 2xx-ack lähtee
+    heti eikä cold-start/hidas Supabase failaa live-eventtiä Stripen ~10 s
+    timeoutiin (retry-loop + virheprosentti-hälytykset).
     """
     if not STRIPE_WEBHOOK_SECRET:
         # Webhook-secret ei vielä konfiguroitu — palauta 200 OK että Stripe
@@ -1861,19 +1883,27 @@ async def stripe_webhook(request: Request):
 
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
-
-    # Tarkista allekirjoitus Stripen kirjastolla (ei käytetä paluuarvoa,
-    # koska StripeObject ei tue .get() -metodia natiivisti)
-    try:
-        stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid payload")
-    except stripe.error.SignatureVerificationError:
-        raise HTTPException(status_code=400, detail="Invalid signature")
+    _verify_stripe_signature(payload, sig_header,
+                             STRIPE_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET_TEST)
 
     # Parsitaan raaka JSON käsittelyä varten — natiivi dict on luotettavampi
     # kuin Stripen StripeObject-wrapper sisäkkäisten kenttien lukemiseen
     event = json.loads(payload)
+    background_tasks.add_task(_process_stripe_webhook_event, event)
+    return {"received": True}
+
+
+def _process_stripe_webhook_event(event: dict) -> None:
+    """Mobiili-Stripe-webhookin varsinainen käsittely (ajetaan ackin jälkeen
+    taustalla). Poikkeus ei saa enää vaikuttaa HTTP-vastaukseen → logataan."""
+    try:
+        _handle_stripe_webhook_event(event)
+    except Exception as e:
+        print(f"[Stripe webhook] taustakäsittely epäonnistui: {e!r} "
+              f"event_type={event.get('type')}")
+
+
+def _handle_stripe_webhook_event(event: dict) -> None:
     event_type = event["type"]
     obj = event["data"]["object"]
 
@@ -1950,8 +1980,6 @@ async def stripe_webhook(request: Request):
 
     else:
         print(f"[Stripe webhook] ignored event_type={event_type}")
-
-    return {"received": True}
 
 
 @app.post("/api/revenuecat/webhook")
@@ -2144,7 +2172,7 @@ def model_accuracy(response: Response):
 
 
 @app.post("/api/webhook/stripe-web")
-async def stripe_web_webhook(request: Request):
+async def stripe_web_webhook(request: Request, background_tasks: BackgroundTasks):
     """GoalIQ Pro (web/pro, pro.goaliq.app) -Checkoutin webhook.
 
     Kirjaa web-tilaukset Supabasen web_subscriptions-tauluun (EI kosketa
@@ -2154,22 +2182,34 @@ async def stripe_web_webhook(request: Request):
 
     Sama konventio kuin /api/webhook/stripe: secret puuttuu → 200 + warning
     (Stripe ei jää retry-looppiin ennen kuin env on konfiguroitu).
+    #37: sama ack-first-kaava kuin /api/webhook/stripe — signature synkronisesti,
+    Supabase-kirjoitukset taustalle.
     """
-    from datetime import datetime, timezone
-
     if not STRIPE_WEB_WEBHOOK_SECRET:
         return {"received": True, "warning": "STRIPE_WEB_WEBHOOK_SECRET not configured"}
 
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
-    try:
-        stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEB_WEBHOOK_SECRET)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid payload")
-    except stripe.error.SignatureVerificationError:
-        raise HTTPException(status_code=400, detail="Invalid signature")
+    _verify_stripe_signature(payload, sig_header,
+                             STRIPE_WEB_WEBHOOK_SECRET, STRIPE_WEB_WEBHOOK_SECRET_TEST)
 
     event = json.loads(payload)
+    background_tasks.add_task(_process_stripe_web_webhook_event, event)
+    return {"received": True}
+
+
+def _process_stripe_web_webhook_event(event: dict) -> None:
+    """Web-Stripe-webhookin varsinainen käsittely (taustalla ackin jälkeen)."""
+    try:
+        _handle_stripe_web_webhook_event(event)
+    except Exception as e:
+        print(f"[Stripe web] taustakäsittely epäonnistui: {e!r} "
+              f"event_type={event.get('type')}")
+
+
+def _handle_stripe_web_webhook_event(event: dict) -> None:
+    from datetime import datetime, timezone
+
     event_type = event["type"]
     obj = event["data"]["object"]
 
@@ -2177,7 +2217,7 @@ async def stripe_web_webhook(request: Request):
         user_id = obj.get("client_reference_id") or (obj.get("metadata") or {}).get("user_id")
         if not user_id:
             print("[Stripe web] checkout.completed ilman user_id-referenssiä — ohitetaan")
-            return {"received": True}
+            return
         plan = (obj.get("metadata") or {}).get("plan", "season")
         if obj.get("subscription"):
             # Molemmat planit recurring (kausi = 25 e/vuosi yearly, Villen
@@ -2248,8 +2288,6 @@ async def stripe_web_webhook(request: Request):
                     "subscription_cancel_at_period_end": False,
                     "subscription_current_period_end": None,
                 })
-
-    return {"received": True}
 
 
 @app.get("/api/fantasy")

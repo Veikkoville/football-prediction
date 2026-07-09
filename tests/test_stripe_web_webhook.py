@@ -223,3 +223,42 @@ def test_checkout_without_user_ref_is_ignored(client, monkeypatch):
                     headers={"stripe-signature": sig})
     assert r.status_code == 200
     assert calls == []
+
+
+def test_testmode_secret_fallback_accepts_test_signed_event(client, monkeypatch):
+    """#37: test-moodin eventti (signeerattu test-secretillä) hyväksytään kun
+    STRIPE_WEB_WEBHOOK_SECRET_TEST on konfiguroitu — live-secret ensin."""
+    import api.main as m
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", "whsec_live")
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET_TEST", "whsec_testmode")
+    calls: list[tuple[dict, dict | None]] = []
+    monkeypatch.setattr(m, "_upsert_web_subscription",
+                        lambda fields, match=None: calls.append((fields, match)) or True)
+    monkeypatch.setattr(m, "_update_profile", lambda *a, **k: True)
+    payload = {
+        "type": "checkout.session.completed",
+        "data": {"object": {
+            "client_reference_id": "user-e2e",
+            "metadata": {"plan": "season"},
+            "customer": "cus_t", "subscription": "sub_t",
+            "payment_status": "paid",
+        }},
+    }
+    body, sig = _signed(payload, "whsec_testmode")
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 200
+    assert calls and calls[0][0]["user_id"] == "user-e2e"
+
+
+def test_testmode_fallback_absent_keeps_rejecting(client, monkeypatch):
+    """#37: ilman test-secretiä väärin signeerattu eventti hylätään yhä (400)."""
+    import api.main as m
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", "whsec_live")
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET_TEST", "")
+    payload = {"type": "customer.subscription.deleted",
+               "data": {"object": {"id": "sub_x", "status": "canceled"}}}
+    body, sig = _signed(payload, "whsec_somethingelse")
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 400
