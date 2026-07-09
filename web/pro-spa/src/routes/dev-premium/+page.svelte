@@ -1,10 +1,14 @@
 <script lang="ts">
-	// DEV-ONLY premium-komponenttien esikatselu (ei auth-gatea) — renderöityy
+	// DEV-ONLY premium-komponenttien esikatselu (ei auth-gatea) - renderöityy
 	// VAIN vite dev -moodissa; tuotantobuildissa reitti näyttää ohjeen eikä
 	// dataa (ei paywall-ohitusta, data on silti julkisesta API:sta).
 	import { fetchXp, type XpResponse } from '$lib/api';
 	import CaptainRanker from '$lib/components/CaptainRanker.svelte';
 	import XpTable from '$lib/components/XpTable.svelte';
+	import RateTeam from '$lib/components/RateTeam.svelte';
+	import TransferPlanner from '$lib/components/TransferPlanner.svelte';
+	import Differentials from '$lib/components/Differentials.svelte';
+	import ComparePlayers from '$lib/components/ComparePlayers.svelte';
 
 	const isDev = import.meta.env.DEV;
 	let xp = $state<XpResponse | null>(null);
@@ -23,6 +27,12 @@
 		<p class="banner success">DEV PREVIEW: premium-näkymät ilman auth-gatea</p>
 		<CaptainRanker data={xp} />
 		<XpTable data={xp} />
+		<!-- #46: premium-FPL-työkalut (RateTeam + TransferPlanner sisältävät
+		     oman entry-ID-syötteen devausta varten) -->
+		<RateTeam premium={true} />
+		<TransferPlanner />
+		<Differentials />
+		<ComparePlayers {xp} />
 	{/if}
 </div>
 

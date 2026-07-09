@@ -5,6 +5,14 @@
 	import ProView from '$lib/components/ProView.svelte';
 
 	let tab = $state<'free' | 'pro'>('free');
+
+	// #46: free-puolen lukittu teaser vie Pro-tabiin, jossa Paywall elää.
+	function goPro() {
+		tab = 'pro';
+		requestAnimationFrame(() => {
+			document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
+		});
+	}
 </script>
 
 <div class="shell">
@@ -31,7 +39,7 @@
 
 	<main>
 		{#if tab === 'free'}
-			<FreeView />
+			<FreeView onUpgrade={goPro} />
 		{:else}
 			<ProView />
 		{/if}
