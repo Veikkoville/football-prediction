@@ -9,6 +9,9 @@ import pytest
 
 import src.models.fpl_rate_team as rt
 
+# Aito _fetch_fpl talteen ENNEN autouse-mockia (#52-stale-testi käyttää)
+_REAL_FETCH_FPL = rt._fetch_fpl
+
 
 # ---------------------------------------------------------------------------
 # Fixturet: pieni mutta laillinen pelaajapooli + fake-FPL
@@ -95,9 +98,11 @@ def _mock_fpl(monkeypatch):
 
     monkeypatch.setattr(rt, "_fetch_fpl", fake_fetch)
     monkeypatch.setattr(rt, "load_xp", lambda: FAKE_XP)
-    rt._RATING_DIST_CACHE.clear()
+    rt._OPTIMAL_XP_CACHE.clear()
+    rt._FPL_CACHE.clear()
     yield
-    rt._RATING_DIST_CACHE.clear()
+    rt._OPTIMAL_XP_CACHE.clear()
+    rt._FPL_CACHE.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +125,8 @@ def test_entry_mode_golden():
     assert out["captain"]["pick"]["id"] == 25
     assert 0.0 <= out["rating"]["percentile"] <= 100.0
     assert out["rating"]["team_xp_horizon"] > out["rating"]["team_xp_horizon_no_captain"]
-    assert out["meta"]["sample_size"] > 0
+    assert out["meta"]["rating_method"] == "vs_optimal_budget_team"
+    assert out["rating"]["optimal_team_xp"] > 0
 
 
 def test_manual_mode_and_validation():
@@ -207,12 +213,20 @@ def test_optimal_xi_formation_legal():
     assert rt.XI_MIN[4] <= counts.get(4, 0) <= rt.XI_MAX[4]
 
 
-def test_rating_distribution_deterministic():
+def test_optimal_benchmark_deterministic_and_beats_squads():
+    # #50: benchmark on deterministinen ja aidosti erotteleva — paras runko
+    # saa korkean %-arvon, heikko runko selvasti matalamman (ei "kaikille 100 %").
     pool = rt._projection_pool(FAKE_XP, {e["id"]: e for e in POOL_BOOT})
-    d1 = rt.rating_distribution(pool, "k1")
-    rt._RATING_DIST_CACHE.clear()
-    d2 = rt.rating_distribution(pool, "k1")
-    assert d1 == d2 and len(d1) > 0
+    o1 = rt.optimal_budget_team_xp(pool, "k1")
+    rt._OPTIMAL_XP_CACHE.clear()
+    o2 = rt.optimal_budget_team_xp(pool, "k1")
+    assert o1 == o2 and o1 > 0
+    best = rt.rate_team(players=SQUAD_IDS, bank=0.0)
+    weak = rt.rate_team(players=[3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24,
+                                 28, 29, 30], bank=0.0)
+    assert best["rating"]["percentile"] <= 100.0
+    assert weak["rating"]["percentile"] < best["rating"]["percentile"]
+    assert weak["rating"]["gap_to_optimal_xp"] > best["rating"]["gap_to_optimal_xp"]
 
 
 # ---------------------------------------------------------------------------
@@ -243,3 +257,39 @@ def test_endpoint_manual_mode(client):
 def test_endpoint_bad_players_param(client):
     r = client.get("/api/fantasy/rate-team?players=1,2,abc")
     assert r.status_code == 400
+
+
+def test_fetch_fpl_stale_fallback_on_failure(monkeypatch):
+    """#52: FPL failaa (deadline-ruuhka) → serveerataan vanhentunut cache,
+    EI virhettä. Ilman cachea → hallittu 503."""
+    import requests as _rq
+    rt._FPL_CACHE.clear()
+    calls = {"n": 0}
+
+    class _Boom:
+        status_code = 500
+        def json(self):
+            return {}
+
+    def fake_get(url, timeout=None, headers=None):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            class _Ok:
+                status_code = 200
+                def json(self):
+                    return {"ok": True}
+            return _Ok()
+        return _Boom()
+
+    monkeypatch.setattr(rt, "_fetch_fpl", _REAL_FETCH_FPL)
+    monkeypatch.setattr(rt.requests, "get", fake_get)
+    assert rt._fetch_fpl("/stale-test/") == {"ok": True}
+    # Vanhenna cache → seuraava haku failaa 500 → stale-fallback
+    ts, data = rt._FPL_CACHE["/stale-test/"]
+    rt._FPL_CACHE["/stale-test/"] = (ts - rt.CACHE_TTL_SEC - 1, data)
+    assert rt._fetch_fpl("/stale-test/") == {"ok": True}
+    # Ilman cachea → hallittu virhe
+    rt._FPL_CACHE.clear()
+    with pytest.raises(rt.RateTeamError) as e:
+        rt._fetch_fpl("/stale-test/")
+    assert e.value.status_code == 503
