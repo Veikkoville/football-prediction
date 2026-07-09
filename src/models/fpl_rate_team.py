@@ -324,17 +324,78 @@ def _projection_pool(xp_data: dict, price_by_id: dict[int, dict]) -> list[dict]:
         boot = price_by_id.get(p["id"])
         if not boot:
             continue
+        try:
+            owned_pct = float(boot.get("selected_by_percent") or 0.0)
+        except (TypeError, ValueError):
+            owned_pct = 0.0
         pool.append({
             "id": p["id"], "web_name": p["web_name"],
             "team_short": p.get("team_short") or "",
             "element_type": pos_by_name.get(p.get("pos"), boot["element_type"]),
             "club": boot["team"],
             "price": boot["now_cost"],
+            "owned_pct": owned_pct,
             "xp_per_gw": float(p.get("xp_per_gw") or 0.0),
             "xp_horizon_total": float(p.get("xp_horizon_total") or 0.0),
             "gameweeks": p.get("gameweeks") or [],
+            # #35 compare: erittelykentät kulkevat poolin mukana
+            "xmins": p.get("xmins"),
+            "predicted_starts": p.get("predicted_starts"),
+            "minutes_confidence": p.get("minutes_confidence"),
+            "components": p.get("components"),
+            "components_gw": p.get("components_gw"),
         })
     return pool
+
+
+def build_context() -> tuple[dict, dict, list[dict], dict[int, dict]]:
+    """#35: jaettu konteksti rate-teamille + planner-suitelle:
+    (xp_data, bootstrap, pool, pool_by_id). Nostaa 503:n jos projektio puuttuu."""
+    xp_data = load_xp()
+    if not xp_data.get("meta", {}).get("available") or not xp_data.get("players"):
+        raise RateTeamError(503, "xP projections are not available yet.")
+    bootstrap = get_bootstrap()
+    price_by_id = {e["id"]: e for e in bootstrap.get("elements") or []}
+    pool = _projection_pool(xp_data, price_by_id)
+    return xp_data, bootstrap, pool, {p["id"]: p for p in pool}
+
+
+def resolve_squad(bootstrap: dict, entry: int | None, gw: int | None,
+                  players: list[int] | None, captain: int | None,
+                  bank: float | None) -> tuple[list[int], int | None, int, int]:
+    """#35: jaettu joukkueresoluutio → (squad_ids, captain_id, bank_tenths,
+    picks_gw). entry-moodi hakee picksit; manual-moodi validoi 15 ID:tä."""
+    bank_tenths = int(round((bank or 0.0) * 10))
+    if players:
+        if len(players) != 15:
+            raise RateTeamError(400, "players must list exactly 15 FPL element IDs.")
+        if len(set(players)) != 15:
+            raise RateTeamError(400, "players contains duplicate IDs.")
+        return list(players), captain, bank_tenths, _resolve_gw(bootstrap, gw)
+    if entry is None:
+        raise RateTeamError(400, "Provide either entry or players.")
+    picks_gw = _resolve_gw(bootstrap, gw)
+    picks_data = get_entry_picks(entry, picks_gw)
+    picks = picks_data.get("picks") or []
+    if not picks:
+        raise RateTeamError(404, f"Entry {entry} has no picks for GW{picks_gw}.")
+    squad_ids = [pk["element"] for pk in picks]
+    cap = [pk["element"] for pk in picks if pk.get("is_captain")]
+    captain_id = captain or (cap[0] if cap else None)
+    if bank is None:
+        bank_tenths = int((picks_data.get("entry_history") or {}).get("bank") or 0)
+    return squad_ids, captain_id, bank_tenths, picks_gw
+
+
+def clamp_gw_to_projections(target_gw: int, pool: list[dict],
+                            xp_data: dict) -> int:
+    """Esikausiclamppi: jos GW ei ole projektioiden kattama, käytä projektioiden
+    seuraavaa GW:tä (meta.next_gameweek, fallback pienin katettu)."""
+    covered = {g.get("gw") for p in pool for g in (p.get("gameweeks") or [])}
+    if target_gw in covered:
+        return target_gw
+    return (xp_data["meta"].get("next_gameweek")
+            or (min(covered) if covered else target_gw))
 
 
 def rate_team(entry: int | None = None, gw: int | None = None,
@@ -342,50 +403,16 @@ def rate_team(entry: int | None = None, gw: int | None = None,
               bank: float | None = None) -> dict:
     """Arvioi joukkue. entry-moodi (julkinen FPL-ID) TAI manual-moodi
     (players = 15 element-ID:tä, esikausifallback)."""
-    xp_data = load_xp()
-    if not xp_data.get("meta", {}).get("available") or not xp_data.get("players"):
-        raise RateTeamError(503, "xP projections are not available yet.")
-
-    bootstrap = get_bootstrap()
-    price_by_id = {e["id"]: e for e in bootstrap.get("elements") or []}
-    pool = _projection_pool(xp_data, price_by_id)
-    pool_by_id = {p["id"]: p for p in pool}
-
+    xp_data, bootstrap, pool, pool_by_id = build_context()
     mode = "manual" if players else "entry"
-    bank_tenths = int(round((bank or 0.0) * 10))
-    captain_id = captain
     missing: list[int] = []
-
-    if mode == "entry":
-        if entry is None:
-            raise RateTeamError(400, "Provide either entry or players.")
-        target_gw = _resolve_gw(bootstrap, gw)
-        picks_data = get_entry_picks(entry, target_gw)
-        picks = picks_data.get("picks") or []
-        if not picks:
-            raise RateTeamError(404, f"Entry {entry} has no picks for GW{target_gw}.")
-        squad_ids = [pk["element"] for pk in picks]
-        cap = [pk["element"] for pk in picks if pk.get("is_captain")]
-        captain_id = captain_id or (cap[0] if cap else None)
-        if bank is None:
-            bank_tenths = int((picks_data.get("entry_history") or {}).get("bank") or 0)
-    else:
-        if len(players or []) != 15:
-            raise RateTeamError(400, "players must list exactly 15 FPL element IDs.")
-        if len(set(players)) != 15:
-            raise RateTeamError(400, "players contains duplicate IDs.")
-        squad_ids = list(players)
-        # Manual-moodi: GW = seuraava pelattava (tai annettu)
-        target_gw = _resolve_gw(bootstrap, gw)
+    squad_ids, captain_id, bank_tenths, picks_gw = resolve_squad(
+        bootstrap, entry, gw, players, captain, bank)
 
     # Esikausiclamppi: picks voi tulla viime kauden GW:stä (esim. GW38), mutta
     # projektiot kattavat tulevan horisontin (GW1–6) → xP-laskennan GW on aina
     # projektioiden kattama. picks_gw raportoidaan erikseen metassa.
-    picks_gw = target_gw
-    covered = {g.get("gw") for p in pool for g in (p.get("gameweeks") or [])}
-    if target_gw not in covered:
-        target_gw = (xp_data["meta"].get("next_gameweek")
-                     or (min(covered) if covered else target_gw))
+    target_gw = clamp_gw_to_projections(picks_gw, pool, xp_data)
 
     squad: list[dict] = []
     for pid in squad_ids:

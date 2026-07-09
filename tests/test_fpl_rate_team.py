@@ -32,25 +32,28 @@ def _build_pool():
     boot = []
     pid = 1
 
-    def add(pos, club, price, xp):
+    def add(pos, club, price, xp, eo="5.0"):
         nonlocal pid
         players.append(_mk_player(pid, pos, club, price, xp))
         boot.append({"id": pid, "now_cost": price, "team": club,
-                     "element_type": pos, "web_name": f"P{pid}", "status": "a"})
+                     "element_type": pos, "web_name": f"P{pid}", "status": "a",
+                     "selected_by_percent": eo})
         pid += 1
 
+    # EO: per position 2 ensimmäistä (= parhaat) "template"-omistuksella 40 %,
+    # loput 5 % → differential-testit saavat molempia luokkia.
     # GKP ×4 (klubit 1-4)
     for i, xp in enumerate([4.0, 3.5, 3.0, 2.5]):
-        add(1, i + 1, 45, xp)
+        add(1, i + 1, 45, xp, eo="40.0" if i < 2 else "5.0")
     # DEF ×10 (klubit 1-10)
     for i, xp in enumerate([4.5, 4.2, 4.0, 3.8, 3.6, 3.4, 3.2, 3.0, 2.8, 2.6]):
-        add(2, i + 1, 50, xp)
+        add(2, i + 1, 50, xp, eo="40.0" if i < 2 else "5.0")
     # MID ×10 (klubit 1-10)
     for i, xp in enumerate([5.5, 5.2, 5.0, 4.8, 4.6, 4.4, 4.2, 4.0, 3.8, 3.6]):
-        add(3, i + 1, 70, xp)
+        add(3, i + 1, 70, xp, eo="40.0" if i < 2 else "5.0")
     # FWD ×6 (klubit 1-6)
     for i, xp in enumerate([5.8, 5.4, 5.0, 4.6, 4.2, 3.8]):
-        add(4, i + 1, 75, xp)
+        add(4, i + 1, 75, xp, eo="40.0" if i < 2 else "5.0")
     return players, boot
 
 

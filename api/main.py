@@ -2341,6 +2341,90 @@ def fantasy_rate_team(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+def _parse_id_csv(raw: str, label: str) -> list[int]:
+    try:
+        return [int(x) for x in raw.split(",") if x.strip()]
+    except ValueError:
+        raise HTTPException(status_code=400,
+                            detail=f"{label} must be comma-separated integers")
+
+
+@app.get("/api/fantasy/plan")
+def fantasy_plan(
+    response: Response,
+    entry: int | None = Query(default=None),
+    gw: int | None = Query(default=None, ge=1, le=38),
+    players: str | None = Query(default=None),
+    bank: float | None = Query(default=None, ge=0, le=100),
+    horizon: int = Query(default=3, ge=2, le=6),
+    ft: int = Query(default=1, ge=0, le=5),
+):
+    """FPL transfer planner (#35): monen GW:n siirtosuunnitelma olemassa olevan
+    xP-projektion päällä (greedy + jäljellä olevan horisontin arvo, hit -4,
+    FT-carry max 5 — dokumentoitu heuristiikka, ei globaali optimi)."""
+    from src.models.fpl_planner import plan_transfers
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    player_ids = _parse_id_csv(players, "players") if players else None
+    try:
+        return plan_transfers(entry=entry, gw=gw, players=player_ids,
+                              bank=bank, horizon=horizon, ft=ft)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@app.get("/api/fantasy/captain")
+def fantasy_captain(
+    response: Response,
+    entry: int | None = Query(default=None),
+    gw: int | None = Query(default=None, ge=1, le=38),
+    players: str | None = Query(default=None),
+):
+    """FPL captain-picker (#35): XI:n top-3 GW-xP:llä + differential-kapteeni
+    (EO ≤ 10 %)."""
+    from src.models.fpl_planner import captain_picker
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    player_ids = _parse_id_csv(players, "players") if players else None
+    try:
+        return captain_picker(entry=entry, gw=gw, players=player_ids)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@app.get("/api/fantasy/differentials")
+def fantasy_differentials(
+    response: Response,
+    max_ownership: float = Query(default=10.0, gt=0, le=100),
+    pos: str | None = Query(default=None),
+):
+    """FPL differential finder (#35): matala EO × korkea xP (FPL-API ownership
+    + xP-projektio)."""
+    from src.models.fpl_planner import differential_finder
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return differential_finder(max_ownership=max_ownership, pos=pos)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@app.get("/api/fantasy/compare")
+def fantasy_compare(
+    response: Response,
+    players: str = Query(..., description="2-3 FPL element-ID:tä pilkuilla"),
+):
+    """FPL pelaajavertailu (#35): 2-3 pelaajan xP-komponenttierittely +
+    hinta/EO/predicted minutes + suora kanta xP-erolla."""
+    from src.models.fpl_planner import compare_players
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return compare_players(_parse_id_csv(players, "players"))
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/debug/seasons")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """
