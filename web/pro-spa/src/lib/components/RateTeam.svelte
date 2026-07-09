@@ -44,10 +44,7 @@
 
 <h2>Rate my FPL team</h2>
 <p class="muted">
-	Import your squad with your public FPL entry ID, no login or password needed. Find the ID
-	on the FPL website: open your Points page and copy the number from the address bar
-	(fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...). Before the season
-	starts this imports last season's final squad.
+	Import your squad with your public FPL entry ID, no login or password needed.
 </p>
 
 <form class="entry-form" onsubmit={rate}>
@@ -65,15 +62,28 @@
 		{loading ? 'Rating…' : 'Rate my team'}
 	</button>
 </form>
+<p class="muted hint">
+	Find the ID on the FPL website: open your Points page and copy the number from the address
+	bar (fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...). Before the season
+	starts this imports last season's final squad.
+</p>
 
 {#if error}
 	<p class="banner error">{error}</p>
 {:else if data}
+	<!-- #48: hero-kortti: iso persentiililuku + selkeä strongest/weakest -->
 	<div class="rating card">
-		<p class="headline">
-			Your XI projects better than <strong>{Math.round(data.rating.percentile)}%</strong> of
-			legal budget squads.
-		</p>
+		<div class="hero-top">
+			<p class="pct" aria-hidden="true">
+				<span class="pct-num">{Math.round(data.rating.percentile)}</span><span class="pct-unit"
+					>%</span
+				>
+			</p>
+			<p class="headline">
+				Your XI projects better than <strong>{Math.round(data.rating.percentile)}%</strong> of
+				legal budget squads.
+			</p>
+		</div>
 		<div class="facts">
 			<div class="fact">
 				<span class="muted">Team xP, GW{data.meta.gw}</span>
@@ -85,11 +95,11 @@
 			</div>
 			<div class="fact">
 				<span class="muted">Strongest line</span>
-				<span class="val">{data.rating.strongest_line}</span>
+				<span class="val line-strong">{data.rating.strongest_line}</span>
 			</div>
 			<div class="fact">
 				<span class="muted">Weakest line</span>
-				<span class="val">{data.rating.weakest_line}</span>
+				<span class="val line-weak">{data.rating.weakest_line}</span>
 			</div>
 		</div>
 		<p class="captain">
@@ -151,7 +161,8 @@
 		{#if data.transfers.note}
 			<p class="muted">{data.transfers.note}</p>
 		{:else if data.transfers.hold}
-			<p class="muted">Holding your transfer looks like the better play this week.</p>
+			<!-- #48: hold-viesti kulta-aksentilla (näkyvä muttei räikeä) -->
+			<p class="hold-note">Holding your transfer looks like the better play this week.</p>
 		{/if}
 	{:else}
 		<button type="button" class="teaser-row" onclick={unlock}>
@@ -172,13 +183,59 @@
 		align-items: end;
 		margin-bottom: var(--s-4);
 	}
+	.hint {
+		margin: 0 0 var(--s-4);
+		font-size: var(--step--1);
+	}
 	.rating {
-		max-width: 640px;
+		max-width: 680px;
 		margin-bottom: var(--s-4);
+		border-color: rgba(255, 46, 126, 0.35);
+		background:
+			linear-gradient(160deg, rgba(255, 46, 126, 0.09), transparent 55%),
+			var(--surface);
+	}
+	.hero-top {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--s-2) var(--s-4);
+		margin-bottom: var(--s-4);
+	}
+	.pct {
+		margin: 0;
+		line-height: 1;
+		white-space: nowrap;
+		color: var(--giq-magenta);
+		font-weight: 700;
+	}
+	.pct-num {
+		font-size: clamp(2.8rem, 2.2rem + 3vw, 4.2rem);
+		letter-spacing: -2px;
+		font-variant-numeric: tabular-nums;
+	}
+	.pct-unit {
+		font-size: var(--step-2);
 	}
 	.headline {
 		font-size: var(--step-1);
-		margin-bottom: var(--s-4);
+		margin: 0;
+		flex: 1 1 200px;
+	}
+	.line-strong {
+		color: var(--giq-teal);
+	}
+	.line-weak {
+		color: var(--giq-coral);
+	}
+	.hold-note {
+		max-width: 640px;
+		border: 1px solid rgba(255, 201, 60, 0.4);
+		background: rgba(255, 201, 60, 0.08);
+		color: var(--giq-gold);
+		border-radius: var(--radius);
+		padding: var(--s-3) var(--s-4);
+		font-weight: 700;
 	}
 	.facts {
 		display: grid;

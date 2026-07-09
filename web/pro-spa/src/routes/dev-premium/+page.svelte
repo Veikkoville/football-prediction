@@ -3,12 +3,7 @@
 	// VAIN vite dev -moodissa; tuotantobuildissa reitti näyttää ohjeen eikä
 	// dataa (ei paywall-ohitusta, data on silti julkisesta API:sta).
 	import { fetchXp, type XpResponse } from '$lib/api';
-	import CaptainRanker from '$lib/components/CaptainRanker.svelte';
-	import XpTable from '$lib/components/XpTable.svelte';
-	import RateTeam from '$lib/components/RateTeam.svelte';
-	import TransferPlanner from '$lib/components/TransferPlanner.svelte';
-	import Differentials from '$lib/components/Differentials.svelte';
-	import ComparePlayers from '$lib/components/ComparePlayers.svelte';
+	import ProTools from '$lib/components/ProTools.svelte';
 
 	const isDev = import.meta.env.DEV;
 	let xp = $state<XpResponse | null>(null);
@@ -25,14 +20,9 @@
 		<p class="muted">Loading…</p>
 	{:else}
 		<p class="banner success">DEV PREVIEW: premium-näkymät ilman auth-gatea</p>
-		<CaptainRanker data={xp} />
-		<XpTable data={xp} />
-		<!-- #46: premium-FPL-työkalut (RateTeam + TransferPlanner sisältävät
-		     oman entry-ID-syötteen devausta varten) -->
-		<RateTeam premium={true} />
-		<TransferPlanner />
-		<Differentials />
-		<ComparePlayers {xp} />
+		<!-- #46/#48: sama segmenttidashboard kuin ProView'ssa (RateTeam +
+		     TransferPlanner sisältävät oman entry-ID-syötteen devausta varten) -->
+		<ProTools {xp} />
 	{/if}
 </div>
 
