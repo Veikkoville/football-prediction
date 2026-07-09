@@ -79,8 +79,8 @@
 		min-height: 44px;
 	}
 	.tabs button.active {
-		color: var(--giq-magenta);
-		border-bottom-color: var(--giq-magenta);
+		color: var(--giq-magenta-deep);
+		border-bottom-color: var(--giq-magenta-deep);
 	}
 	.tabs button:hover {
 		color: var(--text);

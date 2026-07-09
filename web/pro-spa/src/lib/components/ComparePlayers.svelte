@@ -151,7 +151,7 @@
 	.verdict {
 		font-size: var(--step-1);
 		font-weight: 700;
-		color: var(--giq-teal);
+		color: var(--positive);
 		margin-bottom: var(--s-4);
 	}
 	.cmp-grid {

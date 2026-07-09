@@ -106,13 +106,13 @@
 
 <MethodNote summary="How xP is built">
 	<p>
-		<strong>xP = expected minutes &times; the sum of scoring components</strong> — appearance
+		<strong>xP = expected minutes &times; the sum of scoring components</strong>: appearance
 		points, goals, assists, clean sheets, saves, defensive contribution and bonus, minus
 		cards. The per-GW columns show the same projection fixture by fixture.
 	</p>
 	<p>
 		Team-level inputs (clean sheet probability, expected goals for and against) come from
-		the GoalIQ Dixon-Coles match engine — the same model behind our published, pre-match
+		the GoalIQ Dixon-Coles match engine, the same model behind our published, pre-match
 		logged track record. Player baselines come from each player's per-gameweek history,
 		weighted by expected minutes. Defensive contribution is modelled explicitly, which is
 		where the projections most often disagree with the eye test.
@@ -289,11 +289,12 @@
 		cursor: pointer;
 	}
 	tr.selected td {
+		/* magenta-tintti toimii myös vaalealla (10 % valkoisen päällä) */
 		background: rgba(255, 46, 126, 0.1);
 	}
 	tr.group-row td {
 		background: var(--surface-2);
-		color: var(--giq-teal);
+		color: var(--positive);
 		font-weight: 700;
 		cursor: default;
 	}
@@ -304,7 +305,7 @@
 	.comp-select {
 		margin-bottom: var(--s-3);
 	}
-	/* #33f: confidence-merkki — high=teal, med=neutraali, low=himmennetty */
+	/* #33f: confidence-merkki: high=teal, med=neutraali, low=himmennetty */
 	.conf {
 		font-size: 0.65em;
 		vertical-align: 1px;
@@ -321,7 +322,7 @@
 		opacity: 0.45;
 	}
 	.conf-text.conf-high {
-		color: var(--giq-teal-deep);
+		color: var(--positive);
 	}
 	.minutes-line {
 		margin-top: var(--s-3);

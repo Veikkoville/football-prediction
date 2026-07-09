@@ -115,14 +115,14 @@
 		border: 1px solid transparent;
 	}
 	.badge.up {
-		color: var(--giq-teal);
-		background: rgba(25, 227, 210, 0.1);
-		border-color: rgba(25, 227, 210, 0.35);
+		color: var(--positive);
+		background: rgba(0, 194, 173, 0.12);
+		border-color: rgba(0, 148, 130, 0.4);
 	}
 	.badge.down {
-		color: var(--giq-coral);
-		background: rgba(255, 106, 61, 0.1);
-		border-color: rgba(255, 106, 61, 0.4);
+		color: var(--negative);
+		background: rgba(255, 106, 61, 0.12);
+		border-color: rgba(194, 65, 12, 0.4);
 	}
 	/* confidence-merkki: sama väriasteikko kuin XpTable #33f */
 	.conf {

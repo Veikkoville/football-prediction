@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { fetchFantasy, fetchAccuracy, type FantasyResponse, type AccuracyResponse } from '$lib/api';
+	import { fetchFantasy, type FantasyResponse } from '$lib/api';
 	import MethodNote from './MethodNote.svelte';
+	import Provenance from './Provenance.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import PriceWatch from './PriceWatch.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
@@ -20,7 +21,6 @@
 	let segment = $state('cleansheets');
 
 	let data = $state<FantasyResponse | null>(null);
-	let acc = $state<AccuracyResponse | null>(null);
 	let error = $state<string | null>(null);
 
 	$effect(() => {
@@ -28,7 +28,6 @@
 			(d) => (data = d),
 			(e) => (error = String(e))
 		);
-		fetchAccuracy().then((a) => (acc = a));
 	});
 
 	const fdrVar = (fdr: number) => `var(--fdr-${Math.min(Math.max(fdr, 1), 5)})`;
@@ -36,16 +35,14 @@
 	let gwCols = $derived(
 		data?.teams?.[0]?.fixtures?.map((f) => f.gw) ?? []
 	);
-	let trackRecord = $derived.by(() => {
-		const at = acc?.all_time;
-		if (at?.n && at?.pct_1x2) return { n: at.n, pct: at.pct_1x2 * 100 };
-		return null;
-	});
 </script>
 
 <!-- min-height varaa taulukkoalueen tilan ennen API-vastausta → sisältö ei
      hyppää (Lighthouse CLS -fix, QUEUE #15: 0.136-0.784 → tavoite <0.1) -->
 <div class="free-view">
+<!-- #50: mallin alkuperä-rivi työkalualueen yläreunassa (kiila: sama malli
+     kuin julkaistun, pre-match-logatun track recordin takana) -->
+<Provenance />
 <SegmentNav segments={SEGMENTS} bind:active={segment} label="Free FPL tools" />
 
 {#if segment === 'cleansheets'}
@@ -62,21 +59,14 @@
 		{:else if !data.meta?.available}
 			<p class="banner success">Projections go live before Gameweek 1. Check back soon.</p>
 		{:else}
-			{#if trackRecord}
-				<p class="banner success track-banner">
-					Track record: {trackRecord.pct.toFixed(1)} % correct 1X2 across {trackRecord.n}
-					pre-match-logged predictions ·
-					<a href="https://goaliq.app/fpl.html#track-record">methodology</a>
-				</p>
-			{/if}
-
 			<section class="tool-card">
 				<h2>Clean sheet outlook, next {data.meta.horizon_gw ?? 6} gameweeks</h2>
 				<p class="muted">
-					Free · <strong>Avg CS%</strong> = the team's average clean sheet probability over the
-					next {data.meta.horizon_gw ?? 6} gameweeks. <strong>Avg FDR</strong> = average fixture
-					difficulty, 1 = easiest, 5 = hardest. Each GW cell shows opponent, venue and that
-					fixture's FDR.
+					Free · <strong>Avg CS%</strong> = the team's average chance of a clean sheet from the
+					match model over the next {data.meta.horizon_gw ?? 6} gameweeks.
+					<strong>Avg FDR</strong> = average fixture difficulty from the GoalIQ model (win% +
+					xG), not FPL's official FDR; 1 = easiest, 5 = hardest. Each GW cell shows opponent,
+					venue and that fixture's FDR.
 				</p>
 
 				<MethodNote summary="How these numbers are calculated">
@@ -102,8 +92,8 @@
 						<thead>
 							<tr>
 								<th>Team</th>
-								<th class="num"><abbr title="Average clean sheet probability, next gameweeks">Avg CS%</abbr></th>
-								<th class="num"><abbr title="Average model-based fixture difficulty, 1 easiest to 5 hardest">Avg FDR</abbr></th>
+								<th class="num"><abbr title="Chance of a clean sheet from the match model, averaged over the next gameweeks">Avg CS%</abbr></th>
+								<th class="num"><abbr title="Fixture difficulty from the GoalIQ model (win% + xG), not FPL's official FDR; 1 easiest to 5 hardest">Avg FDR</abbr></th>
 								{#each gwCols as gw (gw)}
 									<th>GW{gw}</th>
 								{/each}
@@ -149,9 +139,6 @@
 <style>
 	.free-view {
 		min-height: 82vh;
-	}
-	.track-banner {
-		margin-bottom: var(--s-4);
 	}
 	.skel-row {
 		height: 34px;

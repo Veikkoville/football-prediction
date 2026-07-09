@@ -74,7 +74,7 @@
 	}
 	.bar {
 		flex: 1;
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(10, 8, 32, 0.08);
 		border-radius: 4px;
 		height: 10px;
 	}

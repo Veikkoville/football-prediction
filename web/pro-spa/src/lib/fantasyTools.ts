@@ -64,6 +64,8 @@ export interface RateTeamResponse {
 		picks_gw?: number | null;
 		horizon_gw?: number;
 		note?: string;
+		/** #50: backendin uusi semantiikka ('optimal_team'), defensiivinen */
+		rating_method?: string;
 		[key: string]: unknown;
 	};
 	team: {
@@ -75,9 +77,14 @@ export interface RateTeamResponse {
 		team_xp_gw: number;
 		team_xp_horizon: number;
 		team_xp_horizon_no_captain: number;
+		/** #50: uusi semantiikka = % parhaasta mahdollisesta budjettitiimistä
+		 * (backend clampaa <=100; UI clampaa silti defensiivisesti) */
 		percentile: number;
 		strongest_line: string;
 		weakest_line: string;
+		/** #50: uudet additiiviset kentät, voivat puuttua vanhasta API:sta */
+		optimal_team_xp?: number;
+		gap_to_optimal_xp?: number;
 	};
 	captain: {
 		pick: CaptainPick;

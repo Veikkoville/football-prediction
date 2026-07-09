@@ -71,27 +71,39 @@
 {#if error}
 	<p class="banner error">{error}</p>
 {:else if data}
-	<!-- #48: hero-kortti: iso persentiililuku + selkeä strongest/weakest -->
+	<!-- #50: hero-luku = Team xP horisontilla (FPL-natiivi mittari); rating
+	     sen alla = "% of the best possible budget team" (uusi semantiikka,
+	     gap_to_optimal_xp defensiivisesti jos backend jo tarjoaa sen) -->
 	<div class="rating card">
 		<div class="hero-top">
-			<p class="pct" aria-hidden="true">
-				<span class="pct-num">{Math.round(data.rating.percentile)}</span><span class="pct-unit"
-					>%</span
+			<p class="hero-xp" aria-hidden="true">
+				<span class="hero-num">{Math.round(data.rating.team_xp_horizon)}</span><span
+					class="hero-unit">xP</span
 				>
 			</p>
-			<p class="headline">
-				Your XI projects better than <strong>{Math.round(data.rating.percentile)}%</strong> of
-				legal budget squads.
-			</p>
+			<div class="hero-copy">
+				<p class="headline">
+					<abbr
+						title="Expected points: our match model's projection per player per gameweek, summed over your squad"
+						>Team xP</abbr
+					>,
+					<abbr title="The horizon: how many upcoming gameweeks the projection covers"
+						>next {data.meta.horizon_gw ?? 6} GWs</abbr
+					>: <strong>{data.rating.team_xp_horizon.toFixed(1)}</strong>
+				</p>
+				<p class="subline">
+					That is <strong>{Math.min(100, Math.round(data.rating.percentile))}%</strong> of the
+					best possible budget team{#if typeof data.rating.gap_to_optimal_xp === 'number'}
+						({data.rating.gap_to_optimal_xp > 0.05
+							? `-${data.rating.gap_to_optimal_xp.toFixed(1)} xP vs the best possible team`
+							: 'level with the best possible team'}){/if}.
+				</p>
+			</div>
 		</div>
 		<div class="facts">
 			<div class="fact">
 				<span class="muted">Team xP, GW{data.meta.gw}</span>
 				<span class="val">{data.rating.team_xp_gw.toFixed(1)}</span>
-			</div>
-			<div class="fact">
-				<span class="muted">Team xP, next {data.meta.horizon_gw ?? 6} GWs</span>
-				<span class="val">{data.rating.team_xp_horizon.toFixed(1)}</span>
 			</div>
 			<div class="fact">
 				<span class="muted">Strongest line</span>
@@ -123,6 +135,22 @@
 	</div>
 
 	{#if premium}
+		<!-- #50: VERDICT + ACTION ensin, taulukko vasta sen jälkeen -->
+		{#if data.transfers.hold}
+			<p class="verdict-line hold">
+				Verdict: <abbr
+					title="Keeping (rolling) your free transfer this week instead of spending it"
+					>hold</abbr
+				> your transfer, rolling it looks like the better play this week.
+			</p>
+		{:else if data.transfers.suggestions.length > 0}
+			{@const top = data.transfers.suggestions[0]}
+			<p class="verdict-line">
+				Weak spot: <strong>{data.rating.weakest_line}</strong>. Top upgrade:
+				<strong>{top.out.web_name}</strong> to <strong>{top.in.web_name}</strong>,
+				<span class="gain-text">+{top.delta_xp_horizon.toFixed(1)} xP</span>.
+			</p>
+		{/if}
 		<h3>Transfer suggestions</h3>
 		{#if data.transfers.suggestions.length > 0}
 			<div class="table-wrap">
@@ -160,9 +188,6 @@
 		{/if}
 		{#if data.transfers.note}
 			<p class="muted">{data.transfers.note}</p>
-		{:else if data.transfers.hold}
-			<!-- #48: hold-viesti kulta-aksentilla (näkyvä muttei räikeä) -->
-			<p class="hold-note">Holding your transfer looks like the better play this week.</p>
 		{/if}
 	{:else}
 		<button type="button" class="teaser-row" onclick={unlock}>
@@ -202,39 +227,57 @@
 		gap: var(--s-2) var(--s-4);
 		margin-bottom: var(--s-4);
 	}
-	.pct {
+	.hero-xp {
 		margin: 0;
 		line-height: 1;
 		white-space: nowrap;
-		color: var(--giq-magenta);
+		color: var(--giq-magenta-deep);
 		font-weight: 700;
 	}
-	.pct-num {
+	.hero-num {
 		font-size: clamp(2.8rem, 2.2rem + 3vw, 4.2rem);
 		letter-spacing: -2px;
 		font-variant-numeric: tabular-nums;
 	}
-	.pct-unit {
+	.hero-unit {
 		font-size: var(--step-2);
+		margin-left: 2px;
+	}
+	.hero-copy {
+		flex: 1 1 220px;
 	}
 	.headline {
 		font-size: var(--step-1);
+		margin: 0 0 var(--s-1);
+	}
+	.subline {
 		margin: 0;
-		flex: 1 1 200px;
+		color: var(--text-muted);
+		font-size: var(--step--1);
 	}
 	.line-strong {
-		color: var(--giq-teal);
+		color: var(--positive);
 	}
 	.line-weak {
-		color: var(--giq-coral);
+		color: var(--negative);
 	}
-	.hold-note {
+	/* #50: verdict + action -rivi taulukon yllä; hold-variantti kulta-aksentilla */
+	.verdict-line {
 		max-width: 640px;
-		border: 1px solid rgba(255, 201, 60, 0.4);
-		background: rgba(255, 201, 60, 0.08);
-		color: var(--giq-gold);
+		border: 1px solid var(--border);
+		border-left: 4px solid var(--giq-magenta-deep);
+		background: var(--surface);
 		border-radius: var(--radius);
 		padding: var(--s-3) var(--s-4);
+		margin: var(--s-4) 0 0;
+	}
+	.verdict-line.hold {
+		border-left-color: var(--giq-gold-deep);
+		color: var(--warn-text);
+		font-weight: 700;
+	}
+	.gain-text {
+		color: var(--positive);
 		font-weight: 700;
 	}
 	.facts {
@@ -279,13 +322,13 @@
 		border-color: var(--giq-magenta);
 	}
 	.locked {
-		color: var(--giq-magenta);
+		color: var(--giq-magenta-deep);
 		font-weight: 700;
 		letter-spacing: 2px;
 		margin-left: auto;
 	}
 	.cta {
-		color: var(--giq-teal);
+		color: var(--positive);
 		font-weight: 700;
 	}
 </style>
