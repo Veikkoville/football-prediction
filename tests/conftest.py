@@ -14,3 +14,13 @@ from fastapi.testclient import TestClient
 def client() -> TestClient:
     from api.main import app
     return TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def _clear_fd_http_cache():
+    """#49: FD-TTL-cache on prosessitason tila — nollataan joka testissä ettei
+    cache vuoda testien välillä (mock-vastaus vs cachetettu edellinen)."""
+    import api.main as m
+    m._FD_HTTP_CACHE.clear()
+    yield
+    m._FD_HTTP_CACHE.clear()

@@ -861,6 +861,66 @@ def _fd_standings_row(row: dict) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# #49: /api/standings + /api/fixtures FD-kutsujen jaettu TTL-cache + 429-kovennus.
+# Juurisyy: endpointit olivat cachettomia + ilman backoffia → liigatabien nopea
+# selaus (12 + #25b:n 4 uutta liigaa) ylitti FD:n rate-limitin → käyttäjälle
+# "Too many requests" (#32-auditin ennustama riski). Cache absorboi selauksen
+# (koko käyttäjäkanta = max ~1 FD-kutsu / liiga / TTL-ikkuna), backoff
+# self-healaa yksittäisen 429:n ja stale-fallback serveeraa viimeisimmän
+# onnistuneen vastauksen mieluummin kuin virheen. Vastauksen MUOTO ei muutu
+# (vain additiivinen "stale": true virhetilassa).
+# ---------------------------------------------------------------------------
+_FD_HTTP_CACHE: dict[str, tuple[float, dict]] = {}
+_FD_HTTP_LOCKS: dict[str, threading.Lock] = {}
+_FD_HTTP_LOCKS_GUARD = threading.Lock()
+FD_HTTP_TTL_SEC = 600           # 10 min — standings/fixtures muuttuvat harvoin
+FD_HTTP_429_BACKOFF_SEC = 2.0   # lyhyt backoff + 1 uusinta
+
+
+def _fd_get_cached(url: str, api_key: str,
+                   ttl_sec: int = FD_HTTP_TTL_SEC) -> tuple[dict, bool]:
+    """Palauttaa (data, stale). TTL-cache + single-flight (lukko per URL, ettei
+    rinnakkaiskutsut laukaise montaa FD-hakua) + 429-backoff + stale-fallback.
+    Ilman cachea virhetilassa → HTTPException (hallittu virhe kuten ennen)."""
+    hit = _FD_HTTP_CACHE.get(url)
+    if hit and time.time() - hit[0] < ttl_sec:
+        return hit[1], False
+    with _FD_HTTP_LOCKS_GUARD:
+        lock = _FD_HTTP_LOCKS.setdefault(url, threading.Lock())
+    with lock:
+        # Double-check lukon alta: toinen säie ehti jo hakea tuoreen.
+        hit = _FD_HTTP_CACHE.get(url)
+        if hit and time.time() - hit[0] < ttl_sec:
+            return hit[1], False
+        last_error: HTTPException | None = None
+        for attempt in range(2):
+            try:
+                r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
+            except Exception as e:
+                last_error = HTTPException(
+                    status_code=502,
+                    detail=f"Upstream error contacting football-data.org: "
+                           f"{type(e).__name__}: {e}")
+                break
+            if r.status_code == 200:
+                data = r.json()
+                _FD_HTTP_CACHE[url] = (time.time(), data)
+                return data, False
+            if r.status_code == 429 and attempt == 0:
+                time.sleep(FD_HTTP_429_BACKOFF_SEC)
+                continue
+            last_error = HTTPException(
+                status_code=r.status_code,
+                detail=f"football-data.org returned {r.status_code}: {r.text[:200]}")
+            break
+        if hit:
+            # TTL vanhentunut mutta data olemassa → parempi stale kuin virhe.
+            return hit[1], True
+        raise last_error or HTTPException(status_code=502,
+                                          detail="football-data.org unavailable")
+
+
 @app.get("/api/standings")
 def league_standings(
     league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
@@ -912,20 +972,8 @@ def league_standings(
     else:
         year = _kausi_to_year(season)
         url = f"https://api.football-data.org/v4/competitions/{code}/standings?season={year}"
-    try:
-        r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
-    except Exception as e:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Upstream error contacting football-data.org: {type(e).__name__}: {e}",
-        )
-    if r.status_code != 200:
-        raise HTTPException(
-            status_code=r.status_code,
-            detail=f"football-data.org returned {r.status_code}: {r.text[:200]}",
-        )
-
-    data = r.json()
+    # #49: TTL-cache + 429-backoff + stale-fallback (ei suoraa FD-kutsua)
+    data, fd_stale = _fd_get_cached(url, api_key)
 
     if is_tournament:
         # Kaikki TOTAL-elementit = lohkot (group: "Group A"… kun FD on
@@ -942,19 +990,22 @@ def league_standings(
             for s in data.get("standings", [])
             if s.get("type") == "TOTAL" and s.get("group")
         ]
-        return {"league": league, "season": None, "groups": groups}
+        return {"league": league, "season": None, "groups": groups,
+                **({"stale": True} if fd_stale else {})}
 
     total = next(
         (s for s in data.get("standings", []) if s.get("type") == "TOTAL"),
         None,
     )
     if not total:
-        return {"league": league, "season": season, "rows": []}
+        return {"league": league, "season": season, "rows": [],
+                **({"stale": True} if fd_stale else {})}
 
     return {
         "league": league,
         "season": season,
         "rows": [_fd_standings_row(row) for row in total["table"]],
+        **({"stale": True} if fd_stale else {}),
     }
 
 
@@ -1096,20 +1147,8 @@ def upcoming_fixtures(
         f"?status=SCHEDULED,TIMED"
         f"&dateFrom={today.isoformat()}&dateTo={date_to.isoformat()}"
     )
-    try:
-        r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
-    except Exception as e:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Upstream error contacting football-data.org: {type(e).__name__}: {e}",
-        )
-    if r.status_code != 200:
-        raise HTTPException(
-            status_code=r.status_code,
-            detail=f"football-data.org returned {r.status_code}: {r.text[:200]}",
-        )
-
-    data = r.json()
+    # #49: TTL-cache + 429-backoff + stale-fallback (ei suoraa FD-kutsua)
+    data, fd_stale = _fd_get_cached(url, api_key)
     fixtures = []
     for m in data.get("matches", []):
         home = m.get("homeTeam") or {}
@@ -1129,7 +1168,8 @@ def upcoming_fixtures(
         })
 
     fixtures.sort(key=lambda f: f["datetime"] or "")
-    return {"league": league, "days": days, "fixtures": fixtures}
+    return {"league": league, "days": days, "fixtures": fixtures,
+            **({"stale": True} if fd_stale else {})}
 
 
 # ---------------------------------------------------------------------------
