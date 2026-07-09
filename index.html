@@ -81,16 +81,21 @@
 </script>
 
 <style>
+  /* #54 OSA B: vaalea branditeema (Ink -> Cream token-flip, brand-tokens.md).
+     --green oli harhaanjohtava nimi (arvo oli jo magenta) -> nimetty
+     --magenta/--magenta-deep. Teal TEKSTINÄ syvennettynä (--teal-ink #007A6C,
+     4.9:1 kermalla); puhdas teal vain koristemerkeissä (prob-bar). */
   :root {
-    --bg: #0A0820;
-    --bg-alt: #140F1E;
-    --card: rgba(255,255,255,0.05);
-    --line: rgba(255,255,255,0.10);
-    --text: #FFF6EC;
-    --muted: #C9C3DA;
-    --green: #FF2E7E;
-    --green-dim: #D6006E;
-    --violet: #19E3D2;
+    --bg: #FFF6EC;
+    --bg-alt: #F6F4FF;
+    --card: #FFFFFF;
+    --line: rgba(10,8,32,0.12);
+    --text: #0A0820;
+    --muted: #575170;
+    --magenta: #FF2E7E;
+    --magenta-deep: #D6006E;
+    --teal: #19E3D2;
+    --teal-ink: #007A6C;
     --radius: 16px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -110,7 +115,7 @@
   h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
   a { color: inherit; }
 
-  .bar { height: 6px; background: var(--green); }
+  .bar { height: 6px; background: var(--magenta); }
 
   /* Nav */
   nav {
@@ -120,7 +125,7 @@
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; }
   .logo-mark-img { width: 32px; height: 32px; border-radius: 9px; display: block; }
   .nav-cta {
-    background: var(--green); color: #ffffff; font-weight: 700;
+    background: var(--magenta); color: #ffffff; font-weight: 700;
     padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px;
   }
 
@@ -130,20 +135,20 @@
   .cta-note { color: var(--muted); font-size: 14px; margin-top: 14px; }
   .badge {
     display: inline-block; background: rgba(25,227,210,0.12);
-    color: var(--violet); border: 1px solid rgba(25,227,210,0.35);
+    color: var(--teal-ink); border: 1px solid rgba(25,227,210,0.35);
     padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
     margin-bottom: 24px;
   }
   .hero h1 { font-size: 52px; font-weight: 800; max-width: 760px; margin: 0 auto 20px; }
-  .hero h1 .accent { color: var(--green); }
+  .hero h1 .accent { color: var(--magenta); }
   .hero p.sub { font-size: 19px; color: var(--muted); max-width: 600px; margin: 0 auto 36px; }
   .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
   .btn-primary {
-    background: var(--green); color: #ffffff; font-weight: 800; font-size: 16px;
+    background: var(--magenta); color: #ffffff; font-weight: 800; font-size: 16px;
     padding: 16px 30px; border-radius: 999px; text-decoration: none;
     display: inline-flex; align-items: center; gap: 10px;
   }
-  .btn-primary:hover { background: #FF4D90; }
+  .btn-primary:hover { background: var(--magenta-deep); }
   .btn-ghost {
     color: var(--text); font-weight: 600; font-size: 15px;
     padding: 16px 22px; border-radius: 999px; text-decoration: none;
@@ -152,7 +157,7 @@
        laitelöydös 6.7: inline-ankkuri hajosi kahdelle riville) */
     display: inline-flex; align-items: center; justify-content: center;
   }
-  .btn-ghost:hover { border-color: var(--green); }
+  .btn-ghost:hover { border-color: var(--magenta); }
 
   /* Phone mock strip */
   .stat-strip {
@@ -163,22 +168,22 @@
     background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
     padding: 18px 26px; min-width: 150px;
   }
-  .stat .num { font-size: 26px; font-weight: 800; color: var(--green); }
+  .stat .num { font-size: 26px; font-weight: 800; color: var(--magenta-deep); }
   .stat .lbl { font-size: 13px; color: var(--muted); }
 
   /* World Cup band */
   .wc {
-    background: linear-gradient(135deg, #140F1E, #0A0820);
+    background: var(--bg-alt);
     border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
   }
   .wc .wc-inner { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
   .wc h2 { font-size: 34px; margin-bottom: 16px; }
-  .wc h2 .accent { color: var(--violet); }
+  .wc h2 .accent { color: var(--teal-ink); }
   .wc p { color: var(--muted); font-size: 16px; margin-bottom: 10px; }
   .wc .kickoff {
     margin-top: 22px; display: inline-flex; align-items: center; gap: 10px;
-    background: rgba(25,227,210,0.12); border: 1px solid rgba(25,227,210,0.3);
-    padding: 12px 18px; border-radius: 12px; font-weight: 600; color: var(--violet);
+    background: rgba(25,227,210,0.12); border: 1px solid rgba(0,148,130,0.4);
+    padding: 12px 18px; border-radius: 12px; font-weight: 600; color: var(--teal-ink);
   }
   .wc-visual {
     background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
@@ -187,9 +192,9 @@
   .matchrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .matchrow .team { font-weight: 700; font-size: 15px; }
   .prob-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 16px 0 8px; }
-  .prob-bar .home { background: var(--green); }
-  .prob-bar .draw { background: #3A3550; }
-  .prob-bar .away { background: var(--violet); }
+  .prob-bar .home { background: var(--magenta); }
+  .prob-bar .draw { background: rgba(10,8,32,0.18); }
+  .prob-bar .away { background: var(--teal); }
   .prob-legend { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 
   /* How it works */
@@ -203,7 +208,7 @@
   }
   .step .n {
     width: 38px; height: 38px; border-radius: 10px; background: rgba(255,46,126,0.14);
-    color: var(--green); font-weight: 800; display: flex; align-items: center;
+    color: var(--magenta-deep); font-weight: 800; display: flex; align-items: center;
     justify-content: center; margin-bottom: 16px; font-size: 17px;
   }
   .step h3 { font-size: 19px; margin-bottom: 8px; }
@@ -219,7 +224,7 @@
     background: var(--card); border: 1px solid var(--line); border-radius: 999px;
     padding: 12px 22px; font-weight: 600; font-size: 15px;
   }
-  .league-chip.wc-chip { border-color: rgba(25,227,210,0.5); color: var(--violet); }
+  .league-chip.wc-chip { border-color: rgba(25,227,210,0.5); color: var(--teal-ink); }
 
   /* Features */
   .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -227,15 +232,15 @@
     background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
     padding: 24px;
   }
-  .feat .ico { color: var(--green); margin-bottom: 12px; display: flex; }
+  .feat .ico { color: var(--magenta); margin-bottom: 12px; display: flex; }
   .feat h3 { font-size: 17px; margin-bottom: 6px; }
   .feat p { color: var(--muted); font-size: 14px; }
 
   /* Premium */
   .premium { background: var(--bg-alt); }
   .premium-card {
-    background: linear-gradient(135deg, #140F1E, #0A0820);
-    border: 1px solid rgba(25,227,210,0.35); border-radius: 22px;
+    background: var(--card);
+    border: 1px solid rgba(0,148,130,0.4); border-radius: 22px;
     padding: 44px; max-width: 640px; margin: 0 auto; text-align: center;
   }
   .premium-card .price { font-size: 44px; font-weight: 800; margin: 8px 0; }
@@ -243,7 +248,7 @@
   .premium-list { list-style: none; text-align: left; max-width: 380px; margin: 24px auto; }
   .premium-list li { padding: 8px 0 8px 30px; position: relative; color: var(--text); }
   .premium-list li::before {
-    content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 800;
+    content: "✓"; position: absolute; left: 0; color: var(--magenta); font-weight: 800;
   }
   .premium-card small { color: var(--muted); font-size: 13px; }
 
@@ -251,7 +256,7 @@
   footer { border-top: 1px solid var(--line); padding: 40px 0; }
   .foot-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
   footer, footer a { color: var(--muted); font-size: 14px; text-decoration: none; }
-  footer a:hover { color: var(--green); }
+  footer a:hover { color: var(--magenta-deep); }
 
   @media (max-width: 760px) {
     section { padding: 56px 0; }
@@ -313,7 +318,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div>
       <h2>Free <span class="accent">FPL tools</span> on the web</h2>
       <p>GoalIQ's model gives clean sheet probability and fixture difficulty for every Premier League team, updated every gameweek.</p>
-      <p>Free on the web, no sign-in. Want player expected points (xP) and a captain ranker on top? That is <a href="https://pro.goaliq.app" style="color:var(--violet);font-weight:700;">GoalIQ Pro on the web</a>.</p>
+      <p>Free on the web, no sign-in. Want player expected points (xP) and a captain ranker on top? That is <a href="https://pro.goaliq.app" style="color:var(--teal-ink);font-weight:700;">GoalIQ Pro on the web</a>.</p>
       <div class="cta-row" style="margin-top:22px; justify-content:flex-start;">
         <a class="btn-primary" href="fpl.html">See the FPL clean sheet odds</a>
         <a class="btn-ghost" href="https://pro.goaliq.app">Open GoalIQ Pro</a>
@@ -325,7 +330,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <span style="color:var(--muted);font-size:13px;">hits and misses</span>
       </div>
       <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 61.5% correct results across 96 matches played.<!-- GEN:ACC-PROOF-END --></p>
-      <p style="margin-top:12px;"><a href="fpl.html#track-record" style="color:var(--violet);font-weight:700;">See the full record →</a></p>
+      <p style="margin-top:12px;"><a href="fpl.html#track-record" style="color:var(--teal-ink);font-weight:700;">See the full record →</a></p>
     </div>
   </div>
 </section>
