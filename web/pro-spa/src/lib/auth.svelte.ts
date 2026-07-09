@@ -94,7 +94,9 @@ export async function refreshSubscription(): Promise<void> {
 				? { status: 'active', plan: 'app', current_period_end: null }
 				: null;
 	} catch {
-		auth.sub = null;
+		// #51-F2: transientti verkko/Supabase-virhe EI saa nollata premium-tilaa
+		// (maksaja näkisi hetkellisen väärän paywallin, Hub 2,0 -tähden
+		// #1-valitus). Pidetään edellinen tunnettu tila virheen yli.
 	} finally {
 		auth.subLoading = false;
 	}
