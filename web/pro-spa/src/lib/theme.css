@@ -1,4 +1,4 @@
-/* GoalIQ Pro — brändi-tokenit (goaliq-app/assets/brand/brand-tokens.md,
+/* GoalIQ Pro: brändi-tokenit (goaliq-app/assets/brand/brand-tokens.md,
    TÄSMÄHEXIT) + mittakaavat. Tumma Ink-teema = tuotteen oletusilme
    (pariteetti Streamlit-pron + mobiilin kanssa). */
 :root {
@@ -268,4 +268,23 @@ tbody tr:hover td {
 	background: rgba(255, 106, 61, 0.1);
 	border: 1px solid rgba(255, 106, 61, 0.4);
 	color: var(--giq-coral);
+}
+
+/* #48: FPL-työkalupaneeli (dashboard-kortti segmenttinavin alla).
+   Sama radius/border-kieli kuin .table-wrap/.card; hieman bg:tä vaaleampi
+   pohja jolloin sisällä olevat surface-kortit ja taulukot erottuvat. */
+.tool-card {
+	background: var(--giq-ink-2);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: var(--s-6);
+	margin-bottom: var(--s-6);
+}
+.tool-card > h2 {
+	margin-top: 0;
+}
+@media (max-width: 480px) {
+	.tool-card {
+		padding: var(--s-4);
+	}
 }

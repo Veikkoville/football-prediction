@@ -5,12 +5,7 @@
 	import { capture } from '$lib/analytics';
 	import LoginBox from './LoginBox.svelte';
 	import Paywall from './Paywall.svelte';
-	import CaptainRanker from './CaptainRanker.svelte';
-	import XpTable from './XpTable.svelte';
-	import RateTeam from './RateTeam.svelte';
-	import TransferPlanner from './TransferPlanner.svelte';
-	import Differentials from './Differentials.svelte';
-	import ComparePlayers from './ComparePlayers.svelte';
+	import ProTools from './ProTools.svelte';
 
 	let xp = $state<XpResponse | null>(null);
 	let xpError = $state<string | null>(null);
@@ -72,14 +67,10 @@
 	{:else if !xp.meta?.available}
 		<p class="banner success">xP projections go live before Gameweek 1.</p>
 	{:else}
-		<CaptainRanker data={xp} />
-		<XpTable data={xp} />
-		<!-- #46: premium-FPL-työkalut. Renderöityvät VAIN tässä haarassa
-		     (auth.user + auth.sub + xp saatavilla) → ei premium-vuotoa. -->
-		<RateTeam premium={true} />
-		<TransferPlanner />
-		<Differentials />
-		<ComparePlayers {xp} />
+		<!-- #46/#48: premium-FPL-työkalut segmenttidashboardina (ProTools).
+		     Renderöityvät VAIN tässä haarassa (auth.user + auth.sub + xp
+		     saatavilla) → ei premium-vuotoa. -->
+		<ProTools {xp} />
 	{/if}
 {:else}
 	<Paywall />
