@@ -3,39 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoalIQ — Delete Your Account</title>
+  <title>GoalIQ – Delete Your Account</title>
   <style>
     :root {
-      --bg: #0a0e1a;
-      --card: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.08);
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #8b5cf6;
-      --accent2: #a78bfa;
+      --magenta: #FF2E7E;
+      --magenta-deep: #D6006E;
+      --ink: #0A0820;
+      --ink2: #140F1E;
+      --cream: #FFF6EC;
+      --card: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.10);
+      --line: rgba(255,255,255,0.10);
+      --text: #FFF6EC;
+      --muted: #C9C3DA;
+      --accent: #FF2E7E;
+      --accent2: #19E3D2;
       --warn: #fca5a5;
+      --radius: 16px;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--bg);
+      background: var(--ink);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
+    .site-header { border-bottom: 1px solid var(--line); }
+    .bar { height: 6px; background: var(--magenta); }
+    .nav {
+      max-width: 960px; margin: 0 auto; padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
+    .brand a { color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
+    .brand span { color: var(--magenta); }
+    .nav-cta {
+      display: inline-block; background: var(--magenta); color: #fff;
+      text-decoration: none; padding: 11px 20px; border-radius: 999px; font-weight: 800; font-size: 14px;
+    }
+    .nav-cta:hover { background: #FF4D90; }
+    .site-footer { border-top: 1px solid var(--line); padding: 30px 0 40px; font-size: 14px; }
+    .site-footer .foot { max-width: 960px; margin: 0 auto; padding: 0 20px; color: var(--muted); }
+    .site-footer a { color: var(--muted); }
+    .site-footer a:hover { color: var(--magenta); }
     .wrap {
       max-width: 720px;
       margin: 0 auto;
       padding: 40px 24px 80px;
     }
     h1 {
-      color: var(--accent);
+      color: var(--cream);
       font-size: 32px;
-      letter-spacing: -0.6px;
+      letter-spacing: -0.02em;
       margin-bottom: 4px;
     }
     h2 {
-      color: var(--accent2);
+      color: var(--magenta);
       font-size: 20px;
       margin-top: 36px;
       margin-bottom: 10px;
@@ -45,12 +71,12 @@
     p, li { color: var(--text); font-size: 15px; }
     ul { padding-left: 20px; }
     li { margin-bottom: 6px; }
-    a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+    a { color: var(--magenta); text-decoration: none; font-weight: 600; }
     a:hover { text-decoration: underline; }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--radius);
       padding: 18px 22px;
       margin: 22px 0;
     }
@@ -64,8 +90,8 @@
       width: 28px;
       height: 28px;
       border-radius: 14px;
-      background: var(--accent);
-      color: white;
+      background: var(--magenta);
+      color: #fff;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -76,18 +102,26 @@
       display: inline-block;
       margin-top: 8px;
       padding: 12px 22px;
-      background: var(--accent);
-      color: white;
-      border-radius: 10px;
+      background: var(--magenta);
+      color: #fff;
+      border-radius: 999px;
       font-weight: 700;
     }
     .email-btn:hover {
-      background: var(--accent2);
+      background: #FF4D90;
       text-decoration: none;
     }
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <div class="bar"></div>
+    <div class="nav">
+      <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt="">Goal<span>IQ</span></a></div>
+      <a class="nav-cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Get the free app</a>
+    </div>
+  </header>
+
   <div class="wrap">
     <h1>Delete Your GoalIQ Account</h1>
     <p class="updated">Last updated: 8 May 2026</p>
@@ -143,7 +177,7 @@
         <strong>Billing records:</strong> If you ever made a Premium payment,
         invoice records are retained by Stripe for 6 years (Finnish accounting
         law requirement). These contain only the transaction amount, date, and
-        a Stripe-internal customer ID — they do not include your account
+        a Stripe-internal customer ID. They do not include your account
         password or other personal data.
       </li>
       <li>
@@ -194,5 +228,12 @@
       © 2026 Veikkoville · GoalIQ
     </p>
   </div>
+  <footer class="site-footer">
+    <div class="foot">
+      <p><a href="./">GoalIQ home</a> &middot;
+      <a href="faq.html">FAQ</a> &middot;
+      <a href="privacy.html">Privacy</a></p>
+    </div>
+  </footer>
 </body>
 </html>

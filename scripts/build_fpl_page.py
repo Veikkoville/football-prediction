@@ -14,6 +14,7 @@ jää usein indeksoimatta, ja GEO vaatii tekstiksi purettavat taulut.
 STDLIB-ONLY (json, datetime, html, re, pathlib) — GH Actions -refresh
 (fpl-page-refresh.yml) ajaa tämän ilman pip installia.
 
+
 Fail-safe: jos FPL-data ei ole available tai sanity_gate != PASS → exit 2,
 sivua EI kirjoiteta (vanha versio jää voimaan). Sama konventio kuin
 build_fpl_phase0.py.
@@ -30,6 +31,18 @@ import re
 import sys
 from html import escape
 from pathlib import Path
+
+# #38: PostHog cookieless site-analytiikka (persistence=memory -> ei evasteita,
+# ei consent-banneria; ei PII:ta). Sama projekti kuin appi + pro-web (427890);
+# client-avain on julkinen by design (sama avain SPA-bundlessa).
+POSTHOG_SNIPPET = """<!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only'});
+posthog.register({platform:'web',source_app:'goaliq-static'});
+posthog.capture('web_landing_viewed',{page:location.pathname});
+</script>"""
+
 
 ROOT = Path(__file__).resolve().parent.parent
 FPL_PATH = ROOT / "data" / "fpl_projections_phase0.json"
@@ -516,6 +529,7 @@ def render_page(c: dict) -> str:
 {jsonld}
 <meta name="theme-color" content="#0A0820">
 <style>{CSS}</style>
+{POSTHOG_SNIPPET}
 </head>
 <body>
 <header class="dark">

@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoalIQ — Returning to app</title>
+  <title>GoalIQ – Returning to app</title>
   <style>
     body {
       margin: 0;
-      background: #0a0e1a;
-      color: #e5e7eb;
+      background: #0A0820;
+      color: #FFF6EC;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
@@ -17,24 +17,34 @@
       flex-direction: column;
       padding: 24px;
       text-align: center;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: #FF2E7E;
     }
     h1 {
-      color: #8b5cf6;
+      color: #FFF6EC;
       font-size: 28px;
-      letter-spacing: -0.6px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
       margin: 0 0 8px;
     }
-    p { color: #94a3b8; font-size: 14px; line-height: 1.5; margin: 4px 0; }
+    p { color: #C9C3DA; font-size: 14px; line-height: 1.5; margin: 4px 0; }
     a {
       display: inline-block;
       margin-top: 24px;
       padding: 12px 24px;
-      background: #8b5cf6;
+      background: #FF2E7E;
       color: #fff;
       text-decoration: none;
-      border-radius: 10px;
+      border-radius: 999px;
       font-weight: 700;
     }
+    a:hover { background: #FF4D90; }
   </style>
 </head>
 <body>
