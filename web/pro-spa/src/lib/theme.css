@@ -31,7 +31,7 @@
 	--accent-contrast: #ffffff;
 	/* syvennetyt teal/coral/kulta tekstikäyttöön vaalealla (teal-deep ja
 	   gold-deep jäävät alle AA:n leipätekstissä, siksi omat ink-sävyt) */
-	--positive: #007a6c;
+	--positive: #00c2ad; /* #54: Teal Deep (kanoninen paletti) - ei vihreaa */
 	--negative: #c2410c;
 	--warn-text: #946300;
 
@@ -270,7 +270,9 @@ tbody tr:hover td {
 .banner.success {
 	background: rgba(0, 194, 173, 0.1);
 	border: 1px solid rgba(0, 148, 130, 0.4);
-	color: var(--positive);
+	/* #54-kontrastivahti: #00C2AD creamilla < AA -> teksti ink, teal-identiteetti
+	   kantaa taustasta+reunasta (promptin fallback; EI vihreaa) */
+	color: var(--giq-ink);
 }
 .banner.error {
 	background: rgba(255, 106, 61, 0.1);
