@@ -4,14 +4,17 @@ Malli TUOTTAA tasapelin todennäköisimpänä lopputuloksena matalan xG:n
 tasaväkipareille (skannaus 12.6.: 24/7436 paria, max P(X)=0.3665), ja
 frontendin valintakaava (PredictScreen.tsx:332-337) valitsee X:n aidosti.
 
-HUOM: ankkuripari Tunisia-Congo DR on nykyisen data/wc_model.json:in tila
-(P(X)=0.3656 vs P(1)=0.357, marginaali ~0.009). Jos WC-datavirkistys kääntää
-tämän parin, valitse uusi draw-argmax-pari skannaamalla (ks. STATE 12.6.) —
-älä poista testiä: se vahtii että X voi ylipäätään valikoitua.
+HUOM: ankkuripari Ecuador-Morocco on 9.7.2026 QF-virkistetyn data/wc_model.json:in
+tila (skannaus 9.7.: 44/18915 paria draw-argmax; tämä pari P(X)=0.3781 vs
+max(P(1),P(2))=0.3242, marginaali ~0.054 = skannauksen suurin). Edellinen ankkuri
+Tunisia-Congo DR kääntyi virkistyksessä (marginaali oli vain ~0.009). Jos
+WC-datavirkistys kääntää tämänkin parin, valitse uusi draw-argmax-pari
+skannaamalla (ks. STATE 12.6.) — älä poista testiä: se vahtii että X voi
+ylipäätään valikoitua.
 """
 from __future__ import annotations
 
-ANCHOR = {"home_team": "Tunisia", "away_team": "Congo DR",
+ANCHOR = {"home_team": "Ecuador", "away_team": "Morocco",
           "leagues": ["INT-World Cup"], "seasons": ["2018", "2022"]}
 
 
