@@ -240,20 +240,22 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
             "Is GoalIQ good for FPL?",
             (
                 "Yes. GoalIQ is built FPL-first: clean sheet odds, fixture "
-                "difficulty, rate my team and price watch are free, and GoalIQ "
-                "Pro adds player expected points (xP), captain picks, "
-                "differentials and a transfer planner. Every number comes from "
-                "a match model with a published, pre-match-logged track record."
+                "difficulty, rate my team with a captain pick, and price watch "
+                "are free, and GoalIQ Pro adds player expected points (xP), "
+                "the captain ranker, differentials and a transfer planner. "
+                "Every number comes from a match model with a published, "
+                "pre-match-logged track record."
             ),
         ),
         (
             "What FPL tools does GoalIQ have?",
             (
                 "Free: clean sheet probabilities, fixture difficulty ratings "
-                "(FDR), rate my team and price watch. GoalIQ Pro: player "
-                "expected points (xP) per gameweek, captain picks, "
-                "differentials, player compare, predicted starting minutes and "
-                "a transfer planner. Available on the web, iOS and Android."
+                "(FDR), rate my team with a captain pick, and price watch. "
+                "GoalIQ Pro: player expected points (xP) per gameweek, the "
+                "captain ranker, differentials, player compare, predicted "
+                "starting minutes and a transfer planner. Available on the "
+                "web, iOS and Android."
             ),
         ),
         (
@@ -362,9 +364,11 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "name": "GoalIQ",
         "url": BASE + "/",
         "description": (
-            "GoalIQ makes free FPL (Fantasy Premier League) tools - expected "
-            "points, captain picks, rate my team, price watch and a transfer "
-            "planner - powered by a Dixon-Coles + machine-learning match model "
+            "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet "
+            "odds and fixture difficulty, rate my team with a captain pick, "
+            "and price watch free, plus player expected points (xP), the "
+            "captain ranker, differentials and a transfer planner on GoalIQ "
+            "Pro - powered by a Dixon-Coles + machine-learning match model "
             "with a public, pre-match-logged prediction track record. Built by "
             "an independent developer in Finland. Analytics, not betting."
         ),
@@ -378,9 +382,11 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "operatingSystem": "Android, iOS",
         "applicationCategory": "SportsApplication",
         "description": (
-            "Free FPL assistant and football prediction app. FPL tools: player "
-            "expected points (xP), captain picks, rate my team, price watch, "
-            "differentials and a transfer planner. Also predicts any match - "
+            "Free FPL assistant and football prediction app. Free FPL tools: "
+            "clean sheet odds and fixture difficulty, rate my team with a "
+            "captain pick, and price watch. GoalIQ Pro adds player expected "
+            "points (xP) per gameweek, the captain ranker, differentials and "
+            "a transfer planner. Also predicts any match - "
             "win probability, expected goals (xG) and the most likely score - "
             "using a Dixon-Coles model with an expected-goals ensemble. "
             "Analytics, not betting."
@@ -517,10 +523,11 @@ def render_page(c: dict) -> str:
     cs_table = cs_table_html(c)
     fdr_grid = fdr_grid_html(c)
 
-    title = "Free FPL Tools – xP, Captain Picks, Rate My Team | GoalIQ"
+    title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ"
     meta_desc = (
-        "Free FPL tools: clean sheet odds, fixture difficulty, rate my team and "
-        "price watch, plus xP and captain picks on Pro. Published track record. Not betting."
+        "Free FPL tools: clean sheet odds & FDR, rate my team with a captain pick, "
+        "and price watch. Pro adds player xP and the captain ranker. "
+        "Published track record. Not betting."
     )
 
     faq_html = "".join(
@@ -555,7 +562,7 @@ def render_page(c: dict) -> str:
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Free FPL Tools – xP, Captain Picks, Rate My Team | GoalIQ">
+<meta property="og:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ">
 <meta property="og:description" content="{meta_desc}">
 <meta property="og:url" content="{CANONICAL}">
 <meta property="og:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
@@ -563,7 +570,7 @@ def render_page(c: dict) -> str:
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@goaliqapp">
-<meta name="twitter:title" content="Free FPL Tools – xP, Captain Picks, Rate My Team | GoalIQ">
+<meta name="twitter:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ">
 <meta name="twitter:description" content="{meta_desc}">
 <meta name="twitter:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
 
@@ -589,9 +596,9 @@ def render_page(c: dict) -> str:
 <h1>Free FPL Tools: Clean Sheet Odds, Fixture Difficulty and More</h1>
 <p class="lede">GoalIQ is a free FPL assistant built on a proven match model.
 This page gives clean sheet probability and fixture difficulty for every
-Premier League team, free and updated every gameweek. Rate my team and price
-watch are free too; GoalIQ Pro adds player expected points (xP), captain picks
-and a transfer planner.</p>
+Premier League team, free and updated every gameweek. Rate my team, a captain
+pick and price watch are free too; GoalIQ Pro adds player expected points (xP),
+the captain ranker and a transfer planner.</p>
 <p class="meta">Season {c["season"]}. Data updated {c["data_date"]}.
 Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 
@@ -637,8 +644,8 @@ model-derived, not the official FPL difficulty.</p>
 <h2 id="pro">Unlock xP, captain ranker and transfer planner with Pro</h2>
 <p>GoalIQ Pro adds player expected points (xP) per gameweek, a captain ranker,
 a transfer planner, differential picks, player compare and predicted starting
-minutes, from the same match model as this page. Rate my team and price watch
-are free on the web with your public FPL entry ID.</p>
+minutes, from the same match model as this page. Rate my team, a captain pick
+and price watch are free on the web with your public FPL entry ID.</p>
 <div class="cta-row">
   <a class="cta" href="{PRO_URL}" data-cta="fpl">Start GoalIQ Pro</a>
 </div>
