@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-10T19:28:33+00:00",
+  "updated_at": "2026-07-10T22:04:38+00:00",
   "logged_total": 100,
-  "pending": 3,
+  "pending": 2,
   "all_time": {
-    "n": 97,
-    "correct_1x2": 60,
-    "pct_1x2": 0.6186,
-    "decisive_n": 71,
-    "decisive_correct": 60,
-    "pct_decisive": 0.8451,
-    "exact_n": 49,
+    "n": 98,
+    "correct_1x2": 61,
+    "pct_1x2": 0.6224,
+    "decisive_n": 72,
+    "decisive_correct": 61,
+    "pct_decisive": 0.8472,
+    "exact_n": 50,
     "exact_correct": 10,
-    "pct_exact": 0.2041,
-    "brier": 0.4722,
-    "brier_n": 49
+    "pct_exact": 0.2,
+    "brier": 0.4668,
+    "brier_n": 50
   },
   "rolling": {
-    "n": 97,
-    "correct_1x2": 60,
-    "pct_1x2": 0.6186,
-    "decisive_n": 71,
-    "decisive_correct": 60,
-    "pct_decisive": 0.8451,
-    "exact_n": 49,
+    "n": 98,
+    "correct_1x2": 61,
+    "pct_1x2": 0.6224,
+    "decisive_n": 72,
+    "decisive_correct": 61,
+    "pct_decisive": 0.8472,
+    "exact_n": 50,
     "exact_correct": 10,
-    "pct_exact": 0.2041,
-    "brier": 0.4722,
-    "brier_n": 49,
+    "pct_exact": 0.2,
+    "brier": 0.4668,
+    "brier_n": 50,
     "window": 100
   },
   "calibration": [
@@ -37,16 +37,16 @@
       "n": 10
     },
     {
-      "bin_mid": 0.153,
-      "predicted": 0.153,
-      "actual": 0.0455,
-      "n": 22
+      "bin_mid": 0.1524,
+      "predicted": 0.1524,
+      "actual": 0.0435,
+      "n": 23
     },
     {
-      "bin_mid": 0.2566,
-      "predicted": 0.2566,
-      "actual": 0.1698,
-      "n": 53
+      "bin_mid": 0.2561,
+      "predicted": 0.2561,
+      "actual": 0.1667,
+      "n": 54
     },
     {
       "bin_mid": 0.3429,
@@ -67,10 +67,10 @@
       "n": 8
     },
     {
-      "bin_mid": 0.6404,
-      "predicted": 0.6404,
-      "actual": 0.8,
-      "n": 10
+      "bin_mid": 0.6398,
+      "predicted": 0.6398,
+      "actual": 0.8182,
+      "n": 11
     },
     {
       "bin_mid": 0.7283,
@@ -86,6 +86,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-10",
+      "home_team": "Spain",
+      "away_team": "Belgium",
+      "predicted_winner": "home",
+      "p_winner": 0.6337,
+      "most_likely_score": "2-0",
+      "actual_score": "2-1",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-07-09",
       "home_team": "France",
@@ -348,20 +362,6 @@
       "actual_score": "2-0",
       "actual_outcome": "home",
       "hit_1x2": false,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-06-30",
-      "home_team": "France",
-      "away_team": "Sweden",
-      "predicted_winner": "home",
-      "p_winner": 0.7389,
-      "most_likely_score": "2-0",
-      "actual_score": "3-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
       "exact_hit": false,
       "duration": null,
       "regular_score": null
