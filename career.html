@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your FPL Career Card | GoalIQ</title>
+<meta name="description" content="Turn your FPL career into a shareable card: best season, all-time points and a GoalIQ model projection for your current squad. Free, no login - just your public FPL entry ID." />
+<link rel="canonical" href="https://goaliq.app/career" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
+
+<!-- Open Graph / social preview -->
+<meta property="og:title" content="Your FPL Career Card | GoalIQ" />
+<meta property="og:description" content="Your FPL career on one card: best season, all-time points and a GoalIQ model projection for your squad. Free, no login." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://goaliq.app/career" />
+<meta property="og:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@goaliqapp" />
+<meta name="twitter:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only'});
+posthog.register({platform:'web',source_app:'goaliq-static'});
+posthog.capture('web_landing_viewed',{page:location.pathname});
+</script>
+
+<style>
+  :root {
+    --bg: #FFF6EC;
+    --bg-alt: #F6F4FF;
+    --card: #FFFFFF;
+    --line: rgba(10,8,32,0.12);
+    --text: #0A0820;
+    --muted: #575170;
+    --magenta: #FF2E7E;
+    --magenta-deep: #D6006E;
+    --teal-ink: #007A6C;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: clip; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
+  .bar { height: 6px; background: var(--magenta); }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; text-decoration: none; color: inherit; }
+  .logo span { color: var(--magenta); }
+  .logo-mark-img { width: 32px; height: 32px; border-radius: 9px; display: block; }
+  .nav-cta { background: var(--magenta); color: #fff; font-weight: 700; padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px; }
+  .nav-cta:hover { background: var(--magenta-deep); }
+  h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; margin: 40px 0 12px; }
+  h1 span { color: var(--magenta); }
+  .lede { font-size: 18px; color: var(--muted); max-width: 56ch; }
+  .entry-form { margin: 28px 0 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .entry-form input {
+    flex: 1 1 220px; font: inherit; font-size: 17px; padding: 12px 16px;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--text);
+  }
+  .entry-form input:focus { outline: 2px solid var(--magenta); border-color: transparent; }
+  .btn {
+    display: inline-block; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 16px;
+    background: var(--magenta); color: #fff; padding: 12px 24px; border-radius: 999px; text-decoration: none;
+  }
+  .btn:hover { background: var(--magenta-deep); }
+  .btn.secondary { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+  .btn.secondary:hover { background: var(--bg-alt); }
+  .hint { font-size: 14px; color: var(--muted); }
+  .hint a { color: var(--teal-ink); }
+  .status { margin: 18px 0; font-size: 15px; color: var(--muted); min-height: 1.4em; }
+  .status.error { color: var(--magenta-deep); font-weight: 500; }
+  .card-stage { display: none; margin-top: 8px; }
+  .card-stage.visible { display: block; }
+  #cardCanvas {
+    width: 100%; max-width: 432px; height: auto; display: block;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: 0 12px 40px rgba(10,8,32,0.10);
+  }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
+  .fineprint { font-size: 13px; color: var(--muted); margin-top: 14px; max-width: 60ch; }
+  .get-app { margin-top: 44px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+  .get-app h2 { font-size: 20px; margin-bottom: 6px; }
+  .get-app p { color: var(--muted); font-size: 15px; margin-bottom: 14px; }
+  .store-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; padding: 28px 20px; text-align: center; margin-top: 60px; }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--magenta-deep); }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="https://goaliq.app/"><img class="logo-mark-img" src="/assets/brand/goaliq-appicon-192.png" width="32" height="32" alt="">Goal<span>IQ</span></a>
+    <a class="nav-cta" href="https://goaliq.app/fpl.html">FPL tools</a>
+  </nav>
+
+  <h1>Your FPL career, <span>on one card</span></h1>
+  <p class="lede">Best season, all-time points and how your current squad projects on the GoalIQ model. Free, no login - all it needs is your public FPL entry ID.</p>
+
+  <form class="entry-form" id="entryForm">
+    <input id="entryInput" type="number" inputmode="numeric" min="1" placeholder="Your FPL entry ID, e.g. 1578623" aria-label="FPL entry ID" required>
+    <button class="btn" type="submit">Build my card</button>
+  </form>
+  <p class="hint">Find your ID in the FPL site or app: Points page URL looks like <code>fantasy.premierleague.com/entry/<strong>1578623</strong>/event/38</code> - the number is your entry ID.</p>
+
+  <p class="status" id="status" role="status"></p>
+
+  <div class="card-stage" id="cardStage">
+    <canvas id="cardCanvas" width="1080" height="1350" aria-label="Your FPL career card"></canvas>
+    <div class="actions">
+      <button class="btn" id="shareBtn" type="button">Share card</button>
+      <button class="btn secondary" id="downloadBtn" type="button">Download PNG</button>
+      <button class="btn secondary" id="copyLinkBtn" type="button">Copy link</button>
+    </div>
+    <p class="fineprint">The squad projection uses GoalIQ model expected points against the best possible legal budget squad - not FPL official numbers. For fun, not betting advice.</p>
+  </div>
+
+  <div class="get-app">
+    <h2>Get GoalIQ - free on iOS &amp; Android</h2>
+    <p>Match predictions with a public track record, FPL expected points, rate-my-team and transfer planning.</p>
+    <div class="store-links">
+      <a class="btn" href="https://apps.apple.com/app/id6780047163" data-cta="career-ios">App Store</a>
+      <a class="btn" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq" data-cta="career-android">Google Play</a>
+      <a class="btn secondary" href="https://goaliq.app/">goaliq.app</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://goaliq.app/">GoalIQ</a> &middot; <a href="/fpl.html">FPL clean sheets &amp; FDR</a> &middot; <a href="/privacy.html">Privacy</a> &middot; <a href="/faq.html">FAQ</a>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  // Lokaalikehitys osoittaa lokaaliin API:in; tuotanto aina Renderiin.
+  var API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8000'
+    : 'https://goaliq-api.onrender.com';
+  var canvas = document.getElementById('cardCanvas');
+  var ctx = canvas.getContext('2d');
+  var statusEl = document.getElementById('status');
+  var stage = document.getElementById('cardStage');
+  var currentEntry = null;
+  var accuracyLine = null; // haetaan livena, ei kovakoodata (stale-suoja)
+
+  var INK = '#0A0820', CREAM = '#FFF6EC', MAGENTA = '#FF2E7E',
+      MUTED = '#575170', WHITE = '#FFFFFF', LINE = 'rgba(10,8,32,0.14)';
+
+  function setStatus(msg, isError) {
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (isError ? ' error' : '');
+  }
+
+  function fmtRank(r) {
+    if (r == null) return '-';
+    if (r >= 1e6) return (r / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (r >= 1e4) return Math.round(r / 1e3) + 'k';
+    return r.toLocaleString('en-GB');
+  }
+  function fmtPts(p) { return p == null ? '-' : p.toLocaleString('en-GB'); }
+
+  function fetchAccuracy() {
+    return fetch(API + '/api/accuracy').then(function (r) { return r.json(); })
+      .then(function (a) {
+        var at = a && a.all_time;
+        if (at && at.pct_1x2 && at.n) {
+          accuracyLine = (100 * at.pct_1x2).toFixed(1) + '% of results called right across ' + at.n + ' logged matches';
+        }
+      }).catch(function () { /* trust-rivi jaa yleiseksi */ });
+  }
+
+  function font(px, weight) { return (weight || 400) + ' ' + px + 'px "Space Grotesk", sans-serif'; }
+
+  function fitText(text, maxPx, startSize, weight) {
+    var size = startSize;
+    ctx.font = font(size, weight);
+    while (size > 24 && ctx.measureText(text).width > maxPx) {
+      size -= 2;
+      ctx.font = font(size, weight);
+    }
+    return size;
+  }
+
+  function statBlock(x, y, label, value, valueSize, maxW) {
+    ctx.fillStyle = MUTED;
+    ctx.font = font(26, 500);
+    ctx.fillText(label.toUpperCase(), x, y);
+    ctx.fillStyle = INK;
+    var vs = valueSize || 64;
+    if (maxW) vs = fitText(value, maxW, vs, 700);
+    ctx.font = font(vs, 700);
+    ctx.fillText(value, x, y + (valueSize || 64) + 14);
+  }
+
+  function drawCard(d) {
+    var W = 1080, H = 1350, PAD = 72;
+    ctx.clearRect(0, 0, W, H);
+    ctx.textBaseline = 'alphabetic';
+
+    // Tausta + magenta-yläpalkki
+    ctx.fillStyle = CREAM;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = MAGENTA;
+    ctx.fillRect(0, 0, W, 14);
+
+    // Header: GoalIQ-wordmark + kortin nimi
+    ctx.fillStyle = INK;
+    ctx.font = font(44, 700);
+    ctx.fillText('Goal', PAD, 104);
+    var gw = ctx.measureText('Goal').width;
+    ctx.fillStyle = MAGENTA;
+    ctx.fillText('IQ', PAD + gw, 104);
+    ctx.fillStyle = MUTED;
+    ctx.font = font(28, 500);
+    ctx.textAlign = 'right';
+    ctx.fillText('FPL CAREER CARD', W - PAD, 104);
+    ctx.textAlign = 'left';
+
+    // Manager
+    var name = (d.manager && d.manager.name) || ('FPL entry ' + d.meta.entry);
+    var sz = fitText(name, W - 2 * PAD, 76, 700);
+    ctx.fillStyle = INK;
+    ctx.font = font(sz, 700);
+    ctx.fillText(name, PAD, 218);
+    var teamName = (d.manager && d.manager.team_name) || '';
+    if (teamName) {
+      var tsz = fitText(teamName, W - 2 * PAD, 40, 500);
+      ctx.fillStyle = MAGENTA;
+      ctx.font = font(tsz, 500);
+      ctx.fillText(teamName, PAD, 270);
+    }
+    var s = d.summary || {};
+    ctx.fillStyle = MUTED;
+    ctx.font = font(30, 400);
+    var sinceBits = [];
+    if (s.since) sinceBits.push('Manager since ' + s.since);
+    if (s.seasons_played) sinceBits.push(s.seasons_played + ' season' + (s.seasons_played > 1 ? 's' : ''));
+    ctx.fillText(sinceBits.join('  ·  '), PAD, 322);
+
+    ctx.strokeStyle = LINE;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(PAD, 360); ctx.lineTo(W - PAD, 360); ctx.stroke();
+
+    // Statit 2x2 (colW estää sarakkeiden ylivuodon - fitText kaventaa arvon)
+    var colX = [PAD, W / 2 + 20];
+    var colW = W / 2 - PAD - 40;
+    statBlock(colX[0], 432, 'All-time points', fmtPts(s.all_time_points), 84, colW);
+    statBlock(colX[1], 432, 'Best overall rank', fmtRank(s.best_rank), 84, colW);
+    var bs = s.best_season;
+    statBlock(colX[0], 640, 'Best season',
+      bs ? (bs.season + '  ·  ' + fmtPts(bs.points) + ' pts') : '-', 52, colW);
+    var lat = d.latest_season || {};
+    if (lat.available) {
+      var latLabel = lat.finished ? ('Last season' + (lat.season ? ' (' + lat.season + ')' : '')) : 'This season';
+      var latVal = fmtPts(lat.total_points) + ' pts';
+      if (lat.best_gw) latVal += '  ·  best GW ' + lat.best_gw.points;
+      statBlock(colX[1], 640, latLabel, latVal, 52, colW);
+    } else {
+      statBlock(colX[1], 640, 'New season', 'Starts GW1', 52, colW);
+    }
+
+    // Malliteaser-laatikko (vain jos backend palautti sen - ei placeholderia)
+    var boxTop = 790, boxH = 300;
+    var t = d.model_teaser;
+    if (t) {
+      ctx.fillStyle = WHITE;
+      ctx.strokeStyle = MAGENTA;
+      ctx.lineWidth = 3;
+      roundRect(PAD - 8, boxTop, W - 2 * PAD + 16, boxH, 24);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = MAGENTA;
+      ctx.font = font(26, 700);
+      ctx.fillText('GOALIQ MODEL READ ON YOUR SQUAD', PAD + 28, boxTop + 62);
+      ctx.fillStyle = INK;
+      ctx.font = font(58, 700);
+      ctx.fillText('Projected GW' + t.gw + ' xP ' + Number(t.team_xp_gw).toFixed(1), PAD + 28, boxTop + 138);
+      ctx.font = font(40, 500);
+      ctx.fillText(Number(t.percentile).toFixed(0) + '% of the best possible budget squad', PAD + 28, boxTop + 196);
+      ctx.fillStyle = MUTED;
+      ctx.font = font(25, 400);
+      var trust = accuracyLine
+        ? 'Same match model behind GoalIQ’s ' + accuracyLine + '.'
+        : 'Same match model behind GoalIQ’s public pre-match-logged track record.';
+      wrapText(trust, PAD + 28, boxTop + 248, W - 2 * PAD - 40, 32);
+    } else {
+      // Esikausi/teaseriton: kausilista täyttää tilan
+      ctx.fillStyle = MUTED;
+      ctx.font = font(26, 500);
+      ctx.fillText('SEASON BY SEASON', PAD, boxTop + 20);
+      ctx.fillStyle = INK;
+      ctx.font = font(34, 500);
+      var rows = (d.past_seasons || []).slice(-6).reverse();
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        ctx.fillText(r.season + '   ' + fmtPts(r.points) + ' pts   rank ' + fmtRank(r.rank),
+          PAD, boxTop + 76 + i * 46);
+      }
+      if (!rows.length) {
+        ctx.fillText('First season loading - good luck for GW1!', PAD, boxTop + 76);
+      }
+    }
+
+    // CTA-footer
+    ctx.fillStyle = INK;
+    ctx.fillRect(0, H - 190, W, 190);
+    ctx.fillStyle = CREAM;
+    ctx.font = font(40, 700);
+    ctx.fillText('Get GoalIQ - free on iOS & Android', PAD, H - 108);
+    ctx.fillStyle = MAGENTA;
+    ctx.font = font(30, 500);
+    ctx.fillText('goaliq.app/career', PAD, H - 56);
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function wrapText(text, x, y, maxW, lineH) {
+    var words = text.split(' '), line = '', yy = y;
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(test).width > maxW && line) {
+        ctx.fillText(line, x, yy);
+        line = words[i];
+        yy += lineH;
+      } else {
+        line = test;
+      }
+    }
+    if (line) ctx.fillText(line, x, yy);
+  }
+
+  function build(entry) {
+    currentEntry = entry;
+    setStatus('Fetching your FPL history…');
+    stage.classList.remove('visible');
+    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    Promise.all([
+      fetch(API + '/api/fantasy/career?entry=' + encodeURIComponent(entry)),
+      fetchAccuracy(),
+      fontsReady
+    ]).then(function (res) {
+      var r = res[0];
+      if (!r.ok) {
+        return r.json().then(function (b) {
+          throw new Error((b && b.detail) || ('Request failed (' + r.status + ')'));
+        }, function () { throw new Error('Request failed (' + r.status + ')'); });
+      }
+      return r.json();
+    }).then(function (d) {
+      drawCard(d);
+      stage.classList.add('visible');
+      setStatus('');
+      if (window.posthog) posthog.capture('career_card_generated', { source: 'career_page' });
+      try {
+        var url = new URL(location.href);
+        url.searchParams.set('entry', entry);
+        history.replaceState(null, '', url.pathname + url.search);
+      } catch (e) { /* URL-päivitys on kosmetiikkaa */ }
+    }).catch(function (err) {
+      setStatus(err.message || 'Something went wrong. Try again in a moment.', true);
+    });
+  }
+
+  document.getElementById('entryForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var v = parseInt(document.getElementById('entryInput').value, 10);
+    if (v > 0) build(v);
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function () {
+    canvas.toBlob(function (blob) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'goaliq-fpl-career-card.png';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      if (window.posthog) posthog.capture('career_card_downloaded', {});
+    }, 'image/png');
+  });
+
+  document.getElementById('shareBtn').addEventListener('click', function () {
+    canvas.toBlob(function (blob) {
+      var file = new File([blob], 'goaliq-fpl-career-card.png', { type: 'image/png' });
+      var shareUrl = 'https://goaliq.app/career' + (currentEntry ? '?entry=' + currentEntry : '');
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: 'My FPL Career Card', url: shareUrl })
+          .then(function () { if (window.posthog) posthog.capture('career_card_shared', { method: 'native' }); })
+          .catch(function () { /* peruutus on ok */ });
+      } else if (navigator.share) {
+        navigator.share({ title: 'My FPL Career Card', url: shareUrl })
+          .then(function () { if (window.posthog) posthog.capture('career_card_shared', { method: 'native_url' }); })
+          .catch(function () { /* peruutus on ok */ });
+      } else {
+        document.getElementById('downloadBtn').click();
+      }
+    }, 'image/png');
+  });
+
+  document.getElementById('copyLinkBtn').addEventListener('click', function () {
+    var link = 'https://goaliq.app/career' + (currentEntry ? '?entry=' + currentEntry : '');
+    (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject())
+      .then(function () {
+        setStatus('Link copied.');
+        if (window.posthog) posthog.capture('career_card_shared', { method: 'copy_link' });
+      })
+      .catch(function () { setStatus(link); });
+  });
+
+  document.querySelectorAll('[data-cta]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      if (window.posthog) posthog.capture('career_cta_clicked', { location: a.getAttribute('data-cta') });
+    });
+  });
+
+  // Jaettu linkki: ?entry=N -> rakenna kortti suoraan
+  var params = new URLSearchParams(location.search);
+  var pre = parseInt(params.get('entry') || '', 10);
+  if (pre > 0) {
+    document.getElementById('entryInput').value = pre;
+    build(pre);
+  }
+})();
+</script>
+</body>
+</html>
