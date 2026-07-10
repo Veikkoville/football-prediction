@@ -1,5 +1,5 @@
 """
-FPL-landing-sivun (fpl.html) bake-builderi — SEO + GEO (#SEO-runway, 4.7.2026).
+FPL-landing-sivun (fpl.html) bake-builderi - SEO + GEO (#SEO-runway, 4.7.2026).
 
 Generoi KOKO staattisen fpl.html:n repossa olevasta datasta:
   - data/fpl_projections_phase0.json  (sama tiedosto jonka /api/fantasy servaa;
@@ -8,10 +8,10 @@ Generoi KOKO staattisen fpl.html:n repossa olevasta datasta:
     accuracy-log.yml päivittää mainiin 3 h välein)
 
 MIKSI staattinen bake eikä client-JS-fetch: crawlerit + AI-vastausmoottorit
-(GPTBot, PerplexityBot, ClaudeBot) lukevat initial HTML:n — JS-renderöity data
+(GPTBot, PerplexityBot, ClaudeBot) lukevat initial HTML:n - JS-renderöity data
 jää usein indeksoimatta, ja GEO vaatii tekstiksi purettavat taulut.
 
-STDLIB-ONLY (json, datetime, html, re, pathlib) — GH Actions -refresh
+STDLIB-ONLY (json, datetime, html, re, pathlib) - GH Actions -refresh
 (fpl-page-refresh.yml) ajaa tämän ilman pip installia.
 
 
@@ -43,6 +43,16 @@ posthog.register({platform:'web',source_app:'goaliq-static'});
 posthog.capture('web_landing_viewed',{page:location.pathname});
 </script>"""
 
+# #56: Pro CTA -klikkimittaus (pro_cta_clicked, prop location) - delegoitu
+# listener, ei blokkaa navigaatiota, ei PII:ta, cookieless-moodi ennallaan.
+CTA_TRACK_SNIPPET = """<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<script>
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
+  if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta')}); }
+});
+</script>"""
+
 
 ROOT = Path(__file__).resolve().parent.parent
 FPL_PATH = ROOT / "data" / "fpl_projections_phase0.json"
@@ -64,7 +74,7 @@ ORG_ID = BASE + "/#organization"
 # FDR-väriasteikko GoalIQ:n kanonisesta brändipaletista (brand-tokens.md,
 # täsmähexit, EI approksimaatioita): 1 helpoin = Teal → Gold → Gold Deep →
 # Coral → 5 vaikein = Magenta Deep. Tekstiväri kontrastin mukaan (1-4 ink,
-# 5 valkoinen) — arvot CSS:ssä.
+# 5 valkoinen) - arvot CSS:ssä.
 FDR_COLORS = {1: "#19E3D2", 2: "#FFC93C", 3: "#F4A800", 4: "#FF6A3D", 5: "#D6006E"}
 
 
@@ -76,13 +86,13 @@ def load_data() -> tuple[dict, dict]:
     acc = json.loads(ACC_PATH.read_text(encoding="utf-8"))
     meta = fpl.get("meta", {})
     if not meta.get("available", False):
-        print("FAIL: FPL-data ei available — sivua ei kirjoiteta.")
+        print("FAIL: FPL-data ei available - sivua ei kirjoiteta.")
         sys.exit(2)
     if meta.get("sanity_gate") != "PASS":
-        print("FAIL: FPL sanity_gate != PASS — sivua ei kirjoiteta.")
+        print("FAIL: FPL sanity_gate != PASS - sivua ei kirjoiteta.")
         sys.exit(2)
     if not fpl.get("teams") or not fpl.get("fixtures"):
-        print("FAIL: FPL-datasta puuttuu teams/fixtures — sivua ei kirjoiteta.")
+        print("FAIL: FPL-datasta puuttuu teams/fixtures - sivua ei kirjoiteta.")
         sys.exit(2)
     return fpl, acc
 
@@ -409,7 +419,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
 # ---------------------------------------------------------------------------
 # 4. Sivu
 # ---------------------------------------------------------------------------
-# Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) — täsmähexit.
+# Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) - täsmähexit.
 # Hero = tumma (Ink) + magenta, sisältö = vaalea (Cream/Paper) + ink-teksti.
 CSS = """
   :root{ --magenta:#FF2E7E; --magenta-deep:#D6006E; --coral:#FF6A3D; --gold:#FFC93C; --gold-deep:#F4A800; --teal:#19E3D2; --ink:#0A0820; --ink2:#140F1E; --cream:#FFF6EC; --paper:#F6F4FF; --ink-muted:#54506B; --hero-muted:#C9C3DA; --line:#E7DDCF; }
@@ -456,6 +466,11 @@ CSS = """
   .faq dt{ font-weight:700; margin-top:20px; }
   .faq dd{ margin:6px 0 0; }
   .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:12px; padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
+  .upsell{ border:2px solid var(--magenta); background:var(--paper); border-radius:16px; padding:24px 26px; margin:48px 0 6px; }
+  .upsell h2{ margin:0 0 10px; }
+  .upsell p{ margin:0 0 6px; }
+  .upsell .cta-row{ margin:18px 0 4px; }
+  .upsell .price-note{ color:var(--ink-muted); font-size:14px; margin:10px 0 0; }
   footer{ padding:30px 0 40px; font-size:14px; }
   footer .wrap{ color:var(--hero-muted); }
   footer a{ color:var(--cream); }
@@ -536,7 +551,7 @@ def render_page(c: dict) -> str:
   <div class="bar"></div>
   <div class="nav">
     <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="26" height="26" alt="">Goal<span>IQ</span></a></div>
-    <a class="cta" href="{PRO_URL}">Open GoalIQ Pro</a>
+    <a class="cta" href="{PRO_URL}" data-cta="nav">Open GoalIQ Pro</a>
   </div>
 </header>
 
@@ -553,7 +568,7 @@ fixtures are. The numbers update every gameweek. Everything on this page is free
 Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 
 <div class="cta-row">
-  <a class="cta" href="{PRO_URL}">See the full xP dashboard on GoalIQ Pro</a>
+  <a class="cta" href="{PRO_URL}" data-cta="fpl">See the full xP dashboard on GoalIQ Pro</a>
   <a class="cta secondary" href="{PLAY_URL}">Google Play</a>
   <a class="cta secondary" href="{APPSTORE_URL}">App Store</a>
 </div>
@@ -590,6 +605,19 @@ model-derived, not the official FPL difficulty.</p>
 <span class="fdr fdr4">4</span> <span class="fdr fdr5">5</span>
 (1 easiest, 5 hardest). Venue in cell tooltip: H home, A away.</p>
 
+<aside class="upsell">
+<h2 id="pro">Unlock xP, captain ranker and transfer planner with Pro</h2>
+<p>GoalIQ Pro adds player expected points (xP) per gameweek, a captain ranker,
+a transfer planner, differential picks, player compare and predicted starting
+minutes, from the same match model as this page. Rate my team and price watch
+are free on the web with your public FPL entry ID.</p>
+<div class="cta-row">
+  <a class="cta" href="{PRO_URL}" data-cta="fpl">Start GoalIQ Pro</a>
+</div>
+<p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
+One subscription covers web, iOS and Android.</p>
+</aside>
+
 <h2 id="methodology">Methodology</h2>
 <p>A Dixon-Coles style match model, tau corrected, trained on recent results.
 Clean sheet probability comes from the score matrix: the chance the opponent
@@ -611,7 +639,7 @@ cannot be edited after the fact. If the model has a bad week, the log shows it.<
 </dl>
 
 <div class="cta-row">
-  <a class="cta" href="{PRO_URL}">Open GoalIQ Pro: player xP and captain ranker</a>
+  <a class="cta" href="{PRO_URL}" data-cta="fpl">Open GoalIQ Pro: player xP and captain ranker</a>
   <a class="cta secondary" href="{PLAY_URL}">Predict any fixture in the GoalIQ app</a>
   <a class="cta secondary" href="{APPSTORE_URL}">Download on the App Store</a>
 </div>
@@ -636,6 +664,9 @@ predictions and analytics. Not betting advice.</p>
   informational purposes.</p>
   </div>
 </footer>
+
+{CTA_TRACK_SNIPPET}
+
 </body>
 </html>
 """

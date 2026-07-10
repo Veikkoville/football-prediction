@@ -158,6 +158,42 @@
     display: inline-flex; align-items: center; justify-content: center;
   }
   .btn-ghost:hover { border-color: var(--magenta); }
+  /* #56: appilinkit demotoituna omaan ghost-ryhmäänsä heron CTA-rivillä */
+  .ghost-group { display: inline-flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+  /* Pricing (#56): Pro web ensin - vuosipassi johtaa, kuukausi toissijainen.
+     Samat tokenit kuin muu sivu (card/line/magenta), ei uusia värejä. */
+  .pricing-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    max-width: 680px; margin: 0 auto 30px; align-items: stretch;
+  }
+  .plan {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 28px; position: relative;
+  }
+  .plan.lead { border: 2px solid var(--magenta); }
+  .plan-badge {
+    position: absolute; top: -13px; left: 22px; background: var(--magenta);
+    color: #ffffff; font-size: 12px; font-weight: 800; letter-spacing: 0.02em;
+    padding: 4px 12px; border-radius: 999px;
+  }
+  .plan h3 { font-size: 17px; margin-bottom: 4px; }
+  .plan-price { font-size: 38px; font-weight: 800; }
+  .plan-price span { font-size: 16px; color: var(--muted); font-weight: 500; }
+  .plan-note { color: var(--muted); font-size: 14px; }
+  .pro-features {
+    list-style: none; max-width: 680px; margin: 0 auto 30px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px;
+  }
+  .pro-features li { padding-left: 28px; position: relative; font-size: 15px; }
+  .pro-features li::before {
+    content: "✓"; position: absolute; left: 0; color: var(--magenta); font-weight: 800;
+  }
+  .pricing-cta { text-align: center; }
+  .trust-line { color: var(--muted); font-size: 14px; margin-top: 16px; }
+  @media (max-width: 640px) {
+    .pricing-grid, .pro-features { grid-template-columns: 1fr; }
+  }
 
   /* Phone mock strip */
   .stat-strip {
@@ -269,6 +305,7 @@
   /* Kapea mobiili: CTA-napit pinoon täysleveinä (ei vaakaylivuotoa) */
   @media (max-width: 520px) {
     .cta-row { flex-direction: column; align-items: stretch; }
+    .cta-row .ghost-group { flex-direction: column; align-items: stretch; width: 100%; }
     .cta-row .btn-primary, .cta-row .btn-ghost {
       width: 100%; justify-content: center; text-align: center;
     }
@@ -288,7 +325,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <div class="wrap">
   <nav>
     <div class="logo"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</div>
-    <a class="nav-cta" href="#get">Get the app</a>
+    <a class="nav-cta" href="https://pro.goaliq.app" data-cta="nav">Try Pro</a>
   </nav>
 </div>
 
@@ -299,18 +336,58 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <h1>AI football predictions, <span class="accent">match by match</span></h1>
     <p class="sub">Pick two teams and GoalIQ gives the win probability, expected goals, and a fixture read across the top leagues. Free FPL clean sheet odds and fixture difficulty on the web.</p>
     <div class="cta-row" id="get">
-      <a class="btn-primary" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4.5v15l13-7.5z"/></svg> Get it on Google Play</a>
-      <a class="btn-ghost" href="https://apps.apple.com/app/id6780047163">Download on the App Store</a>
-      <a class="btn-ghost" href="https://pro.goaliq.app">Open GoalIQ Pro on the web</a>
+      <a class="btn-primary" href="https://pro.goaliq.app" data-cta="hero">Start GoalIQ Pro</a>
+      <span class="ghost-group" aria-label="Get the app">
+        <a class="btn-ghost" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4.5v15l13-7.5z"/></svg>&nbsp;Get it on Google Play</a>
+        <a class="btn-ghost" href="https://apps.apple.com/app/id6780047163">Download on the App Store</a>
+      </span>
     </div>
-    <p class="cta-note">Free download. Predict any fixture yourself in the app. One account, premium on web, iOS and Android.</p>
+    <p class="cta-note">Pro unlocks player expected points (xP), a captain ranker and a transfer planner, from €25 a year.</p>
+    <p class="cta-note">The app is a free download. One subscription covers web, iOS and Android.</p>
     <div class="stat-strip">
       <div class="stat"><!-- GEN:ACC-CHIP-START --><div class="num">61.5%</div><div class="lbl">result accuracy across 96 logged matches</div><!-- GEN:ACC-CHIP-END --></div>
       <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
-      <div class="stat"><div class="num">€3.99</div><div class="lbl">Premium / month</div></div>
+      <div class="stat"><div class="num">€25</div><div class="lbl">GoalIQ Pro season pass / year</div></div>
     </div>
   </header>
 </div>
+
+<!-- PRICING (#56): Pro web ensin -->
+<section id="pro">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>GoalIQ Pro, the full FPL toolkit</h2>
+      <p>Everything at pro.goaliq.app, powered by the same match model. One subscription covers web, iOS and Android.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan lead">
+        <span class="plan-badge">Best value</span>
+        <h3>Season pass</h3>
+        <div class="plan-price">€25<span> / year</span></div>
+        <p class="plan-note">Under €2.10 a month, billed once a year.</p>
+      </div>
+      <div class="plan">
+        <h3>Monthly</h3>
+        <div class="plan-price">€3.99<span> / month</span></div>
+        <p class="plan-note">Cancel anytime.</p>
+      </div>
+    </div>
+    <ul class="pro-features">
+      <li>Player expected points (xP) per gameweek</li>
+      <li>Captain ranker</li>
+      <li>Transfer planner</li>
+      <li>Differential picks</li>
+      <li>Player compare, side by side</li>
+      <li>Transfer suggestions for your imported FPL team</li>
+      <li>Predicted starting minutes</li>
+    </ul>
+    <div class="pricing-cta">
+      <a class="btn-primary" href="https://pro.goaliq.app" data-cta="pricing">Start Pro</a>
+      <p class="trust-line">Built on a model with 61.5% correct 1X2 results across 96 logged matches, every prediction logged before kick-off.</p>
+      <p class="cta-note">Clean sheet probabilities, fixture difficulty, rate my team and price watch stay free on the web.</p>
+    </div>
+  </div>
+</section>
 
 <!-- FPL -->
 <section class="wc">
@@ -318,10 +395,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div>
       <h2>Free <span class="accent">FPL tools</span> on the web</h2>
       <p>GoalIQ's model gives clean sheet probability and fixture difficulty for every Premier League team, updated every gameweek.</p>
-      <p>Free on the web, no sign-in. Want player expected points (xP) and a captain ranker on top? That is <a href="https://pro.goaliq.app" style="color:var(--teal-ink);font-weight:700;">GoalIQ Pro on the web</a>.</p>
+      <p>Free on the web, no sign-in. Want player expected points (xP), a captain ranker and a transfer planner on top? That is <a href="https://pro.goaliq.app" style="color:var(--teal-ink);font-weight:700;" data-cta="fpl">GoalIQ Pro on the web</a>.</p>
       <div class="cta-row" style="margin-top:22px; justify-content:flex-start;">
         <a class="btn-primary" href="fpl.html">See the FPL clean sheet odds</a>
-        <a class="btn-ghost" href="https://pro.goaliq.app">Open GoalIQ Pro</a>
+        <a class="btn-ghost" href="https://pro.goaliq.app" data-cta="fpl">Open GoalIQ Pro</a>
       </div>
     </div>
     <div class="wc-visual">
@@ -367,7 +444,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <div class="wrap">
     <div class="section-head">
       <h2>Every match that matters</h2>
-      <p>Six of Europe's top leagues, the Champions League and the World Cup.</p>
+      <p>Europe's top leagues, the Champions League and the World Cup, now joined by Brasileirão, the Championship, Eredivisie and Primeira Liga.</p>
     </div>
     <div class="league-grid">
       <div class="league-chip">Premier League</div>
@@ -377,7 +454,12 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="league-chip">Ligue 1</div>
       <div class="league-chip">Champions League</div>
       <div class="league-chip wc-chip">World Cup 2026</div>
+      <div class="league-chip">Brasileirão</div>
+      <div class="league-chip">Championship</div>
+      <div class="league-chip">Eredivisie</div>
+      <div class="league-chip">Primeira Liga</div>
     </div>
+    <p style="text-align:center; color:var(--muted); font-size:14px; max-width:640px; margin:22px auto 0;">Brasileirão predictions run on live matches from mid-July. Championship, Eredivisie and Primeira Liga are supported now, with their seasons kicking off in August.</p>
   </div>
 </section>
 
@@ -403,16 +485,17 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <section class="premium">
   <div class="wrap">
     <div class="premium-card">
-      <span class="badge">GoalIQ Premium</span>
-      <div class="price">€3.99<span> / month</span></div>
-      <p style="color:var(--muted);">Go deeper on every prediction.</p>
+      <span class="badge">GoalIQ Pro</span>
+      <div class="price">€25<span> / year</span></div>
+      <p style="color:var(--muted);">Or €3.99 a month. Go deeper on every prediction.</p>
       <ul class="premium-list">
-        <li>Top-10 most likely scorelines</li>
-        <li>Form &amp; momentum analysis per team</li>
-        <li>Head-to-head records</li>
-        <li>A full week of fixture predictions</li>
+        <li>Full FPL toolkit on the web: xP, captain ranker, transfer planner</li>
+        <li>Differentials, player compare and predicted starting minutes</li>
+        <li>Transfer suggestions for your imported FPL team</li>
+        <li>In the app: top-10 scorelines, form &amp; momentum, head-to-head, a full week of fixtures</li>
       </ul>
-      <small>Cancel anytime. Billed monthly through your app store.</small>
+      <p style="margin:6px 0 16px;"><a class="btn-primary" href="https://pro.goaliq.app" data-cta="pricing">Start GoalIQ Pro</a></p>
+      <small>Cancel anytime. One subscription covers web, iOS and Android.</small>
     </div>
   </div>
 </section>
@@ -436,6 +519,14 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </div>
   </div>
 </footer>
+
+<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<script>
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
+  if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta')}); }
+});
+</script>
 
 </body>
 </html>

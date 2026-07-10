@@ -146,7 +146,7 @@
  "description": "Model clean sheet probability for every Premier League team and a model fixture difficulty rating (1 to 5) for the next 6 gameweeks of the 2026/27 season, from GoalIQ's Dixon-Coles match model. Updated every gameweek.",
  "url": "https://goaliq.app/fpl.html",
  "isAccessibleForFree": true,
- "dateModified": "2026-07-08",
+ "dateModified": "2026-07-09",
  "temporalCoverage": "2026-08/2027-05",
  "creator": {
   "@id": "https://goaliq.app/#organization"
@@ -207,6 +207,11 @@
   .faq dt{ font-weight:700; margin-top:20px; }
   .faq dd{ margin:6px 0 0; }
   .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:12px; padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
+  .upsell{ border:2px solid var(--magenta); background:var(--paper); border-radius:16px; padding:24px 26px; margin:48px 0 6px; }
+  .upsell h2{ margin:0 0 10px; }
+  .upsell p{ margin:0 0 6px; }
+  .upsell .cta-row{ margin:18px 0 4px; }
+  .upsell .price-note{ color:var(--ink-muted); font-size:14px; margin:10px 0 0; }
   footer{ padding:30px 0 40px; font-size:14px; }
   footer .wrap{ color:var(--hero-muted); }
   footer a{ color:var(--cream); }
@@ -232,7 +237,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <div class="bar"></div>
   <div class="nav">
     <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="26" height="26" alt="">Goal<span>IQ</span></a></div>
-    <a class="cta" href="https://pro.goaliq.app">Open GoalIQ Pro</a>
+    <a class="cta" href="https://pro.goaliq.app" data-cta="nav">Open GoalIQ Pro</a>
   </div>
 </header>
 
@@ -245,11 +250,11 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <p class="lede">GoalIQ runs a football match model that estimates how likely each
 Premier League team is to keep a clean sheet, and how hard their next six
 fixtures are. The numbers update every gameweek. Everything on this page is free.</p>
-<p class="meta">Season 2026/27. Data updated 8 July 2026.
+<p class="meta">Season 2026/27. Data updated 9 July 2026.
 Gameweek 1 starts Friday 21 August 2026.</p>
 
 <div class="cta-row">
-  <a class="cta" href="https://pro.goaliq.app">See the full xP dashboard on GoalIQ Pro</a>
+  <a class="cta" href="https://pro.goaliq.app" data-cta="fpl">See the full xP dashboard on GoalIQ Pro</a>
   <a class="cta secondary" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google Play</a>
   <a class="cta secondary" href="https://apps.apple.com/app/id6780047163">App Store</a>
 </div>
@@ -263,7 +268,7 @@ Gameweek 1 starts Friday 21 August 2026.</p>
 <h2 id="track-record">The model publishes its prediction record</h2>
 <p>The GoalIQ model logged 100 pre-match predictions live during the 2026 World Cup, before kickoff, with no edits afterwards. Across the 96 matches already played, the model called the result correctly in 61.5% of matches. When the model named a clear winner rather than a draw, it was right 84.3% of the time (59 of 70).</p>
 <div class="stat-row"><div class="stat"><b>61.5%</b><span>correct results across 96 completed predictions</span></div><div class="stat"><b>84.3%</b><span>hit rate when the model called a winner (59 of 70)</span></div><div class="stat"><b>100</b><span>predictions logged before kickoff, hits and misses</span></div></div>
-<p class="note">Source: GoalIQ prediction log, updated 8 July 2026. The full
+<p class="note">Source: GoalIQ prediction log, updated 9 July 2026. The full
 log, including every miss, is served live by the same model that produces the
 tables below.</p>
 
@@ -286,6 +291,19 @@ model-derived, not the official FPL difficulty.</p>
 <span class="fdr fdr4">4</span> <span class="fdr fdr5">5</span>
 (1 easiest, 5 hardest). Venue in cell tooltip: H home, A away.</p>
 
+<aside class="upsell">
+<h2 id="pro">Unlock xP, captain ranker and transfer planner with Pro</h2>
+<p>GoalIQ Pro adds player expected points (xP) per gameweek, a captain ranker,
+a transfer planner, differential picks, player compare and predicted starting
+minutes, from the same match model as this page. Rate my team and price watch
+are free on the web with your public FPL entry ID.</p>
+<div class="cta-row">
+  <a class="cta" href="https://pro.goaliq.app" data-cta="fpl">Start GoalIQ Pro</a>
+</div>
+<p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
+One subscription covers web, iOS and Android.</p>
+</aside>
+
 <h2 id="methodology">Methodology</h2>
 <p>A Dixon-Coles style match model, tau corrected, trained on recent results.
 Clean sheet probability comes from the score matrix: the chance the opponent
@@ -307,7 +325,7 @@ cannot be edited after the fact. If the model has a bad week, the log shows it.<
 </dl>
 
 <div class="cta-row">
-  <a class="cta" href="https://pro.goaliq.app">Open GoalIQ Pro: player xP and captain ranker</a>
+  <a class="cta" href="https://pro.goaliq.app" data-cta="fpl">Open GoalIQ Pro: player xP and captain ranker</a>
   <a class="cta secondary" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Predict any fixture in the GoalIQ app</a>
   <a class="cta secondary" href="https://apps.apple.com/app/id6780047163">Download on the App Store</a>
 </div>
@@ -332,5 +350,14 @@ predictions and analytics. Not betting advice.</p>
   informational purposes.</p>
   </div>
 </footer>
+
+<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<script>
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
+  if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta')}); }
+});
+</script>
+
 </body>
 </html>
