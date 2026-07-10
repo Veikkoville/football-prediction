@@ -2465,6 +2465,29 @@ def fantasy_compare(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@app.get("/api/fantasy/career")
+def fantasy_career(
+    response: Response,
+    entry: int = Query(..., description="Julkinen FPL entry-ID"),
+):
+    """FPL career / season review (#55): urahistoria jakokorttia varten
+    julkisella entry-ID:llä (past_seasons + summary + viimeisimmän kauden
+    GW-erittely + GoalIQ-malliteaser #50-opti-baselinella).
+
+    ILMAINEN, ei paywallia (jakelu-feature). FPL-haut kulkevat #34:n jaetun
+    10 min TTL-cachen + #52-stale-fallbackin läpi. Esikaudella current on
+    tyhjä → latest_season palautuu available=False + selite (past_seasons +
+    summary palautuvat silti — EI blank/virhe). no-store kuten muut
+    fantasy-endpointit.
+    """
+    from src.models.fpl_career import RateTeamError, career
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return career(entry=entry)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/debug/seasons")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """
