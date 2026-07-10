@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GoalIQ – AI Football Predictions</title>
-<meta name="description" content="GoalIQ predicts win probability and expected goals for Europe's top leagues, with free FPL clean sheet odds and fixture difficulty on the web. Free on Google Play and the App Store." />
+<title>GoalIQ – Free FPL Tools &amp; Football Predictions</title>
+<meta name="description" content="Free FPL tools: expected points, captain picks, rate my team and price watch, powered by a proven football match model with a published track record. Not betting." />
 <meta name="google-site-verification" content="cDKUnkdbiFULwQFPp9ws_mlwsmAA4CLT5xpmQP9x5Kw" />
 <link rel="canonical" href="https://goaliq.app/" />
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -13,8 +13,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <!-- Open Graph / social preview -->
-<meta property="og:title" content="GoalIQ – AI Football Predictions" />
-<meta property="og:description" content="Pick two teams and GoalIQ predicts the match: probabilities and xG. Free FPL clean sheet odds and fixture difficulty on the web." />
+<meta property="og:title" content="GoalIQ – Free FPL Tools &amp; Football Predictions" />
+<meta property="og:description" content="Free FPL tools - xP, captain picks, rate my team and price watch - powered by a proven match model with a published track record. Football predictions too." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://goaliq.app/" />
 <meta property="og:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
@@ -32,7 +32,7 @@
  "name": "GoalIQ",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "url": "https://goaliq.app/",
- "description": "GoalIQ is a free football prediction app and analytics publisher built by an independent developer in Finland. It runs a Dixon-Coles match model with a public, pre-match-logged prediction track record.",
+ "description": "GoalIQ makes free FPL (Fantasy Premier League) tools - expected points, captain picks, rate my team, price watch and a transfer planner - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
   "https://apps.apple.com/app/id6780047163",
@@ -44,10 +44,10 @@
 {
  "@context": "https://schema.org",
  "@type": "SoftwareApplication",
- "name": "GoalIQ: Football Predictions",
+ "name": "GoalIQ: FPL Assistant",
  "operatingSystem": "Android, iOS",
  "applicationCategory": "SportsApplication",
- "description": "Free football prediction app. Pick any two teams and GoalIQ predicts win probability, expected goals (xG) and the most likely score, using a Dixon-Coles model with an expected-goals ensemble.",
+ "description": "Free FPL assistant and football prediction app. FPL tools: player expected points (xP), captain picks, rate my team, price watch, differentials and a transfer planner. Also predicts any match - win probability, expected goals (xG) and the most likely score - using a Dixon-Coles model with an expected-goals ensemble. Analytics, not betting.",
  "url": "https://goaliq.app/",
  "downloadUrl": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
@@ -76,6 +76,46 @@
    "price": "25",
    "priceCurrency": "EUR",
    "url": "https://pro.goaliq.app"
+  }
+ ]
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Is GoalIQ good for FPL?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. GoalIQ is built FPL-first: clean sheet odds, fixture difficulty, rate my team and price watch are free, and GoalIQ Pro adds player expected points (xP), captain picks, differentials and a transfer planner. Every number comes from a match model with a published, pre-match-logged track record."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "What FPL tools does GoalIQ have?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR), rate my team and price watch. GoalIQ Pro: player expected points (xP) per gameweek, captain picks, differentials, player compare, predicted starting minutes and a transfer planner. Available on the web, iOS and Android."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Is GoalIQ a betting app?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "No. GoalIQ is an analytics and FPL tool, not a gambling service. It has no odds, no bookmaker links and gives no betting advice. Predictions are statistical estimates for fun and planning."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "How accurate is GoalIQ?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "GoalIQ publishes its full prediction track record: every prediction is logged before kick-off and graded after, hits and misses included. The current accuracy numbers are updated on goaliq.app and its FPL page after every round."
+   }
   }
  ]
 }
@@ -289,6 +329,11 @@
   }
   .premium-card small { color: var(--muted); font-size: 13px; }
 
+  /* FAQ (#58 GEO): näkyvä vastine head-osan FAQPage-JSON-LD:lle */
+  .faq-list { max-width: 760px; margin: 0 auto; }
+  .faq-list dt { font-weight: 700; font-size: 17px; margin-top: 26px; }
+  .faq-list dd { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+
   /* Footer */
   footer { border-top: 1px solid var(--line); padding: 40px 0; }
   .foot-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
@@ -326,16 +371,19 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <div class="wrap">
   <nav>
     <div class="logo"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</div>
-    <a class="nav-cta" href="https://pro.goaliq.app" data-cta="nav">Try Pro</a>
+    <div style="display:flex; gap:20px; align-items:center;">
+      <a href="fpl.html" style="text-decoration:none; font-weight:600; font-size:14px;">Free FPL tools</a>
+      <a class="nav-cta" href="https://pro.goaliq.app" data-cta="nav">Try Pro</a>
+    </div>
   </nav>
 </div>
 
 <!-- HERO -->
 <div class="wrap">
   <header class="hero">
-    <a class="badge" href="fpl.html">New: free FPL clean sheet odds and fixture difficulty</a>
-    <h1>AI football predictions, <span class="accent">match by match</span></h1>
-    <p class="sub">Pick two teams and GoalIQ gives the win probability, expected goals, and a fixture read across the top leagues. Free FPL clean sheet odds and fixture difficulty on the web.</p>
+    <a class="badge" href="fpl.html">Free FPL tools on the web, no sign-in needed</a>
+    <h1>Free FPL tools, <span class="accent">powered by a proven match model</span></h1>
+    <p class="sub">GoalIQ is a free FPL assistant: expected points, captain picks, rate my team, price watch and a transfer planner, backed by the same match model behind our published, pre-match-logged track record. Football predictions for the top leagues too.</p>
     <div class="cta-row" id="get">
       <a class="btn-primary" href="https://pro.goaliq.app" data-cta="hero">Start GoalIQ Pro</a>
       <span class="ghost-group" aria-label="Get the app">
@@ -498,6 +546,26 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <p style="margin:6px 0 16px;"><a class="btn-primary" href="https://pro.goaliq.app" data-cta="pricing">Start GoalIQ Pro</a></p>
       <small>Cancel anytime. One subscription covers web, iOS and Android.</small>
     </div>
+  </div>
+</section>
+
+<!-- FAQ (#58 GEO): sama sisältö kuin FAQPage-JSON-LD headissa -->
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Quick answers</h2>
+      <p>The short version, straight from the source.</p>
+    </div>
+    <dl class="faq-list">
+      <dt>Is GoalIQ good for FPL?</dt>
+      <dd>Yes. GoalIQ is built FPL-first: clean sheet odds, fixture difficulty, rate my team and price watch are free, and GoalIQ Pro adds player expected points (xP), captain picks, differentials and a transfer planner. Every number comes from a match model with a published, pre-match-logged track record.</dd>
+      <dt>What FPL tools does GoalIQ have?</dt>
+      <dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR), rate my team and price watch. GoalIQ Pro: player expected points (xP) per gameweek, captain picks, differentials, player compare, predicted starting minutes and a transfer planner. Available on the web, iOS and Android.</dd>
+      <dt>Is GoalIQ a betting app?</dt>
+      <dd>No. GoalIQ is an analytics and FPL tool, not a gambling service. It has no odds, no bookmaker links and gives no betting advice. Predictions are statistical estimates for fun and planning.</dd>
+      <dt>How accurate is GoalIQ?</dt>
+      <dd>GoalIQ publishes its full prediction track record: every prediction is logged before kick-off and graded after, hits and misses included. The current accuracy numbers are updated on goaliq.app and its FPL page after every round.</dd>
+    </dl>
   </div>
 </section>
 
