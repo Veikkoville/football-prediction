@@ -692,12 +692,19 @@ def update_index(c: dict) -> bool:
         f"The model logs every prediction before kickoff. "
         f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} matches played."
     )
+    trust = (
+        f"Built on a model with {fmt_pct(c['acc_pct_1x2'])} correct 1X2 results "
+        f"across {c['acc_n']} logged matches, every prediction logged before kick-off."
+    )
     new = re.sub(
         r"(<!-- GEN:ACC-CHIP-START -->).*?(<!-- GEN:ACC-CHIP-END -->)",
         lambda m: m.group(1) + chip + m.group(2), s, flags=re.S)
     new = re.sub(
         r"(<!-- GEN:ACC-PROOF-START -->).*?(<!-- GEN:ACC-PROOF-END -->)",
         lambda m: m.group(1) + proof + m.group(2), new, flags=re.S)
+    new = re.sub(
+        r"(<!-- GEN:ACC-TRUST-START -->).*?(<!-- GEN:ACC-TRUST-END -->)",
+        lambda m: m.group(1) + trust + m.group(2), new, flags=re.S)
     if new != s:
         INDEX_PATH.write_text(new, encoding="utf-8")
         return True
