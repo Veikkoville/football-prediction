@@ -2554,6 +2554,24 @@
       "predicted_winner": "home",
       "logged_at": "2026-07-08T02:44:47+00:00",
       "result": null
+    },
+    {
+      "match_id": "fd-537387",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-14",
+      "kickoff": "2026-07-14T19:00:00Z",
+      "home_team": "France",
+      "away_team": "Spain",
+      "p_home": 0.2739,
+      "p_draw": 0.2985,
+      "p_away": 0.4276,
+      "xg_home": 1.004,
+      "xg_away": 1.318,
+      "most_likely_score": "1-1",
+      "predicted_winner": "away",
+      "logged_at": "2026-07-11T02:41:42+00:00",
+      "result": null
     }
   ]
 }
