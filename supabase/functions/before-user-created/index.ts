@@ -73,7 +73,13 @@ Deno.serve(async (req) => {
   }
 
   console.warn(`before-user-created: REJECTED (${reason}) domain=${domain}`);
-  return json(400, {
+  // HUOM: hylkäys palautetaan HTTP 200 + error-body. Dokumentaation
+  // 4xx-esimerkki EI toimi deployattua GoTruea vasten: hookshttp.go palauttaa
+  // hookin 400:lle sokeasti 500 "Invalid payload sent to hook" ja parsii
+  // error-objektin ({"error":{"http_code","message"}}, hookserrors.Check)
+  // VAIN 200/202-vastauksen bodysta. Verifioitu supabase/auth-lähteestä +
+  // livenä 12.7.2026 (upstream-bugi: supabase/auth#2235).
+  return json(200, {
     error: { http_code: 400, message: REJECT_MESSAGE },
   });
 });
