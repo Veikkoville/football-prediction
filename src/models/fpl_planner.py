@@ -24,12 +24,12 @@ CoS-linjauksen mukaan; greedy + rajattu kandidaattijoukko riittää GW1-arvoon):
 from __future__ import annotations
 
 from src.models.fpl_rate_team import (
-    POS_NAME, MAX_PER_CLUB, RateTeamError, build_context,
-    captain_suggestion, clamp_gw_to_projections, optimal_xi, resolve_squad,
-    _gw_xp,
+    HIT_COST_XP, HOLD_THRESHOLD_XP, POS_NAME, MAX_PER_CLUB, RateTeamError,
+    build_context, build_hold_verdict, captain_suggestion,
+    clamp_gw_to_projections, optimal_xi, resolve_squad, _gw_xp,
 )
 
-HIT_COST = 4.0
+HIT_COST = HIT_COST_XP  # FPL:n -4; sama lähde kuin rate-teamin hold_verdict
 FT_CARRY_MAX = 5
 MAX_TRANSFERS_PER_GW = 2
 TOP_CANDIDATES_PER_POS = 8
@@ -192,6 +192,30 @@ def plan_transfers(entry: int | None = None, gw: int | None = None,
         plan_total = baseline_total
         total_hits = 0.0
 
+    # #63: hero-verdikti — suunnitelman netto (hitit jo vähennetty) vs kynnys.
+    # Ei koskaan suosittele siirtoketjua jonka hyöty on kynnyksen alle.
+    n_moves = sum(len(p["transfers"]) for p in plan)
+    net_gain = round(plan_total - baseline_total, 2)
+    if n_moves == 0:
+        hv_message = (f"No transfer beats your team over the next {len(gws)} "
+                      f"GWs - holding is the play.")
+    elif net_gain < HOLD_THRESHOLD_XP:
+        hv_message = (f"Your best plan gains only {net_gain:+.1f} xP over "
+                      f"{len(gws)} GWs (hits included) - holding is the play.")
+    else:
+        plural = "s" if n_moves != 1 else ""
+        hv_message = (f"Recommended: {n_moves} transfer{plural} for "
+                      f"{net_gain:+.1f} xP net over {len(gws)} GWs.")
+    hold_verdict = {
+        "verdict": ("hold" if n_moves == 0 or net_gain < HOLD_THRESHOLD_XP
+                    else "transfer"),
+        "best_move_gain_xp": net_gain if n_moves else None,
+        "horizon_gws": len(gws),
+        "threshold_xp": HOLD_THRESHOLD_XP,
+        "transfers_planned": n_moves,
+        "message": hv_message,
+    }
+
     return {
         "meta": {
             "entry": entry, "start_gw": gws[0], "horizon": len(gws),
@@ -202,6 +226,7 @@ def plan_transfers(entry: int | None = None, gw: int | None = None,
             "note": "GoalIQ model projections - for fun and planning, "
                     "not betting advice.",
         },
+        "hold_verdict": hold_verdict,
         "plan": plan,
         "totals": {
             "plan_xp": round(plan_total, 2),

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fetchRateTeam, type RateTeamResponse } from '$lib/fantasyTools';
 	import { capture } from '$lib/analytics';
+	import HoldVerdictCard from './HoldVerdictCard.svelte';
 
 	// FREE/PREMIUM-raja komponenttitasolla: siirtosuositukset renderöityvät
 	// VAIN premium={true} (ProView, tilauksen takana). Free näyttää lukitun
@@ -135,8 +136,19 @@
 	</div>
 
 	{#if premium}
-		<!-- #50: VERDICT + ACTION ensin, taulukko vasta sen jälkeen -->
-		{#if data.transfers.hold}
+		<!-- #63: HOLD-verdikti HERO-kantana siirtolistan yläpuolella; backendin
+		     hold_verdict on hit-tietoinen. Fallback #50-riviin jos kenttä puuttuu. -->
+		{#if data.transfers.hold_verdict}
+			<HoldVerdictCard verdict={data.transfers.hold_verdict} surface="rate_team" />
+			{#if data.transfers.hold_verdict.verdict === 'transfer' && data.transfers.suggestions.length > 0}
+				{@const top = data.transfers.suggestions[0]}
+				<p class="verdict-line">
+					Weak spot: <strong>{data.rating.weakest_line}</strong>. Top upgrade:
+					<strong>{top.out.web_name}</strong> to <strong>{top.in.web_name}</strong>,
+					<span class="gain-text">+{top.delta_xp_horizon.toFixed(1)} xP</span>.
+				</p>
+			{/if}
+		{:else if data.transfers.hold}
 			<p class="verdict-line hold">
 				Verdict: <abbr
 					title="Keeping (rolling) your free transfer this week instead of spending it"

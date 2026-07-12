@@ -40,6 +40,10 @@ BUDGET_TENTHS = 1000  # 100.0 m — satunnaisotoksen budjettiraja
 # "Hold"-kynnys: paras yksittäisen siirron horisontti-xP-delta alle tämän →
 # suositus on pitää joukkue (siirto ei ole hitin arvoinen; -4 p ≈ 2 GW:n etu).
 HOLD_THRESHOLD_XP = 2.0
+# FPL:n siirtohitti (-4 p). #63: hold_verdict lasketaan hitin JÄLKEEN —
+# ilman vapaata siirtoa (ft=0) netto = delta - 4. fpl_planner käyttää samaa
+# arvoa (HIT_COST importataan täältä).
+HIT_COST_XP = 4.0
 # Kapteenivaihtoehto näytetään jos ero kärkeen on alle tämän (GW-xP).
 CAPTAIN_ALT_MARGIN_XP = 0.5
 
@@ -336,6 +340,42 @@ def transfer_suggestions(squad: list[dict], pool: list[dict],
     }
 
 
+def build_hold_verdict(best_gain_xp: float | None, horizon_gws: int,
+                       ft: int = 1) -> dict:
+    """#63: eksplisiittinen hero-verdikti UI-kannaksi. Hit-tietoinen: ilman
+    vapaata siirtoa (ft=0) siirron netto = delta - HIT_COST_XP → verdikti
+    lasketaan hitin JÄLKEEN (vanha `hold`-bool jää bruttona ennalleen,
+    yhteensopivuus). Kynnys = HOLD_THRESHOLD_XP netolle."""
+    hit = 0.0 if ft > 0 else HIT_COST_XP
+    if best_gain_xp is None:
+        return {
+            "verdict": "hold",
+            "best_move_gain_xp": None,
+            "horizon_gws": horizon_gws,
+            "threshold_xp": HOLD_THRESHOLD_XP,
+            "hit_applied_xp": hit,
+            "message": (f"No transfer beats your team over the next "
+                        f"{horizon_gws} GWs - holding is the play."),
+        }
+    net = round(best_gain_xp - hit, 2)
+    hold = net < HOLD_THRESHOLD_XP
+    hit_note = " after a -4 hit" if hit else ""
+    if hold:
+        message = (f"Your best move gains only {net:+.1f} xP over "
+                   f"{horizon_gws} GWs{hit_note} - holding is the play.")
+    else:
+        message = (f"Your best move gains {net:+.1f} xP over "
+                   f"{horizon_gws} GWs{hit_note} - worth a transfer.")
+    return {
+        "verdict": "hold" if hold else "transfer",
+        "best_move_gain_xp": net,
+        "horizon_gws": horizon_gws,
+        "threshold_xp": HOLD_THRESHOLD_XP,
+        "hit_applied_xp": hit,
+        "message": message,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Pääorkestrointi
 # ---------------------------------------------------------------------------
@@ -425,9 +465,12 @@ def clamp_gw_to_projections(target_gw: int, pool: list[dict],
 
 def rate_team(entry: int | None = None, gw: int | None = None,
               players: list[int] | None = None, captain: int | None = None,
-              bank: float | None = None) -> dict:
+              bank: float | None = None, ft: int = 1) -> dict:
     """Arvioi joukkue. entry-moodi (julkinen FPL-ID) TAI manual-moodi
-    (players = 15 element-ID:tä, esikausifallback)."""
+    (players = 15 element-ID:tä, esikausifallback). ft = vapaat siirrot
+    (#63: 0 → hold_verdict laskee -4 hitin siirron nettoon)."""
+    if not 0 <= ft <= 5:
+        raise RateTeamError(400, "ft must be between 0 and 5.")
     xp_data, bootstrap, pool, pool_by_id = build_context()
     mode = "manual" if players else "entry"
     missing: list[int] = []
@@ -479,6 +522,11 @@ def rate_team(entry: int | None = None, gw: int | None = None,
     strongest, weakest = _line_strength(xi, pool)
 
     transfers = transfer_suggestions(squad, pool, bank_tenths)
+    # #63: hero-verdikti — paras yksittäinen siirto hitin jälkeen vs kynnys
+    best_gain = (transfers["suggestions"][0]["delta_xp_horizon"]
+                 if transfers["suggestions"] else None)
+    transfers["hold_verdict"] = build_hold_verdict(
+        best_gain, int(xp_data["meta"].get("horizon_gw") or 6), ft)
 
     return {
         "meta": {

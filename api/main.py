@@ -2354,10 +2354,15 @@ def fantasy_rate_team(
     captain: int | None = Query(default=None),
     bank: float | None = Query(default=None, ge=0, le=100,
                                description="Pankki miljoonina (manual-moodi)"),
+    ft: int = Query(default=1, ge=0, le=5,
+                    description="Vapaat siirrot (#63: 0 -> hold_verdict "
+                                "laskee -4 hitin siirron nettoon)"),
 ):
     """FPL rate-my-team (#34): tuo joukkue julkisella entry-ID:llä (tai 15
     pelaaja-ID:llä ennen kautta) → xP-pohjainen tiimiarvio (percentiili vs
     satunnaisotos laillisia budjettijoukkueita) + kapteeni- ja siirtosuositukset.
+    #63: transfers.hold_verdict = eksplisiittinen hold/transfer-kanta
+    (hit-tietoinen netto vs 2.0 xP -kynnys).
 
     Lukee saman committatun xP-projektion kuin /api/fantasy/xp (ei laskentaa
     mallipolulla); FPL-haut cachetetaan 10 min. Ei kirjautumista/salasanoja.
@@ -2376,7 +2381,7 @@ def fantasy_rate_team(
                             detail="Provide either entry or players.")
     try:
         return rate_team(entry=entry, gw=gw, players=player_ids,
-                         captain=captain, bank=bank)
+                         captain=captain, bank=bank, ft=ft)
     except RateTeamError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 

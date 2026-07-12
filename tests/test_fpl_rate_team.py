@@ -199,6 +199,78 @@ def test_hold_when_no_meaningful_upgrade():
         >= rt.HOLD_THRESHOLD_XP)
 
 
+# ---------------------------------------------------------------------------
+# #63 hold_verdict: hold/transfer + hit-tietoisuus
+# ---------------------------------------------------------------------------
+
+# Heikko runko (per positio poolin huonoimmat) — jaettu myös planner-testeihin
+WEAK_SQUAD_IDS = [3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24, 28, 29, 30]
+# Runko jossa paras upgrade on FWD 28 (4.6/GW) -> 27 (5.0/GW) = +2.4 xP gross
+# 6 GW:lle: ft=1 -> netto 2.4 >= kynnys 2.0 (transfer); ft=0 -> 2.4-4 = -1.6 (hold)
+NEAR_OPTIMAL_SQUAD_IDS = [1, 2, 5, 6, 7, 8, 9, 15, 16, 17, 18, 19, 25, 26, 28]
+
+
+def test_hold_verdict_optimized_team_holds():
+    # (a) selvästi optimoitu tiimi -> verdict=hold + gain alle kynnyksen
+    out = rt.rate_team(players=SQUAD_IDS, bank=0.0)
+    hv = out["transfers"]["hold_verdict"]
+    assert hv["verdict"] == "hold"
+    assert (hv["best_move_gain_xp"] is None
+            or hv["best_move_gain_xp"] < rt.HOLD_THRESHOLD_XP)
+    assert hv["horizon_gws"] == 6
+    assert hv["threshold_xp"] == rt.HOLD_THRESHOLD_XP
+    assert "holding" in hv["message"].lower()
+
+
+def test_hold_verdict_weak_team_transfers():
+    # (b) selvästi heikko tiimi -> verdict=transfer + oikea out->in
+    out = rt.rate_team(players=WEAK_SQUAD_IDS, bank=0.0)
+    hv = out["transfers"]["hold_verdict"]
+    assert hv["verdict"] == "transfer"
+    assert hv["best_move_gain_xp"] >= rt.HOLD_THRESHOLD_XP
+    top = out["transfers"]["suggestions"][0]
+    assert top["out"]["id"] in WEAK_SQUAD_IDS
+    assert top["in"]["id"] not in WEAK_SQUAD_IDS
+    # ft=1 (oletus) -> ei hittiä -> netto == brutto-delta
+    assert hv["best_move_gain_xp"] == top["delta_xp_horizon"]
+    assert hv["hit_applied_xp"] == 0.0
+
+
+def test_hold_verdict_hit_aware():
+    # (c) siirto joka voittaa brutto +2.4 xP: ft=1 -> transfer;
+    # ft=0 -> -4 hitti -> netto -1.6 -> HOLD (hit-tietoisuus)
+    with_ft = rt.rate_team(players=NEAR_OPTIMAL_SQUAD_IDS, bank=0.0, ft=1)
+    assert with_ft["transfers"]["hold_verdict"]["verdict"] == "transfer"
+    assert with_ft["transfers"]["hold_verdict"]["best_move_gain_xp"] == 2.4
+
+    no_ft = rt.rate_team(players=NEAR_OPTIMAL_SQUAD_IDS, bank=0.0, ft=0)
+    hv = no_ft["transfers"]["hold_verdict"]
+    assert hv["verdict"] == "hold"
+    assert hv["hit_applied_xp"] == rt.HIT_COST_XP
+    assert hv["best_move_gain_xp"] == round(2.4 - rt.HIT_COST_XP, 2)
+    assert "hit" in hv["message"]
+
+
+def test_hold_verdict_ft_validation():
+    with pytest.raises(rt.RateTeamError) as e:
+        rt.rate_team(players=SQUAD_IDS, ft=99)
+    assert e.value.status_code == 400
+
+
+def test_hold_verdict_golden_master_entry():
+    # Golden: entry-runko = poolin parhaat -> hold, kentät vakiot
+    hv = rt.rate_team(entry=424242)["transfers"]["hold_verdict"]
+    assert hv == {
+        "verdict": "hold",
+        "best_move_gain_xp": None,
+        "horizon_gws": 6,
+        "threshold_xp": rt.HOLD_THRESHOLD_XP,
+        "hit_applied_xp": 0.0,
+        "message": ("No transfer beats your team over the next 6 GWs - "
+                    "holding is the play."),
+    }
+
+
 def test_optimal_xi_formation_legal():
     squad = [p for p in rt._projection_pool(FAKE_XP,
              {e["id"]: e for e in POOL_BOOT}) if p["id"] in SQUAD_IDS]
@@ -257,6 +329,19 @@ def test_endpoint_manual_mode(client):
 def test_endpoint_bad_players_param(client):
     r = client.get("/api/fantasy/rate-team?players=1,2,abc")
     assert r.status_code == 400
+
+
+def test_endpoint_hold_verdict_and_ft_param(client):
+    # #63: hold_verdict kulkee endpointin läpi + ft=0 flippaa hit-tietoisesti
+    ids = ",".join(str(i) for i in NEAR_OPTIMAL_SQUAD_IDS)
+    r1 = client.get(f"/api/fantasy/rate-team?players={ids}&bank=0")
+    assert r1.status_code == 200
+    assert r1.json()["transfers"]["hold_verdict"]["verdict"] == "transfer"
+    r0 = client.get(f"/api/fantasy/rate-team?players={ids}&bank=0&ft=0")
+    assert r0.status_code == 200
+    assert r0.json()["transfers"]["hold_verdict"]["verdict"] == "hold"
+    r_bad = client.get(f"/api/fantasy/rate-team?players={ids}&ft=99")
+    assert r_bad.status_code == 422  # FastAPI Query(le=5)
 
 
 def test_fetch_fpl_stale_fallback_on_failure(monkeypatch):
