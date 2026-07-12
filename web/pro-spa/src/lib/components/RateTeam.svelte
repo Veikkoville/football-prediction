@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { fetchRateTeam, type RateTeamResponse } from '$lib/fantasyTools';
 	import { capture } from '$lib/analytics';
+	import { auth } from '$lib/auth.svelte';
+	import {
+		fplEntry,
+		forgetEntry,
+		loadProfileEntry,
+		persistEntry,
+		toggleRemember
+	} from '$lib/fplEntry.svelte';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 
 	// FREE/PREMIUM-raja komponenttitasolla: siirtosuositukset renderöityvät
@@ -8,26 +16,44 @@
 	// teaser-rivin joka vie Paywalliin (onUpgrade → Pro-tab).
 	let { premium = false, onUpgrade }: { premium?: boolean; onUpgrade?: () => void } = $props();
 
-	let entryInput = $state('');
+	// #66: entry-kenttä on jaettu (fplEntry.entry) RateTeamin + Plannerin kesken
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let data = $state<RateTeamResponse | null>(null);
 
-	let entryValid = $derived(/^\d{1,10}$/.test(entryInput.trim()));
+	let entryValid = $derived(/^\d{1,10}$/.test(fplEntry.entry.trim()));
 
-	async function rate(e: SubmitEvent) {
-		e.preventDefault();
+	async function runRate() {
 		if (!entryValid || loading) return;
 		loading = true;
 		error = null;
 		try {
-			data = await fetchRateTeam(Number(entryInput.trim()));
+			const id = Number(fplEntry.entry.trim());
+			data = await fetchRateTeam(id);
+			void persistEntry(id); // #66: talteen vasta onnistuneesta hausta
 		} catch (err) {
 			data = null;
 			error = err instanceof Error ? err.message : String(err);
 		}
 		loading = false;
 	}
+
+	function rate(e: SubmitEvent) {
+		e.preventDefault();
+		void runRate();
+	}
+
+	// #66: kirjautuneena lue tallennettu entry-ID profiilista (kerran per user)
+	// -> esitäyttö + kertaluontoinen automaattinen rate-ajo (kuten mobiili-#64).
+	$effect(() => {
+		if (auth.sessionResolved && auth.user) void loadProfileEntry();
+	});
+	$effect(() => {
+		if (fplEntry.autoRunPending && entryValid && !data && !loading) {
+			fplEntry.autoRunPending = false;
+			void runRate();
+		}
+	});
 
 	function unlock() {
 		// Sama funnel-pari kuin Paywall/billing, source erottaa työkalupolun
@@ -56,7 +82,7 @@
 			inputmode="numeric"
 			autocomplete="off"
 			placeholder="e.g. 1234567"
-			bind:value={entryInput}
+			bind:value={fplEntry.entry}
 		/>
 	</div>
 	<button class="primary" type="submit" disabled={!entryValid || loading}>
@@ -68,6 +94,27 @@
 	bar (fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...). Before the season
 	starts this imports last season's final squad.
 </p>
+
+{#if auth.user}
+	<!-- #66: tili-taso persistointi vain kirjautuneena (cross-device) -->
+	<div class="remember-row">
+		<label class="remember-toggle">
+			<input type="checkbox" checked={fplEntry.remember} onchange={() => void toggleRemember()} />
+			Remember my team
+		</label>
+		{#if fplEntry.savedEntry != null}
+			<button type="button" class="linklike" onclick={() => void forgetEntry()}>
+				Forget saved team
+			</button>
+		{/if}
+	</div>
+	{#if fplEntry.savedEntry != null}
+		<p class="muted hint">
+			Saved to your GoalIQ account. Your team loads automatically on any device where you sign
+			in.
+		</p>
+	{/if}
+{/if}
 
 {#if error}
 	<p class="banner error">{error}</p>
@@ -223,6 +270,39 @@
 	.hint {
 		margin: 0 0 var(--s-4);
 		font-size: var(--step--1);
+	}
+	/* #66: Remember my team -rivi (vain kirjautuneena) */
+	.remember-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-3);
+		max-width: 640px;
+		margin: 0 0 var(--s-4);
+	}
+	.remember-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--s-2);
+		font-size: var(--step--1);
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.remember-toggle input {
+		accent-color: var(--giq-magenta);
+	}
+	.linklike {
+		background: none;
+		border: none;
+		padding: 0;
+		color: var(--giq-magenta-deep);
+		font-weight: 700;
+		font-size: var(--step--1);
+		cursor: pointer;
+	}
+	.linklike:hover {
+		text-decoration: underline;
 	}
 	.rating {
 		max-width: 680px;

@@ -1,19 +1,21 @@
 <script lang="ts">
 	import { fetchPlan, type PlanResponse } from '$lib/fantasyTools';
+	import { fplEntry, persistEntry } from '$lib/fplEntry.svelte';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import MethodNote from './MethodNote.svelte';
 
 	const HORIZONS = [2, 3, 4, 5, 6] as const;
 	const FTS = [0, 1, 2, 3, 4, 5] as const;
 
-	let entryInput = $state('');
+	// #66: entry-kenttä on jaettu RateTeamin kanssa (fplEntry.entry) - yksi
+	// entry-ID koko työkalusetille; kirjautuneena tallennettu ID esitäyttää.
 	let horizon = $state(3);
 	let ft = $state(1);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let data = $state<PlanResponse | null>(null);
 
-	let entryValid = $derived(/^\d{1,10}$/.test(entryInput.trim()));
+	let entryValid = $derived(/^\d{1,10}$/.test(fplEntry.entry.trim()));
 
 	async function build(e: SubmitEvent) {
 		e.preventDefault();
@@ -21,7 +23,9 @@
 		loading = true;
 		error = null;
 		try {
-			data = await fetchPlan(Number(entryInput.trim()), horizon, ft);
+			const id = Number(fplEntry.entry.trim());
+			data = await fetchPlan(id, horizon, ft);
+			void persistEntry(id); // #66: talteen vasta onnistuneesta hausta
 		} catch (err) {
 			data = null;
 			error = err instanceof Error ? err.message : String(err);
@@ -44,7 +48,7 @@
 			inputmode="numeric"
 			autocomplete="off"
 			placeholder="e.g. 1234567"
-			bind:value={entryInput}
+			bind:value={fplEntry.entry}
 		/>
 	</div>
 	<div>
