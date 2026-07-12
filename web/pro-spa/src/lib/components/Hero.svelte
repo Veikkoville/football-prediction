@@ -7,7 +7,7 @@
 	<div class="brand">
 		<img src={icon} alt="" width="44" height="44" />
 		<div>
-			<div class="word">Goal<span>IQ</span> Pro</div>
+			<div class="word">Goal<span>IQ</span> Premium</div>
 			<div class="tag">
 				Fantasy Premier League tools from the GoalIQ match model ·
 				<a href="https://goaliq.app">goaliq.app</a>

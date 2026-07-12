@@ -31,20 +31,20 @@
 	});
 </script>
 
-<h3>Unlock GoalIQ Pro</h3>
+<h3>Unlock GoalIQ Premium</h3>
 <p class="muted">
 	Player expected points (xP), captain ranker and per-gameweek breakdowns. Season pass
 	renews yearly, monthly renews monthly, cancel anytime. One subscription covers web, iOS
 	and Android.
 </p>
 <p class="muted">
-	Already subscribed in the GoalIQ app? Sign in with the same account and Pro is already
+	Already subscribed in the GoalIQ app? Sign in with the same account and Premium is already
 	active here.
 </p>
 
 {#if top3.length > 0}
 	<div class="teaser card">
-		<div class="muted">Top xP for GW{teaser?.meta.next_gameweek} (Pro)</div>
+		<div class="muted">Top xP for GW{teaser?.meta.next_gameweek} (Premium)</div>
 		{#each top3 as p, i (p.id)}
 			<div class="row">
 				<span>{i + 1}. {p.web_name} <span class="muted">({p.team_short}, {p.pos})</span></span>

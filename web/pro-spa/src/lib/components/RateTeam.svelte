@@ -195,7 +195,7 @@
 				Transfer suggestions <span class="muted">(out → in, with projected xP gain)</span>
 			</span>
 			<span class="locked" aria-label="Locked">•.••</span>
-			<span class="cta">Unlock with Pro</span>
+			<span class="cta">Unlock with Premium</span>
 		</button>
 	{/if}
 {/if}

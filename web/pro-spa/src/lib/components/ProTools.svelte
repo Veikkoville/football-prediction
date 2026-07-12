@@ -25,7 +25,7 @@
 
 <!-- #50: mallin alkuperä-rivi myös pro-pinnalla (sama kiila kuin FreeView) -->
 <Provenance />
-<SegmentNav segments={SEGMENTS} bind:active={segment} label="Pro FPL tools" />
+<SegmentNav segments={SEGMENTS} bind:active={segment} label="Premium FPL tools" />
 
 {#if segment === 'players'}
 	<div id="panel-players" role="tabpanel" aria-labelledby="seg-players">
