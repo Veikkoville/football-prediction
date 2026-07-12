@@ -74,6 +74,30 @@ def test_plan_hit_math_ft_zero():
         1 for p in out["plan"] for m in p["transfers"] if m["hit"] > 0)
 
 
+def test_plan_hold_verdict_best_squad_holds():
+    # #63: paras runko -> 0 siirtoa -> eksplisiittinen hold-verdikti
+    out = pl.plan_transfers(players=SQUAD_IDS, horizon=3, bank=0.0)
+    hv = out["hold_verdict"]
+    assert hv["verdict"] == "hold"
+    assert hv["transfers_planned"] == 0
+    assert hv["best_move_gain_xp"] is None
+    assert hv["horizon_gws"] == 3
+    assert hv["threshold_xp"] == rt.HOLD_THRESHOLD_XP
+    assert "holding" in hv["message"].lower()
+
+
+def test_plan_hold_verdict_weak_squad_transfers():
+    # #63: heikko runko -> transfer-verdikti, netto = totals.net_gain (hitit jo
+    # vähennetty) ja ylittää kynnyksen
+    out = pl.plan_transfers(players=WEAK_SQUAD, horizon=3, bank=10.0, ft=1)
+    hv = out["hold_verdict"]
+    assert hv["verdict"] == "transfer"
+    assert hv["transfers_planned"] > 0
+    assert hv["best_move_gain_xp"] == out["totals"]["net_gain"]
+    assert hv["best_move_gain_xp"] >= rt.HOLD_THRESHOLD_XP
+    assert "Recommended" in hv["message"]
+
+
 def test_plan_param_validation():
     with pytest.raises(rt.RateTeamError):
         pl.plan_transfers(players=SQUAD_IDS, horizon=1)

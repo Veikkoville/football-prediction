@@ -57,6 +57,18 @@ export interface TransferSuggestion {
 	delta_cost: number;
 }
 
+/** #63: backendin eksplisiittinen hold/transfer-kanta (hit-tietoinen netto
+ * vs kynnys). Optional kaikissa vastauksissa - vanha API voi puuttua. */
+export interface HoldVerdict {
+	verdict: 'hold' | 'transfer';
+	best_move_gain_xp: number | null;
+	horizon_gws: number;
+	threshold_xp: number;
+	hit_applied_xp?: number;
+	transfers_planned?: number;
+	message: string;
+}
+
 export interface RateTeamResponse {
 	meta: {
 		mode: string;
@@ -94,6 +106,7 @@ export interface RateTeamResponse {
 		suggestions: TransferSuggestion[];
 		hold: boolean;
 		note?: string;
+		hold_verdict?: HoldVerdict;
 	};
 }
 
@@ -150,6 +163,7 @@ export interface PlanResponse {
 		note?: string;
 		[key: string]: unknown;
 	};
+	hold_verdict?: HoldVerdict;
 	plan: PlanGw[];
 	totals: {
 		plan_xp: number;

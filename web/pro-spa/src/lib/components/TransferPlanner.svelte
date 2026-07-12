@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fetchPlan, type PlanResponse } from '$lib/fantasyTools';
+	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import MethodNote from './MethodNote.svelte';
 
 	const HORIZONS = [2, 3, 4, 5, 6] as const;
@@ -72,6 +73,13 @@
 {#if error}
 	<p class="banner error">{error}</p>
 {:else if data}
+	<!-- #63: mallin kanta ensin (hold vs transfer, xP-matikka näkyvissä),
+	     suunnitelman yksityiskohdat vasta sen jälkeen -->
+	{#if data.hold_verdict}
+		<div class="verdict-slot">
+			<HoldVerdictCard verdict={data.hold_verdict} surface="planner" />
+		</div>
+	{/if}
 	<MethodNote summary="How this plan is built (and its limits)">
 		<p>{data.meta.heuristic}</p>
 		{#if data.meta.note}
@@ -143,6 +151,10 @@
 		flex-wrap: wrap;
 		gap: var(--s-3);
 		align-items: end;
+		margin-bottom: var(--s-4);
+	}
+	/* #63: verdikti-kortin ja MethodNoten väli (kortilla margin-top, ei -bottom) */
+	.verdict-slot {
 		margin-bottom: var(--s-4);
 	}
 	.timeline {
