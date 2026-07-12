@@ -2563,7 +2563,17 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-07-08T02:44:47+00:00",
-      "result": null
+      "result": {
+        "home_score": 3,
+        "away_score": 1,
+        "actual_score": "3-1",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-12T06:03:43+00:00",
+        "duration": "EXTRA_TIME",
+        "regular_score": "1-1"
+      }
     },
     {
       "match_id": "fd-537387",
@@ -2581,6 +2591,24 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-11T02:41:42+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537388",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-15",
+      "kickoff": "2026-07-15T19:00:00Z",
+      "home_team": "England",
+      "away_team": "Argentina",
+      "p_home": 0.2367,
+      "p_draw": 0.3156,
+      "p_away": 0.4477,
+      "xg_home": 0.822,
+      "xg_away": 1.233,
+      "most_likely_score": "0-1",
+      "predicted_winner": "away",
+      "logged_at": "2026-07-12T06:03:43+00:00",
       "result": null
     }
   ]
