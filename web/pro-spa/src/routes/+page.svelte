@@ -33,7 +33,7 @@
 			class:active={tab === 'pro'}
 			onclick={() => (tab = 'pro')}
 		>
-			Expected points (Pro)
+			Expected points (Premium)
 		</button>
 	</div>
 

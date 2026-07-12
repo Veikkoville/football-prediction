@@ -43,7 +43,7 @@
 
 {#if checkoutSuccess}
 	<p class="banner success">
-		Premium active, welcome aboard! Pro is now active on the web AND in the GoalIQ app
+		Premium active, welcome aboard! Premium is now active on the web AND in the GoalIQ app
 		(iOS and Android). Just sign in with the same account on your phone.
 	</p>
 {/if}
@@ -58,7 +58,7 @@
 	{#if auth.sub.plan === 'app'}
 		<p class="banner success">Your GoalIQ app subscription is active here too. Welcome.</p>
 	{:else}
-		<p class="muted">GoalIQ Pro active ({auth.sub.plan}) · thank you for the support!</p>
+		<p class="muted">GoalIQ Premium active ({auth.sub.plan}) · thank you for the support!</p>
 	{/if}
 	{#if xpError}
 		<p class="banner error">Could not load xP projections right now. Please try again shortly.</p>

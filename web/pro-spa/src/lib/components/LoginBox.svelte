@@ -22,8 +22,8 @@
 
 <h3>Sign in to continue</h3>
 <p class="muted">
-	Expected points (xP) is part of GoalIQ Pro. Sign in or create an account first. Already
-	subscribed in the GoalIQ app? Sign in with the same account and Pro is already active
+	Expected points (xP) is part of GoalIQ Premium. Sign in or create an account first. Already
+	subscribed in the GoalIQ app? Sign in with the same account and Premium is already active
 	here.
 </p>
 
