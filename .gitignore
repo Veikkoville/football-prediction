@@ -87,3 +87,5 @@ dist/
 
 # Kehitystyokalun konfiguraatio
 CLAUDE.md
+
+supabase/.temp/
