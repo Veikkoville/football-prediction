@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-11T21:50:57+00:00",
+  "updated_at": "2026-07-12T02:49:40+00:00",
   "logged_total": 101,
-  "pending": 3,
+  "pending": 2,
   "all_time": {
-    "n": 98,
+    "n": 99,
     "correct_1x2": 61,
-    "pct_1x2": 0.6224,
+    "pct_1x2": 0.6162,
     "decisive_n": 72,
     "decisive_correct": 61,
     "pct_decisive": 0.8472,
-    "exact_n": 50,
-    "exact_correct": 10,
-    "pct_exact": 0.2,
-    "brier": 0.4668,
-    "brier_n": 50
+    "exact_n": 51,
+    "exact_correct": 11,
+    "pct_exact": 0.2157,
+    "brier": 0.4732,
+    "brier_n": 51
   },
   "rolling": {
-    "n": 98,
+    "n": 99,
     "correct_1x2": 61,
-    "pct_1x2": 0.6224,
+    "pct_1x2": 0.6162,
     "decisive_n": 72,
     "decisive_correct": 61,
     "pct_decisive": 0.8472,
-    "exact_n": 50,
-    "exact_correct": 10,
-    "pct_exact": 0.2,
-    "brier": 0.4668,
-    "brier_n": 50,
+    "exact_n": 51,
+    "exact_correct": 11,
+    "pct_exact": 0.2157,
+    "brier": 0.4732,
+    "brier_n": 51,
     "window": 100
   },
   "calibration": [
@@ -43,10 +43,10 @@
       "n": 23
     },
     {
-      "bin_mid": 0.2561,
-      "predicted": 0.2561,
-      "actual": 0.1667,
-      "n": 54
+      "bin_mid": 0.2568,
+      "predicted": 0.2568,
+      "actual": 0.1786,
+      "n": 56
     },
     {
       "bin_mid": 0.3429,
@@ -55,10 +55,10 @@
       "n": 20
     },
     {
-      "bin_mid": 0.4588,
-      "predicted": 0.4588,
-      "actual": 0.6,
-      "n": 15
+      "bin_mid": 0.458,
+      "predicted": 0.458,
+      "actual": 0.5625,
+      "n": 16
     },
     {
       "bin_mid": 0.5333,
@@ -86,6 +86,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-11",
+      "home_team": "Norway",
+      "away_team": "England",
+      "predicted_winner": "away",
+      "p_winner": 0.4457,
+      "most_likely_score": "1-1",
+      "actual_score": "1-2",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": true,
+      "duration": "EXTRA_TIME",
+      "regular_score": "1-1"
+    },
     {
       "date": "2026-07-10",
       "home_team": "Spain",
@@ -348,20 +362,6 @@
       "actual_score": "2-1",
       "actual_outcome": "home",
       "hit_1x2": true,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-01",
-      "home_team": "Mexico",
-      "away_team": "Ecuador",
-      "predicted_winner": "away",
-      "p_winner": 0.4075,
-      "most_likely_score": "0-0",
-      "actual_score": "2-0",
-      "actual_outcome": "home",
-      "hit_1x2": false,
       "exact_hit": false,
       "duration": null,
       "regular_score": null
