@@ -257,6 +257,20 @@
   }
   .stat .num { font-size: 26px; font-weight: 800; color: var(--magenta-deep); }
   .stat .lbl { font-size: 13px; color: var(--muted); }
+  /* #74: iso-numero track-record-hero (FPLai-treatment ansaitulla luvulla) */
+  .tr-hero {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 28px 36px; margin: 44px auto 0; max-width: 560px;
+    box-shadow: 0 4px 14px rgba(10,8,32,0.06);
+  }
+  .tr-hero .num {
+    font-size: 84px; font-weight: 800; line-height: 1; color: var(--magenta-deep);
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .tr-hero .lbl { font-size: 17px; color: var(--text); font-weight: 600; margin-top: 6px; }
+  .tr-hero .tr-note { font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .tr-hero .tr-note a { color: var(--magenta-deep); font-weight: 600; }
+  @media (max-width: 640px) { .tr-hero .num { font-size: 60px; } }
 
   /* World Cup band */
   .wc {
@@ -419,8 +433,14 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </div>
     <p class="cta-note">Premium unlocks player expected points (xP), a captain ranker and a transfer planner, from €25 a year.</p>
     <p class="cta-note">The app is a free download. One subscription covers web, iOS and Android.</p>
+    <!-- #74: iso-numero track-record-hero (ansaittu luku, EI vanity). Samat
+         GEN:ACC-CHIP-markerit kuin ennen -> accuracy-botti pitaa luvun tuoreena
+         ilman builder-muutoksia (sama lahde+tahti kuin fpl.html). -->
+    <div class="tr-hero">
+      <!-- GEN:ACC-CHIP-START --><div class="num">61%</div><div class="lbl">result accuracy across 100 logged matches</div><!-- GEN:ACC-CHIP-END -->
+      <div class="tr-note">Every prediction logged before kick-off, publicly tracked. <a href="fpl.html">See the tools it powers &rarr;</a></div>
+    </div>
     <div class="stat-strip">
-      <div class="stat"><!-- GEN:ACC-CHIP-START --><div class="num">61%</div><div class="lbl">result accuracy across 100 logged matches</div><!-- GEN:ACC-CHIP-END --></div>
       <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
       <div class="stat"><div class="num">€25</div><div class="lbl">GoalIQ Premium season pass / year</div></div>
     </div>
