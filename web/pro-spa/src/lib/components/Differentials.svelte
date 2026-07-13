@@ -11,6 +11,9 @@
 	let data = $state<DifferentialsResponse | null>(null);
 
 	let maxValid = $derived(maxOwnership > 0 && maxOwnership <= 100);
+	// #71: delta-kentät + model_vs_crowd ovat optionaalisia kunnes backend on livenä
+	let hasDelta = $derived(data?.players.some((p) => p.model_vs_crowd_delta != null) ?? false);
+	let mvc = $derived(data?.model_vs_crowd ?? null);
 
 	async function load() {
 		if (!maxValid || loading) return;
@@ -90,6 +93,14 @@
 							>Total xP</abbr
 						></th
 					>
+					{#if hasDelta}
+						<th class="num"
+							><abbr
+								title="Model xP percentile minus ownership percentile, within position. Positive: the model rates the player higher than the crowd owns him."
+								>Δ vs crowd</abbr
+							></th
+						>
+					{/if}
 				</tr>
 			</thead>
 			<tbody>
@@ -103,11 +114,69 @@
 						<td class="num">{p.owned_pct.toFixed(1)}</td>
 						<td class="num">{p.xp_per_gw.toFixed(2)}</td>
 						<td class="num total-col">{p.xp_horizon_total.toFixed(2)}</td>
+						{#if hasDelta}
+							<td class="num" class:delta-pos={(p.model_vs_crowd_delta ?? 0) > 0}>
+								{p.model_vs_crowd_delta != null
+									? (p.model_vs_crowd_delta > 0 ? '+' : '') + p.model_vs_crowd_delta.toFixed(1)
+									: '–'}
+							</td>
+						{/if}
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	</div>
+
+	{#if mvc && (mvc.model_backs.length > 0 || mvc.crowd_backs.length > 0)}
+		<section class="mvc">
+			<h3>Where the model disagrees with the crowd</h3>
+			<p class="muted">
+				Model xP percentile minus ownership percentile, within each position. Others track what
+				the template owns; GoalIQ shows where its independent model breaks from it. The ownership
+				filter above does not apply to these lists.
+			</p>
+			<div class="mvc-cols">
+				<div>
+					<h4>Model backs — crowd hasn’t caught on</h4>
+					{#if mvc.model_backs.length === 0}
+						<p class="muted">No strong disagreements right now.</p>
+					{:else}
+						<ul class="mvc-list">
+							{#each mvc.model_backs as p (p.id)}
+								<li>
+									<span>{p.web_name} <span class="muted">{p.team_short} · {p.pos}</span></span>
+									<span class="num"
+										>{p.owned_pct.toFixed(1)}% owned ·
+										<strong class="delta-pos">+{(p.model_vs_crowd_delta ?? 0).toFixed(1)}</strong
+										></span
+									>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+				<div>
+					<h4>Template picks the model doesn’t rate</h4>
+					{#if mvc.crowd_backs.length === 0}
+						<p class="muted">No strong disagreements right now.</p>
+					{:else}
+						<ul class="mvc-list">
+							{#each mvc.crowd_backs as p (p.id)}
+								<li>
+									<span>{p.web_name} <span class="muted">{p.team_short} · {p.pos}</span></span>
+									<span class="num"
+										>{p.owned_pct.toFixed(1)}% owned ·
+										<strong class="delta-neg">{(p.model_vs_crowd_delta ?? 0).toFixed(1)}</strong
+										></span
+									>
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+			</div>
+		</section>
+	{/if}
 {/if}
 
 <style>
@@ -124,5 +193,31 @@
 	td.total-col {
 		font-weight: 700;
 		color: var(--text);
+	}
+	.delta-pos {
+		color: var(--positive, #00c2ad);
+	}
+	.delta-neg {
+		color: var(--negative, #d64550);
+	}
+	.mvc {
+		margin-top: var(--s-5);
+	}
+	.mvc-cols {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: var(--s-4);
+	}
+	.mvc-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.mvc-list li {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-3);
+		padding: var(--s-2) 0;
+		border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.08));
 	}
 </style>

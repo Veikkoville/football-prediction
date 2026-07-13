@@ -131,6 +131,50 @@ def test_differential_finder_filters():
         pl.differential_finder(pos="XYZ")
 
 
+def test_model_vs_crowd_delta_fields_and_bounds():
+    # #71: players-rivit kantavat delta-kentät ja arvot pysyvät rajoissa
+    out = pl.differential_finder(max_ownership=10.0)
+    for p in out["players"]:
+        assert -100.0 <= p["model_vs_crowd_delta"] <= 100.0
+        assert 0.0 <= p["model_pct"] <= 100.0
+        assert 0.0 <= p["crowd_pct"] <= 100.0
+        assert p["model_vs_crowd_delta"] == round(
+            p["model_pct"] - p["crowd_pct"], 1)
+
+
+def test_model_vs_crowd_lists():
+    # Fixture: per positio 2 parasta EO 40, loput EO 5 → 3.-paras per positio
+    # on "malli edellä joukkoa"; heikohko 40 %-omistettu on fade.
+    out = pl.differential_finder()
+    mvc = out["model_vs_crowd"]
+    backs, fades = mvc["model_backs"], mvc["crowd_backs"]
+    assert backs and all(
+        p["model_vs_crowd_delta"] >= pl.MODEL_VS_CROWD_DELTA_MIN
+        and p["model_pct"] >= pl.MODEL_VS_CROWD_MIN_MODEL_PCT for p in backs)
+    assert fades and all(
+        p["model_vs_crowd_delta"] <= -pl.MODEL_VS_CROWD_DELTA_MIN
+        and p["crowd_pct"] >= pl.MODEL_VS_CROWD_MIN_CROWD_PCT for p in fades)
+    # MID 17 (xP 5.0, EO 5) = poolin selkein "model backs" -tapaus
+    assert 17 in {p["id"] for p in backs}
+    # GKP 2 (xP 3.5, EO 40) = template-pelaaja jota malli ei rankkaa → fade
+    assert 2 in {p["id"] for p in fades}
+    # Rehellisyys: template-pelaajat joista malli on samaa mieltä (MID 15,
+    # xP-ykkönen EO 40) eivät ole kummallakaan listalla
+    ids = {p["id"] for p in backs} | {p["id"] for p in fades}
+    assert 15 not in ids
+    # Deltat laskevassa/nousevassa järjestyksessä
+    bd = [p["model_vs_crowd_delta"] for p in backs]
+    fd = [p["model_vs_crowd_delta"] for p in fades]
+    assert bd == sorted(bd, reverse=True) and fd == sorted(fd)
+
+
+def test_model_vs_crowd_pos_filter():
+    out = pl.differential_finder(pos="MID")
+    mvc = out["model_vs_crowd"]
+    for p in mvc["model_backs"] + mvc["crowd_backs"]:
+        assert p["pos"] == "MID"
+
+
 def test_compare_players_verdict():
     out = pl.compare_players([15, 24])  # paras MID vs huonoin MID
     assert len(out["players"]) == 2
