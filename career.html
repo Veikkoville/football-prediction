@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Your FPL Career Card | GoalIQ</title>
-<meta name="description" content="Turn your FPL career into a shareable card: best season, all-time points and a GoalIQ model projection for your current squad. Free, no login - just your public FPL entry ID." />
+<meta name="description" content="Turn your FPL career into a shareable card: best season, all-time points and rank history, plus a GoalIQ model read on your squad in season. Free, no login - just your public FPL entry ID." />
 <link rel="canonical" href="https://goaliq.app/career" />
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
@@ -13,7 +13,7 @@
 
 <!-- Open Graph / social preview -->
 <meta property="og:title" content="Your FPL Career Card | GoalIQ" />
-<meta property="og:description" content="Your FPL career on one card: best season, all-time points and a GoalIQ model projection for your squad. Free, no login." />
+<meta property="og:description" content="Your FPL career on one card: best season, all-time points and rank history. Free, no login." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://goaliq.app/career" />
 <meta property="og:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
@@ -52,9 +52,14 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
+    /* #78: leipäteksti luettavaan system-sansiin - Space Grotesk on display-
+       fontti ja jää otsikoihin, nappeihin ja kortin canvas-typoon (jaon pointti). */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .logo, .btn, .nav-cta {
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
   .bar { height: 6px; background: var(--magenta); }
@@ -64,9 +69,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .logo-mark-img { width: 32px; height: 32px; border-radius: 9px; display: block; }
   .nav-cta { background: var(--magenta); color: #fff; font-weight: 700; padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px; }
   .nav-cta:hover { background: var(--magenta-deep); }
-  h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; margin: 40px 0 12px; }
+  h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; margin: 44px 0 14px; }
   h1 span { color: var(--magenta); }
-  .lede { font-size: 18px; color: var(--muted); max-width: 56ch; }
+  .lede { font-size: 18px; color: var(--muted); max-width: 56ch; line-height: 1.7; }
   .entry-form { margin: 28px 0 10px; display: flex; gap: 10px; flex-wrap: wrap; }
   .entry-form input {
     flex: 1 1 220px; font: inherit; font-size: 17px; padding: 12px 16px;
@@ -80,7 +85,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .btn:hover { background: var(--magenta-deep); }
   .btn.secondary { background: var(--card); color: var(--text); border: 1px solid var(--line); }
   .btn.secondary:hover { background: var(--bg-alt); }
-  .hint { font-size: 14px; color: var(--muted); }
+  .hint { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 62ch; margin-top: 2px; }
   .hint a { color: var(--teal-ink); }
   .status { margin: 18px 0; font-size: 15px; color: var(--muted); min-height: 1.4em; }
   .status.error { color: var(--magenta-deep); font-weight: 500; }
@@ -92,7 +97,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     box-shadow: 0 12px 40px rgba(10,8,32,0.10);
   }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
-  .fineprint { font-size: 13px; color: var(--muted); margin-top: 14px; max-width: 60ch; }
+  .fineprint { font-size: 13px; color: var(--muted); margin-top: 14px; max-width: 60ch; line-height: 1.6; }
   .get-app { margin-top: 44px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
   .get-app h2 { font-size: 20px; margin-bottom: 6px; }
   .get-app p { color: var(--muted); font-size: 15px; margin-bottom: 14px; }
@@ -111,7 +116,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </nav>
 
   <h1>Your FPL career, <span>on one card</span></h1>
-  <p class="lede">Best season, all-time points and how your current squad projects on the GoalIQ model. Free, no login - all it needs is your public FPL entry ID.</p>
+  <p class="lede">Your best season, all-time points and rank history on one shareable card - plus the GoalIQ model's read on your squad once the season is under way. Free, no login - all it needs is your public FPL entry ID.</p>
 
   <form class="entry-form" id="entryForm">
     <input id="entryInput" type="number" inputmode="numeric" min="1" placeholder="Your FPL entry ID, e.g. 1578623" aria-label="FPL entry ID" required>
