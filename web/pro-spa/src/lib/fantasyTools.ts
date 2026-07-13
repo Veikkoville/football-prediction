@@ -202,11 +202,23 @@ export interface DifferentialPlayer {
 	owned_pct: number;
 	xp_per_gw: number;
 	xp_horizon_total: number;
+	/* #71: positio-sisäiset persentiilit + delta (model − crowd).
+	   Optionaalisia kunnes backend-deploy on livenä (fallback-safe). */
+	model_pct?: number;
+	crowd_pct?: number;
+	model_vs_crowd_delta?: number;
+}
+
+export interface ModelVsCrowd {
+	note: string;
+	model_backs: DifferentialPlayer[];
+	crowd_backs: DifferentialPlayer[];
 }
 
 export interface DifferentialsResponse {
 	meta: { max_ownership: number; pos: string | null; horizon_gw?: number; [key: string]: unknown };
 	players: DifferentialPlayer[];
+	model_vs_crowd?: ModelVsCrowd;
 }
 
 /* ---------- compare ---------- */

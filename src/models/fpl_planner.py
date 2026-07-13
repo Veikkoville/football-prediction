@@ -37,6 +37,15 @@ MIN_GAIN_PER_TRANSFER = 0.5  # alle tämän → roll (siirto ei ole vaivan arvoi
 DIFFERENTIAL_MAX_OWNERSHIP = 10.0
 DIFFERENTIAL_TOP_N = 20
 CAPTAIN_DIFFERENTIAL_EO = 10.0
+# #71 malli-vs-joukko: delta = mallin xP-persentiili − EO-persentiili (positio-
+# sisäisesti, jotta GKP/DEF eivät vertaudu hyökkääjien xP-tasoon). Listalle
+# vaaditaan aito erimielisyys (|delta| ≥ kynnys) JA riittävä taso omalla
+# akselilla — template-pelaajat joista malli on samaa mieltä eivät kuulu
+# kumpaankaan listaan (rehellisyys > listan täyttäminen).
+MODEL_VS_CROWD_TOP_N = 10
+MODEL_VS_CROWD_DELTA_MIN = 15.0
+MODEL_VS_CROWD_MIN_MODEL_PCT = 60.0
+MODEL_VS_CROWD_MIN_CROWD_PCT = 60.0
 
 
 def _horizon_gws(pool: list[dict], start_gw: int, horizon: int) -> list[int]:
@@ -272,30 +281,102 @@ def captain_picker(entry: int | None = None, gw: int | None = None,
     }
 
 
+def _pct_ranks(values: list[float]) -> list[float]:
+    """Persentiililuvut 0–100 keskiarvotetuin tasapelein (ilman numpyä)."""
+    n = len(values)
+    if n == 1:
+        return [50.0]
+    order = sorted(range(n), key=lambda i: values[i])
+    pct = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and values[order[j + 1]] == values[order[i]]:
+            j += 1
+        p = 100.0 * ((i + j) / 2.0) / (n - 1)
+        for k in range(i, j + 1):
+            pct[order[k]] = p
+        i = j + 1
+    return pct
+
+
+def _model_vs_crowd(pool: list[dict]) -> dict[int, tuple[float, float, float]]:
+    """#71: pelaaja-id → (model_pct, crowd_pct, delta), positio-sisäisesti.
+
+    model_pct = xp_horizon_total-persentiili oman position sisällä,
+    crowd_pct = owned_pct-persentiili samoin. delta = model − crowd:
+    positiivinen = malli arvostaa korkeammalle kuin joukko omistaa.
+    """
+    out: dict[int, tuple[float, float, float]] = {}
+    for etype in {p["element_type"] for p in pool}:
+        grp = [p for p in pool if p["element_type"] == etype]
+        model = _pct_ranks([p["xp_horizon_total"] for p in grp])
+        crowd = _pct_ranks([(p.get("owned_pct") or 0.0) for p in grp])
+        for p, m, c in zip(grp, model, crowd):
+            m, c = round(m, 1), round(c, 1)
+            out[p["id"]] = (m, c, round(m - c, 1))
+    return out
+
+
 def differential_finder(max_ownership: float = DIFFERENTIAL_MAX_OWNERSHIP,
                         pos: str | None = None) -> dict:
-    """Matala EO × korkea xP -listaus koko poolista (ei vaadi entryä)."""
+    """Matala EO × korkea xP -listaus koko poolista (ei vaadi entryä).
+
+    #71: mukana myös model_vs_crowd-osio — missä malli on ERI mieltä kuin
+    joukko (käänteinen "seuraa eliittiä": model_backs = malli edellä joukkoa,
+    crowd_backs = template-pelaajat joita malli ei rankkaa omistuksen tasolle).
+    """
     if not 0 < max_ownership <= 100:
         raise RateTeamError(400, "max_ownership must be in (0, 100].")
     pos_by_name = {v: k for k, v in POS_NAME.items()}
     if pos is not None and pos not in pos_by_name:
         raise RateTeamError(400, f"pos must be one of {sorted(pos_by_name)}.")
     xp_data, _bootstrap, pool, _by_id = build_context()
-    cands = [p for p in pool
-             if (p.get("owned_pct") or 0.0) <= max_ownership
-             and (pos is None or p["element_type"] == pos_by_name[pos])]
-    cands.sort(key=lambda p: p["xp_horizon_total"], reverse=True)
-    return {
-        "meta": {"max_ownership": max_ownership, "pos": pos,
-                 "generated_at": xp_data["meta"].get("generated_at"),
-                 "horizon_gw": xp_data["meta"].get("horizon_gw")},
-        "players": [{
+    mvc = _model_vs_crowd(pool)
+
+    def _row(p):
+        m, c, d = mvc[p["id"]]
+        return {
             "id": p["id"], "web_name": p["web_name"],
             "team_short": p["team_short"], "pos": POS_NAME[p["element_type"]],
             "price": p["price"] / 10.0, "owned_pct": p["owned_pct"],
             "xp_per_gw": round(p["xp_per_gw"], 2),
             "xp_horizon_total": round(p["xp_horizon_total"], 2),
-        } for p in cands[:DIFFERENTIAL_TOP_N]],
+            "model_pct": m, "crowd_pct": c, "model_vs_crowd_delta": d,
+        }
+
+    cands = [p for p in pool
+             if (p.get("owned_pct") or 0.0) <= max_ownership
+             and (pos is None or p["element_type"] == pos_by_name[pos])]
+    cands.sort(key=lambda p: p["xp_horizon_total"], reverse=True)
+
+    # #71: model-vs-crowd-listat EIVÄT noudata max_ownership-filtteriä
+    # (crowd_backs on määritelmällisesti korkea-EO), pos-filtteri noudatetaan.
+    scoped = [p for p in pool
+              if pos is None or p["element_type"] == pos_by_name[pos]]
+    backs = sorted(
+        (p for p in scoped
+         if mvc[p["id"]][2] >= MODEL_VS_CROWD_DELTA_MIN
+         and mvc[p["id"]][0] >= MODEL_VS_CROWD_MIN_MODEL_PCT),
+        key=lambda p: mvc[p["id"]][2], reverse=True)
+    fades = sorted(
+        (p for p in scoped
+         if mvc[p["id"]][2] <= -MODEL_VS_CROWD_DELTA_MIN
+         and mvc[p["id"]][1] >= MODEL_VS_CROWD_MIN_CROWD_PCT),
+        key=lambda p: mvc[p["id"]][2])
+
+    return {
+        "meta": {"max_ownership": max_ownership, "pos": pos,
+                 "generated_at": xp_data["meta"].get("generated_at"),
+                 "horizon_gw": xp_data["meta"].get("horizon_gw")},
+        "players": [_row(p) for p in cands[:DIFFERENTIAL_TOP_N]],
+        "model_vs_crowd": {
+            "note": ("delta = model xP percentile minus ownership percentile, "
+                     "within position. Positive: the model rates the player "
+                     "higher than the crowd owns him. Ignores max_ownership."),
+            "model_backs": [_row(p) for p in backs[:MODEL_VS_CROWD_TOP_N]],
+            "crowd_backs": [_row(p) for p in fades[:MODEL_VS_CROWD_TOP_N]],
+        },
     }
 
 
