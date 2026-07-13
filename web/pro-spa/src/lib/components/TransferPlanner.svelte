@@ -3,6 +3,15 @@
 	import { fplEntry, persistEntry } from '$lib/fplEntry.svelte';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import MethodNote from './MethodNote.svelte';
+	import ModelWorking from './ModelWorking.svelte';
+
+	// #73: lataustilan askeleet = putken oikeat vaiheet (rehellinen checklist)
+	const WORKING_STEPS = [
+		'Fetching your FPL squad',
+		'Loading model xP projections',
+		'Simulating each gameweek in your horizon',
+		'Weighing transfers against hits and holding'
+	];
 
 	const HORIZONS = [2, 3, 4, 5, 6] as const;
 	const FTS = [0, 1, 2, 3, 4, 5] as const;
@@ -73,6 +82,11 @@
 		{loading ? 'Planning…' : 'Build plan'}
 	</button>
 </form>
+
+{#if loading}
+	<!-- #73: malli tekee töitä -progressiivinen paljastus -->
+	<ModelWorking steps={WORKING_STEPS} />
+{/if}
 
 {#if error}
 	<p class="banner error">{error}</p>
