@@ -174,6 +174,16 @@
   .hero { padding: 64px 0 72px; text-align: center; }
   a.badge { text-decoration: none; }
   .cta-note { color: var(--muted); font-size: 14px; margin-top: 14px; }
+  /* #72: GW-deadline-countdown (flip-clock) - malli-first-urgenssi herossa */
+  .countdown { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 0 auto 28px; }
+  .countdown .cd-label { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .cd-clock { display: flex; align-items: baseline; gap: 6px; }
+  .cd-box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-width: 58px; text-align: center; box-shadow: 0 2px 6px rgba(10,8,32,0.05); }
+  .cd-box .cd-num { display: block; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text); line-height: 1.1; }
+  .cd-box .cd-unit { display: block; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .cd-sep { font-size: 20px; font-weight: 700; color: var(--muted); }
+  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--magenta-deep); text-decoration: none; }
+  .countdown .cd-cta:hover { text-decoration: underline; }
   .badge {
     display: inline-block; background: rgba(25,227,210,0.12);
     color: var(--teal-ink); border: 1px solid rgba(25,227,210,0.35);
@@ -247,6 +257,20 @@
   }
   .stat .num { font-size: 26px; font-weight: 800; color: var(--magenta-deep); }
   .stat .lbl { font-size: 13px; color: var(--muted); }
+  /* #74: iso-numero track-record-hero (FPLai-treatment ansaitulla luvulla) */
+  .tr-hero {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 28px 36px; margin: 44px auto 0; max-width: 560px;
+    box-shadow: 0 4px 14px rgba(10,8,32,0.06);
+  }
+  .tr-hero .num {
+    font-size: 84px; font-weight: 800; line-height: 1; color: var(--magenta-deep);
+    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  }
+  .tr-hero .lbl { font-size: 17px; color: var(--text); font-weight: 600; margin-top: 6px; }
+  .tr-hero .tr-note { font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .tr-hero .tr-note a { color: var(--magenta-deep); font-weight: 600; }
+  @media (max-width: 640px) { .tr-hero .num { font-size: 60px; } }
 
   /* World Cup band */
   .wc {
@@ -384,6 +408,22 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <a class="badge" href="fpl.html">Free FPL tools on the web, no sign-in needed</a>
     <h1>Free FPL tools, <span class="accent">powered by a proven match model</span></h1>
     <p class="sub">GoalIQ is a free FPL assistant: clean sheet odds & FDR, rate my team with a captain pick, and price watch. GoalIQ Premium adds player xP, the captain ranker and a transfer planner. All backed by the same match model behind our published, pre-match-logged track record. Football predictions for the top leagues too.</p>
+    <!-- #72: GW-deadline-countdown. Oletuskohde = GW1-avaus pe 21.8.2026 (näytetään
+         päivämäärä = väite verifioitavissa); kun /api/fantasy alkaa palauttaa
+         deadline_utc:n (FPL-kausiflip), JS vaihtaa viralliseen GW-deadlineen. -->
+    <div class="countdown" id="gw-countdown" hidden>
+      <span class="cd-label" id="cd-label">Season starts · GW1 (Fri 21 Aug)</span>
+      <div class="cd-clock" aria-hidden="true">
+        <span class="cd-box"><span class="cd-num" id="cd-d">–</span><span class="cd-unit">days</span></span>
+        <span class="cd-sep">:</span>
+        <span class="cd-box"><span class="cd-num" id="cd-h">–</span><span class="cd-unit">hrs</span></span>
+        <span class="cd-sep">:</span>
+        <span class="cd-box"><span class="cd-num" id="cd-m">–</span><span class="cd-unit">min</span></span>
+        <span class="cd-sep">:</span>
+        <span class="cd-box"><span class="cd-num" id="cd-s">–</span><span class="cd-unit">sec</span></span>
+      </div>
+      <a class="cd-cta" href="fpl.html" data-cta="countdown">See the model's captain pick &rarr;</a>
+    </div>
     <div class="cta-row" id="get">
       <a class="btn-primary" href="https://pro.goaliq.app" data-cta="hero">Start GoalIQ Premium</a>
       <span class="ghost-group" aria-label="Get the app">
@@ -393,8 +433,14 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </div>
     <p class="cta-note">Premium unlocks player expected points (xP), a captain ranker and a transfer planner, from €25 a year.</p>
     <p class="cta-note">The app is a free download. One subscription covers web, iOS and Android.</p>
+    <!-- #74: iso-numero track-record-hero (ansaittu luku, EI vanity). Samat
+         GEN:ACC-CHIP-markerit kuin ennen -> accuracy-botti pitaa luvun tuoreena
+         ilman builder-muutoksia (sama lahde+tahti kuin fpl.html). -->
+    <div class="tr-hero">
+      <!-- GEN:ACC-CHIP-START --><div class="num">61%</div><div class="lbl">result accuracy across 100 logged matches</div><!-- GEN:ACC-CHIP-END -->
+      <div class="tr-note">Every prediction logged before kick-off, publicly tracked. <a href="fpl.html">See the tools it powers &rarr;</a></div>
+    </div>
     <div class="stat-strip">
-      <div class="stat"><!-- GEN:ACC-CHIP-START --><div class="num">61%</div><div class="lbl">result accuracy across 100 logged matches</div><!-- GEN:ACC-CHIP-END --></div>
       <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
       <div class="stat"><div class="num">€25</div><div class="lbl">GoalIQ Premium season pass / year</div></div>
     </div>
@@ -595,6 +641,48 @@ document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
   if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta')}); }
 });
+</script>
+
+<script>
+/* #72: GW-deadline-countdown. Fallback-kohde = GW1-avaus (PL 26/27, pe 21.8.2026
+   ~20:00 UK). Progressiivinen parannus: /api/fantasy meta.deadline_utc (FPL:n
+   virallinen deadline) korvaa kohteen ja labelin kun kausi on flipannut -
+   evergreen ilman sivuregeneä. Laskuri piiloutuu kun kohde on ohitettu. */
+(function () {
+  var target = new Date('2026-08-21T19:00:00Z');
+  var isDeadline = false;
+  var el = document.getElementById('gw-countdown');
+  if (!el) return;
+  var d = document.getElementById('cd-d'), h = document.getElementById('cd-h'),
+      m = document.getElementById('cd-m'), s = document.getElementById('cd-s'),
+      label = document.getElementById('cd-label');
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function tick() {
+    var left = target.getTime() - Date.now();
+    if (left <= 0) { el.hidden = true; return; }
+    el.hidden = false;
+    var sec = Math.floor(left / 1000);
+    d.textContent = String(Math.floor(sec / 86400));
+    h.textContent = pad(Math.floor(sec % 86400 / 3600));
+    m.textContent = pad(Math.floor(sec % 3600 / 60));
+    s.textContent = pad(sec % 60);
+  }
+  tick();
+  setInterval(tick, 1000);
+  fetch('https://goaliq-api.onrender.com/api/fantasy')
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      var iso = data && data.meta && data.meta.deadline_utc;
+      var gw = data && data.meta && data.meta.next_gameweek;
+      if (!iso) return;
+      var t2 = new Date(iso);
+      if (isNaN(t2.getTime()) || t2.getTime() <= Date.now()) return;
+      target = t2; isDeadline = true;
+      label.textContent = 'GW' + (gw || '') + ' deadline';
+      tick();
+    })
+    .catch(function () { /* fallback-kohde jää voimaan */ });
+})();
 </script>
 
 </body>
