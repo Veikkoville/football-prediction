@@ -10,6 +10,15 @@
 		toggleRemember
 	} from '$lib/fplEntry.svelte';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
+	import ModelWorking from './ModelWorking.svelte';
+
+	// #73: lataustilan askeleet = putken oikeat vaiheet (rehellinen checklist)
+	const WORKING_STEPS = [
+		'Fetching your FPL squad',
+		'Loading model xP projections',
+		'Picking your best XI and captain',
+		'Checking every transfer against holding'
+	];
 
 	// FREE/PREMIUM-raja komponenttitasolla: siirtosuositukset renderöityvät
 	// VAIN premium={true} (ProView, tilauksen takana). Free näyttää lukitun
@@ -114,6 +123,11 @@
 			in.
 		</p>
 	{/if}
+{/if}
+
+{#if loading}
+	<!-- #73: malli tekee töitä -progressiivinen paljastus -->
+	<ModelWorking steps={WORKING_STEPS} />
 {/if}
 
 {#if error}
