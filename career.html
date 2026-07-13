@@ -244,7 +244,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     ctx.fillStyle = INK;
     ctx.font = font(sz, 700);
     ctx.fillText(name, PAD, 218);
-    var teamName = (d.manager && d.manager.team_name) || '';
+    // Tyhjä/whitespace-nimi → subtitle-rivi jää kokonaan pois (ei placeholderia).
+    var teamName = String((d.manager && d.manager.team_name) || '').trim();
     if (teamName) {
       var tsz = fitText(teamName, W - 2 * PAD, 40, 500);
       ctx.fillStyle = MAGENTA;
@@ -275,7 +276,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     if (lat.available) {
       var latLabel = lat.finished ? ('Last season' + (lat.season ? ' (' + lat.season + ')' : '')) : 'This season';
       var latVal = fmtPts(lat.total_points) + ' pts';
-      if (lat.best_gw) latVal += '  ·  best GW ' + lat.best_gw.points;
+      // 'pts'-yksikkö erottaa pistemäärän kierrosnumerosta (GW:t ovat 1-38).
+      if (lat.best_gw) latVal += '  ·  best GW: ' + lat.best_gw.points + ' pts';
       statBlock(colX[1], 640, latLabel, latVal, 52, colW);
     } else {
       statBlock(colX[1], 640, 'New season', 'Starts GW1', 52, colW);
