@@ -1,19 +1,19 @@
 {
-  "updated_at": "2026-07-14T19:21:40+00:00",
+  "updated_at": "2026-07-14T21:58:55+00:00",
   "logged_total": 102,
-  "pending": 2,
+  "pending": 1,
   "all_time": {
-    "n": 100,
-    "correct_1x2": 61,
-    "pct_1x2": 0.61,
-    "decisive_n": 72,
-    "decisive_correct": 61,
-    "pct_decisive": 0.8472,
-    "exact_n": 52,
+    "n": 101,
+    "correct_1x2": 62,
+    "pct_1x2": 0.6139,
+    "decisive_n": 73,
+    "decisive_correct": 62,
+    "pct_decisive": 0.8493,
+    "exact_n": 53,
     "exact_correct": 11,
-    "pct_exact": 0.2115,
-    "brier": 0.4832,
-    "brier_n": 52
+    "pct_exact": 0.2075,
+    "brier": 0.4833,
+    "brier_n": 53
   },
   "rolling": {
     "n": 100,
@@ -22,11 +22,11 @@
     "decisive_n": 72,
     "decisive_correct": 61,
     "pct_decisive": 0.8472,
-    "exact_n": 52,
+    "exact_n": 53,
     "exact_correct": 11,
-    "pct_exact": 0.2115,
-    "brier": 0.4832,
-    "brier_n": 52,
+    "pct_exact": 0.2075,
+    "brier": 0.4833,
+    "brier_n": 53,
     "window": 100
   },
   "calibration": [
@@ -43,10 +43,10 @@
       "n": 24
     },
     {
-      "bin_mid": 0.2565,
-      "predicted": 0.2565,
-      "actual": 0.193,
-      "n": 57
+      "bin_mid": 0.2575,
+      "predicted": 0.2575,
+      "actual": 0.1864,
+      "n": 59
     },
     {
       "bin_mid": 0.3429,
@@ -55,10 +55,10 @@
       "n": 20
     },
     {
-      "bin_mid": 0.458,
-      "predicted": 0.458,
-      "actual": 0.5625,
-      "n": 16
+      "bin_mid": 0.4562,
+      "predicted": 0.4562,
+      "actual": 0.5882,
+      "n": 17
     },
     {
       "bin_mid": 0.5333,
@@ -86,6 +86,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-14",
+      "home_team": "France",
+      "away_team": "Spain",
+      "predicted_winner": "away",
+      "p_winner": 0.4276,
+      "most_likely_score": "1-1",
+      "actual_score": "0-2",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-07-12",
       "home_team": "Argentina",
@@ -351,20 +365,6 @@
       "exact_hit": true,
       "duration": null,
       "regular_score": null
-    },
-    {
-      "date": "2026-07-01",
-      "home_team": "Belgium",
-      "away_team": "Senegal",
-      "predicted_winner": "home",
-      "p_winner": 0.4221,
-      "most_likely_score": "1-1",
-      "actual_score": "3-2",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": false,
-      "duration": "EXTRA_TIME",
-      "regular_score": "2-2"
     }
   ]
 }
