@@ -11,6 +11,9 @@
 - GoalIQ's FDR is derived from the match model's win and clean sheet probabilities. It is independent of the official FPL fixture difficulty.
 - The page includes GoalIQ's published prediction track record: every prediction is logged before kickoff, hits and misses.
 
+## FPL Career Card (free tool)
+- [FPL Career Card](https://goaliq.app/career): turn any public FPL entry ID into a shareable career card - best season, all-time points and rank history, plus a GoalIQ model read on the squad in season. Free, no login.
+
 ## About GoalIQ
 - [GoalIQ home](https://goaliq.app/)
 - [Get the app on Google Play (free, Android)](https://play.google.com/store/apps/details?id=com.veikkoville.goaliq)
