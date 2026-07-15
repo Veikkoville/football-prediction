@@ -70,6 +70,7 @@ APPSTORE_URL = "https://apps.apple.com/app/id6780047163"
 PRO_URL = "https://pro.goaliq.app"
 X_URL = "https://x.com/goaliqapp"
 ORG_ID = BASE + "/#organization"
+API_BASE = "https://goaliq-api.onrender.com"   # #85: accuracy-Datasetin distribution
 
 # FDR-väriasteikko GoalIQ:n kanonisesta brändipaletista (brand-tokens.md,
 # täsmähexit, EI approksimaatioita): 1 helpoin = Teal → Gold → Gold Deep →
@@ -441,10 +442,47 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "FDR",
         ],
     }
+    # #85 GEO: track record koneluettavana Datasetina (LLM-sitaattien
+    # ykkösmuoto). Luvut samasta accuracy-lähteestä kuin GEN:ACC-chipit →
+    # pysyy tuoreena joka regen-ajolla, ei kovakoodattuja staleja.
+    acc_dataset = accuracy_dataset_ld(c, CANONICAL)
     return "".join(
         f'<script type="application/ld+json">\n{json.dumps(b, ensure_ascii=False, indent=1)}\n</script>\n'
-        for b in (org, app, faq_ld, dataset)
+        for b in (org, app, faq_ld, dataset, acc_dataset)
     )
+
+
+def accuracy_dataset_ld(c: dict, page_url: str) -> dict:
+    """#85: julkisen ennuste-track-recordin Dataset-schema (jaettu fpl.html-
+    templaten ja index.html-markerin kesken — yksi määritelmä, ei driftiä)."""
+    return {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "GoalIQ football prediction accuracy log (pre-match, publicly tracked)",
+        "description": (
+            f"Every GoalIQ model prediction is logged before kickoff and "
+            f"reconciled against the final result, with no edits afterwards. "
+            f"Current aggregate: {fmt_pct(c['acc_pct_1x2'])} correct 1X2 results "
+            f"across {c['acc_n']} logged matches. Includes per-match win/draw/loss "
+            f"probabilities, expected goals (xG) and reconciled outcomes."
+        ),
+        "url": page_url,
+        "distribution": {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": API_BASE + "/api/accuracy",
+        },
+        "isAccessibleForFree": True,
+        "dateModified": c["iso_date"],
+        "creator": {"@id": ORG_ID},
+        "keywords": [
+            "football prediction accuracy",
+            "prediction track record",
+            "1X2 accuracy",
+            "pre-match predictions",
+            "model accountability",
+        ],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -751,6 +789,17 @@ def update_index(c: dict) -> bool:
     new = re.sub(
         r"(<!-- GEN:ACC-TRUST-START -->).*?(<!-- GEN:ACC-TRUST-END -->)",
         lambda m: m.group(1) + trust + m.group(2), new, flags=re.S)
+    # #85 GEO: track-record-Dataset-schema pysyy tuoreena samalla botilla
+    # kuin chipit (luvut + dateModified accuracy-lähteestä, ei kovakoodausta).
+    ds = accuracy_dataset_ld(c, BASE + "/")
+    ds_block = (
+        '\n<script type="application/ld+json">\n'
+        + json.dumps(ds, ensure_ascii=False, indent=1)
+        + "\n</script>\n"
+    )
+    new = re.sub(
+        r"(<!-- GEN:ACC-DATASET-START -->).*?(<!-- GEN:ACC-DATASET-END -->)",
+        lambda m: m.group(1) + ds_block + m.group(2), new, flags=re.S)
     if new != s:
         INDEX_PATH.write_text(new, encoding="utf-8")
         return True

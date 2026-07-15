@@ -106,6 +106,38 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   footer a { color: var(--muted); }
   footer a:hover { color: var(--magenta-deep); }
 </style>
+
+<!-- #85 GEO: sivukohtainen structured data (sivulla ei ollut yhtaan JSON-LD:ta).
+     Organization = sama @id kuin etusivulla (kompakti kopio, ei driftia). -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Organization",
+ "@id": "https://goaliq.app/#organization",
+ "name": "GoalIQ",
+ "url": "https://goaliq.app/",
+ "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
+ "sameAs": [
+  "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
+  "https://apps.apple.com/app/id6780047163",
+  "https://x.com/goaliqapp"
+ ]
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "FPL Career Card by GoalIQ",
+ "url": "https://goaliq.app/career",
+ "applicationCategory": "SportsApplication",
+ "operatingSystem": "Any (web browser)",
+ "isAccessibleForFree": true,
+ "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+ "description": "Turn your public FPL entry ID into a shareable career card: best season, all-time points and rank history, plus a GoalIQ model read on your squad in season. Free, no login.",
+ "author": {"@id": "https://goaliq.app/#organization"}
+}
+</script>
 </head>
 <body>
 <div class="bar"></div>
