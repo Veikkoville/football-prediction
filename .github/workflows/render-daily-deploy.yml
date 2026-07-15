@@ -1,0 +1,69 @@
+# Render-datadeploy (#86, 14.7.2026): hallittu 1 deploy/vrk deploy-hookilla.
+#
+# MIKSI: render.yaml buildFilter estää data-committeja (accuracy-autolog ~14x/vrk,
+# FPL-refreshit) polttamasta pipeline-minuutteja — mutta /api/accuracy, /api/team
+# ym. lukevat data/**-tiedostoja DEPLOYATUSTA reposta, joten tuore data tarvitsee
+# silti deployn Renderiin. Tämä workflow vie datan kerran vuorokaudessa:
+# ~30 buildia/kk (ennen: ~200+/kk → 500 min/kk kiintiö loppui 14.7).
+#
+# KERTALUONTOINEN SETUP (Ville, 🔒 GO — Render-dashboard + GitHub-UI):
+#   1. Render dashboard → goaliq-api → Settings → Deploy Hook → kopioi URL
+#   2. GitHub: Settings → Secrets and variables → Actions → New repository secret:
+#        RENDER_DEPLOY_HOOK = <hook-URL>
+#
+# GUARDRAILIT: jos secret puuttuu → siisti skip (ei punaista runia joka yö);
+# jos data/** ei muuttunut 24 h:ssa → skip (ei polteta minuutteja turhaan).
+# Deploy-hook triggeröi Renderin normaalin buildin — buildFilter EI koske
+# hook-deployta (hook on eksplisiittinen pyyntö, ei commit-triggeri).
+
+name: render-daily-deploy
+
+on:
+  schedule:
+    # Kerran vuorokaudessa aamuyöllä UTC — edellisillan ottelut on reconciloitu
+    # (accuracy-log ajaa 3 h välein) → aamun deploy vie tuoreen track-recordin.
+    - cron: "45 4 * * *"
+  workflow_dispatch: {}   # manuaalinen laukaisu (esim. heti tärkeän tuloksen jälkeen)
+
+concurrency:
+  group: render-daily-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-if-data-changed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0   # git log -tarkastus tarvitsee historian
+
+      - name: Trigger Render deploy hook (jos dataa muuttunut)
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::notice::RENDER_DEPLOY_HOOK-secret puuttuu — skip (setup: ks. workflow-kommentti)."
+            exit 0
+          fi
+          # Manuaalinen dispatch deployaa aina; schedule vain jos data/** muuttui 24 h:ssa.
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            CHANGED=$(git log --since="24 hours ago" --name-only --pretty=format: -- data/ | grep -c . || true)
+            if [ "$CHANGED" -eq 0 ]; then
+              echo "data/** ei muuttunut 24 h:ssa — skip (ei polteta pipeline-minuutteja)."
+              exit 0
+            fi
+            echo "data/**-muutoksia 24 h:ssa: $CHANGED tiedostoriviä → deploy."
+          fi
+          HTTP=$(curl -s -o /tmp/hook-resp -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
+          cat /tmp/hook-resp || true
+          if [ "$HTTP" -ge 200 ] && [ "$HTTP" -lt 300 ]; then
+            echo "Render deploy-hook OK (HTTP $HTTP)."
+          else
+            echo "::error::Render deploy-hook epäonnistui (HTTP $HTTP)."
+            exit 1
+          fi
