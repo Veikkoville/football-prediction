@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-07-14T07:45:29",
+    "generated_at": "2026-07-15T07:48:54",
     "season": "2026/27",
     "source": "pulselive-fallback",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
@@ -36,7 +36,7 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1553
+      "home_gamma": -0.1552
     },
     "sanity_gate": "PASS",
     "next_gameweek": 1,
@@ -1311,7 +1311,7 @@
   "fixtures": [
     {
       "gameweek": 1,
-      "kickoff": "Fri 21 Aug 2026, 20:00 BST",
+      "kickoff": "Fri 21 Aug 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1787338800000.0,
       "finished": false,
       "home": "Arsenal",
@@ -1330,7 +1330,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 12:30 BST",
+      "kickoff": "Sat 22 Aug 2026, 12:30 GMT+01:00",
       "kickoff_ms": 1787398200000.0,
       "finished": false,
       "home": "Hull",
@@ -1349,7 +1349,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 15:00 BST",
+      "kickoff": "Sat 22 Aug 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1787407200000.0,
       "finished": false,
       "home": "Everton",
@@ -1368,7 +1368,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 15:00 BST",
+      "kickoff": "Sat 22 Aug 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1787407200000.0,
       "finished": false,
       "home": "Ipswich",
@@ -1387,7 +1387,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 15:00 BST",
+      "kickoff": "Sat 22 Aug 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1787407200000.0,
       "finished": false,
       "home": "Nottingham Forest",
@@ -1406,7 +1406,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 17:30 BST",
+      "kickoff": "Sat 22 Aug 2026, 17:30 GMT+01:00",
       "kickoff_ms": 1787416200000.0,
       "finished": false,
       "home": "Brentford",
@@ -1425,7 +1425,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sun 23 Aug 2026, 14:00 BST",
+      "kickoff": "Sun 23 Aug 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1787490000000.0,
       "finished": false,
       "home": "Brighton",
@@ -1444,7 +1444,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sun 23 Aug 2026, 14:00 BST",
+      "kickoff": "Sun 23 Aug 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1787490000000.0,
       "finished": false,
       "home": "Manchester City",
@@ -1463,7 +1463,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sun 23 Aug 2026, 16:30 BST",
+      "kickoff": "Sun 23 Aug 2026, 16:30 GMT+01:00",
       "kickoff_ms": 1787499000000.0,
       "finished": false,
       "home": "Newcastle United",
@@ -1482,7 +1482,7 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Mon 24 Aug 2026, 20:00 BST",
+      "kickoff": "Mon 24 Aug 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1787598000000.0,
       "finished": false,
       "home": "Fulham",
@@ -1501,7 +1501,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Fri 28 Aug 2026, 20:00 BST",
+      "kickoff": "Fri 28 Aug 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1787943600000.0,
       "finished": false,
       "home": "Crystal Palace",
@@ -1520,7 +1520,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 12:30 BST",
+      "kickoff": "Sat 29 Aug 2026, 12:30 GMT+01:00",
       "kickoff_ms": 1788003000000.0,
       "finished": false,
       "home": "Liverpool",
@@ -1539,7 +1539,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 15:00 BST",
+      "kickoff": "Sat 29 Aug 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788012000000.0,
       "finished": false,
       "home": "Bournemouth",
@@ -1558,7 +1558,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 15:00 BST",
+      "kickoff": "Sat 29 Aug 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788012000000.0,
       "finished": false,
       "home": "Coventry",
@@ -1567,7 +1567,7 @@
       "away_short": "HUL",
       "xg_home": 1.615,
       "xg_away": 1.197,
-      "p_home_win": 0.4571,
+      "p_home_win": 0.4572,
       "p_draw": 0.2736,
       "p_away_win": 0.2693,
       "cs_home_pct": 30.2,
@@ -1577,7 +1577,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 17:30 BST",
+      "kickoff": "Sat 29 Aug 2026, 17:30 GMT+01:00",
       "kickoff_ms": 1788021000000.0,
       "finished": false,
       "home": "Tottenham",
@@ -1596,7 +1596,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 14:00 BST",
+      "kickoff": "Sun 30 Aug 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1788094800000.0,
       "finished": false,
       "home": "Chelsea",
@@ -1615,7 +1615,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 14:00 BST",
+      "kickoff": "Sun 30 Aug 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1788094800000.0,
       "finished": false,
       "home": "Leeds",
@@ -1634,7 +1634,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 14:00 BST",
+      "kickoff": "Sun 30 Aug 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1788094800000.0,
       "finished": false,
       "home": "Sunderland",
@@ -1653,7 +1653,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 16:30 BST",
+      "kickoff": "Sun 30 Aug 2026, 16:30 GMT+01:00",
       "kickoff_ms": 1788103800000.0,
       "finished": false,
       "home": "Manchester United",
@@ -1672,7 +1672,7 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Mon 31 Aug 2026, 20:00 BST",
+      "kickoff": "Mon 31 Aug 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1788202800000.0,
       "finished": false,
       "home": "Aston Villa",
@@ -1691,7 +1691,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Fri 4 Sep 2026, 20:00 BST",
+      "kickoff": "Fri 4 Sep 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1788548400000.0,
       "finished": false,
       "home": "Ipswich",
@@ -1710,7 +1710,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 12:30 BST",
+      "kickoff": "Sat 5 Sep 2026, 12:30 GMT+01:00",
       "kickoff_ms": 1788607800000.0,
       "finished": false,
       "home": "Newcastle United",
@@ -1719,7 +1719,7 @@
       "away_short": "BOU",
       "xg_home": 1.812,
       "xg_away": 1.49,
-      "p_home_win": 0.4422,
+      "p_home_win": 0.4421,
       "p_draw": 0.2508,
       "p_away_win": 0.3071,
       "cs_home_pct": 22.5,
@@ -1729,7 +1729,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 5 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788616800000.0,
       "finished": false,
       "home": "Brentford",
@@ -1748,7 +1748,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 5 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788616800000.0,
       "finished": false,
       "home": "Brighton",
@@ -1767,7 +1767,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 5 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788616800000.0,
       "finished": false,
       "home": "Fulham",
@@ -1786,7 +1786,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 5 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788616800000.0,
       "finished": false,
       "home": "Manchester City",
@@ -1805,7 +1805,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 5 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1788616800000.0,
       "finished": false,
       "home": "Nottingham Forest",
@@ -1824,7 +1824,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 17:30 BST",
+      "kickoff": "Sat 5 Sep 2026, 17:30 GMT+01:00",
       "kickoff_ms": 1788625800000.0,
       "finished": false,
       "home": "Hull",
@@ -1843,7 +1843,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sun 6 Sep 2026, 14:00 BST",
+      "kickoff": "Sun 6 Sep 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1788699600000.0,
       "finished": false,
       "home": "Everton",
@@ -1862,7 +1862,7 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sun 6 Sep 2026, 16:30 BST",
+      "kickoff": "Sun 6 Sep 2026, 16:30 GMT+01:00",
       "kickoff_ms": 1788708600000.0,
       "finished": false,
       "home": "Arsenal",
@@ -1881,7 +1881,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 12 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789221600000.0,
       "finished": false,
       "home": "Aston Villa",
@@ -1900,7 +1900,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 12 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789221600000.0,
       "finished": false,
       "home": "Bournemouth",
@@ -1919,7 +1919,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 12 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789221600000.0,
       "finished": false,
       "home": "Chelsea",
@@ -1938,7 +1938,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 12 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789221600000.0,
       "finished": false,
       "home": "Crystal Palace",
@@ -1957,7 +1957,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 12 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789221600000.0,
       "finished": false,
       "home": "Liverpool",
@@ -1976,7 +1976,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 17:30 BST",
+      "kickoff": "Sat 12 Sep 2026, 17:30 GMT+01:00",
       "kickoff_ms": 1789230600000.0,
       "finished": false,
       "home": "Tottenham",
@@ -1995,7 +1995,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 20:00 BST",
+      "kickoff": "Sat 12 Sep 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1789239600000.0,
       "finished": false,
       "home": "Sunderland",
@@ -2014,7 +2014,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sun 13 Sep 2026, 14:00 BST",
+      "kickoff": "Sun 13 Sep 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1789304400000.0,
       "finished": false,
       "home": "Coventry",
@@ -2033,7 +2033,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sun 13 Sep 2026, 16:30 BST",
+      "kickoff": "Sun 13 Sep 2026, 16:30 GMT+01:00",
       "kickoff_ms": 1789313400000.0,
       "finished": false,
       "home": "Manchester United",
@@ -2052,7 +2052,7 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Mon 14 Sep 2026, 20:00 BST",
+      "kickoff": "Mon 14 Sep 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1789412400000.0,
       "finished": false,
       "home": "Leeds",
@@ -2071,7 +2071,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Fri 18 Sep 2026, 20:00 BST",
+      "kickoff": "Fri 18 Sep 2026, 20:00 GMT+01:00",
       "kickoff_ms": 1789758000000.0,
       "finished": false,
       "home": "Brentford",
@@ -2090,7 +2090,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 12:30 BST",
+      "kickoff": "Sat 19 Sep 2026, 12:30 GMT+01:00",
       "kickoff_ms": 1789817400000.0,
       "finished": false,
       "home": "Tottenham",
@@ -2109,7 +2109,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 19 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789826400000.0,
       "finished": false,
       "home": "Brighton",
@@ -2128,7 +2128,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 19 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789826400000.0,
       "finished": false,
       "home": "Everton",
@@ -2147,7 +2147,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 19 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789826400000.0,
       "finished": false,
       "home": "Leeds",
@@ -2166,7 +2166,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 19 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789826400000.0,
       "finished": false,
       "home": "Manchester City",
@@ -2185,7 +2185,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
+      "kickoff": "Sat 19 Sep 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1789826400000.0,
       "finished": false,
       "home": "Newcastle United",
@@ -2204,7 +2204,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 17:30 BST",
+      "kickoff": "Sat 19 Sep 2026, 17:30 GMT+01:00",
       "kickoff_ms": 1789835400000.0,
       "finished": false,
       "home": "Nottingham Forest",
@@ -2223,7 +2223,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sun 20 Sep 2026, 14:00 BST",
+      "kickoff": "Sun 20 Sep 2026, 14:00 GMT+01:00",
       "kickoff_ms": 1789909200000.0,
       "finished": false,
       "home": "Bournemouth",
@@ -2242,7 +2242,7 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sun 20 Sep 2026, 16:30 BST",
+      "kickoff": "Sun 20 Sep 2026, 16:30 GMT+01:00",
       "kickoff_ms": 1789918200000.0,
       "finished": false,
       "home": "Fulham",
@@ -2261,7 +2261,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Arsenal",
@@ -2280,7 +2280,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Aston Villa",
@@ -2299,7 +2299,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Chelsea",
@@ -2308,7 +2308,7 @@
       "away_short": "BOU",
       "xg_home": 1.371,
       "xg_away": 1.425,
-      "p_home_win": 0.3473,
+      "p_home_win": 0.3472,
       "p_draw": 0.2812,
       "p_away_win": 0.3716,
       "cs_home_pct": 24.1,
@@ -2318,7 +2318,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Coventry",
@@ -2337,7 +2337,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Crystal Palace",
@@ -2356,7 +2356,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Hull",
@@ -2375,7 +2375,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Ipswich",
@@ -2394,7 +2394,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Liverpool",
@@ -2413,7 +2413,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Manchester United",
@@ -2432,7 +2432,7 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
+      "kickoff": "Sat 10 Oct 2026, 15:00 GMT+01:00",
       "kickoff_ms": 1791640800000.0,
       "finished": false,
       "home": "Sunderland",
