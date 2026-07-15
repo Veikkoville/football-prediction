@@ -2617,6 +2617,50 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-12T06:03:43+00:00",
+      "result": {
+        "home_score": 1,
+        "away_score": 2,
+        "actual_score": "1-2",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-15T22:01:52+00:00"
+      }
+    },
+    {
+      "match_id": "fd-537389",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-18",
+      "kickoff": "2026-07-18T21:00:00Z",
+      "home_team": "France",
+      "away_team": "England",
+      "p_home": 0.4,
+      "p_draw": 0.3101,
+      "p_away": 0.2899,
+      "xg_home": 1.211,
+      "xg_away": 0.992,
+      "most_likely_score": "1-1",
+      "predicted_winner": "home",
+      "logged_at": "2026-07-15T22:01:52+00:00",
+      "result": null
+    },
+    {
+      "match_id": "fd-537390",
+      "source": "fd",
+      "competition": "WC",
+      "date": "2026-07-19",
+      "kickoff": "2026-07-19T19:00:00Z",
+      "home_team": "Spain",
+      "away_team": "Argentina",
+      "p_home": 0.3582,
+      "p_draw": 0.3197,
+      "p_away": 0.3221,
+      "xg_home": 1.093,
+      "xg_away": 1.022,
+      "most_likely_score": "1-1",
+      "predicted_winner": "home",
+      "logged_at": "2026-07-15T22:01:52+00:00",
       "result": null
     }
   ]
