@@ -11,7 +11,24 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
-    autoDeploy: true            # Joka git push -> uusi deploy
+    autoDeploy: true            # Koodi-push -> uusi deploy (ks. buildFilter alla)
+    # #86 (14.7.2026): data-bottien commitit (accuracy-autolog ~14x/vrk + FPL-refreshit)
+    # polttivat workspace-pipeline-minuutit — [skip ci] ei estä Renderin auto-deployta.
+    # Build skipataan kun KAIKKI committien muuttamat tiedostot osuvat ignoredPathsiin;
+    # yksikin koodimuutos (api/, src/, requirements) triggeröi yhä normaalisti.
+    # HUOM: data/** EI enää deployaudu automaattisesti — tuoreen datan vie Renderiin
+    # render-daily-deploy.yml (1 deploy/vrk deploy-hookilla) tai koodideploy.
+    buildFilter:
+      ignoredPaths:
+        - data/**               # accuracy.json, prediction_log, CSV:t, FPL-projektiot
+        - "**/*.html"           # GitHub Pages -sivut (goaliq.app), ei Renderin servaamia
+        - "**/*.md"             # dokumentaatio
+        - sitemap.xml
+        - robots.txt
+        - llms.txt
+        - tests/**              # testimuutokset eivät vaadi deployta (CI ajaa ne)
+        - web/**                # SPA deployataan wranglerilla (Cloudflare), ei Renderiin
+        - .github/**            # workflow-muutokset eivät vaadi API-deployta
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
