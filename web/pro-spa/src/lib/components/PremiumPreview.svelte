@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fetchXp, gwXp, type XpResponse } from '$lib/api';
 	import { capture } from '$lib/analytics';
+	import { PLANS, startCheckout, type PlanKey } from '$lib/billing';
 	import Provenance from './Provenance.svelte';
 
 	// #95: login-seinä myy ennen lomaketta — sama arvolupaus kuin mobiilin
@@ -16,6 +17,16 @@
 	];
 
 	let teaser = $state<XpResponse | null>(null);
+	// #101: suora osto ilman tiliä — hinta + Osta-napit esikatselussa.
+	// Kirjautumaton → guest checkout (tili syntyy maksun jälkeen).
+	let buyError = $state<string | null>(null);
+	let busy = $state<PlanKey | null>(null);
+
+	async function buy(plan: PlanKey) {
+		busy = plan;
+		buyError = await startCheckout(plan, 'pro_web_preview');
+		busy = null;
+	}
 
 	onMount(() => {
 		// Sama funneli-event kuin Paywall, oma source erottaa login-seinän
@@ -81,6 +92,30 @@
 	{/if}
 
 	<Provenance />
+
+	<!-- #101: osto suoraan esikatselusta — ei pakko-sign-iniä. Stripe kerää
+	     emailin ja maksun; tili + kirjautumislinkki tulevat maksun jälkeen. -->
+	<div class="plans">
+		{#each Object.entries(PLANS) as [key, plan] (key)}
+			<div class="plan">
+				<span class="muted">{plan.hint}</span>
+				<button
+					class={key === 'season' ? 'primary' : 'secondary'}
+					disabled={busy !== null}
+					onclick={() => void buy(key as PlanKey)}
+				>
+					{busy === key ? 'Opening checkout…' : `Get Premium — ${plan.label}`}
+				</button>
+			</div>
+		{/each}
+	</div>
+	<p class="muted no-account">
+		No account needed: pay with Stripe and we'll email you a sign-in link. Cancel anytime. One
+		subscription covers web, iOS and Android.
+	</p>
+	{#if buyError}
+		<p class="banner error">{buyError}</p>
+	{/if}
 </section>
 
 <style>
@@ -152,5 +187,20 @@
 	}
 	.lock-pill svg {
 		color: var(--giq-magenta);
+	}
+	.plans {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--s-4);
+		margin-top: var(--s-4);
+	}
+	.plan {
+		display: grid;
+		gap: var(--s-1);
+		justify-items: start;
+	}
+	.no-account {
+		margin-top: var(--s-3);
+		font-size: var(--step--1);
 	}
 </style>

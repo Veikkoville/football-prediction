@@ -4,7 +4,19 @@
 	import FreeView from '$lib/components/FreeView.svelte';
 	import ProView from '$lib/components/ProView.svelte';
 
-	let tab = $state<'free' | 'pro'>('free');
+	// #101: ?tab=premium avaa Premium-välilehden suoraan (etusivun selailu-
+	// CTA:t → arvo-esikatselu + hinnat heti, ei piilossa toisen tabin takana).
+	// Sama myös ?checkout=success|cancelled -paluulle: success-banneri ja
+	// purchase_completed-event elävät ProView'ssä — ilman tätä ostaja
+	// laskeutuisi free-tabille eikä näkisi kuittausta.
+	// SPA-moodi (ssr=false) → window on käytettävissä jo initissä.
+	const initialParams = new URLSearchParams(window.location.search);
+	const initialTab = initialParams.get('tab');
+	let tab = $state<'free' | 'pro'>(
+		initialTab === 'premium' || initialTab === 'pro' || initialParams.has('checkout')
+			? 'pro'
+			: 'free'
+	);
 
 	// #46: free-puolen lukittu teaser vie Pro-tabiin, jossa Paywall elää.
 	function goPro() {

@@ -238,6 +238,86 @@ def _upsert_web_subscription(fields: dict, match: dict | None = None) -> bool:
         return False
 
 
+def _provision_supabase_user(email: str) -> Optional[str]:
+    """Luo (tai löydä) Supabase-käyttäjä emaililla — #101 account-after-payment.
+
+    Guest-checkoutissa maksu tapahtuu ENNEN tiliä: Stripe kerää emailin,
+    webhook kutsuu tätä. Luonti admin-API:lla email_confirm=True (maksettu
+    email = riittävä todiste omistuksesta tässä kontekstissa; ilman tätä
+    magic-link-verify kaatuisi vahvistamattomaan emailiin). Jos email on jo
+    rekisteröity, id haetaan generate_linkillä (EI lähetä mailia) →
+    entitlement laskeutuu olemassa olevalle tilille.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY or not email:
+        print("[Supabase] provision: missing config or email")
+        return None
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        "Content-Type": "application/json",
+    }
+    try:
+        resp = requests.post(
+            f"{SUPABASE_URL}/auth/v1/admin/users",
+            json={"email": email, "email_confirm": True},
+            headers=headers, timeout=10,
+        )
+        if resp.status_code in (200, 201):
+            uid = (resp.json() or {}).get("id")
+            print(f"[Supabase] provisioned NEW user for guest checkout id={uid}")
+            return uid or None
+        # 422/400 = email jo rekisteröity → hae id generate_linkillä
+        # (admin-endpoint, palauttaa user-objektin, EI lähetä sähköpostia)
+        resp2 = requests.post(
+            f"{SUPABASE_URL}/auth/v1/admin/generate_link",
+            json={"type": "magiclink", "email": email},
+            headers=headers, timeout=10,
+        )
+        if resp2.status_code == 200:
+            data = resp2.json() or {}
+            uid = (data.get("user") or {}).get("id") or data.get("id")
+            print(f"[Supabase] guest checkout matched EXISTING user id={uid}")
+            return uid or None
+        print(f"[Supabase] provision FAILED create={resp.status_code} "
+              f"lookup={resp2.status_code} body={resp2.text[:200]}")
+        return None
+    except Exception as e:
+        print(f"[Supabase] provision EXCEPTION: {e}")
+        return None
+
+
+def _send_magic_link(email: str, redirect_to: str = "https://pro.goaliq.app") -> bool:
+    """Lähetä kirjautumislinkki (magic link) Supabasen kautta — #101.
+
+    /auth/v1/otp lähettää magic-link-mailin projektin SMTP:llä.
+    create_user=False: käyttäjä on jo provisioitu (_provision_supabase_user).
+    redirect_to:n pitää olla Supabase-auth-allowlistissa (GO-checklist).
+    Epäonnistuminen EI kaada fulfillmentia — premium on jo aktivoitu,
+    käyttäjä pääsee sisään myös LoginBoxin sign-in-link-polulla.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY or not email:
+        return False
+    try:
+        resp = requests.post(
+            f"{SUPABASE_URL}/auth/v1/otp?redirect_to={requests.utils.quote(redirect_to, safe='')}",
+            json={"email": email, "create_user": False},
+            headers={
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+                "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+                "Content-Type": "application/json",
+            },
+            timeout=10,
+        )
+        ok = resp.status_code in (200, 204)
+        print(f"[Supabase] magic link {'sent' if ok else 'FAILED'} "
+              f"status={resp.status_code}"
+              + ("" if ok else f" body={resp.text[:200]}"))
+        return ok
+    except Exception as e:
+        print(f"[Supabase] magic link EXCEPTION: {e}")
+        return False
+
+
 def _verify_supabase_token(access_token: str) -> Optional[str]:
     """
     Vahvista Supabase-kayttajan access_token ja palauta hanen auth-id:nsa.
@@ -1885,6 +1965,75 @@ def create_web_checkout_session(
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
 
 
+# #101: guest checkout -kevyt rate limit (per IP, in-memory). Estää botti-
+# spämmin luomasta rajattomasti Stripe-sessioita auth-vapaalla endpointilla.
+# Render = 1 prosessi → in-memory riittää; restart nollaa (harmiton).
+_GUEST_CHECKOUT_HITS: dict[str, list[float]] = {}
+_GUEST_CHECKOUT_LIMIT = 10       # sessioita / IP / tunti
+_GUEST_CHECKOUT_WINDOW = 3600.0
+
+
+def _guest_checkout_rate_ok(ip: str) -> bool:
+    now = time.time()
+    hits = [t for t in _GUEST_CHECKOUT_HITS.get(ip, [])
+            if now - t < _GUEST_CHECKOUT_WINDOW]
+    if len(hits) >= _GUEST_CHECKOUT_LIMIT:
+        _GUEST_CHECKOUT_HITS[ip] = hits
+        return False
+    hits.append(now)
+    _GUEST_CHECKOUT_HITS[ip] = hits
+    return True
+
+
+@app.post("/api/web/checkout/guest", response_model=WebCheckoutResponse)
+def create_guest_checkout_session(
+    req: WebCheckoutRequest, request: Request
+) -> WebCheckoutResponse:
+    """#101 — suora osto ILMAN tiliä (konversiovuodon fix).
+
+    Ei authia: Stripe Checkout kerää emailin + maksun yhdessä näkymässä.
+    Tili provisioidaan maksun JÄLKEEN webhookissa (/api/webhook/stripe-web,
+    metadata.source='pro-web-guest' → _provision_supabase_user + magic link).
+    Kirjautuneen käyttäjän polku pysyy /api/web/checkout:issa (client_
+    reference_id linkittää oston suoraan tiliin) — SPA valitsee endpointin.
+    """
+    if not stripe.api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="Stripe not configured (STRIPE_SECRET_KEY missing)")
+    price_id = (STRIPE_PRICE_SEASON_ID if req.plan == "season"
+                else STRIPE_PRICE_MONTHLY_ID)
+    if not price_id:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Stripe price not configured for plan '{req.plan}' "
+                   f"(STRIPE_PRICE_{'SEASON' if req.plan == 'season' else 'MONTHLY'}_ID missing)")
+
+    client_ip = (request.client.host if request.client else "") or "unknown"
+    if not _guest_checkout_rate_ok(client_ip):
+        raise HTTPException(status_code=429,
+                            detail="Too many checkout attempts, try again later")
+
+    base = _web_checkout_base_url(req.origin)
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            # EI customer_email/client_reference_id — Stripe kerää emailin,
+            # webhook provisioi tilin sillä (account-after-payment).
+            metadata={"plan": req.plan, "source": "pro-web-guest"},
+            success_url=f"{base}/?checkout=success&guest=1&session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{base}/?checkout=cancelled",
+            allow_promotion_codes=True,
+        )
+        return WebCheckoutResponse(url=session.url or "")
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400,
+                            detail=f"Stripe error: {e.user_message or str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+
 @app.post("/api/webhook/stripe")
 async def stripe_webhook(request: Request):
     """
@@ -2214,11 +2363,32 @@ async def stripe_web_webhook(request: Request):
     obj = event["data"]["object"]
 
     if event_type == "checkout.session.completed":
-        user_id = obj.get("client_reference_id") or (obj.get("metadata") or {}).get("user_id")
+        metadata = obj.get("metadata") or {}
+        user_id = obj.get("client_reference_id") or metadata.get("user_id")
+        guest_email: str | None = None
+        if not user_id and metadata.get("source") == "pro-web-guest":
+            # #101 account-after-payment: guest maksoi ilman tiliä → provisioi
+            # Supabase-käyttäjä Checkoutin keräämällä emaililla. Magic link
+            # lähetetään fulfillmentin LOPUKSI (premium ehtii aktivoitua
+            # ennen kuin käyttäjä klikkaa linkkiä).
+            guest_email = ((obj.get("customer_details") or {}).get("email")
+                           or obj.get("customer_email"))
+            if guest_email:
+                user_id = _provision_supabase_user(guest_email)
+            if not user_id:
+                # Maksu tuli mutta tiliä ei syntynyt → ÄLÄ palauta virhettä
+                # (Stripe retryaa samaa eventtiä → provisiointi voi onnistua
+                # seuraavalla yrityksellä vain jos palautetaan non-2xx).
+                # Transientti Supabase-häiriö on todennäköisin syy → 500 =
+                # Stripe retry exponential backoffilla on oikea toipumispolku.
+                print(f"[Stripe web] GUEST provisiointi epäonnistui "
+                      f"email={'set' if guest_email else 'MISSING'} — 500 → Stripe retry")
+                raise HTTPException(status_code=500,
+                                    detail="guest provisioning failed")
         if not user_id:
             print("[Stripe web] checkout.completed ilman user_id-referenssiä — ohitetaan")
             return {"received": True}
-        plan = (obj.get("metadata") or {}).get("plan", "season")
+        plan = metadata.get("plan", "season")
         if obj.get("subscription"):
             # Molemmat planit recurring (kausi = 25 e/vuosi yearly, Villen
             # tarkennus 5.7) -> customer.subscription.updated tuo
@@ -2245,6 +2415,10 @@ async def stripe_web_webhook(request: Request):
         if period_end:
             profile_fields["subscription_current_period_end"] = period_end
         _update_profile(user_id, profile_fields)
+        # #101: guest sai tilin → kirjautumislinkki mailiin (premium on jo
+        # aktivoitu yllä → linkin klikkaus laskeutuu suoraan avattuun tilaan).
+        if guest_email:
+            _send_magic_link(guest_email)
     elif event_type == "customer.subscription.updated":
         # Vain web-tilausrivit päivittyvät (match stripe_subscription_id:llä —
         # mobiilin vanhat Stripe-subit eivät ole web_subscriptions-taulussa).

@@ -7,10 +7,14 @@
 	import Paywall from './Paywall.svelte';
 	import PremiumPreview from './PremiumPreview.svelte';
 	import ProTools from './ProTools.svelte';
+	import SetPassword from './SetPassword.svelte';
 
 	let xp = $state<XpResponse | null>(null);
 	let xpError = $state<string | null>(null);
 	let checkoutSuccess = $state(false);
+	// #101: guest-checkout-paluu — ostaja EI ole kirjautunut, tili + magic
+	// link syntyvät webhookissa → oma banneri (ei "Checking subscription").
+	let guestCheckout = $state(false);
 
 	onMount(() => {
 		// Checkout-paluu: ?checkout=success&session_id=... Fulfillment tekee
@@ -19,8 +23,9 @@
 		const params = new URLSearchParams(window.location.search);
 		if (params.get('checkout') === 'success') {
 			checkoutSuccess = true;
+			guestCheckout = params.get('guest') === '1';
 			const sid = params.get('session_id') ?? 'unknown';
-			capture('purchase_completed', { source: 'web' }, `purchase_${sid}`);
+			capture('purchase_completed', { source: 'web', guest: guestCheckout }, `purchase_${sid}`);
 			history.replaceState(null, '', window.location.pathname);
 			let tries = 0;
 			const poll = () => {
@@ -43,10 +48,18 @@
 </script>
 
 {#if checkoutSuccess}
-	<p class="banner success">
-		Premium active, welcome aboard! Premium is now active on the web AND in the GoalIQ app
-		(iOS and Android). Just sign in with the same account on your phone.
-	</p>
+	{#if guestCheckout && !auth.user}
+		<p class="banner success">
+			Payment received — Premium is yours! We just emailed you a sign-in link (check spam
+			too). Click it to open Premium here on the web; once signed in, you can set a password
+			to use the same account in the GoalIQ app on iOS and Android.
+		</p>
+	{:else}
+		<p class="banner success">
+			Premium active, welcome aboard! Premium is now active on the web AND in the GoalIQ app
+			(iOS and Android). Just sign in with the same account on your phone.
+		</p>
+	{/if}
 {/if}
 
 {#if !auth.sessionResolved}
@@ -64,6 +77,8 @@
 		<p class="banner success">Your GoalIQ app subscription is active here too. Welcome.</p>
 	{:else}
 		<p class="muted">GoalIQ Premium active ({auth.sub.plan}) · thank you for the support!</p>
+		<!-- #101: guest-tili syntyy ilman salasanaa → tarjoa asetus appia varten -->
+		<SetPassword />
 	{/if}
 	{#if xpError}
 		<p class="banner error">Could not load xP projections right now. Please try again shortly.</p>

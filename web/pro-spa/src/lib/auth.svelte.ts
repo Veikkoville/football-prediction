@@ -60,6 +60,24 @@ export async function signUp(email: string, password: string): Promise<string | 
 	return null;
 }
 
+/** #101: kirjautumislinkki mailiin — guest-checkout-ostajan (ei salasanaa)
+ * ja salasanansa unohtaneen sisäänpääsy. shouldCreateUser=false: linkki vain
+ * olemassa oleville tileille (ei bottisignup-pintaa). */
+export async function sendMagicLink(email: string): Promise<string | null> {
+	const { error } = await supabase.auth.signInWithOtp({
+		email,
+		options: { shouldCreateUser: false, emailRedirectTo: window.location.origin }
+	});
+	return error ? error.message : null;
+}
+
+/** #101: salasanan asetus magic-linkillä kirjautuneelle (guest-checkout-tili
+ * syntyy ilman salasanaa; mobiili-app kirjautuu email+salasanalla). */
+export async function setPassword(password: string): Promise<string | null> {
+	const { error } = await supabase.auth.updateUser({ password });
+	return error ? error.message : null;
+}
+
 export async function signOut(): Promise<void> {
 	await supabase.auth.signOut();
 	resetAnalytics();
