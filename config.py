@@ -18,6 +18,11 @@ DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
+# #100: WC-refitin staging-kansio — ship-gate PASS -kandidaatti odottaa täällä
+# eksplisiittistä promotea (scripts/promote_wc_refit.py) eikä likaa trackattuja
+# data/-mallitiedostoja. /data/* on gitignoressa → kansio ei näy git statusissa.
+WC_REFIT_STAGING_DIR = DATA_DIR / "_refit_candidate"
+
 # Varmistetaan että kansiot ovat olemassa kun moduulia importataan.
 for _d in (RAW_DATA_DIR, PROCESSED_DATA_DIR):
     _d.mkdir(parents=True, exist_ok=True)

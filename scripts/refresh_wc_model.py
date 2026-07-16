@@ -15,8 +15,17 @@ data/wc_model.json korvataan VAIN jos KAIKKI kolme gatea aukeavat:
 Gate kiinni → diff-raportti, KAIKKI datatiedostot palautetaan backupista
 (työpuu ennalleen), exit != 0. Live-malliin ei kosketa.
 
+#100: myös PASS jättää työpuun puhtaaksi — refit siirretään staging-kansioon
+(data/_refit_candidate/, gitignoressa /data/*:n kautta) ja trackatut tiedostot
+palautetaan backupista. Käyttöönotto = scripts/promote_wc_refit.py (kopioi
+staging → data/) + git commit + push. Näin ajastettu ajo ei koskaan jätä
+committoimattomia jäänteitä trackattuihin mallitiedostoihin (vrt. QUEUE #99).
+Poikkeus: GitHub Actionsissa (GITHUB_ACTIONS=true) PASS säilyttää vanhan
+kontraktin (tiedostot työpuuhun → workflow committaa itse) — ephemeral
+runnerilla hygieniaongelmaa ei ole eikä workflown deploy-polku muutu.
+
 Kaikki esirakennus offline — ei runtime-fittiä (Render 0.5 vCPU lataa vain JSONin).
-EI git-operaatioita: PASS tulostaa commit+push-ohjeen, päätös Villellä.
+EI git-operaatioita: PASS tulostaa promote+commit-ohjeen, päätös Villellä.
 
 Aja repojuuresta: python -m scripts.refresh_wc_model
 Exit: 0 = gate auki (uusi malli kirjoitettu), 1 = gate kiinni, 2 = infra-virhe.
@@ -57,6 +66,12 @@ from src.models.dixon_coles import DixonColesModel
 DATA_FILES = ["international_results.csv", "elo_ratings.csv", "wc_model.json"]
 BACKUP_DIR = config.DATA_DIR / ".refresh_backup"
 CANDIDATE_PATH = config.DATA_DIR / "wc_model.candidate.json"
+# #100: PASS-refit EI jää enää trackattuihin tiedostoihin odottamaan päätöstä
+# (ajastettu ajo → kukaan ei näe banneria → pysyvästi likainen työpuu, osui
+# #99:ään). PASS siirtää tulokset staging-kansioon + palauttaa työpuun;
+# promote = scripts/promote_wc_refit.py (eksplisiittinen hyväksyntä).
+STAGING_DIR = config.WC_REFIT_STAGING_DIR
+STAGING_META = "_refit_meta.json"
 PORT = 8765
 BASE = f"http://localhost:{PORT}"
 METRICS = ("logloss", "brier", "rps")
@@ -87,6 +102,31 @@ def _restore() -> None:
         if src.exists():
             shutil.copy2(src, config.DATA_DIR / name)
     print("PALAUTETTU: kaikki datatiedostot backupista — työpuu ennallaan.")
+
+
+def _stage(meta: dict, gate_summary: dict) -> None:
+    """#100: kopioi PASS-refitin tulokset stagingiin promotea odottamaan.
+
+    Trackatut data/-tiedostot palautetaan tämän jälkeen backupista → työpuu
+    pysyy puhtaana kunnes promote (Ville tai CI:n PASS-askel) ajetaan.
+    """
+    if STAGING_DIR.exists():
+        shutil.rmtree(STAGING_DIR)
+    STAGING_DIR.mkdir(parents=True)
+    for name in DATA_FILES:
+        shutil.copy2(config.DATA_DIR / name, STAGING_DIR / name)
+    with open(STAGING_DIR / STAGING_META, "w", encoding="utf-8") as f:
+        json.dump({"fit_meta": meta, "gate": gate_summary,
+                   "staged_at": time.strftime("%Y-%m-%dT%H:%M:%S")},
+                  f, ensure_ascii=False, indent=1)
+    print(f"STAGED: PASS-refit -> {STAGING_DIR} (odottaa promotea).")
+
+
+def _cleanup() -> None:
+    """#100: siivoa ajon väliaikaisartefaktit (backup palvellut, kandidaatti
+    joko hylätty tai stagingissa) — mikään ajo ei jätä roskia data/-juureen."""
+    CANDIDATE_PATH.unlink(missing_ok=True)
+    shutil.rmtree(BACKUP_DIR, ignore_errors=True)
 
 
 def _load_model(path: Path) -> DixonColesModel:
@@ -291,6 +331,7 @@ def main() -> int:
             print(f"SHIP-GATE: NO-GO (G1 backtest={'OK' if g1 else 'FAIL'}, "
                   f"G2 sanity={'OK' if g2 else 'FAIL'}) — live-malliin ei kosketa.")
             _restore()
+            _cleanup()
             return 1
 
         # G1+G2 auki → kirjoita kandidaatti liveksi ja todista G3 uudella tilalla.
@@ -312,21 +353,45 @@ def main() -> int:
             print("\n" + "=" * 60)
             print("SHIP-GATE: NO-GO (G3 domestic-regressio FAIL) — palautetaan kaikki.")
             _restore()
+            _cleanup()
             return 1
 
-        CANDIDATE_PATH.unlink(missing_ok=True)
+        if os.getenv("GITHUB_ACTIONS") == "true":
+            # #100: CI = ephemeral runner → paikallista hygieniaongelmaa ei ole,
+            # ja wc-knockout-refresh.yml:n PASS-askel odottaa muutettuja
+            # tiedostoja työpuussa (git add → commit → push, Villen hyväksymä
+            # kontrakti #79/#100). Säilytetään se ENNALLAAN.
+            _cleanup()
+            print("\n" + "=" * 60)
+            print("SHIP-GATE: PASS — uusi data/wc_model.json kirjoitettu (CI-polku: "
+                  "workflow committaa; ephemeral runner, ei staging-tarvetta).")
+            print(f"  backtest n={ev_new['n']}: " + ", ".join(
+                f"{k} {ev_old[k]:.4f}->{ev_new[k]:.4f}" for k in METRICS))
+            return 0
+
+        # #100 (lokaali): PASS ei jätä trackattuja tiedostoja likaisiksi — refit
+        # stagingiin, työpuu takaisin lähtötilaan, promote = erillinen askel.
+        gate_summary = {"n": ev_new["n"]} | {
+            k: {"old": round(ev_old[k], 4), "new": round(ev_new[k], 4)} for k in METRICS
+        }
+        _stage(meta, gate_summary)
+        _restore()
+        _cleanup()
         print("\n" + "=" * 60)
-        print("SHIP-GATE: PASS — uusi data/wc_model.json kirjoitettu.")
+        print("SHIP-GATE: PASS — refit stagingissa, trackatut tiedostot KOSKEMATTA.")
         print(f"  backtest n={ev_new['n']}: " + ", ".join(
             f"{k} {ev_old[k]:.4f}->{ev_new[k]:.4f}" for k in METRICS))
         print("  Seuraavaksi (manuaalisesti, Villen päätös):")
+        print("    python -m scripts.promote_wc_refit   <- kopioi staging -> data/")
         print("    git add data/international_results.csv data/elo_ratings.csv data/wc_model.json")
         print("    git commit + push -> Render auto-deploy")
+        print(f"  Hylkäys: poista {STAGING_DIR} (työpuu on jo puhdas).")
         return 0
 
     except Exception as e:
         print(f"\nINFRA-VIRHE: {e!r} — palautetaan backup, live-malliin ei kosketa.")
         _restore()
+        _cleanup()
         return 2
 
 

@@ -4,8 +4,10 @@ Lataa martj42-snapshotin MUISTIIN (ei kirjoita levylle) ja vertaa: onko uusia
 PELATTUJA WC 2026 -tuloksia vs. vendoroitu data/international_results.csv?
   - Ei uusia        -> exit 0 hiljaa (ei tulostetta, ei raporttia).
   - Uusia tuloksia  -> aja scripts.refresh_wc_model (kova ship-gate):
-      PASS  -> tulosta gate-diff + valmiit git-komennot Villen hyväksyttäväksi.
+      PASS  -> refit staging-kansioon (#100, työpuu puhdas) + promote-ohjeet.
       NO-GO -> refresh tulostaa diff-raportin ja palauttaa backupin.
+  - Staging jo ajan tasalla -> muistutus promotesta, EI uutta refittiä
+    (#100: PASS-kandidaatti odottaa Villeä; ei refitata samaa dataa uudelleen).
 
 EI KOSKAAN auto-pushia eikä auto-deployta — push on aina Villen manuaalinen
 päätös (Render auto-deployaa mainista).
@@ -27,9 +29,12 @@ try:
 except Exception:
     pass
 
+import config
 from scripts.update_international_results import URL, DEST
 
 WINDOW = (date(2026, 6, 12), date(2026, 7, 19))  # WC 2026 avaus -> finaali
+# #100: PASS-refit odottaa täällä promotea (ks. refresh_wc_model + promote_wc_refit)
+STAGING_RESULTS = config.WC_REFIT_STAGING_DIR / "international_results.csv"
 
 
 def _completed_wc_results(df: pd.DataFrame) -> int:
@@ -55,6 +60,17 @@ def main() -> int:
     if fresh <= current:
         return 0  # ei uusia WC-tuloksia edellisestä ajosta — exit hiljaa
 
+    # #100: jos edellisen PASS-ajon staging kattaa jo snapshotin tulokset,
+    # älä refitatä samaa dataa uudelleen — muistuta promotesta.
+    if STAGING_RESULTS.exists():
+        staged = _completed_wc_results(pd.read_csv(STAGING_RESULTS))
+        if staged >= fresh:
+            print(f"PASS-refit ODOTTAA PROMOTEA ({STAGING_RESULTS.parent}; "
+                  f"staged {staged} >= snapshot {fresh} tulosta) — ei uutta refittiä.")
+            print("  Käyttöönotto: python -m scripts.promote_wc_refit + git commit + push")
+            print(f"  Hylkäys: poista {STAGING_RESULTS.parent}")
+            return 0
+
     print(f"Uusia WC 2026 -tuloksia: {fresh - current} (snapshot {fresh}, "
           f"vendoroitu {current}) — ajetaan virkistysputki + ship-gate.\n")
     rc = subprocess.run(
@@ -63,11 +79,13 @@ def main() -> int:
     if rc == 0:
         print("\n" + "#" * 60)
         print("# GATE PASS — ODOTTAA VILLEN HYVÄKSYNTÄÄ (ei auto-pushia)")
+        print("# Refit on stagingissa (#100), trackatut tiedostot puhtaat.")
         print("# Tarkista yllä oleva gate-diff ja aja repojuuresta:")
+        print("#   python -m scripts.promote_wc_refit")
         print("#   git add data/international_results.csv data/elo_ratings.csv data/wc_model.json")
         print('#   git commit -m "data: WC-mallin virkistys (gate PASS)"')
         print("#   git push   <- Render auto-deployaa mainista")
-        print("# Hylkäys: git checkout -- data/")
+        print("# Hylkäys: poista data/_refit_candidate/ (työpuu on jo puhdas).")
         print("#" * 60)
     return rc
 
