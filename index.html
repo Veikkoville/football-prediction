@@ -68,14 +68,14 @@
    "name": "GoalIQ Premium on the web, monthly",
    "price": "3.99",
    "priceCurrency": "EUR",
-   "url": "https://pro.goaliq.app"
+   "url": "https://pro.goaliq.app/checkout?plan=monthly"
   },
   {
    "@type": "Offer",
    "name": "GoalIQ Premium on the web, season (yearly)",
    "price": "25",
    "priceCurrency": "EUR",
-   "url": "https://pro.goaliq.app"
+   "url": "https://pro.goaliq.app/checkout?plan=season"
   }
  ]
 }
@@ -429,7 +429,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div class="logo"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</div>
     <div style="display:flex; gap:20px; align-items:center;">
       <a href="fpl.html" style="text-decoration:none; font-weight:600; font-size:14px;">Free FPL tools</a>
-      <a class="nav-cta" href="https://pro.goaliq.app" data-cta="nav">Try Premium</a>
+      <a class="nav-cta" href="https://pro.goaliq.app/?tab=premium" data-cta="nav">Try Premium</a>
     </div>
   </nav>
 </div>
@@ -457,7 +457,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <a class="cd-cta" href="fpl.html" data-cta="countdown">See the model's captain pick &rarr;</a>
     </div>
     <div class="cta-row" id="get">
-      <a class="btn-primary" href="https://pro.goaliq.app" data-cta="hero">Start GoalIQ Premium</a>
+      <!-- #101: hinta-CTA:t suoraan Stripe Checkoutiin (SPA:n /checkout-reitti
+           luo session heti) — ei enää SPA-juureen jossa osto oli piilossa. -->
+      <a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="hero">Start GoalIQ Premium &mdash; &euro;25/year</a>
       <span class="ghost-group" aria-label="Get the app">
         <a class="btn-ghost" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4.5v15l13-7.5z"/></svg>&nbsp;Get it on Google Play</a>
         <a class="btn-ghost" href="https://apps.apple.com/app/id6780047163">Download on the App Store</a>
@@ -492,11 +494,13 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <h3>Season pass</h3>
         <div class="plan-price">€25<span> / year</span></div>
         <p class="plan-note">Under €2.10 a month, billed once a year.</p>
+        <p class="plan-note"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing-season">Get the Season pass</a></p>
       </div>
       <div class="plan">
         <h3>Monthly</h3>
         <div class="plan-price">€3.99<span> / month</span></div>
         <p class="plan-note">Cancel anytime.</p>
+        <p class="plan-note"><a class="btn-ghost" href="https://pro.goaliq.app/checkout?plan=monthly" data-cta="pricing-monthly">Start Monthly</a></p>
       </div>
     </div>
     <ul class="pro-features">
@@ -509,7 +513,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <li>Predicted starting minutes</li>
     </ul>
     <div class="pricing-cta">
-      <a class="btn-primary" href="https://pro.goaliq.app" data-cta="pricing">Start Premium</a>
+      <a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing">Start Premium &mdash; &euro;25/year</a>
       <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 61.8% correct 1X2 results across 102 logged matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
       <p class="cta-note">Clean sheet probabilities, fixture difficulty, rate my team with a captain pick, and price watch stay free on the web.</p>
     </div>
@@ -522,10 +526,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div>
       <h2>Free <span class="accent">FPL tools</span> on the web</h2>
       <p>GoalIQ's model gives clean sheet probability and fixture difficulty for every Premier League team, updated every gameweek.</p>
-      <p>Free on the web, no sign-in. Want player expected points (xP), a captain ranker and a transfer planner on top? That is <a href="https://pro.goaliq.app" style="color:var(--teal-ink);font-weight:700;" data-cta="fpl">GoalIQ Premium on the web</a>.</p>
+      <p>Free on the web, no sign-in. Want player expected points (xP), a captain ranker and a transfer planner on top? That is <a href="https://pro.goaliq.app/?tab=premium" style="color:var(--teal-ink);font-weight:700;" data-cta="fpl">GoalIQ Premium on the web</a>.</p>
       <div class="cta-row" style="margin-top:22px; justify-content:flex-start;">
         <a class="btn-primary" href="fpl.html">See the FPL clean sheet odds</a>
-        <a class="btn-ghost" href="https://pro.goaliq.app" data-cta="fpl">Open GoalIQ Premium</a>
+        <a class="btn-ghost" href="https://pro.goaliq.app/?tab=premium" data-cta="fpl">Open GoalIQ Premium</a>
       </div>
       <!-- #78: career-kortin löydettävyys etusivulta (jakelutyökalu) -->
       <p style="margin-top:14px;">New: <a href="/career" data-cta="index-career" style="color:var(--teal-ink);font-weight:700;">Your FPL Career Card</a> - best season, all-time points and rank history on one shareable card. Free, no login.</p>
@@ -623,7 +627,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <li>Transfer suggestions for your imported FPL team</li>
         <li>In the app: top-10 scorelines, form &amp; momentum, head-to-head, a full week of fixtures</li>
       </ul>
-      <p style="margin:6px 0 16px;"><a class="btn-primary" href="https://pro.goaliq.app" data-cta="pricing">Start GoalIQ Premium</a></p>
+      <p style="margin:6px 0 16px;"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing">Start GoalIQ Premium &mdash; &euro;25/year</a></p>
       <small>Cancel anytime. One subscription covers web, iOS and Android.</small>
     </div>
   </div>

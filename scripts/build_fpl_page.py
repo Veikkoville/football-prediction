@@ -68,6 +68,11 @@ CANONICAL = f"{BASE}/fpl.html"
 PLAY_URL = "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"
 APPSTORE_URL = "https://apps.apple.com/app/id6780047163"
 PRO_URL = "https://pro.goaliq.app"
+# #101: selailu-CTA:t avaavat Premium-tabin suoraan (arvo-esikatselu + hinnat
+# heti näkyviin); hinta-CTA:t vievät suoraan Stripe Checkoutiin (/checkout-
+# reitti luo session heti, tili syntyy maksun jälkeen — ei pakko-sign-iniä).
+PRO_TAB_URL = f"{PRO_URL}/?tab=premium"
+PRO_CHECKOUT_SEASON_URL = f"{PRO_URL}/checkout?plan=season"
 X_URL = "https://x.com/goaliqapp"
 ORG_ID = BASE + "/#organization"
 API_BASE = "https://goaliq-api.onrender.com"   # #85: accuracy-Datasetin distribution
@@ -399,9 +404,11 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             {"@type": "Offer", "name": "GoalIQ app (free download)",
              "price": "0", "priceCurrency": "USD"},
             {"@type": "Offer", "name": "GoalIQ Premium on the web, monthly",
-             "price": "3.99", "priceCurrency": "EUR", "url": PRO_URL},
+             "price": "3.99", "priceCurrency": "EUR",
+             "url": f"{PRO_URL}/checkout?plan=monthly"},
             {"@type": "Offer", "name": "GoalIQ Premium on the web, season (yearly)",
-             "price": "25", "priceCurrency": "EUR", "url": PRO_URL},
+             "price": "25", "priceCurrency": "EUR",
+             "url": PRO_CHECKOUT_SEASON_URL},
         ],
     }
     faq_ld = {
@@ -622,7 +629,7 @@ def render_page(c: dict) -> str:
   <div class="bar"></div>
   <div class="nav">
     <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="26" height="26" alt="">Goal<span>IQ</span></a></div>
-    <a class="cta" href="{PRO_URL}" data-cta="nav">Open GoalIQ Premium</a>
+    <a class="cta" href="{PRO_TAB_URL}" data-cta="nav">Open GoalIQ Premium</a>
   </div>
 </header>
 
@@ -641,7 +648,7 @@ the captain ranker and a transfer planner.</p>
 Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 
 <div class="cta-row">
-  <a class="cta" href="{PRO_URL}" data-cta="fpl">See the full xP dashboard on GoalIQ Premium</a>
+  <a class="cta" href="{PRO_TAB_URL}" data-cta="fpl">See the full xP dashboard on GoalIQ Premium</a>
   <a class="cta secondary" href="{PLAY_URL}">Google Play</a>
   <a class="cta secondary" href="{APPSTORE_URL}">App Store</a>
 </div>
@@ -685,7 +692,7 @@ a transfer planner, differential picks, player compare and predicted starting
 minutes, from the same match model as this page. Rate my team, a captain pick
 and price watch are free on the web with your public FPL entry ID.</p>
 <div class="cta-row">
-  <a class="cta" href="{PRO_URL}" data-cta="fpl">Start GoalIQ Premium</a>
+  <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium &mdash; &euro;25/year</a>
 </div>
 <p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
 One subscription covers web, iOS and Android.</p>
@@ -723,7 +730,7 @@ cannot be edited after the fact. If the model has a bad week, the log shows it.<
 </dl>
 
 <div class="cta-row">
-  <a class="cta" href="{PRO_URL}" data-cta="fpl">Open GoalIQ Premium: player xP and captain ranker</a>
+  <a class="cta" href="{PRO_TAB_URL}" data-cta="fpl">Open GoalIQ Premium: player xP and captain ranker</a>
   <a class="cta secondary" href="{PLAY_URL}">Predict any fixture in the GoalIQ app</a>
   <a class="cta secondary" href="{APPSTORE_URL}">Download on the App Store</a>
 </div>

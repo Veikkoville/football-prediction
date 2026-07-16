@@ -1,9 +1,13 @@
-/** Stripe Checkout SPA-polku (QUEUE #14 ainoa backend-lisäys).
+/** Stripe Checkout SPA-polku (QUEUE #14 + #101 guest checkout).
  *
  * Staattinen SPA EI voi pitää STRIPE_SECRET_KEY:tä → checkout-session luodaan
- * backendissä: POST /api/web/checkout (auth = Supabase-JWT bearer) → {url} →
- * redirect. Fulfillment = olemassa oleva webhook /api/webhook/stripe-web
- * (ei muutu). Hinnat: kausi 25 €/v (oletus) + kuukausi 3,99 €/kk.
+ * backendissä. Kaksi polkua:
+ *   - kirjautunut: POST /api/web/checkout (Supabase-JWT bearer) →
+ *     client_reference_id linkittää oston suoraan tiliin
+ *   - kirjautumaton (#101): POST /api/web/checkout/guest — Stripe kerää
+ *     emailin, tili provisioidaan maksun JÄLKEEN webhookissa + magic link
+ * Fulfillment = webhook /api/webhook/stripe-web molemmissa.
+ * Hinnat: kausi 25 €/v (oletus) + kuukausi 3,99 €/kk.
  */
 import { API_BASE } from './config';
 import { accessToken } from './auth.svelte';
@@ -16,18 +20,20 @@ export const PLANS = {
 
 export type PlanKey = keyof typeof PLANS;
 
-export async function startCheckout(plan: PlanKey): Promise<string | null> {
+/** Vie Stripe Checkoutiin. Kirjautunut → authed endpoint (osto linkittyy
+ * tiliin heti); kirjautumaton → guest endpoint (tili syntyy maksun jälkeen).
+ * Palauttaa virheviestin tai null (= redirect käynnissä). */
+export async function startCheckout(plan: PlanKey, source = 'pro_web'): Promise<string | null> {
 	// Web-funnel: osto-intentti ennen redirectiä (sama muoto kuin #12)
-	capture('upgrade_tapped', { source: 'pro_web', plan, price: PLANS[plan].price });
+	capture('upgrade_tapped', { source, plan, price: PLANS[plan].price });
 	const token = await accessToken();
-	if (!token) return 'Sign in first.';
+	const endpoint = token ? '/api/web/checkout' : '/api/web/checkout/guest';
+	const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+	if (token) headers.Authorization = `Bearer ${token}`;
 	try {
-		const r = await fetch(`${API_BASE}/api/web/checkout`, {
+		const r = await fetch(`${API_BASE}${endpoint}`, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			},
+			headers,
 			body: JSON.stringify({ plan, origin: window.location.origin })
 		});
 		if (!r.ok) {

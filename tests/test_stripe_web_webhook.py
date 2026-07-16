@@ -209,6 +209,101 @@ def test_rc_expiration_clears_premium_when_no_web(client, monkeypatch):
     assert profile_calls and profile_calls[0][1]["is_premium"] is False
 
 
+# --- #101 guest checkout: tili provisioidaan maksun jälkeen ---
+
+
+def test_guest_checkout_provisions_user_and_sends_magic_link(client, monkeypatch):
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    provisioned: list[str] = []
+    monkeypatch.setattr(m, "_provision_supabase_user",
+                        lambda email: provisioned.append(email) or "new-user-1")
+    sub_calls: list[tuple[dict, dict | None]] = []
+    monkeypatch.setattr(m, "_upsert_web_subscription",
+                        lambda fields, match=None: sub_calls.append((fields, match)) or True)
+    profile_calls: list[tuple[str, dict]] = []
+    monkeypatch.setattr(m, "_update_profile",
+                        lambda uid, fields: profile_calls.append((uid, fields)) or True)
+    links: list[str] = []
+    monkeypatch.setattr(m, "_send_magic_link",
+                        lambda email, redirect_to="https://pro.goaliq.app":
+                        links.append(email) or True)
+    payload = {
+        "type": "checkout.session.completed",
+        "data": {"object": {
+            # EI client_reference_id:tä — guest maksoi ilman tiliä
+            "metadata": {"plan": "monthly", "source": "pro-web-guest"},
+            "customer_details": {"email": "buyer@example.com"},
+            "customer": "cus_g", "subscription": "sub_guest",
+            "payment_status": "paid",
+        }},
+    }
+    body, sig = _signed(payload, secret)
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 200
+    assert provisioned == ["buyer@example.com"]
+    # Fulfillment laskeutuu provisioidulle tilille
+    assert sub_calls and sub_calls[0][0]["user_id"] == "new-user-1"
+    assert sub_calls[0][0]["plan"] == "monthly"
+    assert profile_calls and profile_calls[0][0] == "new-user-1"
+    assert profile_calls[0][1]["is_premium"] is True
+    # Kirjautumislinkki lähtee fulfillmentin JÄLKEEN (premium jo aktiivinen)
+    assert links == ["buyer@example.com"]
+
+
+def test_guest_checkout_provisioning_failure_returns_500_for_retry(client, monkeypatch):
+    """Transientti Supabase-häiriö → 500 → Stripe retryaa eventin."""
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    monkeypatch.setattr(m, "_provision_supabase_user", lambda email: None)
+    sub_calls: list = []
+    monkeypatch.setattr(m, "_upsert_web_subscription",
+                        lambda *a, **k: sub_calls.append(a) or True)
+    payload = {
+        "type": "checkout.session.completed",
+        "data": {"object": {
+            "metadata": {"plan": "season", "source": "pro-web-guest"},
+            "customer_details": {"email": "buyer@example.com"},
+            "customer": "cus_g", "subscription": "sub_guest",
+            "payment_status": "paid",
+        }},
+    }
+    body, sig = _signed(payload, secret)
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 500
+    assert sub_calls == []  # fulfillment EI ajettu ilman tiliä
+
+
+def test_guest_magic_link_failure_does_not_fail_fulfillment(client, monkeypatch):
+    """Mailin lähetysvirhe EI saa kaataa webhookia — premium on jo aktivoitu
+    ja käyttäjä pääsee sisään LoginBoxin sign-in-link-polulla."""
+    import api.main as m
+    secret = "whsec_test"
+    monkeypatch.setattr(m, "STRIPE_WEB_WEBHOOK_SECRET", secret)
+    monkeypatch.setattr(m, "_provision_supabase_user", lambda email: "new-user-2")
+    monkeypatch.setattr(m, "_upsert_web_subscription", lambda *a, **k: True)
+    monkeypatch.setattr(m, "_update_profile", lambda *a, **k: True)
+    monkeypatch.setattr(m, "_send_magic_link",
+                        lambda email, redirect_to="https://pro.goaliq.app": False)
+    payload = {
+        "type": "checkout.session.completed",
+        "data": {"object": {
+            "metadata": {"plan": "season", "source": "pro-web-guest"},
+            "customer_details": {"email": "buyer2@example.com"},
+            "customer": "cus_g2", "subscription": "sub_g2",
+            "payment_status": "paid",
+        }},
+    }
+    body, sig = _signed(payload, secret)
+    r = client.post("/api/webhook/stripe-web", content=body,
+                    headers={"stripe-signature": sig})
+    assert r.status_code == 200
+
+
 def test_checkout_without_user_ref_is_ignored(client, monkeypatch):
     import api.main as m
     secret = "whsec_test"

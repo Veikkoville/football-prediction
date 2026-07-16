@@ -79,6 +79,63 @@ def test_creates_session_with_streamlit_parity_metadata(client, monkeypatch):
     assert created["cancel_url"] == "https://pro-next.goaliq.app/?checkout=cancelled"
 
 
+# --- #101 guest checkout (osto ilman tiliä, account-after-payment) ---
+
+
+def _clear_rate_bucket(monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m, "_GUEST_CHECKOUT_HITS", {})
+
+
+def test_guest_checkout_needs_no_auth_and_omits_user_refs(client, monkeypatch):
+    import api.main as m
+    _configure(monkeypatch)
+    _clear_rate_bucket(monkeypatch)
+    created: dict = {}
+
+    def fake_create(**kwargs):
+        created.update(kwargs)
+        return type("S", (), {"url": "https://checkout.stripe.com/guest"})()
+
+    monkeypatch.setattr(stripe.checkout.Session, "create",
+                        staticmethod(fake_create))
+    r = client.post("/api/web/checkout/guest",
+                    json={"plan": "monthly", "origin": "https://pro.goaliq.app"})
+    assert r.status_code == 200
+    assert r.json()["url"] == "https://checkout.stripe.com/guest"
+    # Stripe kerää emailin → EI client_reference_id/customer_email
+    assert "client_reference_id" not in created
+    assert "customer_email" not in created
+    # Webhook tunnistaa guest-oston tästä
+    assert created["metadata"] == {"plan": "monthly", "source": "pro-web-guest"}
+    assert created["line_items"] == [{"price": "price_monthly_test",
+                                      "quantity": 1}]
+    # Success-URL kantaa guest=1 → SPA näyttää "check your email" -bannerin
+    assert "guest=1" in created["success_url"]
+    assert created["success_url"].startswith(
+        "https://pro.goaliq.app/?checkout=success")
+
+
+def test_guest_checkout_unknown_plan_422(client, monkeypatch):
+    _clear_rate_bucket(monkeypatch)
+    r = client.post("/api/web/checkout/guest", json={"plan": "lifetime"})
+    assert r.status_code == 422
+
+
+def test_guest_checkout_rate_limited_429(client, monkeypatch):
+    import api.main as m
+    _configure(monkeypatch)
+    _clear_rate_bucket(monkeypatch)
+    monkeypatch.setattr(m, "_GUEST_CHECKOUT_LIMIT", 2)
+    monkeypatch.setattr(
+        stripe.checkout.Session, "create",
+        staticmethod(lambda **k: type("S", (), {"url": "https://x"})()))
+    body = {"plan": "monthly", "origin": "https://pro.goaliq.app"}
+    assert client.post("/api/web/checkout/guest", json=body).status_code == 200
+    assert client.post("/api/web/checkout/guest", json=body).status_code == 200
+    assert client.post("/api/web/checkout/guest", json=body).status_code == 429
+
+
 def test_origin_allowlist_blocks_open_redirect():
     from api.main import _web_checkout_base_url
     assert _web_checkout_base_url("https://pro.goaliq.app") == "https://pro.goaliq.app"
