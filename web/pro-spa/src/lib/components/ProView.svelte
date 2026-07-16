@@ -5,6 +5,7 @@
 	import { capture } from '$lib/analytics';
 	import LoginBox from './LoginBox.svelte';
 	import Paywall from './Paywall.svelte';
+	import PremiumPreview from './PremiumPreview.svelte';
 	import ProTools from './ProTools.svelte';
 
 	let xp = $state<XpResponse | null>(null);
@@ -51,6 +52,10 @@
 {#if !auth.sessionResolved}
 	<p class="muted">Checking session…</p>
 {:else if !auth.user}
+	<!-- #95: arvo-esikatselu ENNEN login-lomaketta (design-audit vk3 P1) —
+	     bulletit + live-trust-rivi + lukittu xP-teaser; paljas kirjautumis-
+	     seinä ei myynyt mitään juuri konversiohetkellä. -->
+	<PremiumPreview />
 	<LoginBox />
 {:else if auth.subLoading && auth.sub === undefined}
 	<p class="muted">Checking subscription…</p>

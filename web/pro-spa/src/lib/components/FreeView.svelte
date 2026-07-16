@@ -31,6 +31,11 @@
 	});
 
 	const fdrVar = (fdr: number) => `var(--fdr-${Math.min(Math.max(fdr, 1), 5)})`;
+	// #96 (design-audit vk3): FDR-5-token on jo magenta-deep, mutta 14 %:n
+	// tint pesi sen laventelinnäköiseksi haaleaksi pinkiksi. Vaikeimmalle
+	// FDR:lle vahvempi tint → solu lukee selvästi brändimagentana ja
+	// "vaikein = voimakkain väri" -signaali toimii.
+	const fdrTint = (fdr: number) => (fdr >= 5 ? 26 : 14);
 
 	let gwCols = $derived(
 		data?.teams?.[0]?.fixtures?.map((f) => f.gw) ?? []
@@ -108,7 +113,7 @@
 									{#each gwCols as gw (gw)}
 										{@const f = t.fixtures.find((x) => x.gw === gw)}
 										{#if f}
-											<td style="background: color-mix(in srgb, {fdrVar(f.fdr)} 14%, transparent)">
+											<td style="background: color-mix(in srgb, {fdrVar(f.fdr)} {fdrTint(f.fdr)}%, transparent)">
 												{f.opponent_short} ({f.venue}) {f.fdr}
 											</td>
 										{:else}

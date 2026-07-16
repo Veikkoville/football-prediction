@@ -173,8 +173,16 @@ button.ghost:hover {
 	border-color: var(--text-muted);
 }
 
-button:disabled {
-	opacity: 0.55;
+/* #98 (design-audit vk3 = ui-fix P4 webissä): disabled-nappi neutraaliksi
+   paper-taustaksi + himmennetty teksti — EI läpikuultavaa magentaa (mobiilin
+   btnDisabled-pariteetti). :hover-variantti mukana, jotta .primary:hover ei
+   voita disabled-tilaa (sama spesifisyys → järjestys ratkaisee). */
+button:disabled,
+button:disabled:hover {
+	background: var(--giq-paper);
+	border-color: var(--border);
+	color: var(--text-muted);
+	opacity: 1;
 	cursor: default;
 }
 
