@@ -32,9 +32,10 @@
 	<h2>GoalIQ Premium</h2>
 	{#if busy}
 		<p>Opening secure checkout ({PLANS[plan].label}) via Stripe…</p>
+		<!-- #102: sama rehellinen muotoilu kuin PremiumPreview (ei em-dashia) -->
 		<p class="muted">
-			No account needed — pay first, and we'll email you a sign-in link for the web and the
-			GoalIQ app.
+			Skip the signup: pay with Stripe and we'll set up your account and email you a
+			sign-in link for the web and the GoalIQ app.
 		</p>
 	{:else if error}
 		<p class="banner error">{error}</p>
