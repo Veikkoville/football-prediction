@@ -109,9 +109,11 @@
 			</div>
 		{/each}
 	</div>
+	<!-- #102: rehellinen copy — tili LUODAAN oston jälkeen (webhook provisioi),
+	     joten "No account needed" oli faktavirhe. -->
 	<p class="muted no-account">
-		No account needed: pay with Stripe and we'll email you a sign-in link. Cancel anytime. One
-		subscription covers web, iOS and Android.
+		Skip the signup: pay with Stripe and we'll set up your account and email you a sign-in
+		link. Cancel anytime. One subscription covers web, iOS and Android.
 	</p>
 	{#if buyError}
 		<p class="banner error">{buyError}</p>
