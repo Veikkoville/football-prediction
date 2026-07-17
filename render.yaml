@@ -7,7 +7,9 @@ services:
     name: goaliq-api
     runtime: python
     region: frankfurt           # Lähinnä Suomea (matala latenssi)
-    plan: free                  # Vaihda paid:iksi jos haluat aina-päällä (7 $/kk)
+    plan: starter               # #109: tuotanto ON Starterilla (aina-päällä; main.py nojaa
+                                # siihen mm. esirakennetussa WC-mallissa) — free tässä olisi
+                                # antanut Blueprint-synkin pudottaa palvelun freehin (cold startit)
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
