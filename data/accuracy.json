@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-07-17T05:44:03+00:00",
-  "logged_total": 104,
-  "pending": 2,
+  "updated_at": "2026-07-17T08:12:27+00:00",
+  "logged_total": 304,
+  "pending": 202,
   "all_time": {
     "n": 102,
     "correct_1x2": 63,
@@ -28,6 +28,21 @@
     "brier": 0.4829,
     "brier_n": 54,
     "window": 100
+  },
+  "by_competition": {
+    "WC": {
+      "n": 102,
+      "correct_1x2": 63,
+      "pct_1x2": 0.6176,
+      "decisive_n": 74,
+      "decisive_correct": 63,
+      "pct_decisive": 0.8514,
+      "exact_n": 54,
+      "exact_correct": 11,
+      "pct_exact": 0.2037,
+      "brier": 0.4829,
+      "brier_n": 54
+    }
   },
   "calibration": [
     {
