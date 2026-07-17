@@ -2643,6 +2643,24 @@ def fantasy_differentials(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@app.get("/api/fantasy/value")
+def fantasy_value(
+    response: Response,
+    top_n: int = Query(default=20, ge=1, le=100),
+    pairs_n: int = Query(default=10, ge=1, le=50),
+):
+    """FPL value/consistency + GK rotation pairs (#114): xP/£-ranking +
+    fixture-swing + paras 2-vahdin CS%-rotaatio. Rakentuu xP-projektion ja
+    phase0-CS%:n päälle — ei uutta dataputkea."""
+    from src.models.fpl_rate_team import RateTeamError
+    from src.models.fpl_value import value_and_gk
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return value_and_gk(top_n_value=top_n, top_n_pairs=pairs_n)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/fantasy/compare")
 def fantasy_compare(
     response: Response,
