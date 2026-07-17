@@ -746,6 +746,7 @@ predictions and analytics. Not betting advice.</p>
   <div class="wrap">
   <p><a href="./">GoalIQ home</a> &middot;
   <a href="{PRO_URL}">GoalIQ Premium (web)</a> &middot;
+  <a href="/predictions">Match predictions</a> &middot;
   <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
   <a href="faq.html">App FAQ</a> &middot;
   <a href="privacy.html">Privacy</a></p>
@@ -814,28 +815,86 @@ def update_index(c: dict) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# 5b. Evergreen predict-sivun track record -markerit (predictions.html, #105)
+# ---------------------------------------------------------------------------
+PREDICTIONS_PATH = ROOT / "predictions.html"
+PREDICTIONS_URL = f"{BASE}/predictions"
+
+
+def update_predictions(c: dict) -> bool:
+    """Täytä predictions.html:n GEN:ACC-markerit tuoreilla accuracy-luvuilla
+    (#105). Sama lähde ja refresh-tahti kuin fpl.html/index.html - evergreen-
+    sivun track record ei koskaan jää staleksi kovakoodaukseksi."""
+    if not PREDICTIONS_PATH.exists():
+        return False
+    s = PREDICTIONS_PATH.read_text(encoding="utf-8")
+    chip = (
+        f'<div class="num">{fmt_pct(c["acc_pct_1x2"])}</div>'
+        f'<div class="lbl">result accuracy across {c["acc_n"]} logged matches</div>'
+    )
+    proof = (
+        f"The model logs every prediction before kickoff. "
+        f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} matches played."
+    )
+    trust = (
+        f"Built on a model with {fmt_pct(c['acc_pct_1x2'])} correct 1X2 results "
+        f"across {c['acc_n']} logged matches, every prediction logged before kick-off."
+    )
+    new = re.sub(
+        r"(<!-- GEN:ACC-CHIP-START -->).*?(<!-- GEN:ACC-CHIP-END -->)",
+        lambda m: m.group(1) + chip + m.group(2), s, flags=re.S)
+    new = re.sub(
+        r"(<!-- GEN:ACC-PROOF-START -->).*?(<!-- GEN:ACC-PROOF-END -->)",
+        lambda m: m.group(1) + proof + m.group(2), new, flags=re.S)
+    new = re.sub(
+        r"(<!-- GEN:ACC-TRUST-START -->).*?(<!-- GEN:ACC-TRUST-END -->)",
+        lambda m: m.group(1) + trust + m.group(2), new, flags=re.S)
+    ds = accuracy_dataset_ld(c, PREDICTIONS_URL)
+    ds_block = (
+        '\n<script type="application/ld+json">\n'
+        + json.dumps(ds, ensure_ascii=False, indent=1)
+        + "\n</script>\n"
+    )
+    new = re.sub(
+        r"(<!-- GEN:ACC-DATASET-START -->).*?(<!-- GEN:ACC-DATASET-END -->)",
+        lambda m: m.group(1) + ds_block + m.group(2), new, flags=re.S)
+    if new != s:
+        PREDICTIONS_PATH.write_text(new, encoding="utf-8")
+        return True
+    return False
+
+
+# ---------------------------------------------------------------------------
 # 6. Sitemap lastmod
 # ---------------------------------------------------------------------------
-def update_sitemap(iso_date: str) -> bool:
-    xml = SITEMAP_PATH.read_text(encoding="utf-8")
+def _upsert_sitemap_entry(xml: str, loc: str, iso_date: str,
+                          changefreq: str, priority: str) -> str:
+    """Päivitä (tai lisää) yhden URL:n sitemap-blokki. Idempotentti."""
     entry = (
         "  <url>\n"
-        f"    <loc>{CANONICAL}</loc>\n"
+        f"    <loc>{loc}</loc>\n"
         f"    <lastmod>{iso_date}</lastmod>\n"
-        "    <changefreq>weekly</changefreq>\n"
-        "    <priority>0.9</priority>\n"
+        f"    <changefreq>{changefreq}</changefreq>\n"
+        f"    <priority>{priority}</priority>\n"
         "  </url>\n"
     )
-    if CANONICAL in xml:
-        # korvaa olemassa oleva fpl.html-blokki
-        new = re.sub(
-            r"  <url>\s*<loc>" + re.escape(CANONICAL) + r"</loc>.*?</url>\n",
+    if f"<loc>{loc}</loc>" in xml:
+        return re.sub(
+            r"  <url>\s*<loc>" + re.escape(loc) + r"</loc>.*?</url>\n",
             entry,
             xml,
             flags=re.S,
         )
-    else:
-        new = xml.replace("</urlset>", entry + "</urlset>")
+    return xml.replace("</urlset>", entry + "</urlset>")
+
+
+def update_sitemap(iso_date: str) -> bool:
+    xml = SITEMAP_PATH.read_text(encoding="utf-8")
+    new = _upsert_sitemap_entry(xml, CANONICAL, iso_date, "weekly", "0.9")
+    # #105: evergreen predict-sivu elää samassa refresh-tahdissa (accuracy-
+    # markerit päivittyvät joka ajolla → lastmod mukana).
+    if PREDICTIONS_PATH.exists():
+        new = _upsert_sitemap_entry(new, PREDICTIONS_URL, iso_date, "weekly", "0.9")
     if new != xml:
         SITEMAP_PATH.write_text(new, encoding="utf-8")
         return True
@@ -852,6 +911,7 @@ def main() -> None:
     OUT_PATH.write_text(html_out, encoding="utf-8")
     sitemap_changed = update_sitemap(c["iso_date"])
     index_changed = update_index(c)
+    predictions_changed = update_predictions(c)
 
     print("=" * 64)
     print("FPL-LANDING BAKE OK")
@@ -859,6 +919,7 @@ def main() -> None:
     print(f"  fpl.html          : {len(html_out)} merkkiä")
     print(f"  sitemap.xml       : {'päivitetty' if sitemap_changed else 'ei muutosta'}")
     print(f"  index.html        : {'accuracy-markerit päivitetty' if index_changed else 'ei muutosta'}")
+    print(f"  predictions.html  : {'accuracy-markerit päivitetty' if predictions_changed else 'ei muutosta'}")
     print(f"  GW                : {c['next_gw']} ({c['gw_label']})")
     print(f"  CS-rivejä         : {len(c['cs_rows'])}")
     print(f"  FDR-rivejä        : {len(c['fdr_rows'])} x {len(c['gws'])} GW")
