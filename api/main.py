@@ -2324,7 +2324,10 @@ def revenuecat_config():
 
 
 @app.get("/api/accuracy")
-def model_accuracy(response: Response):
+def model_accuracy(
+    response: Response,
+    include: str | None = Query(default=None, pattern="^(pending)$"),
+):
     """Mallin verifioitava tarkkuus-track-record (#100).
 
     Palauttaa committatun aggregaatin (data/accuracy.json) — rolling N +
@@ -2337,14 +2340,21 @@ def model_accuracy(response: Response):
 
     Gambling-turvallinen: pelkkä mallin osumatarkkuus, EI vedonlyönti-ROI:ta.
     """
-    from src.models.accuracy import load_aggregate
+    from src.models.accuracy import load_aggregate, pending_rows
     # #103: ei välimuistitusta. Track record päivittyy palvelinpäästä (cron → main
     # → Render), ja mobiili (lib/api.ts fetchAccuracy) hakee bare-URL:n ilman
     # cache-bustia oletus-fetch-cachella → CDN/edge/OS/RN-HTTP-cache voi tarjota
     # vanhentunutta snapshotia (oire: stale n=48 ~17 h). no-store estää kaikki
     # välimuistitasot, korjaus tulee voimaan ilman app-buildia.
     response.headers["Cache-Control"] = "no-store"
-    return load_aggregate()
+    agg = load_aggregate()
+    # #131: additiivinen pending-rivilista (?include=pending) mobiilin
+    # "logged, awaiting result" -lohkoon (#129-web-pariteetti). Oletusvastaus
+    # ennallaan → vanhat klientit eivät muutu; headline/by_competition
+    # lasketaan edelleen vain gradatuista.
+    if include == "pending":
+        agg = {**agg, "pending_predictions": pending_rows()}
+    return agg
 
 
 @app.post("/api/webhook/stripe-web")

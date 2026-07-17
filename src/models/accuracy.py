@@ -485,6 +485,35 @@ def empty_aggregate() -> dict:
     }
 
 
+def pending_rows(limit: int | None = None, path: Path = LOG_PATH) -> list[dict]:
+    """#131: logatut, pelaamattomat ennusteet (result == null) mobiilin
+    pending-lohkoon — SAMA lähde kuin webin #129-taulu (prediction_log).
+    Lähin kickoff ensin. Kevyt riviformaatti; EI vaikuta aggregaattiin
+    (headline-% ja by_competition lasketaan vain gradatuista)."""
+    log = load_log(path)
+    rows = [e for e in log.get("predictions", []) if not e.get("result")]
+    rows.sort(key=lambda e: e.get("kickoff") or e.get("date") or "9999")
+    out = []
+    for e in rows[: limit if limit else len(rows)]:
+        w = e.get("predicted_winner")
+        p_winner = {
+            "home": e.get("p_home"),
+            "draw": e.get("p_draw"),
+            "away": e.get("p_away"),
+        }.get(w)
+        out.append({
+            "competition": e.get("competition"),
+            "home_team": e.get("home_team"),
+            "away_team": e.get("away_team"),
+            "kickoff": e.get("kickoff"),
+            "date": e.get("date"),
+            "predicted_winner": w,
+            "p_winner": p_winner,
+            "logged_at": e.get("logged_at"),
+        })
+    return out
+
+
 def load_aggregate(path: Path = AGGREGATE_PATH) -> dict:
     if not path.exists():
         return empty_aggregate()
