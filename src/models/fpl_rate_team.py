@@ -272,6 +272,19 @@ def _gw_xp(player: dict, gw: int) -> float:
     return 0.0
 
 
+def _player_gameweeks(p: dict) -> list[dict]:
+    """#122/#123: per-GW-xP + vastustajat vastaukseen (sama muoto kuin
+    /api/fantasy/xp:n FantasyXpGameweek). DGW = useampi opponent, BGW = []."""
+    return [
+        {
+            "gw": g.get("gw"),
+            "opponents": g.get("opponents") or [],
+            "xp": round(float(g.get("xp") or 0.0), 2),
+        }
+        for g in (p.get("gameweeks") or [])
+    ]
+
+
 def captain_suggestion(xi: list[dict], gw: int) -> dict:
     ranked = sorted(xi, key=lambda p: _gw_xp(p, gw), reverse=True)
     pick = ranked[0]
@@ -320,9 +333,14 @@ def transfer_suggestions(squad: list[dict], pool: list[dict],
                 "out": {"id": out_p["id"], "web_name": out_p["web_name"],
                         "team_short": out_p["team_short"],
                         "price": out_p["price"] / 10.0},
+                # #121: in-pelaajalle täydet planner-kentät → apply-to-planner
+                # voi liittää pelaajan pitchiin ilman lisäkutsua.
                 "in": {"id": in_p["id"], "web_name": in_p["web_name"],
                        "team_short": in_p["team_short"],
-                       "price": in_p["price"] / 10.0},
+                       "price": in_p["price"] / 10.0,
+                       "xp_per_gw": round(in_p["xp_per_gw"], 2),
+                       "xp_horizon_total": round(in_p["xp_horizon_total"], 2),
+                       "gameweeks": _player_gameweeks(in_p)},
                 "pos": POS_NAME[out_p["element_type"]],
                 "delta_xp_horizon": round(delta, 2),
                 "delta_cost": round((in_p["price"] - out_p["price"]) / 10.0, 1),
@@ -549,6 +567,10 @@ def rate_team(entry: int | None = None, gw: int | None = None,
                 "price": p["price"] / 10.0,
                 "xp_per_gw": round(p["xp_per_gw"], 2),
                 "xp_horizon_total": round(p["xp_horizon_total"], 2),
+                # #122/#123: per-GW-xP + vastustajat manageriin — summary ja
+                # manageri laskevat samasta GW-kohtaisesta luvusta (ei enää
+                # keskiarvo-vs-GW1-ristiriitaa), ja GW-valitsin saa datansa.
+                "gameweeks": _player_gameweeks(p),
                 "in_xi": p["id"] in xi_ids,
                 "is_captain": p["id"] == effective_captain,
             } for p in squad],

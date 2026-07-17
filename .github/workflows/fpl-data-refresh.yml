@@ -128,6 +128,12 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_price_watch
 
+      # #124/#125: xG- + DefCon-leaders samasta bootstrap+element-summary-
+      # datasta (levyvälimuisti — valmiin kauden summaryt eivät uudelleenhae).
+      - name: Build player leaders (xG + DefCon)
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.build_fpl_player_leaders
+
       - name: Commit + push to main (Render serves fresh data)
         if: steps.guard.outputs.proceed == 'true'
         run: |
