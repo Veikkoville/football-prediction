@@ -11,6 +11,7 @@
 	} from '$lib/fplEntry.svelte';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import ModelWorking from './ModelWorking.svelte';
+	import TeamPitchManager from './TeamPitchManager.svelte';
 
 	// #73: lataustilan askeleet = putken oikeat vaiheet (rehellinen checklist)
 	const WORKING_STEPS = [
@@ -195,6 +196,10 @@
 			<p class="muted">{data.meta.note}</p>
 		{/if}
 	</div>
+
+	<!-- #113: pitch + kitit + what-if-manager (pariteetti mobiilin #106+#112:lle;
+	     free = staattinen pitch + lukko, premium = editointi) -->
+	<TeamPitchManager players={data.team.players} {premium} {onUpgrade} />
 
 	{#if premium}
 		<!-- #63: HOLD-verdikti HERO-kantana siirtolistan yläpuolella; backendin
