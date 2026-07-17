@@ -59,7 +59,10 @@ FPL_PATH = ROOT / "data" / "fpl_projections_phase0.json"
 ACC_PATH = ROOT / "data" / "accuracy.json"
 LOG_PATH = ROOT / "data" / "prediction_log.json"
 OUT_PATH = ROOT / "fpl.html"
-SITEMAP_PATH = ROOT / "sitemap.xml"
+# #119b: sitemap.xml on nyt <sitemapindex> (core + predictions + fpl) —
+# ydinsivujen entryt elävät sitemap-core.xml:ssä. Lapsi-sitemapit kirjoittavat
+# build_prediction_pages.py ja build_fpl_longtail.py (write_urlset alla).
+SITEMAP_PATH = ROOT / "sitemap-core.xml"
 
 # #111: per-kilpailu-näyttönimet (accuracy.json by_competition -koodit).
 # Tuntematon koodi renderöityy koodina — ei kaadu kun elokuun liigat tulevat.
@@ -1103,6 +1106,28 @@ def _upsert_sitemap_entry(xml: str, loc: str, iso_date: str,
     return xml.replace("</urlset>", entry + "</urlset>")
 
 
+def write_urlset(path: Path, entries: list[tuple[str, str, str, str]]) -> None:
+    """#119b: kirjoita kokonainen urlset-sitemap kerralla (wholesale-regen →
+    stalet entryt siivoutuvat automaattisesti kun sivut poistuvat).
+    entries = [(loc, lastmod-iso, changefreq, priority), ...]."""
+    body = "".join(
+        "  <url>\n"
+        f"    <loc>{loc}</loc>\n"
+        f"    <lastmod>{lastmod}</lastmod>\n"
+        f"    <changefreq>{cf}</changefreq>\n"
+        f"    <priority>{pr}</priority>\n"
+        "  </url>\n"
+        for loc, lastmod, cf, pr in entries
+    )
+    path.write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + body
+        + "</urlset>\n",
+        encoding="utf-8",
+    )
+
+
 def update_sitemap(iso_date: str) -> bool:
     xml = SITEMAP_PATH.read_text(encoding="utf-8")
     new = _upsert_sitemap_entry(xml, CANONICAL, iso_date, "weekly", "0.9")
@@ -1147,7 +1172,7 @@ def main() -> None:
     print(f"  Lähteet           : {FPL_PATH.name} ({c['data_date']}), "
           f"{ACC_PATH.name} ({c['acc_date']})")
     print("\nJulkaisu (Villen GO vaaditaan, Pages servaa mainista):")
-    print("  git add fpl.html sitemap.xml")
+    print("  git add fpl.html sitemap-core.xml")
     print('  git commit -m "geo(fpl): FPL-landing data-refresh"')
     print("  git push")
 

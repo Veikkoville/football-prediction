@@ -37,7 +37,12 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.build_fpl_page import _upsert_sitemap_entry, SITEMAP_PATH
+from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
+
+# #119b: long-tail-sivut omaan lapsi-sitemapiin (sitemap.xml-index listaa).
+# Wholesale OUT_DIR-globista → entry jokaiselle olemassa olevalle sivulle,
+# myös silloin kun jokin data-lähde puuttui tältä ajolta (sivu jää voimaan).
+SITEMAP_FPL_PATH = _FP_ROOT / "sitemap-fpl.xml"
 from scripts.build_prediction_pages import CSS, NAV, DISCLAIMER, _page
 
 BASE = "https://goaliq.app"
@@ -221,7 +226,6 @@ def render_price_changes(pw: dict, now: datetime) -> str:
 def main() -> int:
     now = datetime.now(timezone.utc)
     OUT_DIR.mkdir(exist_ok=True)
-    xml = SITEMAP_PATH.read_text(encoding="utf-8")
     built = []
 
     xp = _load(XP_PATH)
@@ -229,9 +233,6 @@ def main() -> int:
         page = render_captain(xp, now)
         if page:
             (OUT_DIR / "best-captain.html").write_text(page, encoding="utf-8")
-            xml = _upsert_sitemap_entry(
-                xml, f"{BASE}/fpl/best-captain", now.strftime("%Y-%m-%d"),
-                "daily", "0.7")
             built.append("best-captain")
 
     diff = _fetch_differentials()
@@ -239,22 +240,21 @@ def main() -> int:
         page = render_differentials(diff, now)
         if page:
             (OUT_DIR / "differentials.html").write_text(page, encoding="utf-8")
-            xml = _upsert_sitemap_entry(
-                xml, f"{BASE}/fpl/differentials", now.strftime("%Y-%m-%d"),
-                "daily", "0.7")
             built.append("differentials")
 
     pw = _load(PW_PATH)
     if pw is not None:
         (OUT_DIR / "price-changes.html").write_text(
             render_price_changes(pw, now), encoding="utf-8")
-        xml = _upsert_sitemap_entry(
-            xml, f"{BASE}/fpl/price-changes", now.strftime("%Y-%m-%d"),
-            "daily", "0.7")
         built.append("price-changes")
 
-    SITEMAP_PATH.write_text(xml, encoding="utf-8")
-    print(f"LONGTAIL: {', '.join(built) or 'ei sivuja (data puuttuu)'}")
+    today = now.strftime("%Y-%m-%d")
+    write_urlset(SITEMAP_FPL_PATH, [
+        (f"{BASE}/fpl/{f.stem}", today, "daily", "0.7")
+        for f in sorted(OUT_DIR.glob("*.html"))
+    ])
+    print(f"LONGTAIL: {', '.join(built) or 'ei sivuja (data puuttuu)'} "
+          f"(sitemap-fpl.xml: {len(list(OUT_DIR.glob('*.html')))} URL:ia)")
     return 0
 
 

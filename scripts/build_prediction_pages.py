@@ -41,7 +41,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.models import accuracy as acc
-from scripts.build_fpl_page import _upsert_sitemap_entry, SITEMAP_PATH
+from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
+
+# #119b: KAIKKI generoidut sivut (hubit + ottelusivut) omaan lapsi-sitemapiin,
+# jonka sitemap.xml-index listaa. Wholesale-kirjoitus joka ajolla → poistuneet
+# sivut putoavat sitemapista samassa ajossa kuin tiedostot siivotaan.
+SITEMAP_PRED_PATH = _FP_ROOT / "sitemap-predictions.xml"
 
 BASE = "https://goaliq.app"
 OUT_ROOT = ROOT / "predictions"
@@ -347,9 +352,10 @@ def main() -> int:
     log = acc.load_log()
     by_comp = _upcoming_by_comp(log, now)
 
-    xml = SITEMAP_PATH.read_text(encoding="utf-8")
+    sitemap_entries: list[tuple[str, str, str, str]] = []
     live_hubs: list[str] = []
     total_pages = 0
+    today = now.strftime("%Y-%m-%d")
 
     for comp, cfg in LEAGUES.items():
         rows = by_comp.get(comp) or []
@@ -376,13 +382,18 @@ def main() -> int:
             )
         live_hubs.append(comp)
         total_pages += 1 + len(rows)
-        xml = _upsert_sitemap_entry(
-            xml, f"{BASE}/predictions/{cfg['slug']}/",
-            now.strftime("%Y-%m-%d"), "daily", "0.8",
+        sitemap_entries.append(
+            (f"{BASE}/predictions/{cfg['slug']}/", today, "daily", "0.8")
+        )
+        sitemap_entries.extend(
+            (f"{BASE}/predictions/{cfg['slug']}/{_match_filename(e)[:-5]}",
+             today, "daily", "0.7")
+            for e in rows
         )
         print(f"{comp}: hub + {len(rows)} ottelusivua → predictions/{cfg['slug']}/")
 
-    SITEMAP_PATH.write_text(xml, encoding="utf-8")
+    write_urlset(SITEMAP_PRED_PATH, sitemap_entries)
+    print(f"sitemap-predictions.xml: {len(sitemap_entries)} URL:ia")
     hub_updated = update_predictions_hub_links(live_hubs)
     print(f"Yhteensä {total_pages} sivua ({len(live_hubs)} liigaa). "
           f"predictions.html-hublinkit: {'päivitetty' if hub_updated else 'ei muutosta'}.")
