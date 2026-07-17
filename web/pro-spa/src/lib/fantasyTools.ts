@@ -17,11 +17,20 @@ export type FantasyTool =
 	| 'plan'
 	| 'captain'
 	| 'differentials'
-	| 'compare';
+	| 'compare'
+	| 'xg_leaders'
+	| 'defcon_leaders';
 
 export type Pos = 'GKP' | 'DEF' | 'MID' | 'FWD';
 
 /* ---------- rate-team ---------- */
+
+/** #123: yhden GW:n xp + vastustajat (DGW = useampi, blank = []). */
+export interface RatedPlayerGw {
+	gw: number;
+	opponents: { opp: string; venue: 'H' | 'A' }[];
+	xp: number;
+}
 
 export interface RatedPlayer {
 	id: number;
@@ -31,6 +40,8 @@ export interface RatedPlayer {
 	price: number;
 	xp_per_gw: number;
 	xp_horizon_total: number;
+	/** #122/#123: optional — vanha deployattu backend ei lähetä. */
+	gameweeks?: RatedPlayerGw[];
 	in_xi: boolean;
 	is_captain: boolean;
 }
@@ -51,7 +62,12 @@ export interface TransferPlayer {
 
 export interface TransferSuggestion {
 	out: TransferPlayer;
-	in: TransferPlayer;
+	/** #121: in-pelaajan planner-kentät optional (vanha backend → ei Applya). */
+	in: TransferPlayer & {
+		xp_per_gw?: number;
+		xp_horizon_total?: number;
+		gameweeks?: RatedPlayerGw[];
+	};
 	pos: Pos;
 	delta_xp_horizon: number;
 	delta_cost: number;
@@ -298,6 +314,73 @@ export function fetchDifferentials(
 
 export function fetchComparePlayers(ids: number[]): Promise<CompareResponse> {
 	return getTool(`/api/fantasy/compare?players=${ids.join(',')}`, 'compare');
+}
+
+/* ---------- #124/#125: xG leaders + DefCon tracker ---------- */
+
+/** Jaettu meta: basis kertoo REHELLISESTI minkä kauden datasta rivit ovat
+ * (esikausi = 25/26 + pakollinen basis_label; otoskoko per rivi). */
+export interface LeadersMeta {
+	window: number;
+	basis_season: string | null;
+	is_prev_season_basis?: boolean;
+	basis_label: string | null;
+	generated_at: string | null;
+	note?: string;
+}
+
+export interface XgLeaderRow {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: Pos;
+	price: number;
+	owned_pct: number | null;
+	games: number;
+	basis: string | null;
+	xg_total: number;
+	xg_per_game: number;
+	xa_total: number;
+	xa_per_game: number;
+	xgi_per_game: number;
+}
+
+export interface XgLeadersResponse {
+	meta: LeadersMeta;
+	players: XgLeaderRow[];
+}
+
+export interface DefconLeaderRow {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: 'DEF' | 'MID' | 'FWD';
+	price: number;
+	owned_pct: number | null;
+	games: number;
+	basis: string | null;
+	threshold: number;
+	dc_per_game: number;
+	hit_rate_pct: number;
+	defcon_points_window: number;
+	hits: number;
+}
+
+export interface DefconLeadersResponse {
+	meta: LeadersMeta & {
+		thresholds?: Record<string, number>;
+		points_per_hit?: number;
+		rule_note?: string;
+	};
+	players: DefconLeaderRow[];
+}
+
+export function fetchXgLeaders(): Promise<XgLeadersResponse> {
+	return getTool('/api/fantasy/xg-leaders', 'xg_leaders');
+}
+
+export function fetchDefconLeaders(): Promise<DefconLeadersResponse> {
+	return getTool('/api/fantasy/defcon-leaders', 'defcon_leaders');
 }
 
 /** Price watch- ja compare-luottamus samalle kolmiportaiselle asteikolle

@@ -11,12 +11,14 @@
 	import TransferPlanner from './TransferPlanner.svelte';
 	import Differentials from './Differentials.svelte';
 	import ComparePlayers from './ComparePlayers.svelte';
+	import Leaders from './Leaders.svelte';
 
 	let { xp }: { xp: XpResponse } = $props();
 
 	const SEGMENTS: Segment[] = [
 		{ id: 'players', label: 'Players' },
 		{ id: 'myteam', label: 'My team' },
+		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'differentials', label: 'Differentials' },
 		{ id: 'compare', label: 'Compare' }
 	];
@@ -37,6 +39,11 @@
 		<!-- #46: RateTeam premium={true} vain tilauksen takana → ei premium-vuotoa. -->
 		<section class="tool-card"><RateTeam premium={true} /></section>
 		<section class="tool-card"><TransferPlanner /></section>
+	</div>
+{:else if segment === 'leaders'}
+	<!-- #124/#125: xG leaders + DefCon tracker (premium-haara → koko listat) -->
+	<div id="panel-leaders" role="tabpanel" aria-labelledby="seg-leaders">
+		<section class="tool-card"><Leaders premium={true} /></section>
 	</div>
 {:else if segment === 'differentials'}
 	<div id="panel-differentials" role="tabpanel" aria-labelledby="seg-differentials">
