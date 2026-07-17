@@ -403,8 +403,11 @@ def record_table_html(preds: list[dict], c: dict) -> str:
 
     graded.sort(key=sort_key, reverse=True)
 
+    # #129: filtterit kattavat myös pending-lohkon kilpailut (esim. BSA
+    # ennen ensimmäistä gradausta) — sama data-comp-attribuutti molemmissa
+    # tauluissa, filtteri-JS osuu kaikkiin .rec-scroll-riveihin.
     comps_in_table = []
-    for e in graded:
+    for e in preds:
         code = e.get("competition") or "WC"
         if code not in comps_in_table:
             comps_in_table.append(code)
@@ -446,11 +449,52 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         if has_nonregular
         else ""
     )
+
+    # #129: logatut, pelaamattomat ennusteet omana lohkonaan — "malli teki
+    # kutsun ENNEN kickoffia, receipts livenä". Lähin kickoff ensin. EI
+    # vaikuta headline-%:iin (vain gradatut lasketaan); reconcile siirtää
+    # rivin gradattuun tauluun automaattisesti kun ottelu on pelattu.
+    pending = [e for e in preds if not e.get("result")]
+    pending.sort(key=lambda e: e.get("kickoff") or e.get("date") or "9999")
+    pending_rows = []
+    for e in pending:
+        code = e.get("competition") or "WC"
+        pick_sym, pick_name = _pick_txt(e)
+        ko = e.get("kickoff") or ""
+        ko_txt = ko.replace("T", " ").replace("Z", " UTC") if ko else (e.get("date") or "")
+        logged = (e.get("logged_at") or "")[:10]
+        pending_rows.append(
+            f'<tr data-comp="{escape(code)}">'
+            f'<td class="num">{escape(ko_txt)}</td>'
+            f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
+            f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
+            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}</td>'
+            f'<td class="num">{escape(logged)}</td>'
+            f'<td class="num"><span class="rec-pending">awaiting result</span></td>'
+            "</tr>"
+        )
+    pending_block = (
+        (
+            "<h3 class=\"rec-subhead\">Upcoming: logged, awaiting result "
+            f"({len(pending_rows)})</h3>"
+            "<p class=\"rec-note\">These predictions are logged before "
+            "kickoff and graded after the match. Nothing is edited once "
+            "logged; each row moves to the graded table above when the "
+            "result is in.</p>"
+            '<div class="rec-scroll"><table>'
+            '<thead><tr><th scope="col">Kick-off</th><th scope="col">Competition</th>'
+            '<th scope="col">Match</th><th scope="col">Pick</th>'
+            '<th scope="col">Logged</th><th scope="col">Status</th></tr></thead>'
+            "<tbody>" + "".join(pending_rows) + "</tbody></table></div>"
+        )
+        if pending_rows
+        else ""
+    )
     pending_note = (
         f"<p class=\"rec-note\">{c['acc_pending']} further predictions are "
-        f"already logged and locked for upcoming matches; they appear here "
-        f"once played and graded.</p>"
-        if c["acc_pending"] > 0
+        f"already logged and locked for upcoming matches; they are listed "
+        f"below and appear in the graded table once played.</p>"
+        if pending_rows
         else ""
     )
 
@@ -474,6 +518,9 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         ".rec-hit{color:#0A9E75;font-weight:800;}"
         ".rec-miss{color:#D6006E;font-weight:800;}"
         ".rec-note{font-size:13px;opacity:.7;margin:10px 0 0;}"
+        ".rec-subhead{font-size:18px;margin:26px 0 4px;}"
+        ".rec-pending{color:#F4A800;font-weight:700;font-size:12px;"
+        "white-space:nowrap;}"
         "</style>"
         + by_comp_html(c)
         + f'<div class="rec-filters" role="group" aria-label="Filter by competition">{filter_btns}</div>'
@@ -489,6 +536,7 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         + "</tbody></table></div>"
         + star_note
         + pending_note
+        + pending_block
         + "<script>document.querySelectorAll('.rec-filter').forEach(function(b){"
         + "b.addEventListener('click',function(){"
         + "document.querySelectorAll('.rec-filter').forEach(function(x){x.classList.remove('on');});"
