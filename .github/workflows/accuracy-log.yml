@@ -124,7 +124,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/prediction_log.json data/accuracy.json data/international_results.csv
-          git add predictions/ fpl/ sitemap.xml predictions.html fpl.html index.html || true
+          git add predictions/ fpl/ sitemap.xml sitemap-core.xml sitemap-predictions.xml sitemap-fpl.xml predictions.html fpl.html index.html || true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
             exit 0

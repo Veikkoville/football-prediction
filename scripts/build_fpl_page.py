@@ -57,8 +57,25 @@ document.addEventListener('click', function (e) {
 ROOT = Path(__file__).resolve().parent.parent
 FPL_PATH = ROOT / "data" / "fpl_projections_phase0.json"
 ACC_PATH = ROOT / "data" / "accuracy.json"
+LOG_PATH = ROOT / "data" / "prediction_log.json"
 OUT_PATH = ROOT / "fpl.html"
-SITEMAP_PATH = ROOT / "sitemap.xml"
+# #119b: sitemap.xml on nyt <sitemapindex> (core + predictions + fpl) —
+# ydinsivujen entryt elävät sitemap-core.xml:ssä. Lapsi-sitemapit kirjoittavat
+# build_prediction_pages.py ja build_fpl_longtail.py (write_urlset alla).
+SITEMAP_PATH = ROOT / "sitemap-core.xml"
+
+# #111: per-kilpailu-näyttönimet (accuracy.json by_competition -koodit).
+# Tuntematon koodi renderöityy koodina — ei kaadu kun elokuun liigat tulevat.
+COMP_NAMES = {
+    "WC": "World Cup 2026",
+    "BSA": "Brasileirão Série A",
+    "PL": "Premier League",
+    "PD": "La Liga",
+    "BL1": "Bundesliga",
+    "SA": "Serie A",
+    "FL1": "Ligue 1",
+    "CL": "Champions League",
+}
 
 # Custom domain (goaliq.app, Cloudflare, rekisteröity 4.7.2026). GitHub Pages
 # servaa CNAME:n kautta juuresta → EI /football-prediction-polkuprefiksiä.
@@ -169,6 +186,21 @@ def build_context(fpl: dict, acc: dict) -> dict:
     gen_dt = _dt.datetime.fromisoformat(meta["generated_at"])
     acc_dt = _dt.datetime.fromisoformat(acc["updated_at"])
 
+    # #111: per-kilpailu-rivit (vain n > 0 — tyhjät off-season-liigat piiloon).
+    # Järjestys: eniten gradattuja ensin → WC pysyy kärjessä kunnes domestic ohittaa.
+    by_comp = [
+        {
+            "code": code,
+            "name": COMP_NAMES.get(code, code),
+            "n": m.get("n", 0),
+            "correct": m.get("correct_1x2", 0),
+            "pct": m.get("pct_1x2", 0.0) * 100,
+        }
+        for code, m in (acc.get("by_competition") or {}).items()
+        if m.get("n", 0) > 0
+    ]
+    by_comp.sort(key=lambda r: r["n"], reverse=True)
+
     return {
         "season": meta.get("season", "2026/27"),
         "next_gw": next_gw,
@@ -183,6 +215,8 @@ def build_context(fpl: dict, acc: dict) -> dict:
         "acc_dec_c": dec_c,
         "acc_pct_dec": pct_dec,
         "acc_logged": logged,
+        "acc_pending": max(0, logged - n),
+        "by_comp": by_comp,
         "data_date": gen_dt.strftime("%d %B %Y").lstrip("0"),
         "acc_date": acc_dt.strftime("%d %B %Y").lstrip("0"),
         "iso_date": max(gen_dt.date(), acc_dt.date()).isoformat(),
@@ -297,6 +331,172 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
             ),
         ),
     ]
+
+
+def by_comp_html(c: dict) -> str:
+    """#111: per-kilpailu-erottelu (headline = blended all_time, tämä lohko
+    näyttää mistä se koostuu). Vain n > 0 -rivit; renderöityy tyhjänä stringinä
+    jos by_competition puuttuu (vanha accuracy.json) → ei kaadu."""
+    if not c["by_comp"]:
+        return ""
+    rows = "".join(
+        '<div class="bycomp-row">'
+        f'<span class="bycomp-name">{escape(r["name"])}</span>'
+        f'<span class="bycomp-pct">{fmt_pct(r["pct"])}</span>'
+        f'<span class="bycomp-n">{r["correct"]} of {r["n"]}</span>'
+        "</div>"
+        for r in c["by_comp"]
+    )
+    return (
+        '<div class="bycomp" aria-label="Accuracy by competition">'
+        '<div class="bycomp-title">By competition</div>'
+        + rows
+        + "</div>"
+    )
+
+
+# CSS jaettuna fpl.html-templaten ja predictions.html-markerin kesken —
+# injektoidaan inline record-lohkoon jotta marker-fill ei riipu sivun
+# omasta tyylitiedostosta.
+BYCOMP_CSS = (
+    ".bycomp{margin:14px 0 4px;max-width:520px;}"
+    ".bycomp-title{font-size:12px;font-weight:700;letter-spacing:.08em;"
+    "text-transform:uppercase;opacity:.65;margin-bottom:6px;}"
+    ".bycomp-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;"
+    "border-top:1px solid rgba(128,128,128,.25);font-size:15px;}"
+    ".bycomp-name{flex:1;font-weight:600;}"
+    ".bycomp-pct{font-weight:800;font-variant-numeric:tabular-nums;}"
+    ".bycomp-n{opacity:.65;font-size:13px;font-variant-numeric:tabular-nums;"
+    "white-space:nowrap;}"
+)
+
+
+def load_log() -> list[dict]:
+    """#117: koko ennusteloki record-taulua varten. Puuttuva tiedosto → []."""
+    if not LOG_PATH.exists():
+        return []
+    return json.loads(LOG_PATH.read_text(encoding="utf-8")).get("predictions", [])
+
+
+def _pick_txt(e: dict) -> tuple[str, str]:
+    """(1/X/2-symboli, joukkuenimi tai Draw) lokirivin pickistä."""
+    w = e.get("predicted_winner")
+    if w == "home":
+        return "1", e.get("home_team", "")
+    if w == "away":
+        return "2", e.get("away_team", "")
+    if w == "draw":
+        return "X", "Draw"
+    return "-", ""
+
+
+def record_table_html(preds: list[dict], c: dict) -> str:
+    """#117: koko per-ottelu-record näkyväksi tauluksi. Vain gradatut rivit
+    (result != null) — pending-ennusteet ovat lukittuja mutta pelaamattomia,
+    ne mainitaan lukumääränä. Uusin ensin; seed-rivit (WC-lohkovaihe, ei
+    päivämäärää) pohjalle. Gradaus = 90 min -tulos (#110-konventio):
+    duration != REGULAR merkitään tähdellä."""
+    graded = [e for e in preds if e.get("result")]
+
+    def sort_key(e: dict) -> str:
+        return e.get("date") or ""
+
+    graded.sort(key=sort_key, reverse=True)
+
+    comps_in_table = []
+    for e in graded:
+        code = e.get("competition") or "WC"
+        if code not in comps_in_table:
+            comps_in_table.append(code)
+
+    filter_btns = '<button class="rec-filter on" data-comp="all">All</button>' + "".join(
+        f'<button class="rec-filter" data-comp="{escape(code)}">'
+        f"{escape(COMP_NAMES.get(code, code))}</button>"
+        for code in comps_in_table
+    )
+
+    rows = []
+    has_nonregular = False
+    for e in graded:
+        r = e["result"]
+        code = e.get("competition") or "WC"
+        pick_sym, pick_name = _pick_txt(e)
+        hit = r.get("hit_1x2")
+        score = r.get("actual_score", "")
+        star = ""
+        if r.get("duration") and r["duration"] != "REGULAR":
+            star = "*"
+            has_nonregular = True
+        date_txt = e.get("date") or "Group stage"
+        rows.append(
+            f'<tr data-comp="{escape(code)}">'
+            f'<td class="num">{escape(date_txt)}</td>'
+            f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
+            f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
+            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}</td>'
+            f'<td class="num">{escape(score)}{star}</td>'
+            f'<td class="num">{"<span class=\"rec-hit\">&#10003;</span>" if hit else "<span class=\"rec-miss\">&#10007;</span>"}</td>'
+            "</tr>"
+        )
+
+    star_note = (
+        "<p class=\"rec-note\">* Decided in extra time or on penalties; "
+        "the prediction is graded on the 90-minute score, the honest basis "
+        "for a 1X2 call.</p>"
+        if has_nonregular
+        else ""
+    )
+    pending_note = (
+        f"<p class=\"rec-note\">{c['acc_pending']} further predictions are "
+        f"already logged and locked for upcoming matches; they appear here "
+        f"once played and graded.</p>"
+        if c["acc_pending"] > 0
+        else ""
+    )
+
+    return (
+        f"<style>{BYCOMP_CSS}"
+        ".rec-filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;}"
+        ".rec-filter{border:1px solid rgba(128,128,128,.4);background:transparent;"
+        "color:inherit;border-radius:20px;padding:6px 14px;font-size:13px;"
+        "font-weight:600;cursor:pointer;}"
+        ".rec-filter.on{background:#D6006E;border-color:#D6006E;color:#fff;}"
+        ".rec-scroll{overflow-x:auto;overflow-y:auto;max-height:560px;"
+        "-webkit-overflow-scrolling:touch;border:1px solid rgba(128,128,128,.3);"
+        "border-radius:14px;}"
+        ".rec-scroll table{width:100%;border-collapse:collapse;min-width:640px;}"
+        ".rec-scroll th,.rec-scroll td{text-align:left;padding:8px 10px;"
+        "border-bottom:1px solid rgba(128,128,128,.2);font-size:14px;}"
+        ".rec-scroll th{position:sticky;top:0;background:#FFF6EC;font-size:12px;"
+        "font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#54506B;}"
+        ".rec-scroll td.team{font-weight:600;white-space:nowrap;}"
+        ".rec-scroll .num{white-space:nowrap;font-variant-numeric:tabular-nums;}"
+        ".rec-hit{color:#0A9E75;font-weight:800;}"
+        ".rec-miss{color:#D6006E;font-weight:800;}"
+        ".rec-note{font-size:13px;opacity:.7;margin:10px 0 0;}"
+        "</style>"
+        + by_comp_html(c)
+        + f'<div class="rec-filters" role="group" aria-label="Filter by competition">{filter_btns}</div>'
+        + '<div class="rec-scroll"><table>'
+        + "<caption style=\"caption-side:bottom;font-size:13px;opacity:.7;"
+        + "text-align:left;padding:8px 2px;\">Every graded GoalIQ pre-match "
+        + "prediction, newest first. Logged before kick-off, no edits afterwards.</caption>"
+        + '<thead><tr><th scope="col">Date</th><th scope="col">Competition</th>'
+        + '<th scope="col">Match</th><th scope="col">Pick</th>'
+        + '<th scope="col">Result</th><th scope="col">1X2</th></tr></thead>'
+        + "<tbody>"
+        + "".join(rows)
+        + "</tbody></table></div>"
+        + star_note
+        + pending_note
+        + "<script>document.querySelectorAll('.rec-filter').forEach(function(b){"
+        + "b.addEventListener('click',function(){"
+        + "document.querySelectorAll('.rec-filter').forEach(function(x){x.classList.remove('on');});"
+        + "b.classList.add('on');var v=b.getAttribute('data-comp');"
+        + "document.querySelectorAll('.rec-scroll tbody tr').forEach(function(tr){"
+        + "tr.style.display=(v==='all'||tr.getAttribute('data-comp')===v)?'':'none';});"
+        + "});});</script>"
+    )
 
 
 def cs_table_html(c: dict) -> str:
@@ -584,7 +784,7 @@ def render_page(c: dict) -> str:
     stats = (
         '<div class="stat-row">'
         f'<div class="stat"><b>{fmt_pct(c["acc_pct_1x2"])}</b>'
-        f'<span>correct results across {c["acc_n"]} completed predictions</span></div>'
+        f'<span>correct results across {c["acc_n"]} completed predictions, all competitions</span></div>'
         f'<div class="stat"><b>{fmt_pct(c["acc_pct_dec"])}</b>'
         f'<span>hit rate when the model called a winner ({c["acc_dec_c"]} of {c["acc_dec_n"]})</span></div>'
         f'<div class="stat"><b>{c["acc_logged"]}</b>'
@@ -664,9 +864,11 @@ Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 <h2 id="track-record">The model publishes its prediction record</h2>
 <p>{escape(tr[0])} {escape(tr[1])} {escape(tr[2])}</p>
 {stats}
+<style>{BYCOMP_CSS}</style>
+{by_comp_html(c)}
 <p class="note">Source: GoalIQ prediction log, updated {c["acc_date"]}. The full
-log, including every miss, is served live by the same model that produces the
-tables below.</p>
+log, match by match with every miss included, is published on the
+<a href="/predictions#record">prediction record page</a>.</p>
 
 <h2 id="clean-sheets">Gameweek {c["next_gw"]} clean sheet odds</h2>
 <p>Model clean sheet probability for all 20 Premier League teams in
@@ -780,7 +982,8 @@ def update_index(c: dict) -> bool:
     s = INDEX_PATH.read_text(encoding="utf-8")
     chip = (
         f'<div class="num">{fmt_pct(c["acc_pct_1x2"])}</div>'
-        f'<div class="lbl">result accuracy across {c["acc_n"]} completed matches</div>'
+        f'<div class="lbl">result accuracy across {c["acc_n"]} completed matches, '
+        f"all competitions</div>"
     )
     proof = (
         f"The model logs every prediction before kickoff. "
@@ -810,6 +1013,11 @@ def update_index(c: dict) -> bool:
     new = re.sub(
         r"(<!-- GEN:ACC-DATASET-START -->).*?(<!-- GEN:ACC-DATASET-END -->)",
         lambda m: m.group(1) + ds_block + m.group(2), new, flags=re.S)
+    # #111: per-kilpailu-erottelu tr-heron alle (sama refresh-tahti kuin chipit).
+    bycomp_block = f"<style>{BYCOMP_CSS}</style>" + by_comp_html(c)
+    new = re.sub(
+        r"(<!-- GEN:ACC-BYCOMP-START -->).*?(<!-- GEN:ACC-BYCOMP-END -->)",
+        lambda m: m.group(1) + bycomp_block + m.group(2), new, flags=re.S)
     if new != s:
         INDEX_PATH.write_text(new, encoding="utf-8")
         return True
@@ -823,16 +1031,19 @@ PREDICTIONS_PATH = ROOT / "predictions.html"
 PREDICTIONS_URL = f"{BASE}/predictions"
 
 
-def update_predictions(c: dict) -> bool:
+def update_predictions(c: dict, preds: list[dict]) -> bool:
     """Täytä predictions.html:n GEN:ACC-markerit tuoreilla accuracy-luvuilla
     (#105). Sama lähde ja refresh-tahti kuin fpl.html/index.html - evergreen-
-    sivun track record ei koskaan jää staleksi kovakoodaukseksi."""
+    sivun track record ei koskaan jää staleksi kovakoodaukseksi.
+    #117: sama ajo bakee myös koko per-ottelu-recordin (GEN:ACC-RECORD) —
+    /predictions on record-taulun kanoninen koti."""
     if not PREDICTIONS_PATH.exists():
         return False
     s = PREDICTIONS_PATH.read_text(encoding="utf-8")
     chip = (
         f'<div class="num">{fmt_pct(c["acc_pct_1x2"])}</div>'
-        f'<div class="lbl">result accuracy across {c["acc_n"]} completed matches</div>'
+        f'<div class="lbl">result accuracy across {c["acc_n"]} completed matches, '
+        f"all competitions</div>"
     )
     proof = (
         f"The model logs every prediction before kickoff. "
@@ -860,6 +1071,11 @@ def update_predictions(c: dict) -> bool:
     new = re.sub(
         r"(<!-- GEN:ACC-DATASET-START -->).*?(<!-- GEN:ACC-DATASET-END -->)",
         lambda m: m.group(1) + ds_block + m.group(2), new, flags=re.S)
+    # #117: koko record-taulu (sisältää #111-by-comp-lohkon taulun päällä).
+    record_block = record_table_html(preds, c)
+    new = re.sub(
+        r"(<!-- GEN:ACC-RECORD-START -->).*?(<!-- GEN:ACC-RECORD-END -->)",
+        lambda m: m.group(1) + record_block + m.group(2), new, flags=re.S)
     if new != s:
         PREDICTIONS_PATH.write_text(new, encoding="utf-8")
         return True
@@ -890,6 +1106,28 @@ def _upsert_sitemap_entry(xml: str, loc: str, iso_date: str,
     return xml.replace("</urlset>", entry + "</urlset>")
 
 
+def write_urlset(path: Path, entries: list[tuple[str, str, str, str]]) -> None:
+    """#119b: kirjoita kokonainen urlset-sitemap kerralla (wholesale-regen →
+    stalet entryt siivoutuvat automaattisesti kun sivut poistuvat).
+    entries = [(loc, lastmod-iso, changefreq, priority), ...]."""
+    body = "".join(
+        "  <url>\n"
+        f"    <loc>{loc}</loc>\n"
+        f"    <lastmod>{lastmod}</lastmod>\n"
+        f"    <changefreq>{cf}</changefreq>\n"
+        f"    <priority>{pr}</priority>\n"
+        "  </url>\n"
+        for loc, lastmod, cf, pr in entries
+    )
+    path.write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + body
+        + "</urlset>\n",
+        encoding="utf-8",
+    )
+
+
 def update_sitemap(iso_date: str) -> bool:
     xml = SITEMAP_PATH.read_text(encoding="utf-8")
     new = _upsert_sitemap_entry(xml, CANONICAL, iso_date, "weekly", "0.9")
@@ -909,11 +1147,12 @@ def update_sitemap(iso_date: str) -> bool:
 def main() -> None:
     fpl, acc = load_data()
     c = build_context(fpl, acc)
+    preds = load_log()
     html_out = render_page(c)
     OUT_PATH.write_text(html_out, encoding="utf-8")
     sitemap_changed = update_sitemap(c["iso_date"])
     index_changed = update_index(c)
-    predictions_changed = update_predictions(c)
+    predictions_changed = update_predictions(c, preds)
 
     print("=" * 64)
     print("FPL-LANDING BAKE OK")
@@ -933,7 +1172,7 @@ def main() -> None:
     print(f"  Lähteet           : {FPL_PATH.name} ({c['data_date']}), "
           f"{ACC_PATH.name} ({c['acc_date']})")
     print("\nJulkaisu (Villen GO vaaditaan, Pages servaa mainista):")
-    print("  git add fpl.html sitemap.xml")
+    print("  git add fpl.html sitemap-core.xml")
     print('  git commit -m "geo(fpl): FPL-landing data-refresh"')
     print("  git push")
 
