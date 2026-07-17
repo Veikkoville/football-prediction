@@ -419,12 +419,13 @@ export interface DefconLeadersResponse {
 	players: DefconLeaderRow[];
 }
 
-export function fetchXgLeaders(): Promise<XgLeadersResponse> {
-	return getTool('/api/fantasy/xg-leaders', 'xg_leaders');
+/** #137: window = pelien lukumäärä (3-10). Vanha backend ignoroi → oletusikkuna. */
+export function fetchXgLeaders(window = 5): Promise<XgLeadersResponse> {
+	return getTool(`/api/fantasy/xg-leaders?window=${window}`, 'xg_leaders');
 }
 
-export function fetchDefconLeaders(): Promise<DefconLeadersResponse> {
-	return getTool('/api/fantasy/defcon-leaders', 'defcon_leaders');
+export function fetchDefconLeaders(window = 5): Promise<DefconLeadersResponse> {
+	return getTool(`/api/fantasy/defcon-leaders?window=${window}`, 'defcon_leaders');
 }
 
 /** Price watch- ja compare-luottamus samalle kolmiportaiselle asteikolle
