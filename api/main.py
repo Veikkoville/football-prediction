@@ -438,11 +438,26 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# CORS — sallitaan mobiili-appin & muiden clienttien kutsut
-# Tuotannossa rajoita vain omaan domainiin
+# CORS (#109): eksplisiittinen origin-lista wildcardin tilalle.
+# Selain-originit enumeroitu koodista: pro.goaliq.app (SPA, config.ts) +
+# goaliq.app (index-countdown- ja career-fetchit; fpl/predictions eivät
+# fetchaa). Mobiili on natiivi client (ei Origin-headeria → CORS ei koske),
+# Stripe/RC-webhookit server-to-server → eivät koske. localhost = SPA-dev
+# (vite dev 5173 / preview 4173) joka osoittaa prod-APIin oletuksena.
+# Samalla poistui allow_credentials+wildcard-epäkoherenssi (selain ei
+# koskaan lähettänyt credentiaaleja "*":lle). *.pages.dev-previewt EIVÄT
+# listalla — lisää tarvittaessa tähän eksplisiittisesti.
+CORS_ALLOWED_ORIGINS = [
+    "https://goaliq.app",
+    "https://www.goaliq.app",
+    "https://pro.goaliq.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Kehityksessä kaikki, tuotannossa esim. ["https://goaliq.app"]
+    allow_origins=CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
