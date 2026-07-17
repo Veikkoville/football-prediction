@@ -429,6 +429,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div class="logo"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</div>
     <div style="display:flex; gap:20px; align-items:center;">
       <a href="fpl.html" style="text-decoration:none; font-weight:600; font-size:14px;">Free FPL tools</a>
+      <a href="/predictions" style="text-decoration:none; font-weight:600; font-size:14px;">Match predictions</a>
       <a class="nav-cta" href="https://pro.goaliq.app/?tab=premium" data-cta="nav">Try Premium</a>
     </div>
   </nav>
@@ -439,7 +440,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <header class="hero">
     <a class="badge" href="fpl.html">Free FPL tools on the web, no sign-in needed</a>
     <h1>Free FPL tools, <span class="accent">powered by a proven match model</span></h1>
-    <p class="sub">GoalIQ is a free FPL assistant: clean sheet odds & FDR, rate my team with a captain pick, and price watch. GoalIQ Premium adds player xP, the captain ranker and a transfer planner. All backed by the same match model behind our published, pre-match-logged track record. Football predictions for the top leagues too.</p>
+    <p class="sub">GoalIQ is a free FPL assistant: clean sheet odds & FDR, rate my team with a captain pick, and price watch. GoalIQ Premium adds player xP, the captain ranker and a transfer planner. All backed by the same match model behind our published, pre-match-logged track record. <a href="/predictions" style="color:var(--magenta-deep);font-weight:600;">Football predictions for the top leagues too</a>.</p>
     <!-- #72: GW-deadline-countdown. Oletuskohde = GW1-avaus pe 21.8.2026 (näytetään
          päivämäärä = väite verifioitavissa); kun /api/fantasy alkaa palauttaa
          deadline_utc:n (FPL-kausiflip), JS vaihtaa viralliseen GW-deadlineen. -->
@@ -659,6 +660,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div>© 2026 GoalIQ · Made in Lahti, Finland</div>
     <div>
       <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a>
+      &nbsp;·&nbsp;
+      <a href="/predictions">Match predictions</a>
       &nbsp;·&nbsp;
       <a href="fpl.html">FPL clean sheets &amp; FDR</a>
       &nbsp;·&nbsp;
