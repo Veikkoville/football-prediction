@@ -16,8 +16,15 @@
 	let {
 		players,
 		premium = false,
+		defaultGw = null,
 		onUpgrade
-	}: { players: RatedPlayer[]; premium?: boolean; onUpgrade?: () => void } = $props();
+	}: {
+		players: RatedPlayer[];
+		premium?: boolean;
+		/** #123: aloitus-GW (rate-teamin meta.gw eli seuraava deadline). */
+		defaultGw?: number | null;
+		onUpgrade?: () => void;
+	} = $props();
 
 	/** Validit FPL-muodostelmat [DEF, MID, FWD] (GK aina 1, yht. 11). */
 	const FORMATIONS: readonly (readonly [number, number, number])[] = [
@@ -35,14 +42,69 @@
 	let captainId = $state<number | null>(null);
 	let viceId = $state<number | null>(null);
 	let selectedId = $state<number | null>(null);
+	let selGw = $state<number | null>(null);
 
-	// Uusi rate-ajo → resetoi what-if backendin XI:hin/kapteeniin.
+	// #121: transfer-apply vaihtaa rosterissa yhden pelaajan → sovita what-if-
+	// tila swap-diffistä (XI/kapteeni/vara seuraavat). Täysi reset vain kun
+	// kyseessä on kokonaan uusi rate-ajo.
+	let prevIds: Set<number> = new Set();
 	$effect(() => {
+		const cur = new Set(players.map((p) => p.id));
+		const removed = [...prevIds].filter((id) => !cur.has(id));
+		const added = [...cur].filter((id) => !prevIds.has(id));
+		const isSwap =
+			removed.length === 1 && added.length === 1 && prevIds.size === cur.size;
+		prevIds = cur;
+		if (isSwap) {
+			const [outId] = removed;
+			const [inId] = added;
+			xiIds = xiIds.map((id) => (id === outId ? inId : id));
+			if (captainId === outId) captainId = inId;
+			if (viceId === outId) viceId = inId;
+			selectedId = null;
+			return;
+		}
 		xiIds = players.filter((p) => p.in_xi).map((p) => p.id);
 		captainId = players.find((p) => p.is_captain)?.id ?? null;
 		viceId = null;
 		selectedId = null;
 	});
+
+	// #123: GW-valitsin — GW:t datasta (vain kun backend lähettää gameweeks).
+	const gwsAvailable = $derived.by(() => {
+		const s = new Set<number>();
+		for (const p of players) for (const g of p.gameweeks ?? []) s.add(g.gw);
+		return Array.from(s).sort((a, b) => a - b);
+	});
+	$effect(() => {
+		if (gwsAvailable.length === 0) {
+			selGw = null;
+			return;
+		}
+		if (selGw != null && gwsAvailable.includes(selGw)) return;
+		selGw =
+			defaultGw != null && gwsAvailable.includes(defaultGw)
+				? defaultGw
+				: gwsAvailable[0];
+	});
+
+	// #122: valitun GW:n xP — SAMA GW-kohtainen luku kuin summaryn team_xp_gw
+	// (ei enää horisonttikeskiarvo-vs-GW-ristiriitaa). Fallback vanhalla API:lla.
+	function xpOf(p: RatedPlayer): number {
+		if (selGw != null && p.gameweeks && p.gameweeks.length > 0) {
+			const g = p.gameweeks.find((x) => x.gw === selGw);
+			return g ? g.xp : 0;
+		}
+		return p.xp_per_gw;
+	}
+
+	/** #123: valitun GW:n vastustaja(t): "HUL (A)", DGW molemmat, blank → "No game". */
+	function oppOf(p: RatedPlayer): string | null {
+		if (selGw == null || !p.gameweeks || p.gameweeks.length === 0) return null;
+		const g = p.gameweeks.find((x) => x.gw === selGw);
+		if (!g || g.opponents.length === 0) return 'No game';
+		return g.opponents.map((o) => `${o.opp} (${o.venue})`).join(' + ');
+	}
 
 	// Free näkee staattisen pitchin + lukon → paywall_shown kerran (#85-oppi).
 	$effect(() => {
@@ -71,9 +133,17 @@
 		viceId != null && xiIds.includes(viceId) && viceId !== effCaptain ? viceId : null
 	);
 	const gwXp = $derived(
-		xi.reduce((s, p) => s + p.xp_per_gw, 0) +
-			(effCaptain != null ? (byId.get(effCaptain)?.xp_per_gw ?? 0) : 0)
+		xi.reduce((s, p) => s + xpOf(p), 0) +
+			(effCaptain != null ? xpOf(byId.get(effCaptain)!) : 0)
 	);
+	// #122: lataus-tilan (importattu XI + kapteeni) xP samalle GW:lle →
+	// user-editin ero näytetään eksplisiittisenä labelina, ei äänettömänä.
+	const baselineXp = $derived.by(() => {
+		const base = players.filter((p) => p.in_xi);
+		const cap = players.find((p) => p.is_captain);
+		return base.reduce((s, p) => s + xpOf(p), 0) + (cap ? xpOf(cap) : 0);
+	});
+	const editDelta = $derived(gwXp - baselineXp);
 	const selectedInXi = $derived(selectedId != null && xiIds.includes(selectedId));
 
 	/** FPL-säännöt: 11 pelaajaa, 1 MV, DEF 3–5, MID 2–5, FWD 1–3. */
@@ -90,7 +160,7 @@
 		const pick = (pos: string, n: number) => {
 			const xs = players
 				.filter((p) => p.pos === pos)
-				.sort((a, b) => b.xp_per_gw - a.xp_per_gw)
+				.sort((a, b) => xpOf(b) - xpOf(a))
 				.slice(0, n);
 			return xs.length === n ? xs : null;
 		};
@@ -111,7 +181,7 @@
 				v ??
 				nextXi
 					.map((id) => byId.get(id)!)
-					.sort((a, b) => b.xp_per_gw - a.xp_per_gw)[0]?.id ??
+					.sort((a, b) => xpOf(b) - xpOf(a))[0]?.id ??
 				null;
 		}
 		if (v === c) v = null;
@@ -161,15 +231,15 @@
 			const ids = bestXiForFormation(f);
 			if (!ids) continue;
 			const ps = ids.map((id) => byId.get(id)!);
-			const cap = Math.max(...ps.map((p) => p.xp_per_gw));
-			const xp = ps.reduce((s, p) => s + p.xp_per_gw, 0) + cap;
+			const cap = Math.max(...ps.map((p) => xpOf(p)));
+			const xp = ps.reduce((s, p) => s + xpOf(p), 0) + cap;
 			if (!best || xp > best.xp) best = { ids, xp };
 		}
 		if (!best) return;
 		xiIds = best.ids;
 		const top = best.ids
 			.map((id) => byId.get(id)!)
-			.sort((a, b) => b.xp_per_gw - a.xp_per_gw)[0];
+			.sort((a, b) => xpOf(b) - xpOf(a))[0];
 		captainId = top?.id ?? null;
 		viceId = null;
 		selectedId = null;
@@ -184,6 +254,22 @@
 {#if players.length > 0}
 	<div class="pitch-block">
 		{#if premium}
+			{#if gwsAvailable.length > 1}
+				<p class="label">Gameweek</p>
+				<div class="chips">
+					{#each gwsAvailable as gw (gw)}
+						<button
+							type="button"
+							class="chip"
+							class:on={selGw === gw}
+							onclick={() => (selGw = gw)}
+						>
+							GW{gw}
+						</button>
+					{/each}
+				</div>
+			{/if}
+
 			<p class="label">Formation</p>
 			<div class="chips">
 				{#each FORMATIONS as f (f.join('-'))}
@@ -199,8 +285,18 @@
 				<button type="button" class="chip" onclick={applyOptimal}>Optimal lineup</button>
 			</div>
 			<div class="xp-row">
-				<span class="label" style="margin:0">Projected GW xP <span class="muted">(captain doubled)</span></span>
-				<span class="xp-val">{gwXp.toFixed(1)}</span>
+				<span class="label" style="margin:0"
+					>Projected {selGw != null ? `GW${selGw}` : 'GW'} xP
+					<span class="muted">(captain doubled)</span></span
+				>
+				<span class="xp-col">
+					<span class="xp-val">{gwXp.toFixed(1)}</span>
+					{#if Math.abs(editDelta) >= 0.05}
+						<span class="xp-delta"
+							>{editDelta > 0 ? '+' : ''}{editDelta.toFixed(1)} xP vs your loaded lineup</span
+						>
+					{/if}
+				</span>
 			</div>
 		{/if}
 
@@ -222,7 +318,10 @@
 								{#if effCaptain !== p.id && effVice === p.id}<span class="badge vice">V</span>{/if}
 							</span>
 							<span class="pname">{p.web_name}</span>
-							<span class="pxp">{p.xp_per_gw.toFixed(1)}</span>
+							<span class="pxp">{xpOf(p).toFixed(1)}</span>
+							{#if oppOf(p)}
+								<span class="popp">{oppOf(p)}</span>
+							{/if}
 						</button>
 					{/each}
 				</div>
@@ -244,7 +343,7 @@
 							<TeamKit {...teamColorByShort(p.team_short)} label={p.team_short} size={34} />
 						</span>
 						<span class="pname">{p.web_name}</span>
-						<span class="pxp">{p.xp_per_gw.toFixed(1)}</span>
+						<span class="pxp">{xpOf(p).toFixed(1)}</span>
 					</button>
 				{/each}
 			</div>
@@ -341,6 +440,25 @@
 		font-size: var(--step-2);
 		font-weight: 800;
 		font-variant-numeric: tabular-nums;
+	}
+	.xp-col {
+		display: grid;
+		justify-items: end;
+	}
+	/* #122: user-editin ero lataus-tilaan eksplisiittisenä */
+	.xp-delta {
+		color: var(--text-muted);
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+	}
+	/* #123: GW:n vastustaja kitin alla */
+	.popp {
+		font-size: 9px;
+		color: var(--text-muted);
+		max-width: 66px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	/* Pitch-tausta = teal-tint (#108: kanoninen token, ei uutta nurmiväriä) */
 	.pitch {

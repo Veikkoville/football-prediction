@@ -4,6 +4,7 @@
 	import Provenance from './Provenance.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import PriceWatch from './PriceWatch.svelte';
+	import Leaders from './Leaders.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
 
 	// #46: lukitun siirtosuositus-teaserin klikki nostaa tämän → +page vaihtaa
@@ -16,6 +17,7 @@
 	const SEGMENTS: Segment[] = [
 		{ id: 'cleansheets', label: 'Clean sheets' },
 		{ id: 'rateteam', label: 'Rate my team' },
+		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'pricewatch', label: 'Price watch' }
 	];
 	let segment = $state('cleansheets');
@@ -133,6 +135,11 @@
 	     Toimii myös ilman fixture-dataa. -->
 	<div class="tool-card" id="panel-rateteam" role="tabpanel" aria-labelledby="seg-rateteam">
 		<RateTeam {onUpgrade} />
+	</div>
+{:else if segment === 'leaders'}
+	<!-- #124/#125: top-3 free -teaser, koko listat premiumissa -->
+	<div class="tool-card" id="panel-leaders" role="tabpanel" aria-labelledby="seg-leaders">
+		<Leaders premium={false} {onUpgrade} />
 	</div>
 {:else}
 	<div class="tool-card" id="panel-pricewatch" role="tabpanel" aria-labelledby="seg-pricewatch">

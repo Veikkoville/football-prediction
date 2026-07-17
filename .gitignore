@@ -44,6 +44,9 @@ raw_data/
 !/data/fpl_manual_overrides.csv
 # FPL price watch (#43): sama refresh-konventio (/api/fantasy/price-watch).
 !/data/fpl_price_watch.json
+
+# #124/#125: xG- + DefCon-leaders-cache (committattu → Render servaa levyltä)
+!/data/fpl_player_leaders.json
 downloaded_files/
 ~/soccerdata/
 

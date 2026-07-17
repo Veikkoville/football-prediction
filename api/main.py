@@ -2661,6 +2661,46 @@ def fantasy_value(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@app.get("/api/fantasy/xg-leaders")
+def fantasy_xg_leaders(
+    response: Response,
+    window: int = Query(default=5, ge=3, le=10),
+    pos: str | None = Query(default=None, pattern="^(GKP|DEF|MID|FWD)$"),
+    top_n: int = Query(default=20, ge=1, le=100),
+):
+    """#124: top xG-tekijät rolling-windowilla (FPLWolfy-ehdotus). Rankkaa
+    committatusta nightly-cachesta (data/fpl_player_leaders.json) — meta
+    kantaa basis-kauden + labelin (esikausi = 25/26-data, ei arvauksia)."""
+    from src.models.fpl_leaders import load_leaders, rank_xg_leaders
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return rank_xg_leaders(load_leaders(), window=window, pos=pos,
+                               top_n=top_n)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@app.get("/api/fantasy/defcon-leaders")
+def fantasy_defcon_leaders(
+    response: Response,
+    window: int = Query(default=5, ge=3, le=10),
+    pos: str | None = Query(default=None, pattern="^(DEF|MID|FWD)$"),
+    top_n: int = Query(default=20, ge=1, le=100),
+):
+    """#125: DefCon-tracker (FPLWolfy-ehdotus): DefCon-actionit/game +
+    hit-rate % + pisteet rolling-windowilla. Kynnykset DEF 10 CBIT /
+    MID+FWD 12 CBIRT (verifioitu virallisista säännöistä + datasta)."""
+    from src.models.fpl_leaders import load_leaders, rank_defcon_leaders
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return rank_defcon_leaders(load_leaders(), window=window, pos=pos,
+                                   top_n=top_n)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/fantasy/compare")
 def fantasy_compare(
     response: Response,

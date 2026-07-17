@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { fetchRateTeam, type RateTeamResponse } from '$lib/fantasyTools';
+	import {
+		fetchRateTeam,
+		type RatedPlayer,
+		type RateTeamResponse,
+		type TransferSuggestion
+	} from '$lib/fantasyTools';
 	import { capture } from '$lib/analytics';
 	import { auth } from '$lib/auth.svelte';
 	import {
@@ -69,6 +74,58 @@
 		// Sama funnel-pari kuin Paywall/billing, source erottaa työkalupolun
 		capture('upgrade_tapped', { source: 'fantasy_tools' });
 		onUpgrade?.();
+	}
+
+	// #121: apply-to-planner (read-only what-if) — siirtoehdotukset sovelletaan
+	// LOKAALISTI planned-tiimiin (pitch + xP + budjetti heti). EI write-backia
+	// oikeaan FPL:ään. Uusi rate-ajo nollaa suunnitelman.
+	let appliedTransfers = $state<TransferSuggestion[]>([]);
+	$effect(() => {
+		void data; // riippuvuus: uusi rate-ajo → suunnitelma nollaan
+		appliedTransfers = [];
+	});
+	const plannedPlayers = $derived.by(() => {
+		let roster: RatedPlayer[] = data?.team.players ?? [];
+		for (const s of appliedTransfers) {
+			roster = roster.map((p) =>
+				p.id === s.out.id
+					? {
+							id: s.in.id,
+							web_name: s.in.web_name,
+							team_short: s.in.team_short,
+							pos: p.pos,
+							price: s.in.price,
+							xp_per_gw: s.in.xp_per_gw ?? 0,
+							xp_horizon_total: s.in.xp_horizon_total ?? 0,
+							gameweeks: s.in.gameweeks,
+							in_xi: p.in_xi,
+							is_captain: p.is_captain
+						}
+					: p
+			);
+		}
+		return roster;
+	});
+	const plannedIds = $derived(new Set(plannedPlayers.map((p) => p.id)));
+	// #35: budjetti on JAETTU siirtojen yli — juokseva bank, ei naiivia summaa.
+	const planBank = $derived(
+		(data?.team.bank ?? 0) - appliedTransfers.reduce((s, x) => s + x.delta_cost, 0)
+	);
+	// Sovellettujen siirtojen netto-horisontti-xP on eksakti (jokainen delta on
+	// oman out-pelaajansa korvaus, ei saman listan kilpailevia vaihtoehtoja).
+	const planNetXp = $derived(
+		appliedTransfers.reduce((s, x) => s + x.delta_xp_horizon, 0)
+	);
+	const appliedKeys = $derived(
+		new Set(appliedTransfers.map((s) => `${s.out.id}-${s.in.id}`))
+	);
+	function canApply(s: TransferSuggestion): boolean {
+		return (
+			s.in.xp_per_gw != null && // vanha backend ilman planner-kenttiä → ei applya
+			plannedIds.has(s.out.id) &&
+			!plannedIds.has(s.in.id) &&
+			planBank - s.delta_cost >= -1e-9
+		);
 	}
 
 	$effect(() => {
@@ -198,8 +255,9 @@
 	</div>
 
 	<!-- #113: pitch + kitit + what-if-manager (pariteetti mobiilin #106+#112:lle;
-	     free = staattinen pitch + lukko, premium = editointi) -->
-	<TeamPitchManager players={data.team.players} {premium} {onUpgrade} />
+	     free = staattinen pitch + lukko, premium = editointi). #121: manageri
+	     saa PLANNED-rosterin (sovelletut siirrot mukana); #123: default-GW. -->
+	<TeamPitchManager players={plannedPlayers} {premium} defaultGw={data.meta.gw} {onUpgrade} />
 
 	{#if premium}
 		<!-- #63: HOLD-verdikti HERO-kantana siirtolistan yläpuolella; backendin
@@ -242,10 +300,13 @@
 							<th class="num"
 								><abbr title="Projected xP gain over the remaining horizon">Δ xP</abbr></th
 							>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each data.transfers.suggestions as s (s.out.id + '-' + s.in.id)}
+							{@const key = `${s.out.id}-${s.in.id}`}
+							{@const isApplied = appliedKeys.has(key)}
 							<tr>
 								<td
 									>{s.out.web_name}
@@ -258,10 +319,53 @@
 								<td>{s.pos}</td>
 								<td class="num">{s.delta_cost > 0 ? '+' : ''}{s.delta_cost.toFixed(1)}</td>
 								<td class="num gain">+{s.delta_xp_horizon.toFixed(2)}</td>
+								<td class="num">
+									<!-- #121: Apply → planned-pitch päivittyy heti (lokaali) -->
+									{#if s.in.xp_per_gw != null}
+										<button
+											type="button"
+											class="apply-btn"
+											class:applied={isApplied}
+											disabled={isApplied || !canApply(s)}
+											onclick={() => (appliedTransfers = [...appliedTransfers, s])}
+										>
+											{isApplied ? 'Applied' : 'Apply'}
+										</button>
+									{/if}
+								</td>
 							</tr>
 						{/each}
 					</tbody>
 				</table>
+			</div>
+		{/if}
+		{#if appliedTransfers.length > 0}
+			<!-- #121: suunnitelman yhteenveto — juokseva bank (jaettu budjetti,
+			     #35) + eksakti netto-xP + undo/reset. Read-only what-if. -->
+			<div class="plan-box">
+				<p class="plan-title">
+					Your transfer plan ({appliedTransfers.length})
+					<span class="muted">
+						· Bank after transfers: {planBank.toFixed(1)}m · Net xP over horizon:
+						{planNetXp > 0 ? '+' : ''}{planNetXp.toFixed(1)}
+					</span>
+				</p>
+				<div class="plan-actions">
+					<button
+						type="button"
+						class="plan-btn"
+						onclick={() => (appliedTransfers = appliedTransfers.slice(0, -1))}
+					>
+						Undo last
+					</button>
+					<button type="button" class="plan-btn" onclick={() => (appliedTransfers = [])}>
+						Reset plan
+					</button>
+				</div>
+				<p class="muted plan-note">
+					A planning sandbox: nothing is sent to FPL. Apply your final team in the official FPL
+					app.
+				</p>
 			</div>
 		{/if}
 		{#if data.transfers.note}
@@ -310,6 +414,58 @@
 	}
 	.remember-toggle input {
 		accent-color: var(--giq-magenta);
+	}
+	/* #121: apply-to-planner */
+	.apply-btn {
+		border: 1px solid var(--giq-magenta);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--giq-magenta);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+	}
+	.apply-btn:disabled {
+		opacity: 0.4;
+		cursor: default;
+	}
+	.apply-btn.applied {
+		background: rgba(255, 46, 126, 0.1);
+		border-color: rgba(255, 46, 126, 0.35);
+		opacity: 1;
+	}
+	.plan-box {
+		background: var(--giq-paper, #f6f4ff);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: var(--s-3);
+		margin: var(--s-3) 0;
+		max-width: 680px;
+	}
+	.plan-title {
+		margin: 0;
+		font-weight: 700;
+		font-size: var(--step--1);
+	}
+	.plan-actions {
+		display: flex;
+		gap: var(--s-2);
+		margin-top: var(--s-2);
+	}
+	.plan-btn {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		color: var(--text);
+		font-weight: 600;
+		font-size: var(--step--1);
+		padding: 6px 12px;
+		cursor: pointer;
+	}
+	.plan-note {
+		margin: var(--s-2) 0 0;
+		font-size: var(--step--1);
 	}
 	.linklike {
 		background: none;
