@@ -114,12 +114,17 @@ jobs:
         continue-on-error: true
         run: python -m scripts.build_prediction_pages
 
+      # #120: FPL-long-tail-sivut (best captain / differentials / price changes)
+      - name: Build FPL long-tail pages (#120)
+        continue-on-error: true
+        run: python -m scripts.build_fpl_longtail
+
       - name: Commit + push to main (Render auto-deploy → /api/accuracy)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/prediction_log.json data/accuracy.json data/international_results.csv
-          git add predictions/ sitemap.xml predictions.html fpl.html index.html || true
+          git add predictions/ fpl/ sitemap.xml predictions.html fpl.html index.html || true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
             exit 0
