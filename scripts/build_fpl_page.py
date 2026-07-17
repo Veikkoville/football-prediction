@@ -409,6 +409,18 @@ def _pick_txt(e: dict) -> tuple[str, str]:
     return "-", ""
 
 
+def _pick_pct(e: dict) -> str:
+    """#133: pickin luottamus-% ("71%") lokirivin todennäköisyyksistä, tai ""
+    jos dataa ei ole (seed-rivit). Näytetään pick-solussa mobiilin kanssa
+    yhtenäisesti (mobiili näyttää 'Pick: X · 71.2%')."""
+    w = e.get("predicted_winner")
+    p = {"home": e.get("p_home"), "draw": e.get("p_draw"),
+         "away": e.get("p_away")}.get(w)
+    if p is None:
+        return ""
+    return f" &middot; {p * 100:.0f}%"
+
+
 def record_table_html(preds: list[dict], c: dict) -> str:
     """#117: koko per-ottelu-record näkyväksi tauluksi. Vain gradatut rivit
     (result != null) — pending-ennusteet ovat lukittuja mutta pelaamattomia,
@@ -455,7 +467,8 @@ def record_table_html(preds: list[dict], c: dict) -> str:
             f'<td class="num">{escape(date_txt)}</td>'
             f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
             f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
-            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}</td>'
+            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}'
+            f'<span class="rec-pct">{_pick_pct(e)}</span></td>'
             f'<td class="num">{escape(score)}{star}</td>'
             f'<td class="num">{"<span class=\"rec-hit\">&#10003;</span>" if hit else "<span class=\"rec-miss\">&#10007;</span>"}</td>'
             "</tr>"
@@ -487,7 +500,8 @@ def record_table_html(preds: list[dict], c: dict) -> str:
             f'<td class="num">{escape(ko_txt)}</td>'
             f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
             f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
-            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}</td>'
+            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}'
+            f'<span class="rec-pct">{_pick_pct(e)}</span></td>'
             f'<td class="num">{escape(logged)}</td>'
             f'<td class="num"><span class="rec-pending">awaiting result</span></td>'
             "</tr>"
@@ -540,6 +554,7 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         ".rec-subhead{font-size:18px;margin:26px 0 4px;}"
         ".rec-pending{color:#F4A800;font-weight:700;font-size:12px;"
         "white-space:nowrap;}"
+        ".rec-pct{color:#54506B;font-variant-numeric:tabular-nums;}"
         "</style>"
         + by_comp_html(c)
         + f'<div class="rec-filters" role="group" aria-label="Filter by competition">{filter_btns}</div>'
