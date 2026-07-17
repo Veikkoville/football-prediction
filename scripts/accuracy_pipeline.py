@@ -49,6 +49,70 @@ WC_HUB_HTML = ROOT / "world-cup-2026-predictions.html"
 WC_COMPETITION_CODE = "WC"
 WC_SEASON = "2026"
 
+# ---------------------------------------------------------------------------
+# #110: domestic-kilpailut — track record ei jäädy WC-finaaliin 19.7.
+# ---------------------------------------------------------------------------
+# fd = football-data.org-koodi, league = mallin liigakoodi (/api/predict +
+# /api/teams). overrides = FD-nimi → mallinimi niille joille normalisointi ei
+# riitä (verifioitu live-/api/teams- ja live-FD-fixture-listoja vasten 17.7).
+#
+# LIVE-LOGAUS ON OPT-IN: ympäristömuuttuja ACC_DOMESTIC_COMPETITIONS
+# (pilkkulista FD-koodeja, esim. "BSA" tai "BSA,PL"). Tyhjä/puuttuva → domestic
+# EI logaa mitään (WC-putki bittitarkasti ennallaan). 🔒 GO = Ville asettaa
+# muuttujan workflowiin/repo-variableen → 1. live-domestic-logi käynnistyy.
+DOMESTIC_COMPETITIONS: dict[str, dict] = {
+    "BSA": {
+        "league": "BRA-Serie A",
+        "overrides": {
+            "CA Mineiro": "Atletico-MG",
+            "CA Paranaense": "Athletico-PR",
+            "Botafogo FR": "Botafogo RJ",
+            "CR Vasco da Gama": "Vasco",
+            "Sport Club do Recife": "Sport Recife",
+            "Sport Recife": "Sport Recife",
+            "EC Juventude": "Juventude",
+            "Ceará SC": "Ceara",
+            "Ceara SC": "Ceara",
+        },
+    },
+    # Big-5 + CL: kaudet alkavat elokuussa — off-season-haku palauttaa tyhjää
+    # (halpa no-op). Overridet täydennetään kun 1. kausikierros on FD:ssä.
+    "PL":  {"league": "ENG-Premier League", "overrides": {
+        "Wolverhampton Wanderers FC": "Wolverhampton Wanderers",
+    }},
+    "PD":  {"league": "ESP-La Liga-FD", "overrides": {}},
+    "BL1": {"league": "GER-Bundesliga-FD", "overrides": {}},
+    "SA":  {"league": "ITA-Serie A-FD", "overrides": {}},
+    "FL1": {"league": "FRA-Ligue 1-FD", "overrides": {}},
+    "CL":  {"league": "INT-Champions League", "overrides": {}},
+}
+
+# Live-API jonka julkaistua ennustetta logataan (= sama malli jonka käyttäjät
+# näkevät — rehellisin mahdollinen pre-match-lähde). Ylikirjoitettavissa
+# testeihin/lokaaliin ympäristömuuttujalla.
+import os
+PREDICT_API_BASE = os.environ.get(
+    "ACC_PREDICT_API_BASE", "https://goaliq-api.onrender.com"
+)
+
+
+def enabled_domestic_codes() -> list[str]:
+    """FD-koodit joille domestic-logaus on kytketty (ACC_DOMESTIC_COMPETITIONS).
+
+    Tuntemattomat koodit ohitetaan varoituksella — kirjoitusvirhe muuttujassa
+    ei saa kaataa WC-putkea.
+    """
+    raw = os.environ.get("ACC_DOMESTIC_COMPETITIONS", "")
+    codes = []
+    for c in (s.strip().upper() for s in raw.split(",")):
+        if not c:
+            continue
+        if c not in DOMESTIC_COMPETITIONS:
+            print(f"VAROITUS: tuntematon domestic-koodi '{c}' — ohitetaan.")
+            continue
+        codes.append(c)
+    return codes
+
 
 # ---------------------------------------------------------------------------
 # SEED — WC-hubin julkaistut pre-match-kutsut
@@ -124,10 +188,14 @@ def cmd_seed(log: dict) -> int:
 
 
 # ---------------------------------------------------------------------------
-# football-data.org -haku (WC-ottelut)
+# football-data.org -haku (yleinen; WC + domestic-kilpailut, #110)
 # ---------------------------------------------------------------------------
-def _fetch_wc_matches() -> list[dict] | None:
-    """Hae kaikki WC2026-ottelut (yksi pyyntö). None jos avain puuttuu/virhe."""
+def _fetch_matches(comp_code: str, season: str | None = None) -> list[dict] | None:
+    """Hae kilpailun ottelut (yksi pyyntö). None jos avain puuttuu/virhe.
+
+    season=None → FD palauttaa kuluvan kauden (domestic-oletus). WC käyttää
+    kiinteää season=2026.
+    """
     import requests
     from src.data.football_data_org import _api_key, BASE, _await_rate_limit
 
@@ -136,16 +204,194 @@ def _fetch_wc_matches() -> list[dict] | None:
         print("VAROITUS: FOOTBALL_DATA_API_KEY puuttuu — ohitetaan FD-haku.")
         return None
     _await_rate_limit()
-    url = f"{BASE}/competitions/{WC_COMPETITION_CODE}/matches?season={WC_SEASON}"
+    url = f"{BASE}/competitions/{comp_code}/matches"
+    if season:
+        url += f"?season={season}"
     try:
         r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=20)
     except Exception as e:
-        print(f"VAROITUS: FD-haku epäonnistui: {type(e).__name__}: {e}")
+        print(f"VAROITUS: FD-haku ({comp_code}) epäonnistui: {type(e).__name__}: {e}")
         return None
     if r.status_code != 200:
-        print(f"VAROITUS: FD palautti {r.status_code}: {r.text[:160]}")
+        print(f"VAROITUS: FD ({comp_code}) palautti {r.status_code}: {r.text[:160]}")
         return None
     return r.json().get("matches", [])
+
+
+def _fetch_wc_matches() -> list[dict] | None:
+    """Hae kaikki WC2026-ottelut (säilytetty wrapperina — kutsujat + testit)."""
+    return _fetch_matches(WC_COMPETITION_CODE, WC_SEASON)
+
+
+# ---------------------------------------------------------------------------
+# #110: FD-nimi → mallinimi -resolveri + live-API-ennuste (domestic)
+# ---------------------------------------------------------------------------
+# FD käyttää virallisia klubinimiä ("SE Palmeiras", "CA Mineiro"); malli
+# käyttää datalähteen lyhytnimiä ("Palmeiras", "Atletico-MG"). Resolvointi:
+# 1) eksplisiittinen override, 2) normalisoitu vertailu (aksentit pois,
+# klubimuoto-tokenit pois), 3) token-osajoukko. Ei osumaa → None (kutsuja
+# skippaa varoituksella — rehellinen fail-open, ei arvauksia).
+_CLUB_TOKENS = frozenset({
+    "fc", "cf", "ec", "sc", "cr", "ca", "se", "af", "ac", "as", "ss", "rc",
+    "rcd", "cd", "ud", "fbc", "fbpa", "fr", "afc", "bc", "clube", "club",
+    "de", "do", "da", "e", "regatas", "esporte", "futebol",
+})
+
+
+def _normalize_team(name: str) -> str:
+    """Pieniksi, aksentit pois, klubimuoto-tokenit pois, aakkosnumeeriseksi."""
+    import unicodedata
+    s = unicodedata.normalize("NFKD", name)
+    s = "".join(ch for ch in s if not unicodedata.combining(ch)).lower()
+    tokens = [t for t in re.split(r"[^a-z0-9]+", s) if t and t not in _CLUB_TOKENS]
+    return " ".join(tokens)
+
+
+def resolve_domestic_name(
+    fd_name: str, model_teams: list[str], overrides: dict[str, str]
+) -> str | None:
+    """FD-ottelunimi → mallin joukkuenimi (tai None jos ei varmaa osumaa)."""
+    if fd_name in overrides:
+        ov = overrides[fd_name]
+        return ov if ov in model_teams else None
+    norm_fd = _normalize_team(fd_name)
+    if not norm_fd:
+        return None
+    by_norm = {_normalize_team(t): t for t in model_teams}
+    if norm_fd in by_norm:
+        return by_norm[norm_fd]
+    # Token-osajoukko: "sao paulo" ⊆ "sao paulo" jne. Hyväksy vain YKSI ehdokas
+    # (moniselitteinen → None, ei arvata).
+    fd_tokens = set(norm_fd.split())
+    candidates = [
+        t for n, t in by_norm.items()
+        if fd_tokens and (fd_tokens <= set(n.split()) or set(n.split()) <= fd_tokens)
+    ]
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _fetch_model_teams(league: str) -> list[str] | None:
+    """Mallin joukkuenimet liigalle live-API:sta (/api/teams). None jos virhe."""
+    import requests
+    try:
+        r = requests.get(
+            f"{PREDICT_API_BASE}/api/teams",
+            params={"leagues": league},
+            timeout=120,  # kylmä Render voi fitata mallin tässä
+        )
+    except Exception as e:
+        print(f"VAROITUS: /api/teams ({league}) epäonnistui: {type(e).__name__}: {e}")
+        return None
+    if r.status_code != 200:
+        print(f"VAROITUS: /api/teams ({league}) palautti {r.status_code}.")
+        return None
+    teams = r.json().get("teams") or []
+    return list(teams) if teams else None
+
+
+def domestic_prematch_prediction(
+    league: str, home_model: str, away_model: str
+) -> dict | None:
+    """Logattava pre-match-ennuste LIVE-API:sta (/api/predict) — täsmälleen
+    sama julkaistu malli jonka käyttäjät näkevät. None jos kutsu epäonnistuu."""
+    import requests
+    try:
+        r = requests.post(
+            f"{PREDICT_API_BASE}/api/predict",
+            json={"home_team": home_model, "away_team": away_model,
+                  "leagues": [league]},
+            timeout=120,
+        )
+    except Exception as e:
+        print(f"VAROITUS: /api/predict ({home_model}-{away_model}) epäonnistui: "
+              f"{type(e).__name__}: {e}")
+        return None
+    if r.status_code != 200:
+        print(f"VAROITUS: /api/predict ({home_model}-{away_model}) → {r.status_code}.")
+        return None
+    d = r.json()
+    top = d.get("top_scores") or []
+    return {
+        "home_team": home_model,
+        "away_team": away_model,
+        "p_home": round(float(d["p_home_win"]), 4),
+        "p_draw": round(float(d["p_draw"]), 4),
+        "p_away": round(float(d["p_away_win"]), 4),
+        "xg_home": round(float(d["expected_goals_home"]), 3),
+        "xg_away": round(float(d["expected_goals_away"]), 3),
+        "most_likely_score": (top[0].get("score") if top else None),
+        "predicted_winner": acc.named_winner(d["p_home_win"], d["p_away_win"]),
+    }
+
+
+def log_domestic_matches(
+    log: dict,
+    comp_code: str,
+    matches: list[dict],
+    model_teams: list[str],
+    predict_fn,
+    now: datetime | None = None,
+) -> tuple[int, int]:
+    """Logaa pre-match-ennusteet yhden domestic-kilpailun tuleville otteluille.
+
+    Sama pre-match-kuri kuin WC:llä: vain SCHEDULED/TIMED + kickoff > now,
+    jo logattuja ei ylikirjoiteta (upsert). predict_fn injektoidaan → testit
+    ajavat ilman verkkoa. Palauttaa (lisätyt, ohitetut-ilman-ennustetta).
+    """
+    cfg = DOMESTIC_COMPETITIONS[comp_code]
+    overrides = cfg.get("overrides", {})
+    now = now or datetime.now(timezone.utc)
+    existing = {e["match_id"] for e in log["predictions"]}
+    added = skipped = 0
+    for m in matches:
+        if m.get("status") not in ("SCHEDULED", "TIMED"):
+            continue
+        fd_home = (m.get("homeTeam") or {}).get("name")
+        fd_away = (m.get("awayTeam") or {}).get("name")
+        if not fd_home or not fd_away:
+            continue
+        utc = m.get("utcDate") or ""
+        try:
+            kickoff = datetime.fromisoformat(utc.replace("Z", "+00:00"))
+        except Exception:
+            continue
+        if kickoff <= now:
+            continue  # ei enää pre-match → ei logata jälkikäteen
+        match_id = f"fd-{m.get('id')}"
+        if match_id in existing:
+            continue
+        home = resolve_domestic_name(fd_home, model_teams, overrides)
+        away = resolve_domestic_name(fd_away, model_teams, overrides)
+        if home is None or away is None:
+            miss = fd_home if home is None else fd_away
+            print(f"VAROITUS: {comp_code} nimi ei resolvoidu malliin: '{miss}' "
+                  f"({fd_home} - {fd_away}) — ohitetaan.")
+            skipped += 1
+            continue
+        pred = predict_fn(cfg["league"], home, away)
+        if pred is None:
+            skipped += 1
+            continue
+        entry = {
+            "match_id": match_id,
+            "source": "fd",
+            "competition": comp_code,
+            "league": cfg["league"],
+            "date": utc[:10],
+            "kickoff": utc,
+            **{k: pred[k] for k in (
+                "home_team", "away_team", "p_home", "p_draw", "p_away",
+                "xg_home", "xg_away", "most_likely_score", "predicted_winner",
+            )},
+            "logged_at": acc._now_iso(),
+            "result": None,
+        }
+        if acc.upsert_prediction(log, entry):
+            existing.add(match_id)
+            added += 1
+    print(f"LOG[{comp_code}]: {added} uutta pre-match-ennustetta"
+          + (f" ({skipped} ohitettu)." if skipped else "."))
+    return added, skipped
 
 
 def _disp_score(m: dict) -> tuple[int, int] | None:
@@ -335,12 +581,38 @@ def main(argv: list[str]) -> int:
     if cmd == "seed":
         rc = cmd_seed(log)
     else:
+        domestic: dict[str, list[dict]] = {}
         if cmd in ("log", "reconcile", "run", "regrade"):
             matches = _fetch_wc_matches()
+            # #110: domestic-kilpailut vain opt-in-lipulla (🔒 GO-portti).
+            # Tyhjä lippu → tämä lohko ei aja → WC-putki bittitarkasti ennallaan.
+            if cmd != "regrade":
+                for code in enabled_domestic_codes():
+                    dm = _fetch_matches(code)
+                    if dm is not None:
+                        domestic[code] = dm
         if cmd in ("log", "run"):
             cmd_log(log, matches)
+            for code, dm in domestic.items():
+                teams = _fetch_model_teams(DOMESTIC_COMPETITIONS[code]["league"])
+                if teams is None:
+                    print(f"VAROITUS: {code} ohitettu — mallin joukkuelista ei "
+                          f"saatavilla (/api/teams).")
+                    continue
+                log_domestic_matches(
+                    log, code, dm, teams, domestic_prematch_prediction
+                )
         if cmd in ("reconcile", "run"):
-            cmd_reconcile(log, matches)
+            # Yhdistetty lista: FD:n ottelu-id:t ovat globaalisti uniikkeja →
+            # sama fd-<id>-avain toimii kaikille kilpailuille.
+            combined: list[dict] | None
+            if matches is None and not domestic:
+                combined = None
+            else:
+                combined = list(matches or [])
+                for dm in domestic.values():
+                    combined.extend(dm)
+            cmd_reconcile(log, combined)
         if cmd == "regrade":
             rc = cmd_regrade(log, matches)
 
