@@ -282,21 +282,40 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
             (
                 "Yes. GoalIQ is built FPL-first: clean sheet odds, fixture "
                 "difficulty, rate my team with a captain pick, and price watch "
-                "are free, and GoalIQ Premium adds player expected points (xP), "
-                "the captain ranker, differentials and a transfer planner. "
-                "Every number comes from a match model with a published, "
-                "pre-match-logged track record."
+                "are free, and GoalIQ Premium adds an interactive team manager "
+                "with a gameweek planner, player expected points (xP), the "
+                "captain ranker, a player value ranking, xG leaders, a DefCon "
+                "tracker, differentials and transfer suggestions you can apply "
+                "to your planned squad. Every number comes from a match model "
+                "with a published, pre-match-logged track record."
             ),
         ),
         (
             "What FPL tools does GoalIQ have?",
             (
                 "Free: clean sheet probabilities, fixture difficulty ratings "
-                "(FDR), rate my team with a captain pick, and price watch. "
-                "GoalIQ Premium: player expected points (xP) per gameweek, the "
-                "captain ranker, differentials, player compare, predicted "
-                "starting minutes and a transfer planner. Available on the "
-                "web, iOS and Android."
+                "(FDR), rate my team with a captain pick, price watch, and the "
+                "top three of the value, xG leaders and DefCon lists. GoalIQ "
+                "Premium: an interactive team manager (formations, bench swaps, "
+                "captaincy, a GW1 to GW6 gameweek planner with each player's "
+                "opponent per week), player expected points (xP), the captain "
+                "ranker, transfer suggestions with one-tap apply to your "
+                "planned squad, player value (xP per million), full xG leaders "
+                "and DefCon (defensive contribution) leaderboards, goalkeeper "
+                "rotation pairs, differentials, player compare and predicted "
+                "starting minutes. Available on the web, iOS and Android."
+            ),
+        ),
+        (
+            "What is DefCon in FPL and does GoalIQ track it?",
+            (
+                "DefCon (defensive contribution) is an FPL scoring rule: a "
+                "defender earns 2 points with 10 combined clearances, blocks, "
+                "interceptions and tackles in a match, and a midfielder or "
+                "forward with 12 including ball recoveries. GoalIQ tracks "
+                "every player's DefCon actions per game and hit rate, so you "
+                "can find the most reliable DefCon point scorers. The top "
+                "three are free and the full leaderboard is on GoalIQ Premium."
             ),
         ),
         (
@@ -403,8 +422,11 @@ def record_table_html(preds: list[dict], c: dict) -> str:
 
     graded.sort(key=sort_key, reverse=True)
 
+    # #129: filtterit kattavat myös pending-lohkon kilpailut (esim. BSA
+    # ennen ensimmäistä gradausta) — sama data-comp-attribuutti molemmissa
+    # tauluissa, filtteri-JS osuu kaikkiin .rec-scroll-riveihin.
     comps_in_table = []
-    for e in graded:
+    for e in preds:
         code = e.get("competition") or "WC"
         if code not in comps_in_table:
             comps_in_table.append(code)
@@ -446,11 +468,52 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         if has_nonregular
         else ""
     )
+
+    # #129: logatut, pelaamattomat ennusteet omana lohkonaan — "malli teki
+    # kutsun ENNEN kickoffia, receipts livenä". Lähin kickoff ensin. EI
+    # vaikuta headline-%:iin (vain gradatut lasketaan); reconcile siirtää
+    # rivin gradattuun tauluun automaattisesti kun ottelu on pelattu.
+    pending = [e for e in preds if not e.get("result")]
+    pending.sort(key=lambda e: e.get("kickoff") or e.get("date") or "9999")
+    pending_rows = []
+    for e in pending:
+        code = e.get("competition") or "WC"
+        pick_sym, pick_name = _pick_txt(e)
+        ko = e.get("kickoff") or ""
+        ko_txt = ko.replace("T", " ").replace("Z", " UTC") if ko else (e.get("date") or "")
+        logged = (e.get("logged_at") or "")[:10]
+        pending_rows.append(
+            f'<tr data-comp="{escape(code)}">'
+            f'<td class="num">{escape(ko_txt)}</td>'
+            f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
+            f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
+            f'<td><strong>{pick_sym}</strong> {escape(pick_name)}</td>'
+            f'<td class="num">{escape(logged)}</td>'
+            f'<td class="num"><span class="rec-pending">awaiting result</span></td>'
+            "</tr>"
+        )
+    pending_block = (
+        (
+            "<h3 class=\"rec-subhead\">Upcoming: logged, awaiting result "
+            f"({len(pending_rows)})</h3>"
+            "<p class=\"rec-note\">These predictions are logged before "
+            "kickoff and graded after the match. Nothing is edited once "
+            "logged; each row moves to the graded table above when the "
+            "result is in.</p>"
+            '<div class="rec-scroll"><table>'
+            '<thead><tr><th scope="col">Kick-off</th><th scope="col">Competition</th>'
+            '<th scope="col">Match</th><th scope="col">Pick</th>'
+            '<th scope="col">Logged</th><th scope="col">Status</th></tr></thead>'
+            "<tbody>" + "".join(pending_rows) + "</tbody></table></div>"
+        )
+        if pending_rows
+        else ""
+    )
     pending_note = (
         f"<p class=\"rec-note\">{c['acc_pending']} further predictions are "
-        f"already logged and locked for upcoming matches; they appear here "
-        f"once played and graded.</p>"
-        if c["acc_pending"] > 0
+        f"already logged and locked for upcoming matches; they are listed "
+        f"below and appear in the graded table once played.</p>"
+        if pending_rows
         else ""
     )
 
@@ -474,6 +537,9 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         ".rec-hit{color:#0A9E75;font-weight:800;}"
         ".rec-miss{color:#D6006E;font-weight:800;}"
         ".rec-note{font-size:13px;opacity:.7;margin:10px 0 0;}"
+        ".rec-subhead{font-size:18px;margin:26px 0 4px;}"
+        ".rec-pending{color:#F4A800;font-weight:700;font-size:12px;"
+        "white-space:nowrap;}"
         "</style>"
         + by_comp_html(c)
         + f'<div class="rec-filters" role="group" aria-label="Filter by competition">{filter_btns}</div>'
@@ -489,6 +555,7 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         + "</tbody></table></div>"
         + star_note
         + pending_note
+        + pending_block
         + "<script>document.querySelectorAll('.rec-filter').forEach(function(b){"
         + "b.addEventListener('click',function(){"
         + "document.querySelectorAll('.rec-filter').forEach(function(x){x.classList.remove('on');});"
@@ -573,8 +640,10 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "description": (
             "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet "
             "odds and fixture difficulty, rate my team with a captain pick, "
-            "and price watch free, plus player expected points (xP), the "
-            "captain ranker, differentials and a transfer planner on GoalIQ "
+            "and price watch free, plus an interactive team manager with a "
+            "gameweek planner, player expected points (xP), the captain "
+            "ranker, player value, xG leaders, a DefCon tracker, "
+            "differentials and transfer suggestions with apply on GoalIQ "
             "Premium - powered by a Dixon-Coles + machine-learning match model "
             "with a public, pre-match-logged prediction track record. Built by "
             "an independent developer in Finland. Analytics, not betting."
@@ -592,12 +661,14 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "description": (
             "Free FPL assistant and football prediction app. Free FPL tools: "
             "clean sheet odds and fixture difficulty, rate my team with a "
-            "captain pick, and price watch. GoalIQ Premium adds player expected "
-            "points (xP) per gameweek, the captain ranker, differentials and "
-            "a transfer planner. Also predicts any match - "
-            "win probability, expected goals (xG) and the most likely score - "
-            "using a Dixon-Coles model with an expected-goals ensemble. "
-            "Analytics, not betting."
+            "captain pick, and price watch. GoalIQ Premium adds an interactive "
+            "team manager with a GW1 to GW6 gameweek planner, player expected "
+            "points (xP), the captain ranker, player value (xP per million), "
+            "xG leaders, a DefCon (defensive contribution) tracker, "
+            "differentials and transfer suggestions with apply. Also predicts "
+            "any match - win probability, expected goals (xG) and the most "
+            "likely score - using a Dixon-Coles model with an expected-goals "
+            "ensemble. Analytics, not betting."
         ),
         "url": BASE + "/",
         "downloadUrl": [PLAY_URL, APPSTORE_URL],
@@ -773,7 +844,8 @@ def render_page(c: dict) -> str:
     title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ"
     meta_desc = (
         "Free FPL tools: clean sheet odds & FDR, rate my team with a captain pick, "
-        "and price watch. Premium adds player xP and the captain ranker. "
+        "and price watch. Premium adds a team manager with gameweek planner, "
+        "player xP, value ranking, xG leaders and a DefCon tracker. "
         "Published track record. Not betting."
     )
 
@@ -844,8 +916,10 @@ def render_page(c: dict) -> str:
 <p class="lede">GoalIQ is a free FPL assistant built on a proven match model.
 This page gives clean sheet probability and fixture difficulty for every
 Premier League team, free and updated every gameweek. Rate my team, a captain
-pick and price watch are free too; GoalIQ Premium adds player expected points (xP),
-the captain ranker and a transfer planner.</p>
+pick and price watch are free too; GoalIQ Premium adds an interactive team
+manager with a gameweek planner, player expected points (xP), the captain
+ranker, player value, xG leaders, a DefCon tracker and transfer suggestions
+you can apply to your planned squad.</p>
 <p class="meta">Season {c["season"]}. Data updated {c["data_date"]}.
 Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 
@@ -890,11 +964,15 @@ model-derived, not the official FPL difficulty.</p>
 (1 easiest, 5 hardest). Venue in cell tooltip: H home, A away.</p>
 
 <aside class="upsell">
-<h2 id="pro">Unlock xP, captain ranker and transfer planner with Premium</h2>
-<p>GoalIQ Premium adds player expected points (xP) per gameweek, a captain ranker,
-a transfer planner, differential picks, player compare and predicted starting
-minutes, from the same match model as this page. Rate my team, a captain pick
-and price watch are free on the web with your public FPL entry ID.</p>
+<h2 id="pro">Unlock the full FPL toolkit with Premium</h2>
+<p>GoalIQ Premium adds an interactive team manager (formations, bench swaps,
+captaincy and a GW1 to GW6 gameweek planner showing each player's opponent
+per week), player expected points (xP), a captain ranker, transfer suggestions
+you can apply straight to your planned squad, a player value ranking (xP per
+million), full xG leaders and DefCon leaderboards, goalkeeper rotation pairs,
+differential picks, player compare and predicted starting minutes, from the
+same match model as this page. Rate my team, a captain pick, price watch and
+the top three of every leaderboard are free.</p>
 <div class="cta-row">
   <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium &mdash; &euro;25/year</a>
 </div>

@@ -49,6 +49,8 @@ BASE = "https://goaliq.app"
 OUT_DIR = ROOT / "fpl"
 XP_PATH = ROOT / "data" / "fpl_xp_projections.json"
 PW_PATH = ROOT / "data" / "fpl_price_watch.json"
+# #128/#120: xG- + DefCon-leaders-sivut samasta nightly-cachesta kuin API
+LEADERS_PATH = ROOT / "data" / "fpl_player_leaders.json"
 API = "https://goaliq-api.onrender.com"
 
 UPSELL = (
@@ -223,6 +225,111 @@ def render_price_changes(pw: dict, now: datetime) -> str:
     return _page(title, desc, url, body, jsonld)
 
 
+def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
+    """#128/#120: 'Top xG performers' — top-3 luvuilla (free-pariteetti:
+    top-3 free appissa), sijat 4-10 niminä ilman lukuja → Premium.
+    Basis-label AINA näkyvissä (25/26-esikausidata, ei arvauksia)."""
+    from src.models.fpl_leaders import rank_xg_leaders
+    if not leaders.get("meta", {}).get("available"):
+        return None
+    out = rank_xg_leaders(leaders, window=5, top_n=10)
+    rows = out["players"]
+    if not rows:
+        return None
+    basis = out["meta"].get("basis_label") or ""
+    url = f"{BASE}/fpl/xg-leaders"
+    title = "Top xG Performers – FPL Expected Goals Leaders | GoalIQ"
+    desc = (
+        f"The top FPL expected-goals (xG) performers over each player's last "
+        f"5 games: {rows[0]['web_name']} leads at {rows[0]['xg_per_game']:.2f} "
+        f"xG per game. From official FPL match data, updated daily."
+    )
+    top3 = "".join(
+        '<div class="stat">'
+        f'<b>{escape(r["web_name"])}</b>'
+        f'<span>#{i + 1} · {escape(r["team_short"])} · {r["xg_per_game"]:.2f} '
+        f'xG/game · {r["games"]} games</span></div>'
+        for i, r in enumerate(rows[:3])
+    )
+    rest = ", ".join(escape(r["web_name"]) for r in rows[3:10])
+    body = (
+        "<h1>Top xG performers in FPL</h1>"
+        '<p class="lede">Which players generate the most expected goals (xG) '
+        "per game? Ranked over each player's last five played matches from "
+        "official FPL match data.</p>"
+        f'<p class="note"><strong>{escape(basis)}</strong></p>'
+        f'<div class="stat-row">{top3}</div>'
+        + (
+            f'<p class="note">Also in the top 10: {rest}. Per-game numbers, '
+            f"xGI and position filters are on GoalIQ Premium.</p>"
+            if rest
+            else ""
+        )
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, body, jsonld)
+
+
+def render_defcon(leaders: dict, now: datetime) -> str | None:
+    """#128/#120: 'Best DefCon players' — FPL:n defensive contribution
+    -pistemekaniikan luotettavimmat lähteet. Top-3 luvuilla, loput niminä."""
+    from src.models.fpl_leaders import rank_defcon_leaders
+    if not leaders.get("meta", {}).get("available"):
+        return None
+    out = rank_defcon_leaders(leaders, window=5, top_n=10)
+    rows = out["players"]
+    if not rows:
+        return None
+    basis = out["meta"].get("basis_label") or ""
+    url = f"{BASE}/fpl/defcon"
+    title = "Best DefCon Players – FPL Defensive Contribution Leaders | GoalIQ"
+    desc = (
+        f"The most reliable FPL defensive contribution (DefCon) point scorers: "
+        f"{rows[0]['web_name']} hits the threshold in "
+        f"{rows[0]['hit_rate_pct']:.0f}% of games. Defenders need 10 CBIT, "
+        f"midfielders and forwards 12 CBIRT, for 2 points."
+    )
+    top3 = "".join(
+        '<div class="stat">'
+        f'<b>{escape(r["web_name"])}</b>'
+        f'<span>#{i + 1} · {escape(r["team_short"])} · '
+        f'{r["hit_rate_pct"]:.0f}% hit rate · {r["dc_per_game"]:.1f} DC/game</span></div>'
+        for i, r in enumerate(rows[:3])
+    )
+    rest = ", ".join(escape(r["web_name"]) for r in rows[3:10])
+    body = (
+        "<h1>Best DefCon players in FPL</h1>"
+        '<p class="lede">Defensive contribution (DefCon) is worth 2 FPL points '
+        "a match: defenders need 10 combined clearances, blocks, interceptions "
+        "and tackles (CBIT); midfielders and forwards need 12 including ball "
+        "recoveries (CBIRT). These players hit the threshold most often.</p>"
+        f'<p class="note"><strong>{escape(basis)}</strong></p>'
+        f'<div class="stat-row">{top3}</div>'
+        + (
+            f'<p class="note">Also in the top 10: {rest}. Hit rates, DC per '
+            f"game and position filters are on GoalIQ Premium.</p>"
+            if rest
+            else ""
+        )
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, body, jsonld)
+
+
 def main() -> int:
     now = datetime.now(timezone.utc)
     OUT_DIR.mkdir(exist_ok=True)
@@ -247,6 +354,19 @@ def main() -> int:
         (OUT_DIR / "price-changes.html").write_text(
             render_price_changes(pw, now), encoding="utf-8")
         built.append("price-changes")
+
+    # #128/#120: xG- + DefCon-leaders-sivut (nightly-cache; puuttuva data →
+    # sivut ohitetaan, vanhat jäävät voimaan)
+    leaders = _load(LEADERS_PATH)
+    if leaders:
+        page = render_xg_leaders(leaders, now)
+        if page:
+            (OUT_DIR / "xg-leaders.html").write_text(page, encoding="utf-8")
+            built.append("xg-leaders")
+        page = render_defcon(leaders, now)
+        if page:
+            (OUT_DIR / "defcon.html").write_text(page, encoding="utf-8")
+            built.append("defcon")
 
     today = now.strftime("%Y-%m-%d")
     write_urlset(SITEMAP_FPL_PATH, [

@@ -16,6 +16,14 @@
 - GoalIQ's FDR is derived from the match model's win and clean sheet probabilities. It is independent of the official FPL fixture difficulty.
 - The page includes GoalIQ's published prediction track record: every prediction is logged before kickoff, hits and misses.
 
+## FPL tools (web app at pro.goaliq.app and iOS/Android app)
+- Free: rate my team (public FPL entry ID, no login), a captain pick, price change predictions, and the top three of the value, xG leaders and DefCon lists.
+- [Best FPL captain](https://goaliq.app/fpl/best-captain): the model's top captain pick with expected points, updated every round.
+- [Top xG performers](https://goaliq.app/fpl/xg-leaders): expected-goals leaders per game over each player's last five matches, from official FPL match data.
+- [Best DefCon players](https://goaliq.app/fpl/defcon): the most reliable defensive contribution (DefCon) point scorers. DefCon rule: a defender earns 2 FPL points with 10 combined clearances, blocks, interceptions and tackles in a match; a midfielder or forward with 12 including ball recoveries.
+- [FPL price changes](https://goaliq.app/fpl/price-changes) and [FPL differentials](https://goaliq.app/fpl/differentials).
+- GoalIQ Premium adds an interactive team manager (formations, bench swaps, captaincy, a GW1 to GW6 gameweek planner showing each player's opponent per week), player expected points (xP) per gameweek, the captain ranker, transfer suggestions with one-tap apply to a planned squad, player value (xP per million), full xG and DefCon leaderboards, goalkeeper rotation pairs, differentials and player compare. One subscription covers web, iOS and Android.
+
 ## FPL Career Card (free tool)
 - [FPL Career Card](https://goaliq.app/career): turn any public FPL entry ID into a shareable career card - best season, all-time points and rank history, plus a GoalIQ model read on the squad in season. Free, no login.
 
