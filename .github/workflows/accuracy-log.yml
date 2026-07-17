@@ -100,6 +100,13 @@ jobs:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
         run: python -m scripts.backfill_knockout_results
 
+      # #118: fpl/index/predictions-accuracy-luvut tuoreiksi joka ajolla
+      # (juurisyy #99-staleuteen oli viikkocadenssi — bake on halpa, stdlib-only).
+      # Fail-safe: builder exit 2 jos FPL-data ei available → continue-on-error.
+      - name: Rebake accuracy numbers into web pages (#118)
+        continue-on-error: true
+        run: python -m scripts.build_fpl_page
+
       # #119: ohjelmalliset ennustesivut prediction_logista (sama data jonka
       # yllä oleva run juuri päivitti → sivu = lokattu pre-match-ennuste).
       # continue-on-error: sivugen ei saa kaataa accuracy-lokia.
@@ -112,7 +119,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/prediction_log.json data/accuracy.json data/international_results.csv
-          git add predictions/ sitemap.xml predictions.html || true
+          git add predictions/ sitemap.xml predictions.html fpl.html index.html || true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
             exit 0

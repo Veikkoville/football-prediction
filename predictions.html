@@ -45,6 +45,7 @@
  "@type": "SoftwareApplication",
  "name": "GoalIQ",
  "operatingSystem": "Android, iOS, Web",
+ "identifier": "com.veikkoville.goaliq",
  "applicationCategory": "SportsApplication",
  "description": "Football prediction app: pick any two teams and get win probability for each side, expected goals (xG) and the most likely scorelines from a Dixon-Coles model with a machine-learning expected-goals ensemble. Covers the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Brasileirao, the Championship, Eredivisie and Primeira Liga. Every model prediction is logged before kick-off and publicly tracked. Analytics, not betting.",
  "url": "https://goaliq.app/predictions",
@@ -121,7 +122,7 @@
  "@context": "https://schema.org",
  "@type": "Dataset",
  "name": "GoalIQ football prediction accuracy log (pre-match, publicly tracked)",
- "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 61.8% correct 1X2 results across 102 logged matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
+ "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 61.8% correct 1X2 results across 102 completed matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
  "url": "https://goaliq.app/predictions",
  "distribution": {
   "@type": "DataDownload",
@@ -129,7 +130,7 @@
   "contentUrl": "https://goaliq-api.onrender.com/api/accuracy"
  },
  "isAccessibleForFree": true,
- "dateModified": "2026-07-16",
+ "dateModified": "2026-07-17",
  "creator": {
   "@id": "https://goaliq.app/#organization"
  },
@@ -352,7 +353,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </div>
     <p class="cta-note">No sign-up needed to try it. The app is a free download.</p>
     <div class="tr-hero">
-      <!-- GEN:ACC-CHIP-START --><div class="num">61.8%</div><div class="lbl">result accuracy across 102 logged matches</div><!-- GEN:ACC-CHIP-END -->
+      <!-- GEN:ACC-CHIP-START --><div class="num">61.8%</div><div class="lbl">result accuracy across 102 completed matches</div><!-- GEN:ACC-CHIP-END -->
       <div class="tr-note">Every prediction logged before kick-off and graded after, hits and misses included. <a href="fpl.html#track-record">See the full record &rarr;</a></div>
     </div>
   </header>
@@ -381,7 +382,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <span class="away" style="width:28%"></span>
       </div>
       <div class="prob-legend"><span>Win probability</span><span>xG for both sides</span><span>Likely scorelines</span></div>
-      <p style="margin-top:14px; color:var(--muted); font-size:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 61.8% correct results across 102 matches played.<!-- GEN:ACC-PROOF-END --></p>
+      <p style="margin-top:14px; color:var(--muted); font-size:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 61.8% correct results across 102 completed matches.<!-- GEN:ACC-PROOF-END --></p>
     </div>
   </div>
 </section>
@@ -455,7 +456,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       </ul>
       <p style="margin:6px 0 16px;"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="predictions-premium">Start GoalIQ Premium &mdash; &euro;25/year</a></p>
       <small>Cancel anytime. No account needed until after checkout.</small>
-      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 61.8% correct 1X2 results across 102 logged matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
+      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 61.8% correct 1X2 results across 102 completed matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
     </div>
   </div>
 </section>

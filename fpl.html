@@ -47,8 +47,9 @@
 {
  "@context": "https://schema.org",
  "@type": "SoftwareApplication",
- "name": "GoalIQ: FPL Assistant",
- "operatingSystem": "Android, iOS",
+ "name": "GoalIQ",
+ "operatingSystem": "Android, iOS, Web",
+ "identifier": "com.veikkoville.goaliq",
  "applicationCategory": "SportsApplication",
  "description": "Free FPL assistant and football prediction app. Free FPL tools: clean sheet odds and fixture difficulty, rate my team with a captain pick, and price watch. GoalIQ Premium adds player expected points (xP) per gameweek, the captain ranker, differentials and a transfer planner. Also predicts any match - win probability, expected goals (xG) and the most likely score - using a Dixon-Coles model with an expected-goals ensemble. Analytics, not betting.",
  "url": "https://goaliq.app/",
@@ -133,7 +134,7 @@
    "name": "How accurate is the GoalIQ model?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "The GoalIQ model logged 104 pre-match predictions live during the 2026 World Cup, before kickoff, with no edits afterwards. Across the 102 matches already played, the model called the result correctly in 61.8% of matches. When the model named a clear winner rather than a draw, it was right 85.1% of the time (63 of 74). Every prediction is logged, hits and misses."
+    "text": "The GoalIQ model has logged 304 pre-match predictions, before kickoff, with no edits afterwards, starting with the 2026 World Cup and now covering domestic leagues. Across the 102 completed matches, the model called the result correctly in 61.8% of matches. When the model named a clear winner rather than a draw, it was right 85.1% of the time (63 of 74). Every prediction is logged, hits and misses."
    }
   },
   {
@@ -163,7 +164,7 @@
  "description": "Model clean sheet probability for every Premier League team and a model fixture difficulty rating (1 to 5) for the next 6 gameweeks of the 2026/27 season, from GoalIQ's Dixon-Coles match model. Updated every gameweek.",
  "url": "https://goaliq.app/fpl.html",
  "isAccessibleForFree": true,
- "dateModified": "2026-07-16",
+ "dateModified": "2026-07-17",
  "temporalCoverage": "2026-08/2027-05",
  "creator": {
   "@id": "https://goaliq.app/#organization"
@@ -182,7 +183,7 @@
  "@context": "https://schema.org",
  "@type": "Dataset",
  "name": "GoalIQ football prediction accuracy log (pre-match, publicly tracked)",
- "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 61.8% correct 1X2 results across 102 logged matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
+ "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 61.8% correct 1X2 results across 102 completed matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
  "url": "https://goaliq.app/fpl.html",
  "distribution": {
   "@type": "DataDownload",
@@ -190,7 +191,7 @@
   "contentUrl": "https://goaliq-api.onrender.com/api/accuracy"
  },
  "isAccessibleForFree": true,
- "dateModified": "2026-07-16",
+ "dateModified": "2026-07-17",
  "creator": {
   "@id": "https://goaliq.app/#organization"
  },
@@ -295,7 +296,7 @@ This page gives clean sheet probability and fixture difficulty for every
 Premier League team, free and updated every gameweek. Rate my team, a captain
 pick and price watch are free too; GoalIQ Premium adds player expected points (xP),
 the captain ranker and a transfer planner.</p>
-<p class="meta">Season 2026/27. Data updated 16 July 2026.
+<p class="meta">Season 2026/27. Data updated 17 July 2026.
 Gameweek 1 starts Friday 21 August 2026.</p>
 
 <div class="cta-row">
@@ -311,9 +312,9 @@ Gameweek 1 starts Friday 21 August 2026.</p>
 <div class="wrap content">
 
 <h2 id="track-record">The model publishes its prediction record</h2>
-<p>The GoalIQ model logged 104 pre-match predictions live during the 2026 World Cup, before kickoff, with no edits afterwards. Across the 102 matches already played, the model called the result correctly in 61.8% of matches. When the model named a clear winner rather than a draw, it was right 85.1% of the time (63 of 74).</p>
-<div class="stat-row"><div class="stat"><b>61.8%</b><span>correct results across 102 completed predictions</span></div><div class="stat"><b>85.1%</b><span>hit rate when the model called a winner (63 of 74)</span></div><div class="stat"><b>104</b><span>predictions logged before kickoff, hits and misses</span></div></div>
-<p class="note">Source: GoalIQ prediction log, updated 16 July 2026. The full
+<p>The GoalIQ model has logged 304 pre-match predictions, before kickoff, with no edits afterwards, starting with the 2026 World Cup and now covering domestic leagues. Across the 102 completed matches, the model called the result correctly in 61.8% of matches. When the model named a clear winner rather than a draw, it was right 85.1% of the time (63 of 74).</p>
+<div class="stat-row"><div class="stat"><b>61.8%</b><span>correct results across 102 completed predictions</span></div><div class="stat"><b>85.1%</b><span>hit rate when the model called a winner (63 of 74)</span></div><div class="stat"><b>304</b><span>predictions logged before kickoff, hits and misses</span></div></div>
+<p class="note">Source: GoalIQ prediction log, updated 17 July 2026. The full
 log, including every miss, is served live by the same model that produces the
 tables below.</p>
 
@@ -377,7 +378,7 @@ cannot be edited after the fact. If the model has a bad week, the log shows it.<
 
 <h2 id="faq">FAQ</h2>
 <dl class="faq">
-<dt>Which teams are most likely to keep a clean sheet in Gameweek 1?</dt><dd>On GoalIQ&#x27;s model the top clean sheet chances in Gameweek 1 of the 2026/27 Premier League season are Arsenal at 60.1% (home against Coventry); Nottingham Forest at 36.4% (home against Leeds); Manchester City at 34.9% (home against Bournemouth). These are pre-season projections and will sharpen once 2026/27 results arrive.</dd><dt>What is fixture difficulty rating (FDR)?</dt><dd>GoalIQ&#x27;s fixture difficulty rating comes from the match model&#x27;s win and clean sheet probabilities, on a 1 to 5 scale. A lower number is an easier fixture. It is model-derived and independent of the official FPL fixture difficulty.</dd><dt>Is GoalIQ good for FPL?</dt><dd>Yes. GoalIQ is built FPL-first: clean sheet odds, fixture difficulty, rate my team with a captain pick, and price watch are free, and GoalIQ Premium adds player expected points (xP), the captain ranker, differentials and a transfer planner. Every number comes from a match model with a published, pre-match-logged track record.</dd><dt>What FPL tools does GoalIQ have?</dt><dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR), rate my team with a captain pick, and price watch. GoalIQ Premium: player expected points (xP) per gameweek, the captain ranker, differentials, player compare, predicted starting minutes and a transfer planner. Available on the web, iOS and Android.</dd><dt>Is GoalIQ free?</dt><dd>Yes. Clean sheet odds and fixture difficulty are free, on the web and in the GoalIQ app for Android and iOS.</dd><dt>How accurate is the GoalIQ model?</dt><dd>The GoalIQ model logged 104 pre-match predictions live during the 2026 World Cup, before kickoff, with no edits afterwards. Across the 102 matches already played, the model called the result correctly in 61.8% of matches. When the model named a clear winner rather than a draw, it was right 85.1% of the time (63 of 74). Every prediction is logged, hits and misses.</dd><dt>Does GoalIQ give betting tips?</dt><dd>No. GoalIQ publishes model predictions and analytics, not betting advice. It is not a gambling service and has no odds or bookmaker links.</dd><dt>Is there a full xP dashboard on top of this free page?</dt><dd>Yes. GoalIQ Premium at pro.goaliq.app adds player expected points (xP) for the coming gameweeks, a captain ranker and per-gameweek breakdowns, from the same match model as this page. 3.99 EUR per month or 25 EUR per year, and one account unlocks premium on the web, iOS and Android.</dd>
+<dt>Which teams are most likely to keep a clean sheet in Gameweek 1?</dt><dd>On GoalIQ&#x27;s model the top clean sheet chances in Gameweek 1 of the 2026/27 Premier League season are Arsenal at 60.1% (home against Coventry); Nottingham Forest at 36.4% (home against Leeds); Manchester City at 34.9% (home against Bournemouth). These are pre-season projections and will sharpen once 2026/27 results arrive.</dd><dt>What is fixture difficulty rating (FDR)?</dt><dd>GoalIQ&#x27;s fixture difficulty rating comes from the match model&#x27;s win and clean sheet probabilities, on a 1 to 5 scale. A lower number is an easier fixture. It is model-derived and independent of the official FPL fixture difficulty.</dd><dt>Is GoalIQ good for FPL?</dt><dd>Yes. GoalIQ is built FPL-first: clean sheet odds, fixture difficulty, rate my team with a captain pick, and price watch are free, and GoalIQ Premium adds player expected points (xP), the captain ranker, differentials and a transfer planner. Every number comes from a match model with a published, pre-match-logged track record.</dd><dt>What FPL tools does GoalIQ have?</dt><dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR), rate my team with a captain pick, and price watch. GoalIQ Premium: player expected points (xP) per gameweek, the captain ranker, differentials, player compare, predicted starting minutes and a transfer planner. Available on the web, iOS and Android.</dd><dt>Is GoalIQ free?</dt><dd>Yes. Clean sheet odds and fixture difficulty are free, on the web and in the GoalIQ app for Android and iOS.</dd><dt>How accurate is the GoalIQ model?</dt><dd>The GoalIQ model has logged 304 pre-match predictions, before kickoff, with no edits afterwards, starting with the 2026 World Cup and now covering domestic leagues. Across the 102 completed matches, the model called the result correctly in 61.8% of matches. When the model named a clear winner rather than a draw, it was right 85.1% of the time (63 of 74). Every prediction is logged, hits and misses.</dd><dt>Does GoalIQ give betting tips?</dt><dd>No. GoalIQ publishes model predictions and analytics, not betting advice. It is not a gambling service and has no odds or bookmaker links.</dd><dt>Is there a full xP dashboard on top of this free page?</dt><dd>Yes. GoalIQ Premium at pro.goaliq.app adds player expected points (xP) for the coming gameweeks, a captain ranker and per-gameweek breakdowns, from the same match model as this page. 3.99 EUR per month or 25 EUR per year, and one account unlocks premium on the web, iOS and Android.</dd>
 </dl>
 
 <div class="cta-row">

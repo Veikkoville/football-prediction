@@ -44,8 +44,9 @@
 {
  "@context": "https://schema.org",
  "@type": "SoftwareApplication",
- "name": "GoalIQ: FPL Assistant",
- "operatingSystem": "Android, iOS",
+ "name": "GoalIQ",
+ "operatingSystem": "Android, iOS, Web",
+ "identifier": "com.veikkoville.goaliq",
  "applicationCategory": "SportsApplication",
  "description": "Free FPL assistant and football prediction app. Free FPL tools: clean sheet odds and fixture difficulty, rate my team with a captain pick, and price watch. GoalIQ Premium adds player expected points (xP) per gameweek, the captain ranker, differentials and a transfer planner. Also predicts any match - win probability, expected goals (xG) and the most likely score - using a Dixon-Coles model with an expected-goals ensemble. Analytics, not betting.",
  "url": "https://goaliq.app/",
@@ -130,7 +131,7 @@
  "@context": "https://schema.org",
  "@type": "Dataset",
  "name": "GoalIQ football prediction accuracy log (pre-match, publicly tracked)",
- "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 61.8% correct 1X2 results across 102 logged matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
+ "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 61.8% correct 1X2 results across 102 completed matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
  "url": "https://goaliq.app/",
  "distribution": {
   "@type": "DataDownload",
@@ -138,7 +139,7 @@
   "contentUrl": "https://goaliq-api.onrender.com/api/accuracy"
  },
  "isAccessibleForFree": true,
- "dateModified": "2026-07-16",
+ "dateModified": "2026-07-17",
  "creator": {
   "@id": "https://goaliq.app/#organization"
  },
@@ -455,7 +456,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <span class="cd-sep">:</span>
         <span class="cd-box"><span class="cd-num" id="cd-s">–</span><span class="cd-unit">sec</span></span>
       </div>
-      <a class="cd-cta" href="fpl.html" data-cta="countdown">See the model's captain pick &rarr;</a>
+      <a class="cd-cta" href="fpl.html" data-cta="countdown">See clean-sheet odds &amp; FDR &rarr;</a>
     </div>
     <div class="cta-row" id="get">
       <!-- #101: hinta-CTA:t suoraan Stripe Checkoutiin (SPA:n /checkout-reitti
@@ -472,7 +473,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
          GEN:ACC-CHIP-markerit kuin ennen -> accuracy-botti pitaa luvun tuoreena
          ilman builder-muutoksia (sama lahde+tahti kuin fpl.html). -->
     <div class="tr-hero">
-      <!-- GEN:ACC-CHIP-START --><div class="num">61.8%</div><div class="lbl">result accuracy across 102 logged matches</div><!-- GEN:ACC-CHIP-END -->
+      <!-- GEN:ACC-CHIP-START --><div class="num">61.8%</div><div class="lbl">result accuracy across 102 completed matches</div><!-- GEN:ACC-CHIP-END -->
       <div class="tr-note">Every prediction logged before kick-off, publicly tracked. <a href="fpl.html">See the tools it powers &rarr;</a></div>
     </div>
     <div class="stat-strip">
@@ -515,7 +516,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </ul>
     <div class="pricing-cta">
       <a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing">Start Premium &mdash; &euro;25/year</a>
-      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 61.8% correct 1X2 results across 102 logged matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
+      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 61.8% correct 1X2 results across 102 completed matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
       <p class="cta-note">Clean sheet probabilities, fixture difficulty, rate my team with a captain pick, and price watch stay free on the web.</p>
     </div>
   </div>
@@ -540,7 +541,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <span class="team">Published track record</span>
         <span style="color:var(--muted);font-size:13px;">hits and misses</span>
       </div>
-      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 61.8% correct results across 102 matches played.<!-- GEN:ACC-PROOF-END --></p>
+      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 61.8% correct results across 102 completed matches.<!-- GEN:ACC-PROOF-END --></p>
       <p style="margin-top:12px;"><a href="fpl.html#track-record" style="color:var(--teal-ink);font-weight:700;">See the full record →</a></p>
     </div>
   </div>
@@ -557,7 +558,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="step">
         <div class="n">1</div>
         <h3>Pick the match</h3>
-        <p>Choose any two teams from a league, the Champions League or the World Cup.</p>
+        <p>Choose any two teams from any covered league or the Champions League.</p>
       </div>
       <div class="step">
         <div class="n">2</div>
@@ -578,7 +579,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <div class="wrap">
     <div class="section-head">
       <h2>Every match that matters</h2>
-      <p>Europe's top leagues, the Champions League and the World Cup, now joined by Brasileirão, the Championship, Eredivisie and Primeira Liga.</p>
+      <p>Europe's top leagues and the Champions League, with Brasileirão live right now, plus the Championship, Eredivisie and Primeira Liga.</p>
     </div>
     <div class="league-grid">
       <div class="league-chip">Premier League</div>
@@ -587,8 +588,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="league-chip">Serie A</div>
       <div class="league-chip">Ligue 1</div>
       <div class="league-chip">Champions League</div>
-      <div class="league-chip wc-chip">World Cup 2026</div>
-      <div class="league-chip">Brasileirão</div>
+      <div class="league-chip wc-chip">Brasileirão · live now</div>
       <div class="league-chip">Championship</div>
       <div class="league-chip">Eredivisie</div>
       <div class="league-chip">Primeira Liga</div>
@@ -659,8 +659,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <div class="wrap foot-inner">
     <div>© 2026 GoalIQ · Made in Lahti, Finland</div>
     <div>
-      <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a>
-      &nbsp;·&nbsp;
       <a href="/predictions">Match predictions</a>
       &nbsp;·&nbsp;
       <a href="fpl.html">FPL clean sheets &amp; FDR</a>

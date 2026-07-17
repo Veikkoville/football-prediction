@@ -201,11 +201,12 @@ def track_record_sentences(c: dict) -> list[str]:
     """Sitaatinkelpoiset faktalauseet, käytetään sekä sivulla että FAQ:ssa."""
     return [
         (
-            f"The GoalIQ model logged {c['acc_logged']} pre-match predictions "
-            f"live during the 2026 World Cup, before kickoff, with no edits afterwards."
+            f"The GoalIQ model has logged {c['acc_logged']} pre-match predictions, "
+            f"before kickoff, with no edits afterwards, starting with the 2026 "
+            f"World Cup and now covering domestic leagues."
         ),
         (
-            f"Across the {c['acc_n']} matches already played, the model called the "
+            f"Across the {c['acc_n']} completed matches, the model called the "
             f"result correctly in {fmt_pct(c['acc_pct_1x2'])} of matches."
         ),
         (
@@ -384,8 +385,9 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
     app = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": "GoalIQ: FPL Assistant",
-        "operatingSystem": "Android, iOS",
+        "name": "GoalIQ",
+        "operatingSystem": "Android, iOS, Web",
+        "identifier": "com.veikkoville.goaliq",
         "applicationCategory": "SportsApplication",
         "description": (
             "Free FPL assistant and football prediction app. Free FPL tools: "
@@ -470,7 +472,7 @@ def accuracy_dataset_ld(c: dict, page_url: str) -> dict:
             f"Every GoalIQ model prediction is logged before kickoff and "
             f"reconciled against the final result, with no edits afterwards. "
             f"Current aggregate: {fmt_pct(c['acc_pct_1x2'])} correct 1X2 results "
-            f"across {c['acc_n']} logged matches. Includes per-match win/draw/loss "
+            f"across {c['acc_n']} completed matches. Includes per-match win/draw/loss "
             f"probabilities, expected goals (xG) and reconciled outcomes."
         ),
         "url": page_url,
@@ -778,15 +780,15 @@ def update_index(c: dict) -> bool:
     s = INDEX_PATH.read_text(encoding="utf-8")
     chip = (
         f'<div class="num">{fmt_pct(c["acc_pct_1x2"])}</div>'
-        f'<div class="lbl">result accuracy across {c["acc_n"]} logged matches</div>'
+        f'<div class="lbl">result accuracy across {c["acc_n"]} completed matches</div>'
     )
     proof = (
         f"The model logs every prediction before kickoff. "
-        f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} matches played."
+        f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} completed matches."
     )
     trust = (
         f"Built on a model with {fmt_pct(c['acc_pct_1x2'])} correct 1X2 results "
-        f"across {c['acc_n']} logged matches, every prediction logged before kick-off."
+        f"across {c['acc_n']} completed matches, every prediction logged before kick-off."
     )
     new = re.sub(
         r"(<!-- GEN:ACC-CHIP-START -->).*?(<!-- GEN:ACC-CHIP-END -->)",
@@ -830,15 +832,15 @@ def update_predictions(c: dict) -> bool:
     s = PREDICTIONS_PATH.read_text(encoding="utf-8")
     chip = (
         f'<div class="num">{fmt_pct(c["acc_pct_1x2"])}</div>'
-        f'<div class="lbl">result accuracy across {c["acc_n"]} logged matches</div>'
+        f'<div class="lbl">result accuracy across {c["acc_n"]} completed matches</div>'
     )
     proof = (
         f"The model logs every prediction before kickoff. "
-        f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} matches played."
+        f"{fmt_pct(c['acc_pct_1x2'])} correct results across {c['acc_n']} completed matches."
     )
     trust = (
         f"Built on a model with {fmt_pct(c['acc_pct_1x2'])} correct 1X2 results "
-        f"across {c['acc_n']} logged matches, every prediction logged before kick-off."
+        f"across {c['acc_n']} completed matches, every prediction logged before kick-off."
     )
     new = re.sub(
         r"(<!-- GEN:ACC-CHIP-START -->).*?(<!-- GEN:ACC-CHIP-END -->)",
