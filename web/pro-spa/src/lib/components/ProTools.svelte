@@ -12,12 +12,14 @@
 	import Differentials from './Differentials.svelte';
 	import ComparePlayers from './ComparePlayers.svelte';
 	import Leaders from './Leaders.svelte';
+	import Value from './Value.svelte';
 
 	let { xp }: { xp: XpResponse } = $props();
 
 	const SEGMENTS: Segment[] = [
 		{ id: 'players', label: 'Players' },
 		{ id: 'myteam', label: 'My team' },
+		{ id: 'value', label: 'Value' },
 		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'differentials', label: 'Differentials' },
 		{ id: 'compare', label: 'Compare' }
@@ -39,6 +41,11 @@
 		<!-- #46: RateTeam premium={true} vain tilauksen takana → ei premium-vuotoa. -->
 		<section class="tool-card"><RateTeam premium={true} /></section>
 		<section class="tool-card"><TransferPlanner /></section>
+	</div>
+{:else if segment === 'value'}
+	<!-- #127: value + GK-parit (premium-haara → koko listat, #114-web-pariteetti) -->
+	<div id="panel-value" role="tabpanel" aria-labelledby="seg-value">
+		<section class="tool-card"><Value premium={true} /></section>
 	</div>
 {:else if segment === 'leaders'}
 	<!-- #124/#125: xG leaders + DefCon tracker (premium-haara → koko listat) -->

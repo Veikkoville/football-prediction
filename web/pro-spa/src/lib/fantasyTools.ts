@@ -18,6 +18,7 @@ export type FantasyTool =
 	| 'captain'
 	| 'differentials'
 	| 'compare'
+	| 'value'
 	| 'xg_leaders'
 	| 'defcon_leaders';
 
@@ -314,6 +315,49 @@ export function fetchDifferentials(
 
 export function fetchComparePlayers(ids: number[]): Promise<CompareResponse> {
 	return getTool(`/api/fantasy/compare?players=${ids.join(',')}`, 'compare');
+}
+
+/* ---------- #127: value + GK rotation pairs (#114-web-pariteetti) ---------- */
+
+export interface ValuePlayer {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: Pos | '?';
+	price: number;
+	owned_pct: number;
+	xp_horizon_total: number;
+	value: number;
+	fixture_swing: number;
+	swing_label: 'steady' | 'moderate' | 'swingy';
+}
+
+export interface GkPair {
+	avg_best_cs_pct: number;
+	combined_price: number;
+	gk_a: { id: number; web_name: string; team_short: string; price: number };
+	gk_b: { id: number; web_name: string; team_short: string; price: number };
+	gw_split: { gw: number; team_short: string; cs_pct: number }[];
+}
+
+export interface ValueResponse {
+	meta: {
+		available: boolean;
+		season: string | null;
+		gw: number | null;
+		horizon_gw: number | null;
+		generated_at: string | null;
+		note: string;
+	};
+	players: ValuePlayer[];
+	gk: {
+		meta: { available: boolean; gw?: number | null; horizon_gw?: number | null; note: string };
+		pairs: GkPair[];
+	};
+}
+
+export function fetchValue(): Promise<ValueResponse> {
+	return getTool('/api/fantasy/value', 'value');
 }
 
 /* ---------- #124/#125: xG leaders + DefCon tracker ---------- */
