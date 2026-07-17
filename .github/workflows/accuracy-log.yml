@@ -78,6 +78,11 @@ jobs:
       - name: Log pre-match + reconcile + recompute aggregate
         env:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          # #110: domestic-liigojen logaus on OPT-IN (🔒 GO-portti). Kytkentä:
+          # Settings → Secrets and variables → Actions → Variables →
+          # ACC_DOMESTIC_COMPETITIONS = "BSA" (myöh. esim. "BSA,PL,PD,BL1,SA,FL1,CL").
+          # Muuttuja puuttuu/tyhjä → domestic ei logaa mitään, WC-putki ennallaan.
+          ACC_DOMESTIC_COMPETITIONS: ${{ vars.ACC_DOMESTIC_COMPETITIONS }}
         run: python -m scripts.accuracy_pipeline run
 
       # Recent-form-sync (4.7.→, Villen GO): täytä pelattujen knockouttien

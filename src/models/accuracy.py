@@ -434,7 +434,13 @@ def compute_aggregate(
     rolling_window: int = DEFAULT_ROLLING_WINDOW,
     recent_n: int = DEFAULT_RECENT_N,
 ) -> dict:
-    """Laske GET /api/accuracy -aggregaatti logista."""
+    """Laske GET /api/accuracy -aggregaatti logista.
+
+    #110: all_time/rolling ovat BLENDED (kaikki kilpailut yhdessä — headline
+    kasvaa liigadatalla WC:n jälkeen). Lisäksi additiivinen by_competition-
+    erottelu (WC 61.8 % säilyy omana rivinään) → esitystapa on frontendin/
+    Villen valinta, data tukee molempia.
+    """
     rows = _resolved(log)
     pending = sum(1 for e in log["predictions"] if not e.get("result"))
 
@@ -443,12 +449,19 @@ def compute_aggregate(
     rolling = _metrics_block(rolling_rows)
     rolling["window"] = rolling_window
 
+    by_comp: dict[str, dict] = {}
+    for comp in sorted({e.get("competition") or "UNKNOWN" for e in rows}):
+        by_comp[comp] = _metrics_block(
+            [e for e in rows if (e.get("competition") or "UNKNOWN") == comp]
+        )
+
     return {
         "updated_at": _now_iso(),
         "logged_total": len(log["predictions"]),
         "pending": pending,
         "all_time": all_time,
         "rolling": rolling,
+        "by_competition": by_comp,
         "calibration": _calibration(rows),
         "recent": _recent_view(rows, recent_n),
     }

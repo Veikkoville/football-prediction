@@ -261,3 +261,179 @@ def test_wc_prematch_symmetry():
 
 def test_wc_prematch_non_wc_team_returns_none():
     assert acc.wc_prematch_prediction("Finland", "Brazil") is None
+
+
+# ---------------------------------------------------------------------------
+# #110: domestic-liigat — nimiresolveri, opt-in-portti, logaus, by_competition
+# ---------------------------------------------------------------------------
+BSA_MODEL_TEAMS = [
+    "Athletico-PR", "Atletico GO", "Atletico-MG", "Bahia", "Botafogo RJ",
+    "Bragantino", "Ceara", "Chapecoense-SC", "Corinthians", "Coritiba",
+    "Criciuma", "Cruzeiro", "Cuiaba", "Flamengo RJ", "Fluminense",
+    "Fortaleza", "Gremio", "Internacional", "Juventude", "Mirassol",
+    "Palmeiras", "Remo", "Santos", "Sao Paulo", "Sport Recife", "Vasco",
+    "Vitoria",
+]
+
+# Live-FD:n BSA-nimet (verifioitu /api/fixtures-listasta 17.7) → odotettu
+# mallinimi. Kattaa normalisointipolun (aksentit, klubi-tokenit) + overridet.
+BSA_FD_TO_MODEL = {
+    "Botafogo FR": "Botafogo RJ",
+    "CA Mineiro": "Atletico-MG",
+    "CA Paranaense": "Athletico-PR",
+    "Chapecoense AF": "Chapecoense-SC",
+    "Clube do Remo": "Remo",
+    "Coritiba FBC": "Coritiba",
+    "CR Flamengo": "Flamengo RJ",
+    "Cruzeiro EC": "Cruzeiro",
+    "EC Bahia": "Bahia",
+    "EC Vitória": "Vitoria",
+    "Fluminense FC": "Fluminense",
+    "Grêmio FBPA": "Gremio",
+    "Mirassol FC": "Mirassol",
+    "RB Bragantino": "Bragantino",
+    "São Paulo FC": "Sao Paulo",
+    "SC Corinthians Paulista": "Corinthians",
+    "SC Internacional": "Internacional",
+    "SE Palmeiras": "Palmeiras",
+    "Santos FC": "Santos",
+    "Fortaleza EC": "Fortaleza",
+    "CR Vasco da Gama": "Vasco",
+}
+
+
+def test_resolve_domestic_name_covers_live_bsa_names():
+    from scripts.accuracy_pipeline import (
+        DOMESTIC_COMPETITIONS, resolve_domestic_name,
+    )
+    overrides = DOMESTIC_COMPETITIONS["BSA"]["overrides"]
+    for fd_name, expected in BSA_FD_TO_MODEL.items():
+        got = resolve_domestic_name(fd_name, BSA_MODEL_TEAMS, overrides)
+        assert got == expected, f"{fd_name!r}: odotettiin {expected!r}, saatiin {got!r}"
+
+
+def test_resolve_domestic_name_unknown_returns_none():
+    from scripts.accuracy_pipeline import resolve_domestic_name
+    assert resolve_domestic_name("FC Nobody United", BSA_MODEL_TEAMS, {}) is None
+    # Chapecoense ilman overrideä EI saa arvautua väärin normalisoinnilla —
+    # "chapecoense" ⊆ "chapecoense sc" -osajoukko osuu yhteen kandidaattiin → OK,
+    # mutta moniselitteinen ei koskaan: kaksi kandidaattia → None.
+    assert resolve_domestic_name(
+        "Atletico", ["Atletico-MG", "Atletico GO"], {}
+    ) is None
+
+
+def test_enabled_domestic_codes_gating(monkeypatch):
+    from scripts import accuracy_pipeline as ap
+    monkeypatch.delenv("ACC_DOMESTIC_COMPETITIONS", raising=False)
+    assert ap.enabled_domestic_codes() == []          # oletus: OFF (GO-portti)
+    monkeypatch.setenv("ACC_DOMESTIC_COMPETITIONS", "")
+    assert ap.enabled_domestic_codes() == []
+    monkeypatch.setenv("ACC_DOMESTIC_COMPETITIONS", "bsa, PL ,TYPO")
+    assert ap.enabled_domestic_codes() == ["BSA", "PL"]  # typo ohitetaan
+
+
+def _fd_match(mid, home, away, utc, status="TIMED", score=None):
+    m = {
+        "id": mid, "status": status, "utcDate": utc,
+        "homeTeam": {"name": home}, "awayTeam": {"name": away},
+    }
+    if score is not None:
+        m["status"] = "FINISHED"
+        m["score"] = {"duration": "REGULAR",
+                      "fullTime": {"home": score[0], "away": score[1]}}
+    return m
+
+
+def test_log_domestic_matches_prematch_only_and_idempotent():
+    from datetime import datetime, timezone
+    from scripts.accuracy_pipeline import log_domestic_matches
+
+    now = datetime(2026, 7, 17, 12, 0, tzinfo=timezone.utc)
+    matches = [
+        _fd_match(1001, "EC Bahia", "Chapecoense AF", "2026-07-18T00:30:00Z"),
+        # jo alkanut → EI logata jälkikäteen
+        _fd_match(1002, "Fluminense FC", "RB Bragantino", "2026-07-17T00:30:00Z"),
+        # nimi joka ei resolvoidu → skip, ei kaatumista
+        _fd_match(1003, "FC Nobody United", "EC Bahia", "2026-07-19T00:30:00Z"),
+        # pelattu → ei logata
+        _fd_match(1004, "SE Palmeiras", "Cruzeiro EC", "2026-07-16T00:30:00Z",
+                  score=(2, 0)),
+    ]
+
+    def fake_predict(league, home, away):
+        assert league == "BRA-Serie A"
+        return {
+            "home_team": home, "away_team": away,
+            "p_home": 0.5, "p_draw": 0.3, "p_away": 0.2,
+            "xg_home": 1.4, "xg_away": 0.9,
+            "most_likely_score": "1-0", "predicted_winner": "home",
+        }
+
+    log = acc.empty_log()
+    added, skipped = log_domestic_matches(
+        log, "BSA", matches, BSA_MODEL_TEAMS, fake_predict, now=now)
+    assert added == 1 and skipped == 1
+    e = log["predictions"][0]
+    assert e["match_id"] == "fd-1001"
+    assert e["competition"] == "BSA"
+    assert e["league"] == "BRA-Serie A"
+    assert e["home_team"] == "Bahia"
+    assert e["away_team"] == "Chapecoense-SC"
+    assert e["predicted_winner"] == "home"
+
+    # idempotentti: toinen ajo ei duplikoi
+    added2, _ = log_domestic_matches(
+        log, "BSA", matches, BSA_MODEL_TEAMS, fake_predict, now=now)
+    assert added2 == 0
+    assert len(log["predictions"]) == 1
+
+
+def test_domestic_reconcile_via_combined_matches():
+    """WC-lokirivit + domestic-rivi reconciloituvat samasta yhdistelmälistasta
+    eikä WC-riveihin kosketa (fd-id:t uniikkeja)."""
+    from datetime import datetime, timezone
+    from scripts.accuracy_pipeline import cmd_reconcile, log_domestic_matches
+
+    now = datetime(2026, 7, 17, 12, 0, tzinfo=timezone.utc)
+    log = acc.empty_log()
+    # olemassa oleva WC-rivi (jo reconciloitu) — ei saa muuttua
+    acc.upsert_prediction(log, _entry("fd-500", "home", mls="2-1"))
+    acc.set_result(log, "fd-500", 2, 1)
+    wc_before = dict(log["predictions"][0]["result"])
+
+    matches = [_fd_match(1001, "EC Bahia", "Chapecoense AF",
+                         "2026-07-18T00:30:00Z")]
+
+    def fake_predict(league, home, away):
+        return {"home_team": home, "away_team": away,
+                "p_home": 0.5, "p_draw": 0.3, "p_away": 0.2,
+                "xg_home": 1.4, "xg_away": 0.9,
+                "most_likely_score": "1-0", "predicted_winner": "home"}
+
+    log_domestic_matches(log, "BSA", matches, BSA_MODEL_TEAMS, fake_predict,
+                         now=now)
+    # ottelu pelataan: FINISHED 90 min 1-1 → named winner home = miss
+    finished = [_fd_match(1001, "EC Bahia", "Chapecoense AF",
+                          "2026-07-18T00:30:00Z", score=(1, 1))]
+    cmd_reconcile(log, finished)
+    dom = next(e for e in log["predictions"] if e["match_id"] == "fd-1001")
+    assert dom["result"]["actual_outcome"] == "draw"
+    assert dom["result"]["hit_1x2"] is False
+    assert log["predictions"][0]["result"] == wc_before  # WC-rivi koskematon
+
+
+def test_aggregate_by_competition_split():
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("w1", "home", mls="2-1"))      # WC
+    acc.set_result(log, "w1", 2, 1)                                   # hit
+    e = _entry("b1", "away", mls="0-1")
+    e["competition"] = "BSA"
+    acc.upsert_prediction(log, e)
+    acc.set_result(log, "b1", 2, 0)                                   # miss
+    agg = acc.compute_aggregate(log)
+    assert agg["all_time"]["n"] == 2                                  # blended
+    assert agg["all_time"]["correct_1x2"] == 1
+    bc = agg["by_competition"]
+    assert bc["WC"]["n"] == 1 and bc["WC"]["correct_1x2"] == 1        # WC säilyy
+    assert bc["BSA"]["n"] == 1 and bc["BSA"]["correct_1x2"] == 0
