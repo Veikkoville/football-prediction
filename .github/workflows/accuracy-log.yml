@@ -100,11 +100,19 @@ jobs:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
         run: python -m scripts.backfill_knockout_results
 
+      # #119: ohjelmalliset ennustesivut prediction_logista (sama data jonka
+      # yllä oleva run juuri päivitti → sivu = lokattu pre-match-ennuste).
+      # continue-on-error: sivugen ei saa kaataa accuracy-lokia.
+      - name: Build programmatic prediction pages (#119)
+        continue-on-error: true
+        run: python -m scripts.build_prediction_pages
+
       - name: Commit + push to main (Render auto-deploy → /api/accuracy)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/prediction_log.json data/accuracy.json data/international_results.csv
+          git add predictions/ sitemap.xml predictions.html || true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
             exit 0
