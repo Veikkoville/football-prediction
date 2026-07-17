@@ -17,15 +17,20 @@
 	let { premium = false, onUpgrade }: { premium?: boolean; onUpgrade?: () => void } = $props();
 
 	const FREE_ROWS = 3;
+	const WINDOWS = [3, 5, 10];
 
 	let xg = $state<XgLeadersResponse | null>(null);
 	let defcon = $state<DefconLeadersResponse | null>(null);
 	let error = $state<string | null>(null);
 	let loading = $state(true);
+	// #137: pelimäärävalitsin (Wolfy: "more expansive to pick for more games")
+	let gameWindow = $state(5);
 
 	$effect(() => {
+		const w = gameWindow;
 		loading = true;
-		Promise.all([fetchXgLeaders(), fetchDefconLeaders()])
+		error = null;
+		Promise.all([fetchXgLeaders(w), fetchDefconLeaders(w)])
 			.then(([x, d]) => {
 				xg = x;
 				defcon = d;
@@ -54,9 +59,23 @@
 
 <h2>xG leaders</h2>
 <p class="muted">
-	Top expected-goals producers over each player's last {xg?.meta?.window ?? 5} games, from official
-	FPL match data.
+	Top expected-goals producers over each player's last {xg?.meta?.window ?? gameWindow} games, from
+	official FPL match data.
 </p>
+<!-- #137: pelimäärävalitsin — vaihtaa window-parametrin molemmille listoille -->
+<div class="window-row">
+	<span class="muted">Games:</span>
+	{#each WINDOWS as w (w)}
+		<button
+			type="button"
+			class="window-chip"
+			class:on={gameWindow === w}
+			onclick={() => (gameWindow = w)}
+		>
+			{w}
+		</button>
+	{/each}
+</div>
 {#if basisLabel}
 	<!-- Data-rajoitus ensiluokkaisena: basis-label aina näkyvissä -->
 	<p class="basis">{basisLabel}</p>
@@ -79,7 +98,8 @@
 						<th>Pos</th>
 						<th class="num">Price</th>
 						<th class="num"><abbr title="Expected goals per game over the window">xG/game</abbr></th>
-						<th class="num"><abbr title="Expected goals + assists per game">xGI/game</abbr></th>
+						<th class="num"><abbr title="Expected assists per game over the window">xA/game</abbr></th>
+						<th class="num"><abbr title="Expected goal involvements (goals + assists) per game">xGI/game</abbr></th>
 						<th class="num"><abbr title="Games played in the window (real sample size)">Games</abbr></th>
 					</tr>
 				</thead>
@@ -91,6 +111,7 @@
 							<td>{p.pos}</td>
 							<td class="num">{p.price.toFixed(1)}</td>
 							<td class="num strong">{p.xg_per_game.toFixed(2)}</td>
+							<td class="num">{p.xa_per_game.toFixed(2)}</td>
 							<td class="num">{p.xgi_per_game.toFixed(2)}</td>
 							<td class="num">{p.games}</td>
 						</tr>
@@ -103,8 +124,8 @@
 	<h2 class="dc-title">DefCon leaders</h2>
 	<p class="muted">
 		The most reliable defensive-contribution scorers over each player's last {defcon?.meta?.window ??
-			5} games. 2 pts when a defender reaches 10 CBIT (clearances, blocks, interceptions, tackles)
-		or a midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match.
+			gameWindow} games. 2 pts when a defender reaches 10 CBIT (clearances, blocks, interceptions,
+		tackles) or a midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match.
 	</p>
 	{#if dcVisible.length === 0}
 		<p class="muted">No data yet.</p>
@@ -163,6 +184,30 @@
 		font-weight: 600;
 		font-size: var(--step--1);
 		margin: 0 0 var(--s-3);
+	}
+	/* #137: pelimäärävalitsin */
+	.window-row {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+		margin: 0 0 var(--s-2);
+		font-size: var(--step--1);
+	}
+	.window-chip {
+		min-width: 36px;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+	}
+	.window-chip.on {
+		background: var(--giq-magenta);
+		border-color: var(--giq-magenta);
+		color: #fff;
 	}
 	.dc-title {
 		margin-top: var(--s-5);
