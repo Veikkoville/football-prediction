@@ -1,35 +1,48 @@
 {
-  "updated_at": "2026-07-17T21:56:08+00:00",
+  "updated_at": "2026-07-18T02:32:15+00:00",
   "logged_total": 304,
-  "pending": 202,
+  "pending": 199,
   "all_time": {
-    "n": 102,
-    "correct_1x2": 63,
-    "pct_1x2": 0.6176,
-    "decisive_n": 74,
-    "decisive_correct": 63,
-    "pct_decisive": 0.8514,
-    "exact_n": 54,
-    "exact_correct": 11,
-    "pct_exact": 0.2037,
-    "brier": 0.4829,
-    "brier_n": 54
+    "n": 105,
+    "correct_1x2": 65,
+    "pct_1x2": 0.619,
+    "decisive_n": 76,
+    "decisive_correct": 65,
+    "pct_decisive": 0.8553,
+    "exact_n": 57,
+    "exact_correct": 12,
+    "pct_exact": 0.2105,
+    "brier": 0.4818,
+    "brier_n": 57
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 61,
-    "pct_1x2": 0.61,
-    "decisive_n": 72,
-    "decisive_correct": 61,
-    "pct_decisive": 0.8472,
-    "exact_n": 54,
-    "exact_correct": 11,
-    "pct_exact": 0.2037,
-    "brier": 0.4829,
-    "brier_n": 54,
+    "correct_1x2": 63,
+    "pct_1x2": 0.63,
+    "decisive_n": 73,
+    "decisive_correct": 63,
+    "pct_decisive": 0.863,
+    "exact_n": 57,
+    "exact_correct": 12,
+    "pct_exact": 0.2105,
+    "brier": 0.4818,
+    "brier_n": 57,
     "window": 100
   },
   "by_competition": {
+    "BSA": {
+      "n": 3,
+      "correct_1x2": 2,
+      "pct_1x2": 0.6667,
+      "decisive_n": 2,
+      "decisive_correct": 2,
+      "pct_decisive": 1.0,
+      "exact_n": 3,
+      "exact_correct": 1,
+      "pct_exact": null,
+      "brier": null,
+      "brier_n": 3
+    },
     "WC": {
       "n": 102,
       "correct_1x2": 63,
@@ -52,16 +65,16 @@
       "n": 10
     },
     {
-      "bin_mid": 0.1516,
-      "predicted": 0.1516,
-      "actual": 0.0417,
-      "n": 24
+      "bin_mid": 0.1524,
+      "predicted": 0.1524,
+      "actual": 0.037,
+      "n": 27
     },
     {
-      "bin_mid": 0.2572,
-      "predicted": 0.2572,
-      "actual": 0.1833,
-      "n": 60
+      "bin_mid": 0.2558,
+      "predicted": 0.2558,
+      "actual": 0.1905,
+      "n": 63
     },
     {
       "bin_mid": 0.3416,
@@ -76,10 +89,10 @@
       "n": 18
     },
     {
-      "bin_mid": 0.5333,
-      "predicted": 0.5333,
-      "actual": 0.75,
-      "n": 8
+      "bin_mid": 0.5393,
+      "predicted": 0.5393,
+      "actual": 0.7,
+      "n": 10
     },
     {
       "bin_mid": 0.6387,
@@ -88,10 +101,10 @@
       "n": 12
     },
     {
-      "bin_mid": 0.7283,
-      "predicted": 0.7283,
+      "bin_mid": 0.726,
+      "predicted": 0.726,
       "actual": 1.0,
-      "n": 6
+      "n": 7
     },
     {
       "bin_mid": 0.8586,
@@ -101,6 +114,48 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-17",
+      "home_team": "Mirassol",
+      "away_team": "Gremio",
+      "predicted_winner": "home",
+      "p_winner": 0.5479,
+      "most_likely_score": "1-0",
+      "actual_score": "2-1",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
+    {
+      "date": "2026-07-17",
+      "home_team": "Fluminense",
+      "away_team": "Bragantino",
+      "predicted_winner": "home",
+      "p_winner": 0.5781,
+      "most_likely_score": "1-0",
+      "actual_score": "1-1",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
+    {
+      "date": "2026-07-17",
+      "home_team": "Bahia",
+      "away_team": "Chapecoense-SC",
+      "predicted_winner": "home",
+      "p_winner": 0.7118,
+      "most_likely_score": "2-0",
+      "actual_score": "2-0",
+      "actual_outcome": "home",
+      "hit_1x2": true,
+      "exact_hit": true,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-07-15",
       "home_team": "England",
@@ -338,48 +393,6 @@
       "exact_hit": false,
       "duration": "EXTRA_TIME",
       "regular_score": "1-1"
-    },
-    {
-      "date": "2026-07-03",
-      "home_team": "Australia",
-      "away_team": "Egypt",
-      "predicted_winner": "home",
-      "p_winner": 0.4286,
-      "most_likely_score": "1-0",
-      "actual_score": "1-1",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": false,
-      "duration": "PENALTY_SHOOTOUT",
-      "regular_score": "1-1"
-    },
-    {
-      "date": "2026-07-02",
-      "home_team": "Portugal",
-      "away_team": "Croatia",
-      "predicted_winner": "home",
-      "p_winner": 0.4727,
-      "most_likely_score": "1-1",
-      "actual_score": "2-1",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-02",
-      "home_team": "Spain",
-      "away_team": "Austria",
-      "predicted_winner": "home",
-      "p_winner": 0.6881,
-      "most_likely_score": "2-0",
-      "actual_score": "3-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
     }
   ]
 }
