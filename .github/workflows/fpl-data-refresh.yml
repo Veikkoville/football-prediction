@@ -139,7 +139,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json
+          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json
           if git diff --cached --quiet; then
             echo "Ei muutoksia (data ennallaan) — ohitetaan commit."
             exit 0
