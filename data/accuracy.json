@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-18T21:53:06+00:00",
+  "updated_at": "2026-07-19T02:46:43+00:00",
   "logged_total": 304,
-  "pending": 199,
+  "pending": 198,
   "all_time": {
-    "n": 105,
+    "n": 106,
     "correct_1x2": 65,
-    "pct_1x2": 0.619,
-    "decisive_n": 76,
+    "pct_1x2": 0.6132,
+    "decisive_n": 77,
     "decisive_correct": 65,
-    "pct_decisive": 0.8553,
-    "exact_n": 57,
+    "pct_decisive": 0.8442,
+    "exact_n": 58,
     "exact_correct": 12,
-    "pct_exact": 0.2105,
-    "brier": 0.4818,
-    "brier_n": 57
+    "pct_exact": 0.2069,
+    "brier": 0.4866,
+    "brier_n": 58
   },
   "rolling": {
     "n": 100,
     "correct_1x2": 63,
     "pct_1x2": 0.63,
-    "decisive_n": 73,
+    "decisive_n": 74,
     "decisive_correct": 63,
-    "pct_decisive": 0.863,
-    "exact_n": 57,
+    "pct_decisive": 0.8514,
+    "exact_n": 58,
     "exact_correct": 12,
-    "pct_exact": 0.2105,
-    "brier": 0.4818,
-    "brier_n": 57,
+    "pct_exact": 0.2069,
+    "brier": 0.4866,
+    "brier_n": 58,
     "window": 100
   },
   "by_competition": {
@@ -44,17 +44,17 @@
       "brier_n": 3
     },
     "WC": {
-      "n": 102,
+      "n": 103,
       "correct_1x2": 63,
-      "pct_1x2": 0.6176,
-      "decisive_n": 74,
+      "pct_1x2": 0.6117,
+      "decisive_n": 75,
       "decisive_correct": 63,
-      "pct_decisive": 0.8514,
-      "exact_n": 54,
+      "pct_decisive": 0.84,
+      "exact_n": 55,
       "exact_correct": 11,
-      "pct_exact": 0.2037,
-      "brier": 0.4829,
-      "brier_n": 54
+      "pct_exact": 0.2,
+      "brier": 0.4879,
+      "brier_n": 55
     }
   },
   "calibration": [
@@ -71,16 +71,16 @@
       "n": 27
     },
     {
-      "bin_mid": 0.2558,
-      "predicted": 0.2558,
-      "actual": 0.1905,
-      "n": 63
+      "bin_mid": 0.2564,
+      "predicted": 0.2564,
+      "actual": 0.2031,
+      "n": 64
     },
     {
-      "bin_mid": 0.3416,
-      "predicted": 0.3416,
-      "actual": 0.3333,
-      "n": 21
+      "bin_mid": 0.3428,
+      "predicted": 0.3428,
+      "actual": 0.3043,
+      "n": 23
     },
     {
       "bin_mid": 0.4557,
@@ -114,6 +114,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-18",
+      "home_team": "France",
+      "away_team": "England",
+      "predicted_winner": "home",
+      "p_winner": 0.4,
+      "most_likely_score": "1-1",
+      "actual_score": "4-6",
+      "actual_outcome": "away",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-07-17",
       "home_team": "Mirassol",
@@ -379,20 +393,6 @@
       "exact_hit": false,
       "duration": null,
       "regular_score": null
-    },
-    {
-      "date": "2026-07-03",
-      "home_team": "Argentina",
-      "away_team": "Cape Verde Islands",
-      "predicted_winner": "home",
-      "p_winner": 0.8873,
-      "most_likely_score": "2-0",
-      "actual_score": "3-2",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": false,
-      "duration": "EXTRA_TIME",
-      "regular_score": "1-1"
     }
   ]
 }
