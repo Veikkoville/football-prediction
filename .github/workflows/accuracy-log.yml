@@ -103,7 +103,10 @@ jobs:
       # #118: fpl/index/predictions-accuracy-luvut tuoreiksi joka ajolla
       # (juurisyy #99-staleuteen oli viikkocadenssi — bake on halpa, stdlib-only).
       # Fail-safe: builder exit 2 jos FPL-data ei available → continue-on-error.
+      # #TRACK-STALE: id:t + häntävahti alla — continue-on-error piilotti
+      # SyntaxErrorin 2 vrk (sivut jäätyivät 61.8/102:een vaikka run oli vihreä).
       - name: Rebake accuracy numbers into web pages (#118)
+        id: bake_fpl
         continue-on-error: true
         run: python -m scripts.build_fpl_page
 
@@ -111,11 +114,13 @@ jobs:
       # yllä oleva run juuri päivitti → sivu = lokattu pre-match-ennuste).
       # continue-on-error: sivugen ei saa kaataa accuracy-lokia.
       - name: Build programmatic prediction pages (#119)
+        id: bake_predictions
         continue-on-error: true
         run: python -m scripts.build_prediction_pages
 
       # #120: FPL-long-tail-sivut (best captain / differentials / price changes)
       - name: Build FPL long-tail pages (#120)
+        id: bake_longtail
         continue-on-error: true
         run: python -m scripts.build_fpl_longtail
 
@@ -148,3 +153,17 @@ jobs:
           done
           echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
           exit 1
+
+      # #TRACK-STALE-vahti: punaa runin jos JOKIN sivubuilderi failasi — AJETAAN
+      # commitin JÄLKEEN, joten data-logaus/commit ei esty (continue-on-error
+      # säilyy buildereissa), mutta failure ei enää piiloudu vihreän runin taakse.
+      # Tausta: build_fpl_page.py:n SyntaxError (py3.11 vs lokaali 3.14) kaatoi
+      # kaikki 3 builderia 17.–19.7 eikä kukaan huomannut → sivut 4 ottelua jäljessä.
+      - name: Page-build health (fail loud, data jo committoitu)
+        if: always()
+        run: |
+          fail=0
+          [ "${{ steps.bake_fpl.outcome }}" = "failure" ] && { echo "::error::build_fpl_page FAILAA — sivut eivät päivity (katso stepin loki)"; fail=1; }
+          [ "${{ steps.bake_predictions.outcome }}" = "failure" ] && { echo "::error::build_prediction_pages FAILAA"; fail=1; }
+          [ "${{ steps.bake_longtail.outcome }}" = "failure" ] && { echo "::error::build_fpl_longtail FAILAA"; fail=1; }
+          exit $fail

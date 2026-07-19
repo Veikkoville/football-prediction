@@ -462,6 +462,13 @@ def record_table_html(preds: list[dict], c: dict) -> str:
             star = "*"
             has_nonregular = True
         date_txt = e.get("date") or "Group stage"
+        # HUOM: ei backslasheja f-string-lausekkeisiin — CI ajaa Python 3.11:tä
+        # (sallittu vasta 3.12+); tämä rivi kaatoi kaikki sivubuilderit 17.–19.7.
+        hit_cell = (
+            '<span class="rec-hit">&#10003;</span>'
+            if hit
+            else '<span class="rec-miss">&#10007;</span>'
+        )
         rows.append(
             f'<tr data-comp="{escape(code)}">'
             f'<td class="num">{escape(date_txt)}</td>'
@@ -470,7 +477,7 @@ def record_table_html(preds: list[dict], c: dict) -> str:
             f'<td><strong>{pick_sym}</strong> {escape(pick_name)}'
             f'<span class="rec-pct">{_pick_pct(e)}</span></td>'
             f'<td class="num">{escape(score)}{star}</td>'
-            f'<td class="num">{"<span class=\"rec-hit\">&#10003;</span>" if hit else "<span class=\"rec-miss\">&#10007;</span>"}</td>'
+            f'<td class="num">{hit_cell}</td>'
             "</tr>"
         )
 
