@@ -10,7 +10,12 @@ services:
     plan: starter               # #109: tuotanto ON Starterilla (aina-päällä; main.py nojaa
                                 # siihen mm. esirakennetussa WC-mallissa) — free tässä olisi
                                 # antanut Blueprint-synkin pudottaa palvelun freehin (cold startit)
-    buildCommand: pip install -r requirements.txt
+    # #86-jatko (19.7.2026): slim + pinnattu API-riippuvuuslista. requirements.txt
+    # asensi ENNEN koko keittiön (streamlit/jupyter/lightgbm/optuna/… pinnaamattomina)
+    # → yksikin upstream-julkaisu kaatoi render-daily-deploy-hookin buildin. Nyt vain
+    # API:n todelliset ajonaikaiset depit, versiolukittuina cp311-wheeleille. Perustelut
+    # + ylläpito: ks. requirements-api.txt.
+    buildCommand: pip install -r requirements-api.txt
     startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
     autoDeploy: true            # Koodi-push -> uusi deploy (ks. buildFilter alla)
