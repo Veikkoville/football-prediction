@@ -68,11 +68,20 @@
 				.map((p, i) => [p.id, i + 1])
 		)
 	);
-	let pool = $derived(
-		data.players
+	// #145: client-side pelaajahaku — nimi TAI team-short ("ARS"), osaosuma.
+	let search = $state('');
+	let pool = $derived.by(() => {
+		const q = search.trim().toLowerCase();
+		return data.players
 			.filter((p) => pos === 'All' || p.pos === pos)
-			.toSorted(SORTS[sortBy].cmp)
-	);
+			.filter(
+				(p) =>
+					!q ||
+					p.web_name.toLowerCase().includes(q) ||
+					p.team_short.toLowerCase().includes(q)
+			)
+			.toSorted(SORTS[sortBy].cmp);
+	});
 	// Joukkueittain-ryhmittely: seurat aakkosin, pelaajat valitussa sortissa.
 	let groups = $derived.by(() => {
 		if (!groupByTeam) return [{ team: null as string | null, players: pool }];
@@ -154,7 +163,25 @@
 		<input type="checkbox" bind:checked={groupByTeam} />
 		Group by team
 	</label>
+	<div class="search-box">
+		<label for="player-search">Search</label>
+		<input
+			id="player-search"
+			type="search"
+			placeholder="Player or team (e.g. ARS)"
+			bind:value={search}
+		/>
+		{#if search}
+			<button type="button" class="search-clear" onclick={() => (search = '')}
+				aria-label="Clear search">&times;</button
+			>
+		{/if}
+	</div>
 </div>
+
+{#if pool.length === 0}
+	<p class="muted">No players match.</p>
+{/if}
 
 <div class="table-wrap tall">
 	<table>
@@ -194,10 +221,15 @@
 						<td class="num muted">{rankById.get(p.id)}</td>
 						<td
 							>{p.web_name}{#if p.data_basis === 'limited_history' || p.data_basis === 'no_history'}
-								<!-- #143-WEB: datapohja-rehellisyysmerkintä (pariteetti mobiiliin;
+								<!-- #143-WEB/#146: datapohja-rehellisyysmerkintä (pariteetti
+								     mobiiliin: sama tagi + sama selite tooltipissa;
 								     pl_history = ei labelia, puuttuva kenttä = ei mitään) -->
-								<span class="basis-tag"
-									>{p.data_basis === 'no_history' ? 'no PL data' : 'thin PL sample'}</span
+								<span
+									class="basis-tag"
+									title={p.data_basis === 'no_history'
+										? 'No Premier League data for this player yet, this is a position-based estimate.'
+										: 'The model has little Premier League history for this player yet, so treat this projection as less certain.'}
+									>{p.data_basis === 'no_history' ? 'No PL data yet' : 'Limited data'}</span
 								>{/if}</td
 						>
 						<td>{p.team_short}</td>
@@ -253,10 +285,10 @@
 					(<span class="conf-text conf-{selected.minutes_confidence}"
 						>{CONF_LABEL[selected.minutes_confidence]} confidence</span
 					>){/if}. Model-based estimate; confidence reflects sample size and rotation
-				stability.{#if selected.data_basis === 'limited_history'}{' '}Thin PL sample:
-					the estimate leans on the position prior more than this player's own
-					data.{:else if selected.data_basis === 'no_history'}{' '}No PL data yet: the
-					estimate is the position prior.{/if}
+				stability.{#if selected.data_basis === 'limited_history'}{' '}Limited data:
+					the model has little Premier League history for this player yet, so treat
+					this projection as less certain.{:else if selected.data_basis === 'no_history'}{' '}No
+					PL data yet: this is a position-based estimate.{/if}
 			</p>
 		{/if}
 	{/if}
@@ -337,12 +369,32 @@
 	.minutes-line {
 		margin-top: var(--s-3);
 	}
-	/* #143-WEB: datapohja-rehellisyysmerkintä nimen perässä (hillitty) */
+	/* #143-WEB: datapohja-rehellisyysmerkintä nimen perässä (hillitty).
+	   #146: title-tooltip selittää — cursor: help vihjaa siitä. */
 	.basis-tag {
 		margin-left: 6px;
 		font-size: 0.72em;
 		color: var(--text-muted);
 		opacity: 0.8;
 		white-space: nowrap;
+		cursor: help;
+		text-decoration: underline dotted;
+	}
+	/* #145: hakukenttä controls-riviin */
+	.search-box {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.search-box input {
+		min-width: 180px;
+	}
+	.search-clear {
+		background: none;
+		border: none;
+		color: var(--text-muted);
+		font-size: 16px;
+		cursor: pointer;
+		padding: 2px 6px;
 	}
 </style>
