@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-07-19T21:54:04+00:00",
+  "updated_at": "2026-07-20T02:58:58+00:00",
   "logged_total": 304,
-  "pending": 198,
+  "pending": 197,
   "all_time": {
-    "n": 106,
+    "n": 107,
     "correct_1x2": 65,
-    "pct_1x2": 0.6132,
+    "pct_1x2": 0.6075,
     "decisive_n": 77,
     "decisive_correct": 65,
     "pct_decisive": 0.8442,
-    "exact_n": 58,
+    "exact_n": 59,
     "exact_correct": 12,
-    "pct_exact": 0.2069,
-    "brier": 0.4866,
-    "brier_n": 58
+    "pct_exact": 0.2034,
+    "brier": 0.4902,
+    "brier_n": 59
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 63,
-    "pct_1x2": 0.63,
-    "decisive_n": 74,
-    "decisive_correct": 63,
-    "pct_decisive": 0.8514,
-    "exact_n": 58,
+    "correct_1x2": 62,
+    "pct_1x2": 0.62,
+    "decisive_n": 73,
+    "decisive_correct": 62,
+    "pct_decisive": 0.8493,
+    "exact_n": 59,
     "exact_correct": 12,
-    "pct_exact": 0.2069,
-    "brier": 0.4866,
-    "brier_n": 58,
+    "pct_exact": 0.2034,
+    "brier": 0.4902,
+    "brier_n": 59,
     "window": 100
   },
   "by_competition": {
@@ -44,17 +44,17 @@
       "brier_n": 3
     },
     "WC": {
-      "n": 103,
+      "n": 104,
       "correct_1x2": 63,
-      "pct_1x2": 0.6117,
+      "pct_1x2": 0.6058,
       "decisive_n": 75,
       "decisive_correct": 63,
       "pct_decisive": 0.84,
-      "exact_n": 55,
+      "exact_n": 56,
       "exact_correct": 11,
-      "pct_exact": 0.2,
-      "brier": 0.4879,
-      "brier_n": 55
+      "pct_exact": 0.1964,
+      "brier": 0.4916,
+      "brier_n": 56
     }
   },
   "calibration": [
@@ -77,10 +77,10 @@
       "n": 64
     },
     {
-      "bin_mid": 0.3428,
-      "predicted": 0.3428,
-      "actual": 0.3043,
-      "n": 23
+      "bin_mid": 0.3417,
+      "predicted": 0.3417,
+      "actual": 0.3077,
+      "n": 26
     },
     {
       "bin_mid": 0.4557,
@@ -114,6 +114,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-19",
+      "home_team": "Spain",
+      "away_team": "Argentina",
+      "predicted_winner": "home",
+      "p_winner": 0.3582,
+      "most_likely_score": "1-1",
+      "actual_score": "1-0",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": "EXTRA_TIME",
+      "regular_score": "0-0"
+    },
     {
       "date": "2026-07-18",
       "home_team": "France",
@@ -374,20 +388,6 @@
       "p_winner": 0.8472,
       "most_likely_score": "2-0",
       "actual_score": "1-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-03",
-      "home_team": "Switzerland",
-      "away_team": "Algeria",
-      "predicted_winner": "home",
-      "p_winner": 0.5367,
-      "most_likely_score": "1-1",
-      "actual_score": "2-0",
       "actual_outcome": "home",
       "hit_1x2": true,
       "exact_hit": false,
