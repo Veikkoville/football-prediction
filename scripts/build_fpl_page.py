@@ -1182,6 +1182,49 @@ def update_predictions(c: dict, preds: list[dict]) -> bool:
     return False
 
 
+WC_HUB_PATH = ROOT / "world-cup-2026-predictions.html"
+
+
+def update_wc_recap(acc: dict) -> bool:
+    """#140: WC-recap-hubin GEN:WCRECAP-lohko accuracy.json:sta (ei kovakoodattuja
+    prosentteja sivulla, vrt. #118). Hub on pysyvä conviction-asetti — luvut
+    tulevat by_competition.WC:stä joka on jäädytetty (turnaus ohi) mutta
+    regradaus/normimuutos päivittyy tänne automaattisesti."""
+    if not WC_HUB_PATH.exists():
+        return False
+    wc = (acc.get("by_competition") or {}).get("WC") or {}
+    n = wc.get("n")
+    if not n:
+        return False
+    # accuracy.json tallentaa osuudet 0..1 — fmt_pct odottaa 0..100 (kuten c:n
+    # acc_pct_1x2, jonka build_context kertoo sadalla).
+    pct_1x2 = (wc.get("pct_1x2") or 0.0) * 100.0
+    pct_dec = (wc.get("pct_decisive") or 0.0) * 100.0
+    block = (
+        '<div class="statrow">'
+        f'<div class="stat"><div class="num">{fmt_pct(pct_1x2)}</div>'
+        f'<div class="lbl">correct 1X2 results across all {n} completed '
+        "World Cup matches "
+        f'({wc.get("correct_1x2")} of {n})</div></div>'
+        f'<div class="stat"><div class="num">{fmt_pct(pct_dec)}</div>'
+        f'<div class="lbl">accuracy in decisive matches '
+        f'({wc.get("decisive_correct")} of {wc.get("decisive_n")} that did not '
+        "end in a draw)</div></div>"
+        "</div>"
+        '<p class="meta">Graded on the official final result after extra time; '
+        "penalty shootouts count as draws. Numbers update automatically from "
+        "the same public log as the track record page.</p>"
+    )
+    s = WC_HUB_PATH.read_text(encoding="utf-8")
+    new = re.sub(
+        r"(<!-- GEN:WCRECAP-START -->).*?(<!-- GEN:WCRECAP-END -->)",
+        lambda m: m.group(1) + block + m.group(2), s, flags=re.S)
+    if new != s:
+        WC_HUB_PATH.write_text(new, encoding="utf-8")
+        return True
+    return False
+
+
 # ---------------------------------------------------------------------------
 # 6. Sitemap lastmod
 # ---------------------------------------------------------------------------
@@ -1253,6 +1296,7 @@ def main() -> None:
     sitemap_changed = update_sitemap(c["iso_date"])
     index_changed = update_index(c)
     predictions_changed = update_predictions(c, preds)
+    wc_recap_changed = update_wc_recap(acc)
 
     print("=" * 64)
     print("FPL-LANDING BAKE OK")
@@ -1261,6 +1305,7 @@ def main() -> None:
     print(f"  sitemap.xml       : {'päivitetty' if sitemap_changed else 'ei muutosta'}")
     print(f"  index.html        : {'accuracy-markerit päivitetty' if index_changed else 'ei muutosta'}")
     print(f"  predictions.html  : {'accuracy-markerit päivitetty' if predictions_changed else 'ei muutosta'}")
+    print(f"  wc-recap-hub      : {'WCRECAP-markerit päivitetty' if wc_recap_changed else 'ei muutosta'}")
     print(f"  GW                : {c['next_gw']} ({c['gw_label']})")
     print(f"  CS-rivejä         : {len(c['cs_rows'])}")
     print(f"  FDR-rivejä        : {len(c['fdr_rows'])} x {len(c['gws'])} GW")
