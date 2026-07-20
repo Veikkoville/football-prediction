@@ -12,8 +12,8 @@ Kolme vaihetta, kaikki idempotentteja:
              logattuihin ennusteisiin → laske aggregaatti uudelleen.
   run        log + reconcile (oletus päivittäisajoon).
   regrade    Re-gradaa jo reconciloidut ottelut nykyisellä normilla.
-             Gradausnormi = FT-AET (Villen päätös 20.7): virallinen
-             lopputulos jatkoajan jälkeen; rankkarikisa = tasapeli.
+             Gradausnormi = 90 MIN (Villen päätös 20.7 ilta): pudotuspeli
+             joka oli tasan täysajalla = tasapeli (ET JA pilkut).
 
 Aja repojuuresta:
   python -m scripts.accuracy_pipeline run        # päivittäinen
@@ -395,11 +395,11 @@ def log_domestic_matches(
 
 
 def _disp_score(m: dict) -> tuple[int, int] | None:
-    """Virallinen FT-AET-tulos ilman rangaistuspotkuja (reg + jatkoaika).
+    """NÄYTETTÄVÄ FT-tulos ilman rangaistuspotkuja (reg + jatkoaika).
 
-    FT-AET-normi (20.7): tämä on myös GRADAUSTULOS — 1X2/exact gradataan
-    virallisella lopputuloksella. 90 min regularTime (_regular_score) menee
-    vain näyttöannotaatioon ("1-0 (a.e.t.)").
+    HUOM: tämä on näyttötulos, EI gradaustulos — 1X2/exact-gradaus nojaa
+    90 min regularTime-tulokseen (_regular_score), Villen 20.7-normi:
+    täysajalla tasan ollut pudotuspeli = tasapeli.
     """
     score = m.get("score") or {}
     ft = score.get("fullTime") or {}
@@ -415,7 +415,7 @@ def _disp_score(m: dict) -> tuple[int, int] | None:
 
 
 def _regular_score(m: dict) -> tuple[int, int] | None:
-    """90 min (score.regularTime) -tulos näyttöannotaatioon. None jos puuttuu."""
+    """90 min (score.regularTime) -tulos gradausta varten. None jos puuttuu."""
     reg = (m.get("score") or {}).get("regularTime") or {}
     h, a = reg.get("home"), reg.get("away")
     if h is None or a is None:
@@ -424,16 +424,16 @@ def _regular_score(m: dict) -> tuple[int, int] | None:
 
 
 def _grading_kwargs(m: dict, mid: str) -> dict:
-    """duration + 90 min -annotaatiotulos set_result/regrade_resultille."""
+    """duration + 90 min -gradaustulos set_result/regrade_resultille."""
     duration = (m.get("score") or {}).get("duration") or "REGULAR"
     if duration == "REGULAR":
         return {}
     reg = _regular_score(m)
     if reg is None:
-        # football-data ei tarjonnut regularTimea → duration-lippu kirjataan
-        # ilman 90 min -annotaatiota (gradaus nojaa joka tapauksessa FT-AET:iin).
+        # football-data ei tarjonnut regularTimea → gradataan näyttötuloksella,
+        # mutta EI hiljaa: tämä inflatoisi ET-voitot takaisin osumiksi.
         print(f"VAROITUS: {mid} duration={duration} mutta regularTime puuttuu "
-              f"— 90 min -annotaatio jää pois.")
+              f"— gradataan näyttötuloksella (tarkista käsin).")
         return {"duration": duration}
     return {"duration": duration, "regular_home": reg[0], "regular_away": reg[1]}
 

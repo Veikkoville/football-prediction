@@ -131,7 +131,7 @@
  "@context": "https://schema.org",
  "@type": "Dataset",
  "name": "GoalIQ football prediction accuracy log (pre-match, publicly tracked)",
- "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 65.4% correct 1X2 results across 107 completed matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
+ "description": "Every GoalIQ model prediction is logged before kickoff and reconciled against the final result, with no edits afterwards. Current aggregate: 60.8% correct 1X2 results across 107 completed matches. Includes per-match win/draw/loss probabilities, expected goals (xG) and reconciled outcomes.",
  "url": "https://goaliq.app/",
  "distribution": {
   "@type": "DataDownload",
@@ -473,10 +473,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
          GEN:ACC-CHIP-markerit kuin ennen -> accuracy-botti pitaa luvun tuoreena
          ilman builder-muutoksia (sama lahde+tahti kuin fpl.html). -->
     <div class="tr-hero">
-      <!-- GEN:ACC-CHIP-START --><div class="num">65.4%</div><div class="lbl">result accuracy across 107 completed matches, all competitions</div><!-- GEN:ACC-CHIP-END -->
+      <!-- GEN:ACC-CHIP-START --><div class="num">60.8%</div><div class="lbl">result accuracy across 107 completed matches, all competitions</div><!-- GEN:ACC-CHIP-END -->
       <div class="tr-note">Every prediction logged before kick-off, publicly tracked. <a href="/predictions#record">See the full record &rarr;</a> &middot; <a href="fpl.html">See the tools it powers &rarr;</a></div>
       <!-- #111: per-kilpailu-erottelu (build_fpl_page.py tayttaa 3 h valein) -->
-      <!-- GEN:ACC-BYCOMP-START --><style>.bycomp{margin:14px 0 4px;max-width:520px;}.bycomp-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-bottom:6px;}.bycomp-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid rgba(128,128,128,.25);font-size:15px;}.bycomp-name{flex:1;font-weight:600;}.bycomp-pct{font-weight:800;font-variant-numeric:tabular-nums;}.bycomp-n{opacity:.65;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;}</style><div class="bycomp" aria-label="Accuracy by competition"><div class="bycomp-title">By competition</div><div class="bycomp-row"><span class="bycomp-name">World Cup 2026</span><span class="bycomp-pct">65.4%</span><span class="bycomp-n">68 of 104</span></div><div class="bycomp-row"><span class="bycomp-name">Brasileirão Série A</span><span class="bycomp-pct">66.7%</span><span class="bycomp-n">2 of 3</span></div></div><!-- GEN:ACC-BYCOMP-END -->
+      <!-- GEN:ACC-BYCOMP-START --><style>.bycomp{margin:14px 0 4px;max-width:520px;}.bycomp-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-bottom:6px;}.bycomp-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid rgba(128,128,128,.25);font-size:15px;}.bycomp-name{flex:1;font-weight:600;}.bycomp-pct{font-weight:800;font-variant-numeric:tabular-nums;}.bycomp-n{opacity:.65;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;}</style><div class="bycomp" aria-label="Accuracy by competition"><div class="bycomp-title">By competition</div><div class="bycomp-row"><span class="bycomp-name">World Cup 2026</span><span class="bycomp-pct">60.6%</span><span class="bycomp-n">63 of 104</span></div><div class="bycomp-row"><span class="bycomp-name">Brasileirão Série A</span><span class="bycomp-pct">66.7%</span><span class="bycomp-n">2 of 3</span></div></div><!-- GEN:ACC-BYCOMP-END -->
     </div>
     <div class="stat-strip">
       <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
@@ -520,7 +520,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </ul>
     <div class="pricing-cta">
       <a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing">Start Premium &mdash; &euro;25/year</a>
-      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 65.4% correct 1X2 results across 107 completed matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
+      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 60.8% correct 1X2 results across 107 completed matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
       <p class="cta-note">Clean sheet probabilities, fixture difficulty, rate my team with a captain pick, and price watch stay free on the web.</p>
     </div>
   </div>
@@ -545,7 +545,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <span class="team">Published track record</span>
         <span style="color:var(--muted);font-size:13px;">hits and misses</span>
       </div>
-      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 65.4% correct results across 107 completed matches.<!-- GEN:ACC-PROOF-END --></p>
+      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 60.8% correct results across 107 completed matches.<!-- GEN:ACC-PROOF-END --></p>
       <p style="margin-top:12px;"><a href="/predictions#record" style="color:var(--teal-ink);font-weight:700;">See the full record →</a></p>
     </div>
   </div>

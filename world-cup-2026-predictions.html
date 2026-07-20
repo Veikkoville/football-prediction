@@ -62,7 +62,7 @@
       "name": "How accurate was GoalIQ's model at the World Cup 2026?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Every World Cup 2026 prediction was logged before kickoff and graded against the official final result after extra time, with penalty shootouts counting as draws. The full per-match record, hits and misses included, is public at goaliq.app/predictions."
+        "text": "Every World Cup 2026 prediction was logged before kickoff. Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result. The full per-match record, hits and misses included, is public at goaliq.app/predictions."
       }
     },
     {
@@ -151,13 +151,13 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 
   <h1>World Cup 2026 <span>Predictions</span>: how our model did</h1>
   <p class="lede">GoalIQ's AI model logged a prediction for every World Cup 2026 match before kickoff, publicly, with no edits afterwards. The tournament is over: Spain beat Argentina 1&ndash;0 after extra time in the final. This page is the permanent recap of how the model did.</p>
-  <p class="meta">Tournament completed 19 July 2026 · Every prediction graded against the official final result after extra time (penalty shootouts count as draws).</p>
+  <p class="meta">Tournament completed 19 July 2026 · Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result.</p>
 
   <h2>The final, as the model saw it</h2>
   <p>Before kickoff on 19 July 2026 the model's read on Spain&nbsp;v&nbsp;Argentina was <strong>Spain 35.8%</strong> · draw 32.0% · Argentina 32.2%, with expected goals 1.09&ndash;1.02. Spain carried the highest probability of the three outcomes. The call was logged publicly before the match and was not edited afterwards. Spain won 1&ndash;0 after extra time (Ferran Torres, 106th minute).</p>
 
   <h2>The full tournament record</h2>
-  <!-- GEN:WCRECAP-START --><div class="statrow"><div class="stat"><div class="num">65.4%</div><div class="lbl">correct 1X2 results across all 104 completed World Cup matches (68 of 104)</div></div><div class="stat"><div class="num">85%</div><div class="lbl">accuracy in decisive matches (68 of 80 that did not end in a draw)</div></div></div><p class="meta">Graded on the official final result after extra time; penalty shootouts count as draws. Numbers update automatically from the same public log as the track record page.</p><!-- GEN:WCRECAP-END -->
+  <!-- GEN:WCRECAP-START --><div class="statrow"><div class="stat"><div class="num">60.6%</div><div class="lbl">correct 1X2 results across all 104 completed World Cup matches (63 of 104)</div></div><div class="stat"><div class="num">84%</div><div class="lbl">accuracy in decisive matches (63 of 75 that did not end in a draw)</div></div></div><p class="meta">Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result. Numbers update automatically from the same public log as the track record page.</p><!-- GEN:WCRECAP-END -->
   <p>The per-match record, hits and misses included, lives on the evergreen predictions page and keeps growing with domestic-league calls: <a href="/predictions#record">see the full track record</a>.</p>
 
   <div class="ctarow"><a class="cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Predict any match in the app &rarr;</a></div>
@@ -172,7 +172,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <dt>What did GoalIQ's model predict for the final?</dt>
     <dd>The model gave Spain the highest probability: 35.8% against 32.0% for the draw and 32.2% for Argentina, logged publicly before kickoff.</dd>
     <dt>How accurate was the model at the World Cup 2026?</dt>
-    <dd>Every prediction was logged before kickoff and graded against the official final result after extra time, with penalty shootouts counting as draws. The full per-match record, hits and misses included, is public on the <a href="/predictions#record">track record page</a>.</dd>
+    <dd>Every prediction was logged before kickoff. Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result. The full per-match record, hits and misses included, is public on the <a href="/predictions#record">track record page</a>.</dd>
     <dt>How does GoalIQ predict football matches?</dt>
     <dd>GoalIQ uses a Dixon-Coles statistical model combined with an expected-goals (xG) ensemble, trained on thousands of real international and club matches. It estimates win/draw/win probabilities, expected goals and the most likely scorelines. It is an informational analytics tool, not a betting service.</dd>
     <dt>Is GoalIQ a betting app?</dt>

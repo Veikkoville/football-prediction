@@ -180,44 +180,46 @@ def _build_result(
     regular_home: Optional[int] = None,
     regular_away: Optional[int] = None,
 ) -> dict:
-    """Rakenna result-lohko: FT-AET-gradaus (Villen päätös 20.7).
+    """Rakenna result-lohko: näyttötulos + 90 min -gradaus (Villen päätös 20.7 ilta).
 
-    home_score/away_score = VIRALLINEN lopputulos (reg + jatkoaika, ilman
-    rangaistuspotkuja) — sama luku jonka yleisö näkee. GRADAUS
-    (1X2/decisive/exact/actual_outcome) nojaa AINA tähän: jatkoaikavoitto ON
-    1X2-osuma, rankkarikisaan päättynyt ottelu on virallisesti tasapeli (FT-AET
-    tasan) = tasa. regular_home/regular_away säilytetään vain näyttö-
-    annotaatioon ("1-0 (a.e.t.)" + 90 min -tulos), ei gradaukseen.
+    home_score/away_score = NÄYTETTÄVÄ lopputulos (reg + jatkoaika, ilman
+    rangaistuspotkuja). GRADAUS (1X2/decisive/exact/actual_outcome) nojaa AINA
+    90 minuutin tulokseen: pudotuspeli joka oli tasan täysajalla = TASAPELI,
+    ratkesi se sitten jatkoajalla tai rangaistuspotkuilla. "Emme ota nimiimme
+    jatkoaikavoittoja" — sama sääntö molemmille, yksi looginen linja.
 
-    Aiempi #24-normi gradasi 90 min -tuloksella; se vaihdettiin FT-AET:iin
-    20.7 koska julkinen track record ei saa näyttää ✗:ää ottelulle jonka
-    virallisen voittajan malli nimesi (WC-finaali Spain 1-0 a.e.t.).
+    Historia: #24 otti 90 min -normin käyttöön; 20.7 päivällä se vaihdettiin
+    hetkeksi FT-AET:iin ja SAMANA ILTANA käännettiin takaisin kun Ville näki
+    live-sivun laskevan jatkoaikavoitot osumiksi (yliottava). Tämä on lopullinen
+    normi — älä vaihda ilman Villen nimettyä päätöstä.
     """
-    grade_h, grade_a = int(home_score), int(away_score)
+    if duration != "REGULAR" and regular_home is not None and regular_away is not None:
+        grade_h, grade_a = int(regular_home), int(regular_away)
+    else:
+        grade_h, grade_a = int(home_score), int(away_score)
 
     actual = outcome_from_score(grade_h, grade_a)
     pred_winner = entry.get("predicted_winner")
     mls = entry.get("most_likely_score")
-    actual_score = f"{grade_h}-{grade_a}"
+    actual_score = f"{int(home_score)}-{int(away_score)}"
+    grade_score = f"{grade_h}-{grade_a}"
 
     result = {
-        "home_score": grade_h,
-        "away_score": grade_a,
+        "home_score": int(home_score),
+        "away_score": int(away_score),
         "actual_score": actual_score,
         "actual_outcome": actual,
-        # headline-1X2: nimetty voittaja vs virallinen FT-AET-tulos
-        # (rankkarikisa = FT-AET tasan = tasapeli = miss nimetylle voittajalle)
+        # headline-1X2: nimetty voittaja vs 90 min -tulos (ET/pilkut = tasa = miss)
         "hit_1x2": bool(pred_winner is not None and pred_winner == actual),
         # exact-score vain jos most_likely_score tunnetaan (FD-rivit, ei seed);
-        # gradataan samalla FT-AET-tuloksella kuin 1X2 (yksi normi)
-        "exact_hit": (None if mls is None else bool(mls == actual_score)),
+        # gradataan samalla 90 min -tuloksella kuin 1X2 (yksi normi)
+        "exact_hit": (None if mls is None else bool(mls == grade_score)),
         "reconciled_at": _now_iso(),
     }
     if duration and duration != "REGULAR":
         # a.e.t./pens-lippu + 90 min tulos näyttöannotaatioon ("1-0 (a.e.t.)")
         result["duration"] = duration
-        if regular_home is not None and regular_away is not None:
-            result["regular_score"] = f"{int(regular_home)}-{int(regular_away)}"
+        result["regular_score"] = grade_score
     return result
 
 

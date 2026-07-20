@@ -425,8 +425,8 @@ def record_table_html(preds: list[dict], c: dict) -> str:
     """#117: koko per-ottelu-record näkyväksi tauluksi. Vain gradatut rivit
     (result != null) — pending-ennusteet ovat lukittuja mutta pelaamattomia,
     ne mainitaan lukumääränä. Uusin ensin; seed-rivit (WC-lohkovaihe, ei
-    päivämäärää) pohjalle. Gradaus = virallinen FT-AET-tulos (20.7-normi):
-    duration != REGULAR merkitään tähdellä."""
+    päivämäärää) pohjalle. Gradaus = 90 min -tulos (Villen 20.7-normi:
+    ET/pilkut = tasapeli): duration != REGULAR merkitään tähdellä."""
     graded = [e for e in preds if e.get("result")]
 
     def sort_key(e: dict) -> str:
@@ -482,9 +482,9 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         )
 
     star_note = (
-        "<p class=\"rec-note\">* Decided in extra time or on penalties; "
-        "the prediction is graded on the official final result after extra "
-        "time (a penalty shootout counts as a draw).</p>"
+        "<p class=\"rec-note\">* Knockout matches level after 90 minutes are "
+        "graded as a draw. Extra time and penalty shootouts do not count "
+        "toward the result.</p>"
         if has_nonregular
         else ""
     )
@@ -1211,9 +1211,10 @@ def update_wc_recap(acc: dict) -> bool:
         f'({wc.get("decisive_correct")} of {wc.get("decisive_n")} that did not '
         "end in a draw)</div></div>"
         "</div>"
-        '<p class="meta">Graded on the official final result after extra time; '
-        "penalty shootouts count as draws. Numbers update automatically from "
-        "the same public log as the track record page.</p>"
+        '<p class="meta">Knockout matches level after 90 minutes are graded '
+        "as a draw; extra time and penalty shootouts do not count toward the "
+        "result. Numbers update automatically from the same public log as "
+        "the track record page.</p>"
     )
     s = WC_HUB_PATH.read_text(encoding="utf-8")
     new = re.sub(
