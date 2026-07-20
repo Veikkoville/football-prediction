@@ -34,12 +34,44 @@
 		);
 	});
 
-	const fdrVar = (fdr: number) => `var(--fdr-${Math.min(Math.max(fdr, 1), 5)})`;
-	// #96 (design-audit vk3): FDR-5-token on jo magenta-deep, mutta 14 %:n
-	// tint pesi sen laventelinnäköiseksi haaleaksi pinkiksi. Vaikeimmalle
-	// FDR:lle vahvempi tint → solu lukee selvästi brändimagentana ja
-	// "vaikein = voimakkain väri" -signaali toimii.
-	const fdrTint = (fdr: number) => (fdr >= 5 ? 26 : 14);
+	// #148: jatkuva CS%-väriskaala soluihin (#144-mobiilipariteetti) — FDR-
+	// bucket-tint ei säilytä edes järjestystä cs_pct:ssä. Ankkurit = FDR-
+	// chippien brändivärit (magenta-deep → coral → gold-deep → gold → teal)
+	// samoissa cs_pct-pisteissä kuin mobiilin CS_STOPS. Tint pitää solun
+	// luettavana vaalealla pohjalla (vahvin = matalin CS% = magenta).
+	const CS_COLOR_STOPS: [number, string][] = [
+		[8, '#D6006E'],
+		[20, '#FF6A3D'],
+		[32, '#F4A800'],
+		[44, '#FFC93C'],
+		[58, '#19E3D2']
+	];
+	function csCellBg(csPct: number): string {
+		const stops = CS_COLOR_STOPS;
+		let hex = stops[0][1];
+		if (csPct >= stops[stops.length - 1][0]) {
+			hex = stops[stops.length - 1][1];
+		} else if (csPct > stops[0][0]) {
+			for (let i = 0; i < stops.length - 1; i++) {
+				if (csPct <= stops[i + 1][0]) {
+					const t = (csPct - stops[i][0]) / (stops[i + 1][0] - stops[i][0]);
+					const a = stops[i][1];
+					const b = stops[i + 1][1];
+					const mix = [1, 3, 5].map((j) =>
+						Math.round(
+							parseInt(a.slice(j, j + 2), 16) +
+								(parseInt(b.slice(j, j + 2), 16) - parseInt(a.slice(j, j + 2), 16)) * t
+						)
+					);
+					hex = `#${mix.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+					break;
+				}
+			}
+		}
+		// vahvempi tint vaikeimmille (matala CS%) — #96-oppi käännettynä
+		const tint = csPct <= 20 ? 26 : 16;
+		return `color-mix(in srgb, ${hex} ${tint}%, transparent)`;
+	}
 
 	let gwCols = $derived(
 		data?.teams?.[0]?.fixtures?.map((f) => f.gw) ?? []
@@ -75,7 +107,8 @@
 					match model over the next {data.meta.horizon_gw ?? 6} gameweeks.
 					<strong>Avg FDR</strong> = average fixture difficulty from the GoalIQ model (win% +
 					xG), not FPL's official FDR; 1 = easiest, 5 = hardest. Each GW cell shows opponent,
-					venue and that fixture's FDR.
+					venue and that fixture's clean sheet probability; the cell colour follows the same
+					probability on a continuous scale (model FDR in the cell tooltip).
 				</p>
 
 				<MethodNote summary="How these numbers are calculated">
@@ -117,9 +150,23 @@
 									{#each gwCols as gw (gw)}
 										{@const f = t.fixtures.find((x) => x.gw === gw)}
 										{#if f}
-											<td style="background: color-mix(in srgb, {fdrVar(f.fdr)} {fdrTint(f.fdr)}%, transparent)">
-												{f.opponent_short} ({f.venue}) {f.fdr}
-											</td>
+											<!-- #148: per-fixture CS% solussa + jatkuva väri; FDR tooltippiin.
+											     Defensiivinen: cs_pct puuttuu vanhasta payloadista → FDR-tint
+											     + FDR-luku kuten ennen. -->
+											{#if typeof f.cs_pct === 'number'}
+												<td
+													style="background: {csCellBg(f.cs_pct)}"
+													title="{f.opponent ?? f.opponent_short} ({f.venue}) · FDR {f.fdr}"
+												>
+													{f.opponent_short} ({f.venue}) {Math.round(f.cs_pct)}%
+												</td>
+											{:else}
+												<td
+													style="background: color-mix(in srgb, var(--fdr-{Math.min(Math.max(f.fdr, 1), 5)}) {f.fdr >= 5 ? 26 : 14}%, transparent)"
+												>
+													{f.opponent_short} ({f.venue}) {f.fdr}
+												</td>
+											{/if}
 										{:else}
 											<td class="muted">Blank</td>
 										{/if}

@@ -12,6 +12,8 @@ import { API_BASE } from './config';
 export interface FantasyFixture {
 	gw: number;
 	opponent_short: string;
+	/** #148: koko vastustajanimi tooltippiin — defensiivinen (voi puuttua). */
+	opponent?: string;
 	venue: string;
 	fdr: number;
 	cs_pct?: number;

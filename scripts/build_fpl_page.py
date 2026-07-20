@@ -613,6 +613,44 @@ def cs_table_html(c: dict) -> str:
     )
 
 
+# #148: jatkuva CS%-väriskaala grid-soluihin (#144-mobiilipariteetti).
+# Ankkurit = olemassa olevat FDR-chippien brändivärit (fdr5→fdr1) samoissa
+# cs_pct-pisteissä kuin mobiilin CS_STOPS — FDR-bucket ei säilytä edes
+# järjestystä cs_pct:ssä (luokkaparit menevät päällekkäin).
+CS_COLOR_STOPS = [
+    (8.0, "#D6006E"),   # magenta-deep = vaikein
+    (20.0, "#FF6A3D"),  # coral
+    (32.0, "#F4A800"),  # gold-deep
+    (44.0, "#FFC93C"),  # gold
+    (58.0, "#19E3D2"),  # teal = helpoin
+]
+
+
+def _hex_rgb(h: str) -> tuple[int, int, int]:
+    return int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+
+
+def cs_cell_colors(cs_pct: float) -> tuple[str, str]:
+    """(background, text) jatkuvana cs_pct:stä. Teksti valkoinen tummilla."""
+    stops = CS_COLOR_STOPS
+    if cs_pct <= stops[0][0]:
+        bg = _hex_rgb(stops[0][1])
+    elif cs_pct >= stops[-1][0]:
+        bg = _hex_rgb(stops[-1][1])
+    else:
+        bg = None
+        for (p0, c0), (p1, c1) in zip(stops, stops[1:]):
+            if cs_pct <= p1:
+                t = (cs_pct - p0) / (p1 - p0)
+                a, b = _hex_rgb(c0), _hex_rgb(c1)
+                bg = tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
+                break
+        assert bg is not None
+    lum = 0.299 * bg[0] + 0.587 * bg[1] + 0.114 * bg[2]
+    fg = "#fff" if lum < 140 else "#0A0820"
+    return f"#{bg[0]:02X}{bg[1]:02X}{bg[2]:02X}", fg
+
+
 def fdr_grid_html(c: dict) -> str:
     head = "".join(f'<th scope="col" class="num">GW{g}</th>' for g in c["gws"])
     rows = []
@@ -622,10 +660,17 @@ def fdr_grid_html(c: dict) -> str:
             if fx is None:
                 cells.append('<td class="num">-</td>')
             else:
+                # #148: solussa vastustaja + venue + per-fixture CS% (pariteetti
+                # mobiilin #144:n kanssa); FDR-luokka siirtyi tooltippiin.
+                bg, fg = cs_cell_colors(float(fx["cs_pct"]))
                 cells.append(
-                    f'<td class="num"><span class="fdr fdr{fx["fdr"]}" '
-                    f'title="{escape(fx["opponent"])} ({fx["venue"]})">'
-                    f'{escape(fx["opponent_short"])} {fx["fdr"]}</span></td>'
+                    f'<td class="num"><span class="fdr" '
+                    f'style="background:{bg};color:{fg}" '
+                    f'title="{escape(fx["opponent"])} ({fx["venue"]}) '
+                    f'&middot; FDR {fx["fdr"]}">'
+                    f'{escape(fx["opponent_short"])} ({fx["venue"]}) '
+                    f'{fx["cs_pct"]:.0f}%'
+                    f"</span></td>"
                 )
         rows.append(
             "<tr>"
@@ -636,8 +681,10 @@ def fdr_grid_html(c: dict) -> str:
         )
     return (
         '<div class="scroll"><table>'
-        f"<caption>Model fixture difficulty (1 easiest, 5 hardest) for the next "
-        f"{len(c['gws'])} gameweeks, with opponent and average. Sorted by easiest run.</caption>"
+        f"<caption>Clean sheet probability per fixture for the next "
+        f"{len(c['gws'])} gameweeks, with opponent and venue. Colour follows the "
+        f"clean sheet probability (model FDR in the cell tooltip). "
+        f"Sorted by easiest run.</caption>"
         "<thead><tr>"
         '<th scope="col">Team</th>' + head + '<th scope="col" class="num">Avg</th>'
         "</tr></thead><tbody>"
@@ -862,6 +909,14 @@ def render_page(c: dict) -> str:
     jsonld = jsonld_blocks(c, faq)
     cs_table = cs_table_html(c)
     fdr_grid = fdr_grid_html(c)
+    # #148: legenda samalla jatkuvalla CS%-skaalalla kuin solut (koherenssi —
+    # ei FDR 1-5 -laatikoita cs%-värien päällä, #144-oppi).
+    cs_legend = " ".join(
+        '<span class="fdr" style="background:{bg};color:{fg}">{p}%</span>'.format(
+            bg=cs_cell_colors(p)[0], fg=cs_cell_colors(p)[1], p=p
+        )
+        for p in (10, 22, 34, 46, 58)
+    )
 
     title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ"
     meta_desc = (
@@ -976,14 +1031,14 @@ results as priors, and newly promoted sides use an empirical promoted-team
 baseline. The numbers sharpen as {c["season"]} results arrive.</p>
 
 <h2 id="fixture-difficulty">Fixture difficulty for the next six gameweeks</h2>
-<p>GoalIQ's fixture difficulty rating per team and gameweek. Each cell shows the
-opponent and the model FDR. A lower number is an easier fixture. This is
-model-derived, not the official FPL difficulty.</p>
+<p>Clean sheet probability per team and gameweek. Each cell shows the opponent,
+venue and the model's clean sheet probability for that match; the colour follows
+the same probability on a continuous scale, so two fixtures in the same FDR
+class no longer look identical. Model FDR (1 easiest, 5 hardest) stays in the
+cell tooltip. Model-derived, not the official FPL difficulty.</p>
 {fdr_grid}
-<p class="legend">FDR scale: <span class="fdr fdr1">1</span>
-<span class="fdr fdr2">2</span> <span class="fdr fdr3">3</span>
-<span class="fdr fdr4">4</span> <span class="fdr fdr5">5</span>
-(1 easiest, 5 hardest). Venue in cell tooltip: H home, A away.</p>
+<p class="legend">Clean sheet scale: {cs_legend}
+(low CS% = hard fixture, high CS% = easy). H home, A away.</p>
 
 <aside class="upsell">
 <h2 id="pro">Unlock the full FPL toolkit with Premium</h2>
