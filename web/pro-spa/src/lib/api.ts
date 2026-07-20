@@ -54,6 +54,8 @@ export interface XpPlayer {
 	/** #33f: probabilistinen minuuttimalli (start-% 0-100) — defensiivinen. */
 	predicted_starts?: number;
 	minutes_confidence?: 'low' | 'med' | 'high';
+	/** #143: estimaatin datapohja — defensiivinen (vanha payload ei tuo). */
+	data_basis?: 'pl_history' | 'limited_history' | 'no_history';
 }
 
 export interface XpMeta {

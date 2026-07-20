@@ -192,7 +192,14 @@
 						onclick={() => (selectedId = p.id)}
 					>
 						<td class="num muted">{rankById.get(p.id)}</td>
-						<td>{p.web_name}</td>
+						<td
+							>{p.web_name}{#if p.data_basis === 'limited_history' || p.data_basis === 'no_history'}
+								<!-- #143-WEB: datapohja-rehellisyysmerkintä (pariteetti mobiiliin;
+								     pl_history = ei labelia, puuttuva kenttä = ei mitään) -->
+								<span class="basis-tag"
+									>{p.data_basis === 'no_history' ? 'no PL data' : 'thin PL sample'}</span
+								>{/if}</td
+						>
 						<td>{p.team_short}</td>
 						<td>{p.pos}</td>
 						<td class="num">{p.xmins.toFixed(1)}</td>
@@ -246,7 +253,10 @@
 					(<span class="conf-text conf-{selected.minutes_confidence}"
 						>{CONF_LABEL[selected.minutes_confidence]} confidence</span
 					>){/if}. Model-based estimate; confidence reflects sample size and rotation
-				stability.
+				stability.{#if selected.data_basis === 'limited_history'}{' '}Thin PL sample:
+					the estimate leans on the position prior more than this player's own
+					data.{:else if selected.data_basis === 'no_history'}{' '}No PL data yet: the
+					estimate is the position prior.{/if}
 			</p>
 		{/if}
 	{/if}
@@ -326,5 +336,13 @@
 	}
 	.minutes-line {
 		margin-top: var(--s-3);
+	}
+	/* #143-WEB: datapohja-rehellisyysmerkintä nimen perässä (hillitty) */
+	.basis-tag {
+		margin-left: 6px;
+		font-size: 0.72em;
+		color: var(--text-muted);
+		opacity: 0.8;
+		white-space: nowrap;
 	}
 </style>
