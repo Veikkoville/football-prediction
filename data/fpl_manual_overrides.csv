@@ -21,3 +21,18 @@
 # Esimerkki manuaalisesta fixture-korjauksesta:
 #   manual,Hull,Manchester United,H,1,1,1.15,,,tuntuma: avaus kotona kovempaa kuin baseline
 scope,team,opponent,venue,gw_from,gw_to,attack_mult,defence_mult,xmins_mult,note
+# MM-2026-vasymys (#142 OSA B, 20.7): mitoitus KONSERVATIIVINEN 0.95-0.97
+# koska per-pelaaja-minuutteja ei ole ohjelmallisesti (FD-tier ei anna
+# lineupeja, FotMob-API blokattu) -> pohjana scripts/build_wc2026_club_load.py
+# (squad-presence x maan ottelut) ristiintarkistettuna CoS:n 8 maan
+# selainminuuttikartoitukseen. 0.90-0.93-kaista vaatisi aidot minuutit.
+# Ei attack/defence-multeja (kuormituksen painottumista ei voi todentaa).
+# Uusinta-ajo ~15.8 (siirtoikkuna muuttaa seuroja).
+wc_fatigue,Manchester City,,,1,2,,,0.96,19 WC-pelaajaa/exposure 105 (suurin); CoS ~3080 min ml. Rodri 726; 0.95 tuotti Haaland -0.52 > 0.5p-gate -> pehmennetty
+wc_fatigue,Arsenal,,,1,2,,,0.95,12 WC-pelaajaa/exposure 73; CoS-kartoitus ~3087 min (suurin 8 maan otoksessa)
+wc_fatigue,Aston Villa,,,1,2,,,0.95,8 WC-pelaajaa/exposure 47; CoS-kartoitus ~2891 min ml. E.Martinez 810 + Konsa 647 avaajia
+wc_fatigue,Chelsea,,,1,2,,,0.96,9 WC-pelaajaa/exposure 55 ml. finaali; Cucurella 750 + Enzo 660
+wc_fatigue,Manchester United,,,1,2,,,0.96,10 WC-pelaajaa/exposure 56 ml. finalisteja (L.Martinez); CoS ~1122 min
+wc_fatigue,Liverpool,,,1,2,,,0.96,10 WC-pelaajaa/exposure 49 ml. finalisteja; Mac Allister 749 min yksin
+wc_fatigue,Tottenham,,,1,2,,,0.97,6 WC-pelaajaa/exposure 27; CoS-kartoitus ~1685 min
+wc_fatigue,Fulham,,,1,2,,,0.97,5 WC-pelaajaa/exposure 29; CoS-kartoitus ~1657 min (4 lahes lapipelaajaa QF-maista)
