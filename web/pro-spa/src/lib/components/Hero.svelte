@@ -15,6 +15,21 @@
 	let resetNotice = $state<string | null>(null);
 	let resetBusy = $state(false);
 
+	// #150b: valikkotila EI saa elää sign-outin yli (Hero ei unmounttaudu →
+	// auki jäänyt valikko pomppasi esiin seuraavassa kirjautumisessa).
+	$effect(() => {
+		if (!auth.user) {
+			menuOpen = false;
+			resetNotice = null;
+		}
+	});
+
+	// #150b: reset-linkistä saapuneelle avataan valikko + lomake valmiiksi —
+	// SPA-landing oli mykkä eikä ohjannut uuden salasanan asetukseen.
+	$effect(() => {
+		if (auth.passwordRecovery && auth.user) menuOpen = true;
+	});
+
 	function upgrade() {
 		capture('upgrade_tapped', { source: 'header_badge' });
 		onUpgrade?.();
@@ -68,7 +83,15 @@
 							· <button type="button" class="linklike" onclick={upgrade}>Upgrade</button>
 						{/if}
 					</div>
-					<SetPassword summary="Change password (works in the GoalIQ app too)" />
+					{#if auth.passwordRecovery}
+						<p class="banner success">
+							Password reset link accepted — set your new password below.
+						</p>
+					{/if}
+					<SetPassword
+						summary="Change password (works in the GoalIQ app too)"
+						open={auth.passwordRecovery}
+					/>
 					<button type="button" class="linklike" disabled={resetBusy} onclick={() => void resetLink()}>
 						Forgot it? Email me a password reset link
 					</button>
