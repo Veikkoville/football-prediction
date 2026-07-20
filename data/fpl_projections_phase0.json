@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-07-20T08:37:21",
+    "generated_at": "2026-07-20T15:49:58",
     "season": "2026/27",
     "source": "pulselive-fallback",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
@@ -15,7 +15,7 @@
         "Hull",
         "Ipswich"
       ],
-      "manual_overrides": 0,
+      "manual_overrides": 8,
       "note": "Phase 1b: nousija-koti-avaus-buusti + manuaaliset yliajot (data/fpl_manual_overrides.csv)"
     },
     "fdr_method": "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), kvintiilibucket koko kauden joukkue-fixtureiden yli",
@@ -36,7 +36,7 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1552
+      "home_gamma": -0.1553
     },
     "sanity_gate": "PASS",
     "next_gameweek": 1,
@@ -1567,7 +1567,7 @@
       "away_short": "HUL",
       "xg_home": 1.615,
       "xg_away": 1.197,
-      "p_home_win": 0.4572,
+      "p_home_win": 0.4571,
       "p_draw": 0.2736,
       "p_away_win": 0.2693,
       "cs_home_pct": 30.2,
@@ -2420,7 +2420,7 @@
       "away": "Tottenham",
       "home_short": "MUN",
       "away_short": "TOT",
-      "xg_home": 2.13,
+      "xg_home": 2.131,
       "xg_away": 1.137,
       "p_home_win": 0.5899,
       "p_draw": 0.2257,
