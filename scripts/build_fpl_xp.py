@@ -348,6 +348,9 @@ def main() -> int:
             # #33: probabilistinen kokoonpanoennuste + rehellinen epävarmuus
             "predicted_starts": round(mm["p_start"] * 100.0, 1),
             "minutes_confidence": mm["confidence"],
+            # #143: rehellisyyslippu — paljonko pelaajan omaa PL-dataa
+            # estimaatin takana on (puhdas emissio, ei muuta xP-lukuja).
+            "data_basis": xp.data_basis(acc_by_player[pid]),
             "xp_per_gw": round(total / max(len(horizon), 1), 2),
             "xp_horizon_total": round(total, 2),
             "gameweeks": gws,
@@ -403,6 +406,25 @@ def main() -> int:
             ),
             "promoted_baseline_teams": missing,
             "promoted_baseline_values": baseline,
+            # #143: rakenteinen katvealueraportti — sama tieto joka tähän asti
+            # oli vain proosana todo-listassa, nyt UI:n luettavissa.
+            "data_coverage": {
+                "baseline_season": prev_key,
+                "transfers_known": src["source"] == "fpl-api",
+                "teams_without_player_data": uncovered,
+                "player_basis_counts": {
+                    v: sum(1 for p in players if p["data_basis"] == v)
+                    for v in xp.DATA_BASIS_VALUES
+                },
+                "basis_threshold_minutes": xp.M_PRIOR_ATTACK,
+                "note": (
+                    "data_basis per pelaaja: pl_history = oma PL-historia "
+                    "kantaa >= 50 % painon; limited_history = ohut otos, "
+                    "positiopriori dominoi; no_history = ei PL-minuutteja. "
+                    "transfers_known=false: pre-season-bootstrap on edellisen "
+                    "kauden -> kesäsiirrot eivät näy."
+                ),
+            },
             "context_layer": {
                 "promoted_teams": sorted(promoted),
                 "promoted_home_opener_att_boost": PROMOTED_HOME_OPENER_ATT_BOOST,

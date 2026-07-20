@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-20T15:51:24",
+    "generated_at": "2026-07-20T15:57:10",
     "season": "2026/27",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
     "player_source": "FPL official API (bootstrap + element-summary history)",
@@ -27,6 +27,22 @@
       "attack": -0.3018,
       "defence": 0.4813,
       "home_gamma": -0.1553
+    },
+    "data_coverage": {
+      "baseline_season": "2526",
+      "transfers_known": false,
+      "teams_without_player_data": [
+        "Coventry",
+        "Hull",
+        "Ipswich"
+      ],
+      "player_basis_counts": {
+        "pl_history": 303,
+        "limited_history": 39,
+        "no_history": 0
+      },
+      "basis_threshold_minutes": 450.0,
+      "note": "data_basis per pelaaja: pl_history = oma PL-historia kantaa >= 50 % painon; limited_history = ohut otos, positiopriori dominoi; no_history = ei PL-minuutteja. transfers_known=false: pre-season-bootstrap on edellisen kauden -> kesäsiirrot eivät näy."
     },
     "context_layer": {
       "promoted_teams": [
@@ -64,6 +80,7 @@
       "xmins": 80.7,
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 5.43,
       "xp_horizon_total": 32.55,
       "gameweeks": [
@@ -150,6 +167,7 @@
       "xmins": 77.5,
       "predicted_starts": 81.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 5.4,
       "xp_horizon_total": 32.4,
       "gameweeks": [
@@ -236,6 +254,7 @@
       "xmins": 90.0,
       "predicted_starts": 92.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.83,
       "xp_horizon_total": 28.98,
       "gameweeks": [
@@ -322,6 +341,7 @@
       "xmins": 76.3,
       "predicted_starts": 78.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.78,
       "xp_horizon_total": 28.7,
       "gameweeks": [
@@ -408,6 +428,7 @@
       "xmins": 88.8,
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.65,
       "xp_horizon_total": 27.9,
       "gameweeks": [
@@ -494,6 +515,7 @@
       "xmins": 86.4,
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.63,
       "xp_horizon_total": 27.79,
       "gameweeks": [
@@ -580,6 +602,7 @@
       "xmins": 86.7,
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.57,
       "xp_horizon_total": 27.43,
       "gameweeks": [
@@ -666,6 +689,7 @@
       "xmins": 86.7,
       "predicted_starts": 89.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.48,
       "xp_horizon_total": 26.89,
       "gameweeks": [
@@ -752,6 +776,7 @@
       "xmins": 84.9,
       "predicted_starts": 87.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.36,
       "xp_horizon_total": 26.17,
       "gameweeks": [
@@ -838,6 +863,7 @@
       "xmins": 80.9,
       "predicted_starts": 82.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.35,
       "xp_horizon_total": 26.09,
       "gameweeks": [
@@ -924,6 +950,7 @@
       "xmins": 86.4,
       "predicted_starts": 88.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.34,
       "xp_horizon_total": 26.02,
       "gameweeks": [
@@ -1010,6 +1037,7 @@
       "xmins": 80.2,
       "predicted_starts": 82.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.29,
       "xp_horizon_total": 25.71,
       "gameweeks": [
@@ -1096,6 +1124,7 @@
       "xmins": 89.8,
       "predicted_starts": 99.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.26,
       "xp_horizon_total": 25.55,
       "gameweeks": [
@@ -1182,6 +1211,7 @@
       "xmins": 82.6,
       "predicted_starts": 86.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.19,
       "xp_horizon_total": 25.11,
       "gameweeks": [
@@ -1268,6 +1298,7 @@
       "xmins": 90.0,
       "predicted_starts": 98.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.14,
       "xp_horizon_total": 24.85,
       "gameweeks": [
@@ -1354,6 +1385,7 @@
       "xmins": 68.7,
       "predicted_starts": 75.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.12,
       "xp_horizon_total": 24.74,
       "gameweeks": [
@@ -1440,6 +1472,7 @@
       "xmins": 86.7,
       "predicted_starts": 89.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.12,
       "xp_horizon_total": 24.73,
       "gameweeks": [
@@ -1526,6 +1559,7 @@
       "xmins": 80.5,
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.11,
       "xp_horizon_total": 24.65,
       "gameweeks": [
@@ -1612,6 +1646,7 @@
       "xmins": 87.6,
       "predicted_starts": 88.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.1,
       "xp_horizon_total": 24.62,
       "gameweeks": [
@@ -1698,6 +1733,7 @@
       "xmins": 85.2,
       "predicted_starts": 86.8,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.08,
       "xp_horizon_total": 24.46,
       "gameweeks": [
@@ -1784,6 +1820,7 @@
       "xmins": 83.9,
       "predicted_starts": 87.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.03,
       "xp_horizon_total": 24.17,
       "gameweeks": [
@@ -1870,6 +1907,7 @@
       "xmins": 85.3,
       "predicted_starts": 86.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.02,
       "xp_horizon_total": 24.14,
       "gameweeks": [
@@ -1956,6 +1994,7 @@
       "xmins": 90.0,
       "predicted_starts": 90.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 4.0,
       "xp_horizon_total": 23.97,
       "gameweeks": [
@@ -2042,6 +2081,7 @@
       "xmins": 71.2,
       "predicted_starts": 77.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.91,
       "xp_horizon_total": 23.45,
       "gameweeks": [
@@ -2128,6 +2168,7 @@
       "xmins": 74.6,
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.89,
       "xp_horizon_total": 23.35,
       "gameweeks": [
@@ -2214,6 +2255,7 @@
       "xmins": 87.7,
       "predicted_starts": 94.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.88,
       "xp_horizon_total": 23.28,
       "gameweeks": [
@@ -2300,6 +2342,7 @@
       "xmins": 71.5,
       "predicted_starts": 74.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.87,
       "xp_horizon_total": 23.25,
       "gameweeks": [
@@ -2386,6 +2429,7 @@
       "xmins": 90.0,
       "predicted_starts": 90.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.85,
       "xp_horizon_total": 23.09,
       "gameweeks": [
@@ -2472,6 +2516,7 @@
       "xmins": 87.7,
       "predicted_starts": 89.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.82,
       "xp_horizon_total": 22.9,
       "gameweeks": [
@@ -2558,6 +2603,7 @@
       "xmins": 70.4,
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.8,
       "xp_horizon_total": 22.79,
       "gameweeks": [
@@ -2644,6 +2690,7 @@
       "xmins": 88.8,
       "predicted_starts": 90.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.79,
       "xp_horizon_total": 22.77,
       "gameweeks": [
@@ -2730,6 +2777,7 @@
       "xmins": 75.5,
       "predicted_starts": 80.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.78,
       "xp_horizon_total": 22.67,
       "gameweeks": [
@@ -2816,6 +2864,7 @@
       "xmins": 67.8,
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.77,
       "xp_horizon_total": 22.61,
       "gameweeks": [
@@ -2902,6 +2951,7 @@
       "xmins": 84.0,
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.76,
       "xp_horizon_total": 22.57,
       "gameweeks": [
@@ -2988,6 +3038,7 @@
       "xmins": 88.6,
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.76,
       "xp_horizon_total": 22.54,
       "gameweeks": [
@@ -3074,6 +3125,7 @@
       "xmins": 69.0,
       "predicted_starts": 71.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.75,
       "xp_horizon_total": 22.51,
       "gameweeks": [
@@ -3160,6 +3212,7 @@
       "xmins": 74.4,
       "predicted_starts": 78.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.75,
       "xp_horizon_total": 22.49,
       "gameweeks": [
@@ -3246,6 +3299,7 @@
       "xmins": 75.1,
       "predicted_starts": 80.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.74,
       "xp_horizon_total": 22.45,
       "gameweeks": [
@@ -3332,6 +3386,7 @@
       "xmins": 90.0,
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.71,
       "xp_horizon_total": 22.24,
       "gameweeks": [
@@ -3418,6 +3473,7 @@
       "xmins": 87.6,
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.7,
       "xp_horizon_total": 22.19,
       "gameweeks": [
@@ -3504,6 +3560,7 @@
       "xmins": 90.0,
       "predicted_starts": 90.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.69,
       "xp_horizon_total": 22.15,
       "gameweeks": [
@@ -3590,6 +3647,7 @@
       "xmins": 59.1,
       "predicted_starts": 63.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.67,
       "xp_horizon_total": 22.04,
       "gameweeks": [
@@ -3676,6 +3734,7 @@
       "xmins": 76.5,
       "predicted_starts": 85.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.66,
       "xp_horizon_total": 21.96,
       "gameweeks": [
@@ -3762,6 +3821,7 @@
       "xmins": 80.6,
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.66,
       "xp_horizon_total": 21.95,
       "gameweeks": [
@@ -3848,6 +3908,7 @@
       "xmins": 84.8,
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.63,
       "xp_horizon_total": 21.78,
       "gameweeks": [
@@ -3934,6 +3995,7 @@
       "xmins": 70.6,
       "predicted_starts": 72.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.63,
       "xp_horizon_total": 21.75,
       "gameweeks": [
@@ -4020,6 +4082,7 @@
       "xmins": 72.8,
       "predicted_starts": 78.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.6,
       "xp_horizon_total": 21.58,
       "gameweeks": [
@@ -4106,6 +4169,7 @@
       "xmins": 82.2,
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.59,
       "xp_horizon_total": 21.55,
       "gameweeks": [
@@ -4192,6 +4256,7 @@
       "xmins": 78.6,
       "predicted_starts": 79.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.57,
       "xp_horizon_total": 21.41,
       "gameweeks": [
@@ -4278,6 +4343,7 @@
       "xmins": 87.6,
       "predicted_starts": 88.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.53,
       "xp_horizon_total": 21.15,
       "gameweeks": [
@@ -4364,6 +4430,7 @@
       "xmins": 82.2,
       "predicted_starts": 82.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.48,
       "xp_horizon_total": 20.89,
       "gameweeks": [
@@ -4450,6 +4517,7 @@
       "xmins": 82.9,
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.47,
       "xp_horizon_total": 20.84,
       "gameweeks": [
@@ -4536,6 +4604,7 @@
       "xmins": 85.8,
       "predicted_starts": 93.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.47,
       "xp_horizon_total": 20.83,
       "gameweeks": [
@@ -4622,6 +4691,7 @@
       "xmins": 70.4,
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.46,
       "xp_horizon_total": 20.76,
       "gameweeks": [
@@ -4708,6 +4778,7 @@
       "xmins": 72.1,
       "predicted_starts": 77.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.44,
       "xp_horizon_total": 20.66,
       "gameweeks": [
@@ -4794,6 +4865,7 @@
       "xmins": 90.0,
       "predicted_starts": 90.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.41,
       "xp_horizon_total": 20.47,
       "gameweeks": [
@@ -4880,6 +4952,7 @@
       "xmins": 79.6,
       "predicted_starts": 82.8,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.4,
       "xp_horizon_total": 20.42,
       "gameweeks": [
@@ -4966,6 +5039,7 @@
       "xmins": 84.5,
       "predicted_starts": 87.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.37,
       "xp_horizon_total": 20.25,
       "gameweeks": [
@@ -5052,6 +5126,7 @@
       "xmins": 81.8,
       "predicted_starts": 83.5,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.36,
       "xp_horizon_total": 20.15,
       "gameweeks": [
@@ -5138,6 +5213,7 @@
       "xmins": 60.0,
       "predicted_starts": 65.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.35,
       "xp_horizon_total": 20.09,
       "gameweeks": [
@@ -5224,6 +5300,7 @@
       "xmins": 87.8,
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.35,
       "xp_horizon_total": 20.08,
       "gameweeks": [
@@ -5310,6 +5387,7 @@
       "xmins": 83.1,
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.34,
       "xp_horizon_total": 20.04,
       "gameweeks": [
@@ -5396,6 +5474,7 @@
       "xmins": 62.6,
       "predicted_starts": 67.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.33,
       "xp_horizon_total": 20.0,
       "gameweeks": [
@@ -5482,6 +5561,7 @@
       "xmins": 80.0,
       "predicted_starts": 81.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.33,
       "xp_horizon_total": 19.99,
       "gameweeks": [
@@ -5568,6 +5648,7 @@
       "xmins": 60.8,
       "predicted_starts": 67.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.31,
       "xp_horizon_total": 19.86,
       "gameweeks": [
@@ -5654,6 +5735,7 @@
       "xmins": 75.8,
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.31,
       "xp_horizon_total": 19.86,
       "gameweeks": [
@@ -5740,6 +5822,7 @@
       "xmins": 65.6,
       "predicted_starts": 71.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.29,
       "xp_horizon_total": 19.76,
       "gameweeks": [
@@ -5826,6 +5909,7 @@
       "xmins": 73.6,
       "predicted_starts": 75.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.29,
       "xp_horizon_total": 19.75,
       "gameweeks": [
@@ -5912,6 +5996,7 @@
       "xmins": 60.3,
       "predicted_starts": 63.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.27,
       "xp_horizon_total": 19.62,
       "gameweeks": [
@@ -5998,6 +6083,7 @@
       "xmins": 51.9,
       "predicted_starts": 66.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.27,
       "xp_horizon_total": 19.62,
       "gameweeks": [
@@ -6084,6 +6170,7 @@
       "xmins": 84.7,
       "predicted_starts": 97.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.26,
       "xp_horizon_total": 19.54,
       "gameweeks": [
@@ -6170,6 +6257,7 @@
       "xmins": 88.1,
       "predicted_starts": 95.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.24,
       "xp_horizon_total": 19.45,
       "gameweeks": [
@@ -6256,6 +6344,7 @@
       "xmins": 79.7,
       "predicted_starts": 83.8,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.23,
       "xp_horizon_total": 19.4,
       "gameweeks": [
@@ -6342,6 +6431,7 @@
       "xmins": 77.2,
       "predicted_starts": 78.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.22,
       "xp_horizon_total": 19.31,
       "gameweeks": [
@@ -6428,6 +6518,7 @@
       "xmins": 77.2,
       "predicted_starts": 80.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.21,
       "xp_horizon_total": 19.27,
       "gameweeks": [
@@ -6514,6 +6605,7 @@
       "xmins": 71.5,
       "predicted_starts": 78.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.21,
       "xp_horizon_total": 19.27,
       "gameweeks": [
@@ -6600,6 +6692,7 @@
       "xmins": 56.1,
       "predicted_starts": 66.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.21,
       "xp_horizon_total": 19.26,
       "gameweeks": [
@@ -6686,6 +6779,7 @@
       "xmins": 73.2,
       "predicted_starts": 77.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.21,
       "xp_horizon_total": 19.25,
       "gameweeks": [
@@ -6772,6 +6866,7 @@
       "xmins": 74.6,
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.19,
       "xp_horizon_total": 19.12,
       "gameweeks": [
@@ -6858,6 +6953,7 @@
       "xmins": 73.2,
       "predicted_starts": 75.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.15,
       "xp_horizon_total": 18.93,
       "gameweeks": [
@@ -6944,6 +7040,7 @@
       "xmins": 78.9,
       "predicted_starts": 81.8,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.13,
       "xp_horizon_total": 18.76,
       "gameweeks": [
@@ -7030,6 +7127,7 @@
       "xmins": 57.7,
       "predicted_starts": 64.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.12,
       "xp_horizon_total": 18.73,
       "gameweeks": [
@@ -7116,6 +7214,7 @@
       "xmins": 66.7,
       "predicted_starts": 71.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.12,
       "xp_horizon_total": 18.73,
       "gameweeks": [
@@ -7202,6 +7301,7 @@
       "xmins": 55.5,
       "predicted_starts": 60.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.12,
       "xp_horizon_total": 18.73,
       "gameweeks": [
@@ -7288,6 +7388,7 @@
       "xmins": 77.7,
       "predicted_starts": 82.8,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.1,
       "xp_horizon_total": 18.58,
       "gameweeks": [
@@ -7374,6 +7475,7 @@
       "xmins": 80.2,
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.09,
       "xp_horizon_total": 18.51,
       "gameweeks": [
@@ -7460,6 +7562,7 @@
       "xmins": 54.1,
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.08,
       "xp_horizon_total": 18.49,
       "gameweeks": [
@@ -7546,6 +7649,7 @@
       "xmins": 71.8,
       "predicted_starts": 78.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.07,
       "xp_horizon_total": 18.41,
       "gameweeks": [
@@ -7632,6 +7736,7 @@
       "xmins": 85.7,
       "predicted_starts": 89.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.06,
       "xp_horizon_total": 18.37,
       "gameweeks": [
@@ -7718,6 +7823,7 @@
       "xmins": 67.3,
       "predicted_starts": 78.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.04,
       "xp_horizon_total": 18.25,
       "gameweeks": [
@@ -7804,6 +7910,7 @@
       "xmins": 60.8,
       "predicted_starts": 66.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.03,
       "xp_horizon_total": 18.2,
       "gameweeks": [
@@ -7890,6 +7997,7 @@
       "xmins": 56.5,
       "predicted_starts": 58.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.03,
       "xp_horizon_total": 18.17,
       "gameweeks": [
@@ -7976,6 +8084,7 @@
       "xmins": 70.2,
       "predicted_starts": 73.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.02,
       "xp_horizon_total": 18.15,
       "gameweeks": [
@@ -8062,6 +8171,7 @@
       "xmins": 67.1,
       "predicted_starts": 75.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.02,
       "xp_horizon_total": 18.1,
       "gameweeks": [
@@ -8148,6 +8258,7 @@
       "xmins": 78.9,
       "predicted_starts": 82.8,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 3.01,
       "xp_horizon_total": 18.05,
       "gameweeks": [
@@ -8234,6 +8345,7 @@
       "xmins": 56.7,
       "predicted_starts": 60.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.99,
       "xp_horizon_total": 17.93,
       "gameweeks": [
@@ -8320,6 +8432,7 @@
       "xmins": 86.9,
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.97,
       "xp_horizon_total": 17.81,
       "gameweeks": [
@@ -8406,6 +8519,7 @@
       "xmins": 57.4,
       "predicted_starts": 66.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.94,
       "xp_horizon_total": 17.64,
       "gameweeks": [
@@ -8492,6 +8606,7 @@
       "xmins": 79.9,
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.93,
       "xp_horizon_total": 17.59,
       "gameweeks": [
@@ -8578,6 +8693,7 @@
       "xmins": 65.2,
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.92,
       "xp_horizon_total": 17.51,
       "gameweeks": [
@@ -8664,6 +8780,7 @@
       "xmins": 59.9,
       "predicted_starts": 71.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.9,
       "xp_horizon_total": 17.41,
       "gameweeks": [
@@ -8750,6 +8867,7 @@
       "xmins": 45.3,
       "predicted_starts": 49.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.9,
       "xp_horizon_total": 17.39,
       "gameweeks": [
@@ -8836,6 +8954,7 @@
       "xmins": 61.8,
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.89,
       "xp_horizon_total": 17.33,
       "gameweeks": [
@@ -8922,6 +9041,7 @@
       "xmins": 61.6,
       "predicted_starts": 66.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.87,
       "xp_horizon_total": 17.23,
       "gameweeks": [
@@ -9008,6 +9128,7 @@
       "xmins": 70.0,
       "predicted_starts": 75.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.85,
       "xp_horizon_total": 17.1,
       "gameweeks": [
@@ -9094,6 +9215,7 @@
       "xmins": 79.4,
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.85,
       "xp_horizon_total": 17.09,
       "gameweeks": [
@@ -9180,6 +9302,7 @@
       "xmins": 54.3,
       "predicted_starts": 61.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.85,
       "xp_horizon_total": 17.07,
       "gameweeks": [
@@ -9266,6 +9389,7 @@
       "xmins": 74.5,
       "predicted_starts": 80.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.82,
       "xp_horizon_total": 16.92,
       "gameweeks": [
@@ -9352,6 +9476,7 @@
       "xmins": 60.3,
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.8,
       "xp_horizon_total": 16.78,
       "gameweeks": [
@@ -9438,6 +9563,7 @@
       "xmins": 63.6,
       "predicted_starts": 66.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.79,
       "xp_horizon_total": 16.77,
       "gameweeks": [
@@ -9524,6 +9650,7 @@
       "xmins": 73.4,
       "predicted_starts": 75.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.79,
       "xp_horizon_total": 16.75,
       "gameweeks": [
@@ -9610,6 +9737,7 @@
       "xmins": 48.8,
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.78,
       "xp_horizon_total": 16.71,
       "gameweeks": [
@@ -9696,6 +9824,7 @@
       "xmins": 59.5,
       "predicted_starts": 65.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.78,
       "xp_horizon_total": 16.7,
       "gameweeks": [
@@ -9782,6 +9911,7 @@
       "xmins": 72.8,
       "predicted_starts": 79.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.75,
       "xp_horizon_total": 16.5,
       "gameweeks": [
@@ -9868,6 +9998,7 @@
       "xmins": 52.7,
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.75,
       "xp_horizon_total": 16.49,
       "gameweeks": [
@@ -9954,6 +10085,7 @@
       "xmins": 70.3,
       "predicted_starts": 74.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.75,
       "xp_horizon_total": 16.48,
       "gameweeks": [
@@ -10040,6 +10172,7 @@
       "xmins": 63.2,
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.74,
       "xp_horizon_total": 16.42,
       "gameweeks": [
@@ -10126,6 +10259,7 @@
       "xmins": 52.9,
       "predicted_starts": 55.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.73,
       "xp_horizon_total": 16.35,
       "gameweeks": [
@@ -10212,6 +10346,7 @@
       "xmins": 49.9,
       "predicted_starts": 54.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.72,
       "xp_horizon_total": 16.3,
       "gameweeks": [
@@ -10298,6 +10433,7 @@
       "xmins": 62.2,
       "predicted_starts": 66.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.72,
       "xp_horizon_total": 16.3,
       "gameweeks": [
@@ -10384,6 +10520,7 @@
       "xmins": 40.8,
       "predicted_starts": 45.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.71,
       "xp_horizon_total": 16.25,
       "gameweeks": [
@@ -10470,6 +10607,7 @@
       "xmins": 76.4,
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.69,
       "xp_horizon_total": 16.14,
       "gameweeks": [
@@ -10556,6 +10694,7 @@
       "xmins": 49.9,
       "predicted_starts": 60.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.67,
       "xp_horizon_total": 16.03,
       "gameweeks": [
@@ -10642,6 +10781,7 @@
       "xmins": 55.2,
       "predicted_starts": 61.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.67,
       "xp_horizon_total": 16.01,
       "gameweeks": [
@@ -10728,6 +10868,7 @@
       "xmins": 63.7,
       "predicted_starts": 71.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.66,
       "xp_horizon_total": 15.94,
       "gameweeks": [
@@ -10814,6 +10955,7 @@
       "xmins": 83.7,
       "predicted_starts": 87.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.63,
       "xp_horizon_total": 15.78,
       "gameweeks": [
@@ -10900,6 +11042,7 @@
       "xmins": 61.3,
       "predicted_starts": 75.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.62,
       "xp_horizon_total": 15.74,
       "gameweeks": [
@@ -10986,6 +11129,7 @@
       "xmins": 54.8,
       "predicted_starts": 65.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.61,
       "xp_horizon_total": 15.63,
       "gameweeks": [
@@ -11072,6 +11216,7 @@
       "xmins": 51.4,
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.6,
       "xp_horizon_total": 15.58,
       "gameweeks": [
@@ -11158,6 +11303,7 @@
       "xmins": 49.0,
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.59,
       "xp_horizon_total": 15.57,
       "gameweeks": [
@@ -11244,6 +11390,7 @@
       "xmins": 50.2,
       "predicted_starts": 57.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.59,
       "xp_horizon_total": 15.55,
       "gameweeks": [
@@ -11330,6 +11477,7 @@
       "xmins": 58.1,
       "predicted_starts": 62.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.55,
       "xp_horizon_total": 15.31,
       "gameweeks": [
@@ -11416,6 +11564,7 @@
       "xmins": 43.8,
       "predicted_starts": 54.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.49,
       "xp_horizon_total": 14.92,
       "gameweeks": [
@@ -11502,6 +11651,7 @@
       "xmins": 59.7,
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.48,
       "xp_horizon_total": 14.87,
       "gameweeks": [
@@ -11588,6 +11738,7 @@
       "xmins": 54.1,
       "predicted_starts": 55.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.46,
       "xp_horizon_total": 14.75,
       "gameweeks": [
@@ -11674,6 +11825,7 @@
       "xmins": 53.2,
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.46,
       "xp_horizon_total": 14.75,
       "gameweeks": [
@@ -11760,6 +11912,7 @@
       "xmins": 54.6,
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.43,
       "xp_horizon_total": 14.59,
       "gameweeks": [
@@ -11846,6 +11999,7 @@
       "xmins": 61.6,
       "predicted_starts": 64.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.43,
       "xp_horizon_total": 14.58,
       "gameweeks": [
@@ -11932,6 +12086,7 @@
       "xmins": 44.5,
       "predicted_starts": 49.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.43,
       "xp_horizon_total": 14.56,
       "gameweeks": [
@@ -12018,6 +12173,7 @@
       "xmins": 61.5,
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.42,
       "xp_horizon_total": 14.52,
       "gameweeks": [
@@ -12104,6 +12260,7 @@
       "xmins": 52.3,
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.42,
       "xp_horizon_total": 14.51,
       "gameweeks": [
@@ -12190,6 +12347,7 @@
       "xmins": 50.2,
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.37,
       "xp_horizon_total": 14.21,
       "gameweeks": [
@@ -12276,6 +12434,7 @@
       "xmins": 62.0,
       "predicted_starts": 67.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.37,
       "xp_horizon_total": 14.2,
       "gameweeks": [
@@ -12362,6 +12521,7 @@
       "xmins": 48.8,
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.36,
       "xp_horizon_total": 14.16,
       "gameweeks": [
@@ -12448,6 +12608,7 @@
       "xmins": 63.8,
       "predicted_starts": 73.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.35,
       "xp_horizon_total": 14.07,
       "gameweeks": [
@@ -12534,6 +12695,7 @@
       "xmins": 45.0,
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.34,
       "xp_horizon_total": 14.07,
       "gameweeks": [
@@ -12620,6 +12782,7 @@
       "xmins": 46.9,
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.34,
       "xp_horizon_total": 14.05,
       "gameweeks": [
@@ -12706,6 +12869,7 @@
       "xmins": 46.9,
       "predicted_starts": 54.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.34,
       "xp_horizon_total": 14.02,
       "gameweeks": [
@@ -12792,6 +12956,7 @@
       "xmins": 54.0,
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.33,
       "xp_horizon_total": 13.99,
       "gameweeks": [
@@ -12878,6 +13043,7 @@
       "xmins": 51.7,
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.33,
       "xp_horizon_total": 13.98,
       "gameweeks": [
@@ -12964,6 +13130,7 @@
       "xmins": 51.8,
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.32,
       "xp_horizon_total": 13.89,
       "gameweeks": [
@@ -13050,6 +13217,7 @@
       "xmins": 43.8,
       "predicted_starts": 51.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.3,
       "xp_horizon_total": 13.77,
       "gameweeks": [
@@ -13136,6 +13304,7 @@
       "xmins": 50.7,
       "predicted_starts": 48.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.28,
       "xp_horizon_total": 13.69,
       "gameweeks": [
@@ -13222,6 +13391,7 @@
       "xmins": 55.4,
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.28,
       "xp_horizon_total": 13.66,
       "gameweeks": [
@@ -13308,6 +13478,7 @@
       "xmins": 52.6,
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.27,
       "xp_horizon_total": 13.62,
       "gameweeks": [
@@ -13394,6 +13565,7 @@
       "xmins": 50.1,
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.25,
       "xp_horizon_total": 13.52,
       "gameweeks": [
@@ -13480,6 +13652,7 @@
       "xmins": 50.5,
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.24,
       "xp_horizon_total": 13.43,
       "gameweeks": [
@@ -13566,6 +13739,7 @@
       "xmins": 55.6,
       "predicted_starts": 62.1,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.22,
       "xp_horizon_total": 13.3,
       "gameweeks": [
@@ -13652,6 +13826,7 @@
       "xmins": 47.8,
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.19,
       "xp_horizon_total": 13.16,
       "gameweeks": [
@@ -13738,6 +13913,7 @@
       "xmins": 48.3,
       "predicted_starts": 51.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.19,
       "xp_horizon_total": 13.14,
       "gameweeks": [
@@ -13824,6 +14000,7 @@
       "xmins": 51.2,
       "predicted_starts": 56.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.18,
       "xp_horizon_total": 13.09,
       "gameweeks": [
@@ -13910,6 +14087,7 @@
       "xmins": 46.9,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.18,
       "xp_horizon_total": 13.08,
       "gameweeks": [
@@ -13996,6 +14174,7 @@
       "xmins": 50.4,
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.17,
       "xp_horizon_total": 13.03,
       "gameweeks": [
@@ -14082,6 +14261,7 @@
       "xmins": 40.4,
       "predicted_starts": 45.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.11,
       "xp_horizon_total": 12.68,
       "gameweeks": [
@@ -14168,6 +14348,7 @@
       "xmins": 48.5,
       "predicted_starts": 54.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.1,
       "xp_horizon_total": 12.63,
       "gameweeks": [
@@ -14254,6 +14435,7 @@
       "xmins": 53.3,
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.09,
       "xp_horizon_total": 12.57,
       "gameweeks": [
@@ -14340,6 +14522,7 @@
       "xmins": 49.8,
       "predicted_starts": 56.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.09,
       "xp_horizon_total": 12.51,
       "gameweeks": [
@@ -14426,6 +14609,7 @@
       "xmins": 32.8,
       "predicted_starts": 40.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.07,
       "xp_horizon_total": 12.41,
       "gameweeks": [
@@ -14512,6 +14696,7 @@
       "xmins": 51.1,
       "predicted_starts": 55.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.05,
       "xp_horizon_total": 12.31,
       "gameweeks": [
@@ -14598,6 +14783,7 @@
       "xmins": 58.4,
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.04,
       "xp_horizon_total": 12.21,
       "gameweeks": [
@@ -14684,6 +14870,7 @@
       "xmins": 37.9,
       "predicted_starts": 47.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.03,
       "xp_horizon_total": 12.18,
       "gameweeks": [
@@ -14770,6 +14957,7 @@
       "xmins": 59.8,
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.02,
       "xp_horizon_total": 12.1,
       "gameweeks": [
@@ -14856,6 +15044,7 @@
       "xmins": 56.6,
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.01,
       "xp_horizon_total": 12.05,
       "gameweeks": [
@@ -14942,6 +15131,7 @@
       "xmins": 42.7,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 2.0,
       "xp_horizon_total": 11.99,
       "gameweeks": [
@@ -15028,6 +15218,7 @@
       "xmins": 41.8,
       "predicted_starts": 45.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.99,
       "xp_horizon_total": 11.94,
       "gameweeks": [
@@ -15114,6 +15305,7 @@
       "xmins": 40.8,
       "predicted_starts": 47.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.98,
       "xp_horizon_total": 11.86,
       "gameweeks": [
@@ -15200,6 +15392,7 @@
       "xmins": 44.7,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.95,
       "xp_horizon_total": 11.72,
       "gameweeks": [
@@ -15286,6 +15479,7 @@
       "xmins": 50.7,
       "predicted_starts": 57.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.95,
       "xp_horizon_total": 11.7,
       "gameweeks": [
@@ -15372,6 +15566,7 @@
       "xmins": 28.4,
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.95,
       "xp_horizon_total": 11.7,
       "gameweeks": [
@@ -15458,6 +15653,7 @@
       "xmins": 37.2,
       "predicted_starts": 45.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.91,
       "xp_horizon_total": 11.47,
       "gameweeks": [
@@ -15544,6 +15740,7 @@
       "xmins": 37.3,
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.9,
       "xp_horizon_total": 11.39,
       "gameweeks": [
@@ -15630,6 +15827,7 @@
       "xmins": 42.1,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.89,
       "xp_horizon_total": 11.32,
       "gameweeks": [
@@ -15716,6 +15914,7 @@
       "xmins": 49.7,
       "predicted_starts": 58.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.88,
       "xp_horizon_total": 11.3,
       "gameweeks": [
@@ -15802,6 +16001,7 @@
       "xmins": 38.4,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.87,
       "xp_horizon_total": 11.2,
       "gameweeks": [
@@ -15888,6 +16088,7 @@
       "xmins": 45.3,
       "predicted_starts": 48.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.87,
       "xp_horizon_total": 11.19,
       "gameweeks": [
@@ -15974,6 +16175,7 @@
       "xmins": 35.5,
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.85,
       "xp_horizon_total": 11.08,
       "gameweeks": [
@@ -16060,6 +16262,7 @@
       "xmins": 47.7,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.83,
       "xp_horizon_total": 10.96,
       "gameweeks": [
@@ -16146,6 +16349,7 @@
       "xmins": 43.5,
       "predicted_starts": 43.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.82,
       "xp_horizon_total": 10.95,
       "gameweeks": [
@@ -16232,6 +16436,7 @@
       "xmins": 45.5,
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.82,
       "xp_horizon_total": 10.93,
       "gameweeks": [
@@ -16318,6 +16523,7 @@
       "xmins": 45.6,
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.82,
       "xp_horizon_total": 10.91,
       "gameweeks": [
@@ -16404,6 +16610,7 @@
       "xmins": 42.9,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.82,
       "xp_horizon_total": 10.9,
       "gameweeks": [
@@ -16490,6 +16697,7 @@
       "xmins": 46.9,
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.81,
       "xp_horizon_total": 10.88,
       "gameweeks": [
@@ -16576,6 +16784,7 @@
       "xmins": 38.1,
       "predicted_starts": 42.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.79,
       "xp_horizon_total": 10.76,
       "gameweeks": [
@@ -16662,6 +16871,7 @@
       "xmins": 43.5,
       "predicted_starts": 48.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.79,
       "xp_horizon_total": 10.72,
       "gameweeks": [
@@ -16748,6 +16958,7 @@
       "xmins": 42.1,
       "predicted_starts": 47.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.78,
       "xp_horizon_total": 10.7,
       "gameweeks": [
@@ -16834,6 +17045,7 @@
       "xmins": 36.4,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.76,
       "xp_horizon_total": 10.59,
       "gameweeks": [
@@ -16920,6 +17132,7 @@
       "xmins": 40.4,
       "predicted_starts": 45.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.76,
       "xp_horizon_total": 10.55,
       "gameweeks": [
@@ -17006,6 +17219,7 @@
       "xmins": 36.2,
       "predicted_starts": 40.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.74,
       "xp_horizon_total": 10.47,
       "gameweeks": [
@@ -17092,6 +17306,7 @@
       "xmins": 44.0,
       "predicted_starts": 47.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.73,
       "xp_horizon_total": 10.4,
       "gameweeks": [
@@ -17178,6 +17393,7 @@
       "xmins": 30.2,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.73,
       "xp_horizon_total": 10.39,
       "gameweeks": [
@@ -17264,6 +17480,7 @@
       "xmins": 41.6,
       "predicted_starts": 42.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.71,
       "xp_horizon_total": 10.27,
       "gameweeks": [
@@ -17350,6 +17567,7 @@
       "xmins": 33.9,
       "predicted_starts": 41.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.71,
       "xp_horizon_total": 10.23,
       "gameweeks": [
@@ -17436,6 +17654,7 @@
       "xmins": 39.2,
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.7,
       "xp_horizon_total": 10.23,
       "gameweeks": [
@@ -17522,6 +17741,7 @@
       "xmins": 43.6,
       "predicted_starts": 54.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.7,
       "xp_horizon_total": 10.21,
       "gameweeks": [
@@ -17608,6 +17828,7 @@
       "xmins": 34.5,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.69,
       "xp_horizon_total": 10.14,
       "gameweeks": [
@@ -17694,6 +17915,7 @@
       "xmins": 36.3,
       "predicted_starts": 44.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.67,
       "xp_horizon_total": 10.02,
       "gameweeks": [
@@ -17780,6 +18002,7 @@
       "xmins": 34.3,
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.65,
       "xp_horizon_total": 9.88,
       "gameweeks": [
@@ -17866,6 +18089,7 @@
       "xmins": 29.5,
       "predicted_starts": 33.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.64,
       "xp_horizon_total": 9.86,
       "gameweeks": [
@@ -17952,6 +18176,7 @@
       "xmins": 33.2,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.63,
       "xp_horizon_total": 9.77,
       "gameweeks": [
@@ -18038,6 +18263,7 @@
       "xmins": 42.3,
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.62,
       "xp_horizon_total": 9.72,
       "gameweeks": [
@@ -18124,6 +18350,7 @@
       "xmins": 40.0,
       "predicted_starts": 45.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.6,
       "xp_horizon_total": 9.59,
       "gameweeks": [
@@ -18210,6 +18437,7 @@
       "xmins": 30.9,
       "predicted_starts": 42.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.59,
       "xp_horizon_total": 9.55,
       "gameweeks": [
@@ -18296,6 +18524,7 @@
       "xmins": 21.2,
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.59,
       "xp_horizon_total": 9.55,
       "gameweeks": [
@@ -18382,6 +18611,7 @@
       "xmins": 34.8,
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.58,
       "xp_horizon_total": 9.46,
       "gameweeks": [
@@ -18468,6 +18698,7 @@
       "xmins": 28.0,
       "predicted_starts": 33.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.54,
       "xp_horizon_total": 9.23,
       "gameweeks": [
@@ -18554,6 +18785,7 @@
       "xmins": 34.8,
       "predicted_starts": 41.6,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.53,
       "xp_horizon_total": 9.19,
       "gameweeks": [
@@ -18640,6 +18872,7 @@
       "xmins": 41.2,
       "predicted_starts": 50.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.53,
       "xp_horizon_total": 9.17,
       "gameweeks": [
@@ -18726,6 +18959,7 @@
       "xmins": 38.9,
       "predicted_starts": 44.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.51,
       "xp_horizon_total": 9.09,
       "gameweeks": [
@@ -18812,6 +19046,7 @@
       "xmins": 34.7,
       "predicted_starts": 40.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.48,
       "xp_horizon_total": 8.87,
       "gameweeks": [
@@ -18898,6 +19133,7 @@
       "xmins": 27.2,
       "predicted_starts": 31.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.47,
       "xp_horizon_total": 8.84,
       "gameweeks": [
@@ -18984,6 +19220,7 @@
       "xmins": 33.1,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.47,
       "xp_horizon_total": 8.82,
       "gameweeks": [
@@ -19070,6 +19307,7 @@
       "xmins": 24.6,
       "predicted_starts": 25.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.46,
       "xp_horizon_total": 8.79,
       "gameweeks": [
@@ -19156,6 +19394,7 @@
       "xmins": 28.1,
       "predicted_starts": 31.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.46,
       "xp_horizon_total": 8.75,
       "gameweeks": [
@@ -19242,6 +19481,7 @@
       "xmins": 33.1,
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.46,
       "xp_horizon_total": 8.75,
       "gameweeks": [
@@ -19328,6 +19568,7 @@
       "xmins": 26.4,
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.45,
       "xp_horizon_total": 8.7,
       "gameweeks": [
@@ -19414,6 +19655,7 @@
       "xmins": 27.2,
       "predicted_starts": 33.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.43,
       "xp_horizon_total": 8.57,
       "gameweeks": [
@@ -19500,6 +19742,7 @@
       "xmins": 26.6,
       "predicted_starts": 35.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.42,
       "xp_horizon_total": 8.53,
       "gameweeks": [
@@ -19586,6 +19829,7 @@
       "xmins": 28.5,
       "predicted_starts": 34.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.41,
       "xp_horizon_total": 8.46,
       "gameweeks": [
@@ -19672,6 +19916,7 @@
       "xmins": 34.5,
       "predicted_starts": 39.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.4,
       "xp_horizon_total": 8.42,
       "gameweeks": [
@@ -19758,6 +20003,7 @@
       "xmins": 31.2,
       "predicted_starts": 40.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.4,
       "xp_horizon_total": 8.38,
       "gameweeks": [
@@ -19844,6 +20090,7 @@
       "xmins": 32.5,
       "predicted_starts": 36.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.37,
       "xp_horizon_total": 8.22,
       "gameweeks": [
@@ -19930,6 +20177,7 @@
       "xmins": 28.2,
       "predicted_starts": 30.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.37,
       "xp_horizon_total": 8.2,
       "gameweeks": [
@@ -20016,6 +20264,7 @@
       "xmins": 26.1,
       "predicted_starts": 36.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.34,
       "xp_horizon_total": 8.03,
       "gameweeks": [
@@ -20102,6 +20351,7 @@
       "xmins": 34.0,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.34,
       "xp_horizon_total": 8.03,
       "gameweeks": [
@@ -20188,6 +20438,7 @@
       "xmins": 27.1,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.33,
       "xp_horizon_total": 7.98,
       "gameweeks": [
@@ -20274,6 +20525,7 @@
       "xmins": 30.3,
       "predicted_starts": 34.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.75,
       "gameweeks": [
@@ -20360,6 +20612,7 @@
       "xmins": 27.5,
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.73,
       "gameweeks": [
@@ -20446,6 +20699,7 @@
       "xmins": 27.2,
       "predicted_starts": 34.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.28,
       "xp_horizon_total": 7.66,
       "gameweeks": [
@@ -20532,6 +20786,7 @@
       "xmins": 26.0,
       "predicted_starts": 31.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.27,
       "xp_horizon_total": 7.63,
       "gameweeks": [
@@ -20618,6 +20873,7 @@
       "xmins": 27.3,
       "predicted_starts": 36.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.27,
       "xp_horizon_total": 7.63,
       "gameweeks": [
@@ -20704,6 +20960,7 @@
       "xmins": 23.6,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.27,
       "xp_horizon_total": 7.63,
       "gameweeks": [
@@ -20790,6 +21047,7 @@
       "xmins": 34.4,
       "predicted_starts": 42.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.26,
       "xp_horizon_total": 7.58,
       "gameweeks": [
@@ -20876,6 +21134,7 @@
       "xmins": 26.2,
       "predicted_starts": 33.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.26,
       "xp_horizon_total": 7.57,
       "gameweeks": [
@@ -20962,6 +21221,7 @@
       "xmins": 27.0,
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.26,
       "xp_horizon_total": 7.55,
       "gameweeks": [
@@ -21048,6 +21308,7 @@
       "xmins": 27.4,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.25,
       "xp_horizon_total": 7.49,
       "gameweeks": [
@@ -21134,6 +21395,7 @@
       "xmins": 29.2,
       "predicted_starts": 38.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.25,
       "xp_horizon_total": 7.48,
       "gameweeks": [
@@ -21220,6 +21482,7 @@
       "xmins": 23.5,
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.24,
       "xp_horizon_total": 7.43,
       "gameweeks": [
@@ -21306,6 +21569,7 @@
       "xmins": 26.8,
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.23,
       "xp_horizon_total": 7.37,
       "gameweeks": [
@@ -21392,6 +21656,7 @@
       "xmins": 21.9,
       "predicted_starts": 25.5,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.23,
       "xp_horizon_total": 7.35,
       "gameweeks": [
@@ -21478,6 +21743,7 @@
       "xmins": 27.1,
       "predicted_starts": 28.9,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.21,
       "xp_horizon_total": 7.25,
       "gameweeks": [
@@ -21564,6 +21830,7 @@
       "xmins": 23.1,
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.18,
       "xp_horizon_total": 7.09,
       "gameweeks": [
@@ -21650,6 +21917,7 @@
       "xmins": 16.8,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.18,
       "xp_horizon_total": 7.08,
       "gameweeks": [
@@ -21736,6 +22004,7 @@
       "xmins": 24.4,
       "predicted_starts": 29.0,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.18,
       "xp_horizon_total": 7.06,
       "gameweeks": [
@@ -21822,6 +22091,7 @@
       "xmins": 20.7,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.17,
       "xp_horizon_total": 7.01,
       "gameweeks": [
@@ -21908,6 +22178,7 @@
       "xmins": 37.9,
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.15,
       "xp_horizon_total": 6.93,
       "gameweeks": [
@@ -21994,6 +22265,7 @@
       "xmins": 26.2,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.13,
       "xp_horizon_total": 6.79,
       "gameweeks": [
@@ -22080,6 +22352,7 @@
       "xmins": 28.9,
       "predicted_starts": 40.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.13,
       "xp_horizon_total": 6.77,
       "gameweeks": [
@@ -22166,6 +22439,7 @@
       "xmins": 24.1,
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.12,
       "xp_horizon_total": 6.72,
       "gameweeks": [
@@ -22252,6 +22526,7 @@
       "xmins": 18.1,
       "predicted_starts": 27.7,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.12,
       "xp_horizon_total": 6.72,
       "gameweeks": [
@@ -22338,6 +22613,7 @@
       "xmins": 19.9,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.12,
       "xp_horizon_total": 6.7,
       "gameweeks": [
@@ -22424,6 +22700,7 @@
       "xmins": 24.0,
       "predicted_starts": 29.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.11,
       "xp_horizon_total": 6.64,
       "gameweeks": [
@@ -22510,6 +22787,7 @@
       "xmins": 19.8,
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.1,
       "xp_horizon_total": 6.58,
       "gameweeks": [
@@ -22596,6 +22874,7 @@
       "xmins": 25.9,
       "predicted_starts": 38.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.09,
       "xp_horizon_total": 6.54,
       "gameweeks": [
@@ -22682,6 +22961,7 @@
       "xmins": 17.6,
       "predicted_starts": 23.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.07,
       "xp_horizon_total": 6.42,
       "gameweeks": [
@@ -22768,6 +23048,7 @@
       "xmins": 26.4,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.07,
       "xp_horizon_total": 6.42,
       "gameweeks": [
@@ -22854,6 +23135,7 @@
       "xmins": 18.9,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.05,
       "xp_horizon_total": 6.28,
       "gameweeks": [
@@ -22940,6 +23222,7 @@
       "xmins": 19.8,
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.04,
       "xp_horizon_total": 6.23,
       "gameweeks": [
@@ -23026,6 +23309,7 @@
       "xmins": 19.1,
       "predicted_starts": 29.3,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.04,
       "xp_horizon_total": 6.22,
       "gameweeks": [
@@ -23112,6 +23396,7 @@
       "xmins": 21.6,
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.04,
       "xp_horizon_total": 6.22,
       "gameweeks": [
@@ -23198,6 +23483,7 @@
       "xmins": 29.6,
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.01,
       "xp_horizon_total": 6.08,
       "gameweeks": [
@@ -23284,6 +23570,7 @@
       "xmins": 24.8,
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.01,
       "xp_horizon_total": 6.07,
       "gameweeks": [
@@ -23370,6 +23657,7 @@
       "xmins": 21.8,
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 1.01,
       "xp_horizon_total": 6.05,
       "gameweeks": [
@@ -23456,6 +23744,7 @@
       "xmins": 23.2,
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.99,
       "xp_horizon_total": 5.96,
       "gameweeks": [
@@ -23542,6 +23831,7 @@
       "xmins": 14.4,
       "predicted_starts": 20.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.99,
       "xp_horizon_total": 5.94,
       "gameweeks": [
@@ -23628,6 +23918,7 @@
       "xmins": 17.8,
       "predicted_starts": 18.4,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.99,
       "xp_horizon_total": 5.92,
       "gameweeks": [
@@ -23714,6 +24005,7 @@
       "xmins": 13.6,
       "predicted_starts": 18.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.99,
       "xp_horizon_total": 5.92,
       "gameweeks": [
@@ -23800,6 +24092,7 @@
       "xmins": 19.4,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.96,
       "xp_horizon_total": 5.76,
       "gameweeks": [
@@ -23886,6 +24179,7 @@
       "xmins": 19.0,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.95,
       "xp_horizon_total": 5.72,
       "gameweeks": [
@@ -23972,6 +24266,7 @@
       "xmins": 18.7,
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.94,
       "xp_horizon_total": 5.64,
       "gameweeks": [
@@ -24058,6 +24353,7 @@
       "xmins": 22.3,
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.93,
       "xp_horizon_total": 5.6,
       "gameweeks": [
@@ -24144,6 +24440,7 @@
       "xmins": 12.6,
       "predicted_starts": 16.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.93,
       "xp_horizon_total": 5.6,
       "gameweeks": [
@@ -24230,6 +24527,7 @@
       "xmins": 22.8,
       "predicted_starts": 31.1,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.93,
       "xp_horizon_total": 5.56,
       "gameweeks": [
@@ -24316,6 +24614,7 @@
       "xmins": 15.5,
       "predicted_starts": 25.4,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.88,
       "xp_horizon_total": 5.26,
       "gameweeks": [
@@ -24402,6 +24701,7 @@
       "xmins": 16.6,
       "predicted_starts": 27.0,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.88,
       "xp_horizon_total": 5.25,
       "gameweeks": [
@@ -24488,6 +24788,7 @@
       "xmins": 16.2,
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.86,
       "xp_horizon_total": 5.18,
       "gameweeks": [
@@ -24574,6 +24875,7 @@
       "xmins": 9.4,
       "predicted_starts": 14.7,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.86,
       "xp_horizon_total": 5.17,
       "gameweeks": [
@@ -24660,6 +24962,7 @@
       "xmins": 8.3,
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.86,
       "xp_horizon_total": 5.15,
       "gameweeks": [
@@ -24746,6 +25049,7 @@
       "xmins": 19.3,
       "predicted_starts": 27.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.85,
       "xp_horizon_total": 5.09,
       "gameweeks": [
@@ -24832,6 +25136,7 @@
       "xmins": 15.3,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.83,
       "xp_horizon_total": 4.96,
       "gameweeks": [
@@ -24918,6 +25223,7 @@
       "xmins": 14.9,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.79,
       "xp_horizon_total": 4.76,
       "gameweeks": [
@@ -25004,6 +25310,7 @@
       "xmins": 14.2,
       "predicted_starts": 20.3,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.79,
       "xp_horizon_total": 4.74,
       "gameweeks": [
@@ -25090,6 +25397,7 @@
       "xmins": 18.2,
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.77,
       "xp_horizon_total": 4.64,
       "gameweeks": [
@@ -25176,6 +25484,7 @@
       "xmins": 5.6,
       "predicted_starts": 10.4,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.76,
       "xp_horizon_total": 4.58,
       "gameweeks": [
@@ -25262,6 +25571,7 @@
       "xmins": 15.4,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.75,
       "xp_horizon_total": 4.53,
       "gameweeks": [
@@ -25348,6 +25658,7 @@
       "xmins": 16.0,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.72,
       "xp_horizon_total": 4.35,
       "gameweeks": [
@@ -25434,6 +25745,7 @@
       "xmins": 16.9,
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.7,
       "xp_horizon_total": 4.2,
       "gameweeks": [
@@ -25520,6 +25832,7 @@
       "xmins": 14.7,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.68,
       "xp_horizon_total": 4.06,
       "gameweeks": [
@@ -25606,6 +25919,7 @@
       "xmins": 11.1,
       "predicted_starts": 16.8,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.66,
       "xp_horizon_total": 3.99,
       "gameweeks": [
@@ -25692,6 +26006,7 @@
       "xmins": 10.8,
       "predicted_starts": 19.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.66,
       "xp_horizon_total": 3.97,
       "gameweeks": [
@@ -25778,6 +26093,7 @@
       "xmins": 17.0,
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.65,
       "xp_horizon_total": 3.9,
       "gameweeks": [
@@ -25864,6 +26180,7 @@
       "xmins": 15.6,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.65,
       "xp_horizon_total": 3.89,
       "gameweeks": [
@@ -25950,6 +26267,7 @@
       "xmins": 9.4,
       "predicted_starts": 13.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.64,
       "xp_horizon_total": 3.86,
       "gameweeks": [
@@ -26036,6 +26354,7 @@
       "xmins": 11.8,
       "predicted_starts": 21.2,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.64,
       "xp_horizon_total": 3.86,
       "gameweeks": [
@@ -26122,6 +26441,7 @@
       "xmins": 12.3,
       "predicted_starts": 17.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.64,
       "xp_horizon_total": 3.82,
       "gameweeks": [
@@ -26208,6 +26528,7 @@
       "xmins": 12.3,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.61,
       "xp_horizon_total": 3.65,
       "gameweeks": [
@@ -26294,6 +26615,7 @@
       "xmins": 14.2,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.59,
       "xp_horizon_total": 3.55,
       "gameweeks": [
@@ -26380,6 +26702,7 @@
       "xmins": 15.4,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.59,
       "xp_horizon_total": 3.54,
       "gameweeks": [
@@ -26466,6 +26789,7 @@
       "xmins": 6.5,
       "predicted_starts": 14.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.59,
       "xp_horizon_total": 3.51,
       "gameweeks": [
@@ -26552,6 +26876,7 @@
       "xmins": 14.6,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.58,
       "xp_horizon_total": 3.5,
       "gameweeks": [
@@ -26638,6 +26963,7 @@
       "xmins": 9.9,
       "predicted_starts": 20.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.58,
       "xp_horizon_total": 3.46,
       "gameweeks": [
@@ -26724,6 +27050,7 @@
       "xmins": 16.6,
       "predicted_starts": 24.7,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.58,
       "xp_horizon_total": 3.45,
       "gameweeks": [
@@ -26810,6 +27137,7 @@
       "xmins": 11.5,
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.56,
       "xp_horizon_total": 3.33,
       "gameweeks": [
@@ -26896,6 +27224,7 @@
       "xmins": 7.3,
       "predicted_starts": 14.2,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.55,
       "xp_horizon_total": 3.29,
       "gameweeks": [
@@ -26982,6 +27311,7 @@
       "xmins": 8.0,
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.51,
       "xp_horizon_total": 3.05,
       "gameweeks": [
@@ -27068,6 +27398,7 @@
       "xmins": 9.9,
       "predicted_starts": 18.9,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.49,
       "xp_horizon_total": 2.97,
       "gameweeks": [
@@ -27154,6 +27485,7 @@
       "xmins": 11.5,
       "predicted_starts": 20.5,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.47,
       "xp_horizon_total": 2.83,
       "gameweeks": [
@@ -27240,6 +27572,7 @@
       "xmins": 4.2,
       "predicted_starts": 10.4,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.46,
       "xp_horizon_total": 2.76,
       "gameweeks": [
@@ -27326,6 +27659,7 @@
       "xmins": 6.6,
       "predicted_starts": 17.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.46,
       "xp_horizon_total": 2.75,
       "gameweeks": [
@@ -27412,6 +27746,7 @@
       "xmins": 7.0,
       "predicted_starts": 12.4,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.46,
       "xp_horizon_total": 2.73,
       "gameweeks": [
@@ -27498,6 +27833,7 @@
       "xmins": 10.0,
       "predicted_starts": 19.4,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.45,
       "xp_horizon_total": 2.68,
       "gameweeks": [
@@ -27584,6 +27920,7 @@
       "xmins": 9.9,
       "predicted_starts": 17.9,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.45,
       "xp_horizon_total": 2.68,
       "gameweeks": [
@@ -27670,6 +28007,7 @@
       "xmins": 9.1,
       "predicted_starts": 20.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.43,
       "xp_horizon_total": 2.57,
       "gameweeks": [
@@ -27756,6 +28094,7 @@
       "xmins": 10.1,
       "predicted_starts": 16.8,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.4,
       "xp_horizon_total": 2.4,
       "gameweeks": [
@@ -27842,6 +28181,7 @@
       "xmins": 13.4,
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.4,
       "xp_horizon_total": 2.38,
       "gameweeks": [
@@ -27928,6 +28268,7 @@
       "xmins": 5.8,
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.35,
       "xp_horizon_total": 2.09,
       "gameweeks": [
@@ -28014,6 +28355,7 @@
       "xmins": 9.0,
       "predicted_starts": 17.9,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.35,
       "xp_horizon_total": 2.09,
       "gameweeks": [
@@ -28100,6 +28442,7 @@
       "xmins": 7.9,
       "predicted_starts": 15.2,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.34,
       "xp_horizon_total": 2.05,
       "gameweeks": [
@@ -28186,6 +28529,7 @@
       "xmins": 3.1,
       "predicted_starts": 10.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.32,
       "xp_horizon_total": 1.91,
       "gameweeks": [
@@ -28272,6 +28616,7 @@
       "xmins": 7.1,
       "predicted_starts": 16.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.3,
       "xp_horizon_total": 1.83,
       "gameweeks": [
@@ -28358,6 +28703,7 @@
       "xmins": 7.1,
       "predicted_starts": 16.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.3,
       "xp_horizon_total": 1.81,
       "gameweeks": [
@@ -28444,6 +28790,7 @@
       "xmins": 4.0,
       "predicted_starts": 12.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.29,
       "xp_horizon_total": 1.74,
       "gameweeks": [
@@ -28530,6 +28877,7 @@
       "xmins": 2.3,
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.27,
       "xp_horizon_total": 1.59,
       "gameweeks": [
@@ -28616,6 +28964,7 @@
       "xmins": 3.8,
       "predicted_starts": 15.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.26,
       "xp_horizon_total": 1.55,
       "gameweeks": [
@@ -28702,6 +29051,7 @@
       "xmins": 2.8,
       "predicted_starts": 10.8,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.25,
       "xp_horizon_total": 1.49,
       "gameweeks": [
@@ -28788,6 +29138,7 @@
       "xmins": 6.4,
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.25,
       "xp_horizon_total": 1.48,
       "gameweeks": [
@@ -28874,6 +29225,7 @@
       "xmins": 5.6,
       "predicted_starts": 14.2,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.22,
       "xp_horizon_total": 1.34,
       "gameweeks": [
@@ -28960,6 +29312,7 @@
       "xmins": 3.3,
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.22,
       "xp_horizon_total": 1.32,
       "gameweeks": [
@@ -29046,6 +29399,7 @@
       "xmins": 2.7,
       "predicted_starts": 12.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.21,
       "xp_horizon_total": 1.29,
       "gameweeks": [
@@ -29132,6 +29486,7 @@
       "xmins": 3.3,
       "predicted_starts": 12.5,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.21,
       "xp_horizon_total": 1.23,
       "gameweeks": [
@@ -29218,6 +29573,7 @@
       "xmins": 2.8,
       "predicted_starts": 12.6,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.19,
       "xp_horizon_total": 1.16,
       "gameweeks": [
@@ -29304,6 +29660,7 @@
       "xmins": 3.5,
       "predicted_starts": 5.6,
       "minutes_confidence": "high",
+      "data_basis": "pl_history",
       "xp_per_gw": 0.18,
       "xp_horizon_total": 1.11,
       "gameweeks": [
@@ -29390,6 +29747,7 @@
       "xmins": 3.0,
       "predicted_starts": 13.3,
       "minutes_confidence": "high",
+      "data_basis": "limited_history",
       "xp_per_gw": 0.17,
       "xp_horizon_total": 1.04,
       "gameweeks": [

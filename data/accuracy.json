@@ -1,31 +1,31 @@
 {
-  "updated_at": "2026-07-20T12:31:19+00:00",
+  "updated_at": "2026-07-20T13:22:26+00:00",
   "logged_total": 304,
   "pending": 197,
   "all_time": {
     "n": 107,
-    "correct_1x2": 70,
-    "pct_1x2": 0.6542,
-    "decisive_n": 82,
-    "decisive_correct": 70,
-    "pct_decisive": 0.8537,
+    "correct_1x2": 65,
+    "pct_1x2": 0.6075,
+    "decisive_n": 77,
+    "decisive_correct": 65,
+    "pct_decisive": 0.8442,
     "exact_n": 59,
-    "exact_correct": 11,
-    "pct_exact": 0.1864,
-    "brier": 0.4394,
+    "exact_correct": 12,
+    "pct_exact": 0.2034,
+    "brier": 0.4902,
     "brier_n": 59
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 67,
-    "pct_1x2": 0.67,
-    "decisive_n": 78,
-    "decisive_correct": 67,
-    "pct_decisive": 0.859,
+    "correct_1x2": 62,
+    "pct_1x2": 0.62,
+    "decisive_n": 73,
+    "decisive_correct": 62,
+    "pct_decisive": 0.8493,
     "exact_n": 59,
-    "exact_correct": 11,
-    "pct_exact": 0.1864,
-    "brier": 0.4394,
+    "exact_correct": 12,
+    "pct_exact": 0.2034,
+    "brier": 0.4902,
     "brier_n": 59,
     "window": 100
   },
@@ -45,15 +45,15 @@
     },
     "WC": {
       "n": 104,
-      "correct_1x2": 68,
-      "pct_1x2": 0.6538,
-      "decisive_n": 80,
-      "decisive_correct": 68,
-      "pct_decisive": 0.85,
+      "correct_1x2": 63,
+      "pct_1x2": 0.6058,
+      "decisive_n": 75,
+      "decisive_correct": 63,
+      "pct_decisive": 0.84,
       "exact_n": 56,
-      "exact_correct": 10,
-      "pct_exact": 0.1786,
-      "brier": 0.4381,
+      "exact_correct": 11,
+      "pct_exact": 0.1964,
+      "brier": 0.4916,
       "brier_n": 56
     }
   },
@@ -61,7 +61,7 @@
     {
       "bin_mid": 0.0676,
       "predicted": 0.0676,
-      "actual": 0.0,
+      "actual": 0.1,
       "n": 10
     },
     {
@@ -73,19 +73,19 @@
     {
       "bin_mid": 0.2564,
       "predicted": 0.2564,
-      "actual": 0.1719,
+      "actual": 0.2031,
       "n": 64
     },
     {
       "bin_mid": 0.3417,
       "predicted": 0.3417,
-      "actual": 0.2692,
+      "actual": 0.3077,
       "n": 26
     },
     {
       "bin_mid": 0.4557,
       "predicted": 0.4557,
-      "actual": 0.7222,
+      "actual": 0.6111,
       "n": 18
     },
     {
@@ -97,7 +97,7 @@
     {
       "bin_mid": 0.6387,
       "predicted": 0.6387,
-      "actual": 0.8333,
+      "actual": 0.75,
       "n": 12
     },
     {
@@ -109,7 +109,7 @@
     {
       "bin_mid": 0.8586,
       "predicted": 0.8586,
-      "actual": 1.0,
+      "actual": 0.6667,
       "n": 3
     }
   ],
@@ -122,8 +122,8 @@
       "p_winner": 0.3582,
       "most_likely_score": "1-1",
       "actual_score": "1-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
+      "actual_outcome": "draw",
+      "hit_1x2": false,
       "exact_hit": false,
       "duration": "EXTRA_TIME",
       "regular_score": "0-0"
@@ -220,8 +220,8 @@
       "p_winner": 0.6266,
       "most_likely_score": "1-0",
       "actual_score": "3-1",
-      "actual_outcome": "home",
-      "hit_1x2": true,
+      "actual_outcome": "draw",
+      "hit_1x2": false,
       "exact_hit": false,
       "duration": "EXTRA_TIME",
       "regular_score": "1-1"
@@ -234,9 +234,9 @@
       "p_winner": 0.4457,
       "most_likely_score": "1-1",
       "actual_score": "1-2",
-      "actual_outcome": "away",
-      "hit_1x2": true,
-      "exact_hit": false,
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": true,
       "duration": "EXTRA_TIME",
       "regular_score": "1-1"
     },

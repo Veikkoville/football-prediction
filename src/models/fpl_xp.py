@@ -53,6 +53,31 @@ DC_PRIOR_GAMES = 5.0        # def. contribution -frekvenssin prioripaino
 # Minuuttimallin recency-painot (vanhin -> uusin viimeisistä joukkuekierroksista).
 MINUTE_WEIGHTS = (1.0, 1.0, 2.0, 2.0, 4.0)
 
+# #143: estimaatin datapohja-luokat ("model can't see this yet" -rehellisyys).
+# Akseli on EVIDENSSI (paljonko pelaajan omaa PL-dataa estimaatin takana on),
+# ei siirtostatus — new_signing-lippua ei voi täyttää totuudella pre-season-
+# bootstrapista (edellisen kauden data, siirrot näkymättömiä).
+DATA_BASIS_FULL = "pl_history"        # oma historia kantaa >= 50 % painon
+DATA_BASIS_LIMITED = "limited_history"  # ohut otos, positiopriori dominoi
+DATA_BASIS_NONE = "no_history"        # ei yhtään PL-minuuttia -> pelkkä priori
+DATA_BASIS_VALUES = (DATA_BASIS_FULL, DATA_BASIS_LIMITED, DATA_BASIS_NONE)
+
+
+def data_basis(acc: dict) -> str:
+    """Estimaatin datapohja pelaajan kertyneistä PL-minuuteista.
+
+    Kynnys = M_PRIOR_ATTACK (_shrink90:n 50 %-piste): sen alle pelaajan oma
+    xG/xA-vauhti kantaa alle puolet painosta eli estimaatti on enemmän
+    positioprioria kuin pelaajaa itseään. Puhdas emissio — ei saa muuttaa
+    yhtäkään xP-lukua.
+    """
+    mins = acc.get("mins", 0.0) or 0.0
+    if mins <= 0:
+        return DATA_BASIS_NONE
+    if mins < M_PRIOR_ATTACK:
+        return DATA_BASIS_LIMITED
+    return DATA_BASIS_FULL
+
 
 # ---------------------------------------------------------------------------
 # Pelaajavauhdit historiasta (walk-forward-turvallinen: kutsuja antaa vain
