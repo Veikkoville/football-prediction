@@ -425,7 +425,7 @@ def record_table_html(preds: list[dict], c: dict) -> str:
     """#117: koko per-ottelu-record näkyväksi tauluksi. Vain gradatut rivit
     (result != null) — pending-ennusteet ovat lukittuja mutta pelaamattomia,
     ne mainitaan lukumääränä. Uusin ensin; seed-rivit (WC-lohkovaihe, ei
-    päivämäärää) pohjalle. Gradaus = 90 min -tulos (#110-konventio):
+    päivämäärää) pohjalle. Gradaus = virallinen FT-AET-tulos (20.7-normi):
     duration != REGULAR merkitään tähdellä."""
     graded = [e for e in preds if e.get("result")]
 
@@ -483,8 +483,8 @@ def record_table_html(preds: list[dict], c: dict) -> str:
 
     star_note = (
         "<p class=\"rec-note\">* Decided in extra time or on penalties; "
-        "the prediction is graded on the 90-minute score, the honest basis "
-        "for a 1X2 call.</p>"
+        "the prediction is graded on the official final result after extra "
+        "time (a penalty shootout counts as a draw).</p>"
         if has_nonregular
         else ""
     )
