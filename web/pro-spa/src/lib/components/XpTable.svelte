@@ -68,17 +68,38 @@
 				.map((p, i) => [p.id, i + 1])
 		)
 	);
-	// #145: client-side pelaajahaku — nimi TAI team-short ("ARS"), osaosuma.
+	// #145/#147: client-side pelaajahaku. Normalisointi (SAMA logiikka
+	// mobiilissa, pariteetti): lowercase + strip diacritics (NFD) + poista
+	// heittomerkit + väliviivat/pisteet välilyönneiksi → "sesko" löytää Šeškon,
+	// "ngolo" N'Golon. Matchataan web_name + full_name ("van dijk" → Virgil) +
+	// joukkueen KOKO nimi ("arsenal") + team_short ("ARS").
+	function normSearch(s: string): string {
+		return s
+			.normalize('NFD')
+			.replace(/[̀-ͯ]/g, '')
+			.toLowerCase()
+			// NFD ei hajota näitä → eksplisiittinen kartta (Ødegaard!)
+			.replace(/ø/g, 'o')
+			.replace(/æ/g, 'ae')
+			.replace(/đ/g, 'd')
+			.replace(/ł/g, 'l')
+			.replace(/['’ʼ]/g, '')
+			.replace(/[-.]/g, ' ')
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
 	let search = $state('');
 	let pool = $derived.by(() => {
-		const q = search.trim().toLowerCase();
+		const q = normSearch(search);
 		return data.players
 			.filter((p) => pos === 'All' || p.pos === pos)
 			.filter(
 				(p) =>
 					!q ||
-					p.web_name.toLowerCase().includes(q) ||
-					p.team_short.toLowerCase().includes(q)
+					normSearch(p.web_name).includes(q) ||
+					(p.full_name ? normSearch(p.full_name).includes(q) : false) ||
+					normSearch(p.team).includes(q) ||
+					normSearch(p.team_short).includes(q)
 			)
 			.toSorted(SORTS[sortBy].cmp);
 	});

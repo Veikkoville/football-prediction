@@ -56,6 +56,8 @@ export interface XpPlayer {
 	minutes_confidence?: 'low' | 'med' | 'high';
 	/** #143: estimaatin datapohja — defensiivinen (vanha payload ei tuo). */
 	data_basis?: 'pl_history' | 'limited_history' | 'no_history';
+	/** #147: koko nimi VAIN hakua varten — defensiivinen (vanha payload ei tuo). */
+	full_name?: string;
 }
 
 export interface XpMeta {
