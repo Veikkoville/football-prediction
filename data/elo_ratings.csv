@@ -1,20 +1,20 @@
 code,name,elo
-ES,Spain,2177
-AR,Argentina,2156
-FR,France,2143
-EN,England,2076
+ES,Spain,2259
+AR,Argentina,2173
+EN,England,2125
+FR,France,2070
 CO,Colombia,2003
 PT,Portugal,1995
 BR,Brazil,1993
-NO,Norway,1972
 NL,Netherlands,1971
-BE,Belgium,1961
-CH,Switzerland,1949
-MA,Morocco,1921
+NO,Norway,1951
+BE,Belgium,1948
+CH,Switzerland,1928
 MX,Mexico,1913
-DE,Germany,1907
+DE,Germany,1908
+MA,Morocco,1901
 JP,Japan,1888
-HR,Croatia,1881
+HR,Croatia,1882
 EC,Ecuador,1871
 DK,Denmark,1869
 IT,Italy,1869
@@ -44,7 +44,7 @@ KO,Kosovo,1714
 HU,Hungary,1710
 PL,Poland,1710
 CD,DR Congo,1704
-PE,Peru,1700
+PE,Peru,1699
 IE,Ireland,1699
 WA,Wales,1682
 SI,Slovenia,1682
@@ -59,7 +59,7 @@ JO,Jordan,1628
 BO,Bolivia,1621
 CV,Cape Verde,1619
 AL,Albania,1616
-CM,Cameroon,1613
+CM,Cameroon,1614
 CR,Costa Rica,1608
 EI,Northern Ireland,1605
 BA,Bosnia and Herzegovina,1605
@@ -71,7 +71,7 @@ HN,Honduras,1570
 IS,Iceland,1568
 TN,Tunisia,1562
 IQ,Iraq,1561
-ZA,South Africa,1560
+ZA,South Africa,1559
 AO,Angola,1542
 AE,United Arab Emirates,1540
 FI,Finland,1536
@@ -80,9 +80,9 @@ BF,Burkina Faso,1529
 JM,Jamaica,1527
 BY,Belarus,1522
 HT,Haiti,1517
-GT,Guatemala,1504
+GT,Guatemala,1505
+OM,Oman,1480
 SY,Syria,1479
-OM,Oman,1479
 PS,Palestine,1465
 GN,Guinea,1463
 ME,Montenegro,1461
@@ -109,14 +109,14 @@ GQ,Equatorial Guinea,1380
 TG,Togo,1379
 TH,Thailand,1376
 KP,North Korea,1375
-KM,Comoros,1374
 AM,Armenia,1373
+KM,Comoros,1373
 ZW,Zimbabwe,1372
 ID,Indonesia,1372
 ZM,Zambia,1371
 KE,Kenya,1363
 EE,Estonia,1360
-VN,Vietnam,1351
+VN,Vietnam,1353
 SD,Sudan,1350
 RE,Reunion,1345
 SV,El Salvador,1342
@@ -141,8 +141,8 @@ LB,Lebanon,1288
 LV,Latvia,1288
 ET,Ethiopia,1287
 NC,New Caledonia,1286
+TJ,Tajikistan,1285
 BI,Burundi,1285
-TJ,Tajikistan,1284
 DO,Dominican Republic,1283
 LT,Lithuania,1279
 MD,Moldova,1270
@@ -178,23 +178,23 @@ MU,Mauritius,1073
 TD,Chad,1073
 BZ,Belize,1073
 SB,Solomon Islands,1054
-MF,Saint Martin,1043
+MF,Saint Martin,1042
 ST,Sao Tome and Principe,1035
 KN,Saint Kitts and Nevis,1030
 GI,Gibraltar,1011
 JS,Somaliland,1005
-LC,Saint Lucia,1004
+LC,Saint Lucia,1003
 EH,Western Sahara,996
-MM,Myanmar,984
+MM,Myanmar,982
 AW,Aruba,979
 SO,Somalia,979
-SX,Sint Maarten,975
+SX,Sint Maarten,974
 MS,Montserrat,972
 AF,Afghanistan,961
 GL,Greenland,945
 BD,Bangladesh,942
 DJ,Djibouti,940
-DM,Dominica,935
+DM,Dominica,934
 PK,Pakistan,909
 MC,Monaco,903
 BB,Barbados,898
@@ -206,14 +206,14 @@ SC,Seychelles,853
 LK,Sri Lanka,836
 SM,San Marino,825
 TW,Taiwan,822
-BQ,Bonaire,816
+BQ,Bonaire,817
 MV,Maldives,801
 KY,Cayman Islands,800
 HG,Chagos Islands,782
 TV,Tuvalu,756
 VG,British Virgin Islands,743
 EU,Sint Eustatius,737
-LA,Laos,734
+LA,Laos,735
 TL,East Timor,734
 WS,Samoa,728
 MN,Mongolia,726
@@ -226,7 +226,7 @@ BS,Bahamas,685
 PM,Saint Pierre and Miquelon,677
 TC,Turks and Caicos Islands,657
 AI,Anguilla,646
-TE,Tibet,629
+TE,Tibet,630
 VI,US Virgin Islands,628
 BT,Bhutan,623
 CK,Cook Islands,622
