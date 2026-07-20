@@ -1,6 +1,17 @@
 <script lang="ts">
 	import { auth, signOut } from '$lib/auth.svelte';
+	import { capture } from '$lib/analytics';
 	import icon from '$lib/assets/goaliq-appicon-192.png';
+
+	// #149: tilaustaso-badge lukee SAMAN auth.sub-tilan jota ProView gateaa →
+	// header ja feature-lukot eivät voi olla ristiriidassa. undefined =
+	// entitlement ei vielä ratkennut → ei badgea (ei väläytetä väärää tasoa).
+	let { onUpgrade }: { onUpgrade?: () => void } = $props();
+
+	function upgrade() {
+		capture('upgrade_tapped', { source: 'header_badge' });
+		onUpgrade?.();
+	}
 </script>
 
 <header class="hero">
@@ -17,6 +28,11 @@
 	{#if auth.user}
 		<div class="session">
 			<span class="muted">Signed in: {auth.user.email}</span>
+			{#if auth.sub}
+				<span class="plan premium">Premium</span>
+			{:else if auth.sub === null}
+				<button class="plan free" onclick={upgrade}>Free · Upgrade</button>
+			{/if}
 			<button class="ghost" onclick={() => void signOut()}>Sign out</button>
 		</div>
 	{/if}
@@ -71,5 +87,30 @@
 		display: flex;
 		align-items: center;
 		gap: var(--s-3);
+	}
+	.plan {
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		line-height: 1.6;
+		padding: 1px 10px;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+	.plan.premium {
+		background: var(--giq-magenta);
+		color: var(--giq-ink);
+	}
+	.plan.free {
+		background: none;
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+		cursor: pointer;
+		min-height: 0;
+	}
+	.plan.free:hover {
+		color: var(--text);
+		border-color: var(--giq-magenta);
 	}
 </style>

@@ -28,7 +28,7 @@
 </script>
 
 <div class="shell">
-	<Hero />
+	<Hero onUpgrade={goPro} />
 
 	<div class="tabs" role="tablist" aria-label="Views">
 		<button
