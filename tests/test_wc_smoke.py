@@ -10,6 +10,12 @@ import pytest
 from src.data.wc_teams import WC2026_TEAMS
 
 TOL = 1e-9
+# API pyöristää todennäköisyydet 4 desimaaliin ennen vastausta → pyöristettyjen
+# kenttien SUMMA voi laillisesti olla 0.9999/1.0001 (3 kenttää × ±5e-5).
+# TOL=1e-9 summille meni läpi vain kun pyöristys sattui tasan (paljastui
+# #141-refitin CI:ssä 20.7). Peilaus-assertit vertaavat identtisesti
+# pyöristettyjä arvoja → niissä TOL pysyy tiukkana.
+SUM_TOL = 2e-4
 
 
 def _predict(client, home, away):
@@ -24,9 +30,9 @@ def test_probabilities_sum_to_one(client):
     r = _predict(client, "Mexico", "South Africa")
     assert r.status_code == 200
     b = r.json()
-    assert b["p_home_win"] + b["p_draw"] + b["p_away_win"] == pytest.approx(1.0, abs=TOL)
-    assert b["p_over_2_5"] + b["p_under_2_5"] == pytest.approx(1.0, abs=TOL)
-    assert b["p_btts_yes"] + b["p_btts_no"] == pytest.approx(1.0, abs=TOL)
+    assert b["p_home_win"] + b["p_draw"] + b["p_away_win"] == pytest.approx(1.0, abs=SUM_TOL)
+    assert b["p_over_2_5"] + b["p_under_2_5"] == pytest.approx(1.0, abs=SUM_TOL)
+    assert b["p_btts_yes"] + b["p_btts_no"] == pytest.approx(1.0, abs=SUM_TOL)
     assert all(0.0 <= b[k] <= 1.0 for k in
                ("p_home_win", "p_draw", "p_away_win"))
 
