@@ -71,6 +71,16 @@ export async function sendMagicLink(email: string): Promise<string | null> {
 	return error ? error.message : null;
 }
 
+/** #150: salasanan reset-linkki mailiin (account-valikko). Linkki tuo takaisin
+ * tähän SPA:han recovery-sessiolla → uusi salasana asetetaan SetPasswordilla
+ * (#101-kaava). Supabase ei paljasta onko email olemassa. */
+export async function sendPasswordReset(email: string): Promise<string | null> {
+	const { error } = await supabase.auth.resetPasswordForEmail(email, {
+		redirectTo: window.location.origin
+	});
+	return error ? error.message : null;
+}
+
 /** #101: salasanan asetus magic-linkillä kirjautuneelle (guest-checkout-tili
  * syntyy ilman salasanaa; mobiili-app kirjautuu email+salasanalla). */
 export async function setPassword(password: string): Promise<string | null> {
