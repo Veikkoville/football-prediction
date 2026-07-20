@@ -4,6 +4,11 @@
 	// kirjautuneelle. Suljettu <details> → ei kohinaa salasanallisille.
 	import { setPassword } from '$lib/auth.svelte';
 
+	// #150: account-valikko reusaa saman lomakkeen "change password" -toimintona
+	let { summary = 'Set a password (to sign in to the GoalIQ iOS/Android app)' }: {
+		summary?: string;
+	} = $props();
+
 	let password = $state('');
 	let notice = $state<string | null>(null);
 	let error = $state<string | null>(null);
@@ -26,7 +31,7 @@
 </script>
 
 <details class="setpw">
-	<summary>Set a password (to sign in to the GoalIQ iOS/Android app)</summary>
+	<summary>{summary}</summary>
 	<form onsubmit={submit}>
 		<label for="new-password">New password (min 6 chars)</label>
 		<input id="new-password" type="password" autocomplete="new-password" bind:value={password} />
