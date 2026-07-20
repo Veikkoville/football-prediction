@@ -38,6 +38,35 @@ def test_load_xp_reads_valid_file(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# #143: data_basis — estimaatin datapohja-luokka (puhdas emissio)
+# ---------------------------------------------------------------------------
+def test_data_basis_no_history():
+    assert xp.data_basis({"mins": 0}) == xp.DATA_BASIS_NONE
+
+
+def test_data_basis_limited_history():
+    assert xp.data_basis({"mins": 200.0}) == xp.DATA_BASIS_LIMITED
+
+
+def test_data_basis_threshold_boundary():
+    # Raja on M_PRIOR_ATTACK (_shrink90:n 50 %-piste): alle = priori dominoi.
+    assert xp.data_basis({"mins": xp.M_PRIOR_ATTACK - 1}) == xp.DATA_BASIS_LIMITED
+    assert xp.data_basis({"mins": xp.M_PRIOR_ATTACK}) == xp.DATA_BASIS_FULL
+
+
+def test_data_basis_full_history():
+    assert xp.data_basis({"mins": 3000.0}) == xp.DATA_BASIS_FULL
+
+
+def test_data_basis_defensive_inputs():
+    # Puuttuva/None-mins ei saa kaataa; palautusarvo aina tunnettu luokka.
+    assert xp.data_basis({}) == xp.DATA_BASIS_NONE
+    assert xp.data_basis({"mins": None}) == xp.DATA_BASIS_NONE
+    for acc in ({}, {"mins": None}, {"mins": 0}, {"mins": 10}, {"mins": 5000}):
+        assert xp.data_basis(acc) in xp.DATA_BASIS_VALUES
+
+
+# ---------------------------------------------------------------------------
 # Endpoint (TestClient conftestista)
 # ---------------------------------------------------------------------------
 def test_fantasy_xp_endpoint_shape(client):
