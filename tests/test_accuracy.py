@@ -82,24 +82,25 @@ def test_exact_hit_none_without_mls():
 
 
 # ---------------------------------------------------------------------------
-# #24: ET/rankkari-gradaus 90 min -tuloksella (malli ennustaa 90 min 1X2:n)
+# FT-AET-gradaus (20.7): virallinen lopputulos (reg + jatkoaika, ei rankkareita)
 # ---------------------------------------------------------------------------
-def test_set_result_extra_time_win_graded_as_90min_draw():
+def test_set_result_extra_time_win_graded_as_official_win():
     log = acc.empty_log()
     acc.upsert_prediction(log, _entry("m1", "home", mls="1-1"))
     # 90 min 1-1, koti voitti jatkoajalla 3-2 (esim. Argentina-Cape Verde)
     assert acc.set_result(log, "m1", 3, 2, duration="EXTRA_TIME",
                           regular_home=1, regular_away=1) is True
     res = log["predictions"][0]["result"]
-    assert res["actual_score"] == "3-2"          # näyttötulos säilyy
+    assert res["actual_score"] == "3-2"          # virallinen tulos
     assert res["duration"] == "EXTRA_TIME"
-    assert res["regular_score"] == "1-1"
-    assert res["actual_outcome"] == "draw"       # 90 min -gradaus
-    assert res["hit_1x2"] is False               # ET-voitto ei ole 1X2-osuma
-    assert res["exact_hit"] is True              # mls 1-1 == 90 min 1-1
+    assert res["regular_score"] == "1-1"         # annotaatio säilyy
+    assert res["actual_outcome"] == "home"       # FT-AET-gradaus
+    assert res["hit_1x2"] is True                # jatkoaikavoitto ON osuma
+    assert res["exact_hit"] is False             # mls 1-1 != FT-AET 3-2
 
 
-def test_set_result_penalty_shootout_graded_as_90min():
+def test_set_result_penalty_shootout_graded_as_draw():
+    # Rankkarikisa = ottelu päättyi FT-AET tasan → virallinen 1X2 = tasapeli.
     log = acc.empty_log()
     acc.upsert_prediction(log, _entry("m1", "away", mls="0-1"))
     acc.set_result(log, "m1", 1, 1, duration="PENALTY_SHOOTOUT",
@@ -111,18 +112,25 @@ def test_set_result_penalty_shootout_graded_as_90min():
     assert res["duration"] == "PENALTY_SHOOTOUT"
 
 
-def test_regrade_flips_et_win_preserves_row_and_reconciled_at():
+def test_regrade_flips_90min_graded_et_draw_to_official_win():
+    # Siirtymä #24-normista (90 min) FT-AET-normiin: vanha lohko gradasi
+    # ET-voiton tasapeliksi → regrade kääntää sen osumaksi, rivi ei putoa.
     log = acc.empty_log()
     acc.upsert_prediction(log, _entry("m1", "home", mls="2-0"))
-    acc.set_result(log, "m1", 3, 2)  # vanha bugi: gradattiin fullTimella
+    acc.set_result(log, "m1", 3, 2, duration="EXTRA_TIME",
+                   regular_home=1, regular_away=1)
     orig_reconciled = log["predictions"][0]["result"]["reconciled_at"]
-    assert log["predictions"][0]["result"]["hit_1x2"] is True
+    # simuloi vanhalla normilla gradattu lohko (kuten prediction_logissa 20.7)
+    log["predictions"][0]["result"].update(
+        {"actual_outcome": "draw", "hit_1x2": False}
+    )
 
     assert acc.regrade_result(log, "m1", 3, 2, duration="EXTRA_TIME",
                               regular_home=1, regular_away=1) is True
     assert len(log["predictions"]) == 1          # union: rivi ei putoa
     res = log["predictions"][0]["result"]
-    assert res["hit_1x2"] is False               # gradaus kääntyi
+    assert res["hit_1x2"] is True                # gradaus kääntyi FT-AET:iin
+    assert res["actual_outcome"] == "home"
     assert res["actual_score"] == "3-2"
     assert res["regular_score"] == "1-1"
     assert res["reconciled_at"] == orig_reconciled

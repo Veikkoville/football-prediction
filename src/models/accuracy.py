@@ -180,41 +180,44 @@ def _build_result(
     regular_home: Optional[int] = None,
     regular_away: Optional[int] = None,
 ) -> dict:
-    """Rakenna result-lohko: näyttötulos + 90 min -gradaus.
+    """Rakenna result-lohko: FT-AET-gradaus (Villen päätös 20.7).
 
-    home_score/away_score = NÄYTETTÄVÄ lopputulos (reg + jatkoaika, ilman
-    rangaistuspotkuja). Jos ottelu ratkesi jatkoajalla/rankkareilla
-    (duration != REGULAR) ja 90 min regularTime-tulos on annettu, GRADAUS
-    (1X2/decisive/exact/actual_outcome) nojaa siihen: malli ennustaa 90 min
-    lopputuloksen, joten ET-voitto EI ole 1X2-osuma — 90 min tasan = tasa.
+    home_score/away_score = VIRALLINEN lopputulos (reg + jatkoaika, ilman
+    rangaistuspotkuja) — sama luku jonka yleisö näkee. GRADAUS
+    (1X2/decisive/exact/actual_outcome) nojaa AINA tähän: jatkoaikavoitto ON
+    1X2-osuma, rankkarikisaan päättynyt ottelu on virallisesti tasapeli (FT-AET
+    tasan) = tasa. regular_home/regular_away säilytetään vain näyttö-
+    annotaatioon ("1-0 (a.e.t.)" + 90 min -tulos), ei gradaukseen.
+
+    Aiempi #24-normi gradasi 90 min -tuloksella; se vaihdettiin FT-AET:iin
+    20.7 koska julkinen track record ei saa näyttää ✗:ää ottelulle jonka
+    virallisen voittajan malli nimesi (WC-finaali Spain 1-0 a.e.t.).
     """
-    if duration != "REGULAR" and regular_home is not None and regular_away is not None:
-        grade_h, grade_a = int(regular_home), int(regular_away)
-    else:
-        grade_h, grade_a = int(home_score), int(away_score)
+    grade_h, grade_a = int(home_score), int(away_score)
 
     actual = outcome_from_score(grade_h, grade_a)
     pred_winner = entry.get("predicted_winner")
     mls = entry.get("most_likely_score")
-    actual_score = f"{int(home_score)}-{int(away_score)}"
-    grade_score = f"{grade_h}-{grade_a}"
+    actual_score = f"{grade_h}-{grade_a}"
 
     result = {
-        "home_score": int(home_score),
-        "away_score": int(away_score),
+        "home_score": grade_h,
+        "away_score": grade_a,
         "actual_score": actual_score,
         "actual_outcome": actual,
-        # headline-1X2: nimetty voittaja vs toteutunut 90 min (tasapeli = miss)
+        # headline-1X2: nimetty voittaja vs virallinen FT-AET-tulos
+        # (rankkarikisa = FT-AET tasan = tasapeli = miss nimetylle voittajalle)
         "hit_1x2": bool(pred_winner is not None and pred_winner == actual),
         # exact-score vain jos most_likely_score tunnetaan (FD-rivit, ei seed);
-        # gradataan 90 min -tuloksella (= actual_score kun duration REGULAR)
-        "exact_hit": (None if mls is None else bool(mls == grade_score)),
+        # gradataan samalla FT-AET-tuloksella kuin 1X2 (yksi normi)
+        "exact_hit": (None if mls is None else bool(mls == actual_score)),
         "reconciled_at": _now_iso(),
     }
     if duration and duration != "REGULAR":
-        # a.e.t./pens-lippu + 90 min tulos näyttöä varten ("3-2 (a.e.t.)")
+        # a.e.t./pens-lippu + 90 min tulos näyttöannotaatioon ("1-0 (a.e.t.)")
         result["duration"] = duration
-        result["regular_score"] = grade_score
+        if regular_home is not None and regular_away is not None:
+            result["regular_score"] = f"{int(regular_home)}-{int(regular_away)}"
     return result
 
 
@@ -229,7 +232,7 @@ def set_result(
 ) -> bool:
     """Täytä toteutunut tulos logatulle ennusteelle. Idempotentti: jo
     reconciloitua ei muuteta. Palauttaa True jos tulos kirjattiin nyt.
-    Gradaussemantiikka: ks. _build_result (90 min -gradaus ET/rankkareissa).
+    Gradaussemantiikka: ks. _build_result (FT-AET-normi 20.7).
     """
     idx = _index_by_id(log)
     entry = idx.get(match_id)
@@ -250,7 +253,7 @@ def regrade_result(
     regular_home: Optional[int] = None,
     regular_away: Optional[int] = None,
 ) -> bool:
-    """Re-gradaa JO reconciloitu tulos nykyisellä gradauslogiikalla (#24).
+    """Re-gradaa JO reconciloitu tulos nykyisellä gradauslogiikalla (#24/FT-AET).
 
     Union-turvallinen: ei koskaan poista riviä eikä koske ennustekenttiin —
     vain result-lohko lasketaan uudelleen. Alkuperäinen reconciled_at
