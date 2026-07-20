@@ -341,6 +341,9 @@ def main() -> int:
         player_row = {
             "id": pid,
             "web_name": e["web_name"],
+            # #147: koko nimi VAIN hakua varten (näyttönimi pysyy web_namena;
+            # "van dijk" ei löytynyt koska web_name = "Virgil").
+            "full_name": f"{e.get('first_name', '')} {e.get('second_name', '')}".strip(),
             "team": model_team_name,
             "team_short": short_name(model_team_name),
             "pos": xp.POS_NAME[pos],

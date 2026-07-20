@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-20T15:57:10",
+    "generated_at": "2026-07-20T18:23:20",
     "season": "2026/27",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
     "player_source": "FPL official API (bootstrap + element-summary history)",
@@ -74,6 +74,7 @@
     {
       "id": 449,
       "web_name": "B.Fernandes",
+      "full_name": "Bruno Borges Fernandes",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -161,6 +162,7 @@
     {
       "id": 430,
       "web_name": "Haaland",
+      "full_name": "Erling Haaland",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "FWD",
@@ -248,6 +250,7 @@
     {
       "id": 291,
       "web_name": "Tarkowski",
+      "full_name": "James Tarkowski",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "DEF",
@@ -335,6 +338,7 @@
     {
       "id": 5,
       "web_name": "Gabriel",
+      "full_name": "Gabriel dos Santos Magalhães",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -422,6 +426,7 @@
     {
       "id": 517,
       "web_name": "Anderson",
+      "full_name": "Elliot Anderson",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -509,6 +514,7 @@
     {
       "id": 136,
       "web_name": "Thiago",
+      "full_name": "Igor Thiago Nascimento Rodrigues",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "FWD",
@@ -596,6 +602,7 @@
     {
       "id": 515,
       "web_name": "Gibbs-White",
+      "full_name": "Morgan Gibbs-White",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -683,6 +690,7 @@
     {
       "id": 237,
       "web_name": "Enzo",
+      "full_name": "Enzo Fernández",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -770,6 +778,7 @@
     {
       "id": 684,
       "web_name": "Thiaw",
+      "full_name": "Malick Thiaw",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "DEF",
@@ -857,6 +866,7 @@
     {
       "id": 260,
       "web_name": "Guéhi",
+      "full_name": "Marc Guéhi",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -944,6 +954,7 @@
     {
       "id": 72,
       "web_name": "Senesi",
+      "full_name": "Marcos Senesi Barón",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -1031,6 +1042,7 @@
     {
       "id": 21,
       "web_name": "Rice",
+      "full_name": "Declan Rice",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -1118,6 +1130,7 @@
     {
       "id": 303,
       "web_name": "Garner",
+      "full_name": "James Garner",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -1205,6 +1218,7 @@
     {
       "id": 82,
       "web_name": "Semenyo",
+      "full_name": "Antoine Semenyo",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -1292,6 +1306,7 @@
     {
       "id": 373,
       "web_name": "Virgil",
+      "full_name": "Virgil van Dijk",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "DEF",
@@ -1379,6 +1394,7 @@
     {
       "id": 119,
       "web_name": "Mbeumo",
+      "full_name": "Bryan Mbeumo",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -1466,6 +1482,7 @@
     {
       "id": 257,
       "web_name": "Lacroix",
+      "full_name": "Maxence Lacroix",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "DEF",
@@ -1553,6 +1570,7 @@
     {
       "id": 299,
       "web_name": "Ndiaye",
+      "full_name": "Iliman Ndiaye",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -1640,6 +1658,7 @@
     {
       "id": 1,
       "web_name": "Raya",
+      "full_name": "David Raya Martín",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "GKP",
@@ -1727,6 +1746,7 @@
     {
       "id": 151,
       "web_name": "Van Hecke",
+      "full_name": "Jan Paul van Hecke",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -1814,6 +1834,7 @@
     {
       "id": 547,
       "web_name": "E.Le Fée",
+      "full_name": "Enzo Le Fée",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -1901,6 +1922,7 @@
     {
       "id": 387,
       "web_name": "Szoboszlai",
+      "full_name": "Dominik Szoboszlai",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -1988,6 +2010,7 @@
     {
       "id": 287,
       "web_name": "Pickford",
+      "full_name": "Jordan Pickford",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "GKP",
@@ -2075,6 +2098,7 @@
     {
       "id": 249,
       "web_name": "João Pedro",
+      "full_name": "João Pedro Junqueira de Jesus",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "FWD",
@@ -2162,6 +2186,7 @@
     {
       "id": 64,
       "web_name": "Watkins",
+      "full_name": "Ollie Watkins",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "FWD",
@@ -2249,6 +2274,7 @@
     {
       "id": 508,
       "web_name": "N.Williams",
+      "full_name": "Neco Williams",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "DEF",
@@ -2336,6 +2362,7 @@
     {
       "id": 295,
       "web_name": "Keane",
+      "full_name": "Michael Keane",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "DEF",
@@ -2423,6 +2450,7 @@
     {
       "id": 139,
       "web_name": "Verbruggen",
+      "full_name": "Bart Verbruggen",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "GKP",
@@ -2510,6 +2538,7 @@
     {
       "id": 354,
       "web_name": "Ampadu",
+      "full_name": "Ethan Ampadu",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "MID",
@@ -2597,6 +2626,7 @@
     {
       "id": 488,
       "web_name": "Bruno G.",
+      "full_name": "Bruno Guimarães Rodriguez Moura",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -2684,6 +2714,7 @@
     {
       "id": 74,
       "web_name": "Truffert",
+      "full_name": "Adrien Truffert",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -2771,6 +2802,7 @@
     {
       "id": 242,
       "web_name": "Dewsbury-Hall",
+      "full_name": "Kiernan Dewsbury-Hall",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -2858,6 +2890,7 @@
     {
       "id": 457,
       "web_name": "Casemiro",
+      "full_name": "Carlos Henrique Casimiro",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -2945,6 +2978,7 @@
     {
       "id": 106,
       "web_name": "Collins",
+      "full_name": "Nathan Collins",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -3032,6 +3066,7 @@
     {
       "id": 47,
       "web_name": "Rogers",
+      "full_name": "Morgan Rogers",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -3119,6 +3154,7 @@
     {
       "id": 411,
       "web_name": "O'Reilly",
+      "full_name": "Nico O'Reilly",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -3206,6 +3242,7 @@
     {
       "id": 84,
       "web_name": "Tavernier",
+      "full_name": "Marcus Tavernier",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -3293,6 +3330,7 @@
     {
       "id": 6,
       "web_name": "Saliba",
+      "full_name": "William Saliba",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -3380,6 +3418,7 @@
     {
       "id": 505,
       "web_name": "Milenković",
+      "full_name": "Nikola Milenković",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "DEF",
@@ -3467,6 +3506,7 @@
     {
       "id": 101,
       "web_name": "Kelleher",
+      "full_name": "Caoimhín Kelleher",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "GKP",
@@ -3554,6 +3594,7 @@
     {
       "id": 314,
       "web_name": "Leno",
+      "full_name": "Bernd Leno",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "GKP",
@@ -3641,6 +3682,7 @@
     {
       "id": 16,
       "web_name": "Saka",
+      "full_name": "Bukayo Saka",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -3728,6 +3770,7 @@
     {
       "id": 90,
       "web_name": "Scott",
+      "full_name": "Alex Scott",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -3815,6 +3858,7 @@
     {
       "id": 694,
       "web_name": "Mukiele",
+      "full_name": "Nordi Mukiele",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -3902,6 +3946,7 @@
     {
       "id": 293,
       "web_name": "O'Brien",
+      "full_name": "Jake O'Brien",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "DEF",
@@ -3989,6 +4034,7 @@
     {
       "id": 691,
       "web_name": "Calvert-Lewin",
+      "full_name": "Dominic Calvert-Lewin",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "FWD",
@@ -4076,6 +4122,7 @@
     {
       "id": 120,
       "web_name": "Schade",
+      "full_name": "Kevin Schade",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -4163,6 +4210,7 @@
     {
       "id": 343,
       "web_name": "Struijk",
+      "full_name": "Pascal Struijk",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "DEF",
@@ -4250,6 +4298,7 @@
     {
       "id": 113,
       "web_name": "Van den Berg",
+      "full_name": "Sepp van den Berg",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -4337,6 +4386,7 @@
     {
       "id": 253,
       "web_name": "Henderson",
+      "full_name": "Dean Henderson",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "GKP",
@@ -4424,6 +4474,7 @@
     {
       "id": 148,
       "web_name": "F.Kadıoğlu",
+      "full_name": "Ferdi Kadıoğlu",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -4511,6 +4562,7 @@
     {
       "id": 670,
       "web_name": "Roefs",
+      "full_name": "Robin Roefs",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "GKP",
@@ -4598,6 +4650,7 @@
     {
       "id": 374,
       "web_name": "Konaté",
+      "full_name": "Ibrahima Konaté",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "DEF",
@@ -4685,6 +4738,7 @@
     {
       "id": 329,
       "web_name": "Wilson",
+      "full_name": "Harry Wilson",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -4772,6 +4826,7 @@
     {
       "id": 384,
       "web_name": "Gakpo",
+      "full_name": "Cody Gakpo",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -4859,6 +4914,7 @@
     {
       "id": 67,
       "web_name": "Petrović",
+      "full_name": "Đorđe Petrović",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "GKP",
@@ -4946,6 +5002,7 @@
     {
       "id": 226,
       "web_name": "Chalobah",
+      "full_name": "Trevoh Chalobah",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -5033,6 +5090,7 @@
     {
       "id": 348,
       "web_name": "Rodon",
+      "full_name": "Joe Rodon",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "DEF",
@@ -5120,6 +5178,7 @@
     {
       "id": 292,
       "web_name": "Mykolenko",
+      "full_name": "Vitalii Mykolenko",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "DEF",
@@ -5207,6 +5266,7 @@
     {
       "id": 283,
       "web_name": "Mateta",
+      "full_name": "Jean-Philippe Mateta",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "FWD",
@@ -5294,6 +5354,7 @@
     {
       "id": 258,
       "web_name": "Mitchell",
+      "full_name": "Tyrick Mitchell",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "DEF",
@@ -5381,6 +5442,7 @@
     {
       "id": 668,
       "web_name": "Xhaka",
+      "full_name": "Granit Xhaka",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -5468,6 +5530,7 @@
     {
       "id": 382,
       "web_name": "Wirtz",
+      "full_name": "Florian Wirtz",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -5555,6 +5618,7 @@
     {
       "id": 736,
       "web_name": "Donnarumma",
+      "full_name": "Gianluigi Donnarumma",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "GKP",
@@ -5642,6 +5706,7 @@
     {
       "id": 178,
       "web_name": "Welbeck",
+      "full_name": "Danny Welbeck",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "FWD",
@@ -5729,6 +5794,7 @@
     {
       "id": 733,
       "web_name": "Lammens",
+      "full_name": "Senne Lammens",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "GKP",
@@ -5816,6 +5882,7 @@
     {
       "id": 450,
       "web_name": "Cunha",
+      "full_name": "Matheus Santos Carneiro da Cunha",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -5903,6 +5970,7 @@
     {
       "id": 407,
       "web_name": "Matheus N.",
+      "full_name": "Matheus Nunes",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -5990,6 +6058,7 @@
     {
       "id": 83,
       "web_name": "O.Dango",
+      "full_name": "Dango Ouattara",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -6077,6 +6146,7 @@
     {
       "id": 485,
       "web_name": "Gordon",
+      "full_name": "Anthony Gordon",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -6164,6 +6234,7 @@
     {
       "id": 443,
       "web_name": "Shaw",
+      "full_name": "Luke Shaw",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -6251,6 +6322,7 @@
     {
       "id": 110,
       "web_name": "Kayode",
+      "full_name": "Michael Kayode",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -6338,6 +6410,7 @@
     {
       "id": 220,
       "web_name": "Sánchez",
+      "full_name": "Robert Lynch Sánchez",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "GKP",
@@ -6425,6 +6498,7 @@
     {
       "id": 146,
       "web_name": "Dunk",
+      "full_name": "Lewis Dunk",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -6512,6 +6586,7 @@
     {
       "id": 26,
       "web_name": "Zubimendi",
+      "full_name": "Martín Zubimendi Ibáñez",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -6599,6 +6674,7 @@
     {
       "id": 236,
       "web_name": "Neto",
+      "full_name": "Pedro Lomba Neto",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -6686,6 +6762,7 @@
     {
       "id": 235,
       "web_name": "Palmer",
+      "full_name": "Cole Palmer",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -6773,6 +6850,7 @@
     {
       "id": 440,
       "web_name": "Dalot",
+      "full_name": "Diogo Dalot Teixeira",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -6860,6 +6938,7 @@
     {
       "id": 32,
       "web_name": "Martinez",
+      "full_name": "Emiliano Martínez Romero",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "GKP",
@@ -6947,6 +7026,7 @@
     {
       "id": 318,
       "web_name": "Bassey",
+      "full_name": "Calvin Bassey",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "DEF",
@@ -7034,6 +7114,7 @@
     {
       "id": 390,
       "web_name": "Gravenberch",
+      "full_name": "Ryan Gravenberch",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -7121,6 +7202,7 @@
     {
       "id": 666,
       "web_name": "Gyökeres",
+      "full_name": "Viktor Gyökeres",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "FWD",
@@ -7208,6 +7290,7 @@
     {
       "id": 273,
       "web_name": "Wharton",
+      "full_name": "Adam Wharton",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -7295,6 +7378,7 @@
     {
       "id": 414,
       "web_name": "Foden",
+      "full_name": "Phil Foden",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -7382,6 +7466,7 @@
     {
       "id": 241,
       "web_name": "Caicedo",
+      "full_name": "Moisés Caicedo Corozo",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -7469,6 +7554,7 @@
     {
       "id": 568,
       "web_name": "Pedro Porro",
+      "full_name": "Pedro Porro Sauceda",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "DEF",
@@ -7556,6 +7642,7 @@
     {
       "id": 487,
       "web_name": "Barnes",
+      "full_name": "Harvey Barnes",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -7643,6 +7730,7 @@
     {
       "id": 97,
       "web_name": "Evanilson",
+      "full_name": "Francisco Evanilson de Lima Barbosa",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "FWD",
@@ -7730,6 +7818,7 @@
     {
       "id": 532,
       "web_name": "Hume",
+      "full_name": "Trai Hume",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -7817,6 +7906,7 @@
     {
       "id": 350,
       "web_name": "Aaronson",
+      "full_name": "Brenden Aaronson",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "MID",
@@ -7904,6 +7994,7 @@
     {
       "id": 531,
       "web_name": "Ballard",
+      "full_name": "Daniel Ballard",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -7991,6 +8082,7 @@
     {
       "id": 381,
       "web_name": "M.Salah",
+      "full_name": "Mohamed Salah",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -8078,6 +8170,7 @@
     {
       "id": 502,
       "web_name": "Sels",
+      "full_name": "Matz Sels",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "GKP",
@@ -8165,6 +8258,7 @@
     {
       "id": 256,
       "web_name": "Muñoz",
+      "full_name": "Daniel Muñoz Mejía",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "DEF",
@@ -8252,6 +8346,7 @@
     {
       "id": 342,
       "web_name": "Bogle",
+      "full_name": "Jayden Bogle",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "DEF",
@@ -8339,6 +8434,7 @@
     {
       "id": 267,
       "web_name": "Sarr",
+      "full_name": "Ismaïla Sarr",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -8426,6 +8522,7 @@
     {
       "id": 575,
       "web_name": "Van de Ven",
+      "full_name": "Micky van de Ven",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "DEF",
@@ -8513,6 +8610,7 @@
     {
       "id": 337,
       "web_name": "Raúl",
+      "full_name": "Raúl Jiménez Rodríguez",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "FWD",
@@ -8600,6 +8698,7 @@
     {
       "id": 38,
       "web_name": "Konsa",
+      "full_name": "Ezri Konsa Ngoyo",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -8687,6 +8786,7 @@
     {
       "id": 160,
       "web_name": "Minteh",
+      "full_name": "Yankuba Minteh",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -8774,6 +8874,7 @@
     {
       "id": 169,
       "web_name": "Gomez",
+      "full_name": "Diego Gómez Amarilla",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -8861,6 +8962,7 @@
     {
       "id": 417,
       "web_name": "Cherki",
+      "full_name": "Rayan Cherki",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -8948,6 +9050,7 @@
     {
       "id": 673,
       "web_name": "J.Palhinha",
+      "full_name": "João Maria Lobo Alves Palhares Costa Palhinha Gonçalves",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -9035,6 +9138,7 @@
     {
       "id": 452,
       "web_name": "Amad",
+      "full_name": "Amad Diallo",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -9122,6 +9226,7 @@
     {
       "id": 386,
       "web_name": "Mac Allister",
+      "full_name": "Alexis Mac Allister",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -9209,6 +9314,7 @@
     {
       "id": 36,
       "web_name": "Cash",
+      "full_name": "Matty Cash",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -9296,6 +9402,7 @@
     {
       "id": 121,
       "web_name": "Damsgaard",
+      "full_name": "Mikkel Damsgaard",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -9383,6 +9490,7 @@
     {
       "id": 224,
       "web_name": "Cucurella",
+      "full_name": "Marc Cucurella Saseta",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -9470,6 +9578,7 @@
     {
       "id": 526,
       "web_name": "Igor Jesus",
+      "full_name": "Igor Jesus Maciel da Cruz",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "FWD",
@@ -9557,6 +9666,7 @@
     {
       "id": 469,
       "web_name": "Pope",
+      "full_name": "Nick Pope",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "GKP",
@@ -9644,6 +9754,7 @@
     {
       "id": 565,
       "web_name": "Vicario",
+      "full_name": "Guglielmo Vicario",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "GKP",
@@ -9731,6 +9842,7 @@
     {
       "id": 7,
       "web_name": "Calafiori",
+      "full_name": "Riccardo Calafiori",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -9818,6 +9930,7 @@
     {
       "id": 126,
       "web_name": "Jensen",
+      "full_name": "Mathias Jensen",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -9905,6 +10018,7 @@
     {
       "id": 416,
       "web_name": "Bernardo",
+      "full_name": "Bernardo Mota Veiga de Carvalho e Silva",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -9992,6 +10106,7 @@
     {
       "id": 475,
       "web_name": "Botman",
+      "full_name": "Sven Botman",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "DEF",
@@ -10079,6 +10194,7 @@
     {
       "id": 129,
       "web_name": "Yarmoliuk",
+      "full_name": "Yehor Yarmoliuk",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -10166,6 +10282,7 @@
     {
       "id": 476,
       "web_name": "Burn",
+      "full_name": "Dan Burn",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "DEF",
@@ -10253,6 +10370,7 @@
     {
       "id": 20,
       "web_name": "Trossard",
+      "full_name": "Leandro Trossard",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -10340,6 +10458,7 @@
     {
       "id": 310,
       "web_name": "Barry",
+      "full_name": "Thierno Barry",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "FWD",
@@ -10427,6 +10546,7 @@
     {
       "id": 473,
       "web_name": "Hall",
+      "full_name": "Lewis Hall",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "DEF",
@@ -10514,6 +10634,7 @@
     {
       "id": 311,
       "web_name": "Beto",
+      "full_name": "Norberto Bercique Gomes Betuncal",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "FWD",
@@ -10601,6 +10722,7 @@
     {
       "id": 330,
       "web_name": "Berge",
+      "full_name": "Sander Berge",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -10688,6 +10810,7 @@
     {
       "id": 714,
       "web_name": "Woltemade",
+      "full_name": "Nick Woltemade",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "FWD",
@@ -10775,6 +10898,7 @@
     {
       "id": 107,
       "web_name": "Lewis-Potter",
+      "full_name": "Keane Lewis-Potter",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -10862,6 +10986,7 @@
     {
       "id": 324,
       "web_name": "Iwobi",
+      "full_name": "Alex Iwobi",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -10949,6 +11074,7 @@
     {
       "id": 552,
       "web_name": "Sadiki",
+      "full_name": "Noah Sadiki",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -11036,6 +11162,7 @@
     {
       "id": 54,
       "web_name": "McGinn",
+      "full_name": "John McGinn",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -11123,6 +11250,7 @@
     {
       "id": 712,
       "web_name": "Yeremy",
+      "full_name": "Yéremy Pino Santos",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -11210,6 +11338,7 @@
     {
       "id": 597,
       "web_name": "Richarlison",
+      "full_name": "Richarlison de Andrade",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "FWD",
@@ -11297,6 +11426,7 @@
     {
       "id": 725,
       "web_name": "Hincapie",
+      "full_name": "Piero Hincapié",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -11384,6 +11514,7 @@
     {
       "id": 266,
       "web_name": "Eze",
+      "full_name": "Eberechi Eze",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -11471,6 +11602,7 @@
     {
       "id": 408,
       "web_name": "Rúben",
+      "full_name": "Rúben dos Santos Gato Alves Dias",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -11558,6 +11690,7 @@
     {
       "id": 100,
       "web_name": "Kroupi.Jr",
+      "full_name": "Junior Kroupi",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "FWD",
@@ -11645,6 +11778,7 @@
     {
       "id": 521,
       "web_name": "Sangaré",
+      "full_name": "Ibrahim Sangaré",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -11732,6 +11866,7 @@
     {
       "id": 77,
       "web_name": "Hill",
+      "full_name": "James Hill",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -11819,6 +11954,7 @@
     {
       "id": 173,
       "web_name": "Wieffer",
+      "full_name": "Mats Wieffer",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -11906,6 +12042,7 @@
     {
       "id": 166,
       "web_name": "Ayari",
+      "full_name": "Yasin Ayari",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -11993,6 +12130,7 @@
     {
       "id": 366,
       "web_name": "A.Becker",
+      "full_name": "Alisson Becker",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "GKP",
@@ -12080,6 +12218,7 @@
     {
       "id": 418,
       "web_name": "Doku",
+      "full_name": "Jérémy Doku",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -12167,6 +12306,7 @@
     {
       "id": 228,
       "web_name": "Gusto",
+      "full_name": "Malo Gusto",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -12254,6 +12394,7 @@
     {
       "id": 344,
       "web_name": "Bijol",
+      "full_name": "Jaka Bijol",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "DEF",
@@ -12341,6 +12482,7 @@
     {
       "id": 325,
       "web_name": "Smith Rowe",
+      "full_name": "Emile Smith Rowe",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -12428,6 +12570,7 @@
     {
       "id": 654,
       "web_name": "Strand Larsen",
+      "full_name": "Jørgen Strand Larsen",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "FWD",
@@ -12515,6 +12658,7 @@
     {
       "id": 50,
       "web_name": "Buendía",
+      "full_name": "Emiliano Buendía Stati",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -12602,6 +12746,7 @@
     {
       "id": 371,
       "web_name": "Kerkez",
+      "full_name": "Milos Kerkez",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "DEF",
@@ -12689,6 +12834,7 @@
     {
       "id": 489,
       "web_name": "J.Murphy",
+      "full_name": "Jacob Murphy",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -12776,6 +12922,7 @@
     {
       "id": 163,
       "web_name": "Hinshelwood",
+      "full_name": "Jack Hinshelwood",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -12863,6 +13010,7 @@
     {
       "id": 442,
       "web_name": "Maguire",
+      "full_name": "Harry Maguire",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -12950,6 +13098,7 @@
     {
       "id": 585,
       "web_name": "Bentancur",
+      "full_name": "Rodrigo Bentancur",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -13037,6 +13186,7 @@
     {
       "id": 706,
       "web_name": "Justin",
+      "full_name": "James Justin",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "DEF",
@@ -13124,6 +13274,7 @@
     {
       "id": 322,
       "web_name": "Tete",
+      "full_name": "Kenny Tete",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "DEF",
@@ -13211,6 +13362,7 @@
     {
       "id": 427,
       "web_name": "Reijnders",
+      "full_name": "Tijjani Reijnders",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -13298,6 +13450,7 @@
     {
       "id": 388,
       "web_name": "C.Jones",
+      "full_name": "Curtis Jones",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -13385,6 +13538,7 @@
     {
       "id": 225,
       "web_name": "James",
+      "full_name": "Reece James",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -13472,6 +13626,7 @@
     {
       "id": 319,
       "web_name": "Castagne",
+      "full_name": "Timothy Castagne",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "DEF",
@@ -13559,6 +13714,7 @@
     {
       "id": 158,
       "web_name": "Georginio",
+      "full_name": "Georginio Rutter",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -13646,6 +13802,7 @@
     {
       "id": 730,
       "web_name": "Brobbey",
+      "full_name": "Brian Brobbey",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "FWD",
@@ -13733,6 +13890,7 @@
     {
       "id": 491,
       "web_name": "Tonali",
+      "full_name": "Sandro Tonali",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -13820,6 +13978,7 @@
     {
       "id": 328,
       "web_name": "Sessegnon",
+      "full_name": "Ryan Sessegnon",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -13907,6 +14066,7 @@
     {
       "id": 444,
       "web_name": "Yoro",
+      "full_name": "Leny Yoro",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -13994,6 +14154,7 @@
     {
       "id": 108,
       "web_name": "Ajer",
+      "full_name": "Kristoffer Ajer",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -14081,6 +14242,7 @@
     {
       "id": 693,
       "web_name": "Hutchinson",
+      "full_name": "Omari Hutchinson",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -14168,6 +14330,7 @@
     {
       "id": 59,
       "web_name": "Onana",
+      "full_name": "Amadou Onana",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -14255,6 +14418,7 @@
     {
       "id": 441,
       "web_name": "Dorgu",
+      "full_name": "Patrick Dorgu",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -14342,6 +14506,7 @@
     {
       "id": 37,
       "web_name": "Digne",
+      "full_name": "Lucas Digne",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -14429,6 +14594,7 @@
     {
       "id": 48,
       "web_name": "Tielemans",
+      "full_name": "Youri Tielemans",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -14516,6 +14682,7 @@
     {
       "id": 271,
       "web_name": "Kamada",
+      "full_name": "Daichi Kamada",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -14603,6 +14770,7 @@
     {
       "id": 86,
       "web_name": "Brooks",
+      "full_name": "David Brooks",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -14690,6 +14858,7 @@
     {
       "id": 341,
       "web_name": "Darlow",
+      "full_name": "Karl Darlow",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "GKP",
@@ -14777,6 +14946,7 @@
     {
       "id": 573,
       "web_name": "Spence",
+      "full_name": "Djed Spence",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "DEF",
@@ -14864,6 +15034,7 @@
     {
       "id": 145,
       "web_name": "De Cuyper",
+      "full_name": "Maxim De Cuyper",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -14951,6 +15122,7 @@
     {
       "id": 713,
       "web_name": "A.Jimenez",
+      "full_name": "Álex Jiménez Sánchez",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -15038,6 +15210,7 @@
     {
       "id": 541,
       "web_name": "Reinildo",
+      "full_name": "Reinildo Mandava",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -15125,6 +15298,7 @@
     {
       "id": 316,
       "web_name": "Robinson",
+      "full_name": "Antonee Robinson",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "DEF",
@@ -15212,6 +15386,7 @@
     {
       "id": 39,
       "web_name": "Maatsen",
+      "full_name": "Ian Maatsen",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -15299,6 +15474,7 @@
     {
       "id": 421,
       "web_name": "Rodrigo",
+      "full_name": "Rodrigo 'Rodri' Hernandez Cascante",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -15386,6 +15562,7 @@
     {
       "id": 783,
       "web_name": "Groß",
+      "full_name": "Pascal Groß",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -15473,6 +15650,7 @@
     {
       "id": 124,
       "web_name": "Henderson",
+      "full_name": "Jordan Henderson",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -15560,6 +15738,7 @@
     {
       "id": 365,
       "web_name": "Nmecha",
+      "full_name": "Lukas Nmecha",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "FWD",
@@ -15647,6 +15826,7 @@
     {
       "id": 403,
       "web_name": "Gvardiol",
+      "full_name": "Joško Gvardiol",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -15734,6 +15914,7 @@
     {
       "id": 584,
       "web_name": "Tel",
+      "full_name": "Mathys Tel",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -15821,6 +16002,7 @@
     {
       "id": 304,
       "web_name": "Iroegbunam",
+      "full_name": "Tim Iroegbunam",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -15908,6 +16090,7 @@
     {
       "id": 85,
       "web_name": "Adams",
+      "full_name": "Tyler Adams",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -15995,6 +16178,7 @@
     {
       "id": 511,
       "web_name": "Morato",
+      "full_name": "Felipe Rodrigues da Silva",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "DEF",
@@ -16082,6 +16266,7 @@
     {
       "id": 272,
       "web_name": "Lerma",
+      "full_name": "Jefferson Lerma Solís",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -16169,6 +16354,7 @@
     {
       "id": 723,
       "web_name": "Canvot",
+      "full_name": "Jaydee Canvot",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "DEF",
@@ -16256,6 +16442,7 @@
     {
       "id": 724,
       "web_name": "Geertruida",
+      "full_name": "Lutsharel Geertruida",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -16343,6 +16530,7 @@
     {
       "id": 458,
       "web_name": "Mainoo",
+      "full_name": "Kobbie Mainoo",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -16430,6 +16618,7 @@
     {
       "id": 332,
       "web_name": "Lukić",
+      "full_name": "Saša Lukić",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -16517,6 +16706,7 @@
     {
       "id": 478,
       "web_name": "Trippier",
+      "full_name": "Kieran Trippier",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "DEF",
@@ -16604,6 +16794,7 @@
     {
       "id": 570,
       "web_name": "Danso",
+      "full_name": "Kevin Danso",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "DEF",
@@ -16691,6 +16882,7 @@
     {
       "id": 167,
       "web_name": "Baleba",
+      "full_name": "Carlos Baleba",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -16778,6 +16970,7 @@
     {
       "id": 125,
       "web_name": "Janelt",
+      "full_name": "Vitaly Janelt",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -16865,6 +17058,7 @@
     {
       "id": 580,
       "web_name": "Johnson",
+      "full_name": "Brennan Johnson",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -16952,6 +17146,7 @@
     {
       "id": 423,
       "web_name": "N.Gonzalez",
+      "full_name": "Nico González Iglesias",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -17039,6 +17234,7 @@
     {
       "id": 486,
       "web_name": "Elanga",
+      "full_name": "Anthony Elanga",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -17126,6 +17322,7 @@
     {
       "id": 52,
       "web_name": "J.Ramsey",
+      "full_name": "Jacob Ramsey",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -17213,6 +17410,7 @@
     {
       "id": 406,
       "web_name": "Khusanov",
+      "full_name": "Abdukodir Khusanov",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -17300,6 +17498,7 @@
     {
       "id": 41,
       "web_name": "Pau",
+      "full_name": "Pau Torres",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -17387,6 +17586,7 @@
     {
       "id": 560,
       "web_name": "Isidor",
+      "full_name": "Wilson Isidor",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "FWD",
@@ -17474,6 +17674,7 @@
     {
       "id": 683,
       "web_name": "Alderete",
+      "full_name": "Omar Alderete",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -17561,6 +17762,7 @@
     {
       "id": 335,
       "web_name": "King",
+      "full_name": "Josh King",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -17648,6 +17850,7 @@
     {
       "id": 593,
       "web_name": "P.M.Sarr",
+      "full_name": "Pape Matar Sarr",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -17735,6 +17938,7 @@
     {
       "id": 726,
       "web_name": "Kolo Muani",
+      "full_name": "Randal Kolo Muani",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "FWD",
@@ -17822,6 +18026,7 @@
     {
       "id": 453,
       "web_name": "Garnacho",
+      "full_name": "Alejandro Garnacho Ferreyra",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -17909,6 +18114,7 @@
     {
       "id": 17,
       "web_name": "Ødegaard",
+      "full_name": "Martin Ødegaard",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -17996,6 +18202,7 @@
     {
       "id": 358,
       "web_name": "Tanaka",
+      "full_name": "Tanaka Ao",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "MID",
@@ -18083,6 +18290,7 @@
     {
       "id": 697,
       "web_name": "Adli",
+      "full_name": "Amine Adli",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -18170,6 +18378,7 @@
     {
       "id": 300,
       "web_name": "McNeil",
+      "full_name": "Dwight McNeil",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -18257,6 +18466,7 @@
     {
       "id": 591,
       "web_name": "Gray",
+      "full_name": "Archie Gray",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -18344,6 +18554,7 @@
     {
       "id": 544,
       "web_name": "Diarra",
+      "full_name": "Habib Diarra",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -18431,6 +18642,7 @@
     {
       "id": 18,
       "web_name": "Madueke",
+      "full_name": "Noni Madueke",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -18518,6 +18730,7 @@
     {
       "id": 500,
       "web_name": "Osula",
+      "full_name": "William Osula",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "FWD",
@@ -18605,6 +18818,7 @@
     {
       "id": 246,
       "web_name": "Andrey Santos",
+      "full_name": "Andrey Nascimento dos Santos",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -18692,6 +18906,7 @@
     {
       "id": 19,
       "web_name": "Martinelli",
+      "full_name": "Gabriel Martinelli Silva",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -18779,6 +18994,7 @@
     {
       "id": 40,
       "web_name": "Mings",
+      "full_name": "Tyrone Mings",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -18866,6 +19082,7 @@
     {
       "id": 270,
       "web_name": "Hughes",
+      "full_name": "Will Hughes",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -18953,6 +19170,7 @@
     {
       "id": 665,
       "web_name": "Perri",
+      "full_name": "Lucas Estella Perri",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "GKP",
@@ -19040,6 +19258,7 @@
     {
       "id": 437,
       "web_name": "Martinez",
+      "full_name": "Lisandro Martínez",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -19127,6 +19346,7 @@
     {
       "id": 22,
       "web_name": "Merino",
+      "full_name": "Mikel Merino Zazón",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -19214,6 +19434,7 @@
     {
       "id": 669,
       "web_name": "Ndoye",
+      "full_name": "Dan Ndoye",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -19301,6 +19522,7 @@
     {
       "id": 681,
       "web_name": "Šeško",
+      "full_name": "Benjamin Sesko",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "FWD",
@@ -19388,6 +19610,7 @@
     {
       "id": 727,
       "web_name": "Chukwueze",
+      "full_name": "Samuel Chukwueze",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -19475,6 +19698,7 @@
     {
       "id": 519,
       "web_name": "Dominguez",
+      "full_name": "Nicolás Domínguez",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -19562,6 +19786,7 @@
     {
       "id": 402,
       "web_name": "Aït-Nouri",
+      "full_name": "Rayan Aït-Nouri",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -19649,6 +19874,7 @@
     {
       "id": 250,
       "web_name": "Delap",
+      "full_name": "Liam Delap",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "FWD",
@@ -19736,6 +19962,7 @@
     {
       "id": 455,
       "web_name": "Mount",
+      "full_name": "Mason Mount",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -19823,6 +20050,7 @@
     {
       "id": 493,
       "web_name": "Longstaff",
+      "full_name": "Sean Longstaff",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "MID",
@@ -19910,6 +20138,7 @@
     {
       "id": 507,
       "web_name": "Aina",
+      "full_name": "Ola Aina",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "DEF",
@@ -19997,6 +20226,7 @@
     {
       "id": 807,
       "web_name": "Rayan",
+      "full_name": "Rayan Vitor Simplício Rocha",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -20084,6 +20314,7 @@
     {
       "id": 372,
       "web_name": "Robertson",
+      "full_name": "Andrew Robertson",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "DEF",
@@ -20171,6 +20402,7 @@
     {
       "id": 152,
       "web_name": "Veltman",
+      "full_name": "Joël Veltman",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -20258,6 +20490,7 @@
     {
       "id": 447,
       "web_name": "Heaven",
+      "full_name": "Ayden Heaven",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -20345,6 +20578,7 @@
     {
       "id": 796,
       "web_name": "Gallagher",
+      "full_name": "Conor Gallagher",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -20432,6 +20666,7 @@
     {
       "id": 424,
       "web_name": "Bobb",
+      "full_name": "Oscar Bobb",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -20519,6 +20754,7 @@
     {
       "id": 302,
       "web_name": "Gana",
+      "full_name": "Idrissa Gana Gueye",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -20606,6 +20842,7 @@
     {
       "id": 662,
       "web_name": "Mosquera",
+      "full_name": "Cristhian Mosquera",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -20693,6 +20930,7 @@
     {
       "id": 494,
       "web_name": "Willock",
+      "full_name": "Joe Willock",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "MID",
@@ -20780,6 +21018,7 @@
     {
       "id": 338,
       "web_name": "Muniz",
+      "full_name": "Rodrigo Muniz Carvalho",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "FWD",
@@ -20867,6 +21106,7 @@
     {
       "id": 438,
       "web_name": "Mazraoui",
+      "full_name": "Noussair Mazraoui",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
@@ -20954,6 +21194,7 @@
     {
       "id": 525,
       "web_name": "Wood",
+      "full_name": "Chris Wood",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "FWD",
@@ -21041,6 +21282,7 @@
     {
       "id": 685,
       "web_name": "Diakité",
+      "full_name": "Bafodé Diakité",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -21128,6 +21370,7 @@
     {
       "id": 81,
       "web_name": "Kluivert",
+      "full_name": "Justin Kluivert",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -21215,6 +21458,7 @@
     {
       "id": 321,
       "web_name": "J.Cuenca",
+      "full_name": "Jorge Cuenca Barreno",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "DEF",
@@ -21302,6 +21546,7 @@
     {
       "id": 44,
       "web_name": "Bogarde",
+      "full_name": "Lamare Bogarde",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -21389,6 +21634,7 @@
     {
       "id": 370,
       "web_name": "Frimpong",
+      "full_name": "Jeremie Frimpong",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "DEF",
@@ -21476,6 +21722,7 @@
     {
       "id": 55,
       "web_name": "Barkley",
+      "full_name": "Ross Barkley",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -21563,6 +21810,7 @@
     {
       "id": 586,
       "web_name": "Bergvall",
+      "full_name": "Lucas Bergvall",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -21650,6 +21898,7 @@
     {
       "id": 415,
       "web_name": "Savinho",
+      "full_name": "Sávio Moreira de Oliveira",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -21737,6 +21986,7 @@
     {
       "id": 731,
       "web_name": "Kevin",
+      "full_name": "Kevin Santos Lopes de Macedo",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -21824,6 +22074,7 @@
     {
       "id": 459,
       "web_name": "Ugarte",
+      "full_name": "Manuel Ugarte Ribeiro",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "MID",
@@ -21911,6 +22162,7 @@
     {
       "id": 466,
       "web_name": "Zirkzee",
+      "full_name": "Joshua Zirkzee",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "FWD",
@@ -21998,6 +22250,7 @@
     {
       "id": 88,
       "web_name": "Cook",
+      "full_name": "Lewis Cook",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -22085,6 +22338,7 @@
     {
       "id": 276,
       "web_name": "Devenny",
+      "full_name": "Justin Devenny",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -22172,6 +22426,7 @@
     {
       "id": 574,
       "web_name": "Udogie",
+      "full_name": "Destiny Udogie",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "DEF",
@@ -22259,6 +22514,7 @@
     {
       "id": 596,
       "web_name": "Solanke",
+      "full_name": "Dominic Solanke-Mitchell",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "FWD",
@@ -22346,6 +22602,7 @@
     {
       "id": 73,
       "web_name": "Smith",
+      "full_name": "Adam Smith",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -22433,6 +22690,7 @@
     {
       "id": 456,
       "web_name": "Sancho",
+      "full_name": "Jadon Sancho",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -22520,6 +22778,7 @@
     {
       "id": 413,
       "web_name": "Marmoush",
+      "full_name": "Omar Marmoush",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -22607,6 +22866,7 @@
     {
       "id": 331,
       "web_name": "Cairney",
+      "full_name": "Tom Cairney",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -22694,6 +22954,7 @@
     {
       "id": 677,
       "web_name": "Guessand",
+      "full_name": "Evann Guessand",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "MID",
@@ -22781,6 +23042,7 @@
     {
       "id": 561,
       "web_name": "Mayenda",
+      "full_name": "Eliezer Mayenda Dossou",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "FWD",
@@ -22868,6 +23130,7 @@
     {
       "id": 699,
       "web_name": "Douglas Luiz",
+      "full_name": "Douglas Luiz Soares de Paulo",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -22955,6 +23218,7 @@
     {
       "id": 405,
       "web_name": "Aké",
+      "full_name": "Nathan Aké",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -23042,6 +23306,7 @@
     {
       "id": 674,
       "web_name": "Ramsdale",
+      "full_name": "Aaron Ramsdale",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "GKP",
@@ -23129,6 +23394,7 @@
     {
       "id": 301,
       "web_name": "Alcaraz",
+      "full_name": "Carlos Alcaraz Durán",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -23216,6 +23482,7 @@
     {
       "id": 499,
       "web_name": "Isak",
+      "full_name": "Alexander Isak",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "FWD",
@@ -23303,6 +23570,7 @@
     {
       "id": 116,
       "web_name": "Hickey",
+      "full_name": "Aaron Hickey",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -23390,6 +23658,7 @@
     {
       "id": 170,
       "web_name": "Milner",
+      "full_name": "James Milner",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -23477,6 +23746,7 @@
     {
       "id": 672,
       "web_name": "Hato",
+      "full_name": "Jorrel Hato",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -23564,6 +23834,7 @@
     {
       "id": 719,
       "web_name": "Lindelöf",
+      "full_name": "Victor Lindelöf",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "DEF",
@@ -23651,6 +23922,7 @@
     {
       "id": 551,
       "web_name": "Rigg",
+      "full_name": "Chris Rigg",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -23738,6 +24010,7 @@
     {
       "id": 320,
       "web_name": "Diop",
+      "full_name": "Issa Diop",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "DEF",
@@ -23825,6 +24098,7 @@
     {
       "id": 686,
       "web_name": "Ngumoha",
+      "full_name": "Rio Ngumoha",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -23912,6 +24186,7 @@
     {
       "id": 8,
       "web_name": "J.Timber",
+      "full_name": "Jurriën Timber",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -23999,6 +24274,7 @@
     {
       "id": 135,
       "web_name": "Wissa",
+      "full_name": "Yoane Wissa",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "FWD",
@@ -24086,6 +24362,7 @@
     {
       "id": 10,
       "web_name": "Lewis-Skelly",
+      "full_name": "Myles Lewis-Skelly",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "DEF",
@@ -24173,6 +24450,7 @@
     {
       "id": 728,
       "web_name": "Röhl",
+      "full_name": "Merlin Röhl",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -24260,6 +24538,7 @@
     {
       "id": 233,
       "web_name": "Acheampong",
+      "full_name": "Josh Acheampong",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -24347,6 +24626,7 @@
     {
       "id": 232,
       "web_name": "Tosin",
+      "full_name": "Tosin Adarabioyo",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -24434,6 +24714,7 @@
     {
       "id": 527,
       "web_name": "Awoniyi",
+      "full_name": "Taiwo Awoniyi",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "FWD",
@@ -24521,6 +24802,7 @@
     {
       "id": 367,
       "web_name": "Mamardashvili",
+      "full_name": "Giorgi Mamardashvili",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "GKP",
@@ -24608,6 +24890,7 @@
     {
       "id": 30,
       "web_name": "Havertz",
+      "full_name": "Kai Havertz",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "FWD",
@@ -24695,6 +24978,7 @@
     {
       "id": 376,
       "web_name": "Gomez",
+      "full_name": "Joe Gomez",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "DEF",
@@ -24782,6 +25066,7 @@
     {
       "id": 522,
       "web_name": "Yates",
+      "full_name": "Ryan Yates",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -24869,6 +25154,7 @@
     {
       "id": 181,
       "web_name": "Kostoulas",
+      "full_name": "Charalampos Kostoulas",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "FWD",
@@ -24956,6 +25242,7 @@
     {
       "id": 385,
       "web_name": "Chiesa",
+      "full_name": "Federico Chiesa",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "MID",
@@ -25043,6 +25330,7 @@
     {
       "id": 143,
       "web_name": "Boscagli",
+      "full_name": "Olivier Boscagli",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -25130,6 +25418,7 @@
     {
       "id": 353,
       "web_name": "James",
+      "full_name": "Daniel James",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "MID",
@@ -25217,6 +25506,7 @@
     {
       "id": 305,
       "web_name": "Armstrong",
+      "full_name": "Harrison Armstrong",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -25304,6 +25594,7 @@
     {
       "id": 351,
       "web_name": "Gnonto",
+      "full_name": "Wilfried Gnonto",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "MID",
@@ -25391,6 +25682,7 @@
     {
       "id": 735,
       "web_name": "Traoré",
+      "full_name": "Bertrand Traoré",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -25478,6 +25770,7 @@
     {
       "id": 98,
       "web_name": "Enes Ünal",
+      "full_name": "Enes Ünal",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "FWD",
@@ -25565,6 +25858,7 @@
     {
       "id": 734,
       "web_name": "Bakwa",
+      "full_name": "Dilane Bakwa",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -25652,6 +25946,7 @@
     {
       "id": 539,
       "web_name": "O'Nien",
+      "full_name": "Luke O'Nien",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -25739,6 +26034,7 @@
     {
       "id": 263,
       "web_name": "Clyne",
+      "full_name": "Nathaniel Clyne",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "DEF",
@@ -25826,6 +26122,7 @@
     {
       "id": 572,
       "web_name": "Dragusin",
+      "full_name": "Radu Drăgușin",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "DEF",
@@ -25913,6 +26210,7 @@
     {
       "id": 31,
       "web_name": "G.Jesus",
+      "full_name": "Gabriel Fernando de Jesus",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "FWD",
@@ -26000,6 +26298,7 @@
     {
       "id": 410,
       "web_name": "Lewis",
+      "full_name": "Rico Lewis",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -26087,6 +26386,7 @@
     {
       "id": 587,
       "web_name": "Bissouma",
+      "full_name": "Yves Bissouma",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "MID",
@@ -26174,6 +26474,7 @@
     {
       "id": 262,
       "web_name": "Chadi Riad",
+      "full_name": "Chadi Riad Dnanou",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "DEF",
@@ -26261,6 +26562,7 @@
     {
       "id": 243,
       "web_name": "George",
+      "full_name": "Tyrique George",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -26348,6 +26650,7 @@
     {
       "id": 409,
       "web_name": "Stones",
+      "full_name": "John Stones",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "DEF",
@@ -26435,6 +26738,7 @@
     {
       "id": 49,
       "web_name": "Bailey",
+      "full_name": "Leon Bailey",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
@@ -26522,6 +26826,7 @@
     {
       "id": 345,
       "web_name": "Bornauw",
+      "full_name": "Sebastiaan Bornauw",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "DEF",
@@ -26609,6 +26914,7 @@
     {
       "id": 431,
       "web_name": "Bayindir",
+      "full_name": "Altay Bayındır",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "GKP",
@@ -26696,6 +27002,7 @@
     {
       "id": 33,
       "web_name": "M.Bizot",
+      "full_name": "Marco Bizot",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "GKP",
@@ -26783,6 +27090,7 @@
     {
       "id": 362,
       "web_name": "Piroe",
+      "full_name": "Joël Piroe",
       "team": "Leeds",
       "team_short": "LEE",
       "pos": "FWD",
@@ -26870,6 +27178,7 @@
     {
       "id": 510,
       "web_name": "Jair Cunha",
+      "full_name": "Jair Paula da Cunha Filho",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "DEF",
@@ -26957,6 +27266,7 @@
     {
       "id": 707,
       "web_name": "Dibling",
+      "full_name": "Tyler Dibling",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
@@ -27044,6 +27354,7 @@
     {
       "id": 567,
       "web_name": "Kinsky",
+      "full_name": "Antonín Kinský",
       "team": "Tottenham",
       "team_short": "TOT",
       "pos": "GKP",
@@ -27131,6 +27442,7 @@
     {
       "id": 813,
       "web_name": "Angulo",
+      "full_name": "Nilson Angulo",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "MID",
@@ -27218,6 +27530,7 @@
     {
       "id": 808,
       "web_name": "Abraham",
+      "full_name": "Tammy Abraham",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "FWD",
@@ -27305,6 +27618,7 @@
     {
       "id": 426,
       "web_name": "McAtee",
+      "full_name": "James McAtee",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "MID",
@@ -27392,6 +27706,7 @@
     {
       "id": 721,
       "web_name": "Milosavljević",
+      "full_name": "Veljko Milosavljevic",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "DEF",
@@ -27479,6 +27794,7 @@
     {
       "id": 715,
       "web_name": "John",
+      "full_name": "John Victor Maciel Furtado",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "GKP",
@@ -27566,6 +27882,7 @@
     {
       "id": 732,
       "web_name": "Uche",
+      "full_name": "Christantus Uche",
       "team": "Crystal Palace",
       "team_short": "CRY",
       "pos": "FWD",
@@ -27653,6 +27970,7 @@
     {
       "id": 296,
       "web_name": "Patterson",
+      "full_name": "Nathan Patterson",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "DEF",
@@ -27740,6 +28058,7 @@
     {
       "id": 252,
       "web_name": "Marc Guiu",
+      "full_name": "Marc Guiu Paz",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "FWD",
@@ -27827,6 +28146,7 @@
     {
       "id": 182,
       "web_name": "Trafford",
+      "full_name": "James Trafford",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "GKP",
@@ -27914,6 +28234,7 @@
     {
       "id": 814,
       "web_name": "Netz",
+      "full_name": "Luca Netz",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "DEF",
@@ -28001,6 +28322,7 @@
     {
       "id": 111,
       "web_name": "Pinnock",
+      "full_name": "Ethan Pinnock",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "DEF",
@@ -28088,6 +28410,7 @@
     {
       "id": 221,
       "web_name": "Jörgensen",
+      "full_name": "Filip Jörgensen",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "GKP",
@@ -28175,6 +28498,7 @@
     {
       "id": 229,
       "web_name": "B.Badiashile",
+      "full_name": "Benoît Badiashile Mukinayi",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -28262,6 +28586,7 @@
     {
       "id": 164,
       "web_name": "O'Riley",
+      "full_name": "Matt O'Riley",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
@@ -28349,6 +28674,7 @@
     {
       "id": 535,
       "web_name": "Cirkin",
+      "full_name": "Dennis Cirkin",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "DEF",
@@ -28436,6 +28762,7 @@
     {
       "id": 244,
       "web_name": "Lavia",
+      "full_name": "Roméo Lavia",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -28523,6 +28850,7 @@
     {
       "id": 27,
       "web_name": "Nelson",
+      "full_name": "Reiss Nelson",
       "team": "Brentford",
       "team_short": "BRE",
       "pos": "MID",
@@ -28610,6 +28938,7 @@
     {
       "id": 812,
       "web_name": "Ellborg",
+      "full_name": "Melker Ellborg",
       "team": "Sunderland",
       "team_short": "SUN",
       "pos": "GKP",
@@ -28697,6 +29026,7 @@
     {
       "id": 400,
       "web_name": "Ortega Moreno",
+      "full_name": "Stefan Ortega Moreno",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "GKP",
@@ -28784,6 +29114,7 @@
     {
       "id": 700,
       "web_name": "Dowman",
+      "full_name": "Max Dowman",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -28871,6 +29202,7 @@
     {
       "id": 336,
       "web_name": "Reed",
+      "full_name": "Harrison Reed",
       "team": "Fulham",
       "team_short": "FUL",
       "pos": "MID",
@@ -28958,6 +29290,7 @@
     {
       "id": 801,
       "web_name": "Tóth.A",
+      "full_name": "Alex Tóth",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -29045,6 +29378,7 @@
     {
       "id": 391,
       "web_name": "Gannon-Doak",
+      "full_name": "Ben Gannon-Doak",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
@@ -29132,6 +29466,7 @@
     {
       "id": 227,
       "web_name": "Colwill",
+      "full_name": "Levi Samuels Colwill",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "DEF",
@@ -29219,6 +29554,7 @@
     {
       "id": 369,
       "web_name": "Woodman",
+      "full_name": "Freddie Woodman",
       "team": "Liverpool",
       "team_short": "LIV",
       "pos": "GKP",
@@ -29306,6 +29642,7 @@
     {
       "id": 805,
       "web_name": "Lucca",
+      "full_name": "Lorenzo Lucca",
       "team": "Nottingham Forest",
       "team_short": "NFO",
       "pos": "FWD",
@@ -29393,6 +29730,7 @@
     {
       "id": 24,
       "web_name": "Nørgaard",
+      "full_name": "Christian Nørgaard",
       "team": "Arsenal",
       "team_short": "ARS",
       "pos": "MID",
@@ -29480,6 +29818,7 @@
     {
       "id": 422,
       "web_name": "Kovačić",
+      "full_name": "Mateo Kovačić",
       "team": "Manchester City",
       "team_short": "MCI",
       "pos": "MID",
@@ -29567,6 +29906,7 @@
     {
       "id": 149,
       "web_name": "Igor",
+      "full_name": "Igor Julio dos Santos de Paulo",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "DEF",
@@ -29654,6 +29994,7 @@
     {
       "id": 239,
       "web_name": "Gittens",
+      "full_name": "Jamie Bynoe-Gittens",
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
@@ -29741,6 +30082,7 @@
     {
       "id": 389,
       "web_name": "Elliott",
+      "full_name": "Harvey Elliott",
       "team": "Aston Villa",
       "team_short": "AVL",
       "pos": "MID",
