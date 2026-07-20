@@ -25,14 +25,20 @@ export const auth = $state({
 	user: null as GiqUser | null,
 	sessionResolved: false,
 	sub: undefined as GiqSub | null | undefined,
-	subLoading: false
+	subLoading: false,
+	// #150b: tultiinko reset-linkistä → UI avaa salasanan asetuksen (muuten
+	// SPA-landing on mykkä). Hash luetaan moduulin latauksessa ENNEN kuin
+	// supabase-client kuluttaa sen; PASSWORD_RECOVERY-event on varapolku.
+	passwordRecovery:
+		typeof window !== 'undefined' && window.location.hash.includes('type=recovery')
 });
 
 export async function initAuth(): Promise<void> {
 	const { data } = await supabase.auth.getSession();
 	applySession(data.session?.user ?? null);
 	auth.sessionResolved = true;
-	supabase.auth.onAuthStateChange((_event, session) => {
+	supabase.auth.onAuthStateChange((event, session) => {
+		if (event === 'PASSWORD_RECOVERY') auth.passwordRecovery = true;
 		applySession(session?.user ?? null);
 	});
 }
@@ -45,7 +51,10 @@ function applySession(u: { id: string; email?: string | null } | null): void {
 		auth.sub = undefined;
 		void refreshSubscription();
 	}
-	if (!u) auth.sub = undefined;
+	if (!u) {
+		auth.sub = undefined;
+		auth.passwordRecovery = false;
+	}
 }
 
 export async function signIn(email: string, password: string): Promise<string | null> {
