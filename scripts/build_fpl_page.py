@@ -280,7 +280,7 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
         (
             "Is GoalIQ good for FPL?",
             (
-                "Yes. GoalIQ is built FPL-first: clean sheet odds, fixture "
+                "Yes. GoalIQ is built FPL-first: clean sheet probability, fixture "
                 "difficulty, rate my team with a captain pick, and price watch "
                 "are free, and GoalIQ Premium adds an interactive team manager "
                 "with a gameweek planner, player expected points (xP), the "
@@ -321,7 +321,7 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
         (
             "Is GoalIQ free?",
             (
-                "Yes. Clean sheet odds and fixture difficulty are free, on the web "
+                "Yes. Clean sheet probability and fixture difficulty are free, on the web "
                 "and in the GoalIQ app for Android and iOS."
             ),
         ),
@@ -708,7 +708,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "url": BASE + "/",
         "description": (
             "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet "
-            "odds and fixture difficulty, rate my team with a captain pick, "
+            "probability and fixture difficulty, rate my team with a captain pick, "
             "and price watch free, plus an interactive team manager with a "
             "gameweek planner, player expected points (xP), the captain "
             "ranker, player value, xG leaders, a DefCon tracker, "
@@ -729,7 +729,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "applicationCategory": "SportsApplication",
         "description": (
             "Free FPL assistant and football prediction app. Free FPL tools: "
-            "clean sheet odds and fixture difficulty, rate my team with a "
+            "clean sheet probability and fixture difficulty, rate my team with a "
             "captain pick, and price watch. GoalIQ Premium adds an interactive "
             "team manager with a GW1 to GW6 gameweek planner, player expected "
             "points (xP), the captain ranker, player value (xP per million), "
@@ -769,7 +769,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "@context": "https://schema.org",
         "@type": "Dataset",
         "name": (
-            f"GoalIQ FPL clean sheet odds and fixture difficulty, "
+            f"GoalIQ FPL clean sheet probability and fixture difficulty, "
             f"Premier League {c['season']}"
         ),
         "description": (
@@ -787,7 +787,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "FPL clean sheets",
             "fixture difficulty rating",
             "Premier League predictions",
-            "clean sheet odds",
+            "clean sheet probability",
             "FDR",
         ],
     }
@@ -918,9 +918,9 @@ def render_page(c: dict) -> str:
         for p in (10, 22, 34, 46, 58)
     )
 
-    title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ"
+    title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ"
     meta_desc = (
-        "Free FPL tools: clean sheet odds & FDR, rate my team with a captain pick, "
+        "Free FPL tools: clean sheet probability & FDR, rate my team with a captain pick, "
         "and price watch. Premium adds a team manager with gameweek planner, "
         "player xP, value ranking, xG leaders and a DefCon tracker. "
         "Published track record. Not betting."
@@ -958,7 +958,7 @@ def render_page(c: dict) -> str:
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ">
+<meta property="og:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ">
 <meta property="og:description" content="{meta_desc}">
 <meta property="og:url" content="{CANONICAL}">
 <meta property="og:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
@@ -966,7 +966,7 @@ def render_page(c: dict) -> str:
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@goaliqapp">
-<meta name="twitter:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Odds | GoalIQ">
+<meta name="twitter:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ">
 <meta name="twitter:description" content="{meta_desc}">
 <meta name="twitter:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
 
@@ -989,7 +989,7 @@ def render_page(c: dict) -> str:
 
 <section class="hero dark">
 <div class="wrap">
-<h1>Free FPL Tools: Clean Sheet Odds, Fixture Difficulty and More</h1>
+<h1>Free FPL Tools: Clean Sheet Probability, Fixture Difficulty and More</h1>
 <p class="lede">GoalIQ is a free FPL assistant built on a proven match model.
 This page gives clean sheet probability and fixture difficulty for every
 Premier League team, free and updated every gameweek. Rate my team, a captain
@@ -1021,7 +1021,7 @@ Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 log, match by match with every miss included, is published on the
 <a href="/predictions#record">prediction record page</a>.</p>
 
-<h2 id="clean-sheets">Gameweek {c["next_gw"]} clean sheet odds</h2>
+<h2 id="clean-sheets">Gameweek {c["next_gw"]} clean sheet probabilities</h2>
 <p>Model clean sheet probability for all 20 Premier League teams in
 Gameweek {c["next_gw"]} ({c["gw_label"]}). FDR is GoalIQ's model fixture
 difficulty for that match, 1 easiest to 5 hardest.</p>
