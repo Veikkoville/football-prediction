@@ -83,7 +83,7 @@ def _cta() -> str:
     return (
         '<div class="cta-row">'
         '<a class="btn" href="https://pro.goaliq.app/?tab=premium">Open GoalIQ Premium</a>'
-        '<a class="btn ghost" href="/fpl.html">Free clean-sheet odds &amp; FDR</a>'
+        '<a class="btn ghost" href="/fpl.html">Free clean-sheet probability &amp; FDR</a>'
         "</div>"
     )
 
