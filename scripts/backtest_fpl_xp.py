@@ -109,7 +109,8 @@ def rho(pred: list[float], actual: list[float]) -> float:
 # ---------------------------------------------------------------------------
 # Backtest
 # ---------------------------------------------------------------------------
-def run_backtest(force_refresh: bool = False, use_context: bool = True) -> dict:
+def run_backtest(force_refresh: bool = False, use_context: bool = True,
+                 bps_2627: bool = True) -> dict:
     print("[1/4] FPL-data (bootstrap + fixtures + 841 element-historiaa)...")
     boot = fpl_api.fetch_bootstrap(force=force_refresh)
     fixtures = fpl_api.fetch_fixtures(force=force_refresh)
@@ -117,6 +118,14 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True) -> dict:
     summaries = fpl_api.fetch_all_summaries(boot, force=force_refresh)
     print(f"      kausi {season_key}: {len(boot['elements'])} pelaajaa, "
           f"{len(fixtures)} fixturea")
+    # #151: sama bonus-oikaisu kuin tuotanto-builderissa — ship-gate mittaa
+    # sitä mitä shipataan. Vaikuttaa VAIN vauhteihin (bonus-kenttä); actualit
+    # ja form-baseline lasketaan total_points-kentästä, joka ei muutu.
+    if bps_2627:
+        summaries = xp.adjust_summaries_bps_2627(summaries)
+        print("      bonus-historia oikaistu 26/27 BPS-sääntöihin (#151)")
+    else:
+        print("      HUOM: legacy-BPS (25/26) — vertailuajo")
 
     (tid_to_model, pos_by_player, team_by_player, name_by_player,
      fixtures_by_event, team_rounds, rows_by_round, mins_by_round,
@@ -256,7 +265,7 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True) -> dict:
 
     print("[4/4] Aggregointi + ship-gate...")
     return aggregate_and_gate(per_gw, obs_rows, season_key,
-                              use_context=use_context)
+                              use_context=use_context, bps_2627=bps_2627)
 
 
 def _agg(per_gw: list[dict], tag: str, gw_from: int, gw_to: int) -> dict:
@@ -290,7 +299,10 @@ def _slice_stats(obs: list[dict]) -> dict:
 
 
 def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
-                       season_key: str, use_context: bool = True) -> dict:
+                       season_key: str, use_context: bool = True,
+                       bps_2627: bool = True) -> dict:
+    bps_rules = ("2026/27 recalibrated (#151)" if bps_2627
+                 else "legacy 25/26 (vertailuajo)")
     gw_max = max(e["gw"] for e in per_gw)
     agg = {
         "played_full": _agg(per_gw, "played", GW_FIRST_EVAL, gw_max),
@@ -342,6 +354,7 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
         "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
         "season": season_key,
         "context_layer": use_context,
+        "bps_rules": bps_rules,
         "baseline": (f"form{FORM_WINDOW} (viim. {FORM_WINDOW} joukkuekierroksen "
                      "pistekeskiarvo; FPL:n historiallista ep_next:iä ei ole "
                      "API:ssa saatavilla)"),
@@ -393,13 +406,17 @@ def main() -> int:
                     help="pakota FPL-datan uudelleenhaku (ohita välimuisti)")
     ap.add_argument("--raw", action="store_true",
                     help="aja ILMAN Phase 1b -kontekstikerrosta (vertailuajo)")
+    ap.add_argument("--legacy-bps", action="store_true",
+                    help="OHITA 26/27 BPS-oikaisu (#151) — vain ennen/jälkeen-"
+                         "vertailuajoihin")
     args = ap.parse_args()
 
-    report = run_backtest(force_refresh=args.refresh, use_context=not args.raw)
+    report = run_backtest(force_refresh=args.refresh, use_context=not args.raw,
+                          bps_2627=not args.legacy_bps)
 
     out_dir = config.PROJECT_ROOT / "logs"
     out_dir.mkdir(exist_ok=True)
-    suffix = "_raw" if args.raw else ""
+    suffix = ("_raw" if args.raw else "") + ("_legacybps" if args.legacy_bps else "")
     out = out_dir / f"fpl_xp_backtest_{_dt.date.today().isoformat()}{suffix}.json"
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2),
                    encoding="utf-8")

@@ -67,6 +67,95 @@ def test_data_basis_defensive_inputs():
 
 
 # ---------------------------------------------------------------------------
+# #151: 26/27 BPS-oikaisu (bonus-historian uudelleenjako)
+# ---------------------------------------------------------------------------
+def test_bps_2627_delta_cbi_only():
+    # 12 CBI: vanha 12//2=6 BPS, uusi 12//3=4 -> delta -2. Ei pilkkutorjuntoja.
+    assert xp.bps_2627_delta({"clearances_blocks_interceptions": 12}) == -2
+    # 5 CBI: vanha 2, uusi 1 -> -1.
+    assert xp.bps_2627_delta({"clearances_blocks_interceptions": 5}) == -1
+    # 0-2 CBI: molemmilla 0 tai sama floor -> 0 / -1 rajat.
+    assert xp.bps_2627_delta({"clearances_blocks_interceptions": 0}) == 0
+    assert xp.bps_2627_delta({"clearances_blocks_interceptions": 2}) == -1
+
+
+def test_bps_2627_delta_penalty_save():
+    assert xp.bps_2627_delta({"penalties_saved": 1}) == -1
+    assert xp.bps_2627_delta({"penalties_saved": 2,
+                              "clearances_blocks_interceptions": 6}) == -3
+
+
+def test_bps_2627_delta_defensive_inputs():
+    assert xp.bps_2627_delta({}) == 0
+    assert xp.bps_2627_delta({"clearances_blocks_interceptions": None,
+                              "penalties_saved": None}) == 0
+
+
+def test_allocate_bonus_plain_top3():
+    assert xp.allocate_bonus([30, 25, 20, 10]) == [3, 2, 1, 0]
+
+
+def test_allocate_bonus_tie_for_first():
+    # Tasoissa 1.: molemmat 3, seuraava 1 (2 pistettä ei jaeta).
+    assert xp.allocate_bonus([30, 30, 20, 10]) == [3, 3, 1, 0]
+
+
+def test_allocate_bonus_tie_for_second():
+    # Tasoissa 2.: 1. saa 3, tasoissa olevat 2, 1 pistettä ei jaeta.
+    assert xp.allocate_bonus([30, 25, 25, 10]) == [3, 2, 2, 0]
+
+
+def test_allocate_bonus_tie_for_third():
+    assert xp.allocate_bonus([30, 25, 20, 20, 10]) == [3, 2, 1, 1, 0]
+
+
+def test_allocate_bonus_short_lists():
+    assert xp.allocate_bonus([]) == []
+    assert xp.allocate_bonus([10]) == [3]
+    assert xp.allocate_bonus([10, 5]) == [3, 2]
+
+
+def test_adjust_summaries_reallocates_and_is_pure():
+    # Ottelu 1: A (CB, bps 30 josta iso CBI-osuus) vs B (bps 29, ei CBI:tä).
+    # Vanha jako: A=3, B=2. 26/27: A:n 12 CBI -> -2 BPS -> A 28 < B 29 -> flip.
+    row_a = {"fixture": 1, "minutes": 90, "bps": 30, "bonus": 3,
+             "clearances_blocks_interceptions": 12}
+    row_b = {"fixture": 1, "minutes": 90, "bps": 29, "bonus": 2,
+             "clearances_blocks_interceptions": 0}
+    row_c = {"fixture": 1, "minutes": 90, "bps": 10, "bonus": 1,
+             "clearances_blocks_interceptions": 0}
+    summaries = {101: [dict(row_a)], 102: [dict(row_b)], 103: [dict(row_c)]}
+    out = xp.adjust_summaries_bps_2627(summaries)
+    assert out[102][0]["bonus"] == 3   # nousi
+    assert out[101][0]["bonus"] == 2   # laski
+    assert out[103][0]["bonus"] == 1   # ennallaan
+    # Puhtaus: syöte ei mutatoitunut.
+    assert summaries[101][0]["bonus"] == 3
+    assert summaries[102][0]["bonus"] == 2
+
+
+def test_adjust_summaries_zero_minutes_excluded():
+    # 0 min pelannut ei osallistu jakoon eikä saa bonusta.
+    summaries = {
+        1: [{"fixture": 7, "minutes": 0, "bps": 50, "bonus": 0}],
+        2: [{"fixture": 7, "minutes": 90, "bps": 10, "bonus": 3}],
+    }
+    out = xp.adjust_summaries_bps_2627(summaries)
+    assert out[1][0]["bonus"] == 0
+    assert out[2][0]["bonus"] == 3
+
+
+def test_adjust_summaries_total_bonus_conserved_no_ties():
+    # Ilman tasapelejä ottelun bonuspotti pysyy 3+2+1:nä.
+    summaries = {i: [{"fixture": 5, "minutes": 90, "bps": 40 - 2 * i, "bonus": 0,
+                      "clearances_blocks_interceptions": 0}]
+                 for i in range(1, 8)}
+    out = xp.adjust_summaries_bps_2627(summaries)
+    total = sum(out[i][0]["bonus"] for i in range(1, 8))
+    assert total == 6
+
+
+# ---------------------------------------------------------------------------
 # Endpoint (TestClient conftestista)
 # ---------------------------------------------------------------------------
 def test_fantasy_xp_endpoint_shape(client):

@@ -122,6 +122,99 @@ def count_dc_hits(rows: list[dict], pos: int) -> int:
     return sum(1 for r in rows if (r.get("minutes", 0) or 0) >= 60 and dc_hit(r, pos))
 
 
+# ---------------------------------------------------------------------------
+# #151: FPL 26/27 BPS-sääntömuutos — historiallisen bonuksen oikaisu
+# ---------------------------------------------------------------------------
+# Bonus-komponentti on empiirinen per-90-vauhti, joka on opittu 25/26-
+# historiasta VANHOILLA BPS-säännöillä. FPL muutti BPS:ää 26/27:ään
+# (lähde: premierleague.com "What's new in 2026/27 Fantasy: Changes to
+# Bonus Points System", /en/news/4679946, julkaistu 20.7.2026):
+#   1. CBI: 1 BPS / 2 CBI  ->  1 BPS / 3 CBI             (laskettavissa)
+#   2. Pilkkutorjunta: 8 BPS -> 7 BPS                     (laskettavissa)
+#   3. "Tackled" (-1 BPS / taklatuksi tulo): poistettu    (EI FPL-API:ssa)
+#   4. GK-torjunnat: 3 (boksista) / 2 (ulkoa) -> 2 / mikä tahansa torjunta
+#      + uusi +1 BPS / big chance -torjunta               (jakoa EI API:ssa)
+# Historiallinen per-rivi-BPS oikaistaan VAIN laskettavista osista (1+2,
+# kentät clearances_blocks_interceptions + penalties_saved) ja ottelun
+# bonukset jaetaan uudelleen oikaistulla BPS:llä (top-3 = 3/2/1).
+# Kohtia 3-4 EI arvata (#151-portti: älä fabrikoi painoja). Suunta on
+# silti oikea: CBI-raskaiden BPS laskee -> uudelleenjaossa maalivahdit,
+# laiturit ja hyökkääjät nousevat. Dokumentoitu vaje: dribblaajien
+# (tackled-poisto) ja GK:n (big chance -metriikka) nousu ALIarvioituu.
+BPS_2627_CBI_PER = 3         # oli: 1 BPS / 2 CBI
+BPS_2627_PENSAVE_DELTA = -1  # pilkkutorjunta 8 -> 7 BPS
+
+
+def bps_2627_delta(row: dict) -> int:
+    """Laskettavissa oleva BPS-muutos 26/27-säännöillä yhdelle historiariville."""
+    cbi = int(row.get("clearances_blocks_interceptions", 0) or 0)
+    pens = int(row.get("penalties_saved", 0) or 0)
+    return (cbi // BPS_2627_CBI_PER - cbi // 2) + BPS_2627_PENSAVE_DELTA * pens
+
+
+def allocate_bonus(bps_list: list[float]) -> list[int]:
+    """FPL:n bonusjako BPS-arvoille: korkein 3, toinen 2, kolmas 1.
+
+    Viralliset tasapelisäännöt: tasoissa 1. sijalla -> kaikki 3, seuraava 1;
+    tasoissa 2. sijalla -> 1. saa 3, tasoissa olevat 2, 1 pistettä ei jaeta;
+    tasoissa 3. sijalla -> kaikki tasoissa olevat 1.
+    """
+    order = sorted(range(len(bps_list)), key=lambda i: -bps_list[i])
+    pts_by_rank_start = {0: 3, 1: 2, 2: 1}
+    out = [0] * len(bps_list)
+    pos = 0
+    while pos < len(order) and pos <= 2:
+        group = [order[pos]]
+        while (pos + len(group) < len(order)
+               and bps_list[order[pos + len(group)]] == bps_list[group[0]]):
+            group.append(order[pos + len(group)])
+        pts = pts_by_rank_start[pos]
+        for i in group:
+            out[i] = pts
+        pos += len(group)
+    return out
+
+
+def adjust_summaries_bps_2627(summaries: dict[int, list[dict]]) -> dict[int, list[dict]]:
+    """Palauttaa summaries-kopion, jossa rivien 'bonus' on jaettu uudelleen
+    26/27-oikaistulla BPS:llä (ottelukohtainen top-3-jako, allocate_bonus).
+
+    Puhdas funktio: syötettä ei mutatoida; vain minuutteja saaneet rivit
+    osallistuvat jakoon. Rajoite: jakopooli = välimuistin pelaajat (nykyisen
+    bootstrapin elementit) -> kesken kauden liigasta poistuneet puuttuvat
+    yksittäisten otteluiden poolista. Vaikutus on pieni ja suuntaamaton
+    (sama vaje koskee ennen- ja jälkeen-ajoa identtisesti).
+    """
+    pool: dict[int, list[tuple[int, int, float]]] = {}
+    for pid, hist in summaries.items():
+        for i, r in enumerate(hist):
+            fx = r.get("fixture")
+            if fx is None or not (r.get("minutes", 0) or 0):
+                continue
+            adj = float(r.get("bps", 0) or 0) + bps_2627_delta(r)
+            pool.setdefault(fx, []).append((pid, i, adj))
+
+    new_bonus: dict[tuple[int, int], int] = {}
+    for entries in pool.values():
+        alloc = allocate_bonus([b for _, _, b in entries])
+        for (pid, i, _), pts in zip(entries, alloc):
+            new_bonus[(pid, i)] = pts
+
+    out: dict[int, list[dict]] = {}
+    for pid, hist in summaries.items():
+        rows: list[dict] = []
+        for i, r in enumerate(hist):
+            nb = new_bonus.get((pid, i))
+            if nb is None or nb == (r.get("bonus", 0) or 0):
+                rows.append(r)
+            else:
+                r2 = dict(r)
+                r2["bonus"] = nb
+                rows.append(r2)
+        out[pid] = rows
+    return out
+
+
 def position_priors(acc_by_player: dict[int, dict],
                     pos_by_player: dict[int, int]) -> dict[int, dict]:
     """Positiotason per-90-priorit poolista (walk-forward: kutsuja antaa
