@@ -152,7 +152,14 @@ def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str]) -> b
 # ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--legacy-bps", action="store_true",
+                    help="OHITA 26/27 BPS-oikaisu (#151) — vain ennen/jälkeen-"
+                         "vertailuajoihin, EI tuotantoon")
+    args = ap.parse_args(argv)
+
     src = fetch_source()
 
     print("[2/6] FPL-pelaajadata (bootstrap + element-historiat)...")
@@ -163,6 +170,13 @@ def main() -> int:
     summaries = fpl_api.fetch_all_summaries(boot, force=season_live)
     print(f"      {len(boot['elements'])} pelaajaa "
           f"({'live-kausi, tuore haku' if season_live else 'päättynyt kausi, välimuisti'})")
+    # #151: bonus-historia oikaistaan 26/27 BPS-sääntöihin ennen vauhteja
+    # (CBI 1/3 + pilkkutorjunta 7; ottelukohtainen bonuksen uudelleenjako).
+    if args.legacy_bps:
+        print("      HUOM: --legacy-bps — 26/27 BPS-oikaisu OHITETTU (vertailuajo)")
+    else:
+        summaries = xp.adjust_summaries_bps_2627(summaries)
+        print("      bonus-historia oikaistu 26/27 BPS-sääntöihin (#151)")
 
     print("[3/6] Sovitetaan PL Dixon-Coles (sama fit kuin /api/predict)...")
     dc, seasons = fit_model()
@@ -402,6 +416,10 @@ def main() -> int:
                 "+ def.contribution + bonus-proxy - kortit; kaava src/models/fpl_xp.py, "
                 "validoitu walk-forward-backtestillä 25/26 (scripts/backtest_fpl_xp.py)"
             ),
+            # #151: bonus-proxyn historia oikaistu 26/27 BPS-sääntöihin
+            # (CBI 1/3, pilkkutorjunta 7; premierleague.com news/4679946).
+            "bps_rules": ("legacy 25/26 (vertailuajo)" if args.legacy_bps
+                          else "2026/27 recalibrated (#151)"),
             "caveat": (
                 "Pre-season: pelaajabaselinet = edellisen kauden FPL-historia, "
                 "minuuttiarvio = kauden lopun rotaatio + FPL-saatavuustieto. "
