@@ -154,11 +154,23 @@
 											     Defensiivinen: cs_pct puuttuu vanhasta payloadista → FDR-tint
 											     + FDR-luku kuten ennen. -->
 											{#if typeof f.cs_pct === 'number'}
+												<!-- #152: solu linkittää predict-pinnalle (mobiilin solu-tap-
+												     pariteetti). SPA:ssa ei ole match-predict-näkymää eikä
+												     build-aikaista tietoa ottelusivujen olemassaolosta →
+												     kohde on aina elävä /predictions-hub goaliq.appissa. -->
 												<td
+													class="cs-link-cell"
 													style="background: {csCellBg(f.cs_pct)}"
-													title="{f.opponent ?? f.opponent_short} ({f.venue}) · FDR {f.fdr}"
+													title="{f.opponent ?? f.opponent_short} ({f.venue}) · FDR {f.fdr} · view model prediction"
 												>
-													{f.opponent_short} ({f.venue}) {Math.round(f.cs_pct)}%
+													<a
+														class="cs-cell-a"
+														href="https://goaliq.app/predictions"
+														target="_blank"
+														rel="noopener"
+													>
+														{f.opponent_short} ({f.venue}) {Math.round(f.cs_pct)}%
+													</a>
 												</td>
 											{:else}
 												<td
@@ -212,5 +224,19 @@
 		background: var(--surface);
 		border: 1px solid var(--border);
 		margin: var(--s-2) 0;
+	}
+	/* #152: CS-solun linkki perii solun värin, ei alleviivausta —
+	   koko solu klikattavaksi ilman visuaalista muutosta. */
+	.cs-link-cell {
+		padding: 0;
+	}
+	.cs-cell-a {
+		display: block;
+		padding: 0.5em 0.75em; /* = theme.css td-padding, solu ei muutu */
+		color: inherit;
+		text-decoration: none;
+	}
+	.cs-cell-a:hover {
+		filter: brightness(0.94);
 	}
 </style>

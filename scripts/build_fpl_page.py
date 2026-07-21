@@ -651,6 +651,28 @@ def cs_cell_colors(cs_pct: float) -> tuple[str, str]:
     return f"#{bg[0]:02X}{bg[1]:02X}{bg[2]:02X}", fg
 
 
+def _pred_slug(s: str) -> str:
+    """SAMA kaava kuin build_prediction_pages._slug (testi vartioi driftin)."""
+    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+
+
+def predict_cell_href(team: str, opponent: str, venue: str,
+                      root: Path = ROOT) -> str:
+    """#152: CS-solun linkkikohde (mobiilipariteetti: solu -> predict-pinta).
+
+    Ohjelmallinen ottelusivu (#119) jos se on generoitu build-hetkellä,
+    muuten /predictions-hub (on aina olemassa). PL-ottelusivut syntyvät
+    prediction_logista vasta kun lokiin ilmestyy tulevia PL-otteluita
+    (elokuu) -> solut päivittyvät ottelusivuiksi automaattisesti
+    seuraavassa regenissä, ei koodimuutosta.
+    """
+    home, away = (team, opponent) if venue == "H" else (opponent, team)
+    rel = f"predictions/premier-league/{_pred_slug(home)}-vs-{_pred_slug(away)}.html"
+    if (root / rel).exists():
+        return "/" + rel
+    return "/predictions"
+
+
 def fdr_grid_html(c: dict) -> str:
     head = "".join(f'<th scope="col" class="num">GW{g}</th>' for g in c["gws"])
     rows = []
@@ -662,15 +684,17 @@ def fdr_grid_html(c: dict) -> str:
             else:
                 # #148: solussa vastustaja + venue + per-fixture CS% (pariteetti
                 # mobiilin #144:n kanssa); FDR-luokka siirtyi tooltippiin.
+                # #152: solu on linkki predict-pinnalle (mobiilin solu-tap-pariteetti).
                 bg, fg = cs_cell_colors(float(fx["cs_pct"]))
+                href = predict_cell_href(r["team"], fx["opponent"], fx["venue"])
                 cells.append(
-                    f'<td class="num"><span class="fdr" '
+                    f'<td class="num"><a class="fdr" href="{href}" '
                     f'style="background:{bg};color:{fg}" '
                     f'title="{escape(fx["opponent"])} ({fx["venue"]}) '
-                    f'&middot; FDR {fx["fdr"]}">'
+                    f'&middot; FDR {fx["fdr"]} &middot; view model prediction">'
                     f'{escape(fx["opponent_short"])} ({fx["venue"]}) '
                     f'{fx["cs_pct"]:.0f}%'
-                    f"</span></td>"
+                    f"</a></td>"
                 )
         rows.append(
             "<tr>"
@@ -874,7 +898,8 @@ CSS = """
   th{ color:var(--ink-muted); font-weight:600; font-size:13px; }
   th.num,td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
   td.team{ font-weight:700; white-space:nowrap; }
-  .fdr{ display:inline-block; min-width:34px; padding:3px 8px; border-radius:8px; color:var(--ink); font-weight:700; text-align:center; font-size:13px; }
+  .fdr{ display:inline-block; min-width:34px; padding:3px 8px; border-radius:8px; color:var(--ink); font-weight:700; text-align:center; font-size:13px; text-decoration:none; }
+  a.fdr:hover{ filter:brightness(0.92); }
   .fdr1{ background:#19E3D2; } .fdr2{ background:#FFC93C; } .fdr3{ background:#F4A800; } .fdr4{ background:#FF6A3D; } .fdr5{ background:#D6006E; color:#fff; }
   .legend{ color:var(--ink-muted); font-size:14px; margin:8px 0 0; }
   .stat-row{ display:flex; flex-wrap:wrap; gap:14px; margin:18px 0; }
