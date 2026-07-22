@@ -1,47 +1,47 @@
 {
-  "updated_at": "2026-07-21T22:04:29+00:00",
+  "updated_at": "2026-07-22T02:42:15+00:00",
   "logged_total": 304,
-  "pending": 197,
+  "pending": 196,
   "all_time": {
-    "n": 107,
+    "n": 108,
     "correct_1x2": 65,
-    "pct_1x2": 0.6075,
+    "pct_1x2": 0.6019,
     "decisive_n": 77,
     "decisive_correct": 65,
     "pct_decisive": 0.8442,
-    "exact_n": 59,
-    "exact_correct": 12,
-    "pct_exact": 0.2034,
-    "brier": 0.4902,
-    "brier_n": 59
+    "exact_n": 60,
+    "exact_correct": 13,
+    "pct_exact": 0.2167,
+    "brier": 0.4969,
+    "brier_n": 60
   },
   "rolling": {
     "n": 100,
     "correct_1x2": 62,
     "pct_1x2": 0.62,
-    "decisive_n": 73,
+    "decisive_n": 72,
     "decisive_correct": 62,
-    "pct_decisive": 0.8493,
-    "exact_n": 59,
-    "exact_correct": 12,
-    "pct_exact": 0.2034,
-    "brier": 0.4902,
-    "brier_n": 59,
+    "pct_decisive": 0.8611,
+    "exact_n": 60,
+    "exact_correct": 13,
+    "pct_exact": 0.2167,
+    "brier": 0.4969,
+    "brier_n": 60,
     "window": 100
   },
   "by_competition": {
     "BSA": {
-      "n": 3,
+      "n": 4,
       "correct_1x2": 2,
-      "pct_1x2": 0.6667,
+      "pct_1x2": 0.5,
       "decisive_n": 2,
       "decisive_correct": 2,
       "pct_decisive": 1.0,
-      "exact_n": 3,
-      "exact_correct": 1,
+      "exact_n": 4,
+      "exact_correct": 2,
       "pct_exact": null,
       "brier": null,
-      "brier_n": 3
+      "brier_n": 4
     },
     "WC": {
       "n": 104,
@@ -71,10 +71,10 @@
       "n": 27
     },
     {
-      "bin_mid": 0.2564,
-      "predicted": 0.2564,
-      "actual": 0.2031,
-      "n": 64
+      "bin_mid": 0.256,
+      "predicted": 0.256,
+      "actual": 0.2121,
+      "n": 66
     },
     {
       "bin_mid": 0.3417,
@@ -89,10 +89,10 @@
       "n": 18
     },
     {
-      "bin_mid": 0.5393,
-      "predicted": 0.5393,
-      "actual": 0.7,
-      "n": 10
+      "bin_mid": 0.5368,
+      "predicted": 0.5368,
+      "actual": 0.6364,
+      "n": 11
     },
     {
       "bin_mid": 0.6387,
@@ -114,6 +114,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-21",
+      "home_team": "Atletico-MG",
+      "away_team": "Bahia",
+      "predicted_winner": "home",
+      "p_winner": 0.512,
+      "most_likely_score": "1-1",
+      "actual_score": "1-1",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": true,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-07-19",
       "home_team": "Spain",
@@ -375,20 +389,6 @@
       "most_likely_score": "0-0",
       "actual_score": "0-3",
       "actual_outcome": "away",
-      "hit_1x2": true,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-04",
-      "home_team": "Colombia",
-      "away_team": "Ghana",
-      "predicted_winner": "home",
-      "p_winner": 0.8472,
-      "most_likely_score": "2-0",
-      "actual_score": "1-0",
-      "actual_outcome": "home",
       "hit_1x2": true,
       "exact_hit": false,
       "duration": null,
