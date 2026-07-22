@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-21T17:45:38",
+    "generated_at": "2026-07-22T08:11:40",
     "season": "2026/27",
     "fixture_source": "premierleague.com (pulselive) compSeason 841",
     "player_source": "FPL official API (bootstrap + element-summary history)",
@@ -27,7 +27,7 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1552
+      "home_gamma": -0.1553
     },
     "data_coverage": {
       "baseline_season": "2526",
@@ -5072,7 +5072,7 @@
               "venue": "H"
             }
           ],
-          "xp": 3.37
+          "xp": 3.38
         }
       ],
       "components": {
