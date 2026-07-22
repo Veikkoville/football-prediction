@@ -87,7 +87,8 @@
 	<p class="muted">
 		Free · Lock 1-3 must-have players and the model builds the best legal 15-player squad
 		around them, then shows what forcing those picks costs against its best free squad.
-		No FPL entry ID needed.
+		No FPL entry ID needed. Prices come straight from the official FPL API and update the
+		moment FPL opens the new season's game.
 	</p>
 
 	<MethodNote summary="How the fit is calculated">
