@@ -2593,6 +2593,25 @@ def _parse_id_csv(raw: str, label: str) -> list[int]:
                             detail=f"{label} must be comma-separated integers")
 
 
+@app.get("/api/fantasy/fit")
+def fantasy_fit(
+    response: Response,
+    locked: str = Query(..., description="1-3 FPL element-ID:tä pilkuilla"),
+):
+    """#155 Fit checker: lukitse 1-3 pakkopelaajaa → paras laillinen runko
+    niiden ympärille (horisontti-xP, sama ahne heuristiikka kuin #50-optimi)
+    + delta vs mallin vapaa optimibudjettijoukkue. Ei entry-ID:tä, ei
+    kirjautumista (PI-13: toimii go-live-hetkellä). Lukee committatun
+    projektion, ei laskentaa mallipolulla."""
+    from src.models.fpl_fit import fit_squad
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return fit_squad(_parse_id_csv(locked, "locked"))
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/fantasy/plan")
 def fantasy_plan(
     response: Response,

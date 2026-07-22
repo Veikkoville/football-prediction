@@ -109,6 +109,39 @@ export function fetchAccuracy(): Promise<AccuracyResponse> {
 	return accuracyP;
 }
 
+/** #155 Fit checker: yksi rungon pelaaja (hinta miljoonina). */
+export interface FitPlayer {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: 'GKP' | 'DEF' | 'MID' | 'FWD';
+	price: number;
+	xp_horizon_total: number;
+	xp_per_gw: number;
+}
+
+export interface FitResponse {
+	meta: {
+		horizon_gw: number;
+		next_gameweek: number | null;
+		generated_at: string | null;
+		budget_cap: number;
+		squad_cost: number;
+		bank: number;
+	};
+	locked: FitPlayer[];
+	xi: FitPlayer[];
+	bench: FitPlayer[];
+	totals: { xi_xp_horizon: number; optimal_xp_horizon: number; delta_xp: number };
+	message: string;
+}
+
+/** #155: lukitse 1-3 pakkopelaajaa → paras laillinen runko + delta vs vapaa
+ * optimi. Ei entry-ID:tä (toimii go-live-hetkellä). Ei cachea (no-store). */
+export function fetchFit(lockedIds: number[]): Promise<FitResponse> {
+	return getJson<FitResponse>(`/api/fantasy/fit?locked=${lockedIds.join(',')}`);
+}
+
 export function gwXp(p: XpPlayer, gw: number | undefined): number {
 	if (gw == null) return 0;
 	return p.gameweeks.find((g) => g.gw === gw)?.xp ?? 0;

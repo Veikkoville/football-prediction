@@ -3,6 +3,7 @@
 	import MethodNote from './MethodNote.svelte';
 	import Provenance from './Provenance.svelte';
 	import RateTeam from './RateTeam.svelte';
+	import FitChecker from './FitChecker.svelte';
 	import PriceWatch from './PriceWatch.svelte';
 	import Leaders from './Leaders.svelte';
 	import Value from './Value.svelte';
@@ -18,6 +19,7 @@
 	const SEGMENTS: Segment[] = [
 		{ id: 'cleansheets', label: 'Clean sheets' },
 		{ id: 'rateteam', label: 'Rate my team' },
+		{ id: 'fitchecker', label: 'Fit checker' },
 		{ id: 'value', label: 'Value' },
 		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'pricewatch', label: 'Price watch' }
@@ -196,6 +198,12 @@
 	     Toimii myös ilman fixture-dataa. -->
 	<div class="tool-card" id="panel-rateteam" role="tabpanel" aria-labelledby="seg-rateteam">
 		<RateTeam {onUpgrade} />
+	</div>
+{:else if segment === 'fitchecker'}
+	<!-- #155: lukitse 1-3 pakkopelaajaa → paras runko + lukituksen xP-hinta.
+	     FREE, ei entry-ID:tä (PI-13: toimii go-live-hetkellä). -->
+	<div class="tool-card" id="panel-fitchecker" role="tabpanel" aria-labelledby="seg-fitchecker">
+		<FitChecker />
 	</div>
 {:else if segment === 'value'}
 	<!-- #127: top-3 free -teaser, koko lista + GK-parit premiumissa -->
