@@ -17,7 +17,18 @@
 			content="Clean sheet probability, fixture difficulty and player expected points from the GoalIQ match model."
 		/>
 		<meta property="og:type" content="website" />
-		<meta property="og:image" content="%sveltekit.assets%/goaliq-appicon-512.png" />
+		<meta property="og:url" content="https://pro.goaliq.app/" />
+		<!-- #155-fix: og:image OLI suhteellinen (%sveltekit.assets%) — X/FB-crawlerit
+		     vaativat absoluuttisen URLin, ja twitter:card puuttui → tweet-kortti jäi
+		     ilman ikonia. summary = neliökortti ikonilla. -->
+		<meta property="og:image" content="https://pro.goaliq.app/goaliq-appicon-512.png" />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content="GoalIQ Premium | FPL tools" />
+		<meta
+			name="twitter:description"
+			content="Clean sheet probability, fixture difficulty and player expected points from the GoalIQ match model."
+		/>
+		<meta name="twitter:image" content="https://pro.goaliq.app/goaliq-appicon-512.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
