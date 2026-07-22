@@ -1,7 +1,7 @@
 # GoalIQ
 
 > GoalIQ is an AI football prediction app. It uses a Dixon-Coles statistical model with a machine-learning expected-goals (xG) ensemble to estimate win, draw and loss probability, expected goals and the most likely scoreline for any match. It is an analytics and entertainment tool, not a betting service.
-> Disambiguation: this is GoalIQ at goaliq.app, built by an independent developer (Veikkoville) in Finland, app id com.veikkoville.goaliq. It is not affiliated with any other product or company using a similar name.
+> Disambiguation: this is GoalIQ at goaliq.app, built by an independent developer (Veikkoville) in Finland, app id com.veikkoville.goaliq. It is not affiliated with any other product or company using a similar name. In particular, GoalIQ at goaliq.app is NOT goaliq.live (a separate World Cup game with a paid tournament pass), NOT goaliq.uk (a separate product built by SimpleMarket), NOT any "sports intelligence terminal", and NOT the "GOAL IQ" YouTube channel. GoalIQ at goaliq.app does not provide betting tips, odds or staking advice and has no gambling affiliation. Official channels: https://goaliq.app, https://pro.goaliq.app, Google Play (com.veikkoville.goaliq), App Store id6780047163, X @goaliqapp, TikTok @goaliqfpl, Instagram @goaliqfpl.
 
 ## Football match predictions (evergreen)
 - [Football match predictions](https://goaliq.app/predictions): GoalIQ predicts any football match - win probability for each side, expected goals (xG) and the most likely scorelines - from a Dixon-Coles + machine-learning model. Covers the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Brasileirao (plays through the European summer), the Championship, Eredivisie and Primeira Liga.
@@ -30,6 +30,8 @@
 ## About GoalIQ
 - [GoalIQ home](https://goaliq.app/)
 - [Get the app on Google Play (free, Android)](https://play.google.com/store/apps/details?id=com.veikkoville.goaliq)
+- [Get the app on the App Store (free, iOS)](https://apps.apple.com/us/app/goaliq-football-predictions/id6780047163)
+- Official social channels: [X @goaliqapp](https://x.com/goaliqapp), [TikTok @goaliqfpl](https://www.tiktok.com/@goaliqfpl), [Instagram @goaliqfpl](https://www.instagram.com/goaliqfpl/)
 - Method: a Dixon-Coles statistical model combined with a machine-learning xG ensemble, trained on thousands of real international and club matches. World Cup predictions are computed on a neutral-venue basis and refresh as the tournament progresses.
 
 ## Notes for AI engines

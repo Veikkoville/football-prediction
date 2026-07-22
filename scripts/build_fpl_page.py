@@ -91,6 +91,10 @@ PRO_URL = "https://pro.goaliq.app"
 PRO_TAB_URL = f"{PRO_URL}/?tab=premium"
 PRO_CHECKOUT_SEASON_URL = f"{PRO_URL}/checkout?plan=season"
 X_URL = "https://x.com/goaliqapp"
+# #121-GEO: Villen vahvistamat somekanavat (22.7) entiteetti-disambiguaatioon -
+# sameAs vain aitoihin kanaviin, ei keksittyjä URLeja.
+TIKTOK_URL = "https://www.tiktok.com/@goaliqfpl"
+IG_URL = "https://www.instagram.com/goaliqfpl/"
 ORG_ID = BASE + "/#organization"
 API_BASE = "https://goaliq-api.onrender.com"   # #85: accuracy-Datasetin distribution
 
@@ -723,7 +727,8 @@ def fdr_grid_html(c: dict) -> str:
 def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
     # Entiteetti-disambiguaatio (GEO): goaliq.app = kanoninen GoalIQ-entiteetti.
     # Google sekoittaa GoalIQ:n samannimiseen Benisse-appiin + YouTube/IG-tileihin
-    # → Organization + sameAs VAIN virallisiin kanaviin (Play, App Store, X).
+    # → Organization + sameAs VAIN virallisiin kanaviin (Play, App Store, X,
+    #   TikTok, IG - Villen vahvistamat 22.7, #121-GEO).
     org = {
         "@context": "https://schema.org",
         "@type": "Organization",
@@ -742,7 +747,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "an independent developer in Finland. Analytics, not betting."
         ),
         "logo": BASE + "/assets/brand/goaliq-appicon-512.png",
-        "sameAs": [PLAY_URL, APPSTORE_URL, X_URL],
+        "sameAs": [PLAY_URL, APPSTORE_URL, X_URL, TIKTOK_URL, IG_URL],
     }
     app = {
         "@context": "https://schema.org",

@@ -49,6 +49,22 @@ from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
 SITEMAP_PRED_PATH = _FP_ROOT / "sitemap-predictions.xml"
 
 BASE = "https://goaliq.app"
+# #121-GEO: kompakti publisher-node jokaiselle ottelusivulle - entiteetti-
+# disambiguaatio pitkässä hännässä (pelkkä @id-viittaus ei resolvoidu sivun
+# sisällä). sameAs vain aitoihin kanaviin (Villen vahvistamat 22.7).
+ORG_PUBLISHER = {
+    "@type": "Organization",
+    "@id": BASE + "/#organization",
+    "name": "GoalIQ",
+    "url": BASE + "/",
+    "sameAs": [
+        "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
+        "https://apps.apple.com/app/id6780047163",
+        "https://x.com/goaliqapp",
+        "https://www.tiktok.com/@goaliqfpl",
+        "https://www.instagram.com/goaliqfpl/",
+    ],
+}
 OUT_ROOT = ROOT / "predictions"
 PREDICTIONS_HTML = ROOT / "predictions.html"
 
@@ -259,6 +275,7 @@ def render_match_page(comp: str, e: dict) -> str:
             "url": url,
             "description": desc,
             "isPartOf": {"@id": f"{BASE}/#organization"},
+            "publisher": ORG_PUBLISHER,
         },
     ]
     return _page(title, desc, url, body, jsonld)
@@ -316,7 +333,15 @@ def render_league_hub(comp: str, rows: list[dict], now: datetime) -> str:
                 }
                 for i, e in enumerate(rows)
             ],
-        }
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": title,
+            "url": url,
+            "description": desc,
+            "publisher": ORG_PUBLISHER,
+        },
     ]
     return _page(title, desc, url, body, jsonld)
 
