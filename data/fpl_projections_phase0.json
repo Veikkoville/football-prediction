@@ -3,10 +3,10 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-07-23T08:09:59",
+    "generated_at": "2026-07-23T13:56:54",
     "season": "2026/27",
-    "source": "pulselive-fallback",
-    "fixture_source": "premierleague.com (pulselive) compSeason 841",
+    "source": "fpl-api",
+    "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2425', '2526'] (sama fit-config kuin /api/predict: decay=0.0035, bayes=2.0)",
     "cs_method": "P(vastustaja 0 maalia) DC-score-matriisista (tau-korjattu)",
     "context_layer": {
@@ -36,15 +36,13 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1553
+      "home_gamma": -0.1552
     },
     "sanity_gate": "PASS",
     "next_gameweek": 1,
-    "deadline_utc": null,
+    "deadline_utc": "2026-08-21T17:30:00+00:00",
     "horizon_gw": 6,
-    "todo": [
-      "TODO(kaudenvaihto): FPL-API ei vielä tarjoile 26/27-kautta — fixturet pulselive-fallbackista, GW-deadlinet puuttuvat. Aja uudelleen kun FPL-peli avautuu (builderi vaihtaa lähteen automaattisesti)."
-    ]
+    "todo": []
   },
   "teams": [
     {
@@ -56,7 +54,7 @@
           "opponent": "Coventry",
           "opponent_short": "COV",
           "venue": "H",
-          "kickoff_ms": 1787338800000.0,
+          "kickoff_ms": 1787338800000,
           "cs_pct": 60.1,
           "fdr": 1
         },
@@ -65,7 +63,7 @@
           "opponent": "Aston Villa",
           "opponent_short": "AVL",
           "venue": "A",
-          "kickoff_ms": 1788202800000.0,
+          "kickoff_ms": 1788202800000,
           "cs_pct": 35.3,
           "fdr": 2
         },
@@ -74,7 +72,7 @@
           "opponent": "Chelsea",
           "opponent_short": "CHE",
           "venue": "H",
-          "kickoff_ms": 1788708600000.0,
+          "kickoff_ms": 1788708600000,
           "cs_pct": 43.4,
           "fdr": 1
         },
@@ -83,7 +81,7 @@
           "opponent": "Sunderland",
           "opponent_short": "SUN",
           "venue": "A",
-          "kickoff_ms": 1789239600000.0,
+          "kickoff_ms": 1789239600000,
           "cs_pct": 48.6,
           "fdr": 1
         },
@@ -92,7 +90,7 @@
           "opponent": "Brighton",
           "opponent_short": "BHA",
           "venue": "A",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 39.6,
           "fdr": 2
         },
@@ -101,7 +99,7 @@
           "opponent": "Leeds",
           "opponent_short": "LEE",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 51.9,
           "fdr": 1
         }
@@ -119,7 +117,7 @@
           "opponent": "Bournemouth",
           "opponent_short": "BOU",
           "venue": "H",
-          "kickoff_ms": 1787490000000.0,
+          "kickoff_ms": 1787490000000,
           "cs_pct": 34.9,
           "fdr": 1
         },
@@ -128,7 +126,7 @@
           "opponent": "Crystal Palace",
           "opponent_short": "CRY",
           "venue": "A",
-          "kickoff_ms": 1787943600000.0,
+          "kickoff_ms": 1787943600000,
           "cs_pct": 42.9,
           "fdr": 1
         },
@@ -137,7 +135,7 @@
           "opponent": "Coventry",
           "opponent_short": "COV",
           "venue": "H",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 53.7,
           "fdr": 1
         },
@@ -146,7 +144,7 @@
           "opponent": "Manchester United",
           "opponent_short": "MUN",
           "venue": "A",
-          "kickoff_ms": 1789313400000.0,
+          "kickoff_ms": 1789313400000,
           "cs_pct": 25.5,
           "fdr": 3
         },
@@ -155,7 +153,7 @@
           "opponent": "Sunderland",
           "opponent_short": "SUN",
           "venue": "H",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 46.6,
           "fdr": 1
         },
@@ -164,7 +162,7 @@
           "opponent": "Liverpool",
           "opponent_short": "LIV",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 25.2,
           "fdr": 3
         }
@@ -182,7 +180,7 @@
           "opponent": "Crystal Palace",
           "opponent_short": "CRY",
           "venue": "H",
-          "kickoff_ms": 1787407200000.0,
+          "kickoff_ms": 1787407200000,
           "cs_pct": 34.6,
           "fdr": 2
         },
@@ -191,7 +189,7 @@
           "opponent": "Bournemouth",
           "opponent_short": "BOU",
           "venue": "A",
-          "kickoff_ms": 1788012000000.0,
+          "kickoff_ms": 1788012000000,
           "cs_pct": 23.8,
           "fdr": 4
         },
@@ -200,7 +198,7 @@
           "opponent": "Manchester United",
           "opponent_short": "MUN",
           "venue": "H",
-          "kickoff_ms": 1788699600000.0,
+          "kickoff_ms": 1788699600000,
           "cs_pct": 26.3,
           "fdr": 3
         },
@@ -209,7 +207,7 @@
           "opponent": "Tottenham",
           "opponent_short": "TOT",
           "venue": "A",
-          "kickoff_ms": 1789230600000.0,
+          "kickoff_ms": 1789230600000,
           "cs_pct": 29.3,
           "fdr": 3
         },
@@ -218,7 +216,7 @@
           "opponent": "Ipswich",
           "opponent_short": "IPS",
           "venue": "H",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 41.2,
           "fdr": 1
         },
@@ -227,7 +225,7 @@
           "opponent": "Hull",
           "opponent_short": "HUL",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 43.4,
           "fdr": 1
         }
@@ -245,7 +243,7 @@
           "opponent": "Aston Villa",
           "opponent_short": "AVL",
           "venue": "H",
-          "kickoff_ms": 1787490000000.0,
+          "kickoff_ms": 1787490000000,
           "cs_pct": 31.6,
           "fdr": 2
         },
@@ -254,7 +252,7 @@
           "opponent": "Chelsea",
           "opponent_short": "CHE",
           "venue": "A",
-          "kickoff_ms": 1788094800000.0,
+          "kickoff_ms": 1788094800000,
           "cs_pct": 26.2,
           "fdr": 3
         },
@@ -263,7 +261,7 @@
           "opponent": "Leeds",
           "opponent_short": "LEE",
           "venue": "H",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 36.2,
           "fdr": 2
         },
@@ -272,7 +270,7 @@
           "opponent": "Coventry",
           "opponent_short": "COV",
           "venue": "A",
-          "kickoff_ms": 1789304400000.0,
+          "kickoff_ms": 1789304400000,
           "cs_pct": 44.1,
           "fdr": 1
         },
@@ -281,7 +279,7 @@
           "opponent": "Arsenal",
           "opponent_short": "ARS",
           "venue": "H",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 24.2,
           "fdr": 4
         },
@@ -290,7 +288,7 @@
           "opponent": "Sunderland",
           "opponent_short": "SUN",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 32.6,
           "fdr": 2
         }
@@ -308,7 +306,7 @@
           "opponent": "Leeds",
           "opponent_short": "LEE",
           "venue": "H",
-          "kickoff_ms": 1787407200000.0,
+          "kickoff_ms": 1787407200000,
           "cs_pct": 36.4,
           "fdr": 2
         },
@@ -317,7 +315,7 @@
           "opponent": "Liverpool",
           "opponent_short": "LIV",
           "venue": "A",
-          "kickoff_ms": 1788003000000.0,
+          "kickoff_ms": 1788003000000,
           "cs_pct": 17.6,
           "fdr": 4
         },
@@ -326,7 +324,7 @@
           "opponent": "Tottenham",
           "opponent_short": "TOT",
           "venue": "H",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 33.0,
           "fdr": 2
         },
@@ -335,7 +333,7 @@
           "opponent": "Aston Villa",
           "opponent_short": "AVL",
           "venue": "A",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 20.1,
           "fdr": 4
         },
@@ -344,7 +342,7 @@
           "opponent": "Coventry",
           "opponent_short": "COV",
           "venue": "H",
-          "kickoff_ms": 1789835400000.0,
+          "kickoff_ms": 1789835400000,
           "cs_pct": 45.6,
           "fdr": 1
         },
@@ -353,7 +351,7 @@
           "opponent": "Crystal Palace",
           "opponent_short": "CRY",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 34.4,
           "fdr": 2
         }
@@ -371,7 +369,7 @@
           "opponent": "Hull",
           "opponent_short": "HUL",
           "venue": "A",
-          "kickoff_ms": 1787398200000.0,
+          "kickoff_ms": 1787398200000,
           "cs_pct": 33.7,
           "fdr": 1
         },
@@ -380,7 +378,7 @@
           "opponent": "Ipswich",
           "opponent_short": "IPS",
           "venue": "H",
-          "kickoff_ms": 1788103800000.0,
+          "kickoff_ms": 1788103800000,
           "cs_pct": 41.1,
           "fdr": 1
         },
@@ -389,7 +387,7 @@
           "opponent": "Everton",
           "opponent_short": "EVE",
           "venue": "A",
-          "kickoff_ms": 1788699600000.0,
+          "kickoff_ms": 1788699600000,
           "cs_pct": 26.8,
           "fdr": 3
         },
@@ -398,7 +396,7 @@
           "opponent": "Manchester City",
           "opponent_short": "MCI",
           "venue": "H",
-          "kickoff_ms": 1789313400000.0,
+          "kickoff_ms": 1789313400000,
           "cs_pct": 23.5,
           "fdr": 3
         },
@@ -407,7 +405,7 @@
           "opponent": "Fulham",
           "opponent_short": "FUL",
           "venue": "A",
-          "kickoff_ms": 1789918200000.0,
+          "kickoff_ms": 1789918200000,
           "cs_pct": 26.0,
           "fdr": 3
         },
@@ -416,7 +414,7 @@
           "opponent": "Tottenham",
           "opponent_short": "TOT",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 32.1,
           "fdr": 2
         }
@@ -434,7 +432,7 @@
           "opponent": "Chelsea",
           "opponent_short": "CHE",
           "venue": "H",
-          "kickoff_ms": 1787598000000.0,
+          "kickoff_ms": 1787598000000,
           "cs_pct": 26.6,
           "fdr": 3
         },
@@ -443,7 +441,7 @@
           "opponent": "Sunderland",
           "opponent_short": "SUN",
           "venue": "A",
-          "kickoff_ms": 1788094800000.0,
+          "kickoff_ms": 1788094800000,
           "cs_pct": 31.8,
           "fdr": 3
         },
@@ -452,7 +450,7 @@
           "opponent": "Crystal Palace",
           "opponent_short": "CRY",
           "venue": "H",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 34.4,
           "fdr": 2
         },
@@ -461,7 +459,7 @@
           "opponent": "Liverpool",
           "opponent_short": "LIV",
           "venue": "A",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 16.7,
           "fdr": 5
         },
@@ -470,7 +468,7 @@
           "opponent": "Manchester United",
           "opponent_short": "MUN",
           "venue": "H",
-          "kickoff_ms": 1789918200000.0,
+          "kickoff_ms": 1789918200000,
           "cs_pct": 26.1,
           "fdr": 3
         },
@@ -479,7 +477,7 @@
           "opponent": "Ipswich",
           "opponent_short": "IPS",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 41.2,
           "fdr": 1
         }
@@ -497,7 +495,7 @@
           "opponent": "Brighton",
           "opponent_short": "BHA",
           "venue": "A",
-          "kickoff_ms": 1787490000000.0,
+          "kickoff_ms": 1787490000000,
           "cs_pct": 22.5,
           "fdr": 4
         },
@@ -506,7 +504,7 @@
           "opponent": "Arsenal",
           "opponent_short": "ARS",
           "venue": "H",
-          "kickoff_ms": 1788202800000.0,
+          "kickoff_ms": 1788202800000,
           "cs_pct": 22.9,
           "fdr": 4
         },
@@ -515,7 +513,7 @@
           "opponent": "Hull",
           "opponent_short": "HUL",
           "venue": "A",
-          "kickoff_ms": 1788625800000.0,
+          "kickoff_ms": 1788625800000,
           "cs_pct": 42.7,
           "fdr": 1
         },
@@ -524,7 +522,7 @@
           "opponent": "Nottingham Forest",
           "opponent_short": "NFO",
           "venue": "H",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 23.6,
           "fdr": 3
         },
@@ -533,7 +531,7 @@
           "opponent": "Tottenham",
           "opponent_short": "TOT",
           "venue": "A",
-          "kickoff_ms": 1789817400000.0,
+          "kickoff_ms": 1789817400000,
           "cs_pct": 28.6,
           "fdr": 3
         },
@@ -542,7 +540,7 @@
           "opponent": "Brentford",
           "opponent_short": "BRE",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 30.9,
           "fdr": 2
         }
@@ -560,7 +558,7 @@
           "opponent": "Liverpool",
           "opponent_short": "LIV",
           "venue": "H",
-          "kickoff_ms": 1787499000000.0,
+          "kickoff_ms": 1787499000000,
           "cs_pct": 19.4,
           "fdr": 3
         },
@@ -569,7 +567,7 @@
           "opponent": "Tottenham",
           "opponent_short": "TOT",
           "venue": "A",
-          "kickoff_ms": 1788021000000.0,
+          "kickoff_ms": 1788021000000,
           "cs_pct": 26.0,
           "fdr": 3
         },
@@ -578,7 +576,7 @@
           "opponent": "Bournemouth",
           "opponent_short": "BOU",
           "venue": "H",
-          "kickoff_ms": 1788607800000.0,
+          "kickoff_ms": 1788607800000,
           "cs_pct": 22.5,
           "fdr": 3
         },
@@ -587,7 +585,7 @@
           "opponent": "Leeds",
           "opponent_short": "LEE",
           "venue": "A",
-          "kickoff_ms": 1789412400000.0,
+          "kickoff_ms": 1789412400000,
           "cs_pct": 21.0,
           "fdr": 4
         },
@@ -596,7 +594,7 @@
           "opponent": "Hull",
           "opponent_short": "HUL",
           "venue": "H",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 41.4,
           "fdr": 1
         },
@@ -605,7 +603,7 @@
           "opponent": "Coventry",
           "opponent_short": "COV",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 40.0,
           "fdr": 1
         }
@@ -623,7 +621,7 @@
           "opponent": "Nottingham Forest",
           "opponent_short": "NFO",
           "venue": "A",
-          "kickoff_ms": 1787407200000.0,
+          "kickoff_ms": 1787407200000,
           "cs_pct": 29.8,
           "fdr": 3
         },
@@ -632,7 +630,7 @@
           "opponent": "Brentford",
           "opponent_short": "BRE",
           "venue": "H",
-          "kickoff_ms": 1788094800000.0,
+          "kickoff_ms": 1788094800000,
           "cs_pct": 29.6,
           "fdr": 2
         },
@@ -641,7 +639,7 @@
           "opponent": "Brighton",
           "opponent_short": "BHA",
           "venue": "A",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 21.2,
           "fdr": 4
         },
@@ -650,7 +648,7 @@
           "opponent": "Newcastle United",
           "opponent_short": "NEW",
           "venue": "H",
-          "kickoff_ms": 1789412400000.0,
+          "kickoff_ms": 1789412400000,
           "cs_pct": 33.6,
           "fdr": 2
         },
@@ -659,7 +657,7 @@
           "opponent": "Crystal Palace",
           "opponent_short": "CRY",
           "venue": "H",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 32.4,
           "fdr": 2
         },
@@ -668,7 +666,7 @@
           "opponent": "Arsenal",
           "opponent_short": "ARS",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 14.5,
           "fdr": 5
         }
@@ -686,7 +684,7 @@
           "opponent": "Newcastle United",
           "opponent_short": "NEW",
           "venue": "A",
-          "kickoff_ms": 1787499000000.0,
+          "kickoff_ms": 1787499000000,
           "cs_pct": 15.0,
           "fdr": 4
         },
@@ -695,7 +693,7 @@
           "opponent": "Nottingham Forest",
           "opponent_short": "NFO",
           "venue": "H",
-          "kickoff_ms": 1788003000000.0,
+          "kickoff_ms": 1788003000000,
           "cs_pct": 22.5,
           "fdr": 3
         },
@@ -704,7 +702,7 @@
           "opponent": "Ipswich",
           "opponent_short": "IPS",
           "venue": "A",
-          "kickoff_ms": 1788548400000.0,
+          "kickoff_ms": 1788548400000,
           "cs_pct": 39.5,
           "fdr": 1
         },
@@ -713,7 +711,7 @@
           "opponent": "Fulham",
           "opponent_short": "FUL",
           "venue": "H",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 36.5,
           "fdr": 1
         },
@@ -722,7 +720,7 @@
           "opponent": "Bournemouth",
           "opponent_short": "BOU",
           "venue": "A",
-          "kickoff_ms": 1789909200000.0,
+          "kickoff_ms": 1789909200000,
           "cs_pct": 22.0,
           "fdr": 3
         },
@@ -731,7 +729,7 @@
           "opponent": "Manchester City",
           "opponent_short": "MCI",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 21.8,
           "fdr": 4
         }
@@ -749,7 +747,7 @@
           "opponent": "Ipswich",
           "opponent_short": "IPS",
           "venue": "A",
-          "kickoff_ms": 1787407200000.0,
+          "kickoff_ms": 1787407200000,
           "cs_pct": 32.1,
           "fdr": 2
         },
@@ -758,7 +756,7 @@
           "opponent": "Fulham",
           "opponent_short": "FUL",
           "venue": "H",
-          "kickoff_ms": 1788094800000.0,
+          "kickoff_ms": 1788094800000,
           "cs_pct": 38.7,
           "fdr": 2
         },
@@ -767,7 +765,7 @@
           "opponent": "Brentford",
           "opponent_short": "BRE",
           "venue": "A",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 19.5,
           "fdr": 4
         },
@@ -776,7 +774,7 @@
           "opponent": "Arsenal",
           "opponent_short": "ARS",
           "venue": "H",
-          "kickoff_ms": 1789239600000.0,
+          "kickoff_ms": 1789239600000,
           "cs_pct": 24.0,
           "fdr": 4
         },
@@ -785,7 +783,7 @@
           "opponent": "Manchester City",
           "opponent_short": "MCI",
           "venue": "A",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 12.0,
           "fdr": 5
         },
@@ -794,7 +792,7 @@
           "opponent": "Brighton",
           "opponent_short": "BHA",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 31.2,
           "fdr": 3
         }
@@ -812,7 +810,7 @@
           "opponent": "Fulham",
           "opponent_short": "FUL",
           "venue": "A",
-          "kickoff_ms": 1787598000000.0,
+          "kickoff_ms": 1787598000000,
           "cs_pct": 24.5,
           "fdr": 3
         },
@@ -821,7 +819,7 @@
           "opponent": "Brighton",
           "opponent_short": "BHA",
           "venue": "H",
-          "kickoff_ms": 1788094800000.0,
+          "kickoff_ms": 1788094800000,
           "cs_pct": 29.1,
           "fdr": 3
         },
@@ -830,7 +828,7 @@
           "opponent": "Arsenal",
           "opponent_short": "ARS",
           "venue": "A",
-          "kickoff_ms": 1788708600000.0,
+          "kickoff_ms": 1788708600000,
           "cs_pct": 14.9,
           "fdr": 5
         },
@@ -839,7 +837,7 @@
           "opponent": "Hull",
           "opponent_short": "HUL",
           "venue": "H",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 43.0,
           "fdr": 1
         },
@@ -848,7 +846,7 @@
           "opponent": "Brentford",
           "opponent_short": "BRE",
           "venue": "A",
-          "kickoff_ms": 1789758000000.0,
+          "kickoff_ms": 1789758000000,
           "cs_pct": 17.7,
           "fdr": 4
         },
@@ -857,7 +855,7 @@
           "opponent": "Bournemouth",
           "opponent_short": "BOU",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 24.1,
           "fdr": 3
         }
@@ -875,7 +873,7 @@
           "opponent": "Tottenham",
           "opponent_short": "TOT",
           "venue": "H",
-          "kickoff_ms": 1787416200000.0,
+          "kickoff_ms": 1787416200000,
           "cs_pct": 30.3,
           "fdr": 2
         },
@@ -884,7 +882,7 @@
           "opponent": "Leeds",
           "opponent_short": "LEE",
           "venue": "A",
-          "kickoff_ms": 1788094800000.0,
+          "kickoff_ms": 1788094800000,
           "cs_pct": 22.4,
           "fdr": 4
         },
@@ -893,7 +891,7 @@
           "opponent": "Sunderland",
           "opponent_short": "SUN",
           "venue": "H",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 35.4,
           "fdr": 2
         },
@@ -902,7 +900,7 @@
           "opponent": "Bournemouth",
           "opponent_short": "BOU",
           "venue": "A",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 22.0,
           "fdr": 4
         },
@@ -911,7 +909,7 @@
           "opponent": "Chelsea",
           "opponent_short": "CHE",
           "venue": "H",
-          "kickoff_ms": 1789758000000.0,
+          "kickoff_ms": 1789758000000,
           "cs_pct": 24.9,
           "fdr": 3
         },
@@ -920,7 +918,7 @@
           "opponent": "Aston Villa",
           "opponent_short": "AVL",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 17.7,
           "fdr": 4
         }
@@ -938,7 +936,7 @@
           "opponent": "Everton",
           "opponent_short": "EVE",
           "venue": "A",
-          "kickoff_ms": 1787407200000.0,
+          "kickoff_ms": 1787407200000,
           "cs_pct": 24.1,
           "fdr": 4
         },
@@ -947,7 +945,7 @@
           "opponent": "Manchester City",
           "opponent_short": "MCI",
           "venue": "H",
-          "kickoff_ms": 1787943600000.0,
+          "kickoff_ms": 1787943600000,
           "cs_pct": 20.9,
           "fdr": 5
         },
@@ -956,7 +954,7 @@
           "opponent": "Fulham",
           "opponent_short": "FUL",
           "venue": "A",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 23.4,
           "fdr": 4
         },
@@ -965,7 +963,7 @@
           "opponent": "Ipswich",
           "opponent_short": "IPS",
           "venue": "H",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 38.3,
           "fdr": 1
         },
@@ -974,7 +972,7 @@
           "opponent": "Leeds",
           "opponent_short": "LEE",
           "venue": "A",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 21.5,
           "fdr": 4
         },
@@ -983,7 +981,7 @@
           "opponent": "Nottingham Forest",
           "opponent_short": "NFO",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 21.7,
           "fdr": 4
         }
@@ -1001,7 +999,7 @@
           "opponent": "Manchester City",
           "opponent_short": "MCI",
           "venue": "A",
-          "kickoff_ms": 1787490000000.0,
+          "kickoff_ms": 1787490000000,
           "cs_pct": 11.6,
           "fdr": 5
         },
@@ -1010,7 +1008,7 @@
           "opponent": "Everton",
           "opponent_short": "EVE",
           "venue": "H",
-          "kickoff_ms": 1788012000000.0,
+          "kickoff_ms": 1788012000000,
           "cs_pct": 36.5,
           "fdr": 2
         },
@@ -1019,7 +1017,7 @@
           "opponent": "Newcastle United",
           "opponent_short": "NEW",
           "venue": "A",
-          "kickoff_ms": 1788607800000.0,
+          "kickoff_ms": 1788607800000,
           "cs_pct": 16.3,
           "fdr": 4
         },
@@ -1028,7 +1026,7 @@
           "opponent": "Brentford",
           "opponent_short": "BRE",
           "venue": "H",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 31.5,
           "fdr": 2
         },
@@ -1037,7 +1035,7 @@
           "opponent": "Liverpool",
           "opponent_short": "LIV",
           "venue": "H",
-          "kickoff_ms": 1789909200000.0,
+          "kickoff_ms": 1789909200000,
           "cs_pct": 22.3,
           "fdr": 3
         },
@@ -1046,7 +1044,7 @@
           "opponent": "Chelsea",
           "opponent_short": "CHE",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 25.4,
           "fdr": 3
         }
@@ -1064,7 +1062,7 @@
           "opponent": "Brentford",
           "opponent_short": "BRE",
           "venue": "A",
-          "kickoff_ms": 1787416200000.0,
+          "kickoff_ms": 1787416200000,
           "cs_pct": 13.7,
           "fdr": 5
         },
@@ -1073,7 +1071,7 @@
           "opponent": "Newcastle United",
           "opponent_short": "NEW",
           "venue": "H",
-          "kickoff_ms": 1788021000000.0,
+          "kickoff_ms": 1788021000000,
           "cs_pct": 28.9,
           "fdr": 3
         },
@@ -1082,7 +1080,7 @@
           "opponent": "Nottingham Forest",
           "opponent_short": "NFO",
           "venue": "A",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 25.2,
           "fdr": 4
         },
@@ -1091,7 +1089,7 @@
           "opponent": "Everton",
           "opponent_short": "EVE",
           "venue": "H",
-          "kickoff_ms": 1789230600000.0,
+          "kickoff_ms": 1789230600000,
           "cs_pct": 29.8,
           "fdr": 3
         },
@@ -1100,7 +1098,7 @@
           "opponent": "Aston Villa",
           "opponent_short": "AVL",
           "venue": "H",
-          "kickoff_ms": 1789817400000.0,
+          "kickoff_ms": 1789817400000,
           "cs_pct": 24.3,
           "fdr": 3
         },
@@ -1109,7 +1107,7 @@
           "opponent": "Manchester United",
           "opponent_short": "MUN",
           "venue": "A",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 11.9,
           "fdr": 5
         }
@@ -1127,7 +1125,7 @@
           "opponent": "Arsenal",
           "opponent_short": "ARS",
           "venue": "A",
-          "kickoff_ms": 1787338800000.0,
+          "kickoff_ms": 1787338800000,
           "cs_pct": 6.7,
           "fdr": 5
         },
@@ -1136,7 +1134,7 @@
           "opponent": "Hull",
           "opponent_short": "HUL",
           "venue": "H",
-          "kickoff_ms": 1788012000000.0,
+          "kickoff_ms": 1788012000000,
           "cs_pct": 30.2,
           "fdr": 2
         },
@@ -1145,7 +1143,7 @@
           "opponent": "Manchester City",
           "opponent_short": "MCI",
           "venue": "A",
-          "kickoff_ms": 1788616800000.0,
+          "kickoff_ms": 1788616800000,
           "cs_pct": 4.1,
           "fdr": 5
         },
@@ -1154,7 +1152,7 @@
           "opponent": "Brighton",
           "opponent_short": "BHA",
           "venue": "H",
-          "kickoff_ms": 1789304400000.0,
+          "kickoff_ms": 1789304400000,
           "cs_pct": 17.4,
           "fdr": 5
         },
@@ -1163,7 +1161,7 @@
           "opponent": "Nottingham Forest",
           "opponent_short": "NFO",
           "venue": "A",
-          "kickoff_ms": 1789835400000.0,
+          "kickoff_ms": 1789835400000,
           "cs_pct": 18.2,
           "fdr": 5
         },
@@ -1172,7 +1170,7 @@
           "opponent": "Newcastle United",
           "opponent_short": "NEW",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 21.6,
           "fdr": 4
         }
@@ -1190,7 +1188,7 @@
           "opponent": "Sunderland",
           "opponent_short": "SUN",
           "venue": "H",
-          "kickoff_ms": 1787407200000.0,
+          "kickoff_ms": 1787407200000,
           "cs_pct": 22.5,
           "fdr": 4
         },
@@ -1199,7 +1197,7 @@
           "opponent": "Manchester United",
           "opponent_short": "MUN",
           "venue": "A",
-          "kickoff_ms": 1788103800000.0,
+          "kickoff_ms": 1788103800000,
           "cs_pct": 6.9,
           "fdr": 5
         },
@@ -1208,7 +1206,7 @@
           "opponent": "Liverpool",
           "opponent_short": "LIV",
           "venue": "H",
-          "kickoff_ms": 1788548400000.0,
+          "kickoff_ms": 1788548400000,
           "cs_pct": 10.5,
           "fdr": 5
         },
@@ -1217,7 +1215,7 @@
           "opponent": "Crystal Palace",
           "opponent_short": "CRY",
           "venue": "A",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 19.2,
           "fdr": 5
         },
@@ -1226,7 +1224,7 @@
           "opponent": "Everton",
           "opponent_short": "EVE",
           "venue": "A",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 13.7,
           "fdr": 5
         },
@@ -1235,7 +1233,7 @@
           "opponent": "Fulham",
           "opponent_short": "FUL",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 23.5,
           "fdr": 4
         }
@@ -1253,7 +1251,7 @@
           "opponent": "Manchester United",
           "opponent_short": "MUN",
           "venue": "H",
-          "kickoff_ms": 1787398200000.0,
+          "kickoff_ms": 1787398200000,
           "cs_pct": 13.7,
           "fdr": 5
         },
@@ -1262,7 +1260,7 @@
           "opponent": "Coventry",
           "opponent_short": "COV",
           "venue": "A",
-          "kickoff_ms": 1788012000000.0,
+          "kickoff_ms": 1788012000000,
           "cs_pct": 19.9,
           "fdr": 4
         },
@@ -1271,7 +1269,7 @@
           "opponent": "Aston Villa",
           "opponent_short": "AVL",
           "venue": "H",
-          "kickoff_ms": 1788625800000.0,
+          "kickoff_ms": 1788625800000,
           "cs_pct": 17.4,
           "fdr": 5
         },
@@ -1280,7 +1278,7 @@
           "opponent": "Chelsea",
           "opponent_short": "CHE",
           "venue": "A",
-          "kickoff_ms": 1789221600000.0,
+          "kickoff_ms": 1789221600000,
           "cs_pct": 13.1,
           "fdr": 5
         },
@@ -1289,7 +1287,7 @@
           "opponent": "Newcastle United",
           "opponent_short": "NEW",
           "venue": "A",
-          "kickoff_ms": 1789826400000.0,
+          "kickoff_ms": 1789826400000,
           "cs_pct": 6.8,
           "fdr": 5
         },
@@ -1298,7 +1296,7 @@
           "opponent": "Everton",
           "opponent_short": "EVE",
           "venue": "H",
-          "kickoff_ms": 1791640800000.0,
+          "kickoff_ms": 1791640800000,
           "cs_pct": 22.5,
           "fdr": 4
         }
@@ -1311,8 +1309,8 @@
   "fixtures": [
     {
       "gameweek": 1,
-      "kickoff": "Fri 21 Aug 2026, 20:00 BST",
-      "kickoff_ms": 1787338800000.0,
+      "kickoff": "Fri 21 Aug 2026, 19:00 UTC",
+      "kickoff_ms": 1787338800000,
       "finished": false,
       "home": "Arsenal",
       "away": "Coventry",
@@ -1330,8 +1328,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 12:30 BST",
-      "kickoff_ms": 1787398200000.0,
+      "kickoff": "Sat 22 Aug 2026, 11:30 UTC",
+      "kickoff_ms": 1787398200000,
       "finished": false,
       "home": "Hull",
       "away": "Manchester United",
@@ -1349,8 +1347,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 15:00 BST",
-      "kickoff_ms": 1787407200000.0,
+      "kickoff": "Sat 22 Aug 2026, 14:00 UTC",
+      "kickoff_ms": 1787407200000,
       "finished": false,
       "home": "Everton",
       "away": "Crystal Palace",
@@ -1368,8 +1366,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 15:00 BST",
-      "kickoff_ms": 1787407200000.0,
+      "kickoff": "Sat 22 Aug 2026, 14:00 UTC",
+      "kickoff_ms": 1787407200000,
       "finished": false,
       "home": "Ipswich",
       "away": "Sunderland",
@@ -1387,8 +1385,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 15:00 BST",
-      "kickoff_ms": 1787407200000.0,
+      "kickoff": "Sat 22 Aug 2026, 14:00 UTC",
+      "kickoff_ms": 1787407200000,
       "finished": false,
       "home": "Nottingham Forest",
       "away": "Leeds",
@@ -1406,8 +1404,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sat 22 Aug 2026, 17:30 BST",
-      "kickoff_ms": 1787416200000.0,
+      "kickoff": "Sat 22 Aug 2026, 16:30 UTC",
+      "kickoff_ms": 1787416200000,
       "finished": false,
       "home": "Brentford",
       "away": "Tottenham",
@@ -1425,8 +1423,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sun 23 Aug 2026, 14:00 BST",
-      "kickoff_ms": 1787490000000.0,
+      "kickoff": "Sun 23 Aug 2026, 13:00 UTC",
+      "kickoff_ms": 1787490000000,
       "finished": false,
       "home": "Brighton",
       "away": "Aston Villa",
@@ -1444,8 +1442,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sun 23 Aug 2026, 14:00 BST",
-      "kickoff_ms": 1787490000000.0,
+      "kickoff": "Sun 23 Aug 2026, 13:00 UTC",
+      "kickoff_ms": 1787490000000,
       "finished": false,
       "home": "Manchester City",
       "away": "Bournemouth",
@@ -1463,8 +1461,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Sun 23 Aug 2026, 16:30 BST",
-      "kickoff_ms": 1787499000000.0,
+      "kickoff": "Sun 23 Aug 2026, 15:30 UTC",
+      "kickoff_ms": 1787499000000,
       "finished": false,
       "home": "Newcastle United",
       "away": "Liverpool",
@@ -1482,8 +1480,8 @@
     },
     {
       "gameweek": 1,
-      "kickoff": "Mon 24 Aug 2026, 20:00 BST",
-      "kickoff_ms": 1787598000000.0,
+      "kickoff": "Mon 24 Aug 2026, 19:00 UTC",
+      "kickoff_ms": 1787598000000,
       "finished": false,
       "home": "Fulham",
       "away": "Chelsea",
@@ -1501,8 +1499,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Fri 28 Aug 2026, 20:00 BST",
-      "kickoff_ms": 1787943600000.0,
+      "kickoff": "Fri 28 Aug 2026, 19:00 UTC",
+      "kickoff_ms": 1787943600000,
       "finished": false,
       "home": "Crystal Palace",
       "away": "Manchester City",
@@ -1520,8 +1518,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 12:30 BST",
-      "kickoff_ms": 1788003000000.0,
+      "kickoff": "Sat 29 Aug 2026, 11:30 UTC",
+      "kickoff_ms": 1788003000000,
       "finished": false,
       "home": "Liverpool",
       "away": "Nottingham Forest",
@@ -1539,8 +1537,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 15:00 BST",
-      "kickoff_ms": 1788012000000.0,
+      "kickoff": "Sat 29 Aug 2026, 14:00 UTC",
+      "kickoff_ms": 1788012000000,
       "finished": false,
       "home": "Bournemouth",
       "away": "Everton",
@@ -1558,8 +1556,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 15:00 BST",
-      "kickoff_ms": 1788012000000.0,
+      "kickoff": "Sat 29 Aug 2026, 14:00 UTC",
+      "kickoff_ms": 1788012000000,
       "finished": false,
       "home": "Coventry",
       "away": "Hull",
@@ -1567,7 +1565,7 @@
       "away_short": "HUL",
       "xg_home": 1.615,
       "xg_away": 1.197,
-      "p_home_win": 0.4571,
+      "p_home_win": 0.4572,
       "p_draw": 0.2736,
       "p_away_win": 0.2693,
       "cs_home_pct": 30.2,
@@ -1577,8 +1575,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sat 29 Aug 2026, 17:30 BST",
-      "kickoff_ms": 1788021000000.0,
+      "kickoff": "Sat 29 Aug 2026, 16:30 UTC",
+      "kickoff_ms": 1788021000000,
       "finished": false,
       "home": "Tottenham",
       "away": "Newcastle United",
@@ -1596,8 +1594,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 14:00 BST",
-      "kickoff_ms": 1788094800000.0,
+      "kickoff": "Sun 30 Aug 2026, 13:00 UTC",
+      "kickoff_ms": 1788094800000,
       "finished": false,
       "home": "Chelsea",
       "away": "Brighton",
@@ -1615,8 +1613,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 14:00 BST",
-      "kickoff_ms": 1788094800000.0,
+      "kickoff": "Sun 30 Aug 2026, 13:00 UTC",
+      "kickoff_ms": 1788094800000,
       "finished": false,
       "home": "Leeds",
       "away": "Brentford",
@@ -1634,8 +1632,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 14:00 BST",
-      "kickoff_ms": 1788094800000.0,
+      "kickoff": "Sun 30 Aug 2026, 13:00 UTC",
+      "kickoff_ms": 1788094800000,
       "finished": false,
       "home": "Sunderland",
       "away": "Fulham",
@@ -1653,8 +1651,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Sun 30 Aug 2026, 16:30 BST",
-      "kickoff_ms": 1788103800000.0,
+      "kickoff": "Sun 30 Aug 2026, 15:30 UTC",
+      "kickoff_ms": 1788103800000,
       "finished": false,
       "home": "Manchester United",
       "away": "Ipswich",
@@ -1672,8 +1670,8 @@
     },
     {
       "gameweek": 2,
-      "kickoff": "Mon 31 Aug 2026, 20:00 BST",
-      "kickoff_ms": 1788202800000.0,
+      "kickoff": "Mon 31 Aug 2026, 19:00 UTC",
+      "kickoff_ms": 1788202800000,
       "finished": false,
       "home": "Aston Villa",
       "away": "Arsenal",
@@ -1691,8 +1689,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Fri 4 Sep 2026, 20:00 BST",
-      "kickoff_ms": 1788548400000.0,
+      "kickoff": "Fri 04 Sep 2026, 19:00 UTC",
+      "kickoff_ms": 1788548400000,
       "finished": false,
       "home": "Ipswich",
       "away": "Liverpool",
@@ -1710,8 +1708,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 12:30 BST",
-      "kickoff_ms": 1788607800000.0,
+      "kickoff": "Sat 05 Sep 2026, 11:30 UTC",
+      "kickoff_ms": 1788607800000,
       "finished": false,
       "home": "Newcastle United",
       "away": "Bournemouth",
@@ -1719,7 +1717,7 @@
       "away_short": "BOU",
       "xg_home": 1.812,
       "xg_away": 1.49,
-      "p_home_win": 0.4422,
+      "p_home_win": 0.4421,
       "p_draw": 0.2508,
       "p_away_win": 0.3071,
       "cs_home_pct": 22.5,
@@ -1729,8 +1727,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1788616800000.0,
+      "kickoff": "Sat 05 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1788616800000,
       "finished": false,
       "home": "Brentford",
       "away": "Sunderland",
@@ -1748,8 +1746,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1788616800000.0,
+      "kickoff": "Sat 05 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1788616800000,
       "finished": false,
       "home": "Brighton",
       "away": "Leeds",
@@ -1767,8 +1765,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1788616800000.0,
+      "kickoff": "Sat 05 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1788616800000,
       "finished": false,
       "home": "Fulham",
       "away": "Crystal Palace",
@@ -1786,8 +1784,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1788616800000.0,
+      "kickoff": "Sat 05 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1788616800000,
       "finished": false,
       "home": "Manchester City",
       "away": "Coventry",
@@ -1805,8 +1803,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1788616800000.0,
+      "kickoff": "Sat 05 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1788616800000,
       "finished": false,
       "home": "Nottingham Forest",
       "away": "Tottenham",
@@ -1824,8 +1822,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sat 5 Sep 2026, 17:30 BST",
-      "kickoff_ms": 1788625800000.0,
+      "kickoff": "Sat 05 Sep 2026, 16:30 UTC",
+      "kickoff_ms": 1788625800000,
       "finished": false,
       "home": "Hull",
       "away": "Aston Villa",
@@ -1843,8 +1841,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sun 6 Sep 2026, 14:00 BST",
-      "kickoff_ms": 1788699600000.0,
+      "kickoff": "Sun 06 Sep 2026, 13:00 UTC",
+      "kickoff_ms": 1788699600000,
       "finished": false,
       "home": "Everton",
       "away": "Manchester United",
@@ -1862,8 +1860,8 @@
     },
     {
       "gameweek": 3,
-      "kickoff": "Sun 6 Sep 2026, 16:30 BST",
-      "kickoff_ms": 1788708600000.0,
+      "kickoff": "Sun 06 Sep 2026, 15:30 UTC",
+      "kickoff_ms": 1788708600000,
       "finished": false,
       "home": "Arsenal",
       "away": "Chelsea",
@@ -1881,8 +1879,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789221600000.0,
+      "kickoff": "Sat 12 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789221600000,
       "finished": false,
       "home": "Aston Villa",
       "away": "Nottingham Forest",
@@ -1900,8 +1898,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789221600000.0,
+      "kickoff": "Sat 12 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789221600000,
       "finished": false,
       "home": "Bournemouth",
       "away": "Brentford",
@@ -1919,8 +1917,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789221600000.0,
+      "kickoff": "Sat 12 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789221600000,
       "finished": false,
       "home": "Chelsea",
       "away": "Hull",
@@ -1938,8 +1936,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789221600000.0,
+      "kickoff": "Sat 12 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789221600000,
       "finished": false,
       "home": "Crystal Palace",
       "away": "Ipswich",
@@ -1957,8 +1955,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789221600000.0,
+      "kickoff": "Sat 12 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789221600000,
       "finished": false,
       "home": "Liverpool",
       "away": "Fulham",
@@ -1976,8 +1974,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 17:30 BST",
-      "kickoff_ms": 1789230600000.0,
+      "kickoff": "Sat 12 Sep 2026, 16:30 UTC",
+      "kickoff_ms": 1789230600000,
       "finished": false,
       "home": "Tottenham",
       "away": "Everton",
@@ -1995,8 +1993,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sat 12 Sep 2026, 20:00 BST",
-      "kickoff_ms": 1789239600000.0,
+      "kickoff": "Sat 12 Sep 2026, 19:00 UTC",
+      "kickoff_ms": 1789239600000,
       "finished": false,
       "home": "Sunderland",
       "away": "Arsenal",
@@ -2014,8 +2012,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sun 13 Sep 2026, 14:00 BST",
-      "kickoff_ms": 1789304400000.0,
+      "kickoff": "Sun 13 Sep 2026, 13:00 UTC",
+      "kickoff_ms": 1789304400000,
       "finished": false,
       "home": "Coventry",
       "away": "Brighton",
@@ -2033,8 +2031,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Sun 13 Sep 2026, 16:30 BST",
-      "kickoff_ms": 1789313400000.0,
+      "kickoff": "Sun 13 Sep 2026, 15:30 UTC",
+      "kickoff_ms": 1789313400000,
       "finished": false,
       "home": "Manchester United",
       "away": "Manchester City",
@@ -2052,8 +2050,8 @@
     },
     {
       "gameweek": 4,
-      "kickoff": "Mon 14 Sep 2026, 20:00 BST",
-      "kickoff_ms": 1789412400000.0,
+      "kickoff": "Mon 14 Sep 2026, 19:00 UTC",
+      "kickoff_ms": 1789412400000,
       "finished": false,
       "home": "Leeds",
       "away": "Newcastle United",
@@ -2071,8 +2069,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Fri 18 Sep 2026, 20:00 BST",
-      "kickoff_ms": 1789758000000.0,
+      "kickoff": "Fri 18 Sep 2026, 19:00 UTC",
+      "kickoff_ms": 1789758000000,
       "finished": false,
       "home": "Brentford",
       "away": "Chelsea",
@@ -2090,8 +2088,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 12:30 BST",
-      "kickoff_ms": 1789817400000.0,
+      "kickoff": "Sat 19 Sep 2026, 11:30 UTC",
+      "kickoff_ms": 1789817400000,
       "finished": false,
       "home": "Tottenham",
       "away": "Aston Villa",
@@ -2109,8 +2107,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789826400000.0,
+      "kickoff": "Sat 19 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789826400000,
       "finished": false,
       "home": "Brighton",
       "away": "Arsenal",
@@ -2128,8 +2126,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789826400000.0,
+      "kickoff": "Sat 19 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789826400000,
       "finished": false,
       "home": "Everton",
       "away": "Ipswich",
@@ -2147,8 +2145,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789826400000.0,
+      "kickoff": "Sat 19 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789826400000,
       "finished": false,
       "home": "Leeds",
       "away": "Crystal Palace",
@@ -2166,8 +2164,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789826400000.0,
+      "kickoff": "Sat 19 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789826400000,
       "finished": false,
       "home": "Manchester City",
       "away": "Sunderland",
@@ -2185,8 +2183,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 15:00 BST",
-      "kickoff_ms": 1789826400000.0,
+      "kickoff": "Sat 19 Sep 2026, 14:00 UTC",
+      "kickoff_ms": 1789826400000,
       "finished": false,
       "home": "Newcastle United",
       "away": "Hull",
@@ -2204,8 +2202,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sat 19 Sep 2026, 17:30 BST",
-      "kickoff_ms": 1789835400000.0,
+      "kickoff": "Sat 19 Sep 2026, 16:30 UTC",
+      "kickoff_ms": 1789835400000,
       "finished": false,
       "home": "Nottingham Forest",
       "away": "Coventry",
@@ -2223,8 +2221,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sun 20 Sep 2026, 14:00 BST",
-      "kickoff_ms": 1789909200000.0,
+      "kickoff": "Sun 20 Sep 2026, 13:00 UTC",
+      "kickoff_ms": 1789909200000,
       "finished": false,
       "home": "Bournemouth",
       "away": "Liverpool",
@@ -2242,8 +2240,8 @@
     },
     {
       "gameweek": 5,
-      "kickoff": "Sun 20 Sep 2026, 16:30 BST",
-      "kickoff_ms": 1789918200000.0,
+      "kickoff": "Sun 20 Sep 2026, 15:30 UTC",
+      "kickoff_ms": 1789918200000,
       "finished": false,
       "home": "Fulham",
       "away": "Manchester United",
@@ -2261,8 +2259,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Arsenal",
       "away": "Leeds",
@@ -2280,8 +2278,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Aston Villa",
       "away": "Brentford",
@@ -2299,8 +2297,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Chelsea",
       "away": "Bournemouth",
@@ -2308,7 +2306,7 @@
       "away_short": "BOU",
       "xg_home": 1.371,
       "xg_away": 1.425,
-      "p_home_win": 0.3473,
+      "p_home_win": 0.3472,
       "p_draw": 0.2812,
       "p_away_win": 0.3716,
       "cs_home_pct": 24.1,
@@ -2318,8 +2316,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Coventry",
       "away": "Newcastle United",
@@ -2337,8 +2335,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Crystal Palace",
       "away": "Nottingham Forest",
@@ -2356,8 +2354,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Hull",
       "away": "Everton",
@@ -2375,8 +2373,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Ipswich",
       "away": "Fulham",
@@ -2394,8 +2392,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Liverpool",
       "away": "Manchester City",
@@ -2413,8 +2411,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Manchester United",
       "away": "Tottenham",
@@ -2432,8 +2430,8 @@
     },
     {
       "gameweek": 6,
-      "kickoff": "Sat 10 Oct 2026, 15:00 BST",
-      "kickoff_ms": 1791640800000.0,
+      "kickoff": "Sat 10 Oct 2026, 14:00 UTC",
+      "kickoff_ms": 1791640800000,
       "finished": false,
       "home": "Sunderland",
       "away": "Brighton",
