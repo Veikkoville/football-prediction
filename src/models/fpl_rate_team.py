@@ -133,10 +133,15 @@ def get_entry_picks(entry_id: int, gw: int) -> dict:
         return _fetch_fpl(f"/entry/{entry_id}/event/{gw}/picks/")
     except RateTeamError as e:
         if e.status_code == 404:
+            # Rehellinen selitys: FPL julkaisee picksit vasta GW-deadlinen
+            # jälkeen. ÄLÄ lupaa manuaalisyöttöä — players=-moodi on olemassa
+            # vain API-tasolla, UI:ssa ei ole syöttöä (TASKS 23.7 P1).
             raise RateTeamError(
-                404, f"No picks found for entry {entry_id} in GW{gw}. Before "
-                     "the season starts you can enter your 15 player IDs "
-                     "manually instead.")
+                404, f"No picks are available for entry {entry_id} yet. FPL "
+                     f"publishes each squad after the GW{gw} deadline passes, "
+                     "so team rating opens up once the gameweek locks. Until "
+                     "then, try the fit checker: lock your must-have players "
+                     "and the model builds the best legal squad around them.")
         raise
 
 
