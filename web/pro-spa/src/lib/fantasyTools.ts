@@ -13,6 +13,7 @@ import { capture } from './analytics';
 
 export type FantasyTool =
 	| 'rate_team'
+	| 'rate_team_draft'
 	| 'price_watch'
 	| 'plan'
 	| 'captain'
@@ -291,6 +292,13 @@ async function getTool<T>(path: string, tool: FantasyTool): Promise<T> {
 
 export function fetchRateTeam(entry: number): Promise<RateTeamResponse> {
 	return getTool(`/api/fantasy/rate-team?entry=${entry}`, 'rate_team');
+}
+
+/** P1 (23.7): esikausi-draft ilman entry-ID:tä — FPL julkaisee picksit vasta
+ * GW-deadlinen jälkeen, joten ennen GW1:tä runko annetaan 15 element-ID:nä
+ * (backendin players=-moodi; kapteenin valitsee malli, paras GW-xP). */
+export function fetchRateTeamManual(playerIds: number[]): Promise<RateTeamResponse> {
+	return getTool(`/api/fantasy/rate-team?players=${playerIds.join(',')}`, 'rate_team_draft');
 }
 
 export function fetchPriceWatch(): Promise<PriceWatchResponse> {

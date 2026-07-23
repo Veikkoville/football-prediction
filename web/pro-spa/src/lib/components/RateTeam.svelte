@@ -1,10 +1,12 @@
 <script lang="ts">
 	import {
 		fetchRateTeam,
+		fetchRateTeamManual,
 		type RatedPlayer,
 		type RateTeamResponse,
 		type TransferSuggestion
 	} from '$lib/fantasyTools';
+	import { fetchXp, type XpPlayer } from '$lib/api';
 	import { capture } from '$lib/analytics';
 	import { auth } from '$lib/auth.svelte';
 	import {
@@ -74,6 +76,79 @@
 		// Sama funnel-pari kuin Paywall/billing, source erottaa työkalupolun
 		capture('upgrade_tapped', { source: 'fantasy_tools' });
 		onUpgrade?.();
+	}
+
+	// P1 (23.7): esikausi-draft — FPL julkaisee picksit vasta GW-deadlinen
+	// jälkeen, joten ennen GW1:tä entry-polku on tyhjän päällä. Draft: valitse
+	// 15 (2 GKP / 5 DEF / 5 MID / 3 FWD) → sama arvio kuin importoidulla
+	// joukkueella. Kapteenin valitsee malli (paras GW-xP).
+	const DRAFT_CAPS: Record<string, number> = { GKP: 2, DEF: 5, MID: 5, FWD: 3 };
+	const DRAFT_ORDER = ['GKP', 'DEF', 'MID', 'FWD'];
+	let draftOpen = $state(false);
+	let pool = $state<XpPlayer[]>([]);
+	let poolError = $state(false);
+	let picks = $state<XpPlayer[]>([]);
+	let draftQuery = $state('');
+	$effect(() => {
+		if (draftOpen && pool.length === 0 && !poolError) {
+			fetchXp().then(
+				(d) => (pool = d.players ?? []),
+				() => (poolError = true)
+			);
+		}
+	});
+	const posCount = $derived.by(() => {
+		const c: Record<string, number> = { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
+		for (const p of picks) c[p.pos] = (c[p.pos] ?? 0) + 1;
+		return c;
+	});
+	const draftReady = $derived(picks.length === 15 && !loading);
+	// Sama normalisointi kuin FitChecker/XpTable-haussa (#145/#147-pariteetti).
+	function normDraft(s: string): string {
+		return s
+			.normalize('NFD')
+			.replace(/[̀-ͯ]/g, '')
+			.toLowerCase()
+			.replace(/ø/g, 'o')
+			.replace(/['’ʼ]/g, '')
+			.replace(/[-.]/g, ' ')
+			.trim();
+	}
+	const draftMatches = $derived.by(() => {
+		const q = normDraft(draftQuery);
+		if (q.length < 2) return [];
+		const pickedIds = new Set(picks.map((p) => p.id));
+		return pool
+			.filter(
+				(p) =>
+					!pickedIds.has(p.id) &&
+					(posCount[p.pos] ?? 0) < (DRAFT_CAPS[p.pos] ?? 0) &&
+					(normDraft(p.web_name).includes(q) ||
+						(p.full_name ? normDraft(p.full_name).includes(q) : false) ||
+						normDraft(p.team_short).includes(q))
+			)
+			.slice(0, 6);
+	});
+	function addPick(p: XpPlayer) {
+		if (picks.length >= 15 || (posCount[p.pos] ?? 0) >= (DRAFT_CAPS[p.pos] ?? 0)) return;
+		picks = [...picks, p];
+		draftQuery = '';
+	}
+	function removePick(id: number) {
+		picks = picks.filter((p) => p.id !== id);
+	}
+	async function submitDraft() {
+		if (!draftReady) return;
+		loading = true;
+		error = null;
+		capture('rate_team_draft_submitted', { picked_n: picks.length });
+		try {
+			data = await fetchRateTeamManual(picks.map((p) => p.id));
+		} catch (err) {
+			data = null;
+			error = err instanceof Error ? err.message : String(err);
+		}
+		loading = false;
 	}
 
 	// #121: apply-to-planner (read-only what-if) — siirtoehdotukset sovelletaan
@@ -158,9 +233,61 @@
 </form>
 <p class="muted hint">
 	Find the ID on the FPL website: open your Points page and copy the number from the address
-	bar (fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...). Before the season
-	starts this imports last season's final squad.
+	bar (fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...). FPL publishes
+	squads only after each deadline, so before Gameweek 1 use the draft option below.
 </p>
+
+<!-- P1: esikausi-draft ilman entry-ID:tä (backendin players=-moodi) -->
+<button type="button" class="linklike draft-toggle" onclick={() => (draftOpen = !draftOpen)}>
+	No team ID yet? Draft your 15
+</button>
+{#if draftOpen}
+	<div class="draft-box">
+		<p class="muted hint">
+			Pick a full 15-man squad (2 GK, 5 DEF, 5 MID, 3 FWD) and the model rates it like an
+			imported team: best XI, captain pick and projected points.
+		</p>
+		{#if poolError}
+			<p class="banner error">
+				Could not load the player pool right now. Please try again shortly.
+			</p>
+		{:else}
+			<div class="draft-chips">
+				{#each DRAFT_ORDER as pos (pos)}
+					{#each picks.filter((p) => p.pos === pos) as p (p.id)}
+						<button type="button" class="draft-chip" onclick={() => removePick(p.id)}>
+							{p.web_name}
+							<span class="muted">{p.team_short} · {p.pos}</span>
+							<span aria-hidden="true">×</span>
+						</button>
+					{/each}
+				{/each}
+			</div>
+			<p class="muted hint">
+				{picks.length} / 15 picked · GK {posCount.GKP}/2 · DEF {posCount.DEF}/5 · MID
+				{posCount.MID}/5 · FWD {posCount.FWD}/3
+			</p>
+			{#if picks.length < 15}
+				<label for="draft-search">Add a player</label>
+				<input
+					id="draft-search"
+					type="search"
+					placeholder="Player or team (e.g. Haaland, ARS)"
+					bind:value={draftQuery}
+				/>
+				{#each draftMatches as p (p.id)}
+					<button type="button" class="picker-row" onclick={() => addPick(p)}>
+						<strong>{p.web_name}</strong>
+						<span class="muted">{p.team_short} · {p.pos}</span>
+					</button>
+				{/each}
+			{/if}
+			<button type="button" class="primary" disabled={!draftReady} onclick={submitDraft}>
+				{loading ? 'Rating…' : 'Rate my draft'}
+			</button>
+		{/if}
+	</div>
+{/if}
 
 {#if auth.user}
 	<!-- #66: tili-taso persistointi vain kirjautuneena (cross-device) -->
@@ -474,6 +601,48 @@
 		color: var(--giq-magenta-deep);
 		font-weight: 700;
 		font-size: var(--step--1);
+		cursor: pointer;
+	}
+	/* P1: esikausi-draft */
+	.draft-toggle {
+		display: block;
+		margin: 0 0 var(--s-3);
+	}
+	.draft-box {
+		max-width: 640px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: var(--s-3) var(--s-4);
+		margin-bottom: var(--s-4);
+	}
+	.draft-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--s-2);
+		margin-bottom: var(--s-2);
+	}
+	.draft-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		background: rgba(255, 46, 126, 0.1);
+		border: 1px solid rgba(255, 46, 126, 0.35);
+		border-radius: 999px;
+		padding: 4px 12px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+	.picker-row {
+		display: flex;
+		gap: 8px;
+		align-items: baseline;
+		width: 100%;
+		text-align: left;
+		background: var(--surface-2);
+		border: none;
+		border-radius: 6px;
+		padding: 8px 10px;
+		margin-top: 4px;
 		cursor: pointer;
 	}
 	.linklike:hover {
