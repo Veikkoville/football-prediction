@@ -40,6 +40,10 @@ raw_data/
 !/data/fpl_projections_phase0.json
 # FPL Phase 1 xP -projektio: sama refresh-konventio (/api/fantasy/xp).
 !/data/fpl_xp_projections.json
+# Jäädytetyt 25/26-pelaajabaselinet (element code -avain) — pre-season-xP:n
+# lähde 26/27-flipin jälkeen (scripts/build_fpl_prev_baselines.py); CI
+# tarvitsee tämän repossa (25/26-data ei enää haettavissa API:sta).
+!/data/fpl_prev_baselines_2526.json
 # FPL Phase 1b: manuaaliset konteksti-yliajot (versioitu input, builderit lukevat).
 !/data/fpl_manual_overrides.csv
 # FPL price watch (#43): sama refresh-konventio (/api/fantasy/price-watch).

@@ -61,6 +61,14 @@ from src.models.fpl_context import (
 
 OUT_PATH = config.PROJECT_ROOT / "data" / "fpl_xp_projections.json"
 
+# Pre-season-baselinet (26/27-flippi 23.7.2026): FPL:n element-summary
+# tarjoilee vain kuluvan kauden historian → flipin jälkeen historiat ovat
+# tyhjiä JA element-id:t vaihtuneet. Edellisen kauden per-GW-data jäädytettiin
+# committoiduksi artefaktiksi (scripts/build_fpl_prev_baselines.py), avaimena
+# kausien yli pysyvä element code. Kun kohdekauden kierroksia alkaa kertyä,
+# normaali live-polku jatkaa automaattisesti (sama koodipolku kuin ennen).
+PREV_BASELINES_PATH = config.PROJECT_ROOT / "data" / "fpl_prev_baselines_2526.json"
+
 # Pudota kuollut paino JSONista (ei minuutteja odotettavissa, ei pisteitä).
 MIN_XP_TOTAL = 1.0
 
@@ -87,11 +95,16 @@ def availability_factor(element: dict) -> float:
 # ---------------------------------------------------------------------------
 # Sanity-gate
 # ---------------------------------------------------------------------------
-def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str]) -> bool:
+def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str],
+                points_by_id: dict[int, int] | None = None) -> bool:
     """coverable_teams = tulevan kauden fixture-joukkueet joilla on FPL-
     pelaajadataa. Pre-seasonissa nousijat puuttuvat FPL:stä rakenteellisesti
     (meta.todo) — gate vaatii että KAIKKI katettavissa olevat on katettu
-    ja että niitä on vähintään 15 (17 = normaali pre-season, 20 = live)."""
+    ja että niitä on vähintään 15 (17 = normaali pre-season, 20 = live).
+
+    points_by_id: tähtitestin pisteranking-lähde. Pre-seasonissa bootstrapin
+    total_points on 0 kaikilla → kutsuja antaa edelliskauden pisteet
+    baseline-artefaktista; None = bootstrapin total_points (live-kausi)."""
     print("\n" + "=" * 64)
     print("SANITY-GATE  (xP-jakauma + kärkipelaajat, fail-safe)")
     print("=" * 64)
@@ -113,8 +126,10 @@ def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str]) -> b
 
     # Dynaaminen tähtitesti: top-10 xP:n pelaajien pitää olla lähdekauden
     # pistekärkeä (top-100 total_points) — ei kovakoodattuja nimiä (siirrot).
-    pts_rank = {e["id"]: i for i, e in enumerate(
-        sorted(boot["elements"], key=lambda e: -e["total_points"]))}
+    if points_by_id is None:
+        points_by_id = {e["id"]: e["total_points"] for e in boot["elements"]}
+    pts_rank = {pid: i for i, pid in enumerate(
+        sorted(points_by_id, key=lambda p: -points_by_id[p]))}
     top10 = players[:10]
     hits = sum(1 for p in top10 if pts_rank.get(p["id"], 9999) < 100)
     for p in top10:
@@ -164,19 +179,39 @@ def main(argv: list[str] | None = None) -> int:
 
     print("[2/6] FPL-pelaajadata (bootstrap + element-historiat)...")
     boot = fpl_api.fetch_bootstrap()
-    # Kesken kauden historia muuttuu joka GW → pakota tuore haku. Päättyneen
-    # kauden data on staattista → välimuisti riittää (pre-season-ajot nopeita).
-    season_live = any(not ev.get("finished") for ev in boot.get("events", []))
-    summaries = fpl_api.fetch_all_summaries(boot, force=season_live)
-    print(f"      {len(boot['elements'])} pelaajaa "
-          f"({'live-kausi, tuore haku' if season_live else 'päättynyt kausi, välimuisti'})")
-    # #151: bonus-historia oikaistaan 26/27 BPS-sääntöihin ennen vauhteja
-    # (CBI 1/3 + pilkkutorjunta 7; ottelukohtainen bonuksen uudelleenjako).
-    if args.legacy_bps:
-        print("      HUOM: --legacy-bps — 26/27 BPS-oikaisu OHITETTU (vertailuajo)")
+    # Pre-season = kohdekaudella ei yhtään pelattua GW:tä → element-summaryt
+    # ovat tyhjiä eikä niitä haeta; baselinet jäädytetystä artefaktista
+    # (PREV_BASELINES_PATH, element code -mappaus).
+    preseason = not any(ev.get("finished") for ev in boot.get("events", []))
+    prev_players: dict | None = None
+    recency_window = False  # True = last-6-recency minuuttimallissa
+    if preseason:
+        prev = json.loads(PREV_BASELINES_PATH.read_text(encoding="utf-8"))
+        prev_players = prev["players"]
+        summaries = {}
+        print(f"      {len(boot['elements'])} pelaajaa (pre-season: baselinet "
+              f"= jäädytetty {prev['meta']['season']}-artefakti, "
+              f"{len(prev_players)} pelaajaa; element-summaryja ei haeta)")
+        # Artefaktin bonus-historia on jo oikaistu 26/27 BPS-sääntöihin (#151)
+        # jäädytettäessä — EI oikaista uudelleen.
+        if args.legacy_bps:
+            print("      HUOM: --legacy-bps ei vaikuta pre-season-artefaktiin "
+                  "(BPS-oikaisu tehty jo jäädytettäessä)")
     else:
-        summaries = xp.adjust_summaries_bps_2627(summaries)
-        print("      bonus-historia oikaistu 26/27 BPS-sääntöihin (#151)")
+        # Kesken kauden historia muuttuu joka GW → pakota tuore haku.
+        # Päättyneen kauden data on staattista → välimuisti riittää.
+        season_live = any(not ev.get("finished") for ev in boot.get("events", []))
+        recency_window = season_live
+        summaries = fpl_api.fetch_all_summaries(boot, force=season_live)
+        print(f"      {len(boot['elements'])} pelaajaa "
+              f"({'live-kausi, tuore haku' if season_live else 'päättynyt kausi, välimuisti'})")
+        # #151: bonus-historia oikaistaan 26/27 BPS-sääntöihin ennen vauhteja
+        # (CBI 1/3 + pilkkutorjunta 7; ottelukohtainen bonuksen uudelleenjako).
+        if args.legacy_bps:
+            print("      HUOM: --legacy-bps — 26/27 BPS-oikaisu OHITETTU (vertailuajo)")
+        else:
+            summaries = xp.adjust_summaries_bps_2627(summaries)
+            print("      bonus-historia oikaistu 26/27 BPS-sääntöihin (#151)")
 
     print("[3/6] Sovitetaan PL Dixon-Coles (sama fit kuin /api/predict)...")
     dc, seasons = fit_model()
@@ -192,6 +227,21 @@ def main(argv: list[str] | None = None) -> int:
     starts_by_round: dict[int, dict[int, int]] = {}
     for e in boot["elements"]:
         pid = e["id"]
+        if prev_players is not None:
+            # Pre-season: jäädytetty acc + per-kierros-minuutit element
+            # codella. Ilman artefaktiriviä (uusi PL-tulokas) → nolla-acc →
+            # positiopriori dominoi (data_basis=no_history, olemassa oleva
+            # mekanismi).
+            b = prev_players.get(str(e.get("code")))
+            if b is not None:
+                acc_by_player[pid] = dict(b["acc"])
+                mins_by_round[pid] = {int(k): v for k, v in b["mins_by_round"].items()}
+                starts_by_round[pid] = {int(k): int(v) for k, v in b["starts_by_round"].items()}
+            else:
+                acc_by_player[pid] = xp.accumulate_history([])
+                mins_by_round[pid] = {}
+                starts_by_round[pid] = {}
+            continue
         hist = summaries.get(pid, [])
         acc = xp.accumulate_history(hist)
         acc["dc_hits"] = xp.count_dc_hits(hist, pos_by_player[pid])
@@ -211,7 +261,9 @@ def main(argv: list[str] | None = None) -> int:
     #   A) minutes_model + saatavuus-gate per pelaaja
     #   B) syvyys-korjaus klubi+positio-ryhmittäin (Σp_start → historialliset
     #      starttipaikat; availability-nollaama kilpailija nostaa muita capatusti)
-    mm_window = 6 if season_live else None
+    # Pre-season: koko edelliskausi tasapainoin (kuten päättyneen kauden ajo);
+    # live-kausi: last-6 recency.
+    mm_window = 6 if recency_window else None
     mm_by_player: dict[int, dict] = {}
     for e in boot["elements"]:
         pid = e["id"]
@@ -287,15 +339,20 @@ def main(argv: list[str] | None = None) -> int:
         fid_to_model = {v: k for k, v in name_to_fid.items()}
         ctx_by_gw[g] = fixture_contexts(dc, fxs, fid_to_model, lam_avg, cfg=cfg)
 
-    # FPL-joukkue (25/26) → mallinimi → fixture-id. Joukkueet joita ei ole
-    # tulevan kauden fixtureissa (putoajat) jäävät pois; nousijoilla ei ole
-    # FPL-pelaajia ennen kuin 26/27-peli avautuu (meta.todo).
+    # FPL-joukkue → mallinimi → fixture-id. Joukkueet joita ei ole tulevan
+    # kauden fixtureissa (putoajat) jäävät pois. Katettu = joukkueella on
+    # vähintään yksi pelaaja jolla on baseline-minuutteja — pre-seasonissa
+    # nousija ilman yhtään ex-PL-pelaajaa (esim. Hull 26/27) jää rehellisesti
+    # teams_without_player_data-listalle (EI arvauksia; sama semantiikka kuin
+    # ennen flippiä, jolloin nousijat puuttuivat bootstrapista kokonaan).
     fplteam_to_fid = {}
     for t in boot["teams"]:
         model = map_name(t["name"])
         if model in name_to_fid:
             fplteam_to_fid[t["id"]] = name_to_fid[model]
-    covered_fids = set(fplteam_to_fid.values())
+    covered_fids = {
+        fplteam_to_fid[e["team"]] for e in boot["elements"]
+        if e["team"] in fplteam_to_fid and acc_by_player[e["id"]]["mins"] > 0}
     uncovered = sorted(n for n, fid in name_to_fid.items() if fid not in covered_fids)
 
     players = []
@@ -381,7 +438,12 @@ def main(argv: list[str] | None = None) -> int:
           f"GW{next_gw}-{horizon[-1]}")
 
     coverable = {n for n, fid in name_to_fid.items() if fid in covered_fids}
-    if not sanity_gate(players, boot, coverable):
+    gate_points = None
+    if prev_players is not None:
+        gate_points = {
+            e["id"]: prev_players.get(str(e.get("code")), {}).get("total_points", 0)
+            for e in boot["elements"]}
+    if not sanity_gate(players, boot, coverable, points_by_id=gate_points):
         print("SANITY-GATE FAIL — data/fpl_xp_projections.json EI kirjoitettu.")
         return 2
 
@@ -406,7 +468,11 @@ def main(argv: list[str] | None = None) -> int:
             "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
             "season": SEASON_LABEL,
             "fixture_source": src["source_label"],
-            "player_source": "FPL official API (bootstrap + element-summary history)",
+            "player_source": (
+                "FPL official API bootstrap (26/27) + jäädytetty 25/26-"
+                "baseline-artefakti (data/fpl_prev_baselines_2526.json, "
+                "element code -mappaus)" if preseason
+                else "FPL official API (bootstrap + element-summary history)"),
             "team_strength_source": (
                 f"GoalIQ Dixon-Coles, Understat PL {seasons} "
                 "(sama fit-config kuin /api/predict)"
@@ -431,6 +497,8 @@ def main(argv: list[str] | None = None) -> int:
             # oli vain proosana todo-listassa, nyt UI:n luettavissa.
             "data_coverage": {
                 "baseline_season": prev_key,
+                "baseline_mode": ("prev_season_archive" if preseason
+                                  else "live_history"),
                 "transfers_known": src["source"] == "fpl-api",
                 "teams_without_player_data": uncovered,
                 "player_basis_counts": {

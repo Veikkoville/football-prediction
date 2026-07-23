@@ -44,12 +44,12 @@ def season_label(key: str) -> str:
     return f"20{key[:2]}/{key[2:]}"
 
 
-def build() -> dict:
-    boot = fetch_bootstrap()
-    season = season_label(season_key_from_bootstrap(boot))
+def _player_rows(boot: dict, summaries: dict, season: str,
+                 keep_empty: bool) -> list[dict]:
+    """Rakenna per-pelaaja-rivit bootstrap+summary-datasta. keep_empty=True
+    jättää 0 pelatun ottelun pelaajat mukaan stubina (recent_games=[]) —
+    kausivaihto-merge voi täyttää ne edellisen snapshotin riveillä."""
     teams = {t["id"]: t["short_name"] for t in boot["teams"]}
-    summaries = fetch_all_summaries(boot)
-
     players = []
     for e in boot["elements"]:
         pos = POS_NAME.get(e["element_type"])
@@ -59,7 +59,7 @@ def build() -> dict:
         played = [r for r in history if (r.get("minutes") or 0) > 0]
         played.sort(key=lambda r: (r.get("round") or 0, r.get("kickoff_time") or ""))
         recent = played[-RECENT_KEEP:]
-        if not recent:
+        if not recent and not keep_empty:
             continue  # ei pelattuja otteluita → ei listalle (No data yet)
         rows = []
         for r in recent:
@@ -83,6 +83,10 @@ def build() -> dict:
             })
         players.append({
             "id": e["id"],
+            # code = FPL:n kausien yli pysyvä pelaajakoodi — kausivaihto-
+            # mergen avain (element-id:t NOLLAUTUVAT kausivaihdossa, joten
+            # id-mappaus sekoittaisi eri pelaajien historiat).
+            "code": e.get("code"),
             "web_name": e["web_name"],
             "team_short": teams.get(e["team"], ""),
             "pos": pos,
@@ -92,27 +96,68 @@ def build() -> dict:
             "basis": season,
             "recent_games": rows,
         })
+    return players
+
+
+def build() -> dict:
+    boot = fetch_bootstrap()
+    season = season_label(season_key_from_bootstrap(boot))
+    players = _player_rows(boot, fetch_all_summaries(boot), season,
+                           keep_empty=(season == TARGET_SEASON))
 
     # Kausivaihto-merge: jos basis on jo target-kausi mutta pelaajalla on alle
     # MIN_CURRENT_GAMES pelattua ottelua → käytä edellisen snapshotin
     # edelliskauden riviä (basis-kenttä säilyy 2025/26 → rehellinen label).
+    # Mappaus element CODElla (pysyvä kausien yli) — EI id:llä (nollautuu).
     if season == TARGET_SEASON and LEADERS_PATH.exists():
         try:
             prev = json.loads(LEADERS_PATH.read_text(encoding="utf-8"))
-            prev_players = {p["id"]: p for p in prev.get("players", [])
-                            if p.get("basis") != TARGET_SEASON}
+            prev_by_code = {p["code"]: p for p in prev.get("players", [])
+                            if p.get("basis") != TARGET_SEASON and p.get("code")}
         except Exception:
-            prev_players = {}
+            prev_by_code = {}
         merged = []
-        current_ids = set()
         for p in players:
-            current_ids.add(p["id"])
-            if p["games_total"] < MIN_CURRENT_GAMES and p["id"] in prev_players:
-                merged.append(prev_players[p["id"]])
+            if p["games_total"] < MIN_CURRENT_GAMES and p.get("code") in prev_by_code:
+                merged.append(prev_by_code[p["code"]])
             else:
                 merged.append(p)
         players = merged
+    # Stubit joille ei löytynyt edelliskauden riviä → pois (No data yet).
+    players = [p for p in players if p["recent_games"]]
+    return _package(season, players)
 
+
+def build_from_cache_2526() -> dict:
+    """Kertaluontoinen kausivaihtoajo (--freeze-prev-2526): rakenna snapshot
+    lokaalista 25/26-levycachesta (vanha bootstrap + summary_2526/). MIKSI:
+    26/27-flipin (23.7.2026) jälkeen 25/26-per-ottelu-data ei ole enää
+    haettavissa API:sta, ja aiemmin committoidusta snapshotista puuttuvat
+    code-kentät joita kausivaihto-merge tarvitsee. VAIN levycache — ei
+    verkkohakuja."""
+    cache = Path(__file__).resolve().parent.parent / "data" / "raw" / "fpl"
+    boot = json.loads((cache / "bootstrap_static.json").read_text(encoding="utf-8"))
+    if not boot["events"][0]["deadline_time"].startswith("2025-"):
+        raise SystemExit(
+            "VIRHE: bootstrap-cache ei ole 25/26-kautta (ylikirjoitettu jo "
+            "26/27:llä) — freeze ei mahdollinen tällä koneella.")
+    summaries: dict[int, list[dict]] = {}
+    missing = 0
+    for e in boot["elements"]:
+        p = cache / "summary_2526" / f"element_{e['id']}.json"
+        if p.exists():
+            summaries[e["id"]] = json.loads(
+                p.read_text(encoding="utf-8")).get("history", [])
+        else:
+            missing += 1
+    if missing:
+        raise SystemExit(f"VIRHE: {missing} summary-tiedostoa puuttuu cachesta.")
+    season = season_label(season_key_from_bootstrap(boot))
+    players = _player_rows(boot, summaries, season, keep_empty=False)
+    return _package(season, players)
+
+
+def _package(season: str, players: list[dict]) -> dict:
     is_prev = season != TARGET_SEASON or all(
         p.get("basis") != TARGET_SEASON for p in players)
     basis_label = (
@@ -164,8 +209,28 @@ def sanity(data: dict) -> list[str]:
     return fails[:10]
 
 
-def main() -> int:
-    data = build()
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--freeze-prev-2526", action="store_true",
+                    help="Rakenna snapshot lokaalista 25/26-cachesta "
+                         "(kertaluontoinen kausivaihtoajo, lisää code-kentät)")
+    args = ap.parse_args(argv)
+
+    if args.freeze_prev_2526:
+        data = build_from_cache_2526()
+    else:
+        boot = fetch_bootstrap()
+        season = season_label(season_key_from_bootstrap(boot))
+        # Kausivaihto-guard: kohdekausi ilman yhtään pelattua GW:tä →
+        # edellinen (25/26-basis, rehellisesti labeloitu) snapshot jää
+        # voimaan EIKÄ haeta 841 tyhjää element-summarya turhaan.
+        if season == TARGET_SEASON and not any(
+                ev.get("finished") for ev in boot.get("events", [])):
+            print(f"PRE-SEASON ({season}, 0 pelattua GW:tä) — {LEADERS_PATH.name} "
+                  f"jää ennalleen (edelliskauden basis, label rehellinen).")
+            return 0
+        data = build()
     fails = sanity(data)
     if fails:
         print("SANITY FAIL — dataa EI kirjoiteta:")
