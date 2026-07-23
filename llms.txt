@@ -17,7 +17,7 @@
 - The page includes GoalIQ's published prediction track record: every prediction is logged before kickoff, hits and misses.
 
 ## FPL tools (web app at pro.goaliq.app and iOS/Android app)
-- Free: rate my team (public FPL entry ID, no login), a captain pick, price change predictions, and the top three of the value, xG leaders and DefCon lists.
+- Free: rate my team (public FPL entry ID, no login), a pre-season draft rater (pick your 15, no team ID needed), a fit checker (lock 1-3 must-have players and the model builds the best legal 15 around them), a captain pick, price change predictions, and the top three of the value, xG leaders and DefCon lists.
 - [Best FPL captain](https://goaliq.app/fpl/best-captain): the model's top captain pick with expected points, updated every round.
 - [Top xG performers](https://goaliq.app/fpl/xg-leaders): expected-goals leaders per game over each player's last five matches, from official FPL match data.
 - [Best DefCon players](https://goaliq.app/fpl/defcon): the most reliable defensive contribution (DefCon) point scorers. DefCon rule: a defender earns 2 FPL points with 10 combined clearances, blocks, interceptions and tackles in a match; a midfielder or forward with 12 including ball recoveries.

@@ -285,7 +285,9 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
             "Is GoalIQ good for FPL?",
             (
                 "Yes. GoalIQ is built FPL-first: clean sheet probability, fixture "
-                "difficulty, rate my team with a captain pick, and price watch "
+                "difficulty, rate my team with a captain pick, a fit checker "
+                "that builds the best legal 15 around your must-have players, "
+                "a pre-season draft rater (no team ID needed), and price watch "
                 "are free, and GoalIQ Premium adds an interactive team manager "
                 "with a gameweek planner, player expected points (xP), the "
                 "captain ranker, a player value ranking, xG leaders, a DefCon "
@@ -298,7 +300,10 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
             "What FPL tools does GoalIQ have?",
             (
                 "Free: clean sheet probabilities, fixture difficulty ratings "
-                "(FDR), rate my team with a captain pick, price watch, and the "
+                "(FDR), rate my team with a captain pick, a pre-season draft "
+                "rater (pick 15, no team ID needed), the fit checker (lock "
+                "must-have players, the model builds the best legal 15 around "
+                "them), price watch, and the "
                 "top three of the value, xG leaders and DefCon lists. GoalIQ "
                 "Premium: an interactive team manager (formations, bench swaps, "
                 "captaincy, a GW1 to GW6 gameweek planner with each player's "
@@ -738,6 +743,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
         "description": (
             "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet "
             "probability and fixture difficulty, rate my team with a captain pick, "
+            "a fit checker, a pre-season draft rater "
             "and price watch free, plus an interactive team manager with a "
             "gameweek planner, player expected points (xP), the captain "
             "ranker, player value, xG leaders, a DefCon tracker, "
@@ -951,6 +957,7 @@ def render_page(c: dict) -> str:
     title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ"
     meta_desc = (
         "Free FPL tools: clean sheet probability & FDR, rate my team with a captain pick, "
+        "fit checker, pre-season draft rater "
         "and price watch. Premium adds a team manager with gameweek planner, "
         "player xP, value ranking, xG leaders and a DefCon tracker. "
         "Published track record. Not betting."

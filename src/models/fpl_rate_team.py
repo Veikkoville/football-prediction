@@ -459,6 +459,39 @@ def resolve_squad(bootstrap: dict, entry: int | None, gw: int | None,
             raise RateTeamError(400, "players must list exactly 15 FPL element IDs.")
         if len(set(players)) != 15:
             raise RateTeamError(400, "players contains duplicate IDs.")
+        # Draft-rehellisyys (23.7): manual-moodi on esikausidraftin polku, joten
+        # runko validoidaan FPL:n draft-sääntöihin — muuten ylikallis runko
+        # saisi "100 % of the best budget team" -arvion jota ei voi omistaa.
+        # Hinnat + positiot bootstrapista (kattaa KAIKKI pelaajat, myös ilman
+        # xP-projektiota olevat). Entry-moodissa validointia EI tehdä: oikean
+        # joukkueen arvo saa ylittää 100.0m (team value kasvaa kaudella).
+        elements = {e["id"]: e for e in (bootstrap.get("elements") or [])}
+        unknown = [pid for pid in players if pid not in elements]
+        if unknown:
+            raise RateTeamError(
+                400, f"Unknown player IDs: {unknown}. Use FPL element IDs "
+                     "from the current season.")
+        pos_need = {1: 2, 2: 5, 3: 5, 4: 3}
+        pos_have: dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}
+        for pid in players:
+            et = elements[pid].get("element_type")
+            if et in pos_have:
+                pos_have[et] += 1
+        if pos_have != pos_need:
+            raise RateTeamError(
+                400, "A draft needs 2 GK, 5 DEF, 5 MID and 3 FWD. This one "
+                     f"has {pos_have[1]} GK, {pos_have[2]} DEF, "
+                     f"{pos_have[3]} MID, {pos_have[4]} FWD.")
+        cost_tenths = sum(int(elements[pid].get("now_cost") or 0)
+                          for pid in players)
+        if cost_tenths > 1000:
+            raise RateTeamError(
+                400, f"This draft costs {cost_tenths / 10:.1f}m, over the "
+                     "100.0m budget. Swap something pricey for a cheaper "
+                     "pick and try again.")
+        # Manual-draftin bank = budjetin jäännös (informatiivinen).
+        if bank is None:
+            bank_tenths = 1000 - cost_tenths
         return list(players), captain, bank_tenths, _resolve_gw(bootstrap, gw)
     if entry is None:
         raise RateTeamError(400, "Provide either entry or players.")
