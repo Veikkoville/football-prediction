@@ -1,0 +1,193 @@
+# FPL 26/27 bootstrap-flip -vahti (#156: Cowork→CC-agenttimigraatio, 1. migroitava).
+#
+# MIKSI: GoalIQ:n koko FPL-personointi (rate-team, planner, chip, xP-entry) on
+# gatettu FPL-API:n kausiflippiin 25/26 → 26/27 (PI-12 "bootstrap-flip"). Ennen
+# flippiä bootstrap tarjoilee 25/26-GW38-jäänteitä (25/26-hinnat, pudonneiden
+# seurojen pelaajat, mahdottomat siirrot, 404-kliffi entry-modessa). Flipin
+# JÄLKEEN aukeaa kaskadi: #115 chip-planner, FPL2627-BPS-verify, PI-12
+# degradaatiotila, PI-13 GW1 first draft, M29 FPL-team-receipt-sarja. Flippiä
+# itseään ei aiemmin omistanut mikään task — desktop-Coworkin lokaali flip-vahti
+# hoiti sen (epävakaa, poltti täyden kontekstin no-op-ajoissa).
+#
+# MIKSI GITHUB ACTIONS eikä CC-pilvi-routine: pilvi-CC:n egress-policy estää
+# fantasy.premierleague.comin (403 policy denial) → pilvisessio EI voi hakea
+# FPL-API:a. GitHub-runnerilla on avoin netti → API-check kuuluu tänne.
+# Kevyt-trigger-malli (#156 OSA B): tämä workflow tuottaa GitHub-natiivin
+# signaalin (committattu lippu data/fpl_season_flip.json + issue flip-hetkellä),
+# jonka egress-lukittu CC-pilvi PÄÄSEE lukemaan GitHub-API:sta. Täysi
+# LLM-konteksti latautuu VAIN kun issue aukeaa → 0 tokenia no-op-päivinä
+# (juurisyykorjaus Coworkin usage-ongelmaan). API-check on puhdas stdlib-Python,
+# ei pip-deppejä, ~15 s/ajo.
+#
+# FLIP-PREDIKAATTI: bootstrap events[].deadline_time. 25/26-kauden viimeinen
+# deadline ~2026-05, 26/27-kauden GW1 ~2026-08-21 → kynnys 2026-07-01 erottaa
+# kaudet puhtaasti. flipped = on olemassa deadline >= kynnys. Kynnys on
+# tarkoituksella tämän kauden erityinen (yhden kerran laukeava vahti, GW1 21.8).
+#
+# TURVA: read-only FPL-API + committaa VAIN pienen lippu-JSONin (ei mallia, ei
+# data/-projektioita). [skip ci] estää test-workflown. Render redeployaa
+# lippu-commitista (no-op, sama koodi) — hyväksytty. Rebase-retry-push sama
+# pattern kuin fpl-data-refresh.yml / accuracy-log.yml (jaettu main).
+
+name: fpl-season-flip-watch
+
+on:
+  schedule:
+    # Päivittäin 06:30 UTC — offset fpl-data-refreshin 06:00:sta (push-kilpailu).
+    - cron: "30 6 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fpl-season-flip-watch
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # committaa lippu
+  issues: write     # avaa issue flip-hetkellä
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}   # branch-dispatch kirjoittaa haaralle; main-cron mainiin
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      # Read-only FPL-API + laske lippu. Ei pip-deppejä (urllib+json stdlib).
+      # just_flipped = edellinen lippu ei flipannut, tämä flippasi → issue-trigger.
+      - name: Check FPL bootstrap for 26/27 season flip
+        id: check
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, os, urllib.request, datetime
+
+          FLAG_PATH = "data/fpl_season_flip.json"
+          # 25/26 viimeinen deadline ~2026-05, 26/27 GW1 ~2026-08 → puhdas erotin.
+          THRESHOLD = "2026-07-01"
+
+          # Edellinen lippu (transition-detektio). Puuttuva/rikki = ei-flipannut.
+          prev_flipped = False
+          try:
+              with open(FLAG_PATH) as f:
+                  prev_flipped = bool(json.load(f).get("flipped", False))
+          except Exception:
+              pass
+
+          now = datetime.datetime.now(datetime.timezone.utc)
+          try:
+              boot = json.load(urllib.request.urlopen(
+                  "https://fantasy.premierleague.com/api/bootstrap-static/", timeout=30))
+              events = boot.get("events", []) or []
+              deadlines = sorted(e["deadline_time"] for e in events
+                                 if e.get("deadline_time"))
+              new_season = [d for d in deadlines if d >= THRESHOLD]
+              flipped = len(new_season) > 0
+              flag = {
+                  "checked_at": now.isoformat(),
+                  "flipped": flipped,
+                  "threshold": THRESHOLD,
+                  "first_new_season_deadline": new_season[0] if flipped else None,
+                  "total_events": len(events),
+                  "source": "fantasy.premierleague.com/api/bootstrap-static/",
+                  "note": ("26/27 bootstrap LIVE — kaskadi auki (#115, FPL2627-BPS, "
+                           "PI-12/13, M29)." if flipped else
+                           "Yha 25/26-jaanteita — odota flippia (GW1 21.8)."),
+              }
+              fetch_ok = True
+          except Exception as e:
+              # Haun kaatuminen EI saa flipata lippua eika avata issueta.
+              flag = {
+                  "checked_at": now.isoformat(),
+                  "flipped": prev_flipped,
+                  "threshold": THRESHOLD,
+                  "first_new_season_deadline": None,
+                  "total_events": None,
+                  "source": "fantasy.premierleague.com/api/bootstrap-static/",
+                  "note": f"API-haku epaonnistui: {e!r}. Lippu ennallaan.",
+              }
+              fetch_ok = False
+
+          with open(FLAG_PATH, "w") as f:
+              json.dump(flag, f, indent=2, ensure_ascii=False)
+              f.write("\n")
+
+          just_flipped = bool(flag["flipped"]) and not prev_flipped
+          print(f"flipped={'true' if flag['flipped'] else 'false'}")
+          print(f"just_flipped={'true' if just_flipped else 'false'}")
+          print(f"fetch_ok={'true' if fetch_ok else 'false'}")
+          print(f"first_deadline={flag['first_new_season_deadline'] or ''}")
+          EOF
+
+      - name: Commit flag if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fpl_season_flip.json
+          if git diff --cached --quiet; then
+            echo "Lippu ennallaan — ei committia."
+            exit 0
+          fi
+          git commit -m "chore(fpl): season-flip watch update (flipped=${{ steps.check.outputs.flipped }}) [skip ci]"
+          for i in 1 2 3 4 5; do
+            git fetch origin "${{ github.ref_name }}" || true
+            if git rebase "origin/${{ github.ref_name }}"; then
+              if git push origin "HEAD:${{ github.ref_name }}"; then
+                echo "Lippu pushattu (yritys $i)."
+                exit 0
+              fi
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
+            echo "Push-yritys $i epaonnistui (kilpailu cronin kanssa?) — retry."
+            sleep 5
+          done
+          echo "VIRHE: lipun push epaonnistui 5 yrityksen jalkeen."
+          exit 1
+
+      # Vain flip-transitiossa (was-false → now-true). Idempotentti: ohita jos
+      # avoin flip-issue on jo olemassa (rerun-turva).
+      - name: Open cascade issue on flip
+        if: steps.check.outputs.just_flipped == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          FIRST_DEADLINE: ${{ steps.check.outputs.first_deadline }}
+        run: |
+          MARKER="[fpl-2627-flip]"
+          existing=$(gh issue list --repo "$REPO" --state open \
+            --search "in:title $MARKER" --json number --jq 'length')
+          if [ "$existing" != "0" ]; then
+            echo "Avoin flip-issue on jo olemassa — ohitetaan."
+            exit 0
+          fi
+          gh issue create --repo "$REPO" \
+            --title "🚦 $MARKER FPL 26/27 bootstrap-flip HAVAITTU" \
+            --body "$(cat <<EOF
+          FPL bootstrap-static tarjoilee **26/27-kautta** (ensimmäinen uuden kauden
+          deadline: \`$FIRST_DEADLINE\`). Lippu: \`data/fpl_season_flip.json\`.
+
+          Tämä on GoalIQ-kaskadin trigger. Kun tämä issue aukeaa, CC (Claude Code)
+          lataa täyden kontekstin ja ajaa gatetut tehtävät prioriteetissa:
+
+          - [ ] **PI-12** — bootstrap-flip-valmiusportti: rehellinen degradaatiotila
+                404:n sijaan, pudonneiden seurojen käsittely, hold_verdict-vaimennus,
+                savutesti (web+mobiili-pariteetti). **P0-ikkuna, aja ensin.**
+          - [ ] **FPL2627-BPS-verify** — 26/27-scoring-data vs xP/DefCon-paino
+                (bonus/DefCon ei saa olla vinossa). Jos vino → refit-tiketti (🔒 GO).
+          - [ ] **PI-13** — "GW1 first draft": malli-xP/£-rankattu 15 hengen runko
+                ilman entry-ID:tä (edellyttää live-hintoja = flip tapahtunut).
+          - [ ] **#115** — chip timing planner next-6-GW (Premium; Deploy = 🔒 GO).
+          - [ ] **M29** — FPL-team-receipt-sarja (edellyttää lisäksi: Ville luo joukkueen).
+
+          Portti: deploy/malli/submit/billing pysyvät 🔒 GO-REQUIRED. Vahti:
+          \`.github/workflows/fpl-season-flip-watch.yml\`.
+          EOF
+          )"
+          echo "Kaskadi-issue avattu."
