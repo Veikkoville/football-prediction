@@ -2809,7 +2809,15 @@
       "most_likely_score": "0-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-17T08:11:37+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 3,
+        "actual_score": "1-3",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-23T02:47:20+00:00"
+      }
     },
     {
       "match_id": "fd-554922",
@@ -2828,7 +2836,15 @@
       "most_likely_score": "0-2",
       "predicted_winner": "away",
       "logged_at": "2026-07-17T08:11:37+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 4,
+        "actual_score": "0-4",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-23T02:47:20+00:00"
+      }
     },
     {
       "match_id": "fd-554926",
@@ -2847,7 +2863,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-07-17T08:11:37+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 2,
+        "actual_score": "1-2",
+        "actual_outcome": "away",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-23T02:47:20+00:00"
+      }
     },
     {
       "match_id": "fd-554928",
@@ -2866,7 +2890,15 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-07-17T08:11:38+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 2,
+        "actual_score": "1-2",
+        "actual_outcome": "away",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-23T02:47:20+00:00"
+      }
     },
     {
       "match_id": "fd-554771",
