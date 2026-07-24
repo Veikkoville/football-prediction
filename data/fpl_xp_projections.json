@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-23T13:56:57",
+    "generated_at": "2026-07-24T08:05:47",
     "season": "2026/27",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + jäädytetty 25/26-baseline-artefakti (data/fpl_prev_baselines_2526.json, element code -mappaus)",
