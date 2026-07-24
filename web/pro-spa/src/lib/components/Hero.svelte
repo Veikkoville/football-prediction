@@ -114,10 +114,14 @@
 		--text-muted: #c9c3da;
 		--border: rgba(255, 255, 255, 0.25);
 		color: var(--text);
-		background: linear-gradient(165deg, var(--giq-ink-2), var(--giq-ink));
-		border: 1px solid rgba(255, 46, 126, 0.35);
+		/* 24.7 redesign-pariteetti: sama gradientti + magenta-alaraita kuin
+		   goaliq.app-landingin hero-shellissä */
+		background: linear-gradient(160deg, var(--giq-ink) 0%, var(--giq-ink-2) 70%, #1c1030 100%);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: 4px solid var(--giq-magenta);
 		border-radius: 16px;
-		padding: var(--s-4) var(--s-6);
+		box-shadow: 0 8px 24px rgba(10, 8, 32, 0.18);
+		padding: var(--s-6) var(--s-6);
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--s-4);

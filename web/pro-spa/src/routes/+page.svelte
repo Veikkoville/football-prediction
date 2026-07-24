@@ -74,28 +74,31 @@
 		margin: 0 auto;
 		padding: var(--s-4);
 	}
+	/* 24.7 redesign-pariteetti: alleviivaustabit → pilleritabit (sama
+	   segmenttikieli kuin mobiilissa ja landingin mockupissa) */
 	.tabs {
 		display: flex;
+		flex-wrap: wrap;
 		gap: var(--s-2);
 		margin: var(--s-4) 0;
-		border-bottom: 1px solid var(--border);
 	}
 	.tabs button {
-		background: none;
-		border: none;
-		border-bottom: 3px solid transparent;
-		border-radius: 0;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 999px;
 		color: var(--text-muted);
 		font-weight: 700;
-		padding: var(--s-2) var(--s-3);
+		padding: var(--s-2) var(--s-4);
 		min-height: 44px;
 	}
 	.tabs button.active {
-		color: var(--giq-magenta-deep);
-		border-bottom-color: var(--giq-magenta-deep);
+		background: var(--giq-magenta);
+		border-color: var(--giq-magenta);
+		color: #fff;
 	}
-	.tabs button:hover {
+	.tabs button:hover:not(.active) {
 		color: var(--text);
+		border-color: var(--giq-magenta);
 	}
 	footer {
 		margin-top: var(--s-12);

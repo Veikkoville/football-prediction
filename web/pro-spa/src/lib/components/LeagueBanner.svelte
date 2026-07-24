@@ -26,17 +26,20 @@
 </a>
 
 <style>
+	/* 24.7 redesign-pariteetti: tumma ink-nauha (sama kuin landingin
+	   league-band) — pomppaa kermapohjalta selvästi kortteja paremmin */
 	.league-banner {
 		display: flex;
 		align-items: center;
 		gap: 0.7rem;
-		border: 1px solid var(--accent);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-left: 4px solid var(--giq-magenta);
 		border-radius: var(--radius, 12px);
-		padding: 0.7rem 0.9rem;
+		padding: 0.75rem 0.9rem;
 		margin: 0 0 1rem;
 		text-decoration: none;
-		color: var(--text, inherit);
-		background: var(--surface, transparent);
+		color: #fff;
+		background: linear-gradient(160deg, var(--giq-ink), var(--giq-ink-2));
 	}
 	.league-banner:hover .cta {
 		text-decoration: underline;
@@ -51,10 +54,10 @@
 		font-size: var(--step--1, 0.85rem);
 	}
 	.text {
-		color: var(--text-muted, inherit);
+		color: #c9c3da;
 	}
 	.cta {
-		color: var(--accent);
+		color: var(--giq-gold);
 		font-weight: 700;
 	}
 </style>

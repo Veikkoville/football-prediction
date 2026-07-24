@@ -292,9 +292,13 @@ tbody tr:hover td {
    Sama radius/border-kieli kuin .table-wrap/.card; paper-pohja jolloin
    sisällä olevat valkoiset surface-kortit ja taulukot erottuvat. */
 .tool-card {
-	background: var(--giq-paper);
+	/* 24.7 redesign-pariteetti: laventeliblokki → valkoinen kortti kevyellä
+	   varjolla (sama paneelikieli kuin landingin free/premium-paneelit).
+	   Sisemmat .card/.table-wrap erottuvat borderilla + paper-theadilla. */
+	background: var(--surface);
 	border: 1px solid var(--border);
 	border-radius: var(--radius);
+	box-shadow: var(--shadow-1);
 	padding: var(--s-6);
 	margin-bottom: var(--s-6);
 }
