@@ -89,12 +89,57 @@
 	let poolError = $state(false);
 	let picks = $state<XpPlayer[]>([]);
 	let draftQuery = $state('');
+
+	// Web-pariteetti mobiilin cc-inbox #2 -fixille: draft-pickit persistoituvat
+	// localStorageen (vain ID:t; oliot resolvoidaan tuoreesta xP-poolista →
+	// hinnat eivät jäädy, poistuneet putoavat pois). Fail-safe: storage-virhe
+	// ei saa kaataa työkalua. Tallennus vasta hydraation jälkeen, ettei tyhjä
+	// alkutila ylikirjoita tallennettua draftia.
+	const DRAFT_LS_KEY = 'goaliq.fplDraftPicks';
+	let savedDraftIds: number[] | null = null;
+	try {
+		const raw = localStorage.getItem(DRAFT_LS_KEY);
+		if (raw) {
+			const parsed = JSON.parse(raw);
+			if (Array.isArray(parsed) && parsed.every((v) => typeof v === 'number')) {
+				savedDraftIds = parsed;
+			}
+		}
+	} catch {
+		/* fail-safe */
+	}
+	let draftCanSave = savedDraftIds == null;
+	if (savedDraftIds && savedDraftIds.length > 0) draftOpen = true; // triggaa pool-fetchin
+
 	$effect(() => {
 		if (draftOpen && pool.length === 0 && !poolError) {
 			fetchXp().then(
 				(d) => (pool = d.players ?? []),
 				() => (poolError = true)
 			);
+		}
+	});
+	// Hydraatio: kun pooli on saatavilla, resolvoi tallennetut ID:t — ei
+	// ylikirjoiteta käyttäjän jo tekemiä tuoreita valintoja.
+	$effect(() => {
+		if (!draftCanSave && savedDraftIds && pool.length > 0) {
+			const byId = new Map(pool.map((p) => [p.id, p]));
+			const resolved = savedDraftIds
+				.map((id) => byId.get(id))
+				.filter((p): p is XpPlayer => p != null);
+			if (picks.length === 0 && resolved.length > 0) picks = resolved;
+			savedDraftIds = null;
+			draftCanSave = true;
+		}
+	});
+	// Persistoi jokainen muutos hydraation jälkeen.
+	$effect(() => {
+		const ids = picks.map((p) => p.id);
+		if (!draftCanSave) return;
+		try {
+			localStorage.setItem(DRAFT_LS_KEY, JSON.stringify(ids));
+		} catch {
+			/* fail-safe */
 		}
 	});
 	const posCount = $derived.by(() => {

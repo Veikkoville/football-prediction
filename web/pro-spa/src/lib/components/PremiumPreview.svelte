@@ -56,6 +56,13 @@
 		{/each}
 	</ul>
 
+	<!-- 24.7 conviction-löydös: perumiset tapahtuvat maksuhetkellä → proof
+	     suoraan ostopäätöksen viereen (ei numeroita jotka vanhenisivat) -->
+	<p class="muted proof">
+		Built on a publicly tracked match model: every prediction logged before kick-off,
+		hits and misses included. This season the model even plays FPL itself, squad public.
+	</p>
+
 	{#if top3.length > 0}
 		<div class="teaser" aria-label="Locked expected points preview">
 			<table>
