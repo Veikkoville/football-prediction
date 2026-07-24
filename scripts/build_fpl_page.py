@@ -1044,6 +1044,10 @@ Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 </div>
 <p class="meta">One account, premium on web, iOS and Android.</p>
 <p class="note">Free download. Predict any fixture yourself in the app.</p>
+<p class="note">The model plays FPL this season with its own public team.
+Think you can outdraft it? Join the
+<a href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9" data-cta="league">Beat
+the Model mini-league</a> with code <strong>jgi6j9</strong>. Bragging rights only.</p>
 </div>
 </section>
 

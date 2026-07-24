@@ -4,6 +4,7 @@
 	// auth.user + auth.sub + xp) tai dev-esikatselusta (/dev-premium, DEV-only).
 	import type { XpResponse } from '$lib/api';
 	import Provenance from './Provenance.svelte';
+	import LeagueBanner from './LeagueBanner.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
 	import CaptainRanker from './CaptainRanker.svelte';
 	import XpTable from './XpTable.svelte';
@@ -29,6 +30,8 @@
 
 <!-- #50: mallin alkuperä-rivi myös pro-pinnalla (sama kiila kuin FreeView) -->
 <Provenance />
+<!-- M29: Beat the Model -miniliigan liittymiskortti (julkinen koodi jgi6j9) -->
+<LeagueBanner />
 <SegmentNav segments={SEGMENTS} bind:active={segment} label="Premium FPL tools" />
 
 {#if segment === 'players'}

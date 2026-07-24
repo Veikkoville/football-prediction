@@ -2,6 +2,7 @@
 	import { fetchFantasy, type FantasyResponse } from '$lib/api';
 	import MethodNote from './MethodNote.svelte';
 	import Provenance from './Provenance.svelte';
+	import LeagueBanner from './LeagueBanner.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import FitChecker from './FitChecker.svelte';
 	import PriceWatch from './PriceWatch.svelte';
@@ -86,6 +87,8 @@
 <!-- #50: mallin alkuperä-rivi työkalualueen yläreunassa (kiila: sama malli
      kuin julkaistun, pre-match-logatun track recordin takana) -->
 <Provenance />
+<!-- M29: Beat the Model -miniliigan liittymiskortti (julkinen koodi jgi6j9) -->
+<LeagueBanner />
 <SegmentNav segments={SEGMENTS} bind:active={segment} label="Free FPL tools" />
 
 {#if segment === 'cleansheets'}
