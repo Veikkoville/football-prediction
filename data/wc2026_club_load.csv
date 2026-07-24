@@ -1,0 +1,155 @@
+player,fpl_team,country,wc_minutes,wc_matches,wc_name,wc_club_at_tournament,match_how,source,fetched_at
+Emiliano Martínez Romero,Aston Villa,Argentina,810,8,Damián Emiliano Martinez,Aston Villa FC,squash+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Alexis Mac Allister,Liverpool,Argentina,750,8,Alexis Mac Allister,Liverpool FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Rodrigo 'Rodri' Hernandez Cascante,Man City,Spain,747,8,Rodrigo Rodri,Manchester City FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Enzo Fernández,Chelsea,Argentina,663,7,Enzo Jeremías Fernandez,Chelsea FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Marc Guéhi,Man City,England,663,8,Keaninkin Marc-Isreal Guehi,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jordan Pickford,Everton,England,660,7,Jordan Lee Pickford,Everton FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ezri Konsa Ngoyo,Aston Villa,England,647,8,Ezri Ngoyo Konsa,Aston Villa FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Elliot Anderson,Man City,England,634,8,Elliot Junior Anderson,Nottingham Forest FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Lisandro Martínez,Man Utd,Argentina,625,7,Lisandro Martinez,Manchester United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Cristian Romero,Spurs,Argentina,611,7,Cristian Gabriel Romero,Tottenham Hotspur FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Granit Xhaka,Sunderland,Switzerland,600,6,Granit Xhaka,Sunderland AFC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Pedro Porro Sauceda,Spurs,Spain,564,6,Pedro Antonio Porro,Tottenham Hotspur FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Declan Rice,Arsenal,England,559,7,Declan Rice,Arsenal FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+William Saliba,Arsenal,France,480,6,William Alain André Gabriel Saliba,Arsenal FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Kristoffer Ajer,Brentford,Norway,480,5,Kristoffer Vassbakk Köpp Ajer,Brentford FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Sander Berge,Fulham,Norway,480,5,Sander Gard Bolin Berge,Fulham FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Timothy Castagne,Fulham,Belgium,478,6,Timothy Castagne,Fulham FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Noussair Mazraoui,Man Utd,Morocco,477,6,Noussair Mazraoui,Manchester United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Youri Tielemans,Man Utd,Belgium,475,5,Youri Marion Tielemans,Aston Villa FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Martin Ødegaard,Arsenal,Norway,471,5,Martín Odegaard,Arsenal FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Erling Haaland,Man City,Norway,465,5,Erling Braut Haaland,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Nico O'Reilly,Man City,England,464,7,Nico Oreilly,Manchester City FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Gabriel dos Santos Magalhães,Arsenal,Brazil,450,5,Gabriel Gabriel Magalhaes,Arsenal FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Alisson Becker,Liverpool,Brazil,450,5,Ramsés Alisson,Liverpool FC,manual,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Maxim De Cuyper,Brighton,Belgium,443,6,Maxim Peter De Cuyper,Brighton & Hove Albion FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Chadi Riad Dnanou,Crystal Palace,Morocco,435,5,Chadi Riad,Crystal Palace FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Bruno Borges Fernandes,Man Utd,Portugal,423,5,Miguel Bruno,Manchester United FC,manual,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Bruno Guimarães Rodriguez Moura,Newcastle,Brazil,420,5,GUIMARAESBruno Bruno,Newcastle United FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jefferson Lerma Solís,Crystal Palace,Colombia,412,5,Jefferson Andrés Lerma,Crystal Palace FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Dan Ndoye,Nott'm Forest,Switzerland,411,6,Dan Ndoye,Nottingham Forest FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Djed Spence,Spurs,England,394,8,Tehuti Djed-Hotep Spence,Tottenham Hotspur FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Daniel Muñoz Mejía,Crystal Palace,Colombia,393,5,Daniel Munoz,Crystal Palace FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Bart Verbruggen,Brighton,Netherlands,390,4,Bart Verbruggen,Brighton & Hove Albion FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Issa Diop,Ipswich Town,Morocco,390,4,Issa Laye Lucas Jean Diop,Fulham FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Virgil van Dijk,Liverpool,Netherlands,390,4,Virgil Van Dijk,Liverpool FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jan Paul van Hecke,Spurs,Netherlands,390,4,Paul Jan-Paul Van Hecke,Brighton & Hove Albion FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Lucas Digne,Aston Villa,France,374,5,Lucas Digne,Aston Villa FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Cody Gakpo,Liverpool,Netherlands,372,4,Cody Mathès Gakpo,Liverpool FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ismaïla Sarr,Crystal Palace,Senegal,366,4,Ismaila Sarr,Crystal Palace FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Florian Wirtz,Liverpool,Germany,363,4,Florian Richard Wirtz,Liverpool FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Viktor Gyökeres,Arsenal,Sweden,360,4,Viktor Einar Gyokeres,Arsenal FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Moisés Caicedo Corozo,Chelsea,Ecuador,360,4,Moisés Isaac Caicedo,Chelsea FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Chris Richards,Crystal Palace,USA,360,4,Christopher Jeffrey Richards,Crystal Palace FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Antoine Semenyo,Man City,Ghana,360,4,Antoine Serlom Semenyo,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Rúben dos Santos Gato Alves Dias,Man City,Portugal,360,4,Rúben Ruben Dias,Manchester City FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Yoane Wissa,Newcastle,Congo DR,360,4,Yoane Wissa,Newcastle United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Alexander Isak,Liverpool,Sweden,359,4,Alexander Isak,Liverpool FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Bukayo Saka,Arsenal,England,358,7,Bukayo Ayoyinka Saka,Arsenal FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Victor Lindelöf,Aston Villa,Sweden,357,4,Victor Jörgen Lindelof,Aston Villa FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Kai Havertz,Arsenal,Germany,355,4,Kai Lukas Havertz,Arsenal FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Pedro Lomba Neto,Chelsea,Portugal,354,5,Pedro Pedro Neto,Chelsea FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Omar Alderete,Sunderland,Paraguay,354,4,Omar Federico Alderete,Sunderland AFC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Antonee Robinson,Fulham,USA,350,4,Antonee Robinson,Fulham FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ryan Gravenberch,Liverpool,Netherlands,347,4,Ryan Jiro Gravenberch,Liverpool FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Tyler Adams,Bournemouth,USA,342,4,Tyler Shaan Adams,AFC Bournemouth,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Piero Hincapié,Arsenal,Ecuador,341,4,Piero Martin Hincapie,Arsenal FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Yasin Ayari,Brighton,Sweden,341,4,Yasin Ayari,Brighton & Hove Albion FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Morgan Rogers,Chelsea,England,336,7,Morgan Elliot Rogers,Aston Villa FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Daichi Kamada,Crystal Palace,Japan,332,4,Daichi Kamada,Crystal Palace FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Gabriel Gudmundsson,Leeds,Sweden,332,4,Gabriel Johan Gudmundsson,Leeds United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Maxence Lacroix,Crystal Palace,France,330,4,Maxence Guy Lacroix,Crystal Palace FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Omar Marmoush,Man City,Egypt,326,5,Mohamed Abdelsalam Omar,Manchester City FC,manual,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Reece James,Chelsea,England,318,5,Reece Lewis James,Chelsea FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Arthur Masuaku,Sunderland,Congo DR,317,4,Arthur Fuka Masuaku,RC Lens,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jérémy Doku,Man City,Belgium,311,5,Jeremy Baffour Doku,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Matheus Santos Carneiro da Cunha,Man Utd,Brazil,293,5,Matheus Matheus Cunha,Manchester United FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Rayan Vitor Simplício Rocha,Bournemouth,Brazil,289,4,Vitor Rayan,AFC Bournemouth,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Noni Madueke,Arsenal,England,287,5,Azuka Tristan Madueke,Arsenal FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Rayan Aït-Nouri,Man City,Algeria,284,4,Rayan Ait-Nouri,Manchester City FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Mateo Kovačić,Man City,Croatia,272,4,Mateo Kovacic,Manchester City FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Tarik Muharemović,Leeds,Bosnia and Herzegovina,270,3,Tarik Muharemovic,US Sassuolo,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Abdukodir Khusanov,Man City,Uzbekistan,270,3,Abdukodir Khusanov,Manchester City FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Chris Wood,Nott'm Forest,New Zealand,270,3,Christopher Grant Wood,Nottingham Forest FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Rodrigo Bentancur,Spurs,Uruguay,270,3,Rodrigo Bentancur,Tottenham Hotspur FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ibrahim Sangaré,Nott'm Forest,Côte d'Ivoire,268,4,Ibrahim Sangare,Nottingham Forest FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Micky van de Ven,Spurs,Netherlands,266,3,Micky Van De Ven,Tottenham Hotspur FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+John McGinn,Aston Villa,Scotland,261,3,Mc,Aston Villa FC,revsquash+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Noah Sadiki,Sunderland,Congo DR,257,4,Noah Junior Sadiki,Sunderland AFC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Chemsdine Talbi,Sunderland,Morocco,246,5,Chemsdine Talbi,Sunderland AFC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Xaver Schlager,Nott'm Forest,Austria,240,4,Xaver Schlager,RB Leipzig,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Kevin Danso,Spurs,Austria,239,4,Kevin Danso,Tottenham Hotspur FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Diego Gómez Amarilla,Brighton,Paraguay,236,3,Diego Alexander Gomez,Brighton & Hove Albion FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Nicolas Jackson,Chelsea,Senegal,234,4,Nicolas Jackson,FC Bayern München,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Andrew Robertson,Spurs,Scotland,226,3,Andrew Henry Robertson,Liverpool FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Brian Brobbey,Sunderland,Netherlands,225,4,Brian Ebenezer Adjei Brobbey,Sunderland AFC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Oscar Bobb,Fulham,Norway,222,6,Oscar Bobb,Fulham FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Marcus Rashford,Man Utd,England,220,5,Marcus Rashford,FC Barcelona,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Nilson Angulo,Sunderland,Ecuador,217,4,Nilson David Angulo,Sunderland AFC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Anthony Elanga,Newcastle,Sweden,216,4,Anthony David Junior Elanga,Newcastle United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Eberechi Eze,Arsenal,England,209,5,Eberechi Oluchi Eze,Arsenal FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Rayan Cherki,Man City,France,209,7,Mathis Rayan Cherki,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Tijjani Reijnders,Man City,Netherlands,201,3,Tijjani Martinus Jan Reijnders,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Johan Manzambi,Aston Villa,Switzerland,198,4,Johan Kula Manzambi,SC Freiburg,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Mikel Merino Zazón,Arsenal,Spain,194,8,Mikel Merino,Arsenal FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Tanaka Ao,Leeds,Japan,192,3,Ao Tanaka,Leeds United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Thomas Meunier,Sunderland,Belgium,190,3,Thomas Andre Meunier,Lille OSC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Manuel Ugarte Ribeiro,Man Utd,Uruguay,187,3,Manuel Ugarte,Manchester United FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ben Gannon-Doak,Bournemouth,Scotland,186,3,Ben Gannon Gannon-Doak,AFC Bournemouth,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Wilson Isidor,Sunderland,Haiti,186,3,Wilson Isidor,Sunderland AFC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Nathan Patterson,Everton,Scotland,185,3,Nathan Kenneth Patterson,Everton FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Amad Diallo,Man Utd,Côte d'Ivoire,185,4,Amad Diallo,Manchester United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Lucas Bergvall,Spurs,Sweden,179,4,Lucas Erik Holger Bergvall,Tottenham Hotspur FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Liam Millar,Hull City,Canada,163,3,Liam Alan Millar,Hull City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ferdi Kadıoğlu,Brighton,Türkiye,160,2,Ferdi Erenay Kadioglu,Brighton & Hove Albion FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Habib Diarra,Sunderland,Senegal,144,3,Habib Mbacke Diarra,Sunderland AFC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Gabriel Martinelli Silva,Arsenal,Brazil,141,4,MARTINELLIGabriel Gabriel,Arsenal FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Joško Gvardiol,Man City,Croatia,139,4,Joško Gvardiol,Manchester City FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Abdul Fatawu,Ipswich Town,Ghana,128,4,Abdul Fatawu Fatawu,Leicester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Malo Gusto,Chelsea,France,116,4,Malo Arthur Gusto,Chelsea FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Iliman Ndiaye,Everton,Senegal,114,3,Iliman Cheikh Baroy Ndiaye,Everton FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Marcos Senesi Barón,Spurs,Argentina,109,2,Marcos Nicolás Senesi,AFC Bournemouth,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Amadou Onana,Aston Villa,Belgium,106,4,Amadou Ba Onana,Aston Villa FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jørgen Strand Larsen,Crystal Palace,Norway,105,2,Jørgen Strand Strand Larsen,Crystal Palace FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ryan Christie,Bournemouth,Scotland,96,3,Ryan Christie,AFC Bournemouth,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Tyler Bindon,Nott'm Forest,New Zealand,96,3,Tyler Grant Bindon,Shefield United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Dean Henderson,Crystal Palace,England,90,1,Dean Bradley Henderson,Crystal Palace FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Bazoumana Touré,Newcastle,Côte d'Ivoire,80,3,Bazoumana Toure,TSG Hoffenheim,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Brenden Aaronson,Leeds,USA,76,1,Brenden Russell Aaronson,Leeds United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Aaron Hickey,Brentford,Scotland,75,1,Aaron Buchanan Hickey,Brentford FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Yéremy Pino Santos,Crystal Palace,Spain,68,2,Yeremy Jesús Pino,Crystal Palace FC,squash,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Luka Vušković,Brighton,Croatia,66,1,Luka Vuskovic,Hamburger SV,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Pape Matar Sarr,Spurs,Senegal,65,2,Pape Matar Sarr,Tottenham Hotspur FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Diogo Dalot Teixeira,Man Utd,Portugal,63,2,Diogo Diogo Dalot,Manchester United FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Igor Thiago Nascimento Rodrigues,Brentford,Brazil,61,1,Thiago Igor Thiago,Brentford FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Ollie Watkins,Aston Villa,England,51,2,George Arthur Watkins,Aston Villa FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Brandon Thomas-Asante,Coventry City,Ghana,51,2,Brandon Michael Clarke Thomas-Asante,Coventry City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Malick Thiaw,Newcastle,Germany,40,2,Malick Thiaw,Newcastle United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jorrel Hato,Chelsea,Netherlands,34,1,Jorrel Evan Hato,Chelsea FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Nick Woltemade,Newcastle,Germany,32,1,Nick Woltemade,Newcastle United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Dan Burn,Newcastle,England,29,3,Daniel Johnson Burn,Newcastle United FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Justin Kluivert,Bournemouth,Netherlands,25,2,Justin Dean Kluivert,AFC Bournemouth,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jean-Philippe Mateta,Crystal Palace,France,22,3,Jean-Philippe Mateta,Crystal Palace FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Noah Okafor,Leeds,Switzerland,19,1,Noah Arinzechukwu Okafor,Leeds United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Senne Lammens,Man Utd,Belgium,19,1,Senne Lammens,Manchester United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Pascal Groß,Brighton,Germany,17,1,Pascal Alexander GROß GROß Gross,Brighton & Hove Albion FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Evann Guessand,Aston Villa,Côte d'Ivoire,16,2,Evann Ludovic Vidjannagni Guessand,Crystal Palace FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Simon Adingra,Sunderland,Côte d'Ivoire,15,1,Simon Adingra,AS Monaco,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Jordan Henderson,Brentford,England,7,2,Jordan Brian Henderson,Brentford FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Haji Wright,Coventry City,USA,2,2,Haji Amir Wright,Coventry City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Trevoh Chalobah,Chelsea,England,1,1,Trevoh Tom Chalobah,Chelsea FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Matheus Nunes,Man City,Portugal,1,1,Luiz Matheus,Manchester City FC,web+club,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+David Raya Martín,Arsenal,Spain,0,0,David Raya,Arsenal FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Martín Zubimendi Ibáñez,Arsenal,Spain,0,0,Martin Zubimendi,Arsenal FC,wc_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Mats Wieffer,Brighton,Netherlands,0,0,Mats Henrik Berne Wieffer,Brighton & Hove Albion FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Michael Svoboda,Brighton,Austria,0,0,Michael Svoboda,Venezia FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Mamadou Sarr,Chelsea,Senegal,0,0,Mamadou Sarr,Chelsea FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Aurèle Amenda,Coventry City,Switzerland,0,0,Aurèle Florian Amenda,Eintracht Frankfurt,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+George Hirst,Ipswich Town,Scotland,0,0,George David Eric Hirst,Ipswich Town FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Victor Munoz,Liverpool,Spain,0,0,Victor Munoz,CA Osasuna,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+James Trafford,Man City,England,0,0,James Harrington Trafford,Manchester City FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Altay Bayındır,Man Utd,Türkiye,0,0,Altay Bayindir,Manchester United FC,exact,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Kobbie Mainoo,Man Utd,England,0,0,Kobbie Boateng Mainoo,Manchester United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Tyler Fletcher,Man Utd,Scotland,0,0,Tyler Robert Fletcher,Manchester United FC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00
+Robin Roefs,Sunderland,Netherlands,0,0,Robin Gerardus Petrus Roefs,Sunderland AFC,fpl_subset,"github:mominullptr/FIFA-World-Cup-2026-Dataset@8fcb734 (CC0, sofascore-pohj.)",2026-07-24T13:45:53+00:00

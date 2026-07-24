@@ -46,6 +46,9 @@ raw_data/
 !/data/fpl_prev_baselines_2526.json
 # FPL Phase 1b: manuaaliset konteksti-yliajot (versioitu input, builderit lukevat).
 !/data/fpl_manual_overrides.csv
+# #142 OSA A: PL-seura->MM-2026-minuuttikartta (versioitu artefakti, OSA B:n
+# mitoitusevidenssi; uusinta-ajo ~15.8 ennen GW1:ta).
+!/data/wc2026_club_load.csv
 # FPL price watch (#43): sama refresh-konventio (/api/fantasy/price-watch).
 !/data/fpl_price_watch.json
 
