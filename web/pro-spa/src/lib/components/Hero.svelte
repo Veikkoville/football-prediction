@@ -53,7 +53,7 @@
 		<div>
 			<div class="word">Goal<span>IQ</span> Premium</div>
 			<div class="tag">
-				Fantasy Premier League tools from the GoalIQ match model ·
+				Draft, rate and plan your squad with a real match model. Numbers, not vibes. ·
 				<a href="https://goaliq.app">goaliq.app</a>
 			</div>
 		</div>
