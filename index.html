@@ -11,6 +11,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
 <!-- Open Graph / social preview -->
 <meta property="og:title" content="GoalIQ – Free FPL Tools &amp; Football Predictions" />
@@ -157,263 +160,211 @@
 <!-- GEN:ACC-DATASET-END -->
 
 <style>
-  /* #54 OSA B: vaalea branditeema (Ink -> Cream token-flip, brand-tokens.md).
-     --green oli harhaanjohtava nimi (arvo oli jo magenta) -> nimetty
-     --magenta/--magenta-deep. Teal TEKSTINÄ syvennettynä (--teal-ink #007A6C,
-     4.9:1 kermalla); puhdas teal vain koristemerkeissä (prob-bar). */
+  /* Redesign 24.7 (Villen GO): brand-tokens.md + Space Grotesk (sama display-
+     fontti kuin prediction-korteissa ja pro-SPA:ssa) + tumma ink-hero.
+     GEN:ACC-markerit sailyvat: chip herossa (.num/.lbl), bycomp+proof
+     track-record-osiossa, trust pricing-osiossa. */
   :root {
     --bg: #FFF6EC;
     --bg-alt: #F6F4FF;
     --card: #FFFFFF;
+    --ink: #0A0820;
+    --ink-2: #140F1E;
     --line: rgba(10,8,32,0.12);
     --text: #0A0820;
     --muted: #575170;
+    --hero-muted: #C9C3DA;
     --magenta: #FF2E7E;
     --magenta-deep: #D6006E;
     --teal: #19E3D2;
     --teal-ink: #007A6C;
+    --gold: #FFC93C;
     --radius: 16px;
+    --shadow-1: 0 2px 8px rgba(10,8,32,0.07);
+    --font-display: "Space Grotesk", -apple-system, "Segoe UI", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  /* Mobiiliylivuodon vahti (#15): mikään hajayksittäinen elementti ei saa
-     avata vaakascrollia kapealla laitteella */
   html, body { overflow-x: clip; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  section { padding: 80px 0; }
-  h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 72px 0; }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; letter-spacing: -0.02em; }
   a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; } }
 
-  .bar { height: 6px; background: var(--magenta); }
-
-  /* Nav */
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 22px 0;
+  /* ============ Dark hero shell ============ */
+  .hero-shell {
+    background: linear-gradient(160deg, var(--ink) 0%, var(--ink-2) 70%, #1C1030 100%);
+    color: #fff;
+    border-bottom: 6px solid var(--magenta);
   }
-  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
   .logo-mark-img { width: 32px; height: 32px; border-radius: 9px; display: block; }
-  .nav-cta {
-    background: var(--magenta); color: #ffffff; font-weight: 700;
-    padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px;
-  }
+  .nav-links { display: flex; gap: 22px; align-items: center; }
+  .nav-links a { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--hero-muted); }
+  .nav-links a:hover { color: #fff; }
+  .nav-cta { background: var(--magenta); color: #fff !important; font-weight: 700; padding: 10px 18px; border-radius: 999px; }
+  .nav-cta:hover { background: var(--magenta-deep); }
 
-  /* Hero */
-  .hero { padding: 64px 0 72px; text-align: center; }
-  a.badge { text-decoration: none; }
-  .cta-note { color: var(--muted); font-size: 14px; margin-top: 14px; }
-  /* #72: GW-deadline-countdown (flip-clock) - malli-first-urgenssi herossa */
-  .countdown { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 0 auto 28px; }
-  .countdown .cd-label { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  .cd-clock { display: flex; align-items: baseline; gap: 6px; }
-  .cd-box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-width: 58px; text-align: center; box-shadow: 0 2px 6px rgba(10,8,32,0.05); }
-  .cd-box .cd-num { display: block; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text); line-height: 1.1; }
-  .cd-box .cd-unit { display: block; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .cd-sep { font-size: 20px; font-weight: 700; color: var(--muted); }
-  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--magenta-deep); text-decoration: none; }
-  .countdown .cd-cta:hover { text-decoration: underline; }
-  .badge {
-    display: inline-block; background: rgba(25,227,210,0.12);
-    color: var(--teal-ink); border: 1px solid rgba(25,227,210,0.35);
+  .hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; padding: 52px 0 68px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(25,227,210,0.12); color: var(--teal);
+    border: 1px solid rgba(25,227,210,0.35);
     padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
-    margin-bottom: 24px;
+    margin-bottom: 22px; text-decoration: none;
   }
-  .hero h1 { font-size: 52px; font-weight: 800; max-width: 760px; margin: 0 auto 20px; }
+  .hero h1 { font-size: clamp(34px, 4.4vw, 52px); font-weight: 700; margin-bottom: 18px; color: #fff; }
   .hero h1 .accent { color: var(--magenta); }
-  .hero p.sub { font-size: 19px; color: var(--muted); max-width: 600px; margin: 0 auto 36px; }
-  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .hero .sub { font-size: 18px; color: var(--hero-muted); max-width: 48ch; margin-bottom: 28px; }
+  .hero .sub a { color: var(--teal); font-weight: 600; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
   .btn-primary {
-    background: var(--magenta); color: #ffffff; font-weight: 800; font-size: 16px;
-    padding: 16px 30px; border-radius: 999px; text-decoration: none;
-    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--magenta); color: #fff; font-weight: 800; font-size: 16px;
+    padding: 15px 28px; border-radius: 999px; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px; transition: background 150ms ease-out;
   }
   .btn-primary:hover { background: var(--magenta-deep); }
   .btn-ghost {
-    color: var(--text); font-weight: 600; font-size: 15px;
-    padding: 16px 22px; border-radius: 999px; text-decoration: none;
-    border: 1px solid var(--line);
-    /* inline-flex: pilleri ei katkea rivien yli mobiilissa (Villen
-       laitelöydös 6.7: inline-ankkuri hajosi kahdelle riville) */
-    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 600; font-size: 15px; padding: 15px 20px;
+    border-radius: 999px; text-decoration: none; border: 1px solid rgba(255,255,255,0.28);
+    display: inline-flex; align-items: center; justify-content: center; transition: border-color 150ms ease-out;
   }
   .btn-ghost:hover { border-color: var(--magenta); }
-  /* #56: appilinkit demotoituna omaan ghost-ryhmäänsä heron CTA-rivillä */
-  .ghost-group { display: inline-flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .hero .cta-note { color: var(--hero-muted); font-size: 13px; margin-top: 14px; }
+  .hero .cta-note a { color: var(--teal); font-weight: 600; }
 
-  /* Pricing (#56): Pro web ensin - vuosipassi johtaa, kuukausi toissijainen.
-     Samat tokenit kuin muu sivu (card/line/magenta), ei uusia värejä. */
-  .pricing-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-    max-width: 680px; margin: 0 auto 30px; align-items: stretch;
+  /* Track record -chip herossa: GEN:ACC-CHIP elaa taalla (.num/.lbl) */
+  .record-chip {
+    display: inline-block;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 12px; padding: 12px 18px; margin-top: 24px;
   }
-  .plan {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 28px; position: relative;
-  }
-  .plan.lead { border: 2px solid var(--magenta); }
-  .plan-badge {
-    position: absolute; top: -13px; left: 22px; background: var(--magenta);
-    color: #ffffff; font-size: 12px; font-weight: 800; letter-spacing: 0.02em;
-    padding: 4px 12px; border-radius: 999px;
-  }
-  .plan h3 { font-size: 17px; margin-bottom: 4px; }
-  .plan-price { font-size: 38px; font-weight: 800; }
-  .plan-price span { font-size: 16px; color: var(--muted); font-weight: 500; }
-  .plan-note { color: var(--muted); font-size: 14px; }
-  .pro-features {
-    list-style: none; max-width: 680px; margin: 0 auto 30px;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px;
-  }
-  .pro-features li { padding-left: 28px; position: relative; font-size: 15px; }
-  .pro-features li::before {
-    content: "✓"; position: absolute; left: 0; color: var(--magenta); font-weight: 800;
-  }
-  .pricing-cta { text-align: center; }
-  .trust-line { color: var(--muted); font-size: 14px; margin-top: 16px; }
-  @media (max-width: 640px) {
-    .pricing-grid, .pro-features { grid-template-columns: 1fr; }
-  }
+  .record-chip .num { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .record-chip .lbl { font-size: 13px; color: var(--hero-muted); max-width: 40ch; line-height: 1.35; }
+  .record-chip .tr-links { font-size: 13px; margin-top: 6px; }
+  .record-chip .tr-links a { color: var(--teal); font-weight: 600; }
 
-  /* Phone mock strip */
-  .stat-strip {
-    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-    margin-top: 52px;
-  }
-  .stat {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 18px 26px; min-width: 150px;
-  }
-  .stat .num { font-size: 26px; font-weight: 800; color: var(--magenta-deep); }
-  .stat .lbl { font-size: 13px; color: var(--muted); }
-  /* #74: iso-numero track-record-hero (FPLai-treatment ansaitulla luvulla) */
-  .tr-hero {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 28px 36px; margin: 44px auto 0; max-width: 560px;
-    box-shadow: 0 4px 14px rgba(10,8,32,0.06);
-  }
-  .tr-hero .num {
-    font-size: 84px; font-weight: 800; line-height: 1; color: var(--magenta-deep);
-    letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
-  }
-  .tr-hero .lbl { font-size: 17px; color: var(--text); font-weight: 600; margin-top: 6px; }
-  .tr-hero .tr-note { font-size: 13px; color: var(--muted); margin-top: 10px; }
-  .tr-hero .tr-note a { color: var(--magenta-deep); font-weight: 600; }
-  @media (max-width: 640px) { .tr-hero .num { font-size: 60px; } }
+  /* #72: GW-deadline-countdown herossa (tummat tokenit) */
+  .countdown { display: flex; flex-direction: column; gap: 8px; margin: 24px 0 0; }
+  .countdown .cd-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--hero-muted); }
+  .cd-clock { display: flex; align-items: baseline; gap: 6px; }
+  .cd-box { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; padding: 7px 11px; min-width: 54px; text-align: center; }
+  .cd-box .cd-num { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; color: #fff; line-height: 1.1; }
+  .cd-box .cd-unit { display: block; font-size: 10px; font-weight: 600; color: var(--hero-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .cd-sep { font-size: 18px; font-weight: 700; color: var(--hero-muted); }
+  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--teal); text-decoration: none; }
+  .countdown .cd-cta:hover { text-decoration: underline; }
 
-  /* World Cup band */
-  .wc {
-    background: var(--bg-alt);
-    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  /* ============ CSS-tuotemockup (oikeat mallin luvut, paivitetaan kasin
+     merkittavien datamuutosten yhteydessa - EI vaadeta botilta) ============ */
+  .mock {
+    background: var(--card); color: var(--text);
+    border-radius: 22px; box-shadow: 0 18px 50px rgba(10,8,32,0.45);
+    overflow: hidden; max-width: 420px; justify-self: end; width: 100%;
+    transform: rotate(1.2deg);
   }
-  .wc .wc-inner { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
-  .wc h2 { font-size: 34px; margin-bottom: 16px; }
-  .wc h2 .accent { color: var(--teal-ink); }
-  .wc p { color: var(--muted); font-size: 16px; margin-bottom: 10px; }
-  .wc .kickoff {
-    margin-top: 22px; display: inline-flex; align-items: center; gap: 10px;
-    background: rgba(25,227,210,0.12); border: 1px solid rgba(0,148,130,0.4);
-    padding: 12px 18px; border-radius: 12px; font-weight: 600; color: var(--teal-ink);
-  }
-  .wc-visual {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 26px;
-  }
-  .matchrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .matchrow .team { font-weight: 700; font-size: 15px; }
-  .prob-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 16px 0 8px; }
-  .prob-bar .home { background: var(--magenta); }
-  .prob-bar .draw { background: rgba(10,8,32,0.18); }
-  .prob-bar .away { background: var(--teal); }
-  .prob-legend { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .mock-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--ink); color: #fff; }
+  .mock-head .t { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+  .mock-head .gw { font-size: 11px; color: var(--hero-muted); }
+  .mock-tabs { display: flex; gap: 6px; padding: 12px 14px 4px; }
+  .mock-tab { font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .mock-tab.on { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+  .mock-rows { padding: 8px 14px 6px; }
+  .mock-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--line); }
+  .mock-row:last-child { border-bottom: 0; }
+  .mock-kit { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #fff; flex: none; }
+  .mock-name { font-weight: 700; font-size: 13.5px; }
+  .mock-meta { font-size: 10.5px; color: var(--muted); }
+  .mock-spacer { flex: 1; }
+  .mock-xp { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--magenta-deep); font-variant-numeric: tabular-nums; }
+  .mock-xp small { display: block; font-size: 9px; color: var(--muted); font-weight: 600; text-align: right; }
+  .mock-bar { height: 4px; border-radius: 2px; background: rgba(10,8,32,0.08); margin-top: 3px; overflow: hidden; }
+  .mock-bar i { display: block; height: 100%; background: var(--teal); }
+  .mock-foot { padding: 10px 18px 14px; background: var(--bg-alt); font-size: 11px; color: var(--muted); }
+  .mock-foot strong { color: var(--teal-ink); }
+
+  /* ============ Light content ============ */
+  .section-head { max-width: 640px; margin: 0 auto 44px; text-align: center; }
+  .section-head h2 { font-size: clamp(26px, 3vw, 36px); margin-bottom: 10px; }
+  .section-head p { color: var(--muted); font-size: 17px; }
+
+  .toolkit { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: stretch; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-1); }
+  .panel.premium-p { border: 2px solid var(--magenta); }
+  .panel .tier { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .panel .tier.free { color: var(--teal-ink); }
+  .panel .tier.prem { color: var(--magenta-deep); }
+  .panel h3 { font-size: 21px; margin: 6px 0 14px; }
+  .tool-list { list-style: none; }
+  .tool-list li { padding: 7px 0 7px 28px; position: relative; font-size: 15px; }
+  .tool-list li::before { content: "✓"; position: absolute; left: 0; font-weight: 800; }
+  .panel .tool-list li::before { color: var(--teal-ink); }
+  .panel.premium-p .tool-list li::before { color: var(--magenta); }
+  .panel .panel-cta { margin-top: 18px; }
+  .price-tag { font-family: var(--font-display); font-size: 30px; font-weight: 700; }
+  .price-tag span { font-size: 14px; color: var(--muted); font-weight: 500; font-family: var(--font-body); }
+  .btn-teal { background: var(--teal-ink); }
+  .btn-teal:hover { background: #00655A; }
+  .trust-line { color: var(--muted); font-size: 14px; margin-top: 18px; text-align: center; }
+  .free-note { color: var(--muted); font-size: 14px; margin-top: 8px; text-align: center; }
+
+  /* Beat the Model -liiganauha */
+  .league-band { background: var(--ink); color: #fff; border-block: 6px solid var(--magenta); padding: 44px 0; }
+  .league-inner { display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+  .league-inner h2 { font-size: clamp(22px, 2.6vw, 30px); color: #fff; }
+  .league-inner p { color: var(--hero-muted); max-width: 52ch; margin-top: 6px; }
+  .league-inner .btn-primary { flex: none; }
+  .league-inner .code { font-family: var(--font-display); }
+
+  /* Track record -osio: GEN:ACC-PROOF + GEN:ACC-BYCOMP elavat taalla */
+  .trust-band { text-align: center; }
+  .trust-band .tr-hero { max-width: 620px; margin: 0 auto; }
+  .trust-band .num { font-family: var(--font-display); font-size: clamp(56px, 8vw, 92px); font-weight: 700; color: var(--magenta-deep); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .trust-band .lbl { font-size: 17px; font-weight: 600; margin-top: 8px; }
+  .trust-band .tr-note { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .trust-band .tr-note a { color: var(--magenta-deep); font-weight: 600; }
+  .trust-band .bycomp { margin-left: auto; margin-right: auto; }
+  .wc-visual { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 26px; max-width: 620px; margin: 22px auto 0; text-align: left; }
+  .wc-visual a { color: var(--teal-ink); font-weight: 700; }
 
   /* How it works */
-  .section-head { text-align: center; max-width: 600px; margin: 0 auto 52px; }
-  .section-head h2 { font-size: 36px; margin-bottom: 12px; }
-  .section-head p { color: var(--muted); font-size: 17px; }
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
-  .step {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 28px;
-  }
-  .step .n {
-    width: 38px; height: 38px; border-radius: 10px; background: rgba(255,46,126,0.14);
-    color: var(--magenta-deep); font-weight: 800; display: flex; align-items: center;
-    justify-content: center; margin-bottom: 16px; font-size: 17px;
-  }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-1); }
+  .step .n { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,46,126,0.14); color: var(--magenta-deep); font-family: var(--font-display); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 17px; }
   .step h3 { font-size: 19px; margin-bottom: 8px; }
   .step p { color: var(--muted); font-size: 15px; }
 
   /* Leagues */
   .leagues { background: var(--bg-alt); }
-  .league-grid {
-    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
-    max-width: 760px; margin: 0 auto;
-  }
-  .league-chip {
-    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
-    padding: 12px 22px; font-weight: 600; font-size: 15px;
-  }
-  .league-chip.wc-chip { border-color: rgba(25,227,210,0.5); color: var(--teal-ink); }
+  .league-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 760px; margin: 0 auto; }
+  .league-chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 12px 22px; font-weight: 600; font-size: 15px; }
+  .league-chip.live-chip { border-color: rgba(25,227,210,0.5); color: var(--teal-ink); }
 
-  /* Features */
-  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .feat {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 24px;
-  }
-  .feat .ico { color: var(--magenta); margin-bottom: 12px; display: flex; }
-  .feat h3 { font-size: 17px; margin-bottom: 6px; }
-  .feat p { color: var(--muted); font-size: 14px; }
-
-  /* Premium */
-  .premium { background: var(--bg-alt); }
-  .premium-card {
-    background: var(--card);
-    border: 1px solid rgba(0,148,130,0.4); border-radius: 22px;
-    padding: 44px; max-width: 640px; margin: 0 auto; text-align: center;
-  }
-  .premium-card .price { font-size: 44px; font-weight: 800; margin: 8px 0; }
-  .premium-card .price span { font-size: 18px; color: var(--muted); font-weight: 500; }
-  .premium-list { list-style: none; text-align: left; max-width: 380px; margin: 24px auto; }
-  .premium-list li { padding: 8px 0 8px 30px; position: relative; color: var(--text); }
-  .premium-list li::before {
-    content: "✓"; position: absolute; left: 0; color: var(--magenta); font-weight: 800;
-  }
-  .premium-card small { color: var(--muted); font-size: 13px; }
-
-  /* FAQ (#58 GEO): näkyvä vastine head-osan FAQPage-JSON-LD:lle */
+  /* FAQ (#58 GEO): nakyva vastine head-osan FAQPage-JSON-LD:lle */
   .faq-list { max-width: 760px; margin: 0 auto; }
-  .faq-list dt { font-weight: 700; font-size: 17px; margin-top: 26px; }
+  .faq-list dt { font-family: var(--font-display); font-weight: 700; font-size: 17px; margin-top: 26px; }
   .faq-list dd { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
 
-  /* Footer */
-  footer { border-top: 1px solid var(--line); padding: 40px 0; }
+  footer { border-top: 1px solid var(--line); padding: 36px 0; }
   .foot-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
   footer, footer a { color: var(--muted); font-size: 14px; text-decoration: none; }
   footer a:hover { color: var(--magenta-deep); }
 
-  @media (max-width: 760px) {
+  @media (max-width: 880px) {
     section { padding: 56px 0; }
-    .hero h1 { font-size: 36px; }
-    .hero p.sub { font-size: 17px; }
-    .wc .wc-inner { grid-template-columns: 1fr; gap: 28px; }
-    .steps, .feat-grid { grid-template-columns: 1fr; }
-    .section-head h2, .wc h2 { font-size: 28px; }
+    .hero { grid-template-columns: 1fr; gap: 40px; }
+    .mock { justify-self: center; transform: none; }
+    .toolkit, .steps { grid-template-columns: 1fr; }
+    .nav-links a:not(.nav-cta) { display: none; }
   }
-  /* Kapea mobiili: CTA-napit pinoon täysleveinä (ei vaakaylivuotoa) */
   @media (max-width: 520px) {
     .cta-row { flex-direction: column; align-items: stretch; }
-    .cta-row .ghost-group { flex-direction: column; align-items: stretch; width: 100%; }
-    .cta-row .btn-primary, .cta-row .btn-ghost {
-      width: 100%; justify-content: center; text-align: center;
-    }
+    .cta-row .btn-primary, .cta-row .btn-ghost { width: 100%; justify-content: center; }
   }
 </style>
 <!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
@@ -426,129 +377,157 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </head>
 <body>
 
-<div class="bar"></div>
-<div class="wrap">
-  <nav>
-    <div class="logo"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</div>
-    <div style="display:flex; gap:20px; align-items:center;">
-      <a href="fpl.html" style="text-decoration:none; font-weight:600; font-size:14px;">Free FPL tools</a>
-      <a href="/predictions" style="text-decoration:none; font-weight:600; font-size:14px;">Match predictions</a>
-      <a class="nav-cta" href="https://pro.goaliq.app/?tab=premium" data-cta="nav">Try Premium</a>
-    </div>
-  </nav>
-</div>
-
-<!-- HERO -->
-<div class="wrap">
-  <header class="hero">
-    <a class="badge" href="fpl.html">Free FPL tools on the web, no sign-in needed</a>
-    <h1>Free FPL tools, <span class="accent">powered by a proven match model</span></h1>
-    <p class="sub">GoalIQ is a free FPL assistant: clean sheet probability & FDR, rate my team with a captain pick, a fit checker that builds the best legal 15 around your must-have players, a pre-season draft rater that needs no team ID, and price watch. GoalIQ Premium adds a team manager with gameweek planner, player xP, value, xG leaders, a DefCon tracker and a transfer planner. All backed by the same match model behind our published, pre-match-logged track record. <a href="/predictions" style="color:var(--magenta-deep);font-weight:600;">Football predictions for the top leagues too</a>.</p>
-    <!-- #72: GW-deadline-countdown. Oletuskohde = GW1-avaus pe 21.8.2026 (näytetään
-         päivämäärä = väite verifioitavissa); kun /api/fantasy alkaa palauttaa
-         deadline_utc:n (FPL-kausiflip), JS vaihtaa viralliseen GW-deadlineen. -->
-    <div class="countdown" id="gw-countdown" hidden>
-      <span class="cd-label" id="cd-label">Season starts · GW1 (Fri 21 Aug)</span>
-      <div class="cd-clock" aria-hidden="true">
-        <span class="cd-box"><span class="cd-num" id="cd-d">–</span><span class="cd-unit">days</span></span>
-        <span class="cd-sep">:</span>
-        <span class="cd-box"><span class="cd-num" id="cd-h">–</span><span class="cd-unit">hrs</span></span>
-        <span class="cd-sep">:</span>
-        <span class="cd-box"><span class="cd-num" id="cd-m">–</span><span class="cd-unit">min</span></span>
-        <span class="cd-sep">:</span>
-        <span class="cd-box"><span class="cd-num" id="cd-s">–</span><span class="cd-unit">sec</span></span>
+<div class="hero-shell">
+  <div class="wrap">
+    <nav>
+      <div class="logo"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</div>
+      <div class="nav-links">
+        <a href="fpl.html">Free FPL tools</a>
+        <a href="/predictions">Match predictions</a>
+        <a class="nav-cta" href="https://pro.goaliq.app/?tab=premium" data-cta="nav">Try Premium</a>
       </div>
-      <a class="cd-cta" href="fpl.html" data-cta="countdown">See clean-sheet probability &amp; FDR &rarr;</a>
-    </div>
-    <div class="cta-row" id="get">
-      <!-- #101: hinta-CTA:t suoraan Stripe Checkoutiin (SPA:n /checkout-reitti
-           luo session heti) — ei enää SPA-juureen jossa osto oli piilossa. -->
-      <a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="hero">Start GoalIQ Premium &mdash; &euro;25/year</a>
-      <span class="ghost-group" aria-label="Get the app">
-        <a class="btn-ghost" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4.5v15l13-7.5z"/></svg>&nbsp;Get it on Google Play</a>
-        <a class="btn-ghost" href="https://apps.apple.com/app/id6780047163">Download on the App Store</a>
-      </span>
-    </div>
-    <p class="cta-note">Premium unlocks an interactive team manager with gameweek planner, player xP, value ranking, xG leaders, a DefCon tracker and more, from €25 a year.</p>
-    <p class="cta-note">The app is a free download. One subscription covers web, iOS and Android.</p>
-    <!-- #74: iso-numero track-record-hero (ansaittu luku, EI vanity). Samat
-         GEN:ACC-CHIP-markerit kuin ennen -> accuracy-botti pitaa luvun tuoreena
-         ilman builder-muutoksia (sama lahde+tahti kuin fpl.html). -->
-    <div class="tr-hero">
-      <!-- GEN:ACC-CHIP-START --><div class="num">59.7%</div><div class="lbl">result accuracy across 114 completed matches, all competitions</div><!-- GEN:ACC-CHIP-END -->
-      <div class="tr-note">Every prediction logged before kick-off, publicly tracked. <a href="/predictions#record">See the full record &rarr;</a> &middot; <a href="fpl.html">See the tools it powers &rarr;</a></div>
-      <!-- #111: per-kilpailu-erottelu (build_fpl_page.py tayttaa 3 h valein) -->
-      <!-- GEN:ACC-BYCOMP-START --><style>.bycomp{margin:14px 0 4px;max-width:520px;}.bycomp-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-bottom:6px;}.bycomp-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid rgba(128,128,128,.25);font-size:15px;}.bycomp-name{flex:1;font-weight:600;}.bycomp-pct{font-weight:800;font-variant-numeric:tabular-nums;}.bycomp-n{opacity:.65;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;}</style><div class="bycomp" aria-label="Accuracy by competition"><div class="bycomp-title">By competition</div><div class="bycomp-row"><span class="bycomp-name">World Cup 2026</span><span class="bycomp-pct">60.6%</span><span class="bycomp-n">63 of 104</span></div><div class="bycomp-row"><span class="bycomp-name">Brasileirão Série A</span><span class="bycomp-pct">50%</span><span class="bycomp-n">5 of 10</span></div></div><!-- GEN:ACC-BYCOMP-END -->
-    </div>
-    <div class="stat-strip">
-      <div class="stat"><div class="num">xG</div><div class="lbl">expected goals model</div></div>
-      <div class="stat"><div class="num">€25</div><div class="lbl">GoalIQ Premium season pass / year</div></div>
-    </div>
-  </header>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <a class="eyebrow" href="fpl.html">Free FPL tools on the web · no sign-in needed</a>
+        <h1>Free FPL tools, <span class="accent">backed by a real match model</span></h1>
+        <p class="sub">Clean sheet probability, fixture difficulty, a fit checker and a
+          pre-season draft rater, free. GoalIQ Premium adds player xP, a gameweek planner and
+          transfer suggestions. Every number comes from the model behind our public,
+          pre-match-logged prediction record. <a href="/predictions">Football predictions for
+          the top leagues too</a>.</p>
+        <div class="cta-row" id="get">
+          <a class="btn-primary" href="fpl.html" data-cta="hero-free">Try the free tools</a>
+          <!-- #101: hinta-CTA suoraan Stripe Checkoutiin -->
+          <a class="btn-ghost" href="https://pro.goaliq.app/checkout?plan=season" data-cta="hero">Premium, &euro;25/year</a>
+        </div>
+        <p class="cta-note">Free download on <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google Play</a> and the <a href="https://apps.apple.com/app/id6780047163">App Store</a>. One subscription covers web, iOS and Android.</p>
+        <div class="record-chip">
+          <!-- GEN:ACC-CHIP-START --><div class="num">59.7%</div><div class="lbl">result accuracy across 114 completed matches, all competitions</div><!-- GEN:ACC-CHIP-END -->
+          <div class="tr-links"><a href="/predictions#record">Full record &rarr;</a></div>
+        </div>
+        <!-- #72: GW-deadline-countdown. Fallback = GW1-avaus pe 21.8.2026; JS
+             vaihtaa viralliseen GW-deadlineen /api/fantasy metasta. -->
+        <div class="countdown" id="gw-countdown" hidden>
+          <span class="cd-label" id="cd-label">Season starts · GW1 (Fri 21 Aug)</span>
+          <div class="cd-clock" aria-hidden="true">
+            <span class="cd-box"><span class="cd-num" id="cd-d">&ndash;</span><span class="cd-unit">days</span></span>
+            <span class="cd-sep">:</span>
+            <span class="cd-box"><span class="cd-num" id="cd-h">&ndash;</span><span class="cd-unit">hrs</span></span>
+            <span class="cd-sep">:</span>
+            <span class="cd-box"><span class="cd-num" id="cd-m">&ndash;</span><span class="cd-unit">min</span></span>
+            <span class="cd-sep">:</span>
+            <span class="cd-box"><span class="cd-num" id="cd-s">&ndash;</span><span class="cd-unit">sec</span></span>
+          </div>
+          <a class="cd-cta" href="fpl.html" data-cta="countdown">See clean-sheet probability &amp; FDR &rarr;</a>
+        </div>
+      </div>
+
+      <!-- CSS-mockup: oikeat Total xP -luvut tuotannon value-ajosta 24.7.
+           Paivita luvut jos datassa iso liike (rehellisyys: ei mock-kautta). -->
+      <div class="mock" aria-hidden="true">
+        <div class="mock-head"><span class="t">GoalIQ · Fantasy</span><span class="gw">GW1&ndash;6 · 2026/27</span></div>
+        <div class="mock-tabs">
+          <span class="mock-tab on">xP</span><span class="mock-tab">Clean sheets</span><span class="mock-tab">Fit checker</span><span class="mock-tab">Value</span>
+        </div>
+        <div class="mock-rows">
+          <div class="mock-row">
+            <span class="mock-kit" style="background:#274488;">EVE</span>
+            <span><span class="mock-name">Garner</span><br><span class="mock-meta">MID · £6.0 · owned 4.0%</span><div class="mock-bar"><i style="width:92%"></i></div></span>
+            <span class="mock-spacer"></span>
+            <span class="mock-xp">25.5<small>total xP</small></span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-kit" style="background:#241F20;">NEW</span>
+            <span><span class="mock-name">Thiaw</span><br><span class="mock-meta">DEF · £5.0 · owned 2.7%</span><div class="mock-bar"><i style="width:88%"></i></div></span>
+            <span class="mock-spacer"></span>
+            <span class="mock-xp">24.8<small>total xP</small></span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-kit" style="background:#B80102;">NFO</span>
+            <span><span class="mock-name">N.Williams</span><br><span class="mock-meta">DEF · £5.0 · owned 10.3%</span><div class="mock-bar"><i style="width:82%"></i></div></span>
+            <span class="mock-spacer"></span>
+            <span class="mock-xp">23.3<small>total xP</small></span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-kit" style="background:#0057B8;">BHA</span>
+            <span><span class="mock-name">Verbruggen</span><br><span class="mock-meta">GKP · £4.5 · owned 16.1%</span><div class="mock-bar"><i style="width:84%"></i></div></span>
+            <span class="mock-spacer"></span>
+            <span class="mock-xp">23.7<small>total xP</small></span>
+          </div>
+        </div>
+        <div class="mock-foot">Model projections, refreshed daily · <strong>live numbers, not a mock season</strong></div>
+      </div>
+    </header>
+  </div>
 </div>
 
-<!-- PRICING (#56): Pro web ensin -->
+<!-- FREE vs PREMIUM (#56-pricing sulautettu paneeleihin) -->
 <section id="pro">
   <div class="wrap">
     <div class="section-head">
-      <h2>GoalIQ Premium, the full FPL toolkit</h2>
-      <p>Everything at pro.goaliq.app, powered by the same match model. One subscription covers web, iOS and Android.</p>
+      <h2>One model, a full FPL toolkit</h2>
+      <p>The free tier is genuinely useful. Premium goes deeper on the same engine.</p>
     </div>
-    <div class="pricing-grid">
-      <div class="plan lead">
-        <span class="plan-badge">Best value</span>
-        <h3>Season pass</h3>
-        <div class="plan-price">€25<span> / year</span></div>
-        <p class="plan-note">Under €2.10 a month, billed once a year.</p>
-        <p class="plan-note"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing-season">Get the Season pass</a></p>
+    <div class="toolkit">
+      <div class="panel">
+        <span class="tier free">Free · no sign-in</span>
+        <h3>Start with the model</h3>
+        <ul class="tool-list">
+          <li>Clean sheet probability &amp; fixture difficulty, every PL team</li>
+          <li>Rate my team, with a captain pick</li>
+          <li>Fit checker: lock 1&ndash;3 players, get the best legal 15 around them</li>
+          <li>Pre-season draft rater, no team ID needed</li>
+          <li>Price watch</li>
+        </ul>
+        <p class="panel-cta"><a class="btn-primary btn-teal" href="fpl.html" data-cta="toolkit-free">Open the free tools</a></p>
       </div>
-      <div class="plan">
-        <h3>Monthly</h3>
-        <div class="plan-price">€3.99<span> / month</span></div>
-        <p class="plan-note">Cancel anytime.</p>
-        <p class="plan-note"><a class="btn-ghost" href="https://pro.goaliq.app/checkout?plan=monthly" data-cta="pricing-monthly">Start Monthly</a></p>
+      <div class="panel premium-p">
+        <span class="tier prem">GoalIQ Premium</span>
+        <h3><span class="price-tag">&euro;25<span> / year</span></span> &nbsp;or &euro;3.99 / month</h3>
+        <ul class="tool-list">
+          <li>Interactive team manager + GW1&ndash;GW6 gameweek planner</li>
+          <li>Player expected points (xP) and captain ranker</li>
+          <li>Transfer suggestions with one-tap apply</li>
+          <li>Player value, xG leaders, DefCon tracker, differentials</li>
+          <li>Player compare and predicted starting minutes</li>
+        </ul>
+        <p class="panel-cta"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing-season">Get the Season pass</a>
+          &nbsp; <a class="btn-ghost" style="color:var(--text);border-color:var(--line);" href="https://pro.goaliq.app/checkout?plan=monthly" data-cta="pricing-monthly">Start Monthly</a></p>
       </div>
     </div>
-    <ul class="pro-features">
-      <li>Interactive team manager + GW1 to GW6 gameweek planner</li>
-<li>Player expected points (xP) per gameweek</li>
-      <li>Captain ranker</li>
-      <li>Transfer suggestions with one-tap apply</li>
-<li>Player value, xG leaders and DefCon tracker</li>
-      <li>Differential picks</li>
-      <li>Player compare, side by side</li>
-      <li>Transfer suggestions for your imported FPL team</li>
-      <li>Predicted starting minutes</li>
-    </ul>
-    <div class="pricing-cta">
-      <a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing">Start Premium &mdash; &euro;25/year</a>
-      <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 59.7% correct 1X2 results across 114 completed matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
-      <p class="cta-note">Clean sheet probabilities, fixture difficulty, rate my team with a captain pick, and price watch stay free on the web.</p>
-    </div>
+    <p class="trust-line"><!-- GEN:ACC-TRUST-START -->Built on a model with 59.7% correct 1X2 results across 114 completed matches, every prediction logged before kick-off.<!-- GEN:ACC-TRUST-END --></p>
+    <p class="free-note">Cancel anytime. One subscription covers web, iOS and Android.</p>
   </div>
 </section>
 
-<!-- FPL -->
-<section class="wc">
-  <div class="wrap wc-inner">
+<!-- BEAT THE MODEL (M29) -->
+<div class="league-band">
+  <div class="wrap league-inner">
     <div>
-      <h2>Free <span class="accent">FPL tools</span> on the web</h2>
-      <p>GoalIQ's model gives clean sheet probability and fixture difficulty for every Premier League team, updated every gameweek.</p>
-      <p>Free on the web, no sign-in. Want the interactive team manager, player xP, value ranking, xG leaders and DefCon tracker on top? That is <a href="https://pro.goaliq.app/?tab=premium" style="color:var(--teal-ink);font-weight:700;" data-cta="fpl">GoalIQ Premium on the web</a>.</p>
-      <div class="cta-row" style="margin-top:22px; justify-content:flex-start;">
-        <a class="btn-primary" href="fpl.html">See the FPL clean sheet probability</a>
-        <a class="btn-ghost" href="https://pro.goaliq.app/?tab=premium" data-cta="fpl">Open GoalIQ Premium</a>
-      </div>
-      <!-- #78: career-kortin löydettävyys etusivulta (jakelutyökalu) -->
-      <p style="margin-top:14px;">New: <a href="/career" data-cta="index-career" style="color:var(--teal-ink);font-weight:700;">Your FPL Career Card</a> - best season, all-time points and rank history on one shareable card. Free, no login.</p>
+      <h2>The model plays FPL this season. Beat it.</h2>
+      <p>GoalIQ's team picks itself from the model's numbers, squad public, every call
+        posted before the deadline. Season winner gets a year of Premium, free.</p>
     </div>
-    <div class="wc-visual">
-      <div class="matchrow">
-        <span class="team">Published track record</span>
-        <span style="color:var(--muted);font-size:13px;">hits and misses</span>
+    <a class="btn-primary" href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9" data-cta="league">Join the league · code <span class="code">jgi6j9</span></a>
+  </div>
+</div>
+
+<!-- TRACK RECORD (#74 + #111): PROOF + BYCOMP -->
+<section class="trust-band">
+  <div class="wrap">
+    <div class="tr-hero">
+      <!-- Iso luku pysyy tuoreena CHIP-markerin kautta herossa; tassa sama
+           luku proof-lauseena + per-kilpailu-erittely (molemmat botin). -->
+      <div class="wc-visual">
+        <p><strong>Published track record, hits and misses.</strong></p>
+        <p style="margin-top:10px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 59.7% correct results across 114 completed matches.<!-- GEN:ACC-PROOF-END --></p>
+        <!-- GEN:ACC-BYCOMP-START --><style>.bycomp{margin:14px 0 4px;max-width:520px;}.bycomp-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.65;margin-bottom:6px;}.bycomp-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid rgba(128,128,128,.25);font-size:15px;}.bycomp-name{flex:1;font-weight:600;}.bycomp-pct{font-weight:800;font-variant-numeric:tabular-nums;}.bycomp-n{opacity:.65;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;}</style><div class="bycomp" aria-label="Accuracy by competition"><div class="bycomp-title">By competition</div><div class="bycomp-row"><span class="bycomp-name">World Cup 2026</span><span class="bycomp-pct">60.6%</span><span class="bycomp-n">63 of 104</span></div><div class="bycomp-row"><span class="bycomp-name">Brasileirão Série A</span><span class="bycomp-pct">50%</span><span class="bycomp-n">5 of 10</span></div></div><!-- GEN:ACC-BYCOMP-END -->
+        <p style="margin-top:10px;"><a href="/predictions#record">See the full record &rarr;</a> &middot; <a href="fpl.html">See the tools it powers &rarr;</a></p>
+        <!-- #78: career-kortin loydettavyys etusivulta -->
+        <p style="margin-top:10px;">New: <a href="/career" data-cta="index-career">Your FPL Career Card</a> - best season, all-time points and rank history on one shareable card. Free, no login.</p>
       </div>
-      <p style="margin-top:14px;"><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 59.7% correct results across 114 completed matches.<!-- GEN:ACC-PROOF-END --></p>
-      <p style="margin-top:12px;"><a href="/predictions#record" style="color:var(--teal-ink);font-weight:700;">See the full record →</a></p>
     </div>
   </div>
 </section>
@@ -594,7 +573,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="league-chip">Serie A</div>
       <div class="league-chip">Ligue 1</div>
       <div class="league-chip">Champions League</div>
-      <div class="league-chip wc-chip">Brasileirão · live now</div>
+      <div class="league-chip live-chip">Brasileirão · live now</div>
       <div class="league-chip">Championship</div>
       <div class="league-chip">Eredivisie</div>
       <div class="league-chip">Primeira Liga</div>
@@ -603,44 +582,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </section>
 
-<!-- FEATURES -->
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <h2>More than a score</h2>
-      <p>GoalIQ is a full match-analysis companion.</p>
-    </div>
-    <div class="feat-grid">
-      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg></div><h3>Outcome probabilities</h3><p>Home, draw and away likelihood for every fixture.</p></div>
-      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="192" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 175.15l-76.09 63.83L200 320h112l20.09-81.02L256 175.15zM332.09 238.98l52.87-22.4 25.78-73.26M447 269.97l-62.04-53.39M179.91 238.98l-52.87-22.4-25.78-73.26M65 269.97l62.04-53.39M256 175.15v-57.57l64-42.64M192 74.93l64 42.65M312 320l28 48-28 71M410.74 368H342M200 320l-28 48 28.37 71.5M101.63 368H172"/></svg></div><h3>Expected goals (xG)</h3><p>Projected goals for both sides, not just a result.</p></div>
-      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><rect x="112" y="48" width="288" height="416" rx="32" ry="32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160.01 112H352v64H160.01z"/><circle cx="168" cy="248" r="24"/><circle cx="256" cy="248" r="24"/><circle cx="344" cy="248" r="24"/><circle cx="168" cy="328" r="24"/><circle cx="256" cy="328" r="24"/><circle cx="168" cy="408" r="24"/><circle cx="256" cy="408" r="24"/><rect x="320" y="304" width="48" height="128" rx="24" ry="24"/></svg></div><h3>Scoreline predictions</h3><p>The most likely exact scores, ranked by probability.</p></div>
-      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><path d="M32 160v296a8 8 0 008 8h136V160a16 16 0 00-16-16H48a16 16 0 00-16 16zM320 48H192a16 16 0 00-16 16v400h160V64a16 16 0 00-16-16zM464 208H352a16 16 0 00-16 16v240h136a8 8 0 008-8V224a16 16 0 00-16-16z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg></div><h3>League tables</h3><p>Live standings with European and relegation markers.</p></div>
-      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><rect fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" x="48" y="80" width="416" height="384" rx="48"/><circle cx="296" cy="232" r="24"/><circle cx="376" cy="232" r="24"/><circle cx="296" cy="312" r="24"/><circle cx="376" cy="312" r="24"/><circle cx="136" cy="312" r="24"/><circle cx="216" cy="312" r="24"/><circle cx="136" cy="392" r="24"/><circle cx="216" cy="392" r="24"/><circle cx="296" cy="392" r="24"/><path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" stroke-linecap="round" d="M128 48v32M384 48v32"/><path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" d="M464 160H48"/></svg></div><h3>This week's fixtures</h3><p>Upcoming matches with one-tap prediction.</p></div>
-      <div class="feat"><div class="ico"><svg width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M304 48l112 112-112 112M398.87 160H96M208 464L96 352l112-112M114 352h302"/></svg></div><h3>Head-to-head &amp; form</h3><p>Recent meetings and each team's momentum trend.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- PREMIUM -->
-<section class="premium">
-  <div class="wrap">
-    <div class="premium-card">
-      <span class="badge">GoalIQ Premium</span>
-      <div class="price">€25<span> / year</span></div>
-      <p style="color:var(--muted);">Or €3.99 a month. Go deeper on every prediction.</p>
-      <ul class="premium-list">
-        <li>Full FPL toolkit on the web: team manager, xP, value, xG leaders, DefCon</li>
-        <li>Differentials, player compare and predicted starting minutes</li>
-        <li>Transfer suggestions for your imported FPL team</li>
-        <li>In the app: top-10 scorelines, form &amp; momentum, head-to-head, a full week of fixtures</li>
-      </ul>
-      <p style="margin:6px 0 16px;"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing">Start GoalIQ Premium &mdash; &euro;25/year</a></p>
-      <small>Cancel anytime. One subscription covers web, iOS and Android.</small>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ (#58 GEO): sama sisältö kuin FAQPage-JSON-LD headissa -->
+<!-- FAQ (#58 GEO): sama sisalto kuin FAQPage-JSON-LD headissa -->
 <section>
   <div class="wrap">
     <div class="section-head">
@@ -690,12 +632,10 @@ document.addEventListener('click', function (e) {
 
 <script>
 /* #72: GW-deadline-countdown. Fallback-kohde = GW1-avaus (PL 26/27, pe 21.8.2026
-   ~20:00 UK). Progressiivinen parannus: /api/fantasy meta.deadline_utc (FPL:n
-   virallinen deadline) korvaa kohteen ja labelin kun kausi on flipannut -
-   evergreen ilman sivuregeneä. Laskuri piiloutuu kun kohde on ohitettu. */
+   ~20:00 UK). Progressiivinen parannus: /api/fantasy meta.deadline_utc korvaa
+   kohteen ja labelin kun kausi on flipannut. Piiloutuu kun kohde ohitettu. */
 (function () {
   var target = new Date('2026-08-21T19:00:00Z');
-  var isDeadline = false;
   var el = document.getElementById('gw-countdown');
   if (!el) return;
   var d = document.getElementById('cd-d'), h = document.getElementById('cd-h'),
@@ -722,7 +662,7 @@ document.addEventListener('click', function (e) {
       if (!iso) return;
       var t2 = new Date(iso);
       if (isNaN(t2.getTime()) || t2.getTime() <= Date.now()) return;
-      target = t2; isDeadline = true;
+      target = t2;
       label.textContent = 'GW' + (gw || '') + ' deadline';
       tick();
     })

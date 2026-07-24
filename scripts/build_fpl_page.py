@@ -878,6 +878,7 @@ CSS = """
   :root{ --magenta:#FF2E7E; --magenta-deep:#D6006E; --coral:#FF6A3D; --gold:#FFC93C; --gold-deep:#F4A800; --teal:#19E3D2; --ink:#0A0820; --ink2:#140F1E; --cream:#FFF6EC; --paper:#F6F4FF; --ink-muted:#54506B; --hero-muted:#C9C3DA; --line:#E7DDCF; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--cream); color:var(--ink); line-height:1.6; font-size:17px; }
+  h1,h2,h3,.brand{ font-family:"Space Grotesk",-apple-system,"Segoe UI",sans-serif; }
   .dark{ background:linear-gradient(165deg,var(--ink2),var(--ink)); color:var(--cream); }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
   .bar{ height:6px; background:var(--magenta); }
@@ -992,6 +993,9 @@ def render_page(c: dict) -> str:
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
