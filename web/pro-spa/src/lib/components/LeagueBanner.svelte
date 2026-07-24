@@ -19,7 +19,7 @@
 		<strong>Beat the Model | GoalIQ</strong>
 		<span class="text">
 			The model picks its own FPL team this season. Join our public mini-league and try to
-			outdraft it. Bragging rights on the line.
+			outdraft it. Season winner gets a year of GoalIQ Premium, free.
 		</span>
 		<span class="cta">Join with code {LEAGUE_CODE}</span>
 	</span>
