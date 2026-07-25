@@ -27,8 +27,10 @@ name: fpl-data-refresh
 
 on:
   schedule:
-    # Päivittäin 06:00 UTC — max ~24 h staleness kaikkina deadline-päivinä.
-    - cron: "0 6 * * *"
+    # 3 h valein (25.7 Garner-case: FPL:n injury-flagit projektioihin max ~3 h
+    # viiveella ilman kasityota; aiemmin 1x/pv = jopa 24 h stale-ikkuna).
+    # GitHub-schedule on best-effort, drift mahdollinen.
+    - cron: "0 */3 * * *"
     # Deadline-aamun boost 09:15 UTC — ajetaan vain jos tämän päivän aikana
     # on GW-deadline (guard-step alla; tyypillinen la-deadline ~12:30 UTC →
     # perjantain lehdistötilaisuuksien team news ehtii mukaan).
