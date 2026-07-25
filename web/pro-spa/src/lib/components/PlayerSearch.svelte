@@ -12,6 +12,11 @@
 		pos: string;
 		price?: number;
 		owned_pct?: number;
+		/** FPL:n virallinen status (a/d/i/s/u/n) — defensiivinen. */
+		status?: string;
+		/** false = ei mukana projektiossa. Tällaisia EI suodateta pois hausta:
+		 * pelaaja pitää löytyä myös silloin kun hänelle ei lasketa xP:tä. */
+		in_projection?: boolean;
 	};
 </script>
 
@@ -58,6 +63,16 @@
 		}
 	}
 
+	// Saatavuusmerkki riville: pelaaja löytyy hausta vaikka hän olisi ulkona,
+	// mutta rivi kertoo sen heti. null = ei merkkiä (pelattavissa / ei tietoa).
+	function flag(p: SearchItem): { text: string; tone: string } | null {
+		const s = p.status;
+		if (p.in_projection === false) return { text: 'out', tone: 'out' };
+		if (s === 'i' || s === 's' || s === 'u' || s === 'n') return { text: 'out', tone: 'out' };
+		if (s === 'd') return { text: 'doubt', tone: 'warn' };
+		return null;
+	}
+
 	function stats(p: SearchItem): string {
 		const parts: string[] = [];
 		if (typeof p.price === 'number' && p.price > 0) parts.push(`${p.price.toFixed(1)}m`);
@@ -94,6 +109,10 @@
 			>
 				<strong>{p.web_name}</strong>
 				<span class="muted">{p.team_short} · {p.pos}</span>
+				{#if flag(p)}
+					{@const f = flag(p)}
+					{#if f}<span class="flag {f.tone}">{f.text}</span>{/if}
+				{/if}
 				{#if stats(p)}
 					<span class="stats muted">{stats(p)}</span>
 				{/if}
@@ -121,6 +140,21 @@
 	.picker-row.kbd-active {
 		outline: 2px solid var(--accent-strong);
 		outline-offset: -2px;
+	}
+	.flag {
+		font-size: var(--step--1);
+		font-weight: 700;
+		border-radius: 999px;
+		padding: 0 8px;
+		white-space: nowrap;
+	}
+	.flag.out {
+		background: rgba(255, 106, 61, 0.12);
+		color: var(--negative);
+	}
+	.flag.warn {
+		background: rgba(255, 201, 60, 0.2);
+		color: var(--warn-text);
 	}
 	.stats {
 		margin-left: auto;

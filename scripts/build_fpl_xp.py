@@ -185,8 +185,16 @@ def main(argv: list[str] | None = None) -> int:
     preseason = not any(ev.get("finished") for ev in boot.get("events", []))
     prev_players: dict | None = None
     recency_window = False  # True = last-6-recency minuuttimallissa
+    # Addendum 2: viime kauden kausisummat player cardia varten luetaan
+    # SAMASTA jaadytetysta artefaktista aina (myos live-kaudella) — se on
+    # committattu ja avaimena kausien yli pysyva element code.
+    try:
+        prev_archive = json.loads(PREV_BASELINES_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        prev_archive = {"players": {}, "meta": {}}
+    prev_by_code: dict = prev_archive.get("players") or {}
     if preseason:
-        prev = json.loads(PREV_BASELINES_PATH.read_text(encoding="utf-8"))
+        prev = prev_archive
         prev_players = prev["players"]
         summaries = {}
         print(f"      {len(boot['elements'])} pelaajaa (pre-season: baselinet "
@@ -340,22 +348,121 @@ def main(argv: list[str] | None = None) -> int:
         ctx_by_gw[g] = fixture_contexts(dc, fxs, fid_to_model, lam_avg, cfg=cfg)
 
     # FPL-joukkue → mallinimi → fixture-id. Joukkueet joita ei ole tulevan
-    # kauden fixtureissa (putoajat) jäävät pois. Katettu = joukkueella on
-    # vähintään yksi pelaaja jolla on baseline-minuutteja — pre-seasonissa
-    # nousija ilman yhtään ex-PL-pelaajaa (esim. Hull 26/27) jää rehellisesti
-    # teams_without_player_data-listalle (EI arvauksia; sama semantiikka kuin
-    # ennen flippiä, jolloin nousijat puuttuivat bootstrapista kokonaan).
+    # kauden fixtureissa (putoajat) jäävät pois. history_fids = joukkueella on
+    # vähintään yksi pelaaja jolla on omaa PL-baseline-historiaa; nousijat
+    # katetaan erikseen positiopriorilla (alla) → data_coverage erottelee
+    # nämä kaksi (teams_without_player_history vs teams_without_player_data).
     fplteam_to_fid = {}
     for t in boot["teams"]:
         model = map_name(t["name"])
         if model in name_to_fid:
             fplteam_to_fid[t["id"]] = name_to_fid[model]
-    covered_fids = {
+    history_fids = {
         fplteam_to_fid[e["team"]] for e in boot["elements"]
         if e["team"] in fplteam_to_fid and acc_by_player[e["id"]]["mins"] > 0}
+
+    # -----------------------------------------------------------------
+    # Addendum 2, tehtava 1: NOUSIJAPELAAJAT pooliin positiopriorilla.
+    #
+    # Ongelma: builderi vaati PL-minuuttihistoriaa -> Hull 0 / Coventry 2 /
+    # Ipswich 1 pelaajaa poolissa, vaikka joukkuetason malli (promoted
+    # baseline: CS% / xG) on olemassa. Ratkaisu: pelaajille joilla EI ole
+    # yhtaan PL-minuuttia JA jotka pelaavat nousijaseurassa, minuuttiarvio
+    # tehdaan FPL-hinnan mukaisella rooliprioorilla (kalleimmat = todennakoi-
+    # simmat aloittajat — dokumentoitu MVP-heuristiikka, ei mallinnettu XI)
+    # ja vauhdit tulevat positiopriorista (player_rates nolla-accilla).
+    #
+    # TEHDAAN VASTA syvyys-passin JALKEEN eika sen syotteena: nain yhdenkaan
+    # olemassa olevan (historiallisen) pelaajan luvut eivat muutu — Coventryn
+    # 2 ex-PL-pelaajaa saavat tasan samat arvot kuin ennen (diff-verifioitu).
+    # Rehellisyysliput seuraavat automaattisesti: data_basis='no_history'
+    # (nolla PL-minuuttia) ja minutes_confidence='low' (n_obs=0).
+    # -----------------------------------------------------------------
+    PROMOTED_PRIOR_SLOTS = {1: 1, 2: 4, 3: 4, 4: 2}   # tyypillinen XI
+    # (p_start, p_sub | ei-start) roolitasoittain, hintajarjestyksen mukaan.
+    PROMOTED_PRIOR_TIERS = ((0.72, 0.35), (0.30, 0.45), (0.08, 0.20))
+    promoted_fpl_team_ids = {t["id"] for t in boot["teams"]
+                             if map_name(t["name"]) in promoted}
+    prior_pids: set[int] = set()
+    for team_id in sorted(promoted_fpl_team_ids):
+        club = [e for e in boot["elements"] if e["team"] == team_id]
+        for etype, slots in PROMOTED_PRIOR_SLOTS.items():
+            # Hintajarjestys KOKO positioryhmasta (myos ex-PL-pelaajat
+            # kilpailevat paikoista) — vain historiattomat saavat priorin.
+            grp = sorted((e for e in club if e["element_type"] == etype),
+                         key=lambda e: (-(e.get("now_cost") or 0), e["id"]))
+            for rank, e in enumerate(grp):
+                if acc_by_player[e["id"]]["mins"] > 0:
+                    continue          # oma PL-historia -> mallipolku ennallaan
+                tier = 0 if rank < slots else (1 if rank < slots + 2 else 2)
+                p_start, p_sub = PROMOTED_PRIOR_TIERS[tier]
+                mm_prior = xp.recompute_minutes({
+                    "p_start_raw": p_start, "p_start": p_start, "p_sub": p_sub,
+                    "e_min_start": xp.START_FALLBACK_MIN,
+                    "e_min_sub": xp.SUB_FALLBACK_MIN,
+                    "p60_start": xp.P60_GIVEN_START_FALLBACK, "p60_sub": 0.0,
+                    "n_obs": 0, "confidence": "low",
+                })
+                # FPL:n saatavuustieto porttina kuten muillakin (i/s/u/n -> 0).
+                mm_by_player[e["id"]] = xp.apply_availability(
+                    mm_prior, e.get("status", "a"),
+                    e.get("chance_of_playing_next_round"))
+                prior_pids.add(e["id"])
+    prior_fids = {fplteam_to_fid[e["team"]] for e in boot["elements"]
+                  if e["id"] in prior_pids and e["team"] in fplteam_to_fid}
+    print(f"      nousijapriori: {len(prior_pids)} pelaajaa "
+          f"({len(promoted_fpl_team_ids)} seuraa) — positiopriori x "
+          f"hintapohjainen rooliarvio, data_basis=no_history")
+
+    covered_fids = history_fids | prior_fids
     uncovered = sorted(n for n, fid in name_to_fid.items() if fid not in covered_fids)
+    no_history_teams = sorted(n for n, fid in name_to_fid.items()
+                              if fid not in history_fids)
+
+    # EDGE-sprint addendum 2 (#Garner-bugi 25.7): projektiosta pudonneet
+    # FPL-listautuneet pelaajat emitoidaan ERILLISEEN excluded[]-listaan, jotta
+    # player card / haku loytaa heidat (aiemmin i-statuksinen pelaaja katosi
+    # payloadista kokonaan -> "ei hakutuloksia"). ERILLINEN lista players[]:n
+    # RINNALLA = vanhat klientit (jotka iteroivat players[]-listaa xP-arvoilla)
+    # eivat nae muutosta lainkaan.
+    def _last_season(e: dict):
+        """Viime kauden PL-kausisummat jaadytetysta artefaktista (element code
+        -avain) tai None. None = pelaajalla EI ole 25/26 PL-kautta (nousija/
+        ulkomailta tullut) — Championship-lukuja ei ole eika niita sekoiteta
+        PL-lukuihin ilman sarjatason labelia (objektissa on 'league')."""
+        row = prev_by_code.get(str(e.get("code"))) or {}
+        return row.get("last_season")
+
+    def _identity_row(e: dict, pid: int, pos: int, model_team_name: str,
+                      reason: str) -> dict:
+        return {
+            "id": pid,
+            "web_name": e["web_name"],
+            "full_name": f"{e.get('first_name', '')} "
+                         f"{e.get('second_name', '')}".strip(),
+            "team": model_team_name,
+            "team_short": short_name(model_team_name),
+            "pos": xp.POS_NAME[pos],
+            "price": (e.get("now_cost") or 0) / 10.0,
+            "owned_pct": float(e.get("selected_by_percent") or 0.0),
+            "status": e.get("status", "a"),
+            "news": (e.get("news") or "").strip()[:140],
+            "chance_next": e.get("chance_of_playing_next_round"),
+            "yellows": int(e.get("yellow_cards") or 0),
+            "set_pieces": {
+                "pens": e.get("penalties_order"),
+                "corners": e.get("corners_and_indirect_freekicks_order"),
+                "fk": e.get("direct_freekicks_order"),
+            },
+            # Player cardin historiaosio toimii myos ilman projektiota.
+            "last_season": _last_season(e),
+            # EI xP/xmins/p_start-arvoja: naille riveille ei ole mallilukuja.
+            "in_projection": False,
+            "excluded_reason": reason,
+        }
 
     players = []
+    excluded = []
     for e in boot["elements"]:
         pid = e["id"]
         fid = fplteam_to_fid.get(e["team"])
@@ -400,6 +507,11 @@ def main(argv: list[str] | None = None) -> int:
                 "xp": round(gw_xp, 2),
             })
         if total < MIN_XP_TOTAL:
+            # Rehellinen syy: FPL:n virallinen saatavuuslippu (i/s/u/n) vs
+            # pelkka kuollut paino (syvalla penkilla / ei minuutteja odotossa).
+            reason = ("unavailable" if e.get("status", "a") in ("i", "s", "u", "n")
+                      else "below_min_xp")
+            excluded.append(_identity_row(e, pid, pos, model_team_name, reason))
             continue
         # Promptin kenttänimet (def_contribution -> defensive_contribution,
         # cards -> yellows). Emitoidaan vain jos headline-GW:llä oli fixture.
@@ -453,6 +565,10 @@ def main(argv: list[str] | None = None) -> int:
             # player card + pickerit tarvitsevat sen (CSV-endpoint lukee jo
             # saman now_costin bootstrapista). now_cost on kymmenesosia.
             "price": (e.get("now_cost") or 0) / 10.0,
+            # Addendum 2 (player card): viime kauden PL-kausisummat
+            # jäädytetystä 25/26-artefaktista. null = ei PL-kautta 25/26
+            # (nousijapelaaja / ulkomailta tullut) — sarjatasoa EI sekoiteta.
+            "last_season": _last_season(e),
             # EDGE: minuuttijakauma (ks. p_start_e-kommentti yllä).
             # p_start on sama kalibroitu tn kuin predicted_starts/100.
             "p_start": round(p_start_e, 4),
@@ -474,13 +590,22 @@ def main(argv: list[str] | None = None) -> int:
             "xp_horizon_total": round(total, 2),
             "gameweeks": gws,
         }
+        if pid in prior_pids:
+            # Rehellisyyslippu VAIN naille riveille (vanhat rivit ennallaan):
+            # minuutit eivat tule minuuttimallista vaan roolipriorista.
+            player_row["minutes_method"] = "promoted_price_prior"
         if components is not None:
             player_row["components"] = components
             player_row["components_gw"] = next_gw
         players.append(player_row)
     players.sort(key=lambda p: -p["xp_horizon_total"])
+    excluded.sort(key=lambda p: (-p["owned_pct"], p["web_name"]))
+    n_unavail = sum(1 for p in excluded if p["excluded_reason"] == "unavailable")
     print(f"      {len(players)} pelaajaa (xP >= {MIN_XP_TOTAL} horisontissa), "
           f"GW{next_gw}-{horizon[-1]}")
+    print(f"      {len(excluded)} excluded-rivia hakua varten "
+          f"({n_unavail} saatavuuslipulla, "
+          f"{len(excluded) - n_unavail} alle xP-kynnyksen)")
 
     coverable = {n for n, fid in name_to_fid.items() if fid in covered_fids}
     gate_points = None
@@ -504,6 +629,13 @@ def main(argv: list[str] | None = None) -> int:
         todo.append(
             f"Ilman pelaajadataa (nousijat, ei vielä FPL:ssä): {uncovered} — "
             "täyttyvät automaattisesti kun 26/27-peli avautuu."
+        )
+    if prior_pids:
+        todo.append(
+            f"Nousijaseurojen pelaajista {len(prior_pids)} on positiopriori-"
+            f"arviolla (ei PL-historiaa): {no_history_teams}. Roolit "
+            "hintajärjestyksestä (MVP-heuristiikka) — tarkentuvat kun "
+            "26/27-kierroksia kertyy."
         )
     out = {
         "meta": {
@@ -546,6 +678,18 @@ def main(argv: list[str] | None = None) -> int:
                                   else "live_history"),
                 "transfers_known": src["source"] == "fpl-api",
                 "teams_without_player_data": uncovered,
+                # Addendum 2: erottelu "ei dataa lainkaan" (yllä, nyt tyhjä)
+                # vs "ei omaa PL-historiaa, arvio = positiopriori" (alla).
+                # Nousijaseurat ovat poolissa mutta EIVÄT historian varassa.
+                "teams_without_player_history": no_history_teams,
+                "promoted_prior_players": len(prior_pids),
+                "promoted_prior_method": (
+                    "Nousijaseurojen pelaajat ilman PL-minuutteja: minuutit = "
+                    "roolipriori FPL-hintajärjestyksestä (XI-paikat 1/4/4/2 per "
+                    "positio; kärki p_start 0.72, seuraavat 2 0.30, loput 0.08) "
+                    "x FPL:n saatavuusportti; vauhdit = positiopriori. "
+                    "data_basis=no_history, minutes_confidence=low, "
+                    "minutes_method=promoted_price_prior."),
                 "player_basis_counts": {
                     v: sum(1 for p in players if p["data_basis"] == v)
                     for v in xp.DATA_BASIS_VALUES
@@ -574,9 +718,20 @@ def main(argv: list[str] | None = None) -> int:
             "horizon_gw": HORIZON_GW,
             "min_xp_total": MIN_XP_TOTAL,
             "n_players": len(players),
+            "n_excluded": len(excluded),
+            # Addendum 2: excluded[] on HAKUA/player cardia varten, ei
+            # rankkauslista. Rivit kantavat vain FPL:n virallisen tiedon
+            # (status/news/hinta/EO/erikoistilanteet) — EI mallilukuja.
+            "excluded_note": (
+                "excluded[] = FPL-listatut pelaajat jotka EIVAT ole "
+                "projektiossa (saatavuuslippu i/s/u/n tai horisontin xP alle "
+                f"{MIN_XP_TOTAL}). Rivit ovat hakua/player cardia varten: "
+                "in_projection=false, ei xP/xmins/p_start-kenttia. Vanhat "
+                "klientit voivat jattaa listan huomiotta."),
             "todo": todo,
         },
         "players": players,
+        "excluded": excluded,
     }
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=2),
                         encoding="utf-8")

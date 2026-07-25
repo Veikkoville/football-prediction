@@ -37,7 +37,13 @@ import config
 from src.models import fpl_xp as xp
 
 CACHE_DIR = config.RAW_DATA_DIR / "fpl"
-OLD_BOOT_PATH = CACHE_DIR / "bootstrap_static.json"
+# 26/27-flipin jalkeen elava bootstrap_static.json on jo kohdekautta -> 25/26-
+# snapshot on arkistossa. Kokeillaan arkistoa ENSIN, elava cache on fallback
+# (deadline-guard alla hylkaa vaaran kauden joka tapauksessa).
+OLD_BOOT_CANDIDATES = (
+    CACHE_DIR / "bootstrap_static_2526.archive.json",
+    CACHE_DIR / "bootstrap_static.json",
+)
 SUMMARY_DIR = CACHE_DIR / "summary_2526"
 OUT_PATH = config.PROJECT_ROOT / "data" / "fpl_prev_baselines_2526.json"
 
@@ -45,14 +51,50 @@ SEASON_KEY = "2526"
 EXPECTED_DEADLINE_PREFIX = "2025-"  # 25/26-kauden GW1-deadline elokuu 2025
 
 
+def season_totals(hist: list[dict]) -> dict:
+    """Edellisen kauden VIRALLISET summat player cardia varten (#addendum 2).
+
+    Summataan raa'oista element-summary-riveistä — EI mallilukuja, EI
+    BPS-oikaisua (bonus-oikaisu koskee vain vauhteja, ei naytettavaa
+    kausisummaa; points tulee bootstrapin total_pointsista kutsujalta).
+    clean_sheets = FPL:n oma per-ottelu-lippu summattuna (sama luku jonka
+    FPL nayttaa pelaajan kausitilastoissa).
+    """
+    def _f(x) -> float:
+        try:
+            return float(x)
+        except (TypeError, ValueError):
+            return 0.0
+
+    t = {"minutes": 0.0, "starts": 0, "goals": 0, "assists": 0,
+         "cs": 0, "xg": 0.0, "xa": 0.0}
+    for r in hist:
+        t["minutes"] += r.get("minutes", 0) or 0
+        t["starts"] += r.get("starts", 0) or 0
+        t["goals"] += r.get("goals_scored", 0) or 0
+        t["assists"] += r.get("assists", 0) or 0
+        t["cs"] += r.get("clean_sheets", 0) or 0
+        t["xg"] += _f(r.get("expected_goals"))
+        t["xa"] += _f(r.get("expected_assists"))
+    t["minutes"] = int(round(t["minutes"]))
+    t["xg"] = round(t["xg"], 2)
+    t["xa"] = round(t["xa"], 2)
+    return t
+
+
 def main() -> int:
-    boot = json.loads(OLD_BOOT_PATH.read_text(encoding="utf-8"))
+    boot_path = next((p for p in OLD_BOOT_CANDIDATES if p.exists()), None)
+    if boot_path is None:
+        raise SystemExit(
+            f"VIRHE: bootstrap-cachea ei loydy ({OLD_BOOT_CANDIDATES}).")
+    boot = json.loads(boot_path.read_text(encoding="utf-8"))
     first_deadline = boot["events"][0]["deadline_time"]
     if not first_deadline.startswith(EXPECTED_DEADLINE_PREFIX):
         raise SystemExit(
             f"VIRHE: bootstrap-cache ei ole 25/26-kautta (events[0].deadline "
             f"= {first_deadline}). Cache on jo ylikirjoitettu 26/27:llä — "
             f"artefaktia ei voi rakentaa tästä.")
+    print(f"[0/3] 25/26-bootstrap-lahde: {boot_path.name}")
     elements = boot["elements"]
     print(f"[1/3] 25/26-bootstrap: {len(elements)} pelaajaa "
           f"(GW1 deadline {first_deadline})")
@@ -91,6 +133,8 @@ def main() -> int:
             k = str(rnd)
             mins_by_round[k] = mins_by_round.get(k, 0.0) + (r.get("minutes", 0) or 0)
             starts_by_round[k] = starts_by_round.get(k, 0) + (r.get("starts", 0) or 0)
+        st = season_totals(hist)
+        mins = st["minutes"]
         players[str(code)] = {
             "web_name": e["web_name"],
             "element_type": pos,
@@ -98,6 +142,26 @@ def main() -> int:
             "acc": acc,
             "mins_by_round": mins_by_round,
             "starts_by_round": starts_by_round,
+            # Addendum 2 (player card): kauden VIRALLISET summat + per90.
+            # Sarjataso merkitaan eksplisiittisesti (league) — nousijoiden
+            # Championship-lukuja EI ole taalla eika sekoiteta naihin.
+            "last_season": {
+                "season": "2025/26",
+                "league": "Premier League",
+                "minutes": mins,
+                "starts": st["starts"],
+                "goals": st["goals"],
+                "assists": st["assists"],
+                "xg": st["xg"],
+                "xa": st["xa"],
+                "cs": st["cs"],
+                "points": e.get("total_points", 0),
+                "per90": ({
+                    "goals": round(90.0 * st["goals"] / mins, 2),
+                    "assists": round(90.0 * st["assists"] / mins, 2),
+                    "xgi": round(90.0 * (st["xg"] + st["xa"]) / mins, 2),
+                } if mins >= 90 else None),
+            },
         }
 
     out = {

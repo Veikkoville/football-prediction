@@ -23,7 +23,10 @@ from __future__ import annotations
 from statistics import pstdev
 
 from src.models.fpl_phase0 import load_phase0
-from src.models.fpl_rate_team import POS_NAME, RateTeamError, build_context
+from src.models.fpl_rate_team import (
+    AVAILABILITY_GATE_NOTE, POS_NAME, RateTeamError, apply_availability_gate,
+    build_context,
+)
 
 # Fixture-swing-luokittelu (per-GW-xP:n keskihajonta, pisteissä). Rajat valittu
 # nykyjakaumasta: mediaanipelaajan swing ~0.3-0.6, raskas DGW/kalenteriheilunta
@@ -55,8 +58,10 @@ def _swing_label(swing: float) -> str:
 
 def value_list(top_n: int = 20) -> dict:
     """xP/£-ranking koko poolista. Nostaa RateTeamErrorin jos projektio puuttuu."""
-    xp_data, _bootstrap, pool, _by_id = build_context()
+    xp_data, bootstrap, pool, _by_id = build_context()
     meta = xp_data.get("meta", {})
+    # Addendum 2: serve-time-portti — juuri loukkaantunut ei ole "value pick".
+    pool, dropped = apply_availability_gate(pool, bootstrap)
 
     rows = []
     for p in pool:
@@ -86,6 +91,8 @@ def value_list(top_n: int = 20) -> dict:
             "horizon_gw": meta.get("horizon_gw"),
             "generated_at": meta.get("generated_at"),
             "note": VALUE_NOTE,
+            "availability_gate": {"checked": True, "dropped": dropped,
+                                  "note": AVAILABILITY_GATE_NOTE},
         },
         "players": rows[:top_n],
     }
@@ -112,7 +119,9 @@ def gk_rotation_pairs(top_n: int = 10) -> dict:
     Nostaa RateTeamErrorin jos xP-pooli puuttuu; CS-data puuttuu →
     available=False-runko (ei kaatumista).
     """
-    _xp, _boot, pool, _ = build_context()
+    _xp, bootstrap, pool, _ = build_context()
+    # Sivussa oleva vahti ei kelpaa rotaatioparin puolikkaaksi (serve-time).
+    pool, _dropped = apply_availability_gate(pool, bootstrap)
     phase0 = load_phase0()
     p0_meta = phase0.get("meta", {})
     if not p0_meta.get("available") or not phase0.get("teams"):

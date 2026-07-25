@@ -60,6 +60,31 @@ export interface XpComponents {
 	[key: string]: number;
 }
 
+/** Edge-sprint addendum: edellisen kauden per-90-vauhdit (julkista historiaa).
+ * Avainnimet eivät ole vielä lukossa → avoin kartta, UI poimii tuntemansa. */
+export interface LastSeasonPer90 {
+	[key: string]: number | null | undefined;
+}
+
+/** Edge-sprint addendum: edellisen kauden julkaistu historia. FREE-dataa
+ * (historia on julkista) — ei premium-gatea.
+ *
+ * Muoto ei ole vielä kontraktissa (contract-data.md:ssä ei ole addendum 2:ta):
+ * lähdeartefakti data/fpl_prev_baselines_2526.json käyttää nimiä
+ * {total_points, acc:{mins, xg, xa, saves, bonus, n60}}, kun taas suunniteltu
+ * payload-muoto on litteä {minutes, starts, goals, assists, xg, xa, cs,
+ * points, per90}. Tyyppi hyväksyy molemmat: UI lukee kenttä kerrallaan
+ * aliaksineen ja jättää puuttuvat renderöimättä. */
+export interface LastSeason {
+	/** Kausileima jos payload tuo sen (esim. '2025/26'). */
+	season?: string;
+	/** Valmiit per-90-vauhdit. Puuttuessa UI laskee ne minuuteista. */
+	per90?: LastSeasonPer90 | null;
+	/** Vaihtoehtoinen sijainti kertymille (prev-baselines-artefaktin muoto). */
+	acc?: Record<string, unknown> | null;
+	[key: string]: unknown;
+}
+
 export interface XpPlayer {
 	id: number;
 	web_name: string;
@@ -106,7 +131,27 @@ export interface XpPlayer {
 	yellows?: number;
 	/** Hinta miljoonina (bootstrapin now_cost / 10). */
 	price?: number;
+	/** Edge-sprint addendum: edellisen kauden historia. Puuttuu / null =
+	 * osiota ei renderöidä lainkaan. */
+	last_season?: LastSeason | null;
+	/** false = pelaaja EI ole mukana projektiossa (esim. i/u/n-status tai
+	 * muuten poissuljettu) → xP on merkityksetön, kortti piilottaa sen.
+	 * Puuttuu vanhasta payloadista → tulkitaan mukana olevaksi. */
+	in_projection?: boolean;
+	/** 'unavailable' = FPL:n saatavuuslippu, 'below_min_xp' = alle
+	 * xP-kynnyksen. Vain excluded[]-riveillä. */
+	excluded_reason?: string;
 }
+
+/** Player card / haku: rivi voi olla projektiosta TAI excluded[]-listasta.
+ * Poissuljetuilla riveillä ei ole mallilukuja lainkaan (ei xmins, xP eikä
+ * gameweeks), joten ne ovat tässä tyypissä valinnaisia — UI:n on vartioitava
+ * ne ennen käyttöä. XpPlayer on sellaisenaan tämän alityyppi. */
+export type CardPlayer = Omit<
+	XpPlayer,
+	'xmins' | 'xp_per_gw' | 'xp_horizon_total' | 'gameweeks'
+> &
+	Partial<Pick<XpPlayer, 'xmins' | 'xp_per_gw' | 'xp_horizon_total' | 'gameweeks'>>;
 
 export interface XpMeta {
 	available: boolean;
@@ -121,6 +166,11 @@ export interface XpMeta {
 export interface XpResponse {
 	meta: XpMeta;
 	players: XpPlayer[];
+	/** Edge-sprint addendum 2: FPL-listatut pelaajat jotka EIVÄT ole
+	 * projektiossa (saatavuuslippu i/s/u/n tai xP alle kynnyksen). Erillinen
+	 * lista players[]:n rinnalla → rankkauslistat eivät näe näitä, mutta haku
+	 * löytää heidät. Defensiivinen: vanha payload ei tuo kenttää. */
+	excluded?: CardPlayer[];
 }
 
 export interface FantasyResponse {
@@ -203,14 +253,15 @@ export function fetchFit(lockedIds: number[]): Promise<FitResponse> {
 	return getJson<FitResponse>(`/api/fantasy/fit?locked=${lockedIds.join(',')}`);
 }
 
+// Defensiivinen: projektiosta poissuljetulla rivillä gameweeks voi puuttua.
 export function gwXp(p: XpPlayer, gw: number | undefined): number {
 	if (gw == null) return 0;
-	return p.gameweeks.find((g) => g.gw === gw)?.xp ?? 0;
+	return p.gameweeks?.find((g) => g.gw === gw)?.xp ?? 0;
 }
 
 export function gwOpponents(p: XpPlayer, gw: number | undefined): string {
 	if (gw == null) return '';
-	const g = p.gameweeks.find((x) => x.gw === gw);
+	const g = p.gameweeks?.find((x) => x.gw === gw);
 	if (!g || g.opponents.length === 0) return 'Blank';
 	return g.opponents.map((o) => `${o.opp} (${o.venue})`).join(', ');
 }

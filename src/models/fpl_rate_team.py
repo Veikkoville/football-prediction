@@ -432,8 +432,73 @@ def _projection_pool(xp_data: dict, price_by_id: dict[int, dict]) -> list[dict]:
             "minutes_confidence": p.get("minutes_confidence"),
             "components": p.get("components"),
             "components_gw": p.get("components_gw"),
+            # Addendum 2: projektiohetken FPL-status (serve-time-portin
+            # vertailukohta). Vanha projektio ilman kenttaa -> None -> portti
+            # kohtelee sita "a":na (sama kayttaytyminen kuin ennen).
+            "status": p.get("status"),
         })
     return pool
+
+
+# ---------------------------------------------------------------------------
+# Serve-time availability -portti (EDGE-sprint addendum 2, 25.7)
+# ---------------------------------------------------------------------------
+# Projektio rakennetaan ~3 h valein; FPL:n saatavuuslippu voi vaihtua milloin
+# vain (Garner-tyyppinen "Groin injury" tunti ennen deadlinea). Portti vertaa
+# ELAVAA bootstrap-statusta (jo haettu build_context()issa, 10 min TTL-cache ->
+# EI yhtaan uutta HTTP-kutsua) projektiohetken statukseen: jos pelaaja on nyt
+# sivussa eika projektio tienyt sita viela, han putoaa suosituksista heti.
+# Palautetut rivit kertovat vastauksen metassa REHELLISESTI kuka putosi ja miksi.
+LIVE_OUT_STATUSES = frozenset({"i", "s", "u", "n"})
+
+AVAILABILITY_GATE_NOTE = (
+    "Serve-time availability check: players flagged unavailable on the live "
+    "FPL bootstrap (status i/s/u/n) after this projection was built are "
+    "dropped from the lists below. The projection itself is unchanged.")
+
+
+def availability_changes(pool: list[dict],
+                         bootstrap: dict | None = None) -> dict[int, dict]:
+    """{player_id: muutosrivi} niille poolin pelaajille jotka ovat ELAVASSA
+    bootstrapissa sivussa (i/s/u/n) mutta EIVAT olleet sita projektiohetkella.
+
+    Ei koskaan nosta poikkeusta: bootstrapin puuttuessa (testit, FPL alhaalla)
+    palautetaan tyhja dict -> vastaus on tasmalleen kuten ennen."""
+    try:
+        boot = bootstrap if bootstrap is not None else get_bootstrap()
+    except Exception:
+        return {}
+    elements = (boot or {}).get("elements") or []
+    if not elements:
+        return {}
+    live = {e.get("id"): e for e in elements}
+    out: dict[int, dict] = {}
+    for p in pool:
+        e = live.get(p.get("id"))
+        if not e:
+            continue
+        live_status = e.get("status") or "a"
+        was = p.get("status") or "a"
+        if live_status in LIVE_OUT_STATUSES and was not in LIVE_OUT_STATUSES:
+            out[p["id"]] = {
+                "id": p["id"], "web_name": p.get("web_name"),
+                "team_short": p.get("team_short"),
+                "status": live_status,
+                "news": (e.get("news") or "").strip()[:140],
+                "chance_next": e.get("chance_of_playing_next_round"),
+                "projection_status": was,
+            }
+    return out
+
+
+def apply_availability_gate(pool: list[dict], bootstrap: dict | None = None
+                            ) -> tuple[list[dict], list[dict]]:
+    """(suodatettu pooli, pudotetut rivit). Kevyt: yksi dict-lookup per pelaaja."""
+    changes = availability_changes(pool, bootstrap)
+    if not changes:
+        return pool, []
+    return ([p for p in pool if p["id"] not in changes],
+            sorted(changes.values(), key=lambda r: (r["web_name"] or "")))
 
 
 def build_context() -> tuple[dict, dict, list[dict], dict[int, dict]]:

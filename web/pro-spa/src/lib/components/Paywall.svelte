@@ -33,9 +33,9 @@
 
 <h3>Unlock GoalIQ Premium</h3>
 <p class="muted">
-	Player expected points (xP), captain ranker and per-gameweek breakdowns. Season pass
-	renews yearly, monthly renews monthly, cancel anytime. One subscription covers web, iOS
-	and Android.
+	Player expected points (xP), captain ranker, chip timing, transfer plan chains, edge mode
+	and per-gameweek breakdowns. Season pass renews yearly, monthly renews monthly, cancel
+	anytime. One subscription covers web, iOS and Android.
 </p>
 <p class="muted">
 	Already subscribed in the GoalIQ app? Sign in with the same account and Premium is already

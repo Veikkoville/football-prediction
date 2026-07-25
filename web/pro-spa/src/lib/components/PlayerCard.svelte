@@ -6,7 +6,7 @@
 	// keltaiset, set-piece-listat), "GoalIQ model view" -blokki = mallin
 	// estimaatti (p_start, confidence, data_basis, xP). Defensiiviset luvut:
 	// vanha payload ilman uusia kenttiä ei kaada mitään.
-	import { fetchXp, type XpMeta, type XpPlayer } from '$lib/api';
+	import { fetchXp, type CardPlayer, type XpMeta } from '$lib/api';
 	// Free-tier-rajaus (Villen havainto 25.7): xP-numerot ovat premium-arvoa
 	// kaikkialla muualla -> kortti nayttaa ne vain premium-pinnalta (ProTools).
 	let { premium = false }: { premium?: boolean } = $props();
@@ -14,13 +14,18 @@
 	import PlayerSearch from './PlayerSearch.svelte';
 	import SetPieceBadges from './SetPieceBadges.svelte';
 
-	let pool = $state<XpPlayer[]>([]);
+	let pool = $state<CardPlayer[]>([]);
 	let meta = $state<XpMeta | null>(null);
 	let poolError = $state(false);
 	$effect(() => {
 		fetchXp().then(
 			(d) => {
-				pool = d.players ?? [];
+				// Hakupooli = projektio + excluded[]. Poissuljetut rivit (i/s/u/n
+				// -status tai xP alle kynnyksen) tulevat payloadissa erillisenä
+				// listana; jos ne jätettäisiin pois, hakukenttä vastaisi "ei
+				// tuloksia" juuri niistä pelaajista joiden tilanne kiinnostaa
+				// eniten. Projektiorivit ensin, jotta ne rankkaavat kärkeen.
+				pool = [...(d.players ?? []), ...(d.excluded ?? [])];
 				meta = d.meta ?? null;
 			},
 			() => (poolError = true)
@@ -28,7 +33,7 @@
 	});
 
 	let query = $state('');
-	let player = $state<XpPlayer | null>(null);
+	let player = $state<CardPlayer | null>(null);
 
 	// Sama normalisointi kuin FitChecker/XpTable-haussa (#145/#147-pariteetti).
 	function norm(s: string): string {
@@ -54,7 +59,7 @@
 			.slice(0, 8);
 	});
 
-	function select(p: XpPlayer) {
+	function select(p: CardPlayer) {
 		player = p;
 		query = '';
 		// Ei PII:tä: pelaaja-ID/positio/status ovat julkista FPL-dataa.
@@ -101,6 +106,125 @@
 		if (opps.length === 0) return 'Blank';
 		return opps.map((o) => `${o.opp} (${o.venue})`).join(', ');
 	}
+
+	// --- Projektiosta poissuljetut pelaajat (edge-sprint addendum) ---------
+	// Payload voi tuoda mukaan pelaajia joille xP:tä ei lasketa (in_projection
+	// false, tai pitkä poissaolo i/u/n/s). Haku löytää heidät (pool-filtteri on
+	// pelkkä nimihaku, ei projektiorajausta), mutta kortti EI saa näyttää
+	// xP-lukuja: ne olisivat merkityksettömiä. Defensiivinen myös vanhalle
+	// payloadille — kenttien puuttuessa kaikki käyttäytyy kuten ennen.
+	const hasXp = $derived(
+		!!player &&
+			Array.isArray(player.gameweeks) &&
+			player.gameweeks.length > 0 &&
+			typeof player.xp_horizon_total === 'number' &&
+			typeof player.xp_per_gw === 'number'
+	);
+	const excluded = $derived(!!player && (player.in_projection === false || !hasXp));
+	const OUT_STATUS: Record<string, string> = {
+		i: 'injured',
+		s: 'suspended',
+		u: 'unavailable',
+		n: 'not available'
+	};
+	const exclusionReason = $derived.by(() => {
+		if (!player) return null;
+		if (player.excluded_reason === 'below_min_xp')
+			return 'the model expects too few minutes to project points';
+		if (OUT_STATUS[st]) return `FPL lists this player as ${OUT_STATUS[st]}`;
+		if (player.excluded_reason === 'unavailable') return 'FPL lists this player as unavailable';
+		return null;
+	});
+
+	// --- Viime kauden historia (FREE: julkista dataa, ei premium-gatea) ----
+	type Cell = { key: string; label: string; value: string };
+	function cell(key: string, label: string, v: unknown, digits = 0): Cell | null {
+		if (typeof v !== 'number' || !Number.isFinite(v)) return null;
+		return { key, label, value: v.toFixed(digits) };
+	}
+	const lastSeason = $derived(
+		player?.last_season && typeof player.last_season === 'object' ? player.last_season : null
+	);
+	const lastSeasonLabel = $derived(
+		typeof lastSeason?.season === 'string' && lastSeason.season ? lastSeason.season : '2025/26'
+	);
+	// Sarja mukaan kun payload kertoo sen: nousijoilla ja tulokkailla viime
+	// kausi ei ole PL-kausi, eikä lukuja saa esittää sellaisena.
+	const lastSeasonLeague = $derived(
+		typeof lastSeason?.league === 'string' && lastSeason.league ? lastSeason.league : null
+	);
+	// Kenttäohjattu, ei muoto-ohjattu: payloadin lopullinen nimeäminen ei ole
+	// vielä kontraktissa (litteä {minutes, points, ...} vs prev-baselines-
+	// artefaktin {total_points, acc:{mins, xg, ...}}), joten jokainen luku
+	// poimitaan aliaslistalla ja acc-fallbackilla. Ei osumaa = ruutua ei ole.
+	function pickNum(src: Record<string, unknown> | null | undefined, keys: string[]): number | null {
+		if (!src) return null;
+		for (const k of keys) {
+			const v = src[k];
+			if (typeof v === 'number' && Number.isFinite(v)) return v;
+		}
+		return null;
+	}
+	function lsNum(keys: string[]): number | null {
+		const ls = lastSeason;
+		if (!ls) return null;
+		return pickNum(ls, keys) ?? pickNum(ls.acc, keys);
+	}
+	const lsMinutes = $derived(lsNum(['minutes', 'mins']));
+	const lsTotals = $derived.by((): Cell[] => {
+		if (!lastSeason) return [];
+		return [
+			cell('minutes', 'Minutes', lsMinutes),
+			cell('starts', 'Starts', lsNum(['starts'])),
+			cell('n60', 'Games 60+ min', lsNum(['n60'])),
+			cell('goals', 'Goals', lsNum(['goals'])),
+			cell('assists', 'Assists', lsNum(['assists'])),
+			cell('xg', 'xG', lsNum(['xg']), 1),
+			cell('xa', 'xA', lsNum(['xa']), 1),
+			cell('cs', 'Clean sheets', lsNum(['cs', 'clean_sheets'])),
+			cell('saves', 'Saves', lsNum(['saves'])),
+			cell('bonus', 'Bonus', lsNum(['bonus'])),
+			cell('points', 'FPL points', lsNum(['points', 'total_points']))
+		].filter((c): c is Cell => c != null);
+	});
+	// Per-90: käytetään payloadin valmiita arvoja jos ne tulevat, muuten
+	// lasketaan minuuteista. Laskenta vasta 90 minuutista ylöspäin — pienestä
+	// otoksesta johdettu per-90 olisi harhaanjohtava.
+	const per90Computed = $derived(!lastSeason?.per90 && (lsMinutes ?? 0) >= 90);
+	const lsPer90 = $derived.by((): Cell[] => {
+		const ls = lastSeason;
+		if (!ls) return [];
+		const given = ls.per90 && typeof ls.per90 === 'object' ? ls.per90 : null;
+		const mins = lsMinutes;
+		const rate = (keys: string[]): number | null => {
+			if (given) return pickNum(given, keys);
+			if (!per90Computed || mins == null || mins <= 0) return null;
+			const tot = lsNum(keys);
+			return tot == null ? null : (tot / mins) * 90;
+		};
+		// xGI = maali + syöttö -osallisuus. Payload tuo sen valmiina; laskettuna
+		// se on xG + xA samasta minuuttimäärästä.
+		const xgi = (): number | null => {
+			if (given) return pickNum(given, ['xgi']);
+			if (!per90Computed || mins == null || mins <= 0) return null;
+			const g = lsNum(['xg']);
+			const a = lsNum(['xa']);
+			if (g == null && a == null) return null;
+			return (((g ?? 0) + (a ?? 0)) / mins) * 90;
+		};
+		return [
+			cell('goals', 'Goals', rate(['goals']), 2),
+			cell('assists', 'Assists', rate(['assists']), 2),
+			cell('xg', 'xG', rate(['xg']), 2),
+			cell('xa', 'xA', rate(['xa']), 2),
+			cell('xgi', 'xGI', xgi(), 2),
+			cell('saves', 'Saves', rate(['saves']), 2),
+			cell('bonus', 'Bonus', rate(['bonus']), 2),
+			cell('points', 'FPL points', rate(['points', 'total_points']), 2),
+			cell('cs', 'Clean sheets', given ? pickNum(given, ['cs', 'clean_sheets']) : null, 2)
+		].filter((c): c is Cell => c != null);
+	});
+	const showLastSeason = $derived(lsTotals.length > 0 || lsPer90.length > 0);
 </script>
 
 <h2>Player card</h2>
@@ -166,40 +290,95 @@
 
 				<section class="pc-block model">
 					<h4>GoalIQ model view <span class="src">estimate, not team news</span></h4>
-					{#if typeof player.p_start === 'number'}
-						<p class="start-line">
-							<span class="brand big">{Math.round(player.p_start * 100)}%</span>
-							chance of starting the next gameweek{#if player.minutes_confidence}
-								<span class="muted">({player.minutes_confidence} confidence)</span>{/if}
+					{#if excluded}
+						<p class="excluded-note">
+							Not in the projections right now{#if exclusionReason}:
+								{exclusionReason}{/if}.
 						</p>
-					{:else if typeof player.predicted_starts === 'number'}
-						<p class="start-line">
-							<span class="brand big">{Math.round(player.predicted_starts)}%</span>
-							chance of starting the next gameweek{#if player.minutes_confidence}
-								<span class="muted">({player.minutes_confidence} confidence)</span>{/if}
-						</p>
-					{/if}
-					{#if player.data_basis}
 						<p class="muted">
-							The model's view on starting, {DATA_BASIS_LABEL[player.data_basis] ??
-								player.data_basis}.
-						</p>
-					{/if}
-					{#if premium}
-						<p>
-							<strong>{player.xp_horizon_total.toFixed(1)} xP</strong> projected over the next
-							{player.gameweeks.length} gameweeks ({player.xp_per_gw.toFixed(1)} per GW).
+							Projected points are left out on purpose. They would not say anything useful
+							until this player is back in contention, so the card stays with the official
+							status above.
 						</p>
 					{:else}
-						<p class="muted">
-							Projected points for this player are part of GoalIQ Premium. The start
-							chance and official status here are free.
-						</p>
+						{#if typeof player.p_start === 'number'}
+							<p class="start-line">
+								<span class="brand big">{Math.round(player.p_start * 100)}%</span>
+								chance of starting the next gameweek{#if player.minutes_confidence}
+									<span class="muted">({player.minutes_confidence} confidence)</span>{/if}
+							</p>
+						{:else if typeof player.predicted_starts === 'number'}
+							<p class="start-line">
+								<span class="brand big">{Math.round(player.predicted_starts)}%</span>
+								chance of starting the next gameweek{#if player.minutes_confidence}
+									<span class="muted">({player.minutes_confidence} confidence)</span>{/if}
+							</p>
+						{/if}
+						{#if player.data_basis}
+							<p class="muted">
+								The model's view on starting, {DATA_BASIS_LABEL[player.data_basis] ??
+									player.data_basis}.
+							</p>
+						{/if}
+						{#if premium}
+							{@const tot = player.xp_horizon_total}
+							{@const per = player.xp_per_gw}
+							{#if typeof tot === 'number' && typeof per === 'number'}
+								<p>
+									<strong>{tot.toFixed(1)} xP</strong> projected over the next
+									{(player.gameweeks ?? []).length} gameweeks ({per.toFixed(1)} per GW).
+								</p>
+							{/if}
+						{:else}
+							<p class="muted">
+								Projected points for this player are part of GoalIQ Premium. The start
+								chance and official status here are free.
+							</p>
+						{/if}
 					{/if}
 				</section>
 			</div>
 
-			{#if premium}
+			{#if showLastSeason}
+				<!-- FREE: historia on julkista dataa (FPL + julkaistut xG/xA-summat),
+				     ei premium-gatea. Puuttuvat kentät jätetään pois kokonaan —
+				     ei koskaan "undefined"/"NaN". -->
+				<section class="last-season">
+					<h4 class="gw-title">
+						Last season {lastSeasonLabel}
+						<span class="src"
+							>{#if lastSeasonLeague}{lastSeasonLeague}, {/if}public history, not a projection</span
+						>
+					</h4>
+					{#if lsTotals.length > 0}
+						<dl class="stat-row">
+							{#each lsTotals as c (c.key)}
+								<div class="stat">
+									<dt>{c.label}</dt>
+									<dd>{c.value}</dd>
+								</div>
+							{/each}
+						</dl>
+					{/if}
+					{#if lsPer90.length > 0}
+						<p class="muted p90-label">
+						Per 90 minutes{#if per90Computed}
+							<span class="src">worked out from the totals above</span>{/if}
+					</p>
+						<dl class="stat-row p90">
+							{#each lsPer90 as c (c.key)}
+								<div class="stat">
+									<dt>{c.label}</dt>
+									<dd>{c.value}</dd>
+								</div>
+							{/each}
+						</dl>
+					{/if}
+				</section>
+			{/if}
+
+			{#if premium && !excluded}
+			{@const gws = player.gameweeks ?? []}
 			<h4 class="gw-title">Projected points by gameweek</h4>
 			<div class="table-wrap">
 				<table>
@@ -326,6 +505,60 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.4px;
+	}
+	.gw-title .src {
+		text-transform: none;
+		letter-spacing: 0;
+		font-weight: 500;
+		color: var(--text-muted);
+	}
+	.excluded-note {
+		font-weight: 700;
+		color: var(--negative);
+		margin: 0 0 var(--s-2);
+	}
+	/* Viime kausi: sama laatikkokieli kuin pc-blockissa, mutta koko leveydeltä. */
+	.last-season {
+		border-top: 1px solid var(--border);
+		padding-top: var(--s-4);
+		margin-bottom: var(--s-4);
+	}
+	.stat-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+		gap: var(--s-2);
+		margin: 0 0 var(--s-3);
+	}
+	.stat {
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		padding: var(--s-2) var(--s-3);
+	}
+	.stat dt {
+		font-size: var(--step--1);
+		color: var(--text-muted);
+		margin: 0 0 2px;
+	}
+	/* Isot luvut = display-fontti (theme.css-sääntö), leipäteksti ei. */
+	.stat dd {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: var(--step-1);
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+		line-height: 1.1;
+	}
+	.stat-row.p90 .stat dd {
+		font-size: var(--step-0);
+	}
+	.p90-label {
+		margin: 0 0 var(--s-2);
+		font-weight: 600;
+	}
+	.p90-label .src {
+		font-weight: 500;
+		margin-left: var(--s-1);
 	}
 	.disclaimer {
 		margin: var(--s-3) 0 0;

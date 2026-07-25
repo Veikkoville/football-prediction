@@ -31,9 +31,10 @@ from fastapi import APIRouter, HTTPException, Query, Request, Response
 
 from src.models.fpl_planner import HIT_COST, TOP_CANDIDATES_PER_POS
 from src.models.fpl_rate_team import (
-    MAX_PER_CLUB, POS_NAME, SQUAD_QUOTA, XI_MAX, XI_MIN, BUDGET_TENTHS,
-    RateTeamError, _fetch_fpl, _gw_xp, _resolve_gw, build_context,
-    clamp_gw_to_projections, get_bootstrap, optimal_xi, resolve_squad,
+    AVAILABILITY_GATE_NOTE, MAX_PER_CLUB, POS_NAME, SQUAD_QUOTA, XI_MAX,
+    XI_MIN, BUDGET_TENTHS, RateTeamError, _fetch_fpl, _gw_xp, _resolve_gw,
+    apply_availability_gate, build_context, clamp_gw_to_projections,
+    get_bootstrap, optimal_xi, resolve_squad,
 )
 from src.models.fpl_xp import load_xp
 
@@ -845,6 +846,13 @@ def fantasy_edge(
             raise RateTeamError(
                 422, "Too few of the squad's players have xP projections.")
         xi = optimal_xi(squad)
+        # Addendum 2: serve-time-portti (jaettu 10 min bootstrap-cache, EI
+        # uusia HTTP-kutsuja). Kapteeniehdokkaista ja differentiaali-/
+        # template-listoista pudotetaan pelaajat jotka ovat NYT sivussa
+        # mutta eivat olleet sita projektiohetkella.
+        pool, dropped = apply_availability_gate(pool, bootstrap)
+        dropped_ids = {r["id"] for r in dropped}
+        xi = [p for p in xi if p["id"] not in dropped_ids] or xi
     except RateTeamError as e:
         raise _http(e)
 
@@ -909,6 +917,8 @@ def fantasy_edge(
             "formula": (f"captain score = gw_xp * (1 - {w} + {w} * EO/100) "
                         "for protect; EO term inverted for climb. Heuristic "
                         "MVP - honest weighting, not a rank simulation."),
+            "availability_gate": {"checked": True, "dropped": dropped,
+                                  "note": AVAILABILITY_GATE_NOTE},
             "disclaimer": DISCLAIMER,
         },
         "captain_top5": cap_rows,

@@ -61,7 +61,7 @@
 	let selectedId = $state<number | null>(null);
 
 	let nextGw = $derived(data.meta.next_gameweek);
-	let gwCols = $derived(data.players[0]?.gameweeks.map((g) => g.gw) ?? []);
+	let gwCols = $derived(data.players[0]?.gameweeks?.map((g) => g.gw) ?? []);
 	let horizonN = $derived(data.meta.horizon_gw ?? gwCols.length ?? 6);
 	let horizonLabel = $derived(
 		gwCols.length > 0 ? `GW${gwCols[0]}–GW${gwCols[gwCols.length - 1]}` : `next ${horizonN} GWs`

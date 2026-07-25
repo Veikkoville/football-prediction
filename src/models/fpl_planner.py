@@ -24,9 +24,10 @@ CoS-linjauksen mukaan; greedy + rajattu kandidaattijoukko riittää GW1-arvoon):
 from __future__ import annotations
 
 from src.models.fpl_rate_team import (
-    HIT_COST_XP, HOLD_THRESHOLD_XP, POS_NAME, MAX_PER_CLUB, RateTeamError,
-    build_context, build_hold_verdict, captain_suggestion,
-    clamp_gw_to_projections, optimal_xi, resolve_squad, _gw_xp,
+    AVAILABILITY_GATE_NOTE, HIT_COST_XP, HOLD_THRESHOLD_XP, POS_NAME,
+    MAX_PER_CLUB, RateTeamError, apply_availability_gate, build_context,
+    build_hold_verdict, captain_suggestion, clamp_gw_to_projections,
+    optimal_xi, resolve_squad, _gw_xp,
 )
 
 HIT_COST = HIT_COST_XP  # FPL:n -4; sama lähde kuin rate-teamin hold_verdict
@@ -258,7 +259,14 @@ def captain_picker(entry: int | None = None, gw: int | None = None,
     if len(squad) < 11:
         raise RateTeamError(422, "Too few projected players in the squad.")
     xi = optimal_xi(squad)
-    ranked = sorted(xi, key=lambda p: _gw_xp(p, target_gw), reverse=True)
+    # Addendum 2: serve-time-portti. XI:n valinta pysyy ennallaan (runko on
+    # kayttajan oma), mutta LIVE-lipulla sivussa oleva ei kelpaa kapteeniksi.
+    # Jos portti tyhjentaisi listan (ei kaytannossa mahdollista), palataan
+    # suodattamattomaan XI:hin — vastaus ei koskaan katoa.
+    dropped = apply_availability_gate(xi, bootstrap)[1]
+    dropped_ids = {r["id"] for r in dropped}
+    gated_xi = [p for p in xi if p["id"] not in dropped_ids] or xi
+    ranked = sorted(gated_xi, key=lambda p: _gw_xp(p, target_gw), reverse=True)
 
     def _fmt(p):
         return {"id": p["id"], "web_name": p["web_name"],
@@ -274,7 +282,12 @@ def captain_picker(entry: int | None = None, gw: int | None = None,
                 None)
     return {
         "meta": {"gw": target_gw,
-                 "generated_at": xp_data["meta"].get("generated_at")},
+                 "generated_at": xp_data["meta"].get("generated_at"),
+                 "availability_gate": {
+                     "checked": True,
+                     "dropped": dropped,
+                     "note": AVAILABILITY_GATE_NOTE,
+                 }},
         "top3": top3,
         "differential": (_fmt(diff) if diff and diff["id"] not in
                          {t["id"] for t in top3[:1]} else None),
@@ -331,8 +344,11 @@ def differential_finder(max_ownership: float = DIFFERENTIAL_MAX_OWNERSHIP,
     pos_by_name = {v: k for k, v in POS_NAME.items()}
     if pos is not None and pos not in pos_by_name:
         raise RateTeamError(400, f"pos must be one of {sorted(pos_by_name)}.")
-    xp_data, _bootstrap, pool, _by_id = build_context()
+    xp_data, bootstrap, pool, _by_id = build_context()
+    # Persentiilit lasketaan TAYDESTA poolista (vertailukohta ei saa heilua
+    # yksittaisen loukkaantumisen mukana), vasta listat suodatetaan.
     mvc = _model_vs_crowd(pool)
+    pool, dropped = apply_availability_gate(pool, bootstrap)
 
     def _row(p):
         m, c, d = mvc[p["id"]]
@@ -368,7 +384,9 @@ def differential_finder(max_ownership: float = DIFFERENTIAL_MAX_OWNERSHIP,
     return {
         "meta": {"max_ownership": max_ownership, "pos": pos,
                  "generated_at": xp_data["meta"].get("generated_at"),
-                 "horizon_gw": xp_data["meta"].get("horizon_gw")},
+                 "horizon_gw": xp_data["meta"].get("horizon_gw"),
+                 "availability_gate": {"checked": True, "dropped": dropped,
+                                       "note": AVAILABILITY_GATE_NOTE}},
         "players": [_row(p) for p in cands[:DIFFERENTIAL_TOP_N]],
         "model_vs_crowd": {
             "note": ("delta = model xP percentile minus ownership percentile, "
