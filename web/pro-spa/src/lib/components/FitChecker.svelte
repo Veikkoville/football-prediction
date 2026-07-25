@@ -1,13 +1,20 @@
 <script lang="ts">
 	import { fetchFit, fetchXp, type FitResponse, type XpPlayer } from '$lib/api';
 	import { capture } from '$lib/analytics';
+	import { saveDraftIds } from '$lib/draft';
 	import MethodNote from './MethodNote.svelte';
+	import PlayerSearch from './PlayerSearch.svelte';
 
 	// #155 Fit checker (FREE): lukitse 1-3 pakkopelaajaa → paras laillinen
 	// runko niiden ympärille + mitä lukitseminen maksaa vs mallin vapaa
 	// optimibudjettijoukkue. Ei entry-ID:tä → toimii myös go-live-hetkellä
 	// (PI-13). Free-pinnassa EI näytetä per-pelaaja-xP:tä (sama raja kuin
 	// muissa free-työkaluissa) — kokonais-xP ja delta näytetään.
+
+	// UX-palaute-erä (25.7) kohta 3: "Save as draft" vie tuloksen 15 ID:tä
+	// samaan draft-storageen jota RateTeam käyttää → onOpenRateTeam-callback
+	// (FreeView vaihtaa segmentin) ja draft latautuu siellä automaattisesti.
+	let { onOpenRateTeam }: { onOpenRateTeam?: () => void } = $props();
 
 	let pool = $state<XpPlayer[]>([]);
 	let poolError = $state(false);
@@ -70,6 +77,7 @@
 		if (chosen.length < 1 || loading) return;
 		loading = true;
 		error = null;
+		draftSaved = false;
 		capture('fit_checker_submitted', { locked_n: chosen.length });
 		try {
 			result = await fetchFit(chosen.map((p) => p.id));
@@ -78,6 +86,19 @@
 			error = 'Could not build a squad right now. Please try again shortly.';
 		} finally {
 			loading = false;
+		}
+	}
+
+	// Kohta 3: tuloksen XI + penkki = tasan 15 ID:tä → jaettu draft-storage.
+	let draftSaved = $state(false);
+	const draftIds = $derived(
+		result ? [...result.xi, ...result.bench].map((p) => p.id) : []
+	);
+	function saveAsDraft() {
+		if (draftIds.length !== 15) return;
+		if (saveDraftIds(draftIds)) {
+			draftSaved = true;
+			capture('fit_saved_as_draft', { locked_n: chosen.length });
 		}
 	}
 </script>
@@ -117,19 +138,15 @@
 		</div>
 
 		{#if chosen.length < 3}
-			<label for="fit-search">Add a must-have player</label>
-			<input
+			<!-- UX-palaute-erä kohdat 2+6: jaettu combobox — hinta + owned%
+			     riveillä, nuolinäppäimet + Enter/Esc. -->
+			<PlayerSearch
 				id="fit-search"
-				type="search"
-				placeholder="Player or team (e.g. Haaland, ARS)"
-				bind:value={query}
+				label="Add a must-have player"
+				bind:query
+				items={matches}
+				onSelect={addLock}
 			/>
-			{#each matches as p (p.id)}
-				<button type="button" class="picker-row" onclick={() => addLock(p)}>
-					<strong>{p.web_name}</strong>
-					<span class="muted">{p.team_short} · {p.pos}</span>
-				</button>
-			{/each}
 		{/if}
 
 		<button
@@ -191,6 +208,26 @@
 					<dd>{result.meta.squad_cost.toFixed(1)}m · {result.meta.bank.toFixed(1)}m in the bank</dd>
 				</div>
 			</dl>
+
+			{#if draftIds.length === 15}
+				<!-- Kohta 3: sama 15 ID:n storage kuin RateTeam-draftilla -->
+				<div class="save-row">
+					<button type="button" class="secondary" onclick={saveAsDraft} disabled={draftSaved}>
+						{draftSaved ? 'Saved as draft' : 'Save as draft'}
+					</button>
+					{#if draftSaved}
+						<span class="muted">
+							{#if onOpenRateTeam}
+								<button type="button" class="linklike" onclick={onOpenRateTeam}
+									>Open Rate my team</button
+								> and this squad loads as your draft automatically.
+							{:else}
+								Open Rate my team and this squad loads as your draft automatically.
+							{/if}
+						</span>
+					{/if}
+				</div>
+			{/if}
 		{/if}
 	{/if}
 </section>
@@ -211,19 +248,6 @@
 		border-radius: 999px;
 		padding: 4px 12px;
 		font-weight: 700;
-		cursor: pointer;
-	}
-	.picker-row {
-		display: flex;
-		gap: 8px;
-		align-items: baseline;
-		width: 100%;
-		text-align: left;
-		background: var(--surface-2);
-		border: none;
-		border-radius: 6px;
-		padding: 8px 10px;
-		margin-top: 4px;
 		cursor: pointer;
 	}
 	.primary {
@@ -264,5 +288,26 @@
 	}
 	.totals dd.cost {
 		color: var(--giq-coral, #ff6a3d);
+	}
+	/* Kohta 3: Save as draft -rivi */
+	.save-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--s-3);
+		margin-top: var(--s-4);
+	}
+	.linklike {
+		background: none;
+		border: none;
+		padding: 0;
+		min-height: 0;
+		color: var(--giq-magenta-deep);
+		font-weight: 700;
+		font-size: inherit;
+		cursor: pointer;
+	}
+	.linklike:hover {
+		text-decoration: underline;
 	}
 </style>

@@ -90,12 +90,31 @@ export interface XpPlayer {
 	/** Odotettu bonus per ottelu. KARKEA PROXY (per-90-historiavauhti x
 	 * minuuttiosuus), EI BPS-simulaatio — copy ei saa väittää muuta. */
 	e_bonus?: number;
+	/** UX-palaute-erä 25.7 (contract-data.md luku 5): FPL:n VIRALLISET
+	 * saatavuus/kurinpitokentät bootstrapista — faktaa, EI mallin estimaattia.
+	 * Kaikki defensiivisiä (vanha payload ei tuo).
+	 * status: a=available, d=doubtful, i=injured, s=suspended,
+	 * u=unavailable, n=not available. */
+	status?: string;
+	/** FPL:n virallinen news-teksti (max ~140 merkkiä; '' = ei lippuja). */
+	news?: string;
+	/** FPL:n chance_of_playing_next_round (0-100 tai null). */
+	chance_next?: number | null;
+	/** Bootstrapin yellow_cards. HUOM: pre-seasonissa FPL:n bootstrap kantaa
+	 * vielä EDELLISEN kauden lukemia (tunnistus:
+	 * meta.data_coverage.baseline_mode === 'prev_season_archive'). */
+	yellows?: number;
+	/** Hinta miljoonina (bootstrapin now_cost / 10). */
+	price?: number;
 }
 
 export interface XpMeta {
 	available: boolean;
 	next_gameweek?: number;
 	horizon_gw?: number;
+	/** #143-katvealueraportti; baseline_mode === 'prev_season_archive'
+	 * = pre-season (mm. yellows on vielä edellisen kauden lukema). */
+	data_coverage?: { baseline_mode?: string; [key: string]: unknown };
 	[key: string]: unknown;
 }
 

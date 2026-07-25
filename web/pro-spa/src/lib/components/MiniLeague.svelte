@@ -11,6 +11,22 @@
 		type LeagueRow
 	} from '$lib/fantasyTools';
 	import { capture } from '$lib/analytics';
+	import { fplEntry } from '$lib/fplEntry.svelte';
+
+	// UX-palaute-erä (25.7) kohta 5: "Use this team" — FPL:ssä ei ole
+	// globaalia nimihakua, joten nimipohjainen joukkueen valinta kulkee
+	// liigan standings-rivin kautta: nappi asettaa rivin entry-ID:n jaettuun
+	// fplEntry-storeen + autoRunPending → Rate my team ajaa arvion heti.
+	// onUseTeam: FreeView vaihtaa segmentin rateteam-paneeliin.
+	let { onUseTeam }: { onUseTeam?: () => void } = $props();
+
+	function useTeam(row: LeagueRow) {
+		fplEntry.entry = String(row.entry);
+		fplEntry.autoRunPending = true;
+		// Ei PII:tä eventtiin (entry-ID ei mene mukaan, sama linja kuin muut).
+		capture('league_use_team_tapped', { source: 'pro_spa' });
+		onUseTeam?.();
+	}
 
 	const LS_KEY = 'goaliq.fplLeagueId';
 
@@ -132,7 +148,8 @@
 		</p>
 	{:else}
 		<p class="muted">
-			Click two rows to compare them head-to-head.
+			Click two rows to compare them head-to-head. "Use this team" loads that manager's
+			squad in Rate my team, no entry ID needed.
 			{#if data.has_next}Showing the first 50 managers.{/if}
 		</p>
 
@@ -178,6 +195,7 @@
 						<th>Manager</th>
 						<th class="num"><abbr title="Points in the latest gameweek">GW</abbr></th>
 						<th class="num">Total</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -196,6 +214,20 @@
 							<td>{row.player_name}</td>
 							<td class="num">{row.event_total}</td>
 							<td class="num total-col">{row.total}</td>
+							<td>
+								<!-- Kohta 5: ei osallistu rivin H2H-valintaan (stopPropagation) -->
+								<button
+									type="button"
+									class="use-btn"
+									title="Load this manager's squad in Rate my team"
+									onclick={(e) => {
+										e.stopPropagation();
+										useTeam(row);
+									}}
+								>
+									Use this team
+								</button>
+							</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -227,6 +259,22 @@
 	}
 	td.total-col {
 		font-weight: 700;
+	}
+	/* Kohta 5: kompakti rivinappi (taulukkoon sopiva, ei globaali 44px) */
+	.use-btn {
+		border: 1px solid var(--giq-magenta);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--giq-magenta-deep);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		min-height: 0;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.use-btn:hover {
+		background: rgba(255, 46, 126, 0.1);
 	}
 	.move {
 		font-size: 0.7em;

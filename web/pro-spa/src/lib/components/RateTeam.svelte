@@ -16,8 +16,10 @@
 		persistEntry,
 		toggleRemember
 	} from '$lib/fplEntry.svelte';
+	import { loadDraftIds, saveDraftIds } from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import ModelWorking from './ModelWorking.svelte';
+	import PlayerSearch from './PlayerSearch.svelte';
 	import TeamPitchManager from './TeamPitchManager.svelte';
 
 	// #73: lataustilan askeleet = putken oikeat vaiheet (rehellinen checklist)
@@ -94,22 +96,17 @@
 	// localStorageen (vain ID:t; oliot resolvoidaan tuoreesta xP-poolista →
 	// hinnat eivät jäädy, poistuneet putoavat pois). Fail-safe: storage-virhe
 	// ei saa kaataa työkalua. Tallennus vasta hydraation jälkeen, ettei tyhjä
-	// alkutila ylikirjoita tallennettua draftia.
-	const DRAFT_LS_KEY = 'goaliq.fplDraftPicks';
-	let savedDraftIds: number[] | null = null;
-	try {
-		const raw = localStorage.getItem(DRAFT_LS_KEY);
-		if (raw) {
-			const parsed = JSON.parse(raw);
-			if (Array.isArray(parsed) && parsed.every((v) => typeof v === 'number')) {
-				savedDraftIds = parsed;
-			}
-		}
-	} catch {
-		/* fail-safe */
-	}
+	// alkutila ylikirjoita tallennettua draftia. UX-palaute-erä (25.7):
+	// avain + luku/kirjoitus jaettu lib/draft.ts:ään — myös Fit checkerin
+	// "Save as draft" kirjoittaa samaan storageen.
+	let savedDraftIds: number[] | null = loadDraftIds();
 	let draftCanSave = savedDraftIds == null;
 	if (savedDraftIds && savedDraftIds.length > 0) draftOpen = true; // triggaa pool-fetchin
+	// UX-palaute-erä kohta 4: täysi tallennettu draft → tulosnäkymä palautuu
+	// automaattisesti ilman uutta "Rate my draft" -painallusta, ja valitsin
+	// menee collapse-tilaan kun tulos näkyy (auki muokkausta varten).
+	let autoDraftPending = $state(false);
+	let pickerCollapsed = $state(false);
 
 	$effect(() => {
 		if (draftOpen && pool.length === 0 && !poolError) {
@@ -127,20 +124,28 @@
 			const resolved = savedDraftIds
 				.map((id) => byId.get(id))
 				.filter((p): p is XpPlayer => p != null);
-			if (picks.length === 0 && resolved.length > 0) picks = resolved;
+			if (picks.length === 0 && resolved.length > 0) {
+				picks = resolved;
+				// Kohta 4: 15/15 tallessa → aja arvio automaattisesti.
+				if (resolved.length === 15) autoDraftPending = true;
+			}
 			savedDraftIds = null;
 			draftCanSave = true;
+		}
+	});
+	// Kohta 4: kertaluontoinen auto-ajo hydraation jälkeen (ei silmukkaa:
+	// lippu nollataan ennen hakua; !data estää tuplat entry-auto-ajon kanssa).
+	$effect(() => {
+		if (autoDraftPending && draftReady && !data && !loading) {
+			autoDraftPending = false;
+			void submitDraft(true);
 		}
 	});
 	// Persistoi jokainen muutos hydraation jälkeen.
 	$effect(() => {
 		const ids = picks.map((p) => p.id);
 		if (!draftCanSave) return;
-		try {
-			localStorage.setItem(DRAFT_LS_KEY, JSON.stringify(ids));
-		} catch {
-			/* fail-safe */
-		}
+		saveDraftIds(ids);
 	});
 	const posCount = $derived.by(() => {
 		const c: Record<string, number> = { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
@@ -182,13 +187,15 @@
 	function removePick(id: number) {
 		picks = picks.filter((p) => p.id !== id);
 	}
-	async function submitDraft() {
+	async function submitDraft(auto = false) {
 		if (!draftReady) return;
 		loading = true;
 		error = null;
-		capture('rate_team_draft_submitted', { picked_n: picks.length });
+		capture('rate_team_draft_submitted', { picked_n: picks.length, auto });
 		try {
 			data = await fetchRateTeamManual(picks.map((p) => p.id));
+			// Kohta 4: tulos näkyy → valitsin collapse-tilaan (Edit draft avaa).
+			pickerCollapsed = true;
 		} catch (err) {
 			data = null;
 			error = err instanceof Error ? err.message : String(err);
@@ -288,15 +295,23 @@
 </button>
 {#if draftOpen}
 	<div class="draft-box">
-		<p class="muted hint">
-			Pick a full 15-man squad (2 GK, 5 DEF, 5 MID, 3 FWD) and the model rates it like an
-			imported team: best XI, captain pick and projected points.
-		</p>
 		{#if poolError}
 			<p class="banner error">
 				Could not load the player pool right now. Please try again shortly.
 			</p>
+		{:else if pickerCollapsed && data}
+			<!-- Kohta 4: tulos näkyy → kompakti rivi, Edit draft avaa valitsimen -->
+			<div class="draft-collapsed">
+				<span class="muted">Draft squad: {picks.length} / 15 picked, rated below.</span>
+				<button type="button" class="linklike" onclick={() => (pickerCollapsed = false)}>
+					Edit draft
+				</button>
+			</div>
 		{:else}
+			<p class="muted hint">
+				Pick a full 15-man squad (2 GK, 5 DEF, 5 MID, 3 FWD) and the model rates it like an
+				imported team: best XI, captain pick and projected points.
+			</p>
 			<div class="draft-chips">
 				{#each DRAFT_ORDER as pos (pos)}
 					{#each picks.filter((p) => p.pos === pos) as p (p.id)}
@@ -313,21 +328,22 @@
 				{posCount.MID}/5 · FWD {posCount.FWD}/3
 			</p>
 			{#if picks.length < 15}
-				<label for="draft-search">Add a player</label>
-				<input
+				<!-- UX-palaute-erä kohdat 2+6: jaettu combobox — hinta + owned%
+				     riveillä, nuolinäppäimet + Enter/Esc. -->
+				<PlayerSearch
 					id="draft-search"
-					type="search"
-					placeholder="Player or team (e.g. Haaland, ARS)"
-					bind:value={draftQuery}
+					label="Add a player"
+					bind:query={draftQuery}
+					items={draftMatches}
+					onSelect={addPick}
 				/>
-				{#each draftMatches as p (p.id)}
-					<button type="button" class="picker-row" onclick={() => addPick(p)}>
-						<strong>{p.web_name}</strong>
-						<span class="muted">{p.team_short} · {p.pos}</span>
-					</button>
-				{/each}
 			{/if}
-			<button type="button" class="primary" disabled={!draftReady} onclick={submitDraft}>
+			<button
+				type="button"
+				class="primary"
+				disabled={!draftReady}
+				onclick={() => void submitDraft()}
+			>
 				{loading ? 'Rating…' : 'Rate my draft'}
 			</button>
 		{/if}
@@ -677,18 +693,13 @@
 		font-weight: 700;
 		cursor: pointer;
 	}
-	.picker-row {
+	/* Kohta 4: collapse-rivi kun draft on arvioitu */
+	.draft-collapsed {
 		display: flex;
-		gap: 8px;
-		align-items: baseline;
-		width: 100%;
-		text-align: left;
-		background: var(--surface-2);
-		border: none;
-		border-radius: 6px;
-		padding: 8px 10px;
-		margin-top: 4px;
-		cursor: pointer;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-3);
 	}
 	.linklike:hover {
 		text-decoration: underline;

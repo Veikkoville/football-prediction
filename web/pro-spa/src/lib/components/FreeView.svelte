@@ -5,6 +5,7 @@
 	import LeagueBanner from './LeagueBanner.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import FitChecker from './FitChecker.svelte';
+	import PlayerCard from './PlayerCard.svelte';
 	import PriceWatch from './PriceWatch.svelte';
 	import Leaders from './Leaders.svelte';
 	import Value from './Value.svelte';
@@ -20,6 +21,7 @@
 	// navi elää datahaarojen ULKOPUOLELLA.
 	const SEGMENTS: Segment[] = [
 		{ id: 'cleansheets', label: 'Clean sheets' },
+		{ id: 'playercard', label: 'Player card' },
 		{ id: 'rateteam', label: 'Rate my team' },
 		{ id: 'fitchecker', label: 'Fit checker' },
 		{ id: 'value', label: 'Value' },
@@ -221,6 +223,11 @@
 			</section>
 		{/if}
 	</div>
+{:else if segment === 'playercard'}
+	<!-- UX-palaute-erä (25.7) kohta 1: player card / hakutietopankki (FREE) -->
+	<div class="tool-card" id="panel-playercard" role="tabpanel" aria-labelledby="seg-playercard">
+		<PlayerCard />
+	</div>
 {:else if segment === 'rateteam'}
 	<!-- #46: rate-my-team ilman siirtosuosituksia (lukittu teaser → Paywall).
 	     Toimii myös ilman fixture-dataa. -->
@@ -231,7 +238,8 @@
 	<!-- #155: lukitse 1-3 pakkopelaajaa → paras runko + lukituksen xP-hinta.
 	     FREE, ei entry-ID:tä (PI-13: toimii go-live-hetkellä). -->
 	<div class="tool-card" id="panel-fitchecker" role="tabpanel" aria-labelledby="seg-fitchecker">
-		<FitChecker />
+		<!-- Kohta 3: Save as draft → segmentti vaihtuu rateteamiin -->
+		<FitChecker onOpenRateTeam={() => (segment = 'rateteam')} />
 	</div>
 {:else if segment === 'value'}
 	<!-- #127: top-3 free -teaser, koko lista + GK-parit premiumissa -->
@@ -248,9 +256,10 @@
 		<PriceWatch />
 	</div>
 {:else}
-	<!-- Edge-sprint kohta 9: mini-league standings + H2H (free MVP) -->
+	<!-- Edge-sprint kohta 9: mini-league standings + H2H (free MVP).
+	     UX-palaute-erä kohta 5: Use this team → rateteam-segmentti. -->
 	<div class="tool-card" id="panel-league" role="tabpanel" aria-labelledby="seg-league">
-		<MiniLeague />
+		<MiniLeague onUseTeam={() => (segment = 'rateteam')} />
 	</div>
 {/if}
 </div>

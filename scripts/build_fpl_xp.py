@@ -435,6 +435,24 @@ def main(argv: list[str] | None = None) -> int:
             # EDGE: omistus-% bootstrapista (sama konventio kuin price watch /
             # leaders: selected_by_percent on merkkijono -> float).
             "owned_pct": float(e.get("selected_by_percent") or 0.0),
+            # UX-palaute-erä (25.7): FPL:n VIRALLINEN saatavuus/kurinpitotieto
+            # sellaisenaan bootstrapista (player cardin "official"-osio).
+            # status: a=pelattavissa, d=epävarma, i=loukkaantunut,
+            # s=pelikiellossa, u=poissa käytöstä, n=ei saatavilla.
+            # news typistetään ~140 merkkiin (payload-koko; FPL:n tekstit
+            # ovat käytännössä lyhyempiä). chance_next = FPL:n oma
+            # chance_of_playing_next_round (int % tai null).
+            "status": e.get("status", "a"),
+            "news": (e.get("news") or "").strip()[:140],
+            "chance_next": e.get("chance_of_playing_next_round"),
+            # yellows = kuluvan kauden keltaiset bootstrapista (pre-season
+            # = 0 kaikilla, kertyy kauden edetessä). Suspensiokynnykset
+            # (5/10/15) ovat UI-copyä, ei tässä.
+            "yellows": int(e.get("yellow_cards") or 0),
+            # UX-palaute-erä: hinta puuttui xp-payloadista kokonaan, mutta
+            # player card + pickerit tarvitsevat sen (CSV-endpoint lukee jo
+            # saman now_costin bootstrapista). now_cost on kymmenesosia.
+            "price": (e.get("now_cost") or 0) / 10.0,
             # EDGE: minuuttijakauma (ks. p_start_e-kommentti yllä).
             # p_start on sama kalibroitu tn kuin predicted_starts/100.
             "p_start": round(p_start_e, 4),
