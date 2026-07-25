@@ -308,7 +308,11 @@ def fantasy_xp_csv(request: Request, response: Response):
                 sp.get("pens", ""), sp.get("corners", ""), sp.get("fk", ""),
                 p.get("xp_per_gw"), p.get("xp_horizon_total"),
             ] + [gw_xp.get(g, "") for g in gws])
-        cached = buf.getvalue()
+        # Excel-yhteensopivuus (Villen bugilöytö 25.7): UTF-8 BOM (aksentilliset
+        # nimet, esim. Kadıoğlu) + "sep=,"-vihjerivi, jota ilman fi/eu-locale-
+        # Excel (listaerotin ";") kaataa kaiken yhteen sarakkeeseen. Sheets ja
+        # pandas sietavat vihjerivin (pandas: skiprows=1).
+        cached = "﻿sep=,\n" + buf.getvalue()
         _cache_put(cache_key, cached)
     season = str(data["meta"].get("season") or "").replace("/", "-")
     response.headers["Cache-Control"] = "no-store"

@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-25T15:20:11",
+    "generated_at": "2026-07-25T19:35:39",
     "season": "2026/27",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + jäädytetty 25/26-baseline-artefakti (data/fpl_prev_baselines_2526.json, element code -mappaus)",
@@ -37,7 +37,7 @@
         "Hull"
       ],
       "player_basis_counts": {
-        "pl_history": 298,
+        "pl_history": 297,
         "limited_history": 46,
         "no_history": 0
       },
@@ -64,7 +64,7 @@
     "deadline_utc": "2026-08-21T17:30:00+00:00",
     "horizon_gw": 6,
     "min_xp_total": 1.0,
-    "n_players": 344,
+    "n_players": 343,
     "todo": [
       "Ilman pelaajadataa (nousijat, ei vielä FPL:ssä): ['Hull'] — täyttyvät automaattisesti kun 26/27-peli avautuu."
     ]
@@ -81,7 +81,7 @@
       "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 47.5,
+      "owned_pct": 47.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -184,7 +184,7 @@
       "predicted_starts": 81.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 73.2,
+      "owned_pct": 73.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -287,7 +287,7 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 11.1,
+      "owned_pct": 10.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -390,7 +390,7 @@
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 12.4,
+      "owned_pct": 12.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -596,7 +596,7 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 18.2,
+      "owned_pct": 17.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1008,7 +1008,7 @@
       "predicted_starts": 82.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 25.5,
+      "owned_pct": 25.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1111,7 +1111,7 @@
       "predicted_starts": 83.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 22.7,
+      "owned_pct": 22.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1204,109 +1204,6 @@
       "components_gw": 1
     },
     {
-      "id": 239,
-      "web_name": "Garner",
-      "full_name": "James Garner",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 89.8,
-      "predicted_starts": 90.0,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "owned_pct": 4.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 12,
-      "price": 6.0,
-      "p_start": 0.9,
-      "p_cameo": 0.0,
-      "p_bench": 0.1,
-      "set_pieces": {
-        "pens": 3,
-        "corners": 4,
-        "fk": 1
-      },
-      "e_bonus": 0.32,
-      "xp_per_gw": 4.25,
-      "xp_horizon_total": 25.47,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 4.27
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.89
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 4.12
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 4.08
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 4.7
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 4.41
-        }
-      ],
-      "components": {
-        "appearance": 2.0,
-        "goals": 0.38,
-        "assists": 0.54,
-        "clean_sheet": 0.35,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.97,
-        "yellows": -0.29,
-        "bonus": 0.32
-      },
-      "components_gw": 1
-    },
-    {
       "id": 155,
       "web_name": "Enzo",
       "full_name": "Enzo Fernández",
@@ -1317,7 +1214,7 @@
       "predicted_starts": 83.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.2,
+      "owned_pct": 5.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1410,105 +1307,105 @@
       "components_gw": 1
     },
     {
-      "id": 445,
-      "web_name": "Thiaw",
-      "full_name": "Malick Thiaw",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "DEF",
-      "xmins": 81.5,
-      "predicted_starts": 83.6,
+      "id": 237,
+      "web_name": "Ndiaye",
+      "full_name": "Iliman Ndiaye",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 80.5,
+      "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.7,
+      "owned_pct": 20.0,
       "status": "a",
       "news": "",
       "chance_next": null,
-      "yellows": 4,
-      "price": 5.0,
-      "p_start": 0.8355,
-      "p_cameo": 0.0658,
-      "p_bench": 0.0987,
+      "yellows": 2,
+      "price": 6.0,
+      "p_start": 0.8511,
+      "p_cameo": 0.0,
+      "p_bench": 0.1489,
       "set_pieces": {
-        "pens": null,
+        "pens": 1,
         "corners": null,
         "fk": null
       },
-      "e_bonus": 0.24,
+      "e_bonus": 0.25,
       "xp_per_gw": 4.14,
-      "xp_horizon_total": 24.82,
+      "xp_horizon_total": 24.83,
       "gameweeks": [
         {
           "gw": 1,
           "opponents": [
             {
-              "opp": "LIV",
+              "opp": "CRY",
               "venue": "H"
             }
           ],
-          "xp": 3.78
+          "xp": 4.17
         },
         {
           "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.64
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.98
+        },
+        {
+          "gw": 4,
           "opponents": [
             {
               "opp": "TOT",
               "venue": "A"
             }
           ],
-          "xp": 3.79
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.91
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.44
+          "xp": 3.9
         },
         {
           "gw": 5,
           "opponents": [
             {
-              "opp": "HUL",
+              "opp": "IPS",
               "venue": "H"
             }
           ],
-          "xp": 5.3
+          "xp": 4.82
         },
         {
           "gw": 6,
           "opponents": [
             {
-              "opp": "COV",
+              "opp": "HUL",
               "venue": "A"
             }
           ],
-          "xp": 4.61
+          "xp": 4.33
         }
       ],
       "components": {
-        "appearance": 1.83,
-        "goals": 0.91,
-        "assists": 0.11,
-        "clean_sheet": 0.69,
-        "conceded": -0.52,
+        "appearance": 1.85,
+        "goals": 1.06,
+        "assists": 0.43,
+        "clean_sheet": 0.32,
+        "conceded": 0.0,
         "saves": 0.0,
-        "defensive_contribution": 0.64,
-        "yellows": -0.12,
-        "bonus": 0.24
+        "defensive_contribution": 0.34,
+        "yellows": -0.08,
+        "bonus": 0.25
       },
       "components_gw": 1
     },
@@ -1626,7 +1523,7 @@
       "predicted_starts": 86.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 13.3,
+      "owned_pct": 12.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1729,7 +1626,7 @@
       "predicted_starts": 88.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 29.7,
+      "owned_pct": 29.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1832,7 +1729,7 @@
       "predicted_starts": 90.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 9.5,
+      "owned_pct": 9.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1935,7 +1832,7 @@
       "predicted_starts": 84.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 13.5,
+      "owned_pct": 13.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2028,6 +1925,109 @@
       "components_gw": 1
     },
     {
+      "id": 445,
+      "web_name": "Thiaw",
+      "full_name": "Malick Thiaw",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "DEF",
+      "xmins": 79.9,
+      "predicted_starts": 81.7,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "owned_pct": 2.6,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 4,
+      "price": 5.0,
+      "p_start": 0.8171,
+      "p_cameo": 0.0732,
+      "p_bench": 0.1098,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.23,
+      "xp_per_gw": 4.06,
+      "xp_horizon_total": 24.33,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.71
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.71
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.83
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.37
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 5.19
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 4.52
+        }
+      ],
+      "components": {
+        "appearance": 1.8,
+        "goals": 0.9,
+        "assists": 0.11,
+        "clean_sheet": 0.67,
+        "conceded": -0.51,
+        "saves": 0.0,
+        "defensive_contribution": 0.63,
+        "yellows": -0.12,
+        "bonus": 0.23
+      },
+      "components_gw": 1
+    },
+    {
       "id": 368,
       "web_name": "Szoboszlai",
       "full_name": "Dominik Szoboszlai",
@@ -2038,7 +2038,7 @@
       "predicted_starts": 85.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 39.6,
+      "owned_pct": 40.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2141,7 +2141,7 @@
       "predicted_starts": 90.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.0,
+      "owned_pct": 16.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2244,7 +2244,7 @@
       "predicted_starts": 77.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 46.5,
+      "owned_pct": 47.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2347,7 +2347,7 @@
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 13.1,
+      "owned_pct": 12.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2450,7 +2450,7 @@
       "predicted_starts": 94.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 11.5,
+      "owned_pct": 12.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2553,7 +2553,7 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 8.6,
+      "owned_pct": 8.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2656,7 +2656,7 @@
       "predicted_starts": 89.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.1,
+      "owned_pct": 4.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2759,7 +2759,7 @@
       "predicted_starts": 71.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 25.0,
+      "owned_pct": 24.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2852,33 +2852,33 @@
       "components_gw": 1
     },
     {
-      "id": 237,
-      "web_name": "Ndiaye",
-      "full_name": "Iliman Ndiaye",
+      "id": 236,
+      "web_name": "Dewsbury-Hall",
+      "full_name": "Kiernan Dewsbury-Hall",
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
-      "xmins": 73.2,
-      "predicted_starts": 77.4,
-      "minutes_confidence": "high",
+      "xmins": 75.5,
+      "predicted_starts": 80.5,
+      "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 19.3,
+      "owned_pct": 4.5,
       "status": "a",
       "news": "",
       "chance_next": null,
-      "yellows": 2,
-      "price": 6.0,
-      "p_start": 0.7737,
-      "p_cameo": 0.0,
-      "p_bench": 0.2263,
+      "yellows": 6,
+      "price": 6.5,
+      "p_start": 0.8047,
+      "p_cameo": 0.0244,
+      "p_bench": 0.1709,
       "set_pieces": {
-        "pens": 1,
-        "corners": null,
+        "pens": null,
+        "corners": 5,
         "fk": null
       },
-      "e_bonus": 0.22,
-      "xp_per_gw": 3.76,
-      "xp_horizon_total": 22.58,
+      "e_bonus": 0.46,
+      "xp_per_gw": 3.79,
+      "xp_horizon_total": 22.71,
       "gameweeks": [
         {
           "gw": 1,
@@ -2888,7 +2888,7 @@
               "venue": "H"
             }
           ],
-          "xp": 3.79
+          "xp": 3.81
         },
         {
           "gw": 2,
@@ -2898,7 +2898,7 @@
               "venue": "A"
             }
           ],
-          "xp": 3.3
+          "xp": 3.37
         },
         {
           "gw": 3,
@@ -2908,7 +2908,7 @@
               "venue": "H"
             }
           ],
-          "xp": 3.62
+          "xp": 3.65
         },
         {
           "gw": 4,
@@ -2918,7 +2918,7 @@
               "venue": "A"
             }
           ],
-          "xp": 3.54
+          "xp": 3.58
         },
         {
           "gw": 5,
@@ -2928,7 +2928,7 @@
               "venue": "H"
             }
           ],
-          "xp": 4.38
+          "xp": 4.35
         },
         {
           "gw": 6,
@@ -2938,19 +2938,19 @@
               "venue": "A"
             }
           ],
-          "xp": 3.93
+          "xp": 3.95
         }
       ],
       "components": {
-        "appearance": 1.68,
-        "goals": 0.96,
-        "assists": 0.39,
+        "appearance": 1.72,
+        "goals": 0.72,
+        "assists": 0.5,
         "clean_sheet": 0.29,
         "conceded": 0.0,
         "saves": 0.0,
-        "defensive_contribution": 0.31,
-        "yellows": -0.08,
-        "bonus": 0.22
+        "defensive_contribution": 0.29,
+        "yellows": -0.17,
+        "bonus": 0.46
       },
       "components_gw": 1
     },
@@ -2965,7 +2965,7 @@
       "predicted_starts": 78.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.6,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3377,7 +3377,7 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.6,
+      "owned_pct": 3.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3480,7 +3480,7 @@
       "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 35.3,
+      "owned_pct": 34.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3583,7 +3583,7 @@
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.5,
+      "owned_pct": 2.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3995,7 +3995,7 @@
       "predicted_starts": 72.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 17.3,
+      "owned_pct": 17.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4098,7 +4098,7 @@
       "predicted_starts": 63.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 11.3,
+      "owned_pct": 11.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4201,7 +4201,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 19.5,
+      "owned_pct": 19.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4510,7 +4510,7 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.1,
+      "owned_pct": 5.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4716,7 +4716,7 @@
       "predicted_starts": 75.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 14.7,
+      "owned_pct": 14.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5025,7 +5025,7 @@
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 6.3,
+      "owned_pct": 6.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5118,109 +5118,6 @@
       "components_gw": 1
     },
     {
-      "id": 236,
-      "web_name": "Dewsbury-Hall",
-      "full_name": "Kiernan Dewsbury-Hall",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 69.2,
-      "predicted_starts": 73.2,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 4.6,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 6,
-      "price": 6.5,
-      "p_start": 0.7316,
-      "p_cameo": 0.0336,
-      "p_bench": 0.2349,
-      "set_pieces": {
-        "pens": null,
-        "corners": 5,
-        "fk": null
-      },
-      "e_bonus": 0.42,
-      "xp_per_gw": 3.46,
-      "xp_horizon_total": 20.78,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.49
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.08
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.34
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.28
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.98
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.61
-        }
-      ],
-      "components": {
-        "appearance": 1.58,
-        "goals": 0.66,
-        "assists": 0.46,
-        "clean_sheet": 0.26,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.26,
-        "yellows": -0.15,
-        "bonus": 0.42
-      },
-      "components_gw": 1
-    },
-    {
       "id": 57,
       "web_name": "Petrović",
       "full_name": "Đorđe Petrović",
@@ -5231,7 +5128,7 @@
       "predicted_starts": 90.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.8,
+      "owned_pct": 3.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5334,7 +5231,7 @@
       "predicted_starts": 77.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.9,
+      "owned_pct": 3.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5437,7 +5334,7 @@
       "predicted_starts": 79.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 10.0,
+      "owned_pct": 9.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5849,7 +5746,7 @@
       "predicted_starts": 82.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 24.0,
+      "owned_pct": 24.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5952,7 +5849,7 @@
       "predicted_starts": 66.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 12.6,
+      "owned_pct": 12.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6055,7 +5952,7 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.8,
+      "owned_pct": 8.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6158,7 +6055,7 @@
       "predicted_starts": 64.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.7,
+      "owned_pct": 1.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6261,7 +6158,7 @@
       "predicted_starts": 75.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.2,
+      "owned_pct": 6.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6467,7 +6364,7 @@
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.0,
+      "owned_pct": 5.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6570,7 +6467,7 @@
       "predicted_starts": 78.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.5,
+      "owned_pct": 3.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6673,7 +6570,7 @@
       "predicted_starts": 65.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 3.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7188,7 +7085,7 @@
       "predicted_starts": 99.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.8,
+      "owned_pct": 18.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7394,7 +7291,7 @@
       "predicted_starts": 86.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 7.3,
+      "owned_pct": 7.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7497,7 +7394,7 @@
       "predicted_starts": 80.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 1.3,
+      "owned_pct": 1.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7806,7 +7703,7 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.3,
+      "owned_pct": 5.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8012,7 +7909,7 @@
       "predicted_starts": 81.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.6,
+      "owned_pct": 2.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8115,7 +8012,7 @@
       "predicted_starts": 64.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 15.1,
+      "owned_pct": 14.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8218,7 +8115,7 @@
       "predicted_starts": 63.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.7,
+      "owned_pct": 11.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8321,7 +8218,7 @@
       "predicted_starts": 70.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.4,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8424,7 +8321,7 @@
       "predicted_starts": 81.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 1.6,
+      "owned_pct": 1.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8733,7 +8630,7 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 6.1,
+      "owned_pct": 6.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9145,7 +9042,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.4,
+      "owned_pct": 10.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9557,7 +9454,7 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.8,
+      "owned_pct": 18.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10381,7 +10278,7 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.7,
+      "owned_pct": 8.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10587,7 +10484,7 @@
       "predicted_starts": 76.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 1.8,
+      "owned_pct": 1.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10690,7 +10587,7 @@
       "predicted_starts": 71.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 13.3,
+      "owned_pct": 13.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11102,7 +10999,7 @@
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.5,
+      "owned_pct": 3.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11308,7 +11205,7 @@
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 11.5,
+      "owned_pct": 11.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11514,7 +11411,7 @@
       "predicted_starts": 56.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 15.9,
+      "owned_pct": 15.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11823,7 +11720,7 @@
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.7,
+      "owned_pct": 5.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -12029,7 +11926,7 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 0.5,
+      "owned_pct": 0.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -12431,212 +12328,6 @@
       "components_gw": 1
     },
     {
-      "id": 447,
-      "web_name": "Botman",
-      "full_name": "Sven Botman",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "DEF",
-      "xmins": 50.6,
-      "predicted_starts": 57.0,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.4,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 2,
-      "price": 5.0,
-      "p_start": 0.5699,
-      "p_cameo": 0.1012,
-      "p_bench": 0.3289,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.15,
-      "xp_per_gw": 2.65,
-      "xp_horizon_total": 15.87,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.4
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.48
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.49
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.28
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.26
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.96
-        }
-      ],
-      "components": {
-        "appearance": 1.23,
-        "goals": 0.34,
-        "assists": 0.1,
-        "clean_sheet": 0.43,
-        "conceded": -0.32,
-        "saves": 0.0,
-        "defensive_contribution": 0.55,
-        "yellows": -0.07,
-        "bonus": 0.15
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 449,
-      "web_name": "Hall",
-      "full_name": "Lewis Hall",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "DEF",
-      "xmins": 59.8,
-      "predicted_starts": 63.6,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 4.8,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 4,
-      "price": 5.0,
-      "p_start": 0.6363,
-      "p_cameo": 0.1559,
-      "p_bench": 0.2078,
-      "set_pieces": {
-        "pens": null,
-        "corners": 5,
-        "fk": 1
-      },
-      "e_bonus": 0.14,
-      "xp_per_gw": 2.64,
-      "xp_horizon_total": 15.86,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.36
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.45
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.47
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.22
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.35
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.01
-        }
-      ],
-      "components": {
-        "appearance": 1.44,
-        "goals": 0.22,
-        "assists": 0.26,
-        "clean_sheet": 0.49,
-        "conceded": -0.38,
-        "saves": 0.0,
-        "defensive_contribution": 0.29,
-        "yellows": -0.11,
-        "bonus": 0.14
-      },
-      "components_gw": 1
-    },
-    {
       "id": 455,
       "web_name": "Tonali",
       "full_name": "Sandro Tonali",
@@ -12956,7 +12647,7 @@
       "predicted_starts": 75.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.7,
+      "owned_pct": 0.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13162,7 +12853,7 @@
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 3.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13255,33 +12946,33 @@
       "components_gw": 1
     },
     {
-      "id": 448,
-      "web_name": "Burn",
-      "full_name": "Dan Burn",
+      "id": 449,
+      "web_name": "Hall",
+      "full_name": "Lewis Hall",
       "team": "Newcastle United",
       "team_short": "NEW",
       "pos": "DEF",
-      "xmins": 60.5,
-      "predicted_starts": 65.8,
+      "xmins": 58.7,
+      "predicted_starts": 62.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.5,
+      "owned_pct": 4.8,
       "status": "a",
       "news": "",
       "chance_next": null,
-      "yellows": 9,
+      "yellows": 4,
       "price": 5.0,
-      "p_start": 0.6585,
-      "p_cameo": 0.1051,
-      "p_bench": 0.2364,
+      "p_start": 0.6223,
+      "p_cameo": 0.1619,
+      "p_bench": 0.2158,
       "set_pieces": {
         "pens": null,
-        "corners": null,
-        "fk": null
+        "corners": 5,
+        "fk": 1
       },
-      "e_bonus": 0.1,
+      "e_bonus": 0.14,
       "xp_per_gw": 2.6,
-      "xp_horizon_total": 15.59,
+      "xp_horizon_total": 15.57,
       "gameweeks": [
         {
           "gw": 1,
@@ -13291,7 +12982,7 @@
               "venue": "H"
             }
           ],
-          "xp": 2.29
+          "xp": 2.32
         },
         {
           "gw": 2,
@@ -13301,7 +12992,7 @@
               "venue": "A"
             }
           ],
-          "xp": 2.45
+          "xp": 2.41
         },
         {
           "gw": 3,
@@ -13311,7 +13002,110 @@
               "venue": "H"
             }
           ],
-          "xp": 2.4
+          "xp": 2.42
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.18
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.29
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.96
+        }
+      ],
+      "components": {
+        "appearance": 1.42,
+        "goals": 0.22,
+        "assists": 0.26,
+        "clean_sheet": 0.48,
+        "conceded": -0.38,
+        "saves": 0.0,
+        "defensive_contribution": 0.28,
+        "yellows": -0.11,
+        "bonus": 0.14
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 447,
+      "web_name": "Botman",
+      "full_name": "Sven Botman",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "DEF",
+      "xmins": 49.5,
+      "predicted_starts": 55.7,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 2,
+      "price": 5.0,
+      "p_start": 0.5573,
+      "p_cameo": 0.1042,
+      "p_bench": 0.3385,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.15,
+      "xp_per_gw": 2.59,
+      "xp_horizon_total": 15.56,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.36
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.43
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.44
         },
         {
           "gw": 4,
@@ -13331,7 +13125,7 @@
               "venue": "H"
             }
           ],
-          "xp": 3.22
+          "xp": 3.2
         },
         {
           "gw": 6,
@@ -13341,19 +13135,19 @@
               "venue": "A"
             }
           ],
-          "xp": 3.0
+          "xp": 2.9
         }
       ],
       "components": {
-        "appearance": 1.45,
-        "goals": 0.24,
-        "assists": 0.06,
-        "clean_sheet": 0.52,
-        "conceded": -0.39,
+        "appearance": 1.21,
+        "goals": 0.33,
+        "assists": 0.09,
+        "clean_sheet": 0.42,
+        "conceded": -0.32,
         "saves": 0.0,
-        "defensive_contribution": 0.52,
-        "yellows": -0.21,
-        "bonus": 0.1
+        "defensive_contribution": 0.54,
+        "yellows": -0.07,
+        "bonus": 0.15
       },
       "components_gw": 1
     },
@@ -13368,7 +13162,7 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.9,
+      "owned_pct": 5.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13457,6 +13251,109 @@
         "defensive_contribution": 0.34,
         "yellows": -0.07,
         "bonus": 0.13
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 448,
+      "web_name": "Burn",
+      "full_name": "Dan Burn",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "DEF",
+      "xmins": 59.3,
+      "predicted_starts": 64.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 2.6,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 9,
+      "price": 5.0,
+      "p_start": 0.6439,
+      "p_cameo": 0.1096,
+      "p_bench": 0.2465,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
+      "xp_per_gw": 2.55,
+      "xp_horizon_total": 15.29,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.24
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.41
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.36
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.19
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.16
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.94
+        }
+      ],
+      "components": {
+        "appearance": 1.43,
+        "goals": 0.23,
+        "assists": 0.06,
+        "clean_sheet": 0.5,
+        "conceded": -0.38,
+        "saves": 0.0,
+        "defensive_contribution": 0.51,
+        "yellows": -0.21,
+        "bonus": 0.1
       },
       "components_gw": 1
     },
@@ -13574,7 +13471,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 7.0,
+      "owned_pct": 6.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14192,7 +14089,7 @@
       "predicted_starts": 64.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 4.6,
+      "owned_pct": 4.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14810,7 +14707,7 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.4,
+      "owned_pct": 6.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -15119,7 +15016,7 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.8,
+      "owned_pct": 6.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -15840,7 +15737,7 @@
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 20.6,
+      "owned_pct": 21.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16046,7 +15943,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.5,
+      "owned_pct": 0.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16149,7 +16046,7 @@
       "predicted_starts": 53.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.6,
+      "owned_pct": 0.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16458,7 +16355,7 @@
       "predicted_starts": 37.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 3.2,
       "status": "d",
       "news": "Shin injury - 75% chance of playing",
       "chance_next": 75,
@@ -16664,7 +16561,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.4,
+      "owned_pct": 0.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -17282,7 +17179,7 @@
       "predicted_starts": 47.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.2,
+      "owned_pct": 2.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -17385,7 +17282,7 @@
       "predicted_starts": 52.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.9,
+      "owned_pct": 0.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -17900,7 +17797,7 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.8,
+      "owned_pct": 1.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -18106,7 +18003,7 @@
       "predicted_starts": 58.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.4,
+      "owned_pct": 10.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -18401,6 +18298,109 @@
         "defensive_contribution": 0.28,
         "yellows": -0.07,
         "bonus": 0.09
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 240,
+      "web_name": "Iroegbunam",
+      "full_name": "Tim Iroegbunam",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 42.1,
+      "predicted_starts": 50.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 9,
+      "price": 5.0,
+      "p_start": 0.5037,
+      "p_cameo": 0.2836,
+      "p_bench": 0.2127,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.08,
+      "xp_per_gw": 1.89,
+      "xp_horizon_total": 11.36,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.9
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.78
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.85
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.84
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.04
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.96
+        }
+      ],
+      "components": {
+        "appearance": 1.25,
+        "goals": 0.16,
+        "assists": 0.1,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.35,
+        "yellows": -0.19,
+        "bonus": 0.08
       },
       "components_gw": 1
     },
@@ -18827,7 +18827,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 4.4,
+      "owned_pct": 4.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19946,109 +19946,6 @@
         "defensive_contribution": 0.0,
         "yellows": -0.02,
         "bonus": 0.1
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 240,
-      "web_name": "Iroegbunam",
-      "full_name": "Tim Iroegbunam",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 38.9,
-      "predicted_starts": 45.8,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 9,
-      "price": 5.0,
-      "p_start": 0.4579,
-      "p_cameo": 0.3098,
-      "p_bench": 0.2323,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.07,
-      "xp_per_gw": 1.78,
-      "xp_horizon_total": 10.65,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.78
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.67
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.73
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.73
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.91
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.83
-        }
-      ],
-      "components": {
-        "appearance": 1.18,
-        "goals": 0.15,
-        "assists": 0.09,
-        "clean_sheet": 0.15,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.32,
-        "yellows": -0.18,
-        "bonus": 0.07
       },
       "components_gw": 1
     },
@@ -21289,6 +21186,109 @@
       "components_gw": 1
     },
     {
+      "id": 241,
+      "web_name": "McNeil",
+      "full_name": "Dwight McNeil",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 33.2,
+      "predicted_starts": 43.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 1,
+      "price": 5.5,
+      "p_start": 0.4342,
+      "p_cameo": 0.1886,
+      "p_bench": 0.3772,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 2
+      },
+      "e_bonus": 0.07,
+      "xp_per_gw": 1.63,
+      "xp_horizon_total": 9.81,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.64
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.48
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.58
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.56
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.84
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.7
+        }
+      ],
+      "components": {
+        "appearance": 0.95,
+        "goals": 0.25,
+        "assists": 0.18,
+        "clean_sheet": 0.12,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.12,
+        "yellows": -0.05,
+        "bonus": 0.07
+      },
+      "components_gw": 1
+    },
+    {
       "id": 522,
       "web_name": "Gray",
       "full_name": "Archie Gray",
@@ -21608,7 +21608,7 @@
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.3,
+      "owned_pct": 2.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21711,7 +21711,7 @@
       "predicted_starts": 42.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.3,
+      "owned_pct": 0.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21814,7 +21814,7 @@
       "predicted_starts": 52.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 9.4,
+      "owned_pct": 9.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -22315,109 +22315,6 @@
         "defensive_contribution": 0.2,
         "yellows": -0.04,
         "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 241,
-      "web_name": "McNeil",
-      "full_name": "Dwight McNeil",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 30.6,
-      "predicted_starts": 39.5,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.2,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 1,
-      "price": 5.5,
-      "p_start": 0.3947,
-      "p_cameo": 0.2018,
-      "p_bench": 0.4035,
-      "set_pieces": {
-        "pens": null,
-        "corners": 6,
-        "fk": 2
-      },
-      "e_bonus": 0.06,
-      "xp_per_gw": 1.52,
-      "xp_horizon_total": 9.13,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.53
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.38
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.48
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.45
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.71
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.58
-        }
-      ],
-      "components": {
-        "appearance": 0.89,
-        "goals": 0.23,
-        "assists": 0.17,
-        "clean_sheet": 0.11,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.11,
-        "yellows": -0.04,
-        "bonus": 0.06
       },
       "components_gw": 1
     },
@@ -23246,6 +23143,109 @@
       "components_gw": 1
     },
     {
+      "id": 446,
+      "web_name": "Schär",
+      "full_name": "Fabian Schär",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "DEF",
+      "xmins": 29.3,
+      "predicted_starts": 34.1,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "status": "a",
+      "news": "",
+      "chance_next": 100,
+      "yellows": 1,
+      "price": 5.0,
+      "p_start": 0.3409,
+      "p_cameo": 0.1221,
+      "p_bench": 0.537,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.03,
+      "xp_per_gw": 1.41,
+      "xp_horizon_total": 8.49,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.28
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.32
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.33
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.21
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.76
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.59
+        }
+      ],
+      "components": {
+        "appearance": 0.73,
+        "goals": 0.18,
+        "assists": 0.06,
+        "clean_sheet": 0.23,
+        "conceded": -0.19,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.04,
+        "bonus": 0.03
+      },
+      "components_gw": 1
+    },
+    {
       "id": 487,
       "web_name": "Dominguez",
       "full_name": "Nicolás Domínguez",
@@ -23359,7 +23359,7 @@
       "predicted_starts": 40.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.9,
+      "owned_pct": 3.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -24286,7 +24286,7 @@
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 15.5,
+      "owned_pct": 16.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -24492,7 +24492,7 @@
       "predicted_starts": 35.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.5,
+      "owned_pct": 1.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -26037,7 +26037,7 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 0.5,
+      "owned_pct": 0.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -26346,7 +26346,7 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.8,
+      "owned_pct": 3.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -26655,7 +26655,7 @@
       "predicted_starts": 30.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.2,
+      "owned_pct": 1.8,
       "status": "d",
       "news": "Thigh injury - 75% chance of playing",
       "chance_next": 75,
@@ -26954,109 +26954,6 @@
       "components_gw": 1
     },
     {
-      "id": 446,
-      "web_name": "Schär",
-      "full_name": "Fabian Schär",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "DEF",
-      "xmins": 22.7,
-      "predicted_starts": 26.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.0,
-      "status": "d",
-      "news": "Ankle injury - 75% chance of playing",
-      "chance_next": 75,
-      "yellows": 1,
-      "price": 5.0,
-      "p_start": 0.2615,
-      "p_cameo": 0.1026,
-      "p_bench": 0.636,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": 3
-      },
-      "e_bonus": 0.03,
-      "xp_per_gw": 1.09,
-      "xp_horizon_total": 6.56,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.99
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.02
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.03
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.93
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.36
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.23
-        }
-      ],
-      "components": {
-        "appearance": 0.56,
-        "goals": 0.14,
-        "assists": 0.05,
-        "clean_sheet": 0.18,
-        "conceded": -0.15,
-        "saves": 0.0,
-        "defensive_contribution": 0.21,
-        "yellows": -0.03,
-        "bonus": 0.03
-      },
-      "components_gw": 1
-    },
-    {
       "id": 506,
       "web_name": "Udogie",
       "full_name": "Destiny Udogie",
@@ -27160,109 +27057,6 @@
       "components_gw": 1
     },
     {
-      "id": 450,
-      "web_name": "Livramento",
-      "full_name": "Tino Livramento",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "DEF",
-      "xmins": 27.7,
-      "predicted_starts": 31.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.1,
-      "status": "d",
-      "news": "Calf injury - 75% chance of playing",
-      "chance_next": 75,
-      "yellows": 1,
-      "price": 5.0,
-      "p_start": 0.3113,
-      "p_cameo": 0.0646,
-      "p_bench": 0.6242,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.07,
-      "xp_per_gw": 1.06,
-      "xp_horizon_total": 6.36,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.92
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.0
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.97
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.9
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.33
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.24
-        }
-      ],
-      "components": {
-        "appearance": 0.65,
-        "goals": 0.05,
-        "assists": 0.07,
-        "clean_sheet": 0.23,
-        "conceded": -0.18,
-        "saves": 0.0,
-        "defensive_contribution": 0.07,
-        "yellows": -0.04,
-        "bonus": 0.07
-      },
-      "components_gw": 1
-    },
-    {
       "id": 379,
       "web_name": "Isak",
       "full_name": "Alexander Isak",
@@ -27273,7 +27067,7 @@
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 12.9,
+      "owned_pct": 12.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -27366,6 +27160,212 @@
       "components_gw": 1
     },
     {
+      "id": 243,
+      "web_name": "Alcaraz",
+      "full_name": "Carlos Alcaraz Durán",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 18.9,
+      "predicted_starts": 24.9,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 4,
+      "price": 5.0,
+      "p_start": 0.2489,
+      "p_cameo": 0.3286,
+      "p_bench": 0.4225,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
+      "xp_per_gw": 1.05,
+      "xp_horizon_total": 6.31,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.06
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.96
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.02
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.01
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.17
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.09
+        }
+      ],
+      "components": {
+        "appearance": 0.73,
+        "goals": 0.19,
+        "assists": 0.07,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.07,
+        "bonus": 0.04
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 450,
+      "web_name": "Livramento",
+      "full_name": "Tino Livramento",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "DEF",
+      "xmins": 27.1,
+      "predicted_starts": 30.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "d",
+      "news": "Calf injury - 75% chance of playing",
+      "chance_next": 75,
+      "yellows": 1,
+      "price": 5.0,
+      "p_start": 0.3044,
+      "p_cameo": 0.0652,
+      "p_bench": 0.6304,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
+      "xp_per_gw": 1.04,
+      "xp_horizon_total": 6.23,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.9
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.98
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.95
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.88
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.3
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.21
+        }
+      ],
+      "components": {
+        "appearance": 0.64,
+        "goals": 0.05,
+        "assists": 0.07,
+        "clean_sheet": 0.22,
+        "conceded": -0.17,
+        "saves": 0.0,
+        "defensive_contribution": 0.07,
+        "yellows": -0.03,
+        "bonus": 0.07
+      },
+      "components_gw": 1
+    },
+    {
       "id": 148,
       "web_name": "Hato",
       "full_name": "Jorrel Hato",
@@ -27376,7 +27376,7 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.4,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -27572,109 +27572,6 @@
       "components_gw": 1
     },
     {
-      "id": 243,
-      "web_name": "Alcaraz",
-      "full_name": "Carlos Alcaraz Durán",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 17.9,
-      "predicted_starts": 22.6,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "owned_pct": 0.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 4,
-      "price": 5.0,
-      "p_start": 0.2263,
-      "p_cameo": 0.3385,
-      "p_bench": 0.4352,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.04,
-      "xp_per_gw": 1.01,
-      "xp_horizon_total": 6.04,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.01
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.92
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.98
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.97
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.12
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.04
-        }
-      ],
-      "components": {
-        "appearance": 0.71,
-        "goals": 0.18,
-        "assists": 0.06,
-        "clean_sheet": 0.06,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.07,
-        "bonus": 0.04
-      },
-      "components_gw": 1
-    },
-    {
       "id": 464,
       "web_name": "Wissa",
       "full_name": "Yoane Wissa",
@@ -27788,7 +27685,7 @@
       "predicted_starts": 20.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 1.8,
+      "owned_pct": 1.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -27980,6 +27877,109 @@
         "defensive_contribution": 0.07,
         "yellows": -0.03,
         "bonus": 0.03
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 246,
+      "web_name": "Röhl",
+      "full_name": "Merlin Röhl",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 19.0,
+      "predicted_starts": 24.9,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 5.0,
+      "p_start": 0.2489,
+      "p_cameo": 0.2347,
+      "p_bench": 0.5163,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
+      "xp_per_gw": 0.96,
+      "xp_horizon_total": 5.75,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.96
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.89
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.93
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.92
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.05
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.99
+        }
+      ],
+      "components": {
+        "appearance": 0.61,
+        "goals": 0.14,
+        "assists": 0.06,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.02,
+        "bonus": 0.06
       },
       "components_gw": 1
     },
@@ -28499,109 +28499,6 @@
       "components_gw": 1
     },
     {
-      "id": 246,
-      "web_name": "Röhl",
-      "full_name": "Merlin Röhl",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 17.8,
-      "predicted_starts": 22.6,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "owned_pct": 0.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 5.0,
-      "p_start": 0.2263,
-      "p_cameo": 0.2418,
-      "p_bench": 0.5319,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.06,
-      "xp_per_gw": 0.91,
-      "xp_horizon_total": 5.44,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.91
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.84
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.88
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.87
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.99
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.93
-        }
-      ],
-      "components": {
-        "appearance": 0.58,
-        "goals": 0.13,
-        "assists": 0.05,
-        "clean_sheet": 0.05,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.05,
-        "yellows": -0.02,
-        "bonus": 0.06
-      },
-      "components_gw": 1
-    },
-    {
       "id": 26,
       "web_name": "Havertz",
       "full_name": "Kai Havertz",
@@ -28612,7 +28509,7 @@
       "predicted_starts": 25.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 4.9,
+      "owned_pct": 4.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29024,7 +28921,7 @@
       "predicted_starts": 14.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 6.9,
+      "owned_pct": 7.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29127,7 +29024,7 @@
       "predicted_starts": 24.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.2,
+      "owned_pct": 2.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29529,6 +29426,109 @@
       "components_gw": 1
     },
     {
+      "id": 244,
+      "web_name": "Armstrong",
+      "full_name": "Harrison Armstrong",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 14.9,
+      "predicted_starts": 24.9,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 5.0,
+      "p_start": 0.2489,
+      "p_cameo": 0.1643,
+      "p_bench": 0.5868,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
+      "xp_per_gw": 0.8,
+      "xp_horizon_total": 4.78,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.8
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.73
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.78
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.77
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.88
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.82
+        }
+      ],
+      "components": {
+        "appearance": 0.5,
+        "goals": 0.14,
+        "assists": 0.05,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.05,
+        "yellows": -0.02,
+        "bonus": 0.03
+      },
+      "components_gw": 1
+    },
+    {
       "id": 546,
       "web_name": "Adingra",
       "full_name": "Simon Adingra",
@@ -29838,109 +29838,6 @@
       "components_gw": 1
     },
     {
-      "id": 244,
-      "web_name": "Armstrong",
-      "full_name": "Harrison Armstrong",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 13.8,
-      "predicted_starts": 22.6,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "owned_pct": 0.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 5.0,
-      "p_start": 0.2263,
-      "p_cameo": 0.1692,
-      "p_bench": 0.6044,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.03,
-      "xp_per_gw": 0.75,
-      "xp_horizon_total": 4.49,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.75
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.69
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.73
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.72
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.83
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.77
-        }
-      ],
-      "components": {
-        "appearance": 0.47,
-        "goals": 0.13,
-        "assists": 0.04,
-        "clean_sheet": 0.05,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.05,
-        "yellows": -0.02,
-        "bonus": 0.03
-      },
-      "components_gw": 1
-    },
-    {
       "id": 259,
       "web_name": "Diop",
       "full_name": "Issa Diop",
@@ -30157,7 +30054,7 @@
       "predicted_starts": 20.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.4,
+      "owned_pct": 2.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -30662,6 +30559,109 @@
       "components_gw": 1
     },
     {
+      "id": 242,
+      "web_name": "George",
+      "full_name": "Tyrique George",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "xmins": 9.4,
+      "predicted_starts": 13.3,
+      "minutes_confidence": "high",
+      "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 2,
+      "price": 5.5,
+      "p_start": 0.1332,
+      "p_cameo": 0.328,
+      "p_bench": 0.5388,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
+      "xp_per_gw": 0.65,
+      "xp_horizon_total": 3.88,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.65
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.59
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.63
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.62
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.72
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.66
+        }
+      ],
+      "components": {
+        "appearance": 0.45,
+        "goals": 0.09,
+        "assists": 0.07,
+        "clean_sheet": 0.02,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.01,
+        "yellows": -0.03,
+        "bonus": 0.02
+      },
+      "components_gw": 1
+    },
+    {
       "id": 224,
       "web_name": "Nketiah",
       "full_name": "Eddie Nketiah",
@@ -30864,109 +30864,6 @@
         "defensive_contribution": 0.02,
         "yellows": -0.02,
         "bonus": 0.03
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 242,
-      "web_name": "George",
-      "full_name": "Tyrique George",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "xmins": 9.2,
-      "predicted_starts": 12.1,
-      "minutes_confidence": "high",
-      "data_basis": "limited_history",
-      "owned_pct": 0.2,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 2,
-      "price": 5.5,
-      "p_start": 0.1211,
-      "p_cameo": 0.3326,
-      "p_bench": 0.5464,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.02,
-      "xp_per_gw": 0.64,
-      "xp_horizon_total": 3.83,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.64
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.59
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.62
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.61
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.71
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.65
-        }
-      ],
-      "components": {
-        "appearance": 0.45,
-        "goals": 0.09,
-        "assists": 0.07,
-        "clean_sheet": 0.02,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.01,
-        "yellows": -0.03,
-        "bonus": 0.02
       },
       "components_gw": 1
     },
@@ -31290,7 +31187,7 @@
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 1.2,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -31393,7 +31290,7 @@
       "predicted_starts": 21.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 0.1,
+      "owned_pct": 0.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -31496,7 +31393,7 @@
       "predicted_starts": 25.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 14.3,
+      "owned_pct": 14.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -31595,8 +31492,8 @@
       "team": "Everton",
       "team_short": "EVE",
       "pos": "MID",
-      "xmins": 9.2,
-      "predicted_starts": 18.4,
+      "xmins": 9.9,
+      "predicted_starts": 20.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "owned_pct": 0.1,
@@ -31605,17 +31502,17 @@
       "chance_next": null,
       "yellows": 2,
       "price": 5.5,
-      "p_start": 0.1842,
-      "p_cameo": 0.2399,
-      "p_bench": 0.5759,
+      "p_start": 0.2026,
+      "p_cameo": 0.2345,
+      "p_bench": 0.5628,
       "set_pieces": {
         "pens": null,
         "corners": null,
         "fk": null
       },
-      "e_bonus": 0.02,
-      "xp_per_gw": 0.56,
-      "xp_horizon_total": 3.34,
+      "e_bonus": 0.03,
+      "xp_per_gw": 0.58,
+      "xp_horizon_total": 3.49,
       "gameweeks": [
         {
           "gw": 1,
@@ -31625,7 +31522,7 @@
               "venue": "H"
             }
           ],
-          "xp": 0.56
+          "xp": 0.58
         },
         {
           "gw": 2,
@@ -31635,7 +31532,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.53
+          "xp": 0.55
         },
         {
           "gw": 3,
@@ -31645,7 +31542,7 @@
               "venue": "H"
             }
           ],
-          "xp": 0.55
+          "xp": 0.57
         },
         {
           "gw": 4,
@@ -31655,7 +31552,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.54
+          "xp": 0.56
         },
         {
           "gw": 5,
@@ -31665,7 +31562,7 @@
               "venue": "H"
             }
           ],
-          "xp": 0.6
+          "xp": 0.63
         },
         {
           "gw": 6,
@@ -31675,19 +31572,19 @@
               "venue": "A"
             }
           ],
-          "xp": 0.57
+          "xp": 0.59
         }
       ],
       "components": {
-        "appearance": 0.42,
-        "goals": 0.06,
+        "appearance": 0.43,
+        "goals": 0.07,
         "assists": 0.03,
         "clean_sheet": 0.02,
         "conceded": 0.0,
         "saves": 0.0,
         "defensive_contribution": 0.03,
         "yellows": -0.03,
-        "bonus": 0.02
+        "bonus": 0.03
       },
       "components_gw": 1
     },
@@ -33762,7 +33659,7 @@
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 1.2,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -34689,7 +34586,7 @@
       "predicted_starts": 10.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 8.1,
+      "owned_pct": 8.2,
       "status": "a",
       "news": "",
       "chance_next": null,
