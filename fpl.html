@@ -37,7 +37,7 @@
  "@id": "https://goaliq.app/#organization",
  "name": "GoalIQ",
  "url": "https://goaliq.app/",
- "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, rate my team with a captain pick, a fit checker, a pre-season draft rater and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, player value, xG leaders, a DefCon tracker, differentials and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
+ "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, a player lookup with availability news, rate my team with a captain pick, a mini-league view and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, player value (xP per million), xG leaders, a DefCon tracker, differentials and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
@@ -56,7 +56,7 @@
  "operatingSystem": "Android, iOS, Web",
  "identifier": "com.veikkoville.goaliq",
  "applicationCategory": "SportsApplication",
- "description": "Free FPL assistant and football prediction app. Free FPL tools: clean sheet probability and fixture difficulty, rate my team with a captain pick, and price watch. GoalIQ Premium adds an interactive team manager with a GW1 to GW6 gameweek planner, player expected points (xP), the captain ranker, player value (xP per million), xG leaders, a DefCon (defensive contribution) tracker, differentials and transfer suggestions with apply. Also predicts any match - win probability, expected goals (xG) and the most likely score - using a Dixon-Coles model with an expected-goals ensemble. Analytics, not betting.",
+ "description": "Free FPL assistant and football prediction app. Free FPL tools: clean sheet probability and fixture difficulty, rate my team with a captain pick, and price watch. GoalIQ Premium adds an interactive team manager with a rolling six-gameweek planner, player expected points (xP), the captain ranker, player value (xP per million), xG leaders, a DefCon (defensive contribution) tracker, differentials and transfer suggestions with apply. Also predicts any match - win probability, expected goals (xG) and the most likely score - using a Dixon-Coles model with an expected-goals ensemble. Analytics, not betting.",
  "url": "https://goaliq.app/",
  "downloadUrl": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
@@ -115,7 +115,7 @@
    "name": "Is GoalIQ good for FPL?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Yes. GoalIQ is built FPL-first: clean sheet probability, fixture difficulty, rate my team with a captain pick, a fit checker that builds the best legal 15 around your must-have players, a pre-season draft rater (no team ID needed), and price watch are free, and GoalIQ Premium adds an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, a player value ranking, xG leaders, a DefCon tracker, differentials and transfer suggestions you can apply to your planned squad. Every number comes from a match model with a published, pre-match-logged track record."
+    "text": "Yes. GoalIQ is built FPL-first: clean sheet probability, fixture difficulty with separate attack and defence views, rate my team with a captain pick, a player lookup with official availability news, start chance and set-piece roles, a mini-league view with head-to-head win odds, a fit checker that builds the best legal 15 around your must-have players and saves it as a draft, a pre-season draft rater (no team ID needed), and price watch are free, and GoalIQ Premium adds an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, an edge mode for your mini-league, a player value ranking, xG leaders, a DefCon tracker, differentials and transfer suggestions you can apply to your planned squad. Every number comes from a match model with a published, pre-match-logged track record."
    }
   },
   {
@@ -123,7 +123,7 @@
    "name": "What FPL tools does GoalIQ have?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR), rate my team with a captain pick, a pre-season draft rater (pick 15, no team ID needed), the fit checker (lock must-have players, the model builds the best legal 15 around them), price watch, and the top three of the value, xG leaders and DefCon lists. GoalIQ Premium: an interactive team manager (formations, bench swaps, captaincy, a GW1 to GW6 gameweek planner with each player's opponent per week), player expected points (xP), the captain ranker, transfer suggestions with one-tap apply to your planned squad, player value (xP per million), full xG leaders and DefCon (defensive contribution) leaderboards, goalkeeper rotation pairs, differentials, player compare and predicted starting minutes. Available on the web, iOS and Android."
+    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, and price watch. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, full xG leaders and DefCon leaderboards, GK rotation pairs, differentials, player compare and predicted starting minutes. Available on the web, iOS and Android."
    }
   },
   {
@@ -307,12 +307,15 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <div class="wrap">
 <h1>Free FPL Tools: Clean Sheet Probability, Fixture Difficulty and More</h1>
 <p class="lede">GoalIQ is a free FPL assistant built on a proven match model.
-This page gives clean sheet probability and fixture difficulty for every
-Premier League team, free and updated every gameweek. Rate my team, a captain
-pick and price watch are free too; GoalIQ Premium adds an interactive team
-manager with a gameweek planner, player expected points (xP), the captain
-ranker, player value, xG leaders, a DefCon tracker and transfer suggestions
-you can apply to your planned squad.</p>
+This page gives clean sheet probability and fixture difficulty, with separate
+attack and defence views, for every Premier League team, free and updated every
+gameweek. Rate my team with a captain pick, a player lookup with official
+availability news, start chance and set-piece roles, a mini-league view with
+head-to-head win odds and price watch are free too; GoalIQ Premium adds an
+interactive team manager with a gameweek planner, player expected points (xP),
+the captain ranker, chip timing, transfer plan chains, an edge mode for your
+mini-league, player value, xG leaders, a DefCon tracker and transfer
+suggestions you can apply to your planned squad.</p>
 <p class="meta">Season 2026/27. Data updated 25 July 2026.
 Gameweek 1 starts Friday 21 August 2026.</p>
 
@@ -364,17 +367,20 @@ cell tooltip. Model-derived, not the official FPL difficulty.</p>
 <aside class="upsell">
 <h2 id="pro">Unlock the full FPL toolkit with Premium</h2>
 <p>GoalIQ Premium adds an interactive team manager (formations, bench swaps,
-captaincy and a GW1 to GW6 gameweek planner showing each player's opponent
-per week), player expected points (xP), a captain ranker, transfer suggestions
-you can apply straight to your planned squad, a player value ranking (xP per
-million), full xG leaders and DefCon leaderboards, goalkeeper rotation pairs,
-differential picks, player compare and predicted starting minutes, from the
-same match model as this page. Rate my team, a captain pick, price watch and
-the top three of every leaderboard are free.</p>
+captaincy and a rolling six-gameweek planner showing each player's opponent
+per week), player expected points (xP) with ownership, minutes outlook and CSV
+export, a captain ranker with a differential pick, chip timing for the best
+Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that
+chain 1 to 2 moves with hits priced in and one-tap apply, an edge mode with
+rank-aware picks for your mini-league, a player value ranking (xP per million),
+full xG leaders and DefCon leaderboards, goalkeeper rotation pairs, differential
+picks, player compare and predicted starting minutes, from the same match model
+as this page. Rate my team, a captain pick, the player lookup, the mini-league
+view, price watch and the top three of every leaderboard are free.</p>
 <div class="cta-row">
   <a class="cta" href="https://pro.goaliq.app/checkout?plan=season" data-cta="fpl">Start GoalIQ Premium &mdash; &euro;25/year</a>
 </div>
-<p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
+<p class="price-note"><strong>First 200: 30% off the season pass with code EARLY30 at checkout, €17.50 for the year.</strong><br>From €25 a year (under €2.10 a month), or €3.99 a month.
 One subscription covers web, iOS and Android.</p>
 </aside>
 
@@ -406,7 +412,7 @@ cannot be edited after the fact. If the model has a bad week, the log shows it.<
 
 <h2 id="faq">FAQ</h2>
 <dl class="faq">
-<dt>Which teams are most likely to keep a clean sheet in Gameweek 1?</dt><dd>On GoalIQ&#x27;s model the top clean sheet chances in Gameweek 1 of the 2026/27 Premier League season are Arsenal at 60.1% (home against Coventry); Nottingham Forest at 36.4% (home against Leeds); Manchester City at 34.9% (home against Bournemouth). These are pre-season projections and will sharpen once 2026/27 results arrive.</dd><dt>What is fixture difficulty rating (FDR)?</dt><dd>GoalIQ&#x27;s fixture difficulty rating comes from the match model&#x27;s win and clean sheet probabilities, on a 1 to 5 scale. A lower number is an easier fixture. It is model-derived and independent of the official FPL fixture difficulty.</dd><dt>Is GoalIQ good for FPL?</dt><dd>Yes. GoalIQ is built FPL-first: clean sheet probability, fixture difficulty, rate my team with a captain pick, a fit checker that builds the best legal 15 around your must-have players, a pre-season draft rater (no team ID needed), and price watch are free, and GoalIQ Premium adds an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, a player value ranking, xG leaders, a DefCon tracker, differentials and transfer suggestions you can apply to your planned squad. Every number comes from a match model with a published, pre-match-logged track record.</dd><dt>What FPL tools does GoalIQ have?</dt><dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR), rate my team with a captain pick, a pre-season draft rater (pick 15, no team ID needed), the fit checker (lock must-have players, the model builds the best legal 15 around them), price watch, and the top three of the value, xG leaders and DefCon lists. GoalIQ Premium: an interactive team manager (formations, bench swaps, captaincy, a GW1 to GW6 gameweek planner with each player&#x27;s opponent per week), player expected points (xP), the captain ranker, transfer suggestions with one-tap apply to your planned squad, player value (xP per million), full xG leaders and DefCon (defensive contribution) leaderboards, goalkeeper rotation pairs, differentials, player compare and predicted starting minutes. Available on the web, iOS and Android.</dd><dt>What is DefCon in FPL and does GoalIQ track it?</dt><dd>DefCon (defensive contribution) is an FPL scoring rule: a defender earns 2 points with 10 combined clearances, blocks, interceptions and tackles in a match, and a midfielder or forward with 12 including ball recoveries. GoalIQ tracks every player&#x27;s DefCon actions per game and hit rate, so you can find the most reliable DefCon point scorers. The top three are free and the full leaderboard is on GoalIQ Premium.</dd><dt>Is GoalIQ free?</dt><dd>Yes. Clean sheet probability and fixture difficulty are free, on the web and in the GoalIQ app for Android and iOS.</dd><dt>How accurate is the GoalIQ model?</dt><dd>The GoalIQ model has logged 304 pre-match predictions, before kickoff, with no edits afterwards, starting with the 2026 World Cup and now covering domestic leagues. Across the 114 completed matches, the model called the result correctly in 59.7% of matches. When the model named a clear winner rather than a draw, it was right 82.9% of the time (68 of 82). Every prediction is logged, hits and misses.</dd><dt>Does GoalIQ give betting tips?</dt><dd>No. GoalIQ publishes model predictions and analytics, not betting advice. It is not a gambling service and has no odds or bookmaker links.</dd><dt>Is there a full xP dashboard on top of this free page?</dt><dd>Yes. GoalIQ Premium at pro.goaliq.app adds player expected points (xP) for the coming gameweeks, a captain ranker and per-gameweek breakdowns, from the same match model as this page. 3.99 EUR per month or 25 EUR per year, and one account unlocks premium on the web, iOS and Android.</dd>
+<dt>Which teams are most likely to keep a clean sheet in Gameweek 1?</dt><dd>On GoalIQ&#x27;s model the top clean sheet chances in Gameweek 1 of the 2026/27 Premier League season are Arsenal at 60.1% (home against Coventry); Nottingham Forest at 36.4% (home against Leeds); Manchester City at 34.9% (home against Bournemouth). These are pre-season projections and will sharpen once 2026/27 results arrive.</dd><dt>What is fixture difficulty rating (FDR)?</dt><dd>GoalIQ&#x27;s fixture difficulty rating comes from the match model&#x27;s win and clean sheet probabilities, on a 1 to 5 scale. A lower number is an easier fixture. It is model-derived and independent of the official FPL fixture difficulty.</dd><dt>Is GoalIQ good for FPL?</dt><dd>Yes. GoalIQ is built FPL-first: clean sheet probability, fixture difficulty with separate attack and defence views, rate my team with a captain pick, a player lookup with official availability news, start chance and set-piece roles, a mini-league view with head-to-head win odds, a fit checker that builds the best legal 15 around your must-have players and saves it as a draft, a pre-season draft rater (no team ID needed), and price watch are free, and GoalIQ Premium adds an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, an edge mode for your mini-league, a player value ranking, xG leaders, a DefCon tracker, differentials and transfer suggestions you can apply to your planned squad. Every number comes from a match model with a published, pre-match-logged track record.</dd><dt>What FPL tools does GoalIQ have?</dt><dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, and price watch. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, full xG leaders and DefCon leaderboards, GK rotation pairs, differentials, player compare and predicted starting minutes. Available on the web, iOS and Android.</dd><dt>What is DefCon in FPL and does GoalIQ track it?</dt><dd>DefCon (defensive contribution) is an FPL scoring rule: a defender earns 2 points with 10 combined clearances, blocks, interceptions and tackles in a match, and a midfielder or forward with 12 including ball recoveries. GoalIQ tracks every player&#x27;s DefCon actions per game and hit rate, so you can find the most reliable DefCon point scorers. The top three are free and the full leaderboard is on GoalIQ Premium.</dd><dt>Is GoalIQ free?</dt><dd>Yes. Clean sheet probability and fixture difficulty are free, on the web and in the GoalIQ app for Android and iOS.</dd><dt>How accurate is the GoalIQ model?</dt><dd>The GoalIQ model has logged 304 pre-match predictions, before kickoff, with no edits afterwards, starting with the 2026 World Cup and now covering domestic leagues. Across the 114 completed matches, the model called the result correctly in 59.7% of matches. When the model named a clear winner rather than a draw, it was right 82.9% of the time (68 of 82). Every prediction is logged, hits and misses.</dd><dt>Does GoalIQ give betting tips?</dt><dd>No. GoalIQ publishes model predictions and analytics, not betting advice. It is not a gambling service and has no odds or bookmaker links.</dd><dt>Is there a full xP dashboard on top of this free page?</dt><dd>Yes. GoalIQ Premium at pro.goaliq.app adds player expected points (xP) for the coming gameweeks, a captain ranker and per-gameweek breakdowns, from the same match model as this page. 3.99 EUR per month or 25 EUR per year, and one account unlocks premium on the web, iOS and Android.</dd>
 </dl>
 
 <div class="cta-row">
