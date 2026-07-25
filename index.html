@@ -311,6 +311,15 @@
   .price-tag span { font-size: 14px; color: var(--muted); font-weight: 500; font-family: var(--font-body); }
   .btn-teal { background: var(--teal-ink); }
   .btn-teal:hover { background: #00655A; }
+  .early-offer {
+    background: rgba(255,201,60,0.16); border: 1px solid rgba(244,168,0,0.45);
+    border-radius: 12px; padding: 10px 14px; margin: 14px 0 0;
+    font-size: 14px; color: var(--text);
+  }
+  .early-offer code {
+    font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em;
+    background: var(--ink); color: #fff; padding: 2px 8px; border-radius: 6px;
+  }
   .trust-line { color: var(--muted); font-size: 14px; margin-top: 18px; text-align: center; }
   .free-note { color: var(--muted); font-size: 14px; margin-top: 8px; text-align: center; }
 
@@ -498,6 +507,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           <li>Edge mode: rank-aware picks to protect or climb in your mini-league</li>
           <li>Player value, xG leaders, DefCon tracker, differentials</li>
         </ul>
+        <p class="early-offer">First 200: <strong>30% off the season pass</strong> with code
+          <code>EARLY30</code> at checkout. That is &euro;17.50 for the year.</p>
         <p class="panel-cta"><a class="btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing-season">Get the Season pass</a>
           &nbsp; <a class="btn-ghost" style="color:var(--text);border-color:var(--line);" href="https://pro.goaliq.app/checkout?plan=monthly" data-cta="pricing-monthly">Start Monthly</a></p>
       </div>
