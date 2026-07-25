@@ -197,13 +197,17 @@ def add_fdr(rows: list[dict]) -> None:
     (1 - voitto-%) ja (odotetut päästetyt maalit), kvintiilibucket koko kauden
     760 joukkue-fixturen yli. 1 = helpoin, 5 = vaikein."""
     # Kokoa molemmat perspektiivit
-    persp = []  # (row_idx, side, p_win, xGC)
+    # EDGE-sprint: fdr emittoidaan myös nimellä def_fdr_{side} (alias,
+    # sovittu kontrakti) + att_fdr_{side} = hyökkäyssuunnan vaikeus (oma
+    # odotettu xG rank-normalisoituna, käännetty, kvintiilit 1-5).
+    persp = []  # (row_idx, side, p_win, xGC, xGF)
     for i, r in enumerate(rows):
-        persp.append((i, "home", r["p_home_win"], r["xg_away"]))
-        persp.append((i, "away", r["p_away_win"], r["xg_home"]))
+        persp.append((i, "home", r["p_home_win"], r["xg_away"], r["xg_home"]))
+        persp.append((i, "away", r["p_away_win"], r["xg_home"], r["xg_away"]))
     n = len(persp)
     lose = np.array([1.0 - p[2] for p in persp])  # korkea = vaikeampi
     xgc = np.array([p[3] for p in persp])
+    xgf = np.array([p[4] for p in persp])         # oma odotettu maalimäärä
 
     def pct_rank(x):
         order = x.argsort()
@@ -215,8 +219,13 @@ def add_fdr(rows: list[dict]) -> None:
     # kvintiilit -> FDR 1..5
     qs = np.quantile(diff, [0.2, 0.4, 0.6, 0.8])
     fdr = np.searchsorted(qs, diff, side="right") + 1  # 1..5
-    for (i, side, _p, _x), d in zip(persp, fdr):
+    att_diff = pct_rank(-xgf)                          # korkea = vaikea hyökätä
+    qs_att = np.quantile(att_diff, [0.2, 0.4, 0.6, 0.8])
+    att_fdr = np.searchsorted(qs_att, att_diff, side="right") + 1  # 1..5
+    for (i, side, _p, _x, _g), d, ad in zip(persp, fdr, att_fdr):
         rows[i][f"fdr_{side}"] = int(d)
+        rows[i][f"def_fdr_{side}"] = int(d)   # alias (kontrakti)
+        rows[i][f"att_fdr_{side}"] = int(ad)
 
 
 # ---------------------------------------------------------------------------
@@ -352,6 +361,13 @@ def main() -> None:
             "fdr_method": (
                 "Mallipohjainen 1-5: 0.55*(1-voitto%) + 0.45*(odotetut päästetyt maalit), "
                 "rank-normalisoitu, kvintiilibucket koko kauden 760 joukkue-fixturen yli"
+            ),
+            # EDGE-sprint: def_fdr = alias fdr:lle (CS/puolustussuunta),
+            # att_fdr = hyökkäyssuunnan vaikeus samasta DC-mallista.
+            "att_fdr_method": (
+                "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä "
+                "(vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden "
+                "760 joukkue-fixturen yli. 1 = helpoin hyökätä, 5 = vaikein."
             ),
             "caveat": (
                 "26/27 team-voimat = viime kauden priorit, suuntaa-antava (ei tarkka). "

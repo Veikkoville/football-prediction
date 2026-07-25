@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-07-25T07:49:01",
+    "generated_at": "2026-07-25T10:37:01",
     "season": "2026/27",
     "source": "fpl-api",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -19,6 +19,7 @@
       "note": "Phase 1b: nousija-koti-avaus-buusti + manuaaliset yliajot (data/fpl_manual_overrides.csv)"
     },
     "fdr_method": "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), kvintiilibucket koko kauden joukkue-fixtureiden yli",
+    "att_fdr_method": "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä (vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden joukkue-fixtureiden yli. 1 = helpoin hyökätä, 5 = vaikein.",
     "caveat": "Pre-season: 26/27 team-voimat = viime kauden priorit, suuntaa-antava. Nousijat ilman ylätason dataa = empiirinen promoted baseline.",
     "promoted_baseline_teams": [
       "Coventry",
@@ -56,7 +57,9 @@
           "venue": "H",
           "kickoff_ms": 1787338800000,
           "cs_pct": 60.1,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 2,
@@ -65,7 +68,9 @@
           "venue": "A",
           "kickoff_ms": 1788202800000,
           "cs_pct": 35.3,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 3,
@@ -74,7 +79,9 @@
           "venue": "H",
           "kickoff_ms": 1788708600000,
           "cs_pct": 43.4,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 4,
@@ -83,7 +90,9 @@
           "venue": "A",
           "kickoff_ms": 1789239600000,
           "cs_pct": 48.6,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -92,7 +101,9 @@
           "venue": "A",
           "kickoff_ms": 1789826400000,
           "cs_pct": 39.6,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 3
         },
         {
           "gw": 6,
@@ -101,7 +112,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 51.9,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         }
       ],
       "next_avg_cs_pct": 46.5,
@@ -119,7 +132,9 @@
           "venue": "H",
           "kickoff_ms": 1787490000000,
           "cs_pct": 34.9,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 2,
@@ -128,7 +143,9 @@
           "venue": "A",
           "kickoff_ms": 1787943600000,
           "cs_pct": 42.9,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         },
         {
           "gw": 3,
@@ -137,7 +154,9 @@
           "venue": "H",
           "kickoff_ms": 1788616800000,
           "cs_pct": 53.7,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 4,
@@ -146,7 +165,9 @@
           "venue": "A",
           "kickoff_ms": 1789313400000,
           "cs_pct": 25.5,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -155,7 +176,9 @@
           "venue": "H",
           "kickoff_ms": 1789826400000,
           "cs_pct": 46.6,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 6,
@@ -164,7 +187,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 25.2,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 2
         }
       ],
       "next_avg_cs_pct": 38.1,
@@ -182,7 +207,9 @@
           "venue": "H",
           "kickoff_ms": 1787407200000,
           "cs_pct": 34.6,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 3
         },
         {
           "gw": 2,
@@ -191,7 +218,9 @@
           "venue": "A",
           "kickoff_ms": 1788012000000,
           "cs_pct": 23.8,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 3,
@@ -200,7 +229,9 @@
           "venue": "H",
           "kickoff_ms": 1788699600000,
           "cs_pct": 26.3,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 4,
@@ -209,7 +240,9 @@
           "venue": "A",
           "kickoff_ms": 1789230600000,
           "cs_pct": 29.3,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 5,
@@ -218,7 +251,9 @@
           "venue": "H",
           "kickoff_ms": 1789826400000,
           "cs_pct": 41.2,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 6,
@@ -227,7 +262,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 43.4,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         }
       ],
       "next_avg_cs_pct": 33.1,
@@ -245,7 +282,9 @@
           "venue": "H",
           "kickoff_ms": 1787490000000,
           "cs_pct": 31.6,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 2,
@@ -254,7 +293,9 @@
           "venue": "A",
           "kickoff_ms": 1788094800000,
           "cs_pct": 26.2,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 3,
@@ -263,7 +304,9 @@
           "venue": "H",
           "kickoff_ms": 1788616800000,
           "cs_pct": 36.2,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 4,
@@ -272,7 +315,9 @@
           "venue": "A",
           "kickoff_ms": 1789304400000,
           "cs_pct": 44.1,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 5,
@@ -281,7 +326,9 @@
           "venue": "H",
           "kickoff_ms": 1789826400000,
           "cs_pct": 24.2,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 5
         },
         {
           "gw": 6,
@@ -290,7 +337,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 32.6,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 4
         }
       ],
       "next_avg_cs_pct": 32.5,
@@ -308,7 +357,9 @@
           "venue": "H",
           "kickoff_ms": 1787407200000,
           "cs_pct": 36.4,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 3
         },
         {
           "gw": 2,
@@ -317,7 +368,9 @@
           "venue": "A",
           "kickoff_ms": 1788003000000,
           "cs_pct": 17.6,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 2
         },
         {
           "gw": 3,
@@ -326,7 +379,9 @@
           "venue": "H",
           "kickoff_ms": 1788616800000,
           "cs_pct": 33.0,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 3
         },
         {
           "gw": 4,
@@ -335,7 +390,9 @@
           "venue": "A",
           "kickoff_ms": 1789221600000,
           "cs_pct": 20.1,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -344,7 +401,9 @@
           "venue": "H",
           "kickoff_ms": 1789835400000,
           "cs_pct": 45.6,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         },
         {
           "gw": 6,
@@ -353,7 +412,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 34.4,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         }
       ],
       "next_avg_cs_pct": 31.2,
@@ -371,7 +432,9 @@
           "venue": "A",
           "kickoff_ms": 1787398200000,
           "cs_pct": 33.7,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 2,
@@ -380,7 +443,9 @@
           "venue": "H",
           "kickoff_ms": 1788103800000,
           "cs_pct": 41.1,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 3,
@@ -389,7 +454,9 @@
           "venue": "A",
           "kickoff_ms": 1788699600000,
           "cs_pct": 26.8,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 4,
@@ -398,7 +465,9 @@
           "venue": "H",
           "kickoff_ms": 1789313400000,
           "cs_pct": 23.5,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 5,
@@ -407,7 +476,9 @@
           "venue": "A",
           "kickoff_ms": 1789918200000,
           "cs_pct": 26.0,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 6,
@@ -416,7 +487,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 32.1,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 1
         }
       ],
       "next_avg_cs_pct": 30.5,
@@ -434,7 +507,9 @@
           "venue": "H",
           "kickoff_ms": 1787598000000,
           "cs_pct": 26.6,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 2,
@@ -443,7 +518,9 @@
           "venue": "A",
           "kickoff_ms": 1788094800000,
           "cs_pct": 31.8,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 5
         },
         {
           "gw": 3,
@@ -452,7 +529,9 @@
           "venue": "H",
           "kickoff_ms": 1788616800000,
           "cs_pct": 34.4,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 4,
@@ -461,7 +540,9 @@
           "venue": "A",
           "kickoff_ms": 1789221600000,
           "cs_pct": 16.7,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 4
         },
         {
           "gw": 5,
@@ -470,7 +551,9 @@
           "venue": "H",
           "kickoff_ms": 1789918200000,
           "cs_pct": 26.1,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 6,
@@ -479,7 +562,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 41.2,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         }
       ],
       "next_avg_cs_pct": 29.5,
@@ -497,7 +582,9 @@
           "venue": "A",
           "kickoff_ms": 1787490000000,
           "cs_pct": 22.5,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -506,7 +593,9 @@
           "venue": "H",
           "kickoff_ms": 1788202800000,
           "cs_pct": 22.9,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 3,
@@ -515,7 +604,9 @@
           "venue": "A",
           "kickoff_ms": 1788625800000,
           "cs_pct": 42.7,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 4,
@@ -524,7 +615,9 @@
           "venue": "H",
           "kickoff_ms": 1789221600000,
           "cs_pct": 23.6,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -533,7 +626,9 @@
           "venue": "A",
           "kickoff_ms": 1789817400000,
           "cs_pct": 28.6,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 6,
@@ -542,7 +637,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 30.9,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         }
       ],
       "next_avg_cs_pct": 28.5,
@@ -560,7 +657,9 @@
           "venue": "H",
           "kickoff_ms": 1787499000000,
           "cs_pct": 19.4,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 1
         },
         {
           "gw": 2,
@@ -569,7 +668,9 @@
           "venue": "A",
           "kickoff_ms": 1788021000000,
           "cs_pct": 26.0,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 3,
@@ -578,7 +679,9 @@
           "venue": "H",
           "kickoff_ms": 1788607800000,
           "cs_pct": 22.5,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 1
         },
         {
           "gw": 4,
@@ -587,7 +690,9 @@
           "venue": "A",
           "kickoff_ms": 1789412400000,
           "cs_pct": 21.0,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 5,
@@ -596,7 +701,9 @@
           "venue": "H",
           "kickoff_ms": 1789826400000,
           "cs_pct": 41.4,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 6,
@@ -605,7 +712,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 40.0,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         }
       ],
       "next_avg_cs_pct": 28.4,
@@ -623,7 +732,9 @@
           "venue": "A",
           "kickoff_ms": 1787407200000,
           "cs_pct": 29.8,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -632,7 +743,9 @@
           "venue": "H",
           "kickoff_ms": 1788094800000,
           "cs_pct": 29.6,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 3,
@@ -641,7 +754,9 @@
           "venue": "A",
           "kickoff_ms": 1788616800000,
           "cs_pct": 21.2,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 4,
@@ -650,7 +765,9 @@
           "venue": "H",
           "kickoff_ms": 1789412400000,
           "cs_pct": 33.6,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -659,7 +776,9 @@
           "venue": "H",
           "kickoff_ms": 1789826400000,
           "cs_pct": 32.4,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 6,
@@ -668,7 +787,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 14.5,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         }
       ],
       "next_avg_cs_pct": 26.9,
@@ -686,7 +807,9 @@
           "venue": "A",
           "kickoff_ms": 1787499000000,
           "cs_pct": 15.0,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 2
         },
         {
           "gw": 2,
@@ -695,7 +818,9 @@
           "venue": "H",
           "kickoff_ms": 1788003000000,
           "cs_pct": 22.5,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 1
         },
         {
           "gw": 3,
@@ -704,7 +829,9 @@
           "venue": "A",
           "kickoff_ms": 1788548400000,
           "cs_pct": 39.5,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 4,
@@ -713,7 +840,9 @@
           "venue": "H",
           "kickoff_ms": 1789221600000,
           "cs_pct": 36.5,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 5,
@@ -722,7 +851,9 @@
           "venue": "A",
           "kickoff_ms": 1789909200000,
           "cs_pct": 22.0,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 2
         },
         {
           "gw": 6,
@@ -731,7 +862,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 21.8,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 3
         }
       ],
       "next_avg_cs_pct": 26.2,
@@ -749,7 +882,9 @@
           "venue": "A",
           "kickoff_ms": 1787407200000,
           "cs_pct": 32.1,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 2,
@@ -758,7 +893,9 @@
           "venue": "H",
           "kickoff_ms": 1788094800000,
           "cs_pct": 38.7,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 4
         },
         {
           "gw": 3,
@@ -767,7 +904,9 @@
           "venue": "A",
           "kickoff_ms": 1788616800000,
           "cs_pct": 19.5,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 4,
@@ -776,7 +915,9 @@
           "venue": "H",
           "kickoff_ms": 1789239600000,
           "cs_pct": 24.0,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 5
         },
         {
           "gw": 5,
@@ -785,7 +926,9 @@
           "venue": "A",
           "kickoff_ms": 1789826400000,
           "cs_pct": 12.0,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 6,
@@ -794,7 +937,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 31.2,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 4
         }
       ],
       "next_avg_cs_pct": 26.2,
@@ -812,7 +957,9 @@
           "venue": "A",
           "kickoff_ms": 1787598000000,
           "cs_pct": 24.5,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 2,
@@ -821,7 +968,9 @@
           "venue": "H",
           "kickoff_ms": 1788094800000,
           "cs_pct": 29.1,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 3,
@@ -830,7 +979,9 @@
           "venue": "A",
           "kickoff_ms": 1788708600000,
           "cs_pct": 14.9,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 4,
@@ -839,7 +990,9 @@
           "venue": "H",
           "kickoff_ms": 1789221600000,
           "cs_pct": 43.0,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 1
         },
         {
           "gw": 5,
@@ -848,7 +1001,9 @@
           "venue": "A",
           "kickoff_ms": 1789758000000,
           "cs_pct": 17.7,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 3
         },
         {
           "gw": 6,
@@ -857,7 +1012,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 24.1,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         }
       ],
       "next_avg_cs_pct": 25.5,
@@ -875,7 +1032,9 @@
           "venue": "H",
           "kickoff_ms": 1787416200000,
           "cs_pct": 30.3,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 1
         },
         {
           "gw": 2,
@@ -884,7 +1043,9 @@
           "venue": "A",
           "kickoff_ms": 1788094800000,
           "cs_pct": 22.4,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 3
         },
         {
           "gw": 3,
@@ -893,7 +1054,9 @@
           "venue": "H",
           "kickoff_ms": 1788616800000,
           "cs_pct": 35.4,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 4,
@@ -902,7 +1065,9 @@
           "venue": "A",
           "kickoff_ms": 1789221600000,
           "cs_pct": 22.0,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 5,
@@ -911,7 +1076,9 @@
           "venue": "H",
           "kickoff_ms": 1789758000000,
           "cs_pct": 24.9,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 2
         },
         {
           "gw": 6,
@@ -920,7 +1087,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 17.7,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         }
       ],
       "next_avg_cs_pct": 25.4,
@@ -938,7 +1107,9 @@
           "venue": "A",
           "kickoff_ms": 1787407200000,
           "cs_pct": 24.1,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -947,7 +1118,9 @@
           "venue": "H",
           "kickoff_ms": 1787943600000,
           "cs_pct": 20.9,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 3,
@@ -956,7 +1129,9 @@
           "venue": "A",
           "kickoff_ms": 1788616800000,
           "cs_pct": 23.4,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 4,
@@ -965,7 +1140,9 @@
           "venue": "H",
           "kickoff_ms": 1789221600000,
           "cs_pct": 38.3,
-          "fdr": 1
+          "fdr": 1,
+          "def_fdr": 1,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -974,7 +1151,9 @@
           "venue": "A",
           "kickoff_ms": 1789826400000,
           "cs_pct": 21.5,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 6,
@@ -983,7 +1162,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 21.7,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         }
       ],
       "next_avg_cs_pct": 25.0,
@@ -1001,7 +1182,9 @@
           "venue": "A",
           "kickoff_ms": 1787490000000,
           "cs_pct": 11.6,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -1010,7 +1193,9 @@
           "venue": "H",
           "kickoff_ms": 1788012000000,
           "cs_pct": 36.5,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 3,
@@ -1019,7 +1204,9 @@
           "venue": "A",
           "kickoff_ms": 1788607800000,
           "cs_pct": 16.3,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 2
         },
         {
           "gw": 4,
@@ -1028,7 +1215,9 @@
           "venue": "H",
           "kickoff_ms": 1789221600000,
           "cs_pct": 31.5,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 5,
@@ -1037,7 +1226,9 @@
           "venue": "H",
           "kickoff_ms": 1789909200000,
           "cs_pct": 22.3,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 2
         },
         {
           "gw": 6,
@@ -1046,7 +1237,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 25.4,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         }
       ],
       "next_avg_cs_pct": 23.9,
@@ -1064,7 +1257,9 @@
           "venue": "A",
           "kickoff_ms": 1787416200000,
           "cs_pct": 13.7,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -1073,7 +1268,9 @@
           "venue": "H",
           "kickoff_ms": 1788021000000,
           "cs_pct": 28.9,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 3,
@@ -1082,7 +1279,9 @@
           "venue": "A",
           "kickoff_ms": 1788616800000,
           "cs_pct": 25.2,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 4,
@@ -1091,7 +1290,9 @@
           "venue": "H",
           "kickoff_ms": 1789230600000,
           "cs_pct": 29.8,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 5,
@@ -1100,7 +1301,9 @@
           "venue": "H",
           "kickoff_ms": 1789817400000,
           "cs_pct": 24.3,
-          "fdr": 3
+          "fdr": 3,
+          "def_fdr": 3,
+          "att_fdr": 3
         },
         {
           "gw": 6,
@@ -1109,7 +1312,9 @@
           "venue": "A",
           "kickoff_ms": 1791640800000,
           "cs_pct": 11.9,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 4
         }
       ],
       "next_avg_cs_pct": 22.3,
@@ -1127,7 +1332,9 @@
           "venue": "A",
           "kickoff_ms": 1787338800000,
           "cs_pct": 6.7,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 2,
@@ -1136,7 +1343,9 @@
           "venue": "H",
           "kickoff_ms": 1788012000000,
           "cs_pct": 30.2,
-          "fdr": 2
+          "fdr": 2,
+          "def_fdr": 2,
+          "att_fdr": 2
         },
         {
           "gw": 3,
@@ -1145,7 +1354,9 @@
           "venue": "A",
           "kickoff_ms": 1788616800000,
           "cs_pct": 4.1,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 4,
@@ -1154,7 +1365,9 @@
           "venue": "H",
           "kickoff_ms": 1789304400000,
           "cs_pct": 17.4,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 5,
@@ -1163,7 +1376,9 @@
           "venue": "A",
           "kickoff_ms": 1789835400000,
           "cs_pct": 18.2,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 6,
@@ -1172,7 +1387,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 21.6,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 5
         }
       ],
       "next_avg_cs_pct": 16.4,
@@ -1190,7 +1407,9 @@
           "venue": "H",
           "kickoff_ms": 1787407200000,
           "cs_pct": 22.5,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -1199,7 +1418,9 @@
           "venue": "A",
           "kickoff_ms": 1788103800000,
           "cs_pct": 6.9,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 3,
@@ -1208,7 +1429,9 @@
           "venue": "H",
           "kickoff_ms": 1788548400000,
           "cs_pct": 10.5,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 4,
@@ -1217,7 +1440,9 @@
           "venue": "A",
           "kickoff_ms": 1789221600000,
           "cs_pct": 19.2,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 5,
@@ -1226,7 +1451,9 @@
           "venue": "A",
           "kickoff_ms": 1789826400000,
           "cs_pct": 13.7,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 6,
@@ -1235,7 +1462,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 23.5,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 5
         }
       ],
       "next_avg_cs_pct": 16.1,
@@ -1253,7 +1482,9 @@
           "venue": "H",
           "kickoff_ms": 1787398200000,
           "cs_pct": 13.7,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 4
         },
         {
           "gw": 2,
@@ -1262,7 +1493,9 @@
           "venue": "A",
           "kickoff_ms": 1788012000000,
           "cs_pct": 19.9,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 4
         },
         {
           "gw": 3,
@@ -1271,7 +1504,9 @@
           "venue": "H",
           "kickoff_ms": 1788625800000,
           "cs_pct": 17.4,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 4,
@@ -1280,7 +1515,9 @@
           "venue": "A",
           "kickoff_ms": 1789221600000,
           "cs_pct": 13.1,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 5,
@@ -1289,7 +1526,9 @@
           "venue": "A",
           "kickoff_ms": 1789826400000,
           "cs_pct": 6.8,
-          "fdr": 5
+          "fdr": 5,
+          "def_fdr": 5,
+          "att_fdr": 5
         },
         {
           "gw": 6,
@@ -1298,7 +1537,9 @@
           "venue": "H",
           "kickoff_ms": 1791640800000,
           "cs_pct": 22.5,
-          "fdr": 4
+          "fdr": 4,
+          "def_fdr": 4,
+          "att_fdr": 5
         }
       ],
       "next_avg_cs_pct": 15.6,
@@ -1324,7 +1565,11 @@
       "cs_home_pct": 60.1,
       "cs_away_pct": 6.7,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 1,
@@ -1343,7 +1588,11 @@
       "cs_home_pct": 13.7,
       "cs_away_pct": 33.7,
       "fdr_home": 5,
-      "fdr_away": 1
+      "def_fdr_home": 5,
+      "att_fdr_home": 4,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 1
     },
     {
       "gameweek": 1,
@@ -1362,7 +1611,11 @@
       "cs_home_pct": 34.6,
       "cs_away_pct": 24.1,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 3,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 1,
@@ -1381,7 +1634,11 @@
       "cs_home_pct": 22.5,
       "cs_away_pct": 32.1,
       "fdr_home": 4,
-      "fdr_away": 2
+      "def_fdr_home": 4,
+      "att_fdr_home": 4,
+      "fdr_away": 2,
+      "def_fdr_away": 2,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 1,
@@ -1400,7 +1657,11 @@
       "cs_home_pct": 36.4,
       "cs_away_pct": 29.8,
       "fdr_home": 2,
-      "fdr_away": 3
+      "def_fdr_home": 2,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 1,
@@ -1419,7 +1680,11 @@
       "cs_home_pct": 30.3,
       "cs_away_pct": 13.7,
       "fdr_home": 2,
-      "fdr_away": 5
+      "def_fdr_home": 2,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 1,
@@ -1438,7 +1703,11 @@
       "cs_home_pct": 31.6,
       "cs_away_pct": 22.5,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 1,
@@ -1457,7 +1726,11 @@
       "cs_home_pct": 34.9,
       "cs_away_pct": 11.6,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 1,
@@ -1476,7 +1749,11 @@
       "cs_home_pct": 19.4,
       "cs_away_pct": 15.0,
       "fdr_home": 3,
-      "fdr_away": 4
+      "def_fdr_home": 3,
+      "att_fdr_home": 1,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 1,
@@ -1495,7 +1772,11 @@
       "cs_home_pct": 26.6,
       "cs_away_pct": 24.5,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 2,
@@ -1514,7 +1795,11 @@
       "cs_home_pct": 20.9,
       "cs_away_pct": 42.9,
       "fdr_home": 5,
-      "fdr_away": 1
+      "def_fdr_home": 5,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 2,
@@ -1533,7 +1818,11 @@
       "cs_home_pct": 22.5,
       "cs_away_pct": 17.6,
       "fdr_home": 3,
-      "fdr_away": 4
+      "def_fdr_home": 3,
+      "att_fdr_home": 1,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 2,
@@ -1552,7 +1841,11 @@
       "cs_home_pct": 36.5,
       "cs_away_pct": 23.8,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 2,
@@ -1571,7 +1864,11 @@
       "cs_home_pct": 30.2,
       "cs_away_pct": 19.9,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 2,
@@ -1590,7 +1887,11 @@
       "cs_home_pct": 28.9,
       "cs_away_pct": 26.0,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 2,
@@ -1609,7 +1910,11 @@
       "cs_home_pct": 29.1,
       "cs_away_pct": 26.2,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 2,
@@ -1628,7 +1933,11 @@
       "cs_home_pct": 29.6,
       "cs_away_pct": 22.4,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 2,
@@ -1647,7 +1956,11 @@
       "cs_home_pct": 38.7,
       "cs_away_pct": 31.8,
       "fdr_home": 2,
-      "fdr_away": 3
+      "def_fdr_home": 2,
+      "att_fdr_home": 4,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 2,
@@ -1666,7 +1979,11 @@
       "cs_home_pct": 41.1,
       "cs_away_pct": 6.9,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 2,
@@ -1685,7 +2002,11 @@
       "cs_home_pct": 22.9,
       "cs_away_pct": 35.3,
       "fdr_home": 4,
-      "fdr_away": 2
+      "def_fdr_home": 4,
+      "att_fdr_home": 4,
+      "fdr_away": 2,
+      "def_fdr_away": 2,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 3,
@@ -1704,7 +2025,11 @@
       "cs_home_pct": 10.5,
       "cs_away_pct": 39.5,
       "fdr_home": 5,
-      "fdr_away": 1
+      "def_fdr_home": 5,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 1
     },
     {
       "gameweek": 3,
@@ -1717,13 +2042,17 @@
       "away_short": "BOU",
       "xg_home": 1.812,
       "xg_away": 1.49,
-      "p_home_win": 0.4422,
+      "p_home_win": 0.4421,
       "p_draw": 0.2508,
       "p_away_win": 0.3071,
       "cs_home_pct": 22.5,
       "cs_away_pct": 16.3,
       "fdr_home": 3,
-      "fdr_away": 4
+      "def_fdr_home": 3,
+      "att_fdr_home": 1,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 3,
@@ -1742,7 +2071,11 @@
       "cs_home_pct": 35.4,
       "cs_away_pct": 19.5,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 3,
@@ -1761,7 +2094,11 @@
       "cs_home_pct": 36.2,
       "cs_away_pct": 21.2,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 3,
@@ -1780,7 +2117,11 @@
       "cs_home_pct": 34.4,
       "cs_away_pct": 23.4,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 3,
@@ -1799,7 +2140,11 @@
       "cs_home_pct": 53.7,
       "cs_away_pct": 4.1,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 3,
@@ -1818,7 +2163,11 @@
       "cs_home_pct": 33.0,
       "cs_away_pct": 25.2,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 3,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 3,
@@ -1837,7 +2186,11 @@
       "cs_home_pct": 17.4,
       "cs_away_pct": 42.7,
       "fdr_home": 5,
-      "fdr_away": 1
+      "def_fdr_home": 5,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 1
     },
     {
       "gameweek": 3,
@@ -1856,7 +2209,11 @@
       "cs_home_pct": 26.3,
       "cs_away_pct": 26.8,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 3,
@@ -1875,7 +2232,11 @@
       "cs_home_pct": 43.4,
       "cs_away_pct": 14.9,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 4,
@@ -1894,7 +2255,11 @@
       "cs_home_pct": 23.6,
       "cs_away_pct": 20.1,
       "fdr_home": 3,
-      "fdr_away": 4
+      "def_fdr_home": 3,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 4,
@@ -1913,7 +2278,11 @@
       "cs_home_pct": 31.5,
       "cs_away_pct": 22.0,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 4,
@@ -1932,7 +2301,11 @@
       "cs_home_pct": 43.0,
       "cs_away_pct": 13.1,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 4,
@@ -1951,7 +2324,11 @@
       "cs_home_pct": 38.3,
       "cs_away_pct": 19.2,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 2,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 4,
@@ -1970,7 +2347,11 @@
       "cs_home_pct": 36.5,
       "cs_away_pct": 16.7,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 4,
@@ -1989,7 +2370,11 @@
       "cs_home_pct": 29.8,
       "cs_away_pct": 29.3,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 4,
@@ -2008,7 +2393,11 @@
       "cs_home_pct": 24.0,
       "cs_away_pct": 48.6,
       "fdr_home": 4,
-      "fdr_away": 1
+      "def_fdr_home": 4,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 4,
@@ -2027,7 +2416,11 @@
       "cs_home_pct": 17.4,
       "cs_away_pct": 44.1,
       "fdr_home": 5,
-      "fdr_away": 1
+      "def_fdr_home": 5,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 1
     },
     {
       "gameweek": 4,
@@ -2046,7 +2439,11 @@
       "cs_home_pct": 23.5,
       "cs_away_pct": 25.5,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 4,
@@ -2065,7 +2462,11 @@
       "cs_home_pct": 33.6,
       "cs_away_pct": 21.0,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 5,
@@ -2084,7 +2485,11 @@
       "cs_home_pct": 24.9,
       "cs_away_pct": 17.7,
       "fdr_home": 3,
-      "fdr_away": 4
+      "def_fdr_home": 3,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 5,
@@ -2103,7 +2508,11 @@
       "cs_home_pct": 24.3,
       "cs_away_pct": 28.6,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 5,
@@ -2122,7 +2531,11 @@
       "cs_home_pct": 24.2,
       "cs_away_pct": 39.6,
       "fdr_home": 4,
-      "fdr_away": 2
+      "def_fdr_home": 4,
+      "att_fdr_home": 5,
+      "fdr_away": 2,
+      "def_fdr_away": 2,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 5,
@@ -2141,7 +2554,11 @@
       "cs_home_pct": 41.2,
       "cs_away_pct": 13.7,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 5,
@@ -2160,7 +2577,11 @@
       "cs_home_pct": 32.4,
       "cs_away_pct": 21.5,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 5,
@@ -2179,7 +2600,11 @@
       "cs_home_pct": 46.6,
       "cs_away_pct": 12.0,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 5,
@@ -2198,7 +2623,11 @@
       "cs_home_pct": 41.4,
       "cs_away_pct": 6.8,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 5,
@@ -2217,7 +2646,11 @@
       "cs_home_pct": 45.6,
       "cs_away_pct": 18.2,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 2,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 5,
@@ -2236,7 +2669,11 @@
       "cs_home_pct": 22.3,
       "cs_away_pct": 22.0,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 2,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 5,
@@ -2255,7 +2692,11 @@
       "cs_home_pct": 26.1,
       "cs_away_pct": 26.0,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 6,
@@ -2274,7 +2715,11 @@
       "cs_home_pct": 51.9,
       "cs_away_pct": 14.5,
       "fdr_home": 1,
-      "fdr_away": 5
+      "def_fdr_home": 1,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 5
     },
     {
       "gameweek": 6,
@@ -2293,7 +2738,11 @@
       "cs_home_pct": 30.9,
       "cs_away_pct": 17.7,
       "fdr_home": 2,
-      "fdr_away": 4
+      "def_fdr_home": 2,
+      "att_fdr_home": 2,
+      "fdr_away": 4,
+      "def_fdr_away": 4,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 6,
@@ -2306,13 +2755,17 @@
       "away_short": "BOU",
       "xg_home": 1.371,
       "xg_away": 1.425,
-      "p_home_win": 0.3473,
+      "p_home_win": 0.3472,
       "p_draw": 0.2812,
       "p_away_win": 0.3716,
       "cs_home_pct": 24.1,
       "cs_away_pct": 25.4,
       "fdr_home": 3,
-      "fdr_away": 3
+      "def_fdr_home": 3,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 3
     },
     {
       "gameweek": 6,
@@ -2331,7 +2784,11 @@
       "cs_home_pct": 21.6,
       "cs_away_pct": 40.0,
       "fdr_home": 4,
-      "fdr_away": 1
+      "def_fdr_home": 4,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 6,
@@ -2350,7 +2807,11 @@
       "cs_home_pct": 21.7,
       "cs_away_pct": 34.4,
       "fdr_home": 4,
-      "fdr_away": 2
+      "def_fdr_home": 4,
+      "att_fdr_home": 4,
+      "fdr_away": 2,
+      "def_fdr_away": 2,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 6,
@@ -2369,7 +2830,11 @@
       "cs_home_pct": 22.5,
       "cs_away_pct": 43.4,
       "fdr_home": 4,
-      "fdr_away": 1
+      "def_fdr_home": 4,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 6,
@@ -2388,7 +2853,11 @@
       "cs_home_pct": 23.5,
       "cs_away_pct": 41.2,
       "fdr_home": 4,
-      "fdr_away": 1
+      "def_fdr_home": 4,
+      "att_fdr_home": 5,
+      "fdr_away": 1,
+      "def_fdr_away": 1,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 6,
@@ -2407,7 +2876,11 @@
       "cs_home_pct": 21.8,
       "cs_away_pct": 25.2,
       "fdr_home": 4,
-      "fdr_away": 3
+      "def_fdr_home": 4,
+      "att_fdr_home": 3,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
+      "att_fdr_away": 2
     },
     {
       "gameweek": 6,
@@ -2418,7 +2891,7 @@
       "away": "Tottenham",
       "home_short": "MUN",
       "away_short": "TOT",
-      "xg_home": 2.13,
+      "xg_home": 2.131,
       "xg_away": 1.137,
       "p_home_win": 0.5899,
       "p_draw": 0.2257,
@@ -2426,7 +2899,11 @@
       "cs_home_pct": 32.1,
       "cs_away_pct": 11.9,
       "fdr_home": 2,
-      "fdr_away": 5
+      "def_fdr_home": 2,
+      "att_fdr_home": 1,
+      "fdr_away": 5,
+      "def_fdr_away": 5,
+      "att_fdr_away": 4
     },
     {
       "gameweek": 6,
@@ -2445,7 +2922,11 @@
       "cs_home_pct": 31.2,
       "cs_away_pct": 32.6,
       "fdr_home": 3,
-      "fdr_away": 2
+      "def_fdr_home": 3,
+      "att_fdr_home": 4,
+      "fdr_away": 2,
+      "def_fdr_away": 2,
+      "att_fdr_away": 4
     }
   ]
 }

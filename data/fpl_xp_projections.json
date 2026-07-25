@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-25T07:49:05",
+    "generated_at": "2026-07-25T10:37:22",
     "season": "2026/27",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + jäädytetty 25/26-baseline-artefakti (data/fpl_prev_baselines_2526.json, element code -mappaus)",
@@ -81,6 +81,16 @@
       "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 47.5,
+      "p_start": 0.8941,
+      "p_cameo": 0.0,
+      "p_bench": 0.1059,
+      "set_pieces": {
+        "pens": 1,
+        "corners": 4,
+        "fk": 1
+      },
+      "e_bonus": 1.01,
       "xp_per_gw": 5.85,
       "xp_horizon_total": 35.08,
       "gameweeks": [
@@ -169,6 +179,16 @@
       "predicted_starts": 81.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 73.2,
+      "p_start": 0.8141,
+      "p_cameo": 0.0372,
+      "p_bench": 0.1487,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.99,
       "xp_per_gw": 5.4,
       "xp_horizon_total": 32.4,
       "gameweeks": [
@@ -257,6 +277,16 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 11.1,
+      "p_start": 0.8789,
+      "p_cameo": 0.0,
+      "p_bench": 0.1211,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.3,
       "xp_per_gw": 4.71,
       "xp_horizon_total": 28.27,
       "gameweeks": [
@@ -345,6 +375,16 @@
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 12.4,
+      "p_start": 0.9668,
+      "p_cameo": 0.0332,
+      "p_bench": 0.0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.45,
       "xp_per_gw": 4.68,
       "xp_horizon_total": 28.07,
       "gameweeks": [
@@ -433,6 +473,16 @@
       "predicted_starts": 78.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 24.8,
+      "p_start": 0.7816,
+      "p_cameo": 0.0485,
+      "p_bench": 0.1699,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.55,
       "xp_per_gw": 4.67,
       "xp_horizon_total": 28.01,
       "gameweeks": [
@@ -521,6 +571,16 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 18.2,
+      "p_start": 0.8789,
+      "p_cameo": 0.1211,
+      "p_bench": 0.0,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.58,
       "xp_per_gw": 4.66,
       "xp_horizon_total": 27.97,
       "gameweeks": [
@@ -609,6 +669,16 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 20.2,
+      "p_start": 0.9205,
+      "p_cameo": 0.0,
+      "p_bench": 0.0795,
+      "set_pieces": {
+        "pens": 3,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.47,
       "xp_per_gw": 4.44,
       "xp_horizon_total": 26.62,
       "gameweeks": [
@@ -697,6 +767,16 @@
       "predicted_starts": 87.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 13.2,
+      "p_start": 0.8697,
+      "p_cameo": 0.0869,
+      "p_bench": 0.0434,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": 1
+      },
+      "e_bonus": 0.45,
       "xp_per_gw": 4.43,
       "xp_horizon_total": 26.61,
       "gameweeks": [
@@ -785,6 +865,16 @@
       "predicted_starts": 80.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 13.5,
+      "p_start": 0.8041,
+      "p_cameo": 0.056,
+      "p_bench": 0.1399,
+      "set_pieces": {
+        "pens": 2,
+        "corners": 5,
+        "fk": 2
+      },
+      "e_bonus": 0.42,
       "xp_per_gw": 4.4,
       "xp_horizon_total": 26.41,
       "gameweeks": [
@@ -873,6 +963,16 @@
       "predicted_starts": 82.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 25.5,
+      "p_start": 0.824,
+      "p_cameo": 0.0,
+      "p_bench": 0.176,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.29,
       "xp_per_gw": 4.33,
       "xp_horizon_total": 25.96,
       "gameweeks": [
@@ -961,6 +1061,16 @@
       "predicted_starts": 83.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 22.7,
+      "p_start": 0.8299,
+      "p_cameo": 0.0425,
+      "p_bench": 0.1275,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 1
+      },
+      "e_bonus": 0.55,
       "xp_per_gw": 4.32,
       "xp_horizon_total": 25.91,
       "gameweeks": [
@@ -1049,6 +1159,16 @@
       "predicted_starts": 90.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 4.1,
+      "p_start": 0.9,
+      "p_cameo": 0.0,
+      "p_bench": 0.1,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 4,
+        "fk": 1
+      },
+      "e_bonus": 0.32,
       "xp_per_gw": 4.25,
       "xp_horizon_total": 25.47,
       "gameweeks": [
@@ -1137,6 +1257,16 @@
       "predicted_starts": 83.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 5.2,
+      "p_start": 0.8297,
+      "p_cameo": 0.0426,
+      "p_bench": 0.1277,
+      "set_pieces": {
+        "pens": 2,
+        "corners": 7,
+        "fk": 2
+      },
+      "e_bonus": 0.45,
       "xp_per_gw": 4.19,
       "xp_horizon_total": 25.11,
       "gameweeks": [
@@ -1225,6 +1355,16 @@
       "predicted_starts": 83.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.7,
+      "p_start": 0.8355,
+      "p_cameo": 0.0658,
+      "p_bench": 0.0987,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 4.14,
       "xp_horizon_total": 24.82,
       "gameweeks": [
@@ -1313,6 +1453,16 @@
       "predicted_starts": 99.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 15.3,
+      "p_start": 0.99,
+      "p_cameo": 0.0,
+      "p_bench": 0.01,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 4.13,
       "xp_horizon_total": 24.77,
       "gameweeks": [
@@ -1401,6 +1551,16 @@
       "predicted_starts": 86.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 13.3,
+      "p_start": 0.8654,
+      "p_cameo": 0.0,
+      "p_bench": 0.1346,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.29,
       "xp_per_gw": 4.12,
       "xp_horizon_total": 24.69,
       "gameweeks": [
@@ -1489,6 +1649,16 @@
       "predicted_starts": 88.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 29.7,
+      "p_start": 0.8811,
+      "p_cameo": 0.0,
+      "p_bench": 0.1189,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.28,
       "xp_per_gw": 4.11,
       "xp_horizon_total": 24.65,
       "gameweeks": [
@@ -1577,6 +1747,16 @@
       "predicted_starts": 90.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 9.5,
+      "p_start": 0.9,
+      "p_cameo": 0.0,
+      "p_bench": 0.1,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.36,
       "xp_per_gw": 4.08,
       "xp_horizon_total": 24.5,
       "gameweeks": [
@@ -1665,6 +1845,16 @@
       "predicted_starts": 84.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 13.5,
+      "p_start": 0.8429,
+      "p_cameo": 0.1257,
+      "p_bench": 0.0314,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.67,
       "xp_per_gw": 4.07,
       "xp_horizon_total": 24.39,
       "gameweeks": [
@@ -1753,6 +1943,16 @@
       "predicted_starts": 85.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 39.6,
+      "p_start": 0.859,
+      "p_cameo": 0.0,
+      "p_bench": 0.141,
+      "set_pieces": {
+        "pens": 2,
+        "corners": 4,
+        "fk": 1
+      },
+      "e_bonus": 0.5,
       "xp_per_gw": 4.03,
       "xp_horizon_total": 24.15,
       "gameweeks": [
@@ -1841,6 +2041,16 @@
       "predicted_starts": 90.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 16.0,
+      "p_start": 0.9027,
+      "p_cameo": 0.0,
+      "p_bench": 0.0973,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.28,
       "xp_per_gw": 3.96,
       "xp_horizon_total": 23.74,
       "gameweeks": [
@@ -1929,6 +2139,16 @@
       "predicted_starts": 77.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 46.5,
+      "p_start": 0.7701,
+      "p_cameo": 0.1314,
+      "p_bench": 0.0985,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.73,
       "xp_per_gw": 3.94,
       "xp_horizon_total": 23.62,
       "gameweeks": [
@@ -2017,6 +2237,16 @@
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 13.1,
+      "p_start": 0.8435,
+      "p_cameo": 0.0,
+      "p_bench": 0.1565,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.29,
       "xp_per_gw": 3.9,
       "xp_horizon_total": 23.42,
       "gameweeks": [
@@ -2105,6 +2335,16 @@
       "predicted_starts": 94.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 11.5,
+      "p_start": 0.9437,
+      "p_cameo": 0.0282,
+      "p_bench": 0.0282,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 3
+      },
+      "e_bonus": 0.37,
       "xp_per_gw": 3.89,
       "xp_horizon_total": 23.33,
       "gameweeks": [
@@ -2193,6 +2433,16 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 8.6,
+      "p_start": 0.7353,
+      "p_cameo": 0.0481,
+      "p_bench": 0.2166,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 6,
+        "fk": 2
+      },
+      "e_bonus": 0.53,
       "xp_per_gw": 3.81,
       "xp_horizon_total": 22.84,
       "gameweeks": [
@@ -2281,6 +2531,16 @@
       "predicted_starts": 89.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 5.1,
+      "p_start": 0.8983,
+      "p_cameo": 0.0,
+      "p_bench": 0.1017,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.44,
       "xp_per_gw": 3.79,
       "xp_horizon_total": 22.72,
       "gameweeks": [
@@ -2369,6 +2629,16 @@
       "predicted_starts": 71.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 25.0,
+      "p_start": 0.7149,
+      "p_cameo": 0.1426,
+      "p_bench": 0.1426,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 3.79,
       "xp_horizon_total": 22.72,
       "gameweeks": [
@@ -2457,6 +2727,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 19.3,
+      "p_start": 0.7737,
+      "p_cameo": 0.0,
+      "p_bench": 0.2263,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.22,
       "xp_per_gw": 3.76,
       "xp_horizon_total": 22.58,
       "gameweeks": [
@@ -2545,6 +2825,16 @@
       "predicted_starts": 78.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.6,
+      "p_start": 0.7864,
+      "p_cameo": 0.0801,
+      "p_bench": 0.1335,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 6,
+        "fk": 1
+      },
+      "e_bonus": 0.35,
       "xp_per_gw": 3.74,
       "xp_horizon_total": 22.47,
       "gameweeks": [
@@ -2633,6 +2923,16 @@
       "predicted_starts": 71.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.5,
+      "p_start": 0.7105,
+      "p_cameo": 0.1287,
+      "p_bench": 0.1608,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.22,
       "xp_per_gw": 3.74,
       "xp_horizon_total": 22.43,
       "gameweeks": [
@@ -2721,6 +3021,16 @@
       "predicted_starts": 90.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.1,
+      "p_start": 0.9,
+      "p_cameo": 0.0,
+      "p_bench": 0.1,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 3.74,
       "xp_horizon_total": 22.42,
       "gameweeks": [
@@ -2809,6 +3119,16 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 5.7,
+      "p_start": 0.8789,
+      "p_cameo": 0.0,
+      "p_bench": 0.1211,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.3,
       "xp_per_gw": 3.72,
       "xp_horizon_total": 22.34,
       "gameweeks": [
@@ -2897,6 +3217,16 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.6,
+      "p_start": 0.7947,
+      "p_cameo": 0.1232,
+      "p_bench": 0.0821,
+      "set_pieces": {
+        "pens": 2,
+        "corners": 6,
+        "fk": 2
+      },
+      "e_bonus": 0.37,
       "xp_per_gw": 3.72,
       "xp_horizon_total": 22.3,
       "gameweeks": [
@@ -2985,6 +3315,16 @@
       "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 35.3,
+      "p_start": 0.8939,
+      "p_cameo": 0.0,
+      "p_bench": 0.1061,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.43,
       "xp_per_gw": 3.71,
       "xp_horizon_total": 22.25,
       "gameweeks": [
@@ -3073,6 +3413,16 @@
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.5,
+      "p_start": 0.9668,
+      "p_cameo": 0.0332,
+      "p_bench": 0.0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 3.69,
       "xp_horizon_total": 22.17,
       "gameweeks": [
@@ -3161,6 +3511,16 @@
       "predicted_starts": 80.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.3,
+      "p_start": 0.8007,
+      "p_cameo": 0.0997,
+      "p_bench": 0.0997,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 3.67,
       "xp_horizon_total": 21.99,
       "gameweeks": [
@@ -3249,6 +3609,16 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.7949,
+      "p_cameo": 0.0342,
+      "p_bench": 0.1709,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 3.66,
       "xp_horizon_total": 21.97,
       "gameweeks": [
@@ -3337,6 +3707,16 @@
       "predicted_starts": 85.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.6,
+      "p_start": 0.8543,
+      "p_cameo": 0.0874,
+      "p_bench": 0.0583,
+      "set_pieces": {
+        "pens": null,
+        "corners": 7,
+        "fk": 4
+      },
+      "e_bonus": 0.25,
       "xp_per_gw": 3.66,
       "xp_horizon_total": 21.95,
       "gameweeks": [
@@ -3425,6 +3805,16 @@
       "predicted_starts": 72.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 17.3,
+      "p_start": 0.7279,
+      "p_cameo": 0.1512,
+      "p_bench": 0.121,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.51,
       "xp_per_gw": 3.65,
       "xp_horizon_total": 21.91,
       "gameweeks": [
@@ -3513,6 +3903,16 @@
       "predicted_starts": 63.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 11.3,
+      "p_start": 0.6372,
+      "p_cameo": 0.1395,
+      "p_bench": 0.2233,
+      "set_pieces": {
+        "pens": 1,
+        "corners": 6,
+        "fk": 2
+      },
+      "e_bonus": 0.37,
       "xp_per_gw": 3.65,
       "xp_horizon_total": 21.88,
       "gameweeks": [
@@ -3601,6 +4001,16 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 19.5,
+      "p_start": 0.8511,
+      "p_cameo": 0.0,
+      "p_bench": 0.1489,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.3,
       "xp_per_gw": 3.64,
       "xp_horizon_total": 21.87,
       "gameweeks": [
@@ -3689,6 +4099,16 @@
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.6,
+      "p_start": 0.8368,
+      "p_cameo": 0.1088,
+      "p_bench": 0.0544,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 3.58,
       "xp_horizon_total": 21.48,
       "gameweeks": [
@@ -3777,6 +4197,16 @@
       "predicted_starts": 83.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.3,
+      "p_start": 0.833,
+      "p_cameo": 0.0,
+      "p_bench": 0.167,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.29,
       "xp_per_gw": 3.55,
       "xp_horizon_total": 21.3,
       "gameweeks": [
@@ -3865,6 +4295,16 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 5.1,
+      "p_start": 0.9205,
+      "p_cameo": 0.0265,
+      "p_bench": 0.053,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 3.54,
       "xp_horizon_total": 21.23,
       "gameweeks": [
@@ -3953,6 +4393,16 @@
       "predicted_starts": 88.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.1,
+      "p_start": 0.8811,
+      "p_cameo": 0.0,
+      "p_bench": 0.1189,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 3.53,
       "xp_horizon_total": 21.18,
       "gameweeks": [
@@ -4041,6 +4491,16 @@
       "predicted_starts": 75.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 14.7,
+      "p_start": 0.7591,
+      "p_cameo": 0.1071,
+      "p_bench": 0.1338,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.37,
       "xp_per_gw": 3.5,
       "xp_horizon_total": 21.01,
       "gameweeks": [
@@ -4129,6 +4589,16 @@
       "predicted_starts": 81.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.9,
+      "p_start": 0.8165,
+      "p_cameo": 0.1101,
+      "p_bench": 0.0734,
+      "set_pieces": {
+        "pens": null,
+        "corners": 7,
+        "fk": null
+      },
+      "e_bonus": 0.21,
       "xp_per_gw": 3.49,
       "xp_horizon_total": 20.93,
       "gameweeks": [
@@ -4217,6 +4687,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.2,
+      "p_start": 0.7737,
+      "p_cameo": 0.1132,
+      "p_bench": 0.1132,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 3.48,
       "xp_horizon_total": 20.87,
       "gameweeks": [
@@ -4305,6 +4785,16 @@
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 6.3,
+      "p_start": 0.8368,
+      "p_cameo": 0.0,
+      "p_bench": 0.1632,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.3,
       "xp_per_gw": 3.48,
       "xp_horizon_total": 20.87,
       "gameweeks": [
@@ -4393,6 +4883,16 @@
       "predicted_starts": 73.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 4.6,
+      "p_start": 0.7316,
+      "p_cameo": 0.0336,
+      "p_bench": 0.2349,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": null
+      },
+      "e_bonus": 0.42,
       "xp_per_gw": 3.46,
       "xp_horizon_total": 20.78,
       "gameweeks": [
@@ -4481,6 +4981,16 @@
       "predicted_starts": 90.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.8,
+      "p_start": 0.9027,
+      "p_cameo": 0.0,
+      "p_bench": 0.0973,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 3.46,
       "xp_horizon_total": 20.75,
       "gameweeks": [
@@ -4569,6 +5079,16 @@
       "predicted_starts": 77.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.9,
+      "p_start": 0.7747,
+      "p_cameo": 0.1502,
+      "p_bench": 0.0751,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 5,
+        "fk": null
+      },
+      "e_bonus": 0.16,
       "xp_per_gw": 3.45,
       "xp_horizon_total": 20.68,
       "gameweeks": [
@@ -4657,6 +5177,16 @@
       "predicted_starts": 79.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 10.0,
+      "p_start": 0.79,
+      "p_cameo": 0.14,
+      "p_bench": 0.07,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.49,
       "xp_per_gw": 3.41,
       "xp_horizon_total": 20.49,
       "gameweeks": [
@@ -4745,6 +5275,16 @@
       "predicted_starts": 82.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.2,
+      "p_start": 0.8279,
+      "p_cameo": 0.0492,
+      "p_bench": 0.1229,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 3.39,
       "xp_horizon_total": 20.35,
       "gameweeks": [
@@ -4833,6 +5373,16 @@
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 8.1,
+      "p_start": 0.8442,
+      "p_cameo": 0.0,
+      "p_bench": 0.1558,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 3.37,
       "xp_horizon_total": 20.21,
       "gameweeks": [
@@ -4921,6 +5471,16 @@
       "predicted_starts": 81.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 11.1,
+      "p_start": 0.8167,
+      "p_cameo": 0.0,
+      "p_bench": 0.1833,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 3.36,
       "xp_horizon_total": 20.13,
       "gameweeks": [
@@ -5009,6 +5569,16 @@
       "predicted_starts": 82.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 24.0,
+      "p_start": 0.8271,
+      "p_cameo": 0.0,
+      "p_bench": 0.1729,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 3.35,
       "xp_horizon_total": 20.09,
       "gameweeks": [
@@ -5097,6 +5667,16 @@
       "predicted_starts": 66.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 12.6,
+      "p_start": 0.6693,
+      "p_cameo": 0.1804,
+      "p_bench": 0.1503,
+      "set_pieces": {
+        "pens": 4,
+        "corners": 6,
+        "fk": 2
+      },
+      "e_bonus": 0.39,
       "xp_per_gw": 3.34,
       "xp_horizon_total": 20.02,
       "gameweeks": [
@@ -5185,6 +5765,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 8.8,
+      "p_start": 0.7737,
+      "p_cameo": 0.0,
+      "p_bench": 0.2263,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.27,
       "xp_per_gw": 3.33,
       "xp_horizon_total": 20.0,
       "gameweeks": [
@@ -5273,6 +5863,16 @@
       "predicted_starts": 64.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.7,
+      "p_start": 0.6482,
+      "p_cameo": 0.1895,
+      "p_bench": 0.1624,
+      "set_pieces": {
+        "pens": null,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.37,
       "xp_per_gw": 3.33,
       "xp_horizon_total": 19.99,
       "gameweeks": [
@@ -5361,6 +5961,16 @@
       "predicted_starts": 75.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 6.2,
+      "p_start": 0.7585,
+      "p_cameo": 0.0604,
+      "p_bench": 0.1811,
+      "set_pieces": {
+        "pens": 5,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.36,
       "xp_per_gw": 3.31,
       "xp_horizon_total": 19.84,
       "gameweeks": [
@@ -5449,6 +6059,16 @@
       "predicted_starts": 62.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 7.7,
+      "p_start": 0.6263,
+      "p_cameo": 0.1725,
+      "p_bench": 0.2012,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.38,
       "xp_per_gw": 3.3,
       "xp_horizon_total": 19.79,
       "gameweeks": [
@@ -5537,6 +6157,16 @@
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 5.0,
+      "p_start": 0.6426,
+      "p_cameo": 0.2144,
+      "p_bench": 0.1429,
+      "set_pieces": {
+        "pens": null,
+        "corners": 4,
+        "fk": 3
+      },
+      "e_bonus": 0.32,
       "xp_per_gw": 3.28,
       "xp_horizon_total": 19.71,
       "gameweeks": [
@@ -5625,6 +6255,16 @@
       "predicted_starts": 78.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.5,
+      "p_start": 0.7816,
+      "p_cameo": 0.1213,
+      "p_bench": 0.0971,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 3.28,
       "xp_horizon_total": 19.66,
       "gameweeks": [
@@ -5713,6 +6353,16 @@
       "predicted_starts": 65.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.1,
+      "p_start": 0.6507,
+      "p_cameo": 0.2911,
+      "p_bench": 0.0582,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": 1
+      },
+      "e_bonus": 0.46,
       "xp_per_gw": 3.28,
       "xp_horizon_total": 19.65,
       "gameweeks": [
@@ -5801,6 +6451,16 @@
       "predicted_starts": 75.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.9,
+      "p_start": 0.7565,
+      "p_cameo": 0.0609,
+      "p_bench": 0.1827,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 3.28,
       "xp_horizon_total": 19.65,
       "gameweeks": [
@@ -5889,6 +6549,16 @@
       "predicted_starts": 73.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.7316,
+      "p_cameo": 0.0671,
+      "p_bench": 0.2013,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 3.26,
       "xp_horizon_total": 19.57,
       "gameweeks": [
@@ -5977,6 +6647,16 @@
       "predicted_starts": 83.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.0,
+      "p_start": 0.8378,
+      "p_cameo": 0.0,
+      "p_bench": 0.1622,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.21,
       "xp_per_gw": 3.26,
       "xp_horizon_total": 19.55,
       "gameweeks": [
@@ -6065,6 +6745,16 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.8,
+      "p_start": 0.7947,
+      "p_cameo": 0.0,
+      "p_bench": 0.2053,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 3.25,
       "xp_horizon_total": 19.47,
       "gameweeks": [
@@ -6153,6 +6843,16 @@
       "predicted_starts": 99.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 16.8,
+      "p_start": 0.99,
+      "p_cameo": 0.0,
+      "p_bench": 0.01,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 3.24,
       "xp_horizon_total": 19.47,
       "gameweeks": [
@@ -6241,6 +6941,16 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.8511,
+      "p_cameo": 0.0745,
+      "p_bench": 0.0745,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 3.24,
       "xp_horizon_total": 19.43,
       "gameweeks": [
@@ -6329,6 +7039,16 @@
       "predicted_starts": 86.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 7.3,
+      "p_start": 0.8653,
+      "p_cameo": 0.0898,
+      "p_bench": 0.0449,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.21,
       "xp_per_gw": 3.23,
       "xp_horizon_total": 19.37,
       "gameweeks": [
@@ -6417,6 +7137,16 @@
       "predicted_starts": 80.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.3,
+      "p_start": 0.8085,
+      "p_cameo": 0.1532,
+      "p_bench": 0.0383,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 3.22,
       "xp_horizon_total": 19.33,
       "gameweeks": [
@@ -6505,6 +7235,16 @@
       "predicted_starts": 77.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.7733,
+      "p_cameo": 0.0648,
+      "p_bench": 0.162,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 3.2,
       "xp_horizon_total": 19.2,
       "gameweeks": [
@@ -6593,6 +7333,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 4.1,
+      "p_start": 0.7737,
+      "p_cameo": 0.0,
+      "p_bench": 0.2263,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.25,
       "xp_per_gw": 3.17,
       "xp_horizon_total": 19.03,
       "gameweeks": [
@@ -6681,6 +7431,16 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 5.3,
+      "p_start": 0.8789,
+      "p_cameo": 0.0,
+      "p_bench": 0.1211,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 3.17,
       "xp_horizon_total": 18.99,
       "gameweeks": [
@@ -6769,6 +7529,16 @@
       "predicted_starts": 75.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.7584,
+      "p_cameo": 0.0483,
+      "p_bench": 0.1933,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 3.16,
       "xp_horizon_total": 18.98,
       "gameweeks": [
@@ -6857,6 +7627,16 @@
       "predicted_starts": 81.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.6,
+      "p_start": 0.8176,
+      "p_cameo": 0.0365,
+      "p_bench": 0.1459,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 3.16,
       "xp_horizon_total": 18.94,
       "gameweeks": [
@@ -6945,6 +7725,16 @@
       "predicted_starts": 64.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 15.1,
+      "p_start": 0.6442,
+      "p_cameo": 0.2737,
+      "p_bench": 0.0821,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.41,
       "xp_per_gw": 3.15,
       "xp_horizon_total": 18.89,
       "gameweeks": [
@@ -7033,6 +7823,16 @@
       "predicted_starts": 63.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 10.7,
+      "p_start": 0.6373,
+      "p_cameo": 0.0777,
+      "p_bench": 0.285,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 3.13,
       "xp_horizon_total": 18.81,
       "gameweeks": [
@@ -7121,6 +7921,16 @@
       "predicted_starts": 70.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.4,
+      "p_start": 0.704,
+      "p_cameo": 0.0296,
+      "p_bench": 0.2664,
+      "set_pieces": {
+        "pens": null,
+        "corners": 4,
+        "fk": 1
+      },
+      "e_bonus": 0.34,
       "xp_per_gw": 3.13,
       "xp_horizon_total": 18.78,
       "gameweeks": [
@@ -7209,6 +8019,16 @@
       "predicted_starts": 81.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.6,
+      "p_start": 0.8169,
+      "p_cameo": 0.0916,
+      "p_bench": 0.0916,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.41,
       "xp_per_gw": 3.13,
       "xp_horizon_total": 18.78,
       "gameweeks": [
@@ -7297,6 +8117,16 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.0,
+      "p_start": 0.55,
+      "p_cameo": 0.4263,
+      "p_bench": 0.0237,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.25,
       "xp_per_gw": 3.11,
       "xp_horizon_total": 18.64,
       "gameweeks": [
@@ -7385,6 +8215,16 @@
       "predicted_starts": 77.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.0,
+      "p_start": 0.7769,
+      "p_cameo": 0.1275,
+      "p_bench": 0.0956,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 3.08,
       "xp_horizon_total": 18.49,
       "gameweeks": [
@@ -7473,6 +8313,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 6.1,
+      "p_start": 0.7737,
+      "p_cameo": 0.0754,
+      "p_bench": 0.1509,
+      "set_pieces": {
+        "pens": null,
+        "corners": 4,
+        "fk": 1
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 3.08,
       "xp_horizon_total": 18.47,
       "gameweeks": [
@@ -7561,6 +8411,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.4,
+      "p_start": 0.7737,
+      "p_cameo": 0.0377,
+      "p_bench": 0.1886,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 3.07,
       "xp_horizon_total": 18.4,
       "gameweeks": [
@@ -7649,6 +8509,16 @@
       "predicted_starts": 72.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.2,
+      "p_start": 0.7226,
+      "p_cameo": 0.1233,
+      "p_bench": 0.1541,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 4
+      },
+      "e_bonus": 0.25,
       "xp_per_gw": 3.06,
       "xp_horizon_total": 18.39,
       "gameweeks": [
@@ -7737,6 +8607,16 @@
       "predicted_starts": 73.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.5,
+      "p_start": 0.7316,
+      "p_cameo": 0.0336,
+      "p_bench": 0.2349,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 3.05,
       "xp_horizon_total": 18.29,
       "gameweeks": [
@@ -7825,6 +8705,16 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 10.4,
+      "p_start": 0.5268,
+      "p_cameo": 0.3076,
+      "p_bench": 0.1656,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 1
+      },
+      "e_bonus": 0.34,
       "xp_per_gw": 3.03,
       "xp_horizon_total": 18.15,
       "gameweeks": [
@@ -7913,6 +8803,16 @@
       "predicted_starts": 71.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.5,
+      "p_start": 0.7141,
+      "p_cameo": 0.1299,
+      "p_bench": 0.1559,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 3.01,
       "xp_horizon_total": 18.06,
       "gameweeks": [
@@ -8001,6 +8901,16 @@
       "predicted_starts": 61.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 13.4,
+      "p_start": 0.6156,
+      "p_cameo": 0.0549,
+      "p_bench": 0.3295,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 3.0,
       "xp_horizon_total": 17.97,
       "gameweeks": [
@@ -8089,6 +8999,16 @@
       "predicted_starts": 77.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.7789,
+      "p_cameo": 0.1579,
+      "p_bench": 0.0632,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 2.99,
       "xp_horizon_total": 17.93,
       "gameweeks": [
@@ -8177,6 +9097,16 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 17.8,
+      "p_start": 0.8158,
+      "p_cameo": 0.0,
+      "p_bench": 0.1842,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 2.96,
       "xp_horizon_total": 17.75,
       "gameweeks": [
@@ -8265,6 +9195,16 @@
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.8,
+      "p_start": 0.6889,
+      "p_cameo": 0.1914,
+      "p_bench": 0.1196,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 2.94,
       "xp_horizon_total": 17.66,
       "gameweeks": [
@@ -8353,6 +9293,16 @@
       "predicted_starts": 72.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.7255,
+      "p_cameo": 0.2135,
+      "p_bench": 0.061,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 2.92,
       "xp_horizon_total": 17.51,
       "gameweeks": [
@@ -8441,6 +9391,16 @@
       "predicted_starts": 71.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.0,
+      "p_start": 0.7121,
+      "p_cameo": 0.1439,
+      "p_bench": 0.1439,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 5
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 2.91,
       "xp_horizon_total": 17.45,
       "gameweeks": [
@@ -8529,6 +9489,16 @@
       "predicted_starts": 62.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.6264,
+      "p_cameo": 0.2402,
+      "p_bench": 0.1334,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 3
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 2.9,
       "xp_horizon_total": 17.39,
       "gameweeks": [
@@ -8617,6 +9587,16 @@
       "predicted_starts": 78.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 23.8,
+      "p_start": 0.7804,
+      "p_cameo": 0.0732,
+      "p_bench": 0.1464,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 1
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 2.88,
       "xp_horizon_total": 17.31,
       "gameweeks": [
@@ -8705,6 +9685,16 @@
       "predicted_starts": 76.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.7,
+      "p_start": 0.7655,
+      "p_cameo": 0.0335,
+      "p_bench": 0.201,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.26,
       "xp_per_gw": 2.88,
       "xp_horizon_total": 17.3,
       "gameweeks": [
@@ -8793,6 +9783,16 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.0,
+      "p_start": 0.8158,
+      "p_cameo": 0.1842,
+      "p_bench": 0.0,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 2.88,
       "xp_horizon_total": 17.3,
       "gameweeks": [
@@ -8881,6 +9881,16 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 8.7,
+      "p_start": 0.8158,
+      "p_cameo": 0.0461,
+      "p_bench": 0.1382,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": null
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 2.86,
       "xp_horizon_total": 17.14,
       "gameweeks": [
@@ -8969,6 +9979,16 @@
       "predicted_starts": 75.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.9,
+      "p_start": 0.7536,
+      "p_cameo": 0.2112,
+      "p_bench": 0.0352,
+      "set_pieces": {
+        "pens": 5,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 2.86,
       "xp_horizon_total": 17.13,
       "gameweeks": [
@@ -9057,6 +10077,16 @@
       "predicted_starts": 76.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.8,
+      "p_start": 0.7631,
+      "p_cameo": 0.0,
+      "p_bench": 0.2369,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 2.85,
       "xp_horizon_total": 17.13,
       "gameweeks": [
@@ -9145,6 +10175,16 @@
       "predicted_starts": 71.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 13.3,
+      "p_start": 0.7129,
+      "p_cameo": 0.0,
+      "p_bench": 0.2871,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.22,
       "xp_per_gw": 2.84,
       "xp_horizon_total": 17.06,
       "gameweeks": [
@@ -9233,6 +10273,16 @@
       "predicted_starts": 77.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.7743,
+      "p_cameo": 0.0645,
+      "p_bench": 0.1612,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 2.84,
       "xp_horizon_total": 17.05,
       "gameweeks": [
@@ -9321,6 +10371,16 @@
       "predicted_starts": 66.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.1,
+      "p_start": 0.6684,
+      "p_cameo": 0.0,
+      "p_bench": 0.3316,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 2.84,
       "xp_horizon_total": 17.02,
       "gameweeks": [
@@ -9409,6 +10469,16 @@
       "predicted_starts": 67.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.6699,
+      "p_cameo": 0.275,
+      "p_bench": 0.055,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 5,
+        "fk": 2
+      },
+      "e_bonus": 0.08,
       "xp_per_gw": 2.83,
       "xp_horizon_total": 16.99,
       "gameweeks": [
@@ -9497,6 +10567,16 @@
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.5,
+      "p_start": 0.6895,
+      "p_cameo": 0.2795,
+      "p_bench": 0.0311,
+      "set_pieces": {
+        "pens": 3,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.36,
       "xp_per_gw": 2.83,
       "xp_horizon_total": 16.95,
       "gameweeks": [
@@ -9585,6 +10665,16 @@
       "predicted_starts": 75.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.4,
+      "p_start": 0.7571,
+      "p_cameo": 0.2125,
+      "p_bench": 0.0304,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 2.79,
       "xp_horizon_total": 16.77,
       "gameweeks": [
@@ -9673,6 +10763,16 @@
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 11.5,
+      "p_start": 0.6195,
+      "p_cameo": 0.0713,
+      "p_bench": 0.3092,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.16,
       "xp_per_gw": 2.79,
       "xp_horizon_total": 16.75,
       "gameweeks": [
@@ -9761,6 +10861,16 @@
       "predicted_starts": 60.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.3,
+      "p_start": 0.6053,
+      "p_cameo": 0.141,
+      "p_bench": 0.2538,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 2.78,
       "xp_horizon_total": 16.7,
       "gameweeks": [
@@ -9849,6 +10959,16 @@
       "predicted_starts": 56.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 15.9,
+      "p_start": 0.5601,
+      "p_cameo": 0.2932,
+      "p_bench": 0.1466,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.3,
       "xp_per_gw": 2.77,
       "xp_horizon_total": 16.64,
       "gameweeks": [
@@ -9937,6 +11057,16 @@
       "predicted_starts": 45.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.4,
+      "p_start": 0.4579,
+      "p_cameo": 0.5163,
+      "p_bench": 0.0258,
+      "set_pieces": {
+        "pens": 4,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.37,
       "xp_per_gw": 2.75,
       "xp_horizon_total": 16.51,
       "gameweeks": [
@@ -10025,6 +11155,16 @@
       "predicted_starts": 54.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.1,
+      "p_start": 0.5421,
+      "p_cameo": 0.4579,
+      "p_bench": 0.0,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.27,
       "xp_per_gw": 2.74,
       "xp_horizon_total": 16.47,
       "gameweeks": [
@@ -10113,6 +11253,16 @@
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 5.7,
+      "p_start": 0.8442,
+      "p_cameo": 0.0,
+      "p_bench": 0.1558,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 2.75,
       "xp_horizon_total": 16.47,
       "gameweeks": [
@@ -10201,6 +11351,16 @@
       "predicted_starts": 60.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.6,
+      "p_start": 0.6053,
+      "p_cameo": 0.2538,
+      "p_bench": 0.141,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.33,
       "xp_per_gw": 2.7,
       "xp_horizon_total": 16.19,
       "gameweeks": [
@@ -10289,6 +11449,16 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.8158,
+      "p_cameo": 0.0461,
+      "p_bench": 0.1382,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 2.7,
       "xp_horizon_total": 16.18,
       "gameweeks": [
@@ -10377,6 +11547,16 @@
       "predicted_starts": 68.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.6817,
+      "p_cameo": 0.2122,
+      "p_bench": 0.1061,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 1
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 2.69,
       "xp_horizon_total": 16.14,
       "gameweeks": [
@@ -10465,6 +11645,16 @@
       "predicted_starts": 71.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.9,
+      "p_start": 0.7105,
+      "p_cameo": 0.0,
+      "p_bench": 0.2895,
+      "set_pieces": {
+        "pens": 2,
+        "corners": 4,
+        "fk": 1
+      },
+      "e_bonus": 0.33,
       "xp_per_gw": 2.68,
       "xp_horizon_total": 16.1,
       "gameweeks": [
@@ -10553,6 +11743,16 @@
       "predicted_starts": 75.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.7,
+      "p_start": 0.7584,
+      "p_cameo": 0.0483,
+      "p_bench": 0.1933,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.21,
       "xp_per_gw": 2.65,
       "xp_horizon_total": 15.9,
       "gameweeks": [
@@ -10641,6 +11841,16 @@
       "predicted_starts": 57.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.5699,
+      "p_cameo": 0.1012,
+      "p_bench": 0.3289,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 2.65,
       "xp_horizon_total": 15.87,
       "gameweeks": [
@@ -10729,6 +11939,16 @@
       "predicted_starts": 63.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 4.8,
+      "p_start": 0.6363,
+      "p_cameo": 0.1559,
+      "p_bench": 0.2078,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 1
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 2.64,
       "xp_horizon_total": 15.86,
       "gameweeks": [
@@ -10817,6 +12037,16 @@
       "predicted_starts": 82.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 3.0,
+      "p_start": 0.8279,
+      "p_cameo": 0.0983,
+      "p_bench": 0.0738,
+      "set_pieces": {
+        "pens": null,
+        "corners": 10,
+        "fk": 4
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 2.63,
       "xp_horizon_total": 15.8,
       "gameweeks": [
@@ -10905,6 +12135,16 @@
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.5,
+      "p_start": 0.5211,
+      "p_cameo": 0.3193,
+      "p_bench": 0.1596,
+      "set_pieces": {
+        "pens": 4,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.42,
       "xp_per_gw": 2.62,
       "xp_horizon_total": 15.73,
       "gameweeks": [
@@ -10993,6 +12233,16 @@
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.5732,
+      "p_cameo": 0.166,
+      "p_bench": 0.2608,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 2.62,
       "xp_horizon_total": 15.71,
       "gameweeks": [
@@ -11081,6 +12331,16 @@
       "predicted_starts": 75.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.7526,
+      "p_cameo": 0.0309,
+      "p_bench": 0.2164,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 2.62,
       "xp_horizon_total": 15.7,
       "gameweeks": [
@@ -11169,6 +12429,16 @@
       "predicted_starts": 57.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.5786,
+      "p_cameo": 0.079,
+      "p_bench": 0.3424,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 2.61,
       "xp_horizon_total": 15.67,
       "gameweeks": [
@@ -11257,6 +12527,16 @@
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.1,
+      "p_start": 0.5729,
+      "p_cameo": 0.2669,
+      "p_bench": 0.1602,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 2.6,
       "xp_horizon_total": 15.6,
       "gameweeks": [
@@ -11345,6 +12625,16 @@
       "predicted_starts": 65.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.5,
+      "p_start": 0.6585,
+      "p_cameo": 0.1051,
+      "p_bench": 0.2364,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 2.6,
       "xp_horizon_total": 15.59,
       "gameweeks": [
@@ -11433,6 +12723,16 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 5.9,
+      "p_start": 0.55,
+      "p_cameo": 0.1184,
+      "p_bench": 0.3316,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 2.57,
       "xp_horizon_total": 15.4,
       "gameweeks": [
@@ -11521,6 +12821,16 @@
       "predicted_starts": 62.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.3,
+      "p_start": 0.6275,
+      "p_cameo": 0.0532,
+      "p_bench": 0.3192,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 2.55,
       "xp_horizon_total": 15.28,
       "gameweeks": [
@@ -11609,6 +12919,16 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 7.0,
+      "p_start": 0.5268,
+      "p_cameo": 0.2366,
+      "p_bench": 0.2366,
+      "set_pieces": {
+        "pens": 4,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.32,
       "xp_per_gw": 2.55,
       "xp_horizon_total": 15.27,
       "gameweeks": [
@@ -11697,6 +13017,16 @@
       "predicted_starts": 56.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.5611,
+      "p_cameo": 0.1463,
+      "p_bench": 0.2926,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": null
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 2.53,
       "xp_horizon_total": 15.17,
       "gameweeks": [
@@ -11785,6 +13115,16 @@
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.2,
+      "p_start": 0.6889,
+      "p_cameo": 0.1914,
+      "p_bench": 0.1196,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 2.45,
       "xp_horizon_total": 14.68,
       "gameweeks": [
@@ -11873,6 +13213,16 @@
       "predicted_starts": 58.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.5828,
+      "p_cameo": 0.3651,
+      "p_bench": 0.0522,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 1
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 2.44,
       "xp_horizon_total": 14.65,
       "gameweeks": [
@@ -11961,6 +13311,16 @@
       "predicted_starts": 55.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.6,
+      "p_start": 0.554,
+      "p_cameo": 0.1836,
+      "p_bench": 0.2623,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 2.44,
       "xp_horizon_total": 14.64,
       "gameweeks": [
@@ -12049,6 +13409,16 @@
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.6,
+      "p_start": 0.5732,
+      "p_cameo": 0.1897,
+      "p_bench": 0.2371,
+      "set_pieces": {
+        "pens": null,
+        "corners": 8,
+        "fk": 2
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 2.44,
       "xp_horizon_total": 14.63,
       "gameweeks": [
@@ -12137,6 +13507,16 @@
       "predicted_starts": 64.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 4.6,
+      "p_start": 0.6474,
+      "p_cameo": 0.0,
+      "p_bench": 0.3526,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
       "xp_per_gw": 2.43,
       "xp_horizon_total": 14.6,
       "gameweeks": [
@@ -12225,6 +13605,16 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.55,
+      "p_cameo": 0.2132,
+      "p_bench": 0.2368,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 4
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 2.41,
       "xp_horizon_total": 14.48,
       "gameweeks": [
@@ -12313,6 +13703,16 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.7947,
+      "p_cameo": 0.0,
+      "p_bench": 0.2053,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 2.4,
       "xp_horizon_total": 14.39,
       "gameweeks": [
@@ -12401,6 +13801,16 @@
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.5632,
+      "p_cameo": 0.4095,
+      "p_bench": 0.0273,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 2.39,
       "xp_horizon_total": 14.35,
       "gameweeks": [
@@ -12489,6 +13899,16 @@
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.8,
+      "p_start": 0.5963,
+      "p_cameo": 0.3562,
+      "p_bench": 0.0475,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": 1
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 2.37,
       "xp_horizon_total": 14.2,
       "gameweeks": [
@@ -12577,6 +13997,16 @@
       "predicted_starts": 65.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.6509,
+      "p_cameo": 0.0806,
+      "p_bench": 0.2685,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 2.36,
       "xp_horizon_total": 14.17,
       "gameweeks": [
@@ -12665,6 +14095,16 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 6.4,
+      "p_start": 0.55,
+      "p_cameo": 0.0947,
+      "p_bench": 0.3553,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 2.36,
       "xp_horizon_total": 14.15,
       "gameweeks": [
@@ -12753,6 +14193,16 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.55,
+      "p_cameo": 0.3316,
+      "p_bench": 0.1184,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 2.35,
       "xp_horizon_total": 14.11,
       "gameweeks": [
@@ -12841,6 +14291,16 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.55,
+      "p_cameo": 0.1658,
+      "p_bench": 0.2842,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 2.35,
       "xp_horizon_total": 14.09,
       "gameweeks": [
@@ -12929,6 +14389,16 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 6.8,
+      "p_start": 0.7353,
+      "p_cameo": 0.1685,
+      "p_bench": 0.0963,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 2.35,
       "xp_horizon_total": 14.08,
       "gameweeks": [
@@ -13017,6 +14487,16 @@
       "predicted_starts": 64.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.6474,
+      "p_cameo": 0.2645,
+      "p_bench": 0.0882,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 2.34,
       "xp_horizon_total": 14.06,
       "gameweeks": [
@@ -13105,6 +14585,16 @@
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.6426,
+      "p_cameo": 0.0715,
+      "p_bench": 0.2859,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 2.34,
       "xp_horizon_total": 14.03,
       "gameweeks": [
@@ -13193,6 +14683,16 @@
       "predicted_starts": 59.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.5963,
+      "p_cameo": 0.0237,
+      "p_bench": 0.3799,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 2.32,
       "xp_horizon_total": 13.94,
       "gameweeks": [
@@ -13281,6 +14781,16 @@
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 8.1,
+      "p_start": 0.5732,
+      "p_cameo": 0.2134,
+      "p_bench": 0.2134,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 1
+      },
+      "e_bonus": 0.28,
       "xp_per_gw": 2.3,
       "xp_horizon_total": 13.82,
       "gameweeks": [
@@ -13369,6 +14879,16 @@
       "predicted_starts": 57.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.5732,
+      "p_cameo": 0.2371,
+      "p_bench": 0.1897,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 2.3,
       "xp_horizon_total": 13.78,
       "gameweeks": [
@@ -13457,6 +14977,16 @@
       "predicted_starts": 48.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4796,
+      "p_cameo": 0.4163,
+      "p_bench": 0.1041,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 2.29,
       "xp_horizon_total": 13.72,
       "gameweeks": [
@@ -13545,6 +15075,16 @@
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 20.6,
+      "p_start": 0.5632,
+      "p_cameo": 0.2457,
+      "p_bench": 0.1911,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.35,
       "xp_per_gw": 2.28,
       "xp_horizon_total": 13.69,
       "gameweeks": [
@@ -13633,6 +15173,16 @@
       "predicted_starts": 53.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.536,
+      "p_cameo": 0.1031,
+      "p_bench": 0.3609,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 2.23,
       "xp_horizon_total": 13.38,
       "gameweeks": [
@@ -13721,6 +15271,16 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.5268,
+      "p_cameo": 0.3312,
+      "p_bench": 0.1419,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 2.22,
       "xp_horizon_total": 13.32,
       "gameweeks": [
@@ -13809,6 +15369,16 @@
       "predicted_starts": 53.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.6,
+      "p_start": 0.536,
+      "p_cameo": 0.2062,
+      "p_bench": 0.2578,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 2.2,
       "xp_horizon_total": 13.19,
       "gameweeks": [
@@ -13897,6 +15467,16 @@
       "predicted_starts": 59.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.593,
+      "p_cameo": 0.1272,
+      "p_bench": 0.2798,
+      "set_pieces": {
+        "pens": null,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 2.17,
       "xp_horizon_total": 13.03,
       "gameweeks": [
@@ -13985,6 +15565,16 @@
       "predicted_starts": 48.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.0,
+      "p_start": 0.489,
+      "p_cameo": 0.2299,
+      "p_bench": 0.281,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.25,
       "xp_per_gw": 2.17,
       "xp_horizon_total": 13.03,
       "gameweeks": [
@@ -14073,6 +15663,16 @@
       "predicted_starts": 37.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.1,
+      "p_start": 0.3778,
+      "p_cameo": 0.2889,
+      "p_bench": 0.3333,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.36,
       "xp_per_gw": 2.12,
       "xp_horizon_total": 12.73,
       "gameweeks": [
@@ -14161,6 +15761,16 @@
       "predicted_starts": 47.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4759,
+      "p_cameo": 0.3494,
+      "p_bench": 0.1747,
+      "set_pieces": {
+        "pens": null,
+        "corners": 4,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 2.12,
       "xp_horizon_total": 12.69,
       "gameweeks": [
@@ -14249,6 +15859,16 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.5268,
+      "p_cameo": 0.0473,
+      "p_bench": 0.4258,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.28,
       "xp_per_gw": 2.1,
       "xp_horizon_total": 12.6,
       "gameweeks": [
@@ -14337,6 +15957,16 @@
       "predicted_starts": 54.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.4,
+      "p_start": 0.5421,
+      "p_cameo": 0.2693,
+      "p_bench": 0.1885,
+      "set_pieces": {
+        "pens": null,
+        "corners": 4,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 2.09,
       "xp_horizon_total": 12.57,
       "gameweeks": [
@@ -14425,6 +16055,16 @@
       "predicted_starts": 40.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4017,
+      "p_cameo": 0.4068,
+      "p_bench": 0.1915,
+      "set_pieces": {
+        "pens": null,
+        "corners": 9,
+        "fk": 3
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 2.07,
       "xp_horizon_total": 12.42,
       "gameweeks": [
@@ -14513,6 +16153,16 @@
       "predicted_starts": 56.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.9,
+      "p_start": 0.5681,
+      "p_cameo": 0.027,
+      "p_bench": 0.4049,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.22,
       "xp_per_gw": 2.07,
       "xp_horizon_total": 12.4,
       "gameweeks": [
@@ -14601,6 +16251,16 @@
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.5211,
+      "p_cameo": 0.1863,
+      "p_bench": 0.2927,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 2.05,
       "xp_horizon_total": 12.31,
       "gameweeks": [
@@ -14689,6 +16349,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.3316,
+      "p_cameo": 0.5199,
+      "p_bench": 0.1485,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 2.04,
       "xp_horizon_total": 12.27,
       "gameweeks": [
@@ -14777,6 +16447,16 @@
       "predicted_starts": 47.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.2,
+      "p_start": 0.4704,
+      "p_cameo": 0.3026,
+      "p_bench": 0.227,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 4
+      },
+      "e_bonus": 0.19,
       "xp_per_gw": 2.03,
       "xp_horizon_total": 12.15,
       "gameweeks": [
@@ -14865,6 +16545,16 @@
       "predicted_starts": 52.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.9,
+      "p_start": 0.5237,
+      "p_cameo": 0.2911,
+      "p_bench": 0.1852,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 2.02,
       "xp_horizon_total": 12.13,
       "gameweeks": [
@@ -14953,6 +16643,16 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.7,
+      "p_start": 0.5037,
+      "p_cameo": 0.1182,
+      "p_bench": 0.3781,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 2.01,
       "xp_horizon_total": 12.04,
       "gameweeks": [
@@ -15041,6 +16741,16 @@
       "predicted_starts": 45.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.6,
+      "p_start": 0.4579,
+      "p_cameo": 0.3356,
+      "p_bench": 0.2065,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 2.0,
       "xp_horizon_total": 11.98,
       "gameweeks": [
@@ -15129,6 +16839,16 @@
       "predicted_starts": 51.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.5167,
+      "p_cameo": 0.0,
+      "p_bench": 0.4833,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 2
+      },
+      "e_bonus": 0.08,
       "xp_per_gw": 1.98,
       "xp_horizon_total": 11.86,
       "gameweeks": [
@@ -15217,6 +16937,16 @@
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.3181,
+      "p_cameo": 0.4871,
+      "p_bench": 0.1948,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.21,
       "xp_per_gw": 1.97,
       "xp_horizon_total": 11.83,
       "gameweeks": [
@@ -15305,6 +17035,16 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.8,
+      "p_start": 0.5037,
+      "p_cameo": 0.0236,
+      "p_bench": 0.4727,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": null
+      },
+      "e_bonus": 0.23,
       "xp_per_gw": 1.96,
       "xp_horizon_total": 11.76,
       "gameweeks": [
@@ -15393,6 +17133,16 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.5043,
+      "p_cameo": 0.2974,
+      "p_bench": 0.1983,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.93,
       "xp_horizon_total": 11.56,
       "gameweeks": [
@@ -15481,6 +17231,16 @@
       "predicted_starts": 58.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 10.4,
+      "p_start": 0.5893,
+      "p_cameo": 0.1917,
+      "p_bench": 0.219,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.92,
       "xp_horizon_total": 11.54,
       "gameweeks": [
@@ -15569,6 +17329,16 @@
       "predicted_starts": 44.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.1,
+      "p_start": 0.4442,
+      "p_cameo": 0.2658,
+      "p_bench": 0.29,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 1.92,
       "xp_horizon_total": 11.53,
       "gameweeks": [
@@ -15657,6 +17427,16 @@
       "predicted_starts": 46.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.3,
+      "p_start": 0.4667,
+      "p_cameo": 0.2909,
+      "p_bench": 0.2424,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.91,
       "xp_horizon_total": 11.48,
       "gameweeks": [
@@ -15745,6 +17525,16 @@
       "predicted_starts": 45.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 6.2,
+      "p_start": 0.4529,
+      "p_cameo": 0.0497,
+      "p_bench": 0.4973,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.89,
       "xp_horizon_total": 11.35,
       "gameweeks": [
@@ -15833,6 +17623,16 @@
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4111,
+      "p_cameo": 0.424,
+      "p_bench": 0.1649,
+      "set_pieces": {
+        "pens": null,
+        "corners": 9,
+        "fk": null
+      },
+      "e_bonus": 0.16,
       "xp_per_gw": 1.89,
       "xp_horizon_total": 11.32,
       "gameweeks": [
@@ -15921,6 +17721,16 @@
       "predicted_starts": 58.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.5828,
+      "p_cameo": 0.0736,
+      "p_bench": 0.3436,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 1.88,
       "xp_horizon_total": 11.31,
       "gameweeks": [
@@ -16009,6 +17819,16 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.5037,
+      "p_cameo": 0.1654,
+      "p_bench": 0.3309,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.08,
       "xp_per_gw": 1.88,
       "xp_horizon_total": 11.27,
       "gameweeks": [
@@ -16097,6 +17917,16 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 4.4,
+      "p_start": 0.5268,
+      "p_cameo": 0.0,
+      "p_bench": 0.4732,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 1.88,
       "xp_horizon_total": 11.27,
       "gameweeks": [
@@ -16185,6 +18015,16 @@
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4342,
+      "p_cameo": 0.165,
+      "p_bench": 0.4008,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.87,
       "xp_horizon_total": 11.25,
       "gameweeks": [
@@ -16273,6 +18113,16 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.5043,
+      "p_cameo": 0.3718,
+      "p_bench": 0.1239,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 2
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.84,
       "xp_horizon_total": 11.01,
       "gameweeks": [
@@ -16361,6 +18211,16 @@
       "predicted_starts": 43.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4303,
+      "p_cameo": 0.2477,
+      "p_bench": 0.322,
+      "set_pieces": {
+        "pens": null,
+        "corners": 7,
+        "fk": null
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 1.83,
       "xp_horizon_total": 10.97,
       "gameweeks": [
@@ -16449,6 +18309,16 @@
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.5211,
+      "p_cameo": 0.1596,
+      "p_bench": 0.3193,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 2
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 1.83,
       "xp_horizon_total": 10.96,
       "gameweeks": [
@@ -16537,6 +18407,16 @@
       "predicted_starts": 58.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.5842,
+      "p_cameo": 0.0554,
+      "p_bench": 0.3604,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 1.83,
       "xp_horizon_total": 10.96,
       "gameweeks": [
@@ -16625,6 +18505,16 @@
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.6,
+      "p_start": 0.6426,
+      "p_cameo": 0.1906,
+      "p_bench": 0.1668,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.82,
       "xp_horizon_total": 10.91,
       "gameweeks": [
@@ -16713,6 +18603,16 @@
       "predicted_starts": 43.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.4368,
+      "p_cameo": 0.3072,
+      "p_bench": 0.256,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 1.82,
       "xp_horizon_total": 10.91,
       "gameweeks": [
@@ -16801,6 +18701,16 @@
       "predicted_starts": 48.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.482,
+      "p_cameo": 0.1036,
+      "p_bench": 0.4144,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.08,
       "xp_per_gw": 1.8,
       "xp_horizon_total": 10.81,
       "gameweeks": [
@@ -16889,6 +18799,16 @@
       "predicted_starts": 42.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.4225,
+      "p_cameo": 0.2293,
+      "p_bench": 0.3482,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 4
+      },
+      "e_bonus": 0.16,
       "xp_per_gw": 1.79,
       "xp_horizon_total": 10.76,
       "gameweeks": [
@@ -16977,6 +18897,16 @@
       "predicted_starts": 44.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4472,
+      "p_cameo": 0.0,
+      "p_bench": 0.5528,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.78,
       "xp_horizon_total": 10.71,
       "gameweeks": [
@@ -17065,6 +18995,16 @@
       "predicted_starts": 45.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4579,
+      "p_cameo": 0.3098,
+      "p_bench": 0.2323,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 1.78,
       "xp_horizon_total": 10.65,
       "gameweeks": [
@@ -17153,6 +19093,16 @@
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.7,
+      "p_start": 0.4342,
+      "p_cameo": 0.4243,
+      "p_bench": 0.1414,
+      "set_pieces": {
+        "pens": null,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.77,
       "xp_horizon_total": 10.62,
       "gameweeks": [
@@ -17241,6 +19191,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.4,
+      "p_start": 0.3316,
+      "p_cameo": 0.5199,
+      "p_bench": 0.1485,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.21,
       "xp_per_gw": 1.77,
       "xp_horizon_total": 10.61,
       "gameweeks": [
@@ -17329,6 +19289,16 @@
       "predicted_starts": 45.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.4574,
+      "p_cameo": 0.3067,
+      "p_bench": 0.2359,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.77,
       "xp_horizon_total": 10.59,
       "gameweeks": [
@@ -17417,6 +19387,16 @@
       "predicted_starts": 40.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.1,
+      "p_start": 0.4093,
+      "p_cameo": 0.1477,
+      "p_bench": 0.443,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.08,
       "xp_per_gw": 1.75,
       "xp_horizon_total": 10.53,
       "gameweeks": [
@@ -17505,6 +19485,16 @@
       "predicted_starts": 47.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.4789,
+      "p_cameo": 0.0782,
+      "p_bench": 0.4429,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 1.74,
       "xp_horizon_total": 10.44,
       "gameweeks": [
@@ -17593,6 +19583,16 @@
       "predicted_starts": 38.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.3864,
+      "p_cameo": 0.1473,
+      "p_bench": 0.4663,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 1.73,
       "xp_horizon_total": 10.37,
       "gameweeks": [
@@ -17681,6 +19681,16 @@
       "predicted_starts": 41.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4158,
+      "p_cameo": 0.4318,
+      "p_bench": 0.1524,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.71,
       "xp_horizon_total": 10.27,
       "gameweeks": [
@@ -17769,6 +19779,16 @@
       "predicted_starts": 41.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.4111,
+      "p_cameo": 0.3063,
+      "p_bench": 0.2827,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.71,
       "xp_horizon_total": 10.26,
       "gameweeks": [
@@ -17857,6 +19877,16 @@
       "predicted_starts": 46.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4619,
+      "p_cameo": 0.1794,
+      "p_bench": 0.3587,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.7,
       "xp_horizon_total": 10.2,
       "gameweeks": [
@@ -17945,6 +19975,16 @@
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.0,
+      "p_start": 0.4342,
+      "p_cameo": 0.2122,
+      "p_bench": 0.3536,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.7,
       "xp_horizon_total": 10.19,
       "gameweeks": [
@@ -18033,6 +20073,16 @@
       "predicted_starts": 44.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.8,
+      "p_start": 0.4444,
+      "p_cameo": 0.202,
+      "p_bench": 0.3536,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 1.68,
       "xp_horizon_total": 10.07,
       "gameweeks": [
@@ -18121,6 +20171,16 @@
       "predicted_starts": 33.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3338,
+      "p_cameo": 0.4996,
+      "p_bench": 0.1665,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.65,
       "xp_horizon_total": 9.87,
       "gameweeks": [
@@ -18209,6 +20269,16 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.5268,
+      "p_cameo": 0.1419,
+      "p_bench": 0.3312,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 1.63,
       "xp_horizon_total": 9.75,
       "gameweeks": [
@@ -18297,6 +20367,16 @@
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.0,
+      "p_start": 0.4344,
+      "p_cameo": 0.0998,
+      "p_bench": 0.4658,
+      "set_pieces": {
+        "pens": 3,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.62,
       "xp_horizon_total": 9.73,
       "gameweeks": [
@@ -18385,6 +20465,16 @@
       "predicted_starts": 39.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.6,
+      "p_start": 0.3992,
+      "p_cameo": 0.3364,
+      "p_bench": 0.2643,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.62,
       "xp_horizon_total": 9.7,
       "gameweeks": [
@@ -18473,6 +20563,16 @@
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.3,
+      "p_start": 0.2684,
+      "p_cameo": 0.3902,
+      "p_bench": 0.3414,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.24,
       "xp_per_gw": 1.61,
       "xp_horizon_total": 9.67,
       "gameweeks": [
@@ -18561,6 +20661,16 @@
       "predicted_starts": 42.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.423,
+      "p_cameo": 0.2509,
+      "p_bench": 0.3261,
+      "set_pieces": {
+        "pens": null,
+        "corners": 7,
+        "fk": null
+      },
+      "e_bonus": 0.18,
       "xp_per_gw": 1.6,
       "xp_horizon_total": 9.59,
       "gameweeks": [
@@ -18649,6 +20759,16 @@
       "predicted_starts": 52.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 9.4,
+      "p_start": 0.5265,
+      "p_cameo": 0.2991,
+      "p_bench": 0.1745,
+      "set_pieces": {
+        "pens": null,
+        "corners": 7,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.57,
       "xp_horizon_total": 9.45,
       "gameweeks": [
@@ -18737,6 +20857,16 @@
       "predicted_starts": 43.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.4371,
+      "p_cameo": 0.2639,
+      "p_bench": 0.299,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 1.57,
       "xp_horizon_total": 9.4,
       "gameweeks": [
@@ -18825,6 +20955,16 @@
       "predicted_starts": 38.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.3816,
+      "p_cameo": 0.3463,
+      "p_bench": 0.2721,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.57,
       "xp_horizon_total": 9.4,
       "gameweeks": [
@@ -18913,6 +21053,16 @@
       "predicted_starts": 33.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.3373,
+      "p_cameo": 0.4418,
+      "p_bench": 0.2209,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.54,
       "xp_horizon_total": 9.27,
       "gameweeks": [
@@ -19001,6 +21151,16 @@
       "predicted_starts": 41.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4158,
+      "p_cameo": 0.0508,
+      "p_bench": 0.5334,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.54,
       "xp_horizon_total": 9.23,
       "gameweeks": [
@@ -19089,6 +21249,16 @@
       "predicted_starts": 39.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3947,
+      "p_cameo": 0.2018,
+      "p_bench": 0.4035,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": 2
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.52,
       "xp_horizon_total": 9.13,
       "gameweeks": [
@@ -19177,6 +21347,16 @@
       "predicted_starts": 41.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4158,
+      "p_cameo": 0.127,
+      "p_bench": 0.4572,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 1.5,
       "xp_horizon_total": 9.0,
       "gameweeks": [
@@ -19265,6 +21445,16 @@
       "predicted_starts": 37.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3767,
+      "p_cameo": 0.2637,
+      "p_bench": 0.3596,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.49,
       "xp_horizon_total": 8.94,
       "gameweeks": [
@@ -19353,6 +21543,16 @@
       "predicted_starts": 31.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.2,
+      "p_start": 0.3159,
+      "p_cameo": 0.2932,
+      "p_bench": 0.3909,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 1.48,
       "xp_horizon_total": 8.88,
       "gameweeks": [
@@ -19441,6 +21641,16 @@
       "predicted_starts": 43.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.9,
+      "p_start": 0.4368,
+      "p_cameo": 0.0,
+      "p_bench": 0.5632,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.48,
       "xp_horizon_total": 8.87,
       "gameweeks": [
@@ -19529,6 +21739,16 @@
       "predicted_starts": 36.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.0,
+      "p_start": 0.3656,
+      "p_cameo": 0.122,
+      "p_bench": 0.5124,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.17,
       "xp_per_gw": 1.47,
       "xp_horizon_total": 8.84,
       "gameweeks": [
@@ -19617,6 +21837,16 @@
       "predicted_starts": 39.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3947,
+      "p_cameo": 0.3531,
+      "p_bench": 0.2522,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.46,
       "xp_horizon_total": 8.76,
       "gameweeks": [
@@ -19705,6 +21935,16 @@
       "predicted_starts": 33.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.3393,
+      "p_cameo": 0.3915,
+      "p_bench": 0.2692,
+      "set_pieces": {
+        "pens": 4,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.45,
       "xp_horizon_total": 8.69,
       "gameweeks": [
@@ -19793,6 +22033,16 @@
       "predicted_starts": 41.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.8,
+      "p_start": 0.4102,
+      "p_cameo": 0.2457,
+      "p_bench": 0.344,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.42,
       "xp_horizon_total": 8.53,
       "gameweeks": [
@@ -19881,6 +22131,16 @@
       "predicted_starts": 47.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4759,
+      "p_cameo": 0.2496,
+      "p_bench": 0.2745,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.41,
       "xp_horizon_total": 8.48,
       "gameweeks": [
@@ -19969,6 +22229,16 @@
       "predicted_starts": 40.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.9,
+      "p_start": 0.4017,
+      "p_cameo": 0.0239,
+      "p_bench": 0.5744,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.4,
       "xp_horizon_total": 8.38,
       "gameweeks": [
@@ -20057,6 +22327,16 @@
       "predicted_starts": 42.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.4245,
+      "p_cameo": 0.2002,
+      "p_bench": 0.3753,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.38,
       "xp_horizon_total": 8.31,
       "gameweeks": [
@@ -20145,6 +22425,16 @@
       "predicted_starts": 31.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3171,
+      "p_cameo": 0.2927,
+      "p_bench": 0.3902,
+      "set_pieces": {
+        "pens": null,
+        "corners": 5,
+        "fk": 2
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 1.35,
       "xp_horizon_total": 8.1,
       "gameweeks": [
@@ -20233,6 +22523,16 @@
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4342,
+      "p_cameo": 0.0471,
+      "p_bench": 0.5186,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 1.34,
       "xp_horizon_total": 8.06,
       "gameweeks": [
@@ -20321,6 +22621,16 @@
       "predicted_starts": 43.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4342,
+      "p_cameo": 0.0,
+      "p_bench": 0.5658,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 1.34,
       "xp_horizon_total": 8.04,
       "gameweeks": [
@@ -20409,6 +22719,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.3316,
+      "p_cameo": 0.2971,
+      "p_bench": 0.3713,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.34,
       "xp_horizon_total": 8.01,
       "gameweeks": [
@@ -20497,6 +22817,16 @@
       "predicted_starts": 41.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.4125,
+      "p_cameo": 0.0,
+      "p_bench": 0.5875,
+      "set_pieces": {
+        "pens": 2,
+        "corners": 7,
+        "fk": 3
+      },
+      "e_bonus": 0.15,
       "xp_per_gw": 1.33,
       "xp_horizon_total": 8.0,
       "gameweeks": [
@@ -20585,6 +22915,16 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.3647,
+      "p_cameo": 0.1412,
+      "p_bench": 0.4941,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 1.32,
       "xp_horizon_total": 7.91,
       "gameweeks": [
@@ -20673,6 +23013,16 @@
       "predicted_starts": 39.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3947,
+      "p_cameo": 0.2774,
+      "p_bench": 0.3279,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 1.3,
       "xp_horizon_total": 7.82,
       "gameweeks": [
@@ -20761,6 +23111,16 @@
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 15.5,
+      "p_start": 0.3184,
+      "p_cameo": 0.2585,
+      "p_bench": 0.423,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.77,
       "gameweeks": [
@@ -20849,6 +23209,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.8,
+      "p_start": 0.3316,
+      "p_cameo": 0.099,
+      "p_bench": 0.5694,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.76,
       "gameweeks": [
@@ -20937,6 +23307,16 @@
       "predicted_starts": 35.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.5,
+      "p_start": 0.3586,
+      "p_cameo": 0.2467,
+      "p_bench": 0.3947,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.75,
       "gameweeks": [
@@ -21025,6 +23405,16 @@
       "predicted_starts": 31.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.8,
+      "p_start": 0.3105,
+      "p_cameo": 0.2709,
+      "p_bench": 0.4186,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.75,
       "gameweeks": [
@@ -21113,6 +23503,16 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.8,
+      "p_start": 0.3647,
+      "p_cameo": 0.2118,
+      "p_bench": 0.4235,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
       "xp_per_gw": 1.29,
       "xp_horizon_total": 7.74,
       "gameweeks": [
@@ -21201,6 +23601,16 @@
       "predicted_starts": 34.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3416,
+      "p_cameo": 0.3292,
+      "p_bench": 0.3292,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.28,
       "xp_horizon_total": 7.69,
       "gameweeks": [
@@ -21289,6 +23699,16 @@
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2721,
+      "p_cameo": 0.3522,
+      "p_bench": 0.3757,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.27,
       "xp_horizon_total": 7.62,
       "gameweeks": [
@@ -21377,6 +23797,16 @@
       "predicted_starts": 42.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.4249,
+      "p_cameo": 0.075,
+      "p_bench": 0.5001,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 1.27,
       "xp_horizon_total": 7.59,
       "gameweeks": [
@@ -21465,6 +23895,16 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3647,
+      "p_cameo": 0.0941,
+      "p_bench": 0.5412,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.27,
       "xp_horizon_total": 7.59,
       "gameweeks": [
@@ -21553,6 +23993,16 @@
       "predicted_starts": 33.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.8,
+      "p_start": 0.3338,
+      "p_cameo": 0.2379,
+      "p_bench": 0.4283,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": 2
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.26,
       "xp_horizon_total": 7.58,
       "gameweeks": [
@@ -21641,6 +24091,16 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3647,
+      "p_cameo": 0.4,
+      "p_bench": 0.2353,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.26,
       "xp_horizon_total": 7.57,
       "gameweeks": [
@@ -21729,6 +24189,16 @@
       "predicted_starts": 38.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.0,
+      "p_start": 0.3879,
+      "p_cameo": 0.2119,
+      "p_bench": 0.4002,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.26,
       "xp_horizon_total": 7.56,
       "gameweeks": [
@@ -21817,6 +24287,16 @@
       "predicted_starts": 33.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.8,
+      "p_start": 0.3345,
+      "p_cameo": 0.3204,
+      "p_bench": 0.3451,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.25,
       "xp_horizon_total": 7.49,
       "gameweeks": [
@@ -21905,6 +24385,16 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3647,
+      "p_cameo": 0.2823,
+      "p_bench": 0.3529,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.25,
       "xp_horizon_total": 7.48,
       "gameweeks": [
@@ -21993,6 +24483,16 @@
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.2721,
+      "p_cameo": 0.3287,
+      "p_bench": 0.3992,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.11,
       "xp_per_gw": 1.24,
       "xp_horizon_total": 7.46,
       "gameweeks": [
@@ -22081,6 +24581,16 @@
       "predicted_starts": 28.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2895,
+      "p_cameo": 0.4165,
+      "p_bench": 0.294,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.21,
       "xp_horizon_total": 7.28,
       "gameweeks": [
@@ -22169,6 +24679,16 @@
       "predicted_starts": 26.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.2605,
+      "p_cameo": 0.334,
+      "p_bench": 0.4055,
+      "set_pieces": {
+        "pens": 3,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 1.2,
       "xp_horizon_total": 7.21,
       "gameweeks": [
@@ -22257,6 +24777,16 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "p_start": 0.2258,
+      "p_cameo": 0.4458,
+      "p_bench": 0.3285,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 1.2,
       "xp_horizon_total": 7.19,
       "gameweeks": [
@@ -22345,6 +24875,16 @@
       "predicted_starts": 28.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2886,
+      "p_cameo": 0.2371,
+      "p_bench": 0.4743,
+      "set_pieces": {
+        "pens": null,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.18,
       "xp_horizon_total": 7.07,
       "gameweeks": [
@@ -22433,6 +24973,16 @@
       "predicted_starts": 37.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3778,
+      "p_cameo": 0.0222,
+      "p_bench": 0.6,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 1.17,
       "xp_horizon_total": 7.0,
       "gameweeks": [
@@ -22521,6 +25071,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 3.8,
+      "p_start": 0.3316,
+      "p_cameo": 0.099,
+      "p_bench": 0.5694,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
       "xp_per_gw": 1.15,
       "xp_horizon_total": 6.91,
       "gameweeks": [
@@ -22609,6 +25169,16 @@
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3184,
+      "p_cameo": 0.282,
+      "p_bench": 0.3995,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.14,
       "xp_horizon_total": 6.85,
       "gameweeks": [
@@ -22697,6 +25267,16 @@
       "predicted_starts": 40.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.4034,
+      "p_cameo": 0.1989,
+      "p_bench": 0.3977,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 1.13,
       "xp_horizon_total": 6.79,
       "gameweeks": [
@@ -22785,6 +25365,16 @@
       "predicted_starts": 30.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 2.2,
+      "p_start": 0.3083,
+      "p_cameo": 0.1038,
+      "p_bench": 0.588,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.13,
       "xp_horizon_total": 6.78,
       "gameweeks": [
@@ -22873,6 +25463,16 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.2263,
+      "p_cameo": 0.4352,
+      "p_bench": 0.3385,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.12,
       "xp_horizon_total": 6.73,
       "gameweeks": [
@@ -22961,6 +25561,16 @@
       "predicted_starts": 27.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.6,
+      "p_start": 0.275,
+      "p_cameo": 0.29,
+      "p_bench": 0.435,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": 2
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 1.1,
       "xp_horizon_total": 6.62,
       "gameweeks": [
@@ -23049,6 +25659,16 @@
       "predicted_starts": 26.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.2615,
+      "p_cameo": 0.1026,
+      "p_bench": 0.636,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 1.09,
       "xp_horizon_total": 6.56,
       "gameweeks": [
@@ -23137,6 +25757,16 @@
       "predicted_starts": 39.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.3982,
+      "p_cameo": 0.1505,
+      "p_bench": 0.4514,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 1.08,
       "xp_horizon_total": 6.5,
       "gameweeks": [
@@ -23225,6 +25855,16 @@
       "predicted_starts": 31.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3113,
+      "p_cameo": 0.0646,
+      "p_bench": 0.6242,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 1.06,
       "xp_horizon_total": 6.36,
       "gameweeks": [
@@ -23313,6 +25953,16 @@
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 12.9,
+      "p_start": 0.2953,
+      "p_cameo": 0.1409,
+      "p_bench": 0.5638,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.13,
       "xp_per_gw": 1.06,
       "xp_horizon_total": 6.34,
       "gameweeks": [
@@ -23401,6 +26051,16 @@
       "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 1.4,
+      "p_start": 0.3647,
+      "p_cameo": 0.2353,
+      "p_bench": 0.4,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 1.02,
       "xp_horizon_total": 6.11,
       "gameweeks": [
@@ -23489,6 +26149,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3316,
+      "p_cameo": 0.1485,
+      "p_bench": 0.5199,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 1.02,
       "xp_horizon_total": 6.1,
       "gameweeks": [
@@ -23577,6 +26247,16 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2263,
+      "p_cameo": 0.3385,
+      "p_bench": 0.4352,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 1.01,
       "xp_horizon_total": 6.04,
       "gameweeks": [
@@ -23665,6 +26345,16 @@
       "predicted_starts": 18.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.5,
+      "p_start": 0.1842,
+      "p_cameo": 0.3599,
+      "p_bench": 0.4559,
+      "set_pieces": {
+        "pens": 4,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 1.0,
       "xp_horizon_total": 6.02,
       "gameweeks": [
@@ -23753,6 +26443,16 @@
       "predicted_starts": 20.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.8,
+      "p_start": 0.2055,
+      "p_cameo": 0.337,
+      "p_bench": 0.4574,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 0.99,
       "xp_horizon_total": 5.96,
       "gameweeks": [
@@ -23841,6 +26541,16 @@
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2684,
+      "p_cameo": 0.317,
+      "p_bench": 0.4146,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.99,
       "xp_horizon_total": 5.95,
       "gameweeks": [
@@ -23929,6 +26639,16 @@
       "predicted_starts": 16.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.1632,
+      "p_cameo": 0.3347,
+      "p_bench": 0.5021,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 0.95,
       "xp_horizon_total": 5.69,
       "gameweeks": [
@@ -24017,6 +26737,16 @@
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.2953,
+      "p_cameo": 0.1879,
+      "p_bench": 0.5168,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
       "xp_per_gw": 0.94,
       "xp_horizon_total": 5.67,
       "gameweeks": [
@@ -24105,6 +26835,16 @@
       "predicted_starts": 29.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.2953,
+      "p_cameo": 0.1879,
+      "p_bench": 0.5168,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 0.94,
       "xp_horizon_total": 5.63,
       "gameweeks": [
@@ -24193,6 +26933,16 @@
       "predicted_starts": 33.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.3316,
+      "p_cameo": 0.1733,
+      "p_bench": 0.4951,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.93,
       "xp_horizon_total": 5.6,
       "gameweeks": [
@@ -24281,6 +27031,16 @@
       "predicted_starts": 31.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.3105,
+      "p_cameo": 0.0,
+      "p_bench": 0.6895,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 0.93,
       "xp_horizon_total": 5.57,
       "gameweeks": [
@@ -24369,6 +27129,16 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2263,
+      "p_cameo": 0.2418,
+      "p_bench": 0.5319,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 0.91,
       "xp_horizon_total": 5.44,
       "gameweeks": [
@@ -24457,6 +27227,16 @@
       "predicted_starts": 25.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 4.9,
+      "p_start": 0.2544,
+      "p_cameo": 0.1203,
+      "p_bench": 0.6253,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
       "xp_per_gw": 0.89,
       "xp_horizon_total": 5.36,
       "gameweeks": [
@@ -24545,6 +27325,16 @@
       "predicted_starts": 27.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.2721,
+      "p_cameo": 0.3287,
+      "p_bench": 0.3992,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 0.88,
       "xp_horizon_total": 5.3,
       "gameweeks": [
@@ -24633,6 +27423,16 @@
       "predicted_starts": 14.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.3,
+      "p_start": 0.1428,
+      "p_cameo": 0.4524,
+      "p_bench": 0.4048,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 0.87,
       "xp_horizon_total": 5.21,
       "gameweeks": [
@@ -24721,6 +27521,16 @@
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1212,
+      "p_cameo": 0.5938,
+      "p_bench": 0.285,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.86,
       "xp_horizon_total": 5.17,
       "gameweeks": [
@@ -24809,6 +27619,16 @@
       "predicted_starts": 14.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 6.9,
+      "p_start": 0.1477,
+      "p_cameo": 0.4735,
+      "p_bench": 0.3788,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.86,
       "xp_horizon_total": 5.15,
       "gameweeks": [
@@ -24897,6 +27717,16 @@
       "predicted_starts": 24.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.2,
+      "p_start": 0.2474,
+      "p_cameo": 0.0728,
+      "p_bench": 0.6798,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.84,
       "xp_horizon_total": 5.06,
       "gameweeks": [
@@ -24985,6 +27815,16 @@
       "predicted_starts": 27.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2758,
+      "p_cameo": 0.0724,
+      "p_bench": 0.6518,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.06,
       "xp_per_gw": 0.84,
       "xp_horizon_total": 5.01,
       "gameweeks": [
@@ -25073,6 +27913,16 @@
       "predicted_starts": 20.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "p_start": 0.2088,
+      "p_cameo": 0.3596,
+      "p_bench": 0.4316,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.83,
       "xp_horizon_total": 4.97,
       "gameweeks": [
@@ -25161,6 +28011,16 @@
       "predicted_starts": 23.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2311,
+      "p_cameo": 0.3124,
+      "p_bench": 0.4565,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.81,
       "xp_horizon_total": 4.83,
       "gameweeks": [
@@ -25249,6 +28109,16 @@
       "predicted_starts": 28.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 0.4,
+      "p_start": 0.2895,
+      "p_cameo": 0.1225,
+      "p_bench": 0.588,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 0.79,
       "xp_horizon_total": 4.73,
       "gameweeks": [
@@ -25337,6 +28207,16 @@
       "predicted_starts": 18.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1881,
+      "p_cameo": 0.4298,
+      "p_bench": 0.3821,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.78,
       "xp_horizon_total": 4.68,
       "gameweeks": [
@@ -25425,6 +28305,16 @@
       "predicted_starts": 10.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1032,
+      "p_cameo": 0.5428,
+      "p_bench": 0.354,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": 5
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.77,
       "xp_horizon_total": 4.64,
       "gameweeks": [
@@ -25513,6 +28403,16 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2263,
+      "p_cameo": 0.1692,
+      "p_bench": 0.6044,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.75,
       "xp_horizon_total": 4.49,
       "gameweeks": [
@@ -25601,6 +28501,16 @@
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
+      "owned_pct": 21.4,
+      "p_start": 0.2684,
+      "p_cameo": 0.1219,
+      "p_bench": 0.6096,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.07,
       "xp_per_gw": 0.75,
       "xp_horizon_total": 4.48,
       "gameweeks": [
@@ -25689,6 +28599,16 @@
       "predicted_starts": 23.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "p_start": 0.2352,
+      "p_cameo": 0.1912,
+      "p_bench": 0.5736,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.73,
       "xp_horizon_total": 4.41,
       "gameweeks": [
@@ -25777,6 +28697,16 @@
       "predicted_starts": 20.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 2.4,
+      "p_start": 0.2053,
+      "p_cameo": 0.1686,
+      "p_bench": 0.6262,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.69,
       "xp_horizon_total": 4.13,
       "gameweeks": [
@@ -25865,6 +28795,16 @@
       "predicted_starts": 16.8,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.3,
+      "p_start": 0.1678,
+      "p_cameo": 0.2615,
+      "p_bench": 0.5706,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
       "xp_per_gw": 0.68,
       "xp_horizon_total": 4.07,
       "gameweeks": [
@@ -25953,6 +28893,16 @@
       "predicted_starts": 20.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2088,
+      "p_cameo": 0.2637,
+      "p_bench": 0.5275,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.68,
       "xp_horizon_total": 4.06,
       "gameweeks": [
@@ -26041,6 +28991,16 @@
       "predicted_starts": 19.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.191,
+      "p_cameo": 0.1666,
+      "p_bench": 0.6424,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.67,
       "xp_horizon_total": 4.0,
       "gameweeks": [
@@ -26129,6 +29089,16 @@
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "p_start": 0.2489,
+      "p_cameo": 0.0,
+      "p_bench": 0.7511,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.65,
       "xp_horizon_total": 3.92,
       "gameweeks": [
@@ -26217,6 +29187,16 @@
       "predicted_starts": 14.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.5,
+      "p_start": 0.1421,
+      "p_cameo": 0.2383,
+      "p_bench": 0.6196,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.08,
       "xp_per_gw": 0.64,
       "xp_horizon_total": 3.86,
       "gameweeks": [
@@ -26305,6 +29285,16 @@
       "predicted_starts": 17.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1795,
+      "p_cameo": 0.2344,
+      "p_bench": 0.5861,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.64,
       "xp_horizon_total": 3.84,
       "gameweeks": [
@@ -26393,6 +29383,16 @@
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1211,
+      "p_cameo": 0.3326,
+      "p_bench": 0.5464,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.64,
       "xp_horizon_total": 3.83,
       "gameweeks": [
@@ -26481,6 +29481,16 @@
       "predicted_starts": 23.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.234,
+      "p_cameo": 0.0718,
+      "p_bench": 0.6942,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.62,
       "xp_horizon_total": 3.72,
       "gameweeks": [
@@ -26569,6 +29579,16 @@
       "predicted_starts": 22.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2263,
+      "p_cameo": 0.0242,
+      "p_bench": 0.7495,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.6,
       "xp_horizon_total": 3.62,
       "gameweeks": [
@@ -26657,6 +29677,16 @@
       "predicted_starts": 14.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.5,
+      "p_start": 0.1456,
+      "p_cameo": 0.3323,
+      "p_bench": 0.5222,
+      "set_pieces": {
+        "pens": 3,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.6,
       "xp_horizon_total": 3.57,
       "gameweeks": [
@@ -26745,6 +29775,16 @@
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 1.2,
+      "p_start": 0.2489,
+      "p_cameo": 0.0704,
+      "p_bench": 0.6806,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.59,
       "xp_horizon_total": 3.53,
       "gameweeks": [
@@ -26833,6 +29873,16 @@
       "predicted_starts": 21.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2112,
+      "p_cameo": 0.1673,
+      "p_bench": 0.6215,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.59,
       "xp_horizon_total": 3.52,
       "gameweeks": [
@@ -26921,6 +29971,16 @@
       "predicted_starts": 25.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 14.3,
+      "p_start": 0.2508,
+      "p_cameo": 0.0,
+      "p_bench": 0.7492,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.59,
       "xp_horizon_total": 3.51,
       "gameweeks": [
@@ -27009,6 +30069,16 @@
       "predicted_starts": 18.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1842,
+      "p_cameo": 0.2399,
+      "p_bench": 0.5759,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.56,
       "xp_horizon_total": 3.34,
       "gameweeks": [
@@ -27097,6 +30167,16 @@
       "predicted_starts": 14.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "p_start": 0.1421,
+      "p_cameo": 0.286,
+      "p_bench": 0.5719,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.54,
       "xp_horizon_total": 3.27,
       "gameweeks": [
@@ -27185,6 +30265,16 @@
       "predicted_starts": 20.5,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2053,
+      "p_cameo": 0.0722,
+      "p_bench": 0.7225,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.52,
       "xp_horizon_total": 3.1,
       "gameweeks": [
@@ -27273,6 +30363,16 @@
       "predicted_starts": 14.8,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1477,
+      "p_cameo": 0.2841,
+      "p_bench": 0.5682,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.5,
       "xp_horizon_total": 3.02,
       "gameweeks": [
@@ -27361,6 +30461,16 @@
       "predicted_starts": 18.8,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1883,
+      "p_cameo": 0.0716,
+      "p_bench": 0.7401,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.5,
       "xp_horizon_total": 2.98,
       "gameweeks": [
@@ -27449,6 +30559,16 @@
       "predicted_starts": 20.5,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2053,
+      "p_cameo": 0.0,
+      "p_bench": 0.7947,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.47,
       "xp_horizon_total": 2.84,
       "gameweeks": [
@@ -27537,6 +30657,16 @@
       "predicted_starts": 12.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.5,
+      "p_start": 0.1239,
+      "p_cameo": 0.2131,
+      "p_bench": 0.663,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.04,
       "xp_per_gw": 0.47,
       "xp_horizon_total": 2.8,
       "gameweeks": [
@@ -27625,6 +30755,16 @@
       "predicted_starts": 17.9,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1795,
+      "p_cameo": 0.0938,
+      "p_bench": 0.7268,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.45,
       "xp_horizon_total": 2.71,
       "gameweeks": [
@@ -27713,6 +30853,16 @@
       "predicted_starts": 19.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 1.0,
+      "p_start": 0.1944,
+      "p_cameo": 0.0,
+      "p_bench": 0.8056,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.45,
       "xp_horizon_total": 2.69,
       "gameweeks": [
@@ -27801,6 +30951,16 @@
       "predicted_starts": 16.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1632,
+      "p_cameo": 0.0956,
+      "p_bench": 0.7412,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.44,
       "xp_horizon_total": 2.67,
       "gameweeks": [
@@ -27889,6 +31049,16 @@
       "predicted_starts": 18.7,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1874,
+      "p_cameo": 0.1673,
+      "p_bench": 0.6453,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.44,
       "xp_horizon_total": 2.62,
       "gameweeks": [
@@ -27977,6 +31147,16 @@
       "predicted_starts": 12.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1236,
+      "p_cameo": 0.2369,
+      "p_bench": 0.6395,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.41,
       "xp_horizon_total": 2.47,
       "gameweeks": [
@@ -28065,6 +31245,16 @@
       "predicted_starts": 16.8,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1676,
+      "p_cameo": 0.0476,
+      "p_bench": 0.7849,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.4,
       "xp_horizon_total": 2.41,
       "gameweeks": [
@@ -28153,6 +31343,16 @@
       "predicted_starts": 24.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "p_start": 0.2489,
+      "p_cameo": 0.0469,
+      "p_bench": 0.7041,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.4,
       "xp_horizon_total": 2.41,
       "gameweeks": [
@@ -28241,6 +31441,16 @@
       "predicted_starts": 18.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1842,
+      "p_cameo": 0.0,
+      "p_bench": 0.8158,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.4,
       "xp_horizon_total": 2.37,
       "gameweeks": [
@@ -28329,6 +31539,16 @@
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1563,
+      "p_cameo": 0.0703,
+      "p_bench": 0.7734,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.35,
       "xp_horizon_total": 2.1,
       "gameweeks": [
@@ -28417,6 +31637,16 @@
       "predicted_starts": 10.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "p_start": 0.1017,
+      "p_cameo": 0.2364,
+      "p_bench": 0.6619,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.32,
       "xp_horizon_total": 1.9,
       "gameweeks": [
@@ -28505,6 +31735,16 @@
       "predicted_starts": 16.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1632,
+      "p_cameo": 0.0,
+      "p_bench": 0.8368,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
       "xp_per_gw": 0.31,
       "xp_horizon_total": 1.84,
       "gameweeks": [
@@ -28593,6 +31833,16 @@
       "predicted_starts": 10.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1,
+      "p_cameo": 0.2132,
+      "p_bench": 0.6868,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.3,
       "xp_horizon_total": 1.81,
       "gameweeks": [
@@ -28681,6 +31931,16 @@
       "predicted_starts": 12.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1232,
+      "p_cameo": 0.1185,
+      "p_bench": 0.7584,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.29,
       "xp_horizon_total": 1.75,
       "gameweeks": [
@@ -28769,6 +32029,16 @@
       "predicted_starts": 14.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.146,
+      "p_cameo": 0.0712,
+      "p_bench": 0.7828,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.29,
       "xp_horizon_total": 1.73,
       "gameweeks": [
@@ -28857,6 +32127,16 @@
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 1.2,
+      "p_start": 0.1211,
+      "p_cameo": 0.1425,
+      "p_bench": 0.7364,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.27,
       "xp_horizon_total": 1.6,
       "gameweeks": [
@@ -28945,6 +32225,16 @@
       "predicted_starts": 15.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "p_start": 0.1528,
+      "p_cameo": 0.1412,
+      "p_bench": 0.706,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.26,
       "xp_horizon_total": 1.56,
       "gameweeks": [
@@ -29033,6 +32323,16 @@
       "predicted_starts": 10.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "p_start": 0.1017,
+      "p_cameo": 0.1418,
+      "p_bench": 0.7564,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.26,
       "xp_horizon_total": 1.54,
       "gameweeks": [
@@ -29118,9 +32418,19 @@
       "team_short": "BOU",
       "pos": "MID",
       "xmins": 2.8,
-      "predicted_starts": 10.7,
+      "predicted_starts": 10.8,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1075,
+      "p_cameo": 0.1879,
+      "p_bench": 0.7046,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.25,
       "xp_horizon_total": 1.5,
       "gameweeks": [
@@ -29209,6 +32519,16 @@
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 2.2,
+      "p_start": 0.1563,
+      "p_cameo": 0.0234,
+      "p_bench": 0.8202,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.25,
       "xp_horizon_total": 1.5,
       "gameweeks": [
@@ -29297,6 +32617,16 @@
       "predicted_starts": 9.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.0913,
+      "p_cameo": 0.1474,
+      "p_bench": 0.7614,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
       "xp_per_gw": 0.24,
       "xp_horizon_total": 1.45,
       "gameweeks": [
@@ -29385,6 +32715,16 @@
       "predicted_starts": 14.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 1.2,
+      "p_start": 0.1421,
+      "p_cameo": 0.0238,
+      "p_bench": 0.8341,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.22,
       "xp_horizon_total": 1.35,
       "gameweeks": [
@@ -29473,6 +32813,16 @@
       "predicted_starts": 9.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "p_start": 0.0909,
+      "p_cameo": 0.129,
+      "p_bench": 0.7801,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.22,
       "xp_horizon_total": 1.33,
       "gameweeks": [
@@ -29561,6 +32911,16 @@
       "predicted_starts": 12.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1232,
+      "p_cameo": 0.1422,
+      "p_bench": 0.7347,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.22,
       "xp_horizon_total": 1.3,
       "gameweeks": [
@@ -29649,6 +33009,16 @@
       "predicted_starts": 10.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 8.1,
+      "p_start": 0.1,
+      "p_cameo": 0.1658,
+      "p_bench": 0.7342,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.21,
       "xp_horizon_total": 1.28,
       "gameweeks": [
@@ -29737,6 +33107,16 @@
       "predicted_starts": 13.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1332,
+      "p_cameo": 0.1171,
+      "p_bench": 0.7497,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.21,
       "xp_horizon_total": 1.26,
       "gameweeks": [
@@ -29825,6 +33205,16 @@
       "predicted_starts": 12.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1244,
+      "p_cameo": 0.071,
+      "p_bench": 0.8046,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.19,
       "xp_horizon_total": 1.16,
       "gameweeks": [
@@ -29913,6 +33303,16 @@
       "predicted_starts": 10.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1,
+      "p_cameo": 0.1421,
+      "p_bench": 0.7579,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.19,
       "xp_horizon_total": 1.15,
       "gameweeks": [
@@ -30001,6 +33401,16 @@
       "predicted_starts": 10.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1034,
+      "p_cameo": 0.1652,
+      "p_bench": 0.7314,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.18,
       "xp_horizon_total": 1.1,
       "gameweeks": [
@@ -30089,6 +33499,16 @@
       "predicted_starts": 11.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "p_start": 0.11,
+      "p_cameo": 0.1405,
+      "p_bench": 0.7495,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.18,
       "xp_horizon_total": 1.06,
       "gameweeks": [
@@ -30177,6 +33597,16 @@
       "predicted_starts": 12.1,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.1,
+      "p_start": 0.1212,
+      "p_cameo": 0.095,
+      "p_bench": 0.7838,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.17,
       "xp_horizon_total": 1.03,
       "gameweeks": [
@@ -30265,6 +33695,16 @@
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
+      "owned_pct": 0.2,
+      "p_start": 0.1563,
+      "p_cameo": 0.0234,
+      "p_bench": 0.8202,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.01,
       "xp_per_gw": 0.17,
       "xp_horizon_total": 1.0,
       "gameweeks": [

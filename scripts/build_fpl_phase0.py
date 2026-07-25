@@ -344,16 +344,24 @@ def compute_fixtures(dc: DixonColesModel, fixtures: list[dict],
 def add_fdr(rows: list[dict]) -> None:
     """Mallipohjainen FDR (1-5) per joukkue/fixture. Difficulty = rank-keskiarvo
     (1 - voitto-%) ja (odotetut päästetyt maalit), kvintiilibucket koko kauden
-    joukkue-fixtureiden yli. 1 = helpoin, 5 = vaikein."""
-    persp = []  # (row_idx, side, p_win, xGC)
+    joukkue-fixtureiden yli. 1 = helpoin, 5 = vaikein.
+
+    EDGE-sprint: sama fdr emittoidaan myös nimellä def_fdr_{side} (sovittu
+    kontrakti — nykyinen FDR on CS/puolustussuuntainen), ja lisäksi
+    att_fdr_{side} = HYÖKKÄYSSUUNNAN vaikeus: oma odotettu xG tässä
+    fixturessa rank-normalisoituna (käännetty: vähän omaa xG:tä = vaikea),
+    kvintiilibucket samaan 1-5-skaalaan. Johdettu puhtaasti jo lasketuista
+    xg_home/xg_away-arvoista — ei uutta mallia."""
+    persp = []  # (row_idx, side, p_win, xGC, xGF)
     for i, r in enumerate(rows):
-        persp.append((i, "home", r["p_home_win"], r["xg_away"]))
-        persp.append((i, "away", r["p_away_win"], r["xg_home"]))
+        persp.append((i, "home", r["p_home_win"], r["xg_away"], r["xg_home"]))
+        persp.append((i, "away", r["p_away_win"], r["xg_home"], r["xg_away"]))
     n = len(persp)
     if n == 0:
         return
     lose = np.array([1.0 - p[2] for p in persp])  # korkea = vaikeampi
     xgc = np.array([p[3] for p in persp])
+    xgf = np.array([p[4] for p in persp])         # oma odotettu maalimäärä
 
     def pct_rank(x):
         order = x.argsort()
@@ -364,8 +372,13 @@ def add_fdr(rows: list[dict]) -> None:
     diff = 0.55 * pct_rank(lose) + 0.45 * pct_rank(xgc)
     qs = np.quantile(diff, [0.2, 0.4, 0.6, 0.8])
     fdr = np.searchsorted(qs, diff, side="right") + 1  # 1..5
-    for (i, side, _p, _x), d in zip(persp, fdr):
+    att_diff = pct_rank(-xgf)                          # korkea = vaikea hyökätä
+    qs_att = np.quantile(att_diff, [0.2, 0.4, 0.6, 0.8])
+    att_fdr = np.searchsorted(qs_att, att_diff, side="right") + 1  # 1..5
+    for (i, side, _p, _x, _g), d, ad in zip(persp, fdr, att_fdr):
         rows[i][f"fdr_{side}"] = int(d)
+        rows[i][f"def_fdr_{side}"] = int(d)   # alias (kontrakti)
+        rows[i][f"att_fdr_{side}"] = int(ad)
 
 
 # ---------------------------------------------------------------------------
@@ -401,6 +414,10 @@ def build_team_view(rows: list[dict], next_gw: int, horizon_gw: int = HORIZON_GW
                     "kickoff_ms": r["kickoff_ms"],
                     "cs_pct": r[f"cs_{side}_pct"],
                     "fdr": r[f"fdr_{side}"],
+                    # EDGE: def_fdr = alias nykyiselle CS-pohjaiselle FDR:lle,
+                    # att_fdr = hyökkäyssuunnan vaikeus (ks. add_fdr).
+                    "def_fdr": r[f"fdr_{side}"],
+                    "att_fdr": r[f"att_fdr_{side}"],
                 }
             )
     out = []
@@ -536,6 +553,13 @@ def main() -> int:
             "fdr_method": (
                 "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), "
                 "kvintiilibucket koko kauden joukkue-fixtureiden yli"
+            ),
+            # EDGE-sprint: def_fdr = alias fdr:lle (CS/puolustussuunta),
+            # att_fdr = hyökkäyssuunnan vaikeus samasta DC-mallista.
+            "att_fdr_method": (
+                "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä "
+                "(vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden "
+                "joukkue-fixtureiden yli. 1 = helpoin hyökätä, 5 = vaikein."
             ),
             "caveat": (
                 "Pre-season: 26/27 team-voimat = viime kauden priorit, suuntaa-antava. "

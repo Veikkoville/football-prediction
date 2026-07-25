@@ -409,6 +409,13 @@ def main(argv: list[str] | None = None) -> int:
                        "cards": "yellows"}
             components = {key_map.get(k, k): round(v, 2)
                           for k, v in headline_comps.items()}
+        # EDGE-sprint (datakerros): minuuttijakauma kolmeen tilaan SAMASTA
+        # minuuttimallista josta predicted_starts tulee (kalibroitu p_start,
+        # saatavuus- ja syvyyskorjattu). Summa = 1.0 rakenteellisesti ennen
+        # pyöristystä: p_cameo = (1-p_start)*p_sub, p_bench = loppu.
+        p_start_e = mm["p_start"]
+        p_cameo_e = (1.0 - p_start_e) * mm["p_sub"]
+        p_bench_e = max(1.0 - p_start_e - p_cameo_e, 0.0)
         player_row = {
             "id": pid,
             "web_name": e["web_name"],
@@ -425,6 +432,26 @@ def main(argv: list[str] | None = None) -> int:
             # #143: rehellisyyslippu — paljonko pelaajan omaa PL-dataa
             # estimaatin takana on (puhdas emissio, ei muuta xP-lukuja).
             "data_basis": xp.data_basis(acc_by_player[pid]),
+            # EDGE: omistus-% bootstrapista (sama konventio kuin price watch /
+            # leaders: selected_by_percent on merkkijono -> float).
+            "owned_pct": float(e.get("selected_by_percent") or 0.0),
+            # EDGE: minuuttijakauma (ks. p_start_e-kommentti yllä).
+            # p_start on sama kalibroitu tn kuin predicted_starts/100.
+            "p_start": round(p_start_e, 4),
+            "p_cameo": round(p_cameo_e, 4),
+            "p_bench": round(p_bench_e, 4),
+            # EDGE: erikoistilannevastuut FPL-bootstrapista sellaisenaan
+            # (int = järjestys listalla, null = ei listalla).
+            "set_pieces": {
+                "pens": e.get("penalties_order"),
+                "corners": e.get("corners_and_indirect_freekicks_order"),
+                "fk": e.get("direct_freekicks_order"),
+            },
+            # EDGE: odotettu bonus / ottelu — KARKEA PROXY, ei simuloitu
+            # BPS-jako: shrinkattu bonus90-vauhti * (xmins/90), cap 3.0.
+            # Sama kaava kuin xP:n bonus-komponentti neutraalille fixturelle;
+            # bonushistoria on 26/27-BPS-oikaistu (#151).
+            "e_bonus": round(min(rates["bonus90"] * xmins / 90.0, 3.0), 2),
             "xp_per_gw": round(total / max(len(horizon), 1), 2),
             "xp_horizon_total": round(total, 2),
             "gameweeks": gws,

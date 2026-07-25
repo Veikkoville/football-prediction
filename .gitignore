@@ -40,6 +40,9 @@ raw_data/
 !/data/fpl_projections_phase0.json
 # FPL Phase 1 xP -projektio: sama refresh-konventio (/api/fantasy/xp).
 !/data/fpl_xp_projections.json
+# Koko kauden 380 fixturen CS/FDR/1X2 (chip-EV lukee Renderilla gitista;
+# ilman tata chip-ev degradoituu 6 GW:n ikkunaan).
+!/data/fpl_cs_fdr.json
 # Jäädytetyt 25/26-pelaajabaselinet (element code -avain) — pre-season-xP:n
 # lähde 26/27-flipin jälkeen (scripts/build_fpl_prev_baselines.py); CI
 # tarvitsee tämän repossa (25/26-data ei enää haettavissa API:sta).

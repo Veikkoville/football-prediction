@@ -42,6 +42,12 @@ from src.models.dixon_coles import DixonColesModel, apply_match_adjustments
 
 import requests
 
+# Edge-sprint P0: admin-portti + PREMIUM_ENFORCE-maskit (default off — kun
+# flagi on pois, is_premium_request palauttaa aina True eika mikaan muutu).
+from api.premium import (
+    is_premium_request, mask_plan_payload, mask_xp_payload, require_admin,
+)
+
 # Stripe-konfiguraatio (Render env varseista)
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_PRICE_ID = os.getenv("STRIPE_PRICE_ID", "")
@@ -462,6 +468,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Edge-sprint: uudet fantasy-endpointit (chip-ev, plan-chains, league, h2h,
+# edge, xp.csv) omassa moduulissa — main.py:n olemassa olevat polut eivat
+# muutu. Importti tassa (ei tiedoston alussa) jotta app + CORS ovat valmiit.
+from api.fantasy_edge import router as _fantasy_edge_router  # noqa: E402
+app.include_router(_fantasy_edge_router)
 
 
 # ---------------------------------------------------------------------------
@@ -1766,8 +1778,13 @@ def parlay(req: ParlayRequest):
 # ENDPOINT: tyhjennä mallin välimuisti (debug-tarkoitukseen)
 # ---------------------------------------------------------------------------
 @app.post("/api/admin/clear-cache")
-def clear_cache():
-    """Tyhjennä mallin välimuisti — pakottaa uudelleen-sovituksen."""
+def clear_cache(request: Request):
+    """Tyhjennä mallin välimuisti — pakottaa uudelleen-sovituksen.
+
+    Edge-sprint P0 (turva): vaatii X-Admin-Token-headerin joka verrataan
+    ADMIN_TOKEN-enviin. Env puuttuu -> 403 aina (endpoint pois paalta
+    kunnes token on konfiguroitu Renderiin)."""
+    require_admin(request)
     from src.data.football_data_org import _TOURNAMENT_MEM_CACHE
     with _MODEL_LOCK:
         n = len(_MODEL_CACHE)
@@ -2510,7 +2527,7 @@ def fantasy_phase0(response: Response):
 
 
 @app.get("/api/fantasy/xp")
-def fantasy_xp(response: Response):
+def fantasy_xp(request: Request, response: Response):
     """FPL Phase 1 — xP (expected points) per pelaaja per GW (premium-ydin).
 
     Palauttaa committatun projektion (data/fpl_xp_projections.json).
@@ -2524,7 +2541,13 @@ def fantasy_xp(response: Response):
     """
     from src.models.fpl_xp import load_xp
     response.headers["Cache-Control"] = "no-store"
-    return load_xp()
+    payload = load_xp()
+    # Edge-sprint P0c: PREMIUM_ENFORCE=on + ei-premium -> typistetty teaser
+    # (top-10 taysia riveja, meta.masked=true). Flagi off (default) -> tama
+    # haara ei koskaan aja ja vastaus on bittitarkasti ennallaan.
+    if payload.get("players") and not is_premium_request(request):
+        payload = mask_xp_payload(payload)
+    return payload
 
 
 @app.get("/api/fantasy/price-watch")
@@ -2614,6 +2637,7 @@ def fantasy_fit(
 
 @app.get("/api/fantasy/plan")
 def fantasy_plan(
+    request: Request,
     response: Response,
     entry: int | None = Query(default=None),
     gw: int | None = Query(default=None, ge=1, le=38),
@@ -2630,10 +2654,15 @@ def fantasy_plan(
     response.headers["Cache-Control"] = "no-store"
     player_ids = _parse_id_csv(players, "players") if players else None
     try:
-        return plan_transfers(entry=entry, gw=gw, players=player_ids,
-                              bank=bank, horizon=horizon, ft=ft)
+        payload = plan_transfers(entry=entry, gw=gw, players=player_ids,
+                                 bank=bank, horizon=horizon, ft=ft)
     except RateTeamError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+    # Edge-sprint P0c: enforcement paalla ei-premium saa vain 1. GW:n askeleen
+    # (taysi rivi -> renderointi ei kaadu). Default off -> ennallaan.
+    if not is_premium_request(request):
+        payload = mask_plan_payload(payload)
+    return payload
 
 
 @app.get("/api/fantasy/captain")
@@ -2650,9 +2679,32 @@ def fantasy_captain(
     response.headers["Cache-Control"] = "no-store"
     player_ids = _parse_id_csv(players, "players") if players else None
     try:
-        return captain_picker(entry=entry, gw=gw, players=player_ids)
+        payload = captain_picker(entry=entry, gw=gw, players=player_ids)
     except RateTeamError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+    # Edge-sprint (additiivinen, defensiivinen): jos xP-projektio tuo
+    # e_bonus/set_pieces-kentat (contract-data.md), liitetaan ne captain-
+    # riveihin. Kenttien puuttuessa vastaus on tasmalleen ennallaan.
+    try:
+        from src.models.fpl_xp import load_xp
+        extras = {p.get("id"): p for p in (load_xp().get("players") or [])
+                  if p.get("e_bonus") is not None
+                  or p.get("set_pieces") is not None}
+        if extras:
+            rows = list(payload.get("top3") or [])
+            if payload.get("differential"):
+                rows.append(payload["differential"])
+            for row in rows:
+                src = extras.get(row.get("id"))
+                if not src:
+                    continue
+                if src.get("e_bonus") is not None:
+                    row["e_bonus"] = src["e_bonus"]
+                if src.get("set_pieces") is not None:
+                    row["set_pieces"] = src["set_pieces"]
+    except Exception:
+        pass  # enrichment ei koskaan kaada peruspayloadia
+    return payload
 
 
 @app.get("/api/fantasy/differentials")
