@@ -7,6 +7,9 @@
 	// estimaatti (p_start, confidence, data_basis, xP). Defensiiviset luvut:
 	// vanha payload ilman uusia kenttiä ei kaada mitään.
 	import { fetchXp, type XpMeta, type XpPlayer } from '$lib/api';
+	// Free-tier-rajaus (Villen havainto 25.7): xP-numerot ovat premium-arvoa
+	// kaikkialla muualla -> kortti nayttaa ne vain premium-pinnalta (ProTools).
+	let { premium = false }: { premium?: boolean } = $props();
 	import { capture } from '$lib/analytics';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import SetPieceBadges from './SetPieceBadges.svelte';
@@ -182,13 +185,21 @@
 								player.data_basis}.
 						</p>
 					{/if}
-					<p>
-						<strong>{player.xp_horizon_total.toFixed(1)} xP</strong> projected over the next
-						{player.gameweeks.length} gameweeks ({player.xp_per_gw.toFixed(1)} per GW).
-					</p>
+					{#if premium}
+						<p>
+							<strong>{player.xp_horizon_total.toFixed(1)} xP</strong> projected over the next
+							{player.gameweeks.length} gameweeks ({player.xp_per_gw.toFixed(1)} per GW).
+						</p>
+					{:else}
+						<p class="muted">
+							Projected points for this player are part of GoalIQ Premium. The start
+							chance and official status here are free.
+						</p>
+					{/if}
 				</section>
 			</div>
 
+			{#if premium}
 			<h4 class="gw-title">Projected points by gameweek</h4>
 			<div class="table-wrap">
 				<table>
@@ -210,6 +221,7 @@
 					</tbody>
 				</table>
 			</div>
+			{/if}
 			<p class="muted disclaimer">
 				Official status and news are FPL's own data. Starting chance and xP are GoalIQ model
 				projections, for fun and planning, not betting advice.

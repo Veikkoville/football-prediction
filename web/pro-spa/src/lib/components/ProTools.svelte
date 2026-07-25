@@ -16,6 +16,7 @@
 	import Value from './Value.svelte';
 	import ChipEv from './ChipEv.svelte';
 	import PlanChains from './PlanChains.svelte';
+	import PlayerCard from './PlayerCard.svelte';
 	import EdgeMode from './EdgeMode.svelte';
 
 	let { xp }: { xp: XpResponse } = $props();
@@ -26,6 +27,7 @@
 	const SEGMENTS: Segment[] = [
 		{ id: 'players', label: 'Players' },
 		{ id: 'myteam', label: 'My team' },
+		{ id: 'lookup', label: 'Player card' },
 		{ id: 'chips', label: 'Chips' },
 		{ id: 'chains', label: 'Chains' },
 		{ id: 'edge', label: 'Edge' },
@@ -53,6 +55,10 @@
 		<!-- #46: RateTeam premium={true} vain tilauksen takana → ei premium-vuotoa. -->
 		<section class="tool-card"><RateTeam premium={true} /></section>
 		<section class="tool-card"><TransferPlanner /></section>
+	</div>
+{:else if segment === 'lookup'}
+	<div id="panel-lookup" role="tabpanel" aria-labelledby="seg-lookup">
+		<section class="tool-card"><PlayerCard premium={true} /></section>
 	</div>
 {:else if segment === 'chips'}
 	<!-- Edge-sprint kohta 6: chip-ajoituksen EV -->
