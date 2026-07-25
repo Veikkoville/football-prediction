@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-24T08:05:47",
+    "generated_at": "2026-07-25T07:49:05",
     "season": "2026/27",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + jäädytetty 25/26-baseline-artefakti (data/fpl_prev_baselines_2526.json, element code -mappaus)",
@@ -27,7 +27,7 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1552
+      "home_gamma": -0.1553
     },
     "data_coverage": {
       "baseline_season": "2526",
@@ -37,7 +37,7 @@
         "Hull"
       ],
       "player_basis_counts": {
-        "pl_history": 300,
+        "pl_history": 298,
         "limited_history": 46,
         "no_history": 0
       },
@@ -64,7 +64,7 @@
     "deadline_utc": "2026-08-21T17:30:00+00:00",
     "horizon_gw": 6,
     "min_xp_total": 1.0,
-    "n_players": 346,
+    "n_players": 344,
     "todo": [
       "Ilman pelaajadataa (nousijat, ei vielä FPL:ssä): ['Hull'] — täyttyvät automaattisesti kun 26/27-peli avautuu."
     ]
@@ -1133,12 +1133,12 @@
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
-      "xmins": 80.8,
-      "predicted_starts": 82.9,
+      "xmins": 80.9,
+      "predicted_starts": 83.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "xp_per_gw": 4.18,
-      "xp_horizon_total": 25.08,
+      "xp_per_gw": 4.19,
+      "xp_horizon_total": 25.11,
       "gameweeks": [
         {
           "gw": 1,
@@ -1158,7 +1158,7 @@
               "venue": "H"
             }
           ],
-          "xp": 4.04
+          "xp": 4.05
         },
         {
           "gw": 3,
@@ -1178,7 +1178,7 @@
               "venue": "H"
             }
           ],
-          "xp": 5.25
+          "xp": 5.26
         },
         {
           "gw": 5,
@@ -1188,7 +1188,7 @@
               "venue": "A"
             }
           ],
-          "xp": 4.17
+          "xp": 4.18
         },
         {
           "gw": 6,
@@ -1204,7 +1204,7 @@
       "components": {
         "appearance": 1.77,
         "goals": 1.2,
-        "assists": 0.47,
+        "assists": 0.48,
         "clean_sheet": 0.21,
         "conceded": 0.0,
         "saves": 0.0,
@@ -2535,6 +2535,94 @@
       "components_gw": 1
     },
     {
+      "id": 68,
+      "web_name": "Tavernier",
+      "full_name": "Marcus Tavernier",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 74.1,
+      "predicted_starts": 78.6,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 3.74,
+      "xp_horizon_total": 22.47,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.29
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.88
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.77
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.92
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.84
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.78
+        }
+      ],
+      "components": {
+        "appearance": 1.75,
+        "goals": 0.8,
+        "assists": 0.26,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.18,
+        "yellows": -0.16,
+        "bonus": 0.35
+      },
+      "components_gw": 1
+    },
+    {
       "id": 231,
       "web_name": "Keane",
       "full_name": "Michael Keane",
@@ -2893,12 +2981,12 @@
       "team": "Chelsea",
       "team_short": "CHE",
       "pos": "MID",
-      "xmins": 87.7,
-      "predicted_starts": 89.3,
+      "xmins": 87.8,
+      "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "xp_per_gw": 3.7,
-      "xp_horizon_total": 22.22,
+      "xp_per_gw": 3.71,
+      "xp_horizon_total": 22.25,
       "gameweeks": [
         {
           "gw": 1,
@@ -2918,7 +3006,7 @@
               "venue": "H"
             }
           ],
-          "xp": 3.6
+          "xp": 3.61
         },
         {
           "gw": 3,
@@ -2928,7 +3016,7 @@
               "venue": "A"
             }
           ],
-          "xp": 3.17
+          "xp": 3.18
         },
         {
           "gw": 4,
@@ -2948,7 +3036,7 @@
               "venue": "A"
             }
           ],
-          "xp": 3.68
+          "xp": 3.69
         },
         {
           "gw": 6,
@@ -3239,6 +3327,94 @@
       "components_gw": 1
     },
     {
+      "id": 69,
+      "web_name": "Scott",
+      "full_name": "Alex Scott",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 76.3,
+      "predicted_starts": 85.4,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "xp_per_gw": 3.66,
+      "xp_horizon_total": 21.95,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.37
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.79
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.63
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.78
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.7
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.68
+        }
+      ],
+      "components": {
+        "appearance": 1.86,
+        "goals": 0.37,
+        "assists": 0.17,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.74,
+        "yellows": -0.14,
+        "bonus": 0.25
+      },
+      "components_gw": 1
+    },
+    {
       "id": 346,
       "web_name": "Calvert-Lewin",
       "full_name": "Dominic Calvert-Lewin",
@@ -3503,94 +3679,6 @@
       "components_gw": 1
     },
     {
-      "id": 68,
-      "web_name": "Tavernier",
-      "full_name": "Marcus Tavernier",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 71.0,
-      "predicted_starts": 74.9,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 3.59,
-      "xp_horizon_total": 21.56,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.15
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.73
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.61
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.76
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.68
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.62
-        }
-      ],
-      "components": {
-        "appearance": 1.69,
-        "goals": 0.77,
-        "assists": 0.25,
-        "clean_sheet": 0.09,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.17,
-        "yellows": -0.15,
-        "bonus": 0.34
-      },
-      "components_gw": 1
-    },
-    {
       "id": 232,
       "web_name": "O'Brien",
       "full_name": "Jake O'Brien",
@@ -3763,94 +3851,6 @@
         "defensive_contribution": 0.91,
         "yellows": -0.24,
         "bonus": 0.29
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 69,
-      "web_name": "Scott",
-      "full_name": "Alex Scott",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 73.8,
-      "predicted_starts": 81.4,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "xp_per_gw": 3.54,
-      "xp_horizon_total": 21.27,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.26
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.67
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.52
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.66
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.58
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.57
-        }
-      ],
-      "components": {
-        "appearance": 1.81,
-        "goals": 0.36,
-        "assists": 0.17,
-        "clean_sheet": 0.1,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.72,
-        "yellows": -0.13,
-        "bonus": 0.24
       },
       "components_gw": 1
     },
@@ -5615,6 +5615,94 @@
       "components_gw": 1
     },
     {
+      "id": 417,
+      "web_name": "Dalot",
+      "full_name": "Diogo Dalot Teixeira",
+      "team": "Manchester United",
+      "team_short": "MUN",
+      "pos": "DEF",
+      "xmins": 74.1,
+      "predicted_starts": 78.2,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 3.28,
+      "xp_horizon_total": 19.66,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.39
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.9
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.01
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.87
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.98
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.51
+        }
+      ],
+      "components": {
+        "appearance": 1.67,
+        "goals": 0.37,
+        "assists": 0.24,
+        "clean_sheet": 1.05,
+        "conceded": -0.25,
+        "saves": 0.0,
+        "defensive_contribution": 0.21,
+        "yellows": -0.14,
+        "bonus": 0.25
+      },
+      "components_gw": 1
+    },
+    {
       "id": 136,
       "web_name": "Welbeck",
       "full_name": "Danny Welbeck",
@@ -5879,94 +5967,6 @@
       "components_gw": 1
     },
     {
-      "id": 417,
-      "web_name": "Dalot",
-      "full_name": "Diogo Dalot Teixeira",
-      "team": "Manchester United",
-      "team_short": "MUN",
-      "pos": "DEF",
-      "xmins": 73.7,
-      "predicted_starts": 77.7,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 3.26,
-      "xp_horizon_total": 19.56,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.38
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.88
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.0
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.85
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.97
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.49
-        }
-      ],
-      "components": {
-        "appearance": 1.66,
-        "goals": 0.37,
-        "assists": 0.24,
-        "clean_sheet": 1.04,
-        "conceded": -0.25,
-        "saves": 0.0,
-        "defensive_contribution": 0.21,
-        "yellows": -0.14,
-        "bonus": 0.25
-      },
-      "components_gw": 1
-    },
-    {
       "id": 140,
       "web_name": "Sánchez",
       "full_name": "Robert Lynch Sánchez",
@@ -6150,7 +6150,7 @@
       "team_short": "MUN",
       "pos": "DEF",
       "xmins": 84.7,
-      "predicted_starts": 98.4,
+      "predicted_starts": 99.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
       "xp_per_gw": 3.24,
@@ -7646,11 +7646,11 @@
       "team_short": "CHE",
       "pos": "MID",
       "xmins": 67.6,
-      "predicted_starts": 72.2,
+      "predicted_starts": 72.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
       "xp_per_gw": 3.06,
-      "xp_horizon_total": 18.37,
+      "xp_horizon_total": 18.39,
       "gameweeks": [
         {
           "gw": 1,
@@ -7670,7 +7670,7 @@
               "venue": "H"
             }
           ],
-          "xp": 2.97
+          "xp": 2.98
         },
         {
           "gw": 3,
@@ -7710,7 +7710,7 @@
               "venue": "H"
             }
           ],
-          "xp": 3.08
+          "xp": 3.09
         }
       ],
       "components": {
@@ -7998,11 +7998,11 @@
       "team_short": "CHE",
       "pos": "MID",
       "xmins": 52.2,
-      "predicted_starts": 61.5,
+      "predicted_starts": 61.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "xp_per_gw": 2.99,
-      "xp_horizon_total": 17.95,
+      "xp_per_gw": 3.0,
+      "xp_horizon_total": 17.97,
       "gameweeks": [
         {
           "gw": 1,
@@ -8052,7 +8052,7 @@
               "venue": "A"
             }
           ],
-          "xp": 2.99
+          "xp": 3.0
         },
         {
           "gw": 6,
@@ -8062,12 +8062,12 @@
               "venue": "H"
             }
           ],
-          "xp": 3.01
+          "xp": 3.02
         }
       ],
       "components": {
-        "appearance": 1.2,
-        "goals": 1.08,
+        "appearance": 1.21,
+        "goals": 1.09,
         "assists": 0.18,
         "clean_sheet": 0.13,
         "conceded": 0.0,
@@ -8255,6 +8255,94 @@
       "components_gw": 1
     },
     {
+      "id": 122,
+      "web_name": "Minteh",
+      "full_name": "Yankuba Minteh",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "MID",
+      "xmins": 65.2,
+      "predicted_starts": 68.9,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.94,
+      "xp_horizon_total": 17.66,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.03
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.82
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.1
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.28
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.61
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.82
+        }
+      ],
+      "components": {
+        "appearance": 1.59,
+        "goals": 0.55,
+        "assists": 0.41,
+        "clean_sheet": 0.22,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.1,
+        "bonus": 0.26
+      },
+      "components_gw": 1
+    },
+    {
       "id": 337,
       "web_name": "Aaronson",
       "full_name": "Brenden Aaronson",
@@ -8339,6 +8427,94 @@
         "defensive_contribution": 0.17,
         "yellows": -0.09,
         "bonus": 0.18
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 127,
+      "web_name": "Gomez",
+      "full_name": "Diego Gómez Amarilla",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "MID",
+      "xmins": 59.9,
+      "predicted_starts": 71.2,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.91,
+      "xp_horizon_total": 17.45,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.0
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.78
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.07
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.26
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.56
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.78
+        }
+      ],
+      "components": {
+        "appearance": 1.54,
+        "goals": 0.86,
+        "assists": 0.17,
+        "clean_sheet": 0.21,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.18,
+        "yellows": -0.22,
+        "bonus": 0.24
       },
       "components_gw": 1
     },
@@ -8519,6 +8695,94 @@
       "components_gw": 1
     },
     {
+      "id": 159,
+      "web_name": "Caicedo",
+      "full_name": "Moisés Caicedo Corozo",
+      "team": "Chelsea",
+      "team_short": "CHE",
+      "pos": "MID",
+      "xmins": 72.3,
+      "predicted_starts": 76.5,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.88,
+      "xp_horizon_total": 17.3,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.78
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.82
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.66
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.27
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.86
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.91
+        }
+      ],
+      "components": {
+        "appearance": 1.59,
+        "goals": 0.22,
+        "assists": 0.18,
+        "clean_sheet": 0.19,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.59,
+        "yellows": -0.24,
+        "bonus": 0.25
+      },
+      "components_gw": 1
+    },
+    {
       "id": 534,
       "web_name": "Hume",
       "full_name": "Trai Hume",
@@ -8603,94 +8867,6 @@
         "defensive_contribution": 0.15,
         "yellows": -0.22,
         "bonus": 0.17
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 159,
-      "web_name": "Caicedo",
-      "full_name": "Moisés Caicedo Corozo",
-      "team": "Chelsea",
-      "team_short": "CHE",
-      "pos": "MID",
-      "xmins": 72.2,
-      "predicted_starts": 76.5,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.88,
-      "xp_horizon_total": 17.28,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.78
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.82
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.66
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.26
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.86
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.9
-        }
-      ],
-      "components": {
-        "appearance": 1.59,
-        "goals": 0.22,
-        "assists": 0.18,
-        "clean_sheet": 0.19,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.59,
-        "yellows": -0.24,
-        "bonus": 0.25
       },
       "components_gw": 1
     },
@@ -9487,94 +9663,6 @@
       "components_gw": 1
     },
     {
-      "id": 122,
-      "web_name": "Minteh",
-      "full_name": "Yankuba Minteh",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 61.7,
-      "predicted_starts": 63.9,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.79,
-      "xp_horizon_total": 16.76,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.87
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.68
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.94
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.11
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.48
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.68
-        }
-      ],
-      "components": {
-        "appearance": 1.52,
-        "goals": 0.52,
-        "assists": 0.39,
-        "clean_sheet": 0.2,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.08,
-        "yellows": -0.09,
-        "bonus": 0.25
-      },
-      "components_gw": 1
-    },
-    {
       "id": 8,
       "web_name": "Calafiori",
       "full_name": "Riccardo Calafiori",
@@ -9751,6 +9839,94 @@
       "components_gw": 1
     },
     {
+      "id": 78,
+      "web_name": "Kroupi.Jr",
+      "full_name": "Junior Kroupi",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 45.0,
+      "predicted_starts": 56.0,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.77,
+      "xp_horizon_total": 16.64,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.45
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.86
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.8
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.89
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.84
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.8
+        }
+      ],
+      "components": {
+        "appearance": 1.39,
+        "goals": 0.68,
+        "assists": 0.1,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.12,
+        "bonus": 0.3
+      },
+      "components_gw": 1
+    },
+    {
       "id": 248,
       "web_name": "Beto",
       "full_name": "Norberto Bercique Gomes Betuncal",
@@ -9835,94 +10011,6 @@
         "defensive_contribution": 0.0,
         "yellows": -0.07,
         "bonus": 0.37
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 127,
-      "web_name": "Gomez",
-      "full_name": "Diego Gómez Amarilla",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 56.5,
-      "predicted_starts": 66.0,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.75,
-      "xp_horizon_total": 16.49,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.83
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.63
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.9
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.08
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.42
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.63
-        }
-      ],
-      "components": {
-        "appearance": 1.47,
-        "goals": 0.81,
-        "assists": 0.16,
-        "clean_sheet": 0.19,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.17,
-        "yellows": -0.2,
-        "bonus": 0.23
       },
       "components_gw": 1
     },
@@ -10363,94 +10451,6 @@
         "defensive_contribution": 0.08,
         "yellows": -0.11,
         "bonus": 0.12
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 78,
-      "web_name": "Kroupi.Jr",
-      "full_name": "Junior Kroupi",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 43.3,
-      "predicted_starts": 53.3,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.69,
-      "xp_horizon_total": 16.12,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.37
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.77
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.71
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.8
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.75
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.71
-        }
-      ],
-      "components": {
-        "appearance": 1.36,
-        "goals": 0.65,
-        "assists": 0.09,
-        "clean_sheet": 0.06,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.04,
-        "yellows": -0.12,
-        "bonus": 0.29
       },
       "components_gw": 1
     },
@@ -12039,6 +12039,94 @@
       "components_gw": 1
     },
     {
+      "id": 129,
+      "web_name": "Ayari",
+      "full_name": "Yasin Ayari",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "MID",
+      "xmins": 54.6,
+      "predicted_starts": 57.3,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.44,
+      "xp_horizon_total": 14.63,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.48
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.36
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.53
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.65
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.23
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.37
+        }
+      ],
+      "components": {
+        "appearance": 1.34,
+        "goals": 0.42,
+        "assists": 0.13,
+        "clean_sheet": 0.18,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.06,
+        "bonus": 0.2
+      },
+      "components_gw": 1
+    },
+    {
       "id": 350,
       "web_name": "A.Becker",
       "full_name": "Alisson Becker",
@@ -12567,6 +12655,94 @@
       "components_gw": 1
     },
     {
+      "id": 418,
+      "web_name": "Maguire",
+      "full_name": "Harry Maguire",
+      "team": "Manchester United",
+      "team_short": "MUN",
+      "pos": "DEF",
+      "xmins": 47.5,
+      "predicted_starts": 55.0,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.36,
+      "xp_horizon_total": 14.15,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.42
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.71
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.21
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.11
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.19
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.49
+        }
+      ],
+      "components": {
+        "appearance": 1.15,
+        "goals": 0.22,
+        "assists": 0.06,
+        "clean_sheet": 0.71,
+        "conceded": -0.16,
+        "saves": 0.0,
+        "defensive_contribution": 0.41,
+        "yellows": -0.09,
+        "bonus": 0.11
+      },
+      "components_gw": 1
+    },
+    {
       "id": 457,
       "web_name": "J.Murphy",
       "full_name": "Jacob Murphy",
@@ -12655,6 +12831,94 @@
       "components_gw": 1
     },
     {
+      "id": 123,
+      "web_name": "Hinshelwood",
+      "full_name": "Jack Hinshelwood",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "MID",
+      "xmins": 46.9,
+      "predicted_starts": 55.0,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.35,
+      "xp_horizon_total": 14.09,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.42
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.25
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.48
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.64
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.06
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.24
+        }
+      ],
+      "components": {
+        "appearance": 1.26,
+        "goals": 0.64,
+        "assists": 0.2,
+        "clean_sheet": 0.17,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.03,
+        "bonus": 0.09
+      },
+      "components_gw": 1
+    },
+    {
       "id": 358,
       "web_name": "Kerkez",
       "full_name": "Milos Kerkez",
@@ -12739,94 +13003,6 @@
         "defensive_contribution": 0.11,
         "yellows": -0.11,
         "bonus": 0.1
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 418,
-      "web_name": "Maguire",
-      "full_name": "Harry Maguire",
-      "team": "Manchester United",
-      "team_short": "MUN",
-      "pos": "DEF",
-      "xmins": 47.2,
-      "predicted_starts": 54.7,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.35,
-      "xp_horizon_total": 14.07,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.41
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.7
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.2
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.1
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.18
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.48
-        }
-      ],
-      "components": {
-        "appearance": 1.14,
-        "goals": 0.22,
-        "assists": 0.06,
-        "clean_sheet": 0.71,
-        "conceded": -0.16,
-        "saves": 0.0,
-        "defensive_contribution": 0.41,
-        "yellows": -0.09,
-        "bonus": 0.11
       },
       "components_gw": 1
     },
@@ -13091,94 +13267,6 @@
         "defensive_contribution": 0.37,
         "yellows": -0.07,
         "bonus": 0.14
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 129,
-      "web_name": "Ayari",
-      "full_name": "Yasin Ayari",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 51.3,
-      "predicted_starts": 53.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.31,
-      "xp_horizon_total": 13.85,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.35
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.23
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.4
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.51
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.12
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.24
-        }
-      ],
-      "components": {
-        "appearance": 1.28,
-        "goals": 0.4,
-        "assists": 0.12,
-        "clean_sheet": 0.17,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.25,
-        "yellows": -0.05,
-        "bonus": 0.19
       },
       "components_gw": 1
     },
@@ -13623,106 +13711,18 @@
       "components_gw": 1
     },
     {
-      "id": 123,
-      "web_name": "Hinshelwood",
-      "full_name": "Jack Hinshelwood",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 44.4,
-      "predicted_starts": 51.0,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.22,
-      "xp_horizon_total": 13.34,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.29
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.13
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.35
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.5
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.95
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.12
-        }
-      ],
-      "components": {
-        "appearance": 1.2,
-        "goals": 0.61,
-        "assists": 0.19,
-        "clean_sheet": 0.16,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.08,
-        "yellows": -0.03,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
       "id": 420,
       "web_name": "Yoro",
       "full_name": "Leny Yoro",
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
-      "xmins": 48.6,
-      "predicted_starts": 52.4,
+      "xmins": 48.8,
+      "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "xp_per_gw": 2.21,
-      "xp_horizon_total": 13.27,
+      "xp_per_gw": 2.22,
+      "xp_horizon_total": 13.32,
       "gameweeks": [
         {
           "gw": 1,
@@ -13732,7 +13732,7 @@
               "venue": "A"
             }
           ],
-          "xp": 2.27
+          "xp": 2.28
         },
         {
           "gw": 2,
@@ -13742,7 +13742,7 @@
               "venue": "H"
             }
           ],
-          "xp": 2.56
+          "xp": 2.58
         },
         {
           "gw": 3,
@@ -13762,7 +13762,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.97
+          "xp": 1.98
         },
         {
           "gw": 5,
@@ -13782,14 +13782,14 @@
               "venue": "H"
             }
           ],
-          "xp": 2.35
+          "xp": 2.36
         }
       ],
       "components": {
         "appearance": 1.29,
         "goals": 0.25,
         "assists": 0.07,
-        "clean_sheet": 0.63,
+        "clean_sheet": 0.64,
         "conceded": -0.17,
         "saves": 0.0,
         "defensive_contribution": 0.19,
@@ -14415,6 +14415,94 @@
       "components_gw": 1
     },
     {
+      "id": 74,
+      "web_name": "Brooks",
+      "full_name": "David Brooks",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 32.7,
+      "predicted_starts": 40.2,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 2.07,
+      "xp_horizon_total": 12.42,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.82
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.13
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.1
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.16
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.13
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.09
+        }
+      ],
+      "components": {
+        "appearance": 1.14,
+        "goals": 0.46,
+        "assists": 0.17,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.14,
+        "bonus": 0.11
+      },
+      "components_gw": 1
+    },
+    {
       "id": 500,
       "web_name": "Romero",
       "full_name": "Cristian Romero",
@@ -14855,94 +14943,6 @@
       "components_gw": 1
     },
     {
-      "id": 74,
-      "web_name": "Brooks",
-      "full_name": "David Brooks",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 31.7,
-      "predicted_starts": 38.3,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 2.02,
-      "xp_horizon_total": 12.11,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.77
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.08
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.04
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.11
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.08
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.03
-        }
-      ],
-      "components": {
-        "appearance": 1.12,
-        "goals": 0.45,
-        "assists": 0.16,
-        "clean_sheet": 0.04,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.13,
-        "bonus": 0.11
-      },
-      "components_gw": 1
-    },
-    {
       "id": 254,
       "web_name": "Robinson",
       "full_name": "Antonee Robinson",
@@ -15295,6 +15295,94 @@
       "components_gw": 1
     },
     {
+      "id": 124,
+      "web_name": "Groß",
+      "full_name": "Pascal Groß",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "MID",
+      "xmins": 44.7,
+      "predicted_starts": 50.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.96,
+      "xp_horizon_total": 11.76,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.01
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.88
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.05
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.16
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.76
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.89
+        }
+      ],
+      "components": {
+        "appearance": 1.01,
+        "goals": 0.24,
+        "assists": 0.31,
+        "clean_sheet": 0.16,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.12,
+        "yellows": -0.07,
+        "bonus": 0.23
+      },
+      "components_gw": 1
+    },
+    {
       "id": 213,
       "web_name": "Lerma",
       "full_name": "Jefferson Lerma Solís",
@@ -15379,94 +15467,6 @@
         "defensive_contribution": 0.21,
         "yellows": -0.16,
         "bonus": 0.11
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 121,
-      "web_name": "Mitoma",
-      "full_name": "Mitoma Kaoru",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 44.7,
-      "predicted_starts": 51.0,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.93,
-      "xp_horizon_total": 11.55,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.99
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.84
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.04
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.18
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.68
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.83
-        }
-      ],
-      "components": {
-        "appearance": 1.09,
-        "goals": 0.52,
-        "assists": 0.22,
-        "clean_sheet": 0.14,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.04,
-        "yellows": -0.12,
-        "bonus": 0.09
       },
       "components_gw": 1
     },
@@ -15907,6 +15907,94 @@
         "defensive_contribution": 0.03,
         "yellows": -0.05,
         "bonus": 0.15
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 73,
+      "web_name": "Adams",
+      "full_name": "Tyler Adams",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 49.6,
+      "predicted_starts": 58.3,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.88,
+      "xp_horizon_total": 11.31,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.76
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.96
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.86
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.94
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.89
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.9
+        }
+      ],
+      "components": {
+        "appearance": 1.23,
+        "goals": 0.11,
+        "assists": 0.06,
+        "clean_sheet": 0.07,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.36,
+        "yellows": -0.18,
+        "bonus": 0.12
       },
       "components_gw": 1
     },
@@ -16527,18 +16615,18 @@
       "components_gw": 1
     },
     {
-      "id": 124,
-      "web_name": "Groß",
-      "full_name": "Pascal Groß",
+      "id": 131,
+      "web_name": "Baleba",
+      "full_name": "Carlos Baleba",
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
-      "xmins": 41.5,
-      "predicted_starts": 46.7,
+      "xmins": 46.9,
+      "predicted_starts": 64.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
       "xp_per_gw": 1.82,
-      "xp_horizon_total": 10.92,
+      "xp_horizon_total": 10.91,
       "gameweeks": [
         {
           "gw": 1,
@@ -16548,7 +16636,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.86
+          "xp": 1.84
         },
         {
           "gw": 2,
@@ -16558,7 +16646,7 @@
               "venue": "A"
             }
           ],
-          "xp": 1.75
+          "xp": 1.77
         },
         {
           "gw": 3,
@@ -16568,7 +16656,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.91
+          "xp": 1.87
         },
         {
           "gw": 4,
@@ -16578,7 +16666,7 @@
               "venue": "A"
             }
           ],
-          "xp": 2.01
+          "xp": 1.94
         },
         {
           "gw": 5,
@@ -16588,7 +16676,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.64
+          "xp": 1.7
         },
         {
           "gw": 6,
@@ -16598,19 +16686,19 @@
               "venue": "A"
             }
           ],
-          "xp": 1.76
+          "xp": 1.78
         }
       ],
       "components": {
-        "appearance": 0.94,
-        "goals": 0.23,
-        "assists": 0.29,
+        "appearance": 1.28,
+        "goals": 0.18,
+        "assists": 0.1,
         "clean_sheet": 0.14,
         "conceded": 0.0,
         "saves": 0.0,
-        "defensive_contribution": 0.11,
-        "yellows": -0.06,
-        "bonus": 0.22
+        "defensive_contribution": 0.21,
+        "yellows": -0.13,
+        "bonus": 0.06
       },
       "components_gw": 1
     },
@@ -16699,94 +16787,6 @@
         "defensive_contribution": 0.03,
         "yellows": -0.03,
         "bonus": 0.17
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 73,
-      "web_name": "Adams",
-      "full_name": "Tyler Adams",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 47.5,
-      "predicted_starts": 55.5,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.8,
-      "xp_horizon_total": 10.82,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.68
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.88
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.78
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.86
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.81
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.81
-        }
-      ],
-      "components": {
-        "appearance": 1.18,
-        "goals": 0.11,
-        "assists": 0.06,
-        "clean_sheet": 0.06,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.34,
-        "yellows": -0.18,
-        "bonus": 0.11
       },
       "components_gw": 1
     },
@@ -17671,94 +17671,6 @@
       "components_gw": 1
     },
     {
-      "id": 131,
-      "web_name": "Baleba",
-      "full_name": "Carlos Baleba",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 44.0,
-      "predicted_starts": 59.6,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.73,
-      "xp_horizon_total": 10.36,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.75
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.68
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.78
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.84
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.62
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.69
-        }
-      ],
-      "components": {
-        "appearance": 1.22,
-        "goals": 0.17,
-        "assists": 0.09,
-        "clean_sheet": 0.13,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.2,
-        "yellows": -0.12,
-        "bonus": 0.06
-      },
-      "components_gw": 1
-    },
-    {
       "id": 268,
       "web_name": "King",
       "full_name": "Josh King",
@@ -18023,6 +17935,94 @@
       "components_gw": 1
     },
     {
+      "id": 160,
+      "web_name": "Garnacho",
+      "full_name": "Alejandro Garnacho Ferreyra",
+      "team": "Aston Villa",
+      "team_short": "AVL",
+      "pos": "MID",
+      "xmins": 34.5,
+      "predicted_starts": 43.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.7,
+      "xp_horizon_total": 10.19,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.49
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.45
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.9
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.78
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.71
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.86
+        }
+      ],
+      "components": {
+        "appearance": 0.87,
+        "goals": 0.31,
+        "assists": 0.19,
+        "clean_sheet": 0.06,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.06,
+        "bonus": 0.1
+      },
+      "components_gw": 1
+    },
+    {
       "id": 15,
       "web_name": "Ødegaard",
       "full_name": "Martin Ødegaard",
@@ -18107,6 +18107,94 @@
         "defensive_contribution": 0.06,
         "yellows": -0.03,
         "bonus": 0.13
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 77,
+      "web_name": "Adli",
+      "full_name": "Amine Adli",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 29.5,
+      "predicted_starts": 33.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.65,
+      "xp_horizon_total": 9.87,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.51
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.68
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.65
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.7
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.68
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.66
+        }
+      ],
+      "components": {
+        "appearance": 1.05,
+        "goals": 0.23,
+        "assists": 0.09,
+        "clean_sheet": 0.03,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.06,
+        "bonus": 0.11
       },
       "components_gw": 1
     },
@@ -18371,182 +18459,6 @@
         "defensive_contribution": 0.11,
         "yellows": -0.09,
         "bonus": 0.1
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 160,
-      "web_name": "Garnacho",
-      "full_name": "Alejandro Garnacho Ferreyra",
-      "team": "Chelsea",
-      "team_short": "CHE",
-      "pos": "MID",
-      "xmins": 32.8,
-      "predicted_starts": 40.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.62,
-      "xp_horizon_total": 9.69,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.54
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.56
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.36
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.98
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.62
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.63
-        }
-      ],
-      "components": {
-        "appearance": 0.84,
-        "goals": 0.36,
-        "assists": 0.22,
-        "clean_sheet": 0.06,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.06,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 77,
-      "web_name": "Adli",
-      "full_name": "Amine Adli",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 28.6,
-      "predicted_starts": 31.8,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.61,
-      "xp_horizon_total": 9.68,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.48
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.65
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.62
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.66
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.64
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.62
-        }
-      ],
-      "components": {
-        "appearance": 1.03,
-        "goals": 0.22,
-        "assists": 0.09,
-        "clean_sheet": 0.03,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.06,
-        "yellows": -0.06,
-        "bonus": 0.11
       },
       "components_gw": 1
     },
@@ -19519,94 +19431,6 @@
       "components_gw": 1
     },
     {
-      "id": 419,
-      "web_name": "Martinez",
-      "full_name": "Lisandro Martínez",
-      "team": "Manchester United",
-      "team_short": "MUN",
-      "pos": "DEF",
-      "xmins": 35.0,
-      "predicted_starts": 40.9,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.48,
-      "xp_horizon_total": 8.88,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.52
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.69
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.4
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.33
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.38
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "TOT",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.56
-        }
-      ],
-      "components": {
-        "appearance": 0.81,
-        "goals": 0.06,
-        "assists": 0.06,
-        "clean_sheet": 0.45,
-        "conceded": -0.12,
-        "saves": 0.0,
-        "defensive_contribution": 0.21,
-        "yellows": -0.03,
-        "bonus": 0.07
-      },
-      "components_gw": 1
-    },
-    {
       "id": 326,
       "web_name": "Perri",
       "full_name": "Lucas Estella Perri",
@@ -20135,6 +19959,94 @@
       "components_gw": 1
     },
     {
+      "id": 67,
+      "web_name": "Rayan",
+      "full_name": "Rayan Vitor Simplício Rocha",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 31.1,
+      "predicted_starts": 40.2,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.4,
+      "xp_horizon_total": 8.38,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.24
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.45
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.4
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.46
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.43
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.41
+        }
+      ],
+      "components": {
+        "appearance": 0.76,
+        "goals": 0.24,
+        "assists": 0.1,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.04,
+        "bonus": 0.1
+      },
+      "components_gw": 1
+    },
+    {
       "id": 344,
       "web_name": "Gruev",
       "full_name": "Ilia Gruev",
@@ -20575,94 +20487,6 @@
       "components_gw": 1
     },
     {
-      "id": 67,
-      "web_name": "Rayan",
-      "full_name": "Rayan Vitor Simplício Rocha",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 29.6,
-      "predicted_starts": 38.3,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.33,
-      "xp_horizon_total": 8.0,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.18
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.39
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.33
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.39
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.36
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.34
-        }
-      ],
-      "components": {
-        "appearance": 0.73,
-        "goals": 0.23,
-        "assists": 0.1,
-        "clean_sheet": 0.04,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.04,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
       "id": 512,
       "web_name": "Kudus",
       "full_name": "Mohammed Kudus",
@@ -20757,12 +20581,12 @@
       "team": "Manchester United",
       "team_short": "MUN",
       "pos": "DEF",
-      "xmins": 26.3,
-      "predicted_starts": 36.3,
+      "xmins": 26.5,
+      "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "xp_per_gw": 1.31,
-      "xp_horizon_total": 7.87,
+      "xp_per_gw": 1.32,
+      "xp_horizon_total": 7.91,
       "gameweeks": [
         {
           "gw": 1,
@@ -20772,7 +20596,7 @@
               "venue": "A"
             }
           ],
-          "xp": 1.34
+          "xp": 1.35
         },
         {
           "gw": 2,
@@ -20782,7 +20606,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.48
+          "xp": 1.49
         },
         {
           "gw": 3,
@@ -20792,7 +20616,7 @@
               "venue": "A"
             }
           ],
-          "xp": 1.24
+          "xp": 1.25
         },
         {
           "gw": 4,
@@ -20802,7 +20626,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.19
+          "xp": 1.2
         },
         {
           "gw": 5,
@@ -20812,7 +20636,7 @@
               "venue": "A"
             }
           ],
-          "xp": 1.23
+          "xp": 1.24
         },
         {
           "gw": 6,
@@ -21103,6 +20927,94 @@
       "components_gw": 1
     },
     {
+      "id": 157,
+      "web_name": "Estêvão",
+      "full_name": "Estêvão Almeida de Oliveira Gonçalves",
+      "team": "Chelsea",
+      "team_short": "CHE",
+      "pos": "MID",
+      "xmins": 22.3,
+      "predicted_starts": 35.9,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.29,
+      "xp_horizon_total": 7.75,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.24
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.25
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.11
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.55
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.3
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.3
+        }
+      ],
+      "components": {
+        "appearance": 0.74,
+        "goals": 0.28,
+        "assists": 0.13,
+        "clean_sheet": 0.04,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.07,
+        "bonus": 0.09
+      },
+      "components_gw": 1
+    },
+    {
       "id": 271,
       "web_name": "Muniz",
       "full_name": "Rodrigo Muniz Carvalho",
@@ -21191,14 +21103,14 @@
       "components_gw": 1
     },
     {
-      "id": 157,
-      "web_name": "Estêvão",
-      "full_name": "Estêvão Almeida de Oliveira Gonçalves",
-      "team": "Chelsea",
-      "team_short": "CHE",
-      "pos": "MID",
-      "xmins": 22.3,
-      "predicted_starts": 35.8,
+      "id": 422,
+      "web_name": "Mazraoui",
+      "full_name": "Noussair Mazraoui",
+      "team": "Manchester United",
+      "team_short": "MUN",
+      "pos": "DEF",
+      "xmins": 27.6,
+      "predicted_starts": 36.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
       "xp_per_gw": 1.29,
@@ -21208,99 +21120,11 @@
           "gw": 1,
           "opponents": [
             {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.24
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.25
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.11
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.55
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.3
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.3
-        }
-      ],
-      "components": {
-        "appearance": 0.74,
-        "goals": 0.28,
-        "assists": 0.13,
-        "clean_sheet": 0.04,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.07,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 422,
-      "web_name": "Mazraoui",
-      "full_name": "Noussair Mazraoui",
-      "team": "Manchester United",
-      "team_short": "MUN",
-      "pos": "DEF",
-      "xmins": 27.5,
-      "predicted_starts": 36.3,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.29,
-      "xp_horizon_total": 7.71,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
               "opp": "HUL",
               "venue": "A"
             }
           ],
-          "xp": 1.31
+          "xp": 1.32
         },
         {
           "gw": 2,
@@ -21350,12 +21174,12 @@
               "venue": "H"
             }
           ],
-          "xp": 1.35
+          "xp": 1.36
         }
       ],
       "components": {
         "appearance": 0.8,
-        "goals": 0.06,
+        "goals": 0.07,
         "assists": 0.04,
         "clean_sheet": 0.37,
         "conceded": -0.09,
@@ -21715,6 +21539,94 @@
         "defensive_contribution": 0.31,
         "yellows": -0.11,
         "bonus": 0.05
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 70,
+      "web_name": "Kluivert",
+      "full_name": "Justin Kluivert",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 26.1,
+      "predicted_starts": 33.4,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.26,
+      "xp_horizon_total": 7.58,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.14
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.3
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.27
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.31
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.29
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.27
+        }
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.2,
+        "assists": 0.09,
+        "clean_sheet": 0.03,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.1,
+        "bonus": 0.09
       },
       "components_gw": 1
     },
@@ -22159,94 +22071,6 @@
       "components_gw": 1
     },
     {
-      "id": 70,
-      "web_name": "Kluivert",
-      "full_name": "Justin Kluivert",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 25.3,
-      "predicted_starts": 31.8,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.23,
-      "xp_horizon_total": 7.36,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.1
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.27
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.23
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.27
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.25
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.24
-        }
-      ],
-      "components": {
-        "appearance": 0.77,
-        "goals": 0.2,
-        "assists": 0.08,
-        "clean_sheet": 0.03,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.09,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
       "id": 263,
       "web_name": "Kevin",
       "full_name": "Kevin Santos Lopes de Macedo",
@@ -22511,18 +22335,18 @@
       "components_gw": 1
     },
     {
-      "id": 75,
-      "web_name": "Christie",
-      "full_name": "Ryan Christie",
+      "id": 71,
+      "web_name": "Cook",
+      "full_name": "Lewis Cook",
       "team": "Bournemouth",
       "team_short": "BOU",
       "pos": "MID",
-      "xmins": 24.8,
-      "predicted_starts": 27.5,
+      "xmins": 24.3,
+      "predicted_starts": 28.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "xp_per_gw": 1.2,
-      "xp_horizon_total": 7.18,
+      "xp_per_gw": 1.18,
+      "xp_horizon_total": 7.07,
       "gameweeks": [
         {
           "gw": 1,
@@ -22532,7 +22356,7 @@
               "venue": "A"
             }
           ],
-          "xp": 1.11
+          "xp": 1.12
         },
         {
           "gw": 2,
@@ -22542,7 +22366,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.22
+          "xp": 1.21
         },
         {
           "gw": 3,
@@ -22552,7 +22376,7 @@
               "venue": "A"
             }
           ],
-          "xp": 1.2
+          "xp": 1.17
         },
         {
           "gw": 4,
@@ -22562,7 +22386,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.23
+          "xp": 1.21
         },
         {
           "gw": 5,
@@ -22572,7 +22396,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.22
+          "xp": 1.18
         },
         {
           "gw": 6,
@@ -22582,19 +22406,19 @@
               "venue": "A"
             }
           ],
-          "xp": 1.2
+          "xp": 1.18
         }
       ],
       "components": {
-        "appearance": 0.82,
-        "goals": 0.16,
+        "appearance": 0.71,
+        "goals": 0.05,
         "assists": 0.05,
-        "clean_sheet": 0.02,
+        "clean_sheet": 0.03,
         "conceded": 0.0,
         "saves": 0.0,
-        "defensive_contribution": 0.05,
-        "yellows": -0.06,
-        "bonus": 0.07
+        "defensive_contribution": 0.27,
+        "yellows": -0.04,
+        "bonus": 0.05
       },
       "components_gw": 1
     },
@@ -22863,94 +22687,6 @@
       "components_gw": 1
     },
     {
-      "id": 71,
-      "web_name": "Cook",
-      "full_name": "Lewis Cook",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 23.4,
-      "predicted_starts": 27.5,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "xp_per_gw": 1.14,
-      "xp_horizon_total": 6.84,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.08
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.17
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.13
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.17
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.15
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.14
-        }
-      ],
-      "components": {
-        "appearance": 0.69,
-        "goals": 0.05,
-        "assists": 0.04,
-        "clean_sheet": 0.03,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.26,
-        "yellows": -0.04,
-        "bonus": 0.04
-      },
-      "components_gw": 1
-    },
-    {
       "id": 64,
       "web_name": "Smith",
       "full_name": "Adam Smith",
@@ -23035,6 +22771,94 @@
         "defensive_contribution": 0.05,
         "yellows": -0.07,
         "bonus": 0.09
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 419,
+      "web_name": "Martinez",
+      "full_name": "Lisandro Martínez",
+      "team": "Manchester United",
+      "team_short": "MUN",
+      "pos": "DEF",
+      "xmins": 26.7,
+      "predicted_starts": 30.8,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "xp_per_gw": 1.13,
+      "xp_horizon_total": 6.78,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.16
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.29
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.07
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.02
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.06
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "TOT",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.19
+        }
+      ],
+      "components": {
+        "appearance": 0.62,
+        "goals": 0.05,
+        "assists": 0.05,
+        "clean_sheet": 0.34,
+        "conceded": -0.09,
+        "saves": 0.0,
+        "defensive_contribution": 0.16,
+        "yellows": -0.02,
+        "bonus": 0.05
       },
       "components_gw": 1
     },
@@ -26130,7 +25954,7 @@
       "minutes_confidence": "high",
       "data_basis": "pl_history",
       "xp_per_gw": 0.68,
-      "xp_horizon_total": 4.05,
+      "xp_horizon_total": 4.06,
       "gameweeks": [
         {
           "gw": 1,
@@ -28501,12 +28325,12 @@
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "MID",
-      "xmins": 5.4,
-      "predicted_starts": 14.5,
+      "xmins": 5.8,
+      "predicted_starts": 15.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "xp_per_gw": 0.33,
-      "xp_horizon_total": 1.99,
+      "xp_per_gw": 0.35,
+      "xp_horizon_total": 2.1,
       "gameweeks": [
         {
           "gw": 1,
@@ -28516,7 +28340,7 @@
               "venue": "H"
             }
           ],
-          "xp": 0.34
+          "xp": 0.36
         },
         {
           "gw": 2,
@@ -28526,7 +28350,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.32
+          "xp": 0.34
         },
         {
           "gw": 3,
@@ -28536,7 +28360,7 @@
               "venue": "H"
             }
           ],
-          "xp": 0.35
+          "xp": 0.37
         },
         {
           "gw": 4,
@@ -28546,7 +28370,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.37
+          "xp": 0.39
         },
         {
           "gw": 5,
@@ -28556,7 +28380,7 @@
               "venue": "H"
             }
           ],
-          "xp": 0.3
+          "xp": 0.31
         },
         {
           "gw": 6,
@@ -28566,7 +28390,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.32
+          "xp": 0.34
         }
       ],
       "components": {
@@ -29111,6 +28935,94 @@
       "components_gw": 1
     },
     {
+      "id": 76,
+      "web_name": "Tóth.A",
+      "full_name": "Alex Tóth",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "MID",
+      "xmins": 3.8,
+      "predicted_starts": 15.3,
+      "minutes_confidence": "high",
+      "data_basis": "limited_history",
+      "xp_per_gw": 0.26,
+      "xp_horizon_total": 1.56,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.25
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.26
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.26
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.26
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.26
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.26
+        }
+      ],
+      "components": {
+        "appearance": 0.21,
+        "goals": 0.02,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.01
+      },
+      "components_gw": 1
+    },
+    {
       "id": 22,
       "web_name": "Nwaneri",
       "full_name": "Ethan Nwaneri",
@@ -29199,94 +29111,6 @@
       "components_gw": 1
     },
     {
-      "id": 76,
-      "web_name": "Tóth.A",
-      "full_name": "Alex Tóth",
-      "team": "Bournemouth",
-      "team_short": "BOU",
-      "pos": "MID",
-      "xmins": 3.6,
-      "predicted_starts": 14.5,
-      "minutes_confidence": "high",
-      "data_basis": "limited_history",
-      "xp_per_gw": 0.26,
-      "xp_horizon_total": 1.54,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.25
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.26
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.26
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.26
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.26
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.26
-        }
-      ],
-      "components": {
-        "appearance": 0.21,
-        "goals": 0.02,
-        "assists": 0.01,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.01,
-        "bonus": 0.01
-      },
-      "components_gw": 1
-    },
-    {
       "id": 72,
       "web_name": "Gannon-Doak",
       "full_name": "Ben Gannon-Doak",
@@ -29294,7 +29118,7 @@
       "team_short": "BOU",
       "pos": "MID",
       "xmins": 2.8,
-      "predicted_starts": 10.2,
+      "predicted_starts": 10.7,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "xp_per_gw": 0.25,
@@ -30262,7 +30086,7 @@
       "team_short": "BHA",
       "pos": "MID",
       "xmins": 1.5,
-      "predicted_starts": 10.2,
+      "predicted_starts": 11.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "xp_per_gw": 0.18,
