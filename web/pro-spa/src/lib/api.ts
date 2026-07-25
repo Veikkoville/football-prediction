@@ -265,3 +265,48 @@ export function gwOpponents(p: XpPlayer, gw: number | undefined): string {
 	if (!g || g.opponents.length === 0) return 'Blank';
 	return g.opponents.map((o) => `${o.opp} (${o.venue})`).join(', ');
 }
+
+/** Per-pelaajan DefCon-erittely (Villen pyynto 25.7). FREE: FPL:n omaa
+ * otteludataa. cbi/tkl/rec puuttuvat vanhemmista snapshoteista -> optionaalisia. */
+export interface DefconGame {
+	round: number | null;
+	opp: string;
+	venue: string;
+	minutes: number;
+	dc: number;
+	hit: boolean;
+	cbi?: number;
+	tkl?: number;
+	rec?: number;
+}
+export interface DefconPlayerResponse {
+	meta: {
+		window: number;
+		threshold: number | null;
+		points_per_hit: number;
+		counts_recoveries: boolean;
+		components_available: boolean;
+		basis_label?: string | null;
+		is_prev_season_basis?: boolean | null;
+		rule_note: string;
+	};
+	player: { id: number; web_name: string; team_short: string; pos: string };
+	games: DefconGame[];
+	totals: {
+		games: number;
+		hits: number;
+		hit_rate_pct: number;
+		dc_per_game: number;
+		defcon_points: number;
+		cbi_per_game?: number;
+		tkl_per_game?: number;
+		rec_per_game?: number;
+	};
+}
+
+export async function fetchPlayerDefcon(
+	id: number,
+	window = 10
+): Promise<DefconPlayerResponse> {
+	return getJson<DefconPlayerResponse>(`/api/fantasy/defcon/${id}?window=${window}`);
+}

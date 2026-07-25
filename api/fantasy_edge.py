@@ -932,3 +932,117 @@ def fantasy_edge(
         payload["differentials"] = diffs[:FREE_EDGE_DIFFERENTIALS]
         payload["template_risks"] = template[:FREE_EDGE_TEMPLATE_RISKS]
     return payload
+
+
+# ---------------------------------------------------------------------------
+# Per-pelaajan DefCon-erittely (Villen pyynto 25.7: "missa nakyy pelaaja-
+# kohtainen defcon ERITELTYNA"). FREE: kaikki luvut ovat FPL:n omaa julkista
+# otteludataa (defensive_contribution + CBI/tacklet/riistot), ei mallin
+# tuotoksia -> ei premium-maskia.
+#
+# Lyhenteet vastauksessa: dc = FPL:n defensive_contribution (DEF: CBIT,
+# MID/FWD: CBIRT). cbi = clearances+blocks+interceptions (FPL tarjoaa nama
+# yhtena kenttana, ei eroteltavissa), tkl = tacklet, rec = riistot
+# (recoveries; lasketaan mukaan vain MID/FWD-kynnykseen).
+# ---------------------------------------------------------------------------
+@router.get("/api/fantasy/defcon/{player_id}")
+def fantasy_defcon_player(
+    response: Response,
+    player_id: int,
+    window: int = Query(default=10, ge=3, le=10),
+):
+    """Yhden pelaajan DefCon-loki ottelu ottelulta + osaerittely.
+
+    Palauttaa per ottelu: dc-summan, kynnysosuman ja komponentit (cbi/tkl/rec)
+    kun ne ovat datassa. Komponentit puuttuvat vanhemmista snapshoteista ->
+    `components_available` kertoo rehellisesti kumpi tilanne on."""
+    from src.models.fpl_leaders import (
+        DEFCON_POINTS, DEFCON_THRESHOLD, defcon_hit, load_leaders,
+    )
+    from src.models.fpl_rate_team import RateTeamError
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        data = load_leaders()
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+    player = next((p for p in data.get("players", [])
+                   if p.get("id") == player_id), None)
+    if player is None:
+        raise HTTPException(status_code=404,
+                            detail="Player not found in the DefCon dataset.")
+    pos = player.get("pos")
+    if pos == "GKP":
+        raise HTTPException(
+            status_code=404,
+            detail="Goalkeepers cannot score defensive contribution points.")
+
+    rows = (player.get("recent_games") or [])[-window:]
+    games = []
+    tot = {"dc": 0, "cbi": 0, "tkl": 0, "rec": 0, "hits": 0}
+    have_components = False
+    for g in rows:
+        dc = int(g.get("dc") or 0)
+        hit = defcon_hit(pos, dc)
+        row = {
+            "round": g.get("round"),
+            "opp": g.get("opp"),
+            "venue": g.get("venue"),
+            "minutes": g.get("minutes"),
+            "dc": dc,
+            "hit": hit,
+        }
+        for key in ("cbi", "tkl", "rec"):
+            if g.get(key) is not None:
+                row[key] = int(g[key])
+                tot[key] += int(g[key])
+                have_components = True
+        games.append(row)
+        tot["dc"] += dc
+        tot["hits"] += 1 if hit else 0
+
+    n = len(games) or 1
+    threshold = DEFCON_THRESHOLD.get(pos)
+    totals = {
+        "games": len(games),
+        "hits": tot["hits"],
+        "hit_rate_pct": round(100.0 * tot["hits"] / n, 0),
+        "dc_per_game": round(tot["dc"] / n, 1),
+        "defcon_points": tot["hits"] * DEFCON_POINTS,
+    }
+    if have_components:
+        totals.update({
+            "cbi_per_game": round(tot["cbi"] / n, 1),
+            "tkl_per_game": round(tot["tkl"] / n, 1),
+            "rec_per_game": round(tot["rec"] / n, 1),
+        })
+
+    meta = dict(data.get("meta") or {})
+    return {
+        "meta": {
+            "window": window,
+            "threshold": threshold,
+            "points_per_hit": DEFCON_POINTS,
+            "counts_recoveries": pos in ("MID", "FWD"),
+            "components_available": have_components,
+            "basis_season": meta.get("basis_season"),
+            "is_prev_season_basis": meta.get("is_prev_season_basis"),
+            "basis_label": meta.get("basis_label"),
+            "generated_at": meta.get("generated_at"),
+            "rule_note": (
+                "2 points when a defender reaches 10 CBIT (clearances, "
+                "blocks, interceptions, tackles) or a midfielder or forward "
+                "reaches 12 CBIRT (CBIT plus ball recoveries). Counts are "
+                "FPL's own match data."),
+        },
+        "player": {
+            "id": player.get("id"),
+            "web_name": player.get("web_name"),
+            "team_short": player.get("team_short"),
+            "pos": pos,
+            "price": player.get("price"),
+            "owned_pct": player.get("owned_pct"),
+        },
+        "games": games,
+        "totals": totals,
+    }

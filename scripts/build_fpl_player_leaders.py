@@ -80,6 +80,14 @@ def _player_rows(boot: dict, summaries: dict, season: str,
                 "dc": int(r.get("defensive_contribution")
                           if r.get("defensive_contribution") is not None
                           else (cbit if pos == "DEF" else cbirt)),
+                # Villen pyyntö 25.7: DefCon eriteltynä. Osatekijät laskettiin
+                # jo (cbit/cbirt) mutta heitettiin pois — nyt talteen, jotta
+                # player card voi näyttää mistä luku koostuu. cbi ja tackles
+                # erikseen koska FPL tarjoaa ne eri kenttinä (cbi on valmiiksi
+                # yhdistetty clearances+blocks+interceptions, ei eroteltavissa).
+                "cbi": int(r.get("clearances_blocks_interceptions") or 0),
+                "tkl": int(r.get("tackles") or 0),
+                "rec": int(r.get("recoveries") or 0),
             })
         players.append({
             "id": e["id"],

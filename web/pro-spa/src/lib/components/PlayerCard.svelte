@@ -6,7 +6,13 @@
 	// keltaiset, set-piece-listat), "GoalIQ model view" -blokki = mallin
 	// estimaatti (p_start, confidence, data_basis, xP). Defensiiviset luvut:
 	// vanha payload ilman uusia kenttiä ei kaada mitään.
-	import { fetchXp, type CardPlayer, type XpMeta } from '$lib/api';
+	import {
+		fetchXp,
+		fetchPlayerDefcon,
+		type CardPlayer,
+		type DefconPlayerResponse,
+		type XpMeta
+	} from '$lib/api';
 	// Free-tier-rajaus (Villen havainto 25.7): xP-numerot ovat premium-arvoa
 	// kaikkialla muualla -> kortti nayttaa ne vain premium-pinnalta (ProTools).
 	let { premium = false }: { premium?: boolean } = $props();
@@ -59,11 +65,30 @@
 			.slice(0, 8);
 	});
 
+	// DefCon-erittely (Villen pyyntö 25.7): haetaan vasta valinnan yhteydessä,
+	// jotta kortin avaus ei odota erillistä kutsua. GKP ei voi saada DefConia.
+	let defcon = $state<DefconPlayerResponse | null>(null);
+	let defconLoading = $state(false);
+
+	async function loadDefcon(p: CardPlayer) {
+		defcon = null;
+		if (p.pos === 'GKP') return;
+		defconLoading = true;
+		try {
+			defcon = await fetchPlayerDefcon(p.id, 10);
+		} catch {
+			defcon = null; // ei dataa (esim. ei otteluita) → osio jää pois
+		} finally {
+			defconLoading = false;
+		}
+	}
+
 	function select(p: CardPlayer) {
 		player = p;
 		query = '';
 		// Ei PII:tä: pelaaja-ID/positio/status ovat julkista FPL-dataa.
 		capture('player_card_viewed', { player_id: p.id, pos: p.pos, status: p.status ?? 'a' });
+		void loadDefcon(p);
 	}
 
 	// Virallinen FPL-status → label + sävy (EI mallin päättelyä).
@@ -401,6 +426,58 @@
 				</table>
 			</div>
 			{/if}
+			{#if defconLoading}
+				<p class="muted">Loading defensive contribution log...</p>
+			{:else if defcon && defcon.games.length > 0}
+				<h4 class="gw-title">
+					Defensive contribution (DefCon)
+					<span class="src">source: FPL</span>
+				</h4>
+				<p class="muted dc-sub">
+					{defcon.totals.hits} of {defcon.totals.games} games over the
+					{defcon.meta.threshold} action mark ({defcon.totals.hit_rate_pct}% hit rate,
+					{defcon.totals.defcon_points} FPL points), {defcon.totals.dc_per_game} actions per game.
+					{#if defcon.meta.is_prev_season_basis && defcon.meta.basis_label}
+						{defcon.meta.basis_label}.
+					{/if}
+				</p>
+				{#if defcon.meta.components_available}
+					<p class="muted dc-sub">
+						Per game: {defcon.totals.cbi_per_game} clearances, blocks and interceptions,
+						{defcon.totals.tkl_per_game} tackles{#if defcon.meta.counts_recoveries},
+							{defcon.totals.rec_per_game} recoveries{/if}.
+						{#if !defcon.meta.counts_recoveries}Recoveries do not count for defenders.{/if}
+					</p>
+				{/if}
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>GW</th>
+								<th>Fixture</th>
+								<th class="num"><abbr title="Clearances, blocks and interceptions">CBI</abbr></th>
+								<th class="num"><abbr title="Tackles">Tkl</abbr></th>
+								<th class="num"><abbr title="Ball recoveries">Rec</abbr></th>
+								<th class="num"><abbr title="Defensive contribution total">DC</abbr></th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each defcon.games as g (g.round)}
+								<tr class:dc-hit={g.hit}>
+									<td>GW{g.round}</td>
+									<td>{g.opp} ({g.venue})</td>
+									<td class="num">{g.cbi ?? '-'}</td>
+									<td class="num">{g.tkl ?? '-'}</td>
+									<td class="num">{g.rec ?? '-'}</td>
+									<td class="num dc-total">{g.dc}{#if g.hit} ✓{/if}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+				<p class="muted dc-sub">{defcon.meta.rule_note}</p>
+			{/if}
+
 			<p class="muted disclaimer">
 				Official status and news are FPL's own data. Starting chance and xP are GoalIQ model
 				projections, for fun and planning, not betting advice.
@@ -498,6 +575,14 @@
 		color: var(--giq-magenta-deep);
 		font-variant-numeric: tabular-nums;
 		margin-right: 4px;
+	}
+	.dc-sub {
+		font-size: var(--step--1);
+		margin: 0 0 var(--s-2);
+	}
+	.dc-hit .dc-total {
+		font-weight: 700;
+		color: var(--giq-teal-deep, var(--text));
 	}
 	.gw-title {
 		margin: 0 0 var(--s-2);
