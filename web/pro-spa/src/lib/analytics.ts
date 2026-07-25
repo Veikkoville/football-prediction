@@ -17,7 +17,11 @@ export function initAnalytics(): void {
 	if (ready || !POSTHOG_KEY) return;
 	posthog.init(POSTHOG_KEY, {
 		api_host: POSTHOG_HOST,
-		capture_pageview: false, // pro_page_viewed on funnelin oma eventti
+		// $pageview tarvitaan PostHogin Web Analyticsiin: ilman sita
+		// pro.goaliq.app nakyi dashboardilla nollana vaikka liikennetta oli
+		// (havaittu 25.7 kampanjamittausta valmistellessa). pro_page_viewed
+		// jaa funnelin omaksi eventiksi.
+		capture_pageview: true,
 		autocapture: false,
 		persistence: 'localStorage+cookie'
 	});
