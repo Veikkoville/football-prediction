@@ -14,12 +14,21 @@
 	import ComparePlayers from './ComparePlayers.svelte';
 	import Leaders from './Leaders.svelte';
 	import Value from './Value.svelte';
+	import ChipEv from './ChipEv.svelte';
+	import PlanChains from './PlanChains.svelte';
+	import EdgeMode from './EdgeMode.svelte';
 
 	let { xp }: { xp: XpResponse } = $props();
 
+	// Edge-sprint: Chips (chip-EV), Chains (plan-chains) ja Edge (protect/climb)
+	// ovat uusia premium-segmenttejä — renderöityvät VAIN tästä gatatusta
+	// haarasta (ei premium-vuotoa).
 	const SEGMENTS: Segment[] = [
 		{ id: 'players', label: 'Players' },
 		{ id: 'myteam', label: 'My team' },
+		{ id: 'chips', label: 'Chips' },
+		{ id: 'chains', label: 'Chains' },
+		{ id: 'edge', label: 'Edge' },
 		{ id: 'value', label: 'Value' },
 		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'differentials', label: 'Differentials' },
@@ -44,6 +53,21 @@
 		<!-- #46: RateTeam premium={true} vain tilauksen takana → ei premium-vuotoa. -->
 		<section class="tool-card"><RateTeam premium={true} /></section>
 		<section class="tool-card"><TransferPlanner /></section>
+	</div>
+{:else if segment === 'chips'}
+	<!-- Edge-sprint kohta 6: chip-ajoituksen EV -->
+	<div id="panel-chips" role="tabpanel" aria-labelledby="seg-chips">
+		<section class="tool-card"><ChipEv /></section>
+	</div>
+{:else if segment === 'chains'}
+	<!-- Edge-sprint kohta 7: plan-chains (solver-light) -->
+	<div id="panel-chains" role="tabpanel" aria-labelledby="seg-chains">
+		<section class="tool-card"><PlanChains /></section>
+	</div>
+{:else if segment === 'edge'}
+	<!-- Edge-sprint kohta 8: rank-tietoinen protect/climb -->
+	<div id="panel-edge" role="tabpanel" aria-labelledby="seg-edge">
+		<section class="tool-card"><EdgeMode /></section>
 	</div>
 {:else if segment === 'value'}
 	<!-- #127: value + GK-parit (premium-haara → koko listat, #114-web-pariteetti) -->

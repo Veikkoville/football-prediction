@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { XpResponse, XpPlayer } from '$lib/api';
 	import { gwXp } from '$lib/api';
+	import { downloadXpCsv } from '$lib/fantasyTools';
 	import ComponentSplit from './ComponentSplit.svelte';
 	import MethodNote from './MethodNote.svelte';
+	import SetPieceBadges from './SetPieceBadges.svelte';
 
 	let { data }: { data: XpResponse } = $props();
 
@@ -42,6 +44,11 @@
 			cmp: (a: XpPlayer, b: XpPlayer) =>
 				(b.predicted_starts ?? -1) - (a.predicted_starts ?? -1) ||
 				b.xp_horizon_total - a.xp_horizon_total
+		},
+		owned: {
+			label: 'Ownership % (high to low)',
+			cmp: (a: XpPlayer, b: XpPlayer) =>
+				(b.owned_pct ?? -1) - (a.owned_pct ?? -1) || b.xp_horizon_total - a.xp_horizon_total
 		}
 	} as const;
 
@@ -125,13 +132,57 @@
 	let compGw = $derived(compPool[0]?.components_gw ?? nextGw);
 	// #33f: Start %-sarake vain jos backend tuo kentän (defensiivinen).
 	let hasStarts = $derived(data.players.some((p) => typeof p.predicted_starts === 'number'));
+	// Edge-sprint: Own%-sarake vain jos backend tuo kentän (defensiivinen).
+	let hasOwned = $derived(data.players.some((p) => typeof p.owned_pct === 'number'));
+	// Edge-sprint: badge-selite vain jos joku pelaaja saa badgen (order<=2).
+	let hasSetPieces = $derived(
+		data.players.some(
+			(p) =>
+				p.set_pieces &&
+				[p.set_pieces.pens, p.set_pieces.corners, p.set_pieces.fk].some(
+					(o) => typeof o === 'number' && o <= 2
+				)
+		)
+	);
+
+	// Edge-sprint: minuuttijakauma title-tooltippiin (kompakti; contract-data 1:
+	// p_start + p_cameo + p_bench = 1). Puuttuvat kentät → vanha tooltip.
+	function minutesTitle(p: XpPlayer): string {
+		if (
+			typeof p.p_start !== 'number' ||
+			typeof p.p_cameo !== 'number' ||
+			typeof p.p_bench !== 'number'
+		) {
+			return `${CONF_LABEL[p.minutes_confidence ?? 'low']} confidence`;
+		}
+		return (
+			`Minutes model: start ${Math.round(p.p_start * 100)}%, ` +
+			`sub appearance ${Math.round(p.p_cameo * 100)}%, ` +
+			`unused ${Math.round(p.p_bench * 100)}% ` +
+			`(${CONF_LABEL[p.minutes_confidence ?? 'low']} confidence)`
+		);
+	}
+
+	// Edge-sprint kohta 5: CSV-lataus (premium-pinta; Bearer-header kulkee
+	// downloadXpCsv-helperissä). Virhe inline-banneriin, ei heitetä.
+	let csvBusy = $state(false);
+	let csvError = $state<string | null>(null);
+	async function onCsv() {
+		if (csvBusy) return;
+		csvBusy = true;
+		csvError = await downloadXpCsv();
+		csvBusy = false;
+	}
 </script>
 
 <h2>Player expected points, {horizonLabel}</h2>
 <p class="muted">
 	<strong>Total xP</strong> = the sum of projected points across {horizonLabel}
 	({horizonN} gameweeks). <strong>xP/GW</strong> = the per-gameweek average over the same
-	horizon. Click a row to see how a player's xP is built.
+	horizon. Click a row to see how a player's xP is built.{#if hasSetPieces}
+		The <strong>P</strong>, <strong>C</strong> and <strong>FK</strong> badges mark players
+		first or second in line for penalties, corners and direct free kicks (FPL squad data,
+		updated through pre-season).{/if}
 </p>
 
 <MethodNote summary="How xP is built">
@@ -198,7 +249,14 @@
 			>
 		{/if}
 	</div>
+	<!-- Edge-sprint kohta 5: koko projektio CSV:nä (premium-pinta) -->
+	<button type="button" class="ghost csv-btn" disabled={csvBusy} onclick={() => void onCsv()}>
+		{csvBusy ? 'Preparing CSV…' : 'Download CSV'}
+	</button>
 </div>
+{#if csvError}
+	<p class="banner error">{csvError}</p>
+{/if}
 
 {#if pool.length === 0}
 	<p class="muted">No players match.</p>
@@ -215,8 +273,15 @@
 				<th class="num"><abbr title="Expected minutes per gameweek">xMins</abbr></th>
 				{#if hasStarts}
 					<th class="num"
-						><abbr title="Start probability from the GoalIQ minutes model; the mark shows confidence"
+						><abbr title="Start probability from the GoalIQ minutes model; the mark shows confidence. Hover a value for the full minutes split (start / sub / unused)"
 							>Start %</abbr
+						></th
+					>
+				{/if}
+				{#if hasOwned}
+					<th class="num"
+						><abbr title="Ownership: share of FPL managers who own the player (FPL data)"
+							>Own %</abbr
 						></th
 					>
 				{/if}
@@ -231,7 +296,9 @@
 			{#each groups as g (g.team ?? '_all')}
 				{#if g.team}
 					<tr class="group-row">
-						<td colspan={(hasStarts ? 8 : 7) + gwCols.length}>{g.team}</td>
+						<td colspan={7 + (hasStarts ? 1 : 0) + (hasOwned ? 1 : 0) + gwCols.length}
+							>{g.team}</td
+						>
 					</tr>
 				{/if}
 				{#each g.players as p (p.id)}
@@ -251,20 +318,22 @@
 										? 'No Premier League data for this player yet, this is a position-based estimate.'
 										: 'The model has little Premier League history for this player yet, so treat this projection as less certain.'}
 									>{p.data_basis === 'no_history' ? 'No PL data yet' : 'Limited data'}</span
-								>{/if}</td
+								>{/if}<SetPieceBadges sp={p.set_pieces} /></td
 						>
 						<td>{p.team_short}</td>
 						<td>{p.pos}</td>
 						<td class="num">{p.xmins.toFixed(1)}</td>
 						{#if hasStarts}
-							<td class="num">
+							<td class="num" title={minutesTitle(p)}>
 								{#if typeof p.predicted_starts === 'number'}
-									<span
-										class="conf conf-{p.minutes_confidence ?? 'low'}"
-										title="{CONF_LABEL[p.minutes_confidence ?? 'low']} confidence"
-										>&#9679;</span
+									<span class="conf conf-{p.minutes_confidence ?? 'low'}">&#9679;</span
 									>{Math.round(p.predicted_starts)}
 								{/if}
+							</td>
+						{/if}
+						{#if hasOwned}
+							<td class="num">
+								{#if typeof p.owned_pct === 'number'}{p.owned_pct.toFixed(1)}{/if}
 							</td>
 						{/if}
 						<td class="num">{p.xp_per_gw.toFixed(2)}</td>
@@ -417,5 +486,10 @@
 		font-size: 16px;
 		cursor: pointer;
 		padding: 2px 6px;
+	}
+	/* Edge-sprint kohta 5: CSV-nappi controls-rivin oikeaan laitaan */
+	.csv-btn {
+		margin-left: auto;
+		font-size: var(--step--1);
 	}
 </style>

@@ -10,6 +10,7 @@
  */
 import { API_BASE } from './config';
 import { capture } from './analytics';
+import { authHeaders } from './api';
 
 export type FantasyTool =
 	| 'rate_team'
@@ -21,7 +22,13 @@ export type FantasyTool =
 	| 'compare'
 	| 'value'
 	| 'xg_leaders'
-	| 'defcon_leaders';
+	| 'defcon_leaders'
+	| 'chip_ev'
+	| 'plan_chains'
+	| 'league'
+	| 'h2h'
+	| 'edge'
+	| 'xp_csv';
 
 export type Pos = 'GKP' | 'DEF' | 'MID' | 'FWD';
 
@@ -272,7 +279,10 @@ export interface CompareResponse {
 async function getTool<T>(path: string, tool: FantasyTool): Promise<T> {
 	let r: Response;
 	try {
-		r = await fetch(`${API_BASE}${path}`);
+		// Edge-sprint kohta 1: Bearer-token kaikkiin fantasy-kutsuihin
+		// kirjautuneena (premium-maskit eivät osu maksajaan).
+		const headers = await authHeaders();
+		r = await fetch(`${API_BASE}${path}`, { headers });
 	} catch {
 		throw new Error('Could not reach the GoalIQ API. Please check your connection and try again.');
 	}
@@ -442,4 +452,221 @@ export function confBand(confidence: number): 'low' | 'med' | 'high' {
 	if (confidence >= 0.85) return 'high';
 	if (confidence >= 0.5) return 'med';
 	return 'low';
+}
+
+/* ---------- Edge-sprint (contract-api 25.7): chip-EV ---------- */
+
+export interface ChipWindow {
+	gw: number;
+	wc_ev: number;
+	bb_ev: number;
+	tc_ev: number;
+	fh_ev: number;
+	/** 'player_xp' (6 GW:n horisontti) | 'team_approx_cs_fdr' (GW7+). */
+	basis: string;
+}
+
+export interface ChipBest {
+	gw: number;
+	ev: number;
+	basis: string;
+}
+
+export interface ChipEvResponse {
+	meta: {
+		entry: number | null;
+		mode: string;
+		horizon_gws?: number[];
+		generated_at?: string;
+		notes?: string[];
+		disclaimer?: string;
+		[key: string]: unknown;
+	};
+	windows: ChipWindow[];
+	/** Maskattuna {} (premium-teaser) — komponentti käsittelee puuttuvat avaimet. */
+	best: Partial<Record<'wc' | 'bb' | 'tc' | 'fh', ChipBest>>;
+}
+
+/** entry valinnainen: annettuna käyttäjän runko, ilman mallin optimi-XI. */
+export function fetchChipEv(entry?: number | null): Promise<ChipEvResponse> {
+	const q = entry != null ? `?entry=${entry}` : '';
+	return getTool(`/api/fantasy/chip-ev${q}`, 'chip_ev');
+}
+
+/* ---------- Edge-sprint: plan-chains (solver-light) ---------- */
+
+export interface ChainMovePlayer {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: Pos;
+}
+
+export interface ChainMove {
+	out: ChainMovePlayer;
+	in: ChainMovePlayer;
+	gain_xp_remaining: number;
+	hit: number;
+}
+
+export interface ChainGw {
+	gw: number;
+	moves: ChainMove[];
+	roll_transfer: boolean;
+	captain: { id: number; web_name: string; gw_xp: number };
+	gw_xp: number;
+	free_transfers_left: number;
+	bank: number;
+}
+
+export interface ChainPlan {
+	total_xp: number;
+	net_ev_vs_hold: number;
+	hits_taken: number;
+	gws: ChainGw[];
+	rationale: string;
+}
+
+export interface PlanChainsResponse {
+	meta: {
+		entry: number;
+		start_gw: number;
+		horizon: number;
+		ft_assumed: number;
+		beam_width?: number;
+		generated_at?: string;
+		timeout_degraded?: boolean;
+		heuristic?: string;
+		note?: string;
+		[key: string]: unknown;
+	};
+	baseline_xp_no_transfers: number;
+	plans: ChainPlan[];
+}
+
+export function fetchPlanChains(entry: number, horizon: number): Promise<PlanChainsResponse> {
+	return getTool(`/api/fantasy/plan-chains?entry=${entry}&horizon=${horizon}`, 'plan_chains');
+}
+
+/* ---------- Edge-sprint: mini-league + H2H ---------- */
+
+export interface LeagueRow {
+	rank: number;
+	last_rank: number;
+	entry: number;
+	entry_name: string;
+	player_name: string;
+	total: number;
+	event_total: number;
+}
+
+export interface LeagueResponse {
+	meta: { league_id: number; page: number; [key: string]: unknown };
+	league: { id: number; name: string; created?: string };
+	standings: LeagueRow[];
+	has_next: boolean;
+}
+
+export function fetchLeague(leagueId: number): Promise<LeagueResponse> {
+	return getTool(`/api/fantasy/league/${leagueId}`, 'league');
+}
+
+export interface H2hEntry {
+	entry: number;
+	team_name: string;
+	xi_xp: number;
+	players_matched: number;
+	missing_ids: number[];
+}
+
+export interface H2hResponse {
+	meta: { gw: number; method?: string; disclaimer?: string; [key: string]: unknown };
+	entry_a: H2hEntry;
+	entry_b: H2hEntry;
+	p_a: number;
+	p_draw_band: number;
+	p_b: number;
+}
+
+export function fetchH2h(entryA: number, entryB: number): Promise<H2hResponse> {
+	return getTool(`/api/fantasy/h2h?entry_a=${entryA}&entry_b=${entryB}`, 'h2h');
+}
+
+/* ---------- Edge-sprint: edge-mode (protect/climb) ---------- */
+
+export type EdgeMode = 'protect' | 'climb';
+
+export interface EdgeCaptainRow {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: Pos;
+	gw_xp: number;
+	owned_pct: number;
+	score: number;
+	rationale: string;
+}
+
+export interface EdgePlayerRow {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos?: Pos;
+	owned_pct: number;
+	price?: number;
+	xp_horizon_total?: number;
+	rationale: string;
+}
+
+export interface EdgeResponse {
+	meta: {
+		entry: number;
+		mode: EdgeMode;
+		gw: number;
+		overall_rank: number | null;
+		formula?: string;
+		disclaimer?: string;
+		[key: string]: unknown;
+	};
+	captain_top5: EdgeCaptainRow[];
+	differentials: EdgePlayerRow[];
+	template_risks: EdgePlayerRow[];
+}
+
+export function fetchEdge(entry: number, mode: EdgeMode): Promise<EdgeResponse> {
+	return getTool(`/api/fantasy/edge?entry=${entry}&mode=${mode}`, 'edge');
+}
+
+/* ---------- Edge-sprint: CSV-lataus (premium) ---------- */
+
+/** Hakee xP-projektiot CSV:nä Bearer-headerilla ja käynnistää selainlatauksen.
+ * Palauttaa null onnistuessa, virheviestin epäonnistuessa (inline-banneriin). */
+export async function downloadXpCsv(): Promise<string | null> {
+	try {
+		const headers = await authHeaders();
+		const r = await fetch(`${API_BASE}/api/fantasy/xp.csv`, { headers });
+		if (!r.ok) {
+			const detail = (await r.json().catch(() => null))?.detail;
+			return typeof detail === 'string' && detail
+				? detail
+				: `Download failed (${r.status}). Please try again shortly.`;
+		}
+		const blob = await r.blob();
+		// filename Content-Dispositionista jos saatavilla, muuten oletus
+		const cd = r.headers.get('Content-Disposition') ?? '';
+		const m = cd.match(/filename="([^"]+)"/);
+		const name = m?.[1] ?? 'goaliq_xp.csv';
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = name;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(url);
+		capture('xp_csv_downloaded', { source: 'pro_spa' });
+		return null;
+	} catch {
+		return 'Could not reach the GoalIQ API. Please check your connection and try again.';
+	}
 }

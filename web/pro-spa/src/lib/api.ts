@@ -8,6 +8,21 @@
  * sivulataus riittää (Streamlitin ttl=900 vastine).
  */
 import { API_BASE } from './config';
+import { accessToken } from './auth.svelte';
+
+/** Edge-sprint kohta 1 (KRIITTINEN): Supabase-access_token Bearer-headeriin
+ * kaikkiin goaliq-api-fantasy-kutsuihin kirjautuneena. Backend verifioi
+ * tokenin Supabasen /auth/v1/user-endpointilla → premium-payload säilyy kun
+ * PREMIUM_ENFORCE käännetään päälle. Fail-safe: token-virhe → header pois
+ * (backend palauttaa silloin free-tason datan, ei kaadu). */
+export async function authHeaders(): Promise<Record<string, string>> {
+	try {
+		const t = await accessToken();
+		return t ? { Authorization: `Bearer ${t}` } : {};
+	} catch {
+		return {};
+	}
+}
 
 export interface FantasyFixture {
 	gw: number;
@@ -17,6 +32,10 @@ export interface FantasyFixture {
 	venue: string;
 	fdr: number;
 	cs_pct?: number;
+	/** Edge-sprint (contract-data 2b): def_fdr = alias fdr:lle, att_fdr =
+	 * hyökkäyssuunnan vaikeus (1 helpoin - 5 vaikein). Defensiivisiä. */
+	def_fdr?: number;
+	att_fdr?: number;
 }
 
 export interface FantasyTeam {
@@ -60,6 +79,17 @@ export interface XpPlayer {
 	data_basis?: 'pl_history' | 'limited_history' | 'no_history';
 	/** #147: koko nimi VAIN hakua varten — defensiivinen (vanha payload ei tuo). */
 	full_name?: string;
+	/** Edge-sprint (contract-data 1): kaikki defensiivisiä (vanha payload ei tuo). */
+	owned_pct?: number;
+	/** Minuuttijakauma 0..1: p_start + p_cameo + p_bench = 1. */
+	p_start?: number;
+	p_cameo?: number;
+	p_bench?: number;
+	/** Erikoistilanne-ottajajärjestys bootstrapista (1 = ykkösottaja, null = ei listalla). */
+	set_pieces?: { pens: number | null; corners: number | null; fk: number | null };
+	/** Odotettu bonus per ottelu. KARKEA PROXY (per-90-historiavauhti x
+	 * minuuttiosuus), EI BPS-simulaatio — copy ei saa väittää muuta. */
+	e_bonus?: number;
 }
 
 export interface XpMeta {
@@ -85,13 +115,18 @@ export interface AccuracyResponse {
 }
 
 async function getJson<T>(path: string): Promise<T> {
-	const r = await fetch(`${API_BASE}${path}`);
+	const headers = await authHeaders();
+	const r = await fetch(`${API_BASE}${path}`, { headers });
 	if (!r.ok) throw new Error(`${path} -> HTTP ${r.status}`);
 	return r.json() as Promise<T>;
 }
 
 let fantasyP: Promise<FantasyResponse> | null = null;
 let xpP: Promise<XpResponse> | null = null;
+/** true = cachetettu xp-haku lähti Bearer-headerilla. Jos ensimmäinen haku
+ * tehtiin kirjautumattomana (PremiumPreview-teaser) ja käyttäjä kirjautuu,
+ * maskattu vastaus EI saa jäädä premium-näkymän dataksi → refetch tokenilla. */
+let xpAuthed = false;
 let accuracyP: Promise<AccuracyResponse> | null = null;
 
 export function fetchFantasy(): Promise<FantasyResponse> {
@@ -99,8 +134,15 @@ export function fetchFantasy(): Promise<FantasyResponse> {
 	return fantasyP;
 }
 
-export function fetchXp(): Promise<XpResponse> {
-	xpP ??= getJson<XpResponse>('/api/fantasy/xp');
+export async function fetchXp(): Promise<XpResponse> {
+	const headers = await authHeaders();
+	const hasToken = 'Authorization' in headers;
+	if (xpP && (xpAuthed || !hasToken)) return xpP;
+	xpAuthed = hasToken;
+	xpP = fetch(`${API_BASE}/api/fantasy/xp`, { headers }).then((r) => {
+		if (!r.ok) throw new Error(`/api/fantasy/xp -> HTTP ${r.status}`);
+		return r.json() as Promise<XpResponse>;
+	});
 	return xpP;
 }
 

@@ -8,6 +8,7 @@
 	import PriceWatch from './PriceWatch.svelte';
 	import Leaders from './Leaders.svelte';
 	import Value from './Value.svelte';
+	import MiniLeague from './MiniLeague.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
 
 	// #46: lukitun siirtosuositus-teaserin klikki nostaa tämän → +page vaihtaa
@@ -23,7 +24,8 @@
 		{ id: 'fitchecker', label: 'Fit checker' },
 		{ id: 'value', label: 'Value' },
 		{ id: 'leaders', label: 'Leaders' },
-		{ id: 'pricewatch', label: 'Price watch' }
+		{ id: 'pricewatch', label: 'Price watch' },
+		{ id: 'league', label: 'Mini-league' }
 	];
 	let segment = $state('cleansheets');
 
@@ -79,6 +81,14 @@
 	let gwCols = $derived(
 		data?.teams?.[0]?.fixtures?.map((f) => f.gw) ?? []
 	);
+	// Edge-sprint kohta 4: selite näkyviin vain jos payload tuo D/A-kentät.
+	let hasDuoAny = $derived(
+		data?.teams?.some((t) =>
+			t.fixtures.some(
+				(f) => typeof f.def_fdr === 'number' && typeof f.att_fdr === 'number'
+			)
+		) ?? false
+	);
 </script>
 
 <!-- min-height varaa taulukkoalueen tilan ennen API-vastausta → sisältö ei
@@ -113,7 +123,10 @@
 					<strong>Avg FDR</strong> = average fixture difficulty from the GoalIQ model (win% +
 					xG), not FPL's official FDR; 1 = easiest, 5 = hardest. Each GW cell shows opponent,
 					venue and that fixture's clean sheet probability; the cell colour follows the same
-					probability on a continuous scale (model FDR in the cell tooltip).
+					probability on a continuous scale (model FDR in the cell tooltip).{#if hasDuoAny}
+						The <strong>D · A</strong> chip splits difficulty by direction:
+						<strong>D</strong> = how hard it is to keep a clean sheet,
+						<strong>A</strong> = how hard it is to score, both 1 (easiest) to 5 (hardest).{/if}
 				</p>
 
 				<MethodNote summary="How these numbers are calculated">
@@ -158,15 +171,22 @@
 											<!-- #148: per-fixture CS% solussa + jatkuva väri; FDR tooltippiin.
 											     Defensiivinen: cs_pct puuttuu vanhasta payloadista → FDR-tint
 											     + FDR-luku kuten ennen. -->
+											{@const hasDuo =
+												typeof f.def_fdr === 'number' && typeof f.att_fdr === 'number'}
+											{@const fdrTitle = hasDuo
+												? `Defence FDR ${f.def_fdr} (clean sheet angle) · Attack FDR ${f.att_fdr} (scoring angle)`
+												: `FDR ${f.fdr}`}
 											{#if typeof f.cs_pct === 'number'}
 												<!-- #152: solu linkittää predict-pinnalle (mobiilin solu-tap-
 												     pariteetti). SPA:ssa ei ole match-predict-näkymää eikä
 												     build-aikaista tietoa ottelusivujen olemassaolosta →
-												     kohde on aina elävä /predictions-hub goaliq.appissa. -->
+												     kohde on aina elävä /predictions-hub goaliq.appissa.
+												     Edge-sprint kohta 4: D/A-FDR-chip (def = CS-kulma,
+												     att = maalintekokulma); fallback vanhaan fdr:ään. -->
 												<td
 													class="cs-link-cell"
 													style="background: {csCellBg(f.cs_pct)}"
-													title="{f.opponent ?? f.opponent_short} ({f.venue}) · FDR {f.fdr} · view model prediction"
+													title="{f.opponent ?? f.opponent_short} ({f.venue}) · {fdrTitle} · view model prediction"
 												>
 													<a
 														class="cs-cell-a"
@@ -174,14 +194,19 @@
 														target="_blank"
 														rel="noopener"
 													>
-														{f.opponent_short} ({f.venue}) {Math.round(f.cs_pct)}%
+														{f.opponent_short} ({f.venue}) {Math.round(f.cs_pct)}%{#if hasDuo}
+															<span class="fdr-duo">D{f.def_fdr} · A{f.att_fdr}</span>{/if}
 													</a>
 												</td>
 											{:else}
 												<td
 													style="background: color-mix(in srgb, var(--fdr-{Math.min(Math.max(f.fdr, 1), 5)}) {f.fdr >= 5 ? 26 : 14}%, transparent)"
+													title={hasDuo ? fdrTitle : undefined}
 												>
-													{f.opponent_short} ({f.venue}) {f.fdr}
+													{f.opponent_short} ({f.venue})
+													{#if hasDuo}
+														<span class="fdr-duo">D{f.def_fdr} · A{f.att_fdr}</span>
+													{:else}{f.fdr}{/if}
 												</td>
 											{/if}
 										{:else}
@@ -218,9 +243,14 @@
 	<div class="tool-card" id="panel-leaders" role="tabpanel" aria-labelledby="seg-leaders">
 		<Leaders premium={false} {onUpgrade} />
 	</div>
-{:else}
+{:else if segment === 'pricewatch'}
 	<div class="tool-card" id="panel-pricewatch" role="tabpanel" aria-labelledby="seg-pricewatch">
 		<PriceWatch />
+	</div>
+{:else}
+	<!-- Edge-sprint kohta 9: mini-league standings + H2H (free MVP) -->
+	<div class="tool-card" id="panel-league" role="tabpanel" aria-labelledby="seg-league">
+		<MiniLeague />
 	</div>
 {/if}
 </div>
@@ -249,5 +279,20 @@
 	}
 	.cs-cell-a:hover {
 		filter: brightness(0.94);
+	}
+	/* Edge-sprint kohta 4: suuntajaettu FDR-chip solun sisällä (hillitty,
+	   ei kilpaile CS%-taustavärin kanssa) */
+	.fdr-duo {
+		display: inline-block;
+		margin-left: 6px;
+		padding: 0 5px;
+		border: 1px solid rgba(10, 8, 32, 0.22);
+		border-radius: 4px;
+		background: rgba(255, 255, 255, 0.55);
+		color: var(--giq-ink);
+		font-size: 0.72em;
+		font-weight: 700;
+		line-height: 1.6;
+		white-space: nowrap;
 	}
 </style>

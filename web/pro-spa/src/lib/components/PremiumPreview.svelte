@@ -12,7 +12,10 @@
 		'Per-player xP projections for every gameweek',
 		'Captain ranker with top picks',
 		'Differential finder: low ownership, high xP',
-		'Multi-gameweek transfer planner',
+		'Multi-gameweek transfer planner and plan chains',
+		'Chip timing: best window for Wildcard, Bench Boost, Triple Captain and Free Hit',
+		'Edge mode: protect or climb your rank with ownership-weighted picks',
+		'CSV export of the full projection set',
 		'Full match analysis: scorelines, goals & momentum'
 	];
 
