@@ -43,8 +43,10 @@
 	--fdr-4: var(--giq-coral);
 	--fdr-5: var(--giq-magenta-deep);
 
-	/* typografia */
-	--font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+	/* typografia — pariteetti goaliq.app-landingin kanssa (25.7, Villen havainto):
+	   Space Grotesk = VAIN display (otsikot, brändi, isot luvut), leipäteksti = system-stack */
+	--font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	--font-display: 'Space Grotesk', -apple-system, 'Segoe UI', sans-serif;
 	--step--1: clamp(0.82rem, 0.8rem + 0.1vw, 0.88rem);
 	--step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1rem);
 	--step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.3rem);
@@ -87,10 +89,17 @@ body {
 h1,
 h2,
 h3 {
+	font-family: var(--font-display);
 	line-height: 1.15;
 	letter-spacing: -0.4px;
 	font-weight: 700;
 	margin: 0 0 var(--s-3);
+}
+
+/* Brändi ja display-luvut samalla fontilla kuin landingilla (globaali,
+   osuu Svelte-komponenttien class="brand"-elementteihin) */
+.brand {
+	font-family: var(--font-display);
 }
 
 h1 {

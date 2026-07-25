@@ -47,6 +47,9 @@
 	.trophy {
 		font-size: 1.3rem;
 	}
+	.body strong {
+		font-family: var(--font-display);
+	}
 	.body {
 		display: flex;
 		flex-direction: column;
