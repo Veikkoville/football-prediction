@@ -15,6 +15,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0A0820">
   <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -23,7 +27,7 @@
  "name": "GoalIQ",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "url": "https://goaliq.app/",
- "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, rate my team with a captain pick, and price watch free, plus player expected points (xP), the captain ranker, differentials and a transfer planner on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
+ "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, rate my team with a captain pick, a fit checker, a pre-season draft rater and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, player value, xG leaders, a DefCon tracker, differentials and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
   "https://apps.apple.com/app/id6780047163",
@@ -51,6 +55,7 @@
       --radius: 16px;
     }
     * { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
     body {
       margin: 0;
       background: var(--cream);
@@ -59,7 +64,8 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    .site-header { background: var(--ink); color: var(--cream); border-bottom: 1px solid var(--line); }
+    h1, h2, h3, .brand { font-family: "Space Grotesk", -apple-system, "Segoe UI", sans-serif; }
+    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); color: var(--cream); border-bottom: 1px solid var(--line); }
     .bar { height: 6px; background: var(--magenta); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;

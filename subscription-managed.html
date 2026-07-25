@@ -4,56 +4,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoalIQ – Returning to app</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0A0820">
   <style>
-    /* #54 OSA B: vaalea branditeema (Ink -> Cream token-flip, brand-tokens.md) */
+    /* Redesign 24.7: brand-tokens + Space Grotesk + tumma ink-header ja magenta-bar
+       (sama kieli kuin fpl.html/index.html). */
+    :root {
+      --magenta: #FF2E7E;
+      --magenta-deep: #D6006E;
+      --ink: #0A0820;
+      --ink2: #140F1E;
+      --cream: #FFF6EC;
+      --muted: #575170;
+    }
+    * { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
     body {
       margin: 0;
-      background: #FFF6EC;
-      color: #0A0820;
+      background: var(--cream);
+      color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, .brand { font-family: "Space Grotesk", -apple-system, "Segoe UI", sans-serif; }
+    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); color: var(--cream); }
+    .bar { height: 6px; background: var(--magenta); }
+    .nav {
+      max-width: 960px; margin: 0 auto; padding: 16px 20px; width: 100%;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
+    .brand a { color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
+    .brand span { color: var(--magenta); }
+    main {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       padding: 24px;
       text-align: center;
-      -webkit-font-smoothing: antialiased;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 6px;
-      background: #FF2E7E;
     }
     h1 {
-      color: #0A0820;
+      color: var(--ink);
       font-size: 28px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: -0.02em;
       margin: 0 0 8px;
     }
-    p { color: #575170; font-size: 14px; line-height: 1.5; margin: 4px 0; }
-    a {
+    p { color: var(--muted); font-size: 14px; line-height: 1.5; margin: 4px 0; }
+    main a {
       display: inline-block;
       margin-top: 24px;
       padding: 12px 24px;
-      background: #FF2E7E;
+      background: var(--magenta);
       color: #fff;
       text-decoration: none;
       border-radius: 999px;
       font-weight: 700;
     }
-    a:hover { background: #D6006E; }
+    main a:hover { background: var(--magenta-deep); }
   </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
 </head>
 <body>
-  <h1>GoalIQ</h1>
-  <p>Returning you to the app...</p>
-  <p>If nothing happens, tap the button below.</p>
-  <a href="goaliq://subscription-managed">Open GoalIQ</a>
+  <header class="site-header">
+    <div class="bar"></div>
+    <div class="nav">
+      <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt="">Goal<span>IQ</span></a></div>
+    </div>
+  </header>
+
+  <main>
+    <h1>GoalIQ</h1>
+    <p>Returning you to the app...</p>
+    <p>If nothing happens, tap the button below.</p>
+    <a href="goaliq://subscription-managed">Open GoalIQ</a>
+  </main>
 
   <script>
     // Auto-redirect to the app via deep link

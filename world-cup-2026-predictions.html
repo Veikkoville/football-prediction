@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>World Cup 2026 Predictions: How Our Model Did | GoalIQ</title>
 <meta name="description" content="GoalIQ's AI model logged a prediction for every World Cup 2026 match before kickoff. Spain won the final 1-0 after extra time; the model gave Spain the highest probability. See the full public record.">
-<link rel="canonical" href="https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html">
-<link rel="alternate" hreflang="en" href="https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html">
-<link rel="alternate" hreflang="x-default" href="https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html">
+<link rel="canonical" href="https://goaliq.app/world-cup-2026-predictions.html">
+<link rel="alternate" hreflang="en" href="https://goaliq.app/world-cup-2026-predictions.html">
+<link rel="alternate" hreflang="x-default" href="https://goaliq.app/world-cup-2026-predictions.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0A0820">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="World Cup 2026 Predictions: How Our Model Did">
 <meta property="og:description" content="Every World Cup 2026 prediction logged before kickoff, graded against official results. Spain won the final 1-0 aet; the model gave Spain the highest probability.">
-<meta property="og:url" content="https://veikkoville.github.io/football-prediction/world-cup-2026-predictions.html">
+<meta property="og:url" content="https://goaliq.app/world-cup-2026-predictions.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@goaliqapp">
 <meta name="twitter:title" content="World Cup 2026 Predictions: How Our Model Did">
@@ -23,11 +27,16 @@
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "GoalIQ: Football Predictions",
-  "operatingSystem": "Android",
+  "name": "GoalIQ: FPL Assistant",
+  "operatingSystem": "Android, iOS, Web",
+  "identifier": "com.veikkoville.goaliq",
   "applicationCategory": "SportsApplication",
-  "description": "AI football prediction app. Pick any two teams and GoalIQ predicts win probability, expected goals (xG) and the most likely score, using a Dixon-Coles model with an expected-goals ensemble.",
-  "url": "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
+  "description": "Free FPL assistant and football prediction app. Free FPL tools: clean sheet probability and fixture difficulty, rate my team with a captain pick, and price watch. GoalIQ Premium adds an interactive team manager with a gameweek planner, player expected points (xP) and transfer suggestions. Also predicts any match - win probability, expected goals (xG) and the most likely score - using a Dixon-Coles model with an expected-goals ensemble. Analytics, not betting.",
+  "url": "https://goaliq.app/",
+  "downloadUrl": [
+    "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
+    "https://apps.apple.com/app/id6780047163"
+  ],
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -86,21 +95,26 @@
 </script>
 
 <style>
-  /* #54 OSA B: vaalea branditeema (Ink->Cream token-flip, brand-tokens.md).
-     Header-band pysyy tumman inkin varissa + magenta-bar (on-brand). */
-  :root{ --bg:#FFF6EC; --bg2:#F6F4FF; --card:#FFFFFF; --line:rgba(10,8,32,0.12); --accent:#FF2E7E; --accent-deep:#D6006E; --teal:#19E3D2; --ink:#0A0820; --text:#0A0820; --muted:#575170; --band-text:#FFF6EC; --radius:16px; }
+  /* Redesign 24.7 (brand-tokens.md): Space Grotesk -display-fontti + tumma
+     ink-hero (index-gradientti, 6px magenta-raita) + cream-body.
+     GEN:WCRECAP-lohko sailyy: .statrow/.stat/.num/.lbl/.meta tyylit alla. */
+  :root{ --bg:#FFF6EC; --bg2:#F6F4FF; --card:#FFFFFF; --line:rgba(10,8,32,0.12); --accent:#FF2E7E; --accent-deep:#D6006E; --teal:#19E3D2; --teal-ink:#007A6C; --ink:#0A0820; --ink-2:#140F1E; --text:#0A0820; --muted:#575170; --hero-muted:#C9C3DA; --radius:16px; --font-display:"Space Grotesk",-apple-system,"Segoe UI",sans-serif; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px 80px; }
-  header{ background:var(--ink); color:var(--band-text); border-bottom:1px solid var(--line); }
-  .bar{ height:6px; background:var(--accent); }
+  h1,h2,h3,.brand{ font-family:var(--font-display); }
+  header{ background:linear-gradient(160deg,var(--ink) 0%,var(--ink-2) 70%,#1C1030 100%); color:#fff; border-bottom:6px solid var(--accent); }
   .nav{ max-width:960px; margin:0 auto; padding:22px 20px; display:flex; align-items:center; justify-content:space-between; }
-  .brand{ font-size:20px; font-weight:800; display:flex; align-items:center; }
+  .brand{ font-size:20px; font-weight:700; display:flex; align-items:center; }
   .brand a{ color:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:10px; }
   .brand span{ color:var(--accent); }
   .logo-mark-img{ width:32px; height:32px; border-radius:9px; display:block; }
   .cta{ display:inline-block; background:var(--accent); color:#fff; text-decoration:none; padding:11px 20px; border-radius:999px; font-weight:700; }
   .cta:hover{ background:var(--accent-deep); }
+  .hero{ max-width:960px; margin:0 auto; padding:26px 20px 56px; }
+  .hero h1{ margin:14px 0 14px; color:#fff; }
+  .hero .lede{ color:var(--hero-muted); }
+  .hero .meta{ color:var(--hero-muted); }
   h1{ font-size:40px; line-height:1.15; letter-spacing:-0.02em; margin:48px 0 14px; }
   h1 span{ color:var(--accent); }
   .lede{ font-size:19px; color:var(--muted); max-width:720px; }
@@ -109,7 +123,7 @@
   .group{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:6px 18px 14px; margin:14px 0; overflow-x:auto; }
   .statrow{ display:flex; flex-wrap:wrap; gap:14px; margin:18px 0; }
   .stat{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 20px; min-width:180px; flex:1; }
-  .stat .num{ font-size:30px; font-weight:800; color:var(--accent-deep); font-variant-numeric:tabular-nums; }
+  .stat .num{ font-family:var(--font-display); font-size:30px; font-weight:700; color:var(--accent-deep); font-variant-numeric:tabular-nums; }
   .stat .lbl{ color:var(--muted); font-size:13px; margin-top:2px; }
   .faq dt{ font-weight:700; margin-top:18px; }
   .faq dd{ margin:4px 0 0; color:var(--muted); }
@@ -131,10 +145,14 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </head>
 <body>
 <header>
-  <div class="bar"></div>
   <div class="nav">
-    <div class="brand"><a href="https://veikkoville.github.io/football-prediction/"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</a></div>
-    <a class="cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Get the app</a>
+    <div class="brand"><a href="/"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</a></div>
+    <a class="cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq" data-cta="wc-nav">Get the app</a>
+  </div>
+  <div class="hero">
+    <h1>World Cup 2026 <span>Predictions</span>: how our model did</h1>
+    <p class="lede">GoalIQ's model logged a prediction for every World Cup 2026 match before kickoff, publicly, with no edits afterwards. The tournament is over: Spain beat Argentina 1&ndash;0 after extra time in the final. This page is the permanent recap of how the model did.</p>
+    <p class="meta">Tournament completed 19 July 2026 · Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result.</p>
   </div>
 </header>
 
@@ -149,10 +167,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <a href="/fpl">FPL tools for 2026/27</a>
   </div>
 
-  <h1>World Cup 2026 <span>Predictions</span>: how our model did</h1>
-  <p class="lede">GoalIQ's AI model logged a prediction for every World Cup 2026 match before kickoff, publicly, with no edits afterwards. The tournament is over: Spain beat Argentina 1&ndash;0 after extra time in the final. This page is the permanent recap of how the model did.</p>
-  <p class="meta">Tournament completed 19 July 2026 · Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result.</p>
-
   <h2>The final, as the model saw it</h2>
   <p>Before kickoff on 19 July 2026 the model's read on Spain&nbsp;v&nbsp;Argentina was <strong>Spain 35.8%</strong> · draw 32.0% · Argentina 32.2%, with expected goals 1.09&ndash;1.02. Spain carried the highest probability of the three outcomes. The call was logged publicly before the match and was not edited afterwards. Spain won 1&ndash;0 after extra time (Ferran Torres, 106th minute).</p>
 
@@ -160,7 +174,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <!-- GEN:WCRECAP-START --><div class="statrow"><div class="stat"><div class="num">60.6%</div><div class="lbl">correct 1X2 results across all 104 completed World Cup matches (63 of 104)</div></div><div class="stat"><div class="num">84%</div><div class="lbl">accuracy in decisive matches (63 of 75 that did not end in a draw)</div></div></div><p class="meta">Knockout matches level after 90 minutes are graded as a draw; extra time and penalty shootouts do not count toward the result. Numbers update automatically from the same public log as the track record page.</p><!-- GEN:WCRECAP-END -->
   <p>The per-match record, hits and misses included, lives on the evergreen predictions page and keeps growing with domestic-league calls: <a href="/predictions#record">see the full track record</a>.</p>
 
-  <div class="ctarow"><a class="cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Predict any match in the app &rarr;</a></div>
+  <div class="ctarow"><a class="cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq" data-cta="wc-play">Predict any match in the app &rarr;</a> &nbsp; <a href="https://apps.apple.com/app/id6780047163" data-cta="wc-appstore">Also on the App Store</a></div>
 
   <h2>How the model works</h2>
   <p>GoalIQ is powered by a <strong>Dixon-Coles statistical model combined with a machine-learning expected-goals (xG) ensemble</strong>, trained on thousands of real international and club matches. For any fixture it estimates the win / draw / win probability, the expected goals for each team, and the most likely exact scorelines. World Cup 2026 predictions were computed on a neutral-venue basis and refreshed as results came in during the tournament.</p>
@@ -179,7 +193,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <dd>No. GoalIQ is an analytics and entertainment app that provides statistical model predictions for informational purposes only. It is not a betting or gambling service and does not provide betting tips or odds.</dd>
   </dl>
 
-  <div class="ctarow"><a class="cta" href="/fpl">FPL tools for 2026/27 &rarr;</a></div>
+  <div class="ctarow"><a class="cta" href="/fpl" data-cta="wc-fpl">FPL tools for 2026/27 &rarr;</a></div>
 
   <div class="disclaimer">
     <strong>Important:</strong> GoalIQ provides statistical model predictions for informational and entertainment purposes only. It is not a betting or gambling service and does not provide betting tips or odds. Predictions are estimates, not guarantees.
@@ -187,7 +201,21 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </div>
 
 <footer>
-  GoalIQ, AI football predictions · <a href="https://veikkoville.github.io/football-prediction/">GoalIQ home</a> · <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google Play</a> · <a href="https://x.com/goaliqapp">@goaliqapp</a>
+  © 2026 GoalIQ · Made in Lahti, Finland ·
+  <a href="/predictions">Match predictions</a> ·
+  <a href="fpl.html">FPL clean sheets &amp; FDR</a> ·
+  <a href="https://pro.goaliq.app">GoalIQ Premium (web)</a> ·
+  <a href="privacy.html">Privacy</a> ·
+  <a href="faq.html">FAQ</a> ·
+  <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Get the app</a>
 </footer>
+
+<!-- Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<script>
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
+  if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta')}); }
+});
+</script>
 </body>
 </html>

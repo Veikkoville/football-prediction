@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoalIQ – Delete Your Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0A0820">
   <style>
     /* #54 OSA B: vaalea branditeema (Ink -> Cream token-flip, brand-tokens.md).
        Header-band pysyy tumman inkin varissa + magenta-bar (on-brand). */
@@ -26,6 +30,7 @@
       --radius: 16px;
     }
     * { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
     body {
       margin: 0;
       background: var(--cream);
@@ -34,7 +39,8 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    .site-header { background: var(--ink); color: var(--cream); border-bottom: 1px solid var(--line); }
+    h1, h2, h3, .brand { font-family: "Space Grotesk", -apple-system, "Segoe UI", sans-serif; }
+    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); color: var(--cream); border-bottom: 1px solid var(--line); }
     .bar { height: 6px; background: var(--magenta); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;
@@ -129,7 +135,7 @@
 
   <div class="wrap">
     <h1>Delete Your GoalIQ Account</h1>
-    <p class="updated">Last updated: 8 May 2026</p>
+    <p class="updated">Last updated: 25 July 2026</p>
 
     <p>
       You can request deletion of your GoalIQ account and associated personal
@@ -194,11 +200,15 @@
     <h2>Cancel an active subscription first</h2>
     <p>
       If you have an active GoalIQ Premium subscription, please cancel it
-      before requesting account deletion. You can cancel directly in the app:
+      before requesting account deletion:
     </p>
     <ul>
-      <li>Open GoalIQ → <strong>Profile</strong> tab → tap <strong>Manage subscription</strong></li>
-      <li>This opens the Stripe Customer Portal where you can cancel</li>
+      <li><strong>App Store or Google Play subscriptions:</strong> cancel in your
+        device's subscription settings (iOS: Settings → your name →
+        Subscriptions; Android: Google Play → Subscriptions), or open GoalIQ →
+        <strong>Profile</strong> tab → tap <strong>Manage subscription</strong></li>
+      <li><strong>Web subscriptions (pro.goaliq.app):</strong> email us at the
+        address below and we cancel immediately</li>
       <li>Your subscription remains active until the end of the current billing period</li>
     </ul>
     <p>

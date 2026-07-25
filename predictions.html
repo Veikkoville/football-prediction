@@ -10,6 +10,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0A0820">
 
 <!-- Open Graph / social preview -->
 <meta property="og:title" content="Football Match Predictions – Win Probability, xG &amp; Scorelines | GoalIQ" />
@@ -148,19 +152,28 @@
 <!-- GEN:ACC-DATASET-END -->
 
 <style>
-  /* Sama vaalea branditeema kuin index.html (#54, brand-tokens.md). */
+  /* Redesign 24.7 (brand-tokens.md): sama kieli kuin index.html - Space
+     Grotesk -display-fontti, tumma ink-hero + 6px magenta-raita, cream-body.
+     GEN:ACC-/GEN:PRED-markerit sailyvat: chip herossa (.num/.lbl), proof
+     demossa, record + leagues sisallossa, trust premium-kortissa. */
   :root {
     --bg: #FFF6EC;
     --bg-alt: #F6F4FF;
     --card: #FFFFFF;
+    --ink: #0A0820;
+    --ink-2: #140F1E;
     --line: rgba(10,8,32,0.12);
     --text: #0A0820;
     --muted: #575170;
+    --hero-muted: #C9C3DA;
     --magenta: #FF2E7E;
     --magenta-deep: #D6006E;
     --teal: #19E3D2;
     --teal-ink: #007A6C;
+    --gold: #FFC93C;
     --radius: 16px;
+    --font-display: "Space Grotesk", -apple-system, "Segoe UI", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -168,37 +181,52 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-body);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
   section { padding: 80px 0; }
-  h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; letter-spacing: -0.02em; }
   a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
 
-  .bar { height: 6px; background: var(--magenta); }
-
+  /* ============ Dark ink hero shell (index-tyyli) ============ */
+  .hero-shell {
+    background: linear-gradient(160deg, var(--ink) 0%, var(--ink-2) 70%, #1C1030 100%);
+    color: #fff;
+    border-bottom: 6px solid var(--magenta);
+  }
   nav {
     display: flex; align-items: center; justify-content: space-between;
     padding: 22px 0;
   }
-  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
   .logo a { text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
   .logo-mark-img { width: 32px; height: 32px; border-radius: 9px; display: block; }
+  .nav-link { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--hero-muted); }
+  .nav-link:hover { color: #fff; }
   .nav-cta {
     background: var(--magenta); color: #ffffff; font-weight: 700;
     padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px;
   }
+  .nav-cta:hover { background: var(--magenta-deep); }
 
-  .hero { padding: 64px 0 72px; text-align: center; }
+  .hero { padding: 56px 0 68px; text-align: center; }
+  .hero .badge { color: var(--teal); }
+  .hero h1 { color: #fff; }
+  .hero p.sub { color: var(--hero-muted); }
+  .hero p.sub a { color: var(--teal); font-weight: 600; }
+  .hero .btn-ghost { color: #fff; border-color: rgba(255,255,255,0.28); }
+  .hero .btn-ghost:hover { border-color: var(--magenta); }
+  .hero .cta-note { color: var(--hero-muted); }
   .badge {
     display: inline-block; background: rgba(25,227,210,0.12);
     color: var(--teal-ink); border: 1px solid rgba(25,227,210,0.35);
     padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
     margin-bottom: 24px; text-decoration: none;
   }
-  .hero h1 { font-size: 48px; font-weight: 800; max-width: 820px; margin: 0 auto 20px; }
+  .hero h1 { font-size: 48px; font-weight: 700; max-width: 820px; margin: 0 auto 20px; }
   .hero h1 .accent { color: var(--magenta); }
   .hero p.sub { font-size: 19px; color: var(--muted); max-width: 680px; margin: 0 auto 36px; }
   .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
@@ -218,18 +246,20 @@
   .ghost-group { display: inline-flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
   .cta-note { color: var(--muted); font-size: 14px; margin-top: 14px; }
 
+  /* Track record -kortti tummassa herossa: GEN:ACC-CHIP elaa taalla (.num/.lbl) */
   .tr-hero {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+    border-radius: var(--radius);
     padding: 28px 36px; margin: 44px auto 0; max-width: 560px;
-    box-shadow: 0 4px 14px rgba(10,8,32,0.06);
   }
   .tr-hero .num {
-    font-size: 84px; font-weight: 800; line-height: 1; color: var(--magenta-deep);
+    font-family: var(--font-display);
+    font-size: 84px; font-weight: 700; line-height: 1; color: var(--gold);
     letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
   }
-  .tr-hero .lbl { font-size: 17px; color: var(--text); font-weight: 600; margin-top: 6px; }
-  .tr-hero .tr-note { font-size: 13px; color: var(--muted); margin-top: 10px; }
-  .tr-hero .tr-note a { color: var(--magenta-deep); font-weight: 600; }
+  .tr-hero .lbl { font-size: 17px; color: #fff; font-weight: 600; margin-top: 6px; }
+  .tr-hero .tr-note { font-size: 13px; color: var(--hero-muted); margin-top: 10px; }
+  .tr-hero .tr-note a { color: var(--teal); font-weight: 600; }
   @media (max-width: 640px) { .tr-hero .num { font-size: 60px; } }
 
   .demo {
@@ -262,7 +292,8 @@
   }
   .step .n {
     width: 38px; height: 38px; border-radius: 10px; background: rgba(255,46,126,0.14);
-    color: var(--magenta-deep); font-weight: 800; display: flex; align-items: center;
+    color: var(--magenta-deep); font-family: var(--font-display); font-weight: 700;
+    display: flex; align-items: center;
     justify-content: center; margin-bottom: 16px; font-size: 17px;
   }
   .step h3 { font-size: 19px; margin-bottom: 8px; }
@@ -284,15 +315,24 @@
     border: 2px solid var(--magenta); border-radius: 22px;
     padding: 44px; max-width: 640px; margin: 0 auto; text-align: center;
   }
-  .premium-card .price { font-size: 44px; font-weight: 800; margin: 8px 0; }
+  .premium-card .price { font-size: 44px; font-weight: 700; margin: 8px 0; }
   .premium-card .price span { font-size: 18px; color: var(--muted); font-weight: 500; }
   .premium-list { list-style: none; text-align: left; max-width: 420px; margin: 24px auto; }
   .premium-list li { padding: 8px 0 8px 30px; position: relative; color: var(--text); }
   .premium-list li::before {
     content: "✓"; position: absolute; left: 0; color: var(--magenta); font-weight: 800;
   }
+  .premium-card .price { font-family: var(--font-display); }
   .premium-card small { color: var(--muted); font-size: 13px; }
   .trust-line { color: var(--muted); font-size: 14px; margin-top: 16px; }
+
+  /* Beat the Model -liiganauha (index .league-band -malli) */
+  .league-band { background: var(--ink); color: #fff; border-block: 6px solid var(--magenta); padding: 44px 0; }
+  .league-inner { display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+  .league-inner h2 { font-size: clamp(22px, 2.6vw, 30px); color: #fff; }
+  .league-inner p { color: var(--hero-muted); max-width: 52ch; margin-top: 6px; }
+  .league-inner .btn-primary { flex: none; }
+  .league-inner .code { font-family: var(--font-display); }
 
   .faq-list { max-width: 760px; margin: 0 auto; }
   .faq-list dt { font-weight: 700; font-size: 17px; margin-top: 26px; }
@@ -329,19 +369,17 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </head>
 <body>
 
-<div class="bar"></div>
+<!-- Tumma ink-hero (redesign 24.7): nav + hero samassa shellissa kuten index.html -->
+<div class="hero-shell">
 <div class="wrap">
   <nav>
     <div class="logo"><a href="/"><img class="logo-mark-img" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt=""> GoalIQ</a></div>
     <div style="display:flex; gap:20px; align-items:center;">
-      <a href="fpl.html" style="text-decoration:none; font-weight:600; font-size:14px;">Free FPL tools</a>
+      <a class="nav-link" href="fpl.html">Free FPL tools</a>
       <a class="nav-cta" href="https://pro.goaliq.app/?tab=premium" data-cta="predictions-nav">Try Premium</a>
     </div>
   </nav>
-</div>
 
-<!-- HERO -->
-<div class="wrap">
   <header class="hero">
     <span class="badge">Every prediction logged before kick-off, publicly tracked</span>
     <h1>Football match predictions, <span class="accent">from a model that shows its record</span></h1>
@@ -359,6 +397,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="tr-note">Every prediction logged before kick-off and graded after, hits and misses included. <a href="#record">See the full record &rarr;</a></div>
     </div>
   </header>
+</div>
 </div>
 
 <!-- WHAT A PREDICTION LOOKS LIKE -->
@@ -456,6 +495,18 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </section>
 
+<!-- BEAT THE MODEL (M29): sama nauha kuin etusivulla -->
+<div class="league-band">
+  <div class="wrap league-inner">
+    <div>
+      <h2>The model plays FPL this season. Beat it.</h2>
+      <p>GoalIQ's team picks itself from the model's numbers, squad public, every call
+        posted before the deadline. Season winner gets a year of Premium, free.</p>
+    </div>
+    <a class="btn-primary" href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9" data-cta="predictions-league">Join the league · code <span class="code">jgi6j9</span></a>
+  </div>
+</div>
+
 <!-- PREMIUM -->
 <section>
   <div class="wrap">
@@ -510,6 +561,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <a href="privacy.html">Privacy</a>
       &nbsp;·&nbsp;
       <a href="faq.html">FAQ</a>
+      &nbsp;·&nbsp;
+      <a href="#get">Get the app</a>
     </div>
   </div>
 </footer>

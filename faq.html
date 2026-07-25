@@ -18,6 +18,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0A0820">
   <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -26,7 +30,7 @@
  "name": "GoalIQ",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "url": "https://goaliq.app/",
- "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, rate my team with a captain pick, and price watch free, plus player expected points (xP), the captain ranker, differentials and a transfer planner on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
+ "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, rate my team with a captain pick, a fit checker, a pre-season draft rater and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, player value, xG leaders, a DefCon tracker, differentials and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
   "https://apps.apple.com/app/id6780047163",
@@ -46,7 +50,7 @@
    "name": "What is GoalIQ?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "GoalIQ is a free FPL assistant and football prediction tool. Free FPL tools: clean sheet probability and fixture difficulty, rate my team with a captain pick, and price watch. GoalIQ Premium adds player expected points (xP), the captain ranker, differentials and a transfer planner. It also predicts any match with a Dixon-Coles + machine-learning model. Analytics, not betting."
+    "text": "GoalIQ is a free FPL assistant and football prediction tool, in the app stores as GoalIQ: FPL Assistant. Free FPL tools: clean sheet probability and fixture difficulty, rate my team with a captain pick, a fit checker, a pre-season draft rater and price watch. GoalIQ Premium adds an interactive team manager with a GW1 to GW6 gameweek planner, player expected points (xP), the captain ranker, transfer suggestions, player value, xG leaders, a DefCon tracker and differentials. It also predicts any match with a Dixon-Coles + machine-learning model. Analytics, not betting."
    }
   },
   {
@@ -62,7 +66,7 @@
    "name": "How much does GoalIQ Premium cost and what does it include?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Monthly through the App Store or Google Play at the price shown in the app, or on the web at pro.goaliq.app for 3.99 euros per month or 25 euros per year (season pass). One subscription covers web, iOS and Android. Premium unlocks player expected points (xP), the captain ranker, transfer planner, differentials, player compare, predicted starting minutes, and in the app top-10 scorelines, total goals and BTTS probabilities, form and head-to-head."
+    "text": "Monthly through the App Store or Google Play at the price shown in the app, or on the web at pro.goaliq.app for 3.99 euros per month or 25 euros per year (season pass). One subscription covers web, iOS and Android. Premium unlocks an interactive team manager with a GW1 to GW6 gameweek planner, player expected points (xP), the captain ranker, transfer suggestions with apply, player value (xP per million), xG leaders, a DefCon tracker, differentials, player compare, predicted starting minutes, and in the app top-10 scorelines, total goals and BTTS probabilities, form and head-to-head."
    }
   },
   {
@@ -102,6 +106,7 @@
       --radius: 16px;
     }
     * { box-sizing: border-box; }
+    html, body { overflow-x: clip; }
     body {
       margin: 0;
       background: var(--cream);
@@ -110,7 +115,8 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    .site-header { background: var(--ink); color: var(--cream); border-bottom: 1px solid var(--line); }
+    h1, h2, h3, .brand, summary { font-family: "Space Grotesk", -apple-system, "Segoe UI", sans-serif; }
+    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); color: var(--cream); border-bottom: 1px solid var(--line); }
     .bar { height: 6px; background: var(--magenta); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;
@@ -226,7 +232,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 
   <div class="wrap">
     <h1>Frequently Asked Questions</h1>
-    <p class="updated">Last updated: 17 July 2026</p>
+    <p class="updated">Last updated: 25 July 2026</p>
 
     <p>
       Quick answers to the most common questions about GoalIQ. If you can't
@@ -238,12 +244,15 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <summary>What is GoalIQ?</summary>
       <div>
         <p>
-          GoalIQ is a free FPL assistant and football prediction tool. Free
-          FPL tools: clean sheet probability and fixture difficulty, rate my team
-          with a captain pick, and price watch. GoalIQ Premium adds player
-          expected points (xP), the captain ranker, differentials and a
-          transfer planner. It can also predict any match: the app uses
-          machine learning models (Dixon-Coles + LightGBM ensemble) to
+          GoalIQ is a free FPL assistant and football prediction tool, in the
+          app stores as <strong>GoalIQ: FPL Assistant</strong>. Free FPL tools:
+          clean sheet probability and fixture difficulty, rate my team with a
+          captain pick, a fit checker, a pre-season draft rater and price
+          watch. GoalIQ Premium adds an interactive team manager with a GW1 to
+          GW6 gameweek planner, player expected points (xP), the captain
+          ranker, transfer suggestions, player value, xG leaders, a DefCon
+          tracker and differentials. It can also predict any match: the app
+          uses machine learning models (Dixon-Coles + LightGBM ensemble) to
           estimate match outcomes, expected goals (xG), and likely
           scorelines.
         </p>
@@ -282,8 +291,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         </p>
         <p>Premium unlocks:</p>
         <ul>
+          <li>Interactive team manager: formations, bench swaps, captaincy and a GW1 to GW6 gameweek planner</li>
           <li>Player expected points (xP) per gameweek and the captain ranker</li>
-          <li>Transfer planner, differentials, player compare and predicted starting minutes</li>
+          <li>Transfer suggestions with one-tap apply, player value (xP per million), full xG leaders and DefCon leaderboards</li>
+          <li>Differentials, player compare and predicted starting minutes</li>
           <li>In the app: top-10 most likely scorelines, total goals and BTTS probabilities, form &amp; momentum, head-to-head history</li>
         </ul>
       </div>
@@ -322,11 +333,13 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <p>
           GoalIQ Premium is a web dashboard at
           <a href="https://pro.goaliq.app">pro.goaliq.app</a> built for
-          Fantasy Premier League. The free view shows clean sheet probability and
-          model-based fixture difficulty for every PL team. Premium adds player
-          expected points (xP) for the coming gameweeks, a captain ranker and
-          per-gameweek breakdowns, all from the same GoalIQ match model with
-          a published track record.
+          Fantasy Premier League. Free: clean sheet probability and model-based
+          fixture difficulty for every PL team, rate my team with a captain
+          pick, a fit checker, a pre-season draft rater and price watch.
+          Premium adds an interactive team manager with a GW1 to GW6 gameweek
+          planner, player expected points (xP) for the coming gameweeks, a
+          captain ranker and per-gameweek breakdowns, all from the same GoalIQ
+          match model with a published track record.
         </p>
         <p>
           Pricing: 3.99 &euro;/month or 25 &euro;/year (season pass). Sign in
@@ -369,9 +382,12 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <summary>Is there an iOS version?</summary>
       <div>
         <p>
-          GoalIQ is available now on Google Play (Android), and an iOS version
-          is on its way to the App Store. Coverage and features are kept in sync
-          across both platforms.
+          Yes. GoalIQ is available on both the
+          <a href="https://apps.apple.com/app/id6780047163">App Store</a> (iOS)
+          and <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google
+          Play</a> (Android), in both stores as <strong>GoalIQ: FPL Assistant</strong>.
+          Coverage and features are kept in sync across both platforms, and one
+          Premium subscription covers web, iOS and Android.
         </p>
       </div>
     </details>
@@ -407,9 +423,23 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <summary>The app shows a different price than what I was charged. Why?</summary>
       <div>
         <p>
-          All charges go through your app store at the price displayed in the
-          app at the time of purchase. If you see a discrepancy, contact us with
+          All charges go through your app store (App Store or Google Play) or,
+          for web subscriptions, through Stripe, at the price displayed at the
+          time of purchase. If you see a discrepancy, contact us with
           the transaction details and we will investigate within 7 days.
+        </p>
+      </div>
+    </details>
+
+    <details>
+      <summary>What is the Beat the Model mini-league?</summary>
+      <div>
+        <p>
+          The GoalIQ model plays FPL in the 2026/27 season with its own public
+          team, and anyone can try to outscore it. Join the Beat the Model
+          mini-league with code <strong>jgi6j9</strong> or via
+          <a href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9">this
+          auto-join link</a>. The season winner gets a year of GoalIQ Premium, free.
         </p>
       </div>
     </details>
