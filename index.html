@@ -216,15 +216,15 @@
   .hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; padding: 52px 0 68px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
-    background: transparent; color: var(--teal-ink);
+    background: transparent; color: var(--muted);
     border: 1px solid var(--line);
     padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
     margin-bottom: 22px; text-decoration: none;
   }
   .hero h1 { font-size: clamp(34px, 4.4vw, 52px); font-weight: 700; margin-bottom: 18px; color: var(--ink); }
-  .hero h1 .accent { color: var(--magenta); }
+  .hero h1 .accent { color: var(--gold-deep,#8C6428); }
   .hero .sub { font-size: 18px; color: var(--hero-muted); max-width: 48ch; margin-bottom: 28px; }
-  .hero .sub a { color: var(--teal-ink); font-weight: 600; }
+  .hero .sub a { color: var(--magenta-deep); font-weight: 600; }
   .cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
   .btn-primary {
     background: transparent; color: var(--gold-deep); font-weight: 700; font-size: 16px;
@@ -242,7 +242,7 @@
   .hero .cta-note { color: var(--hero-muted); font-size: 13px; margin-top: 14px; }
   /* 26.7 CLASSIC: kirkas #19E3D2 on TEKSTINA lukukelvoton cream-pohjalla
      (~1.9:1). Teksti kayttaa aina --teal-inkia; kirkas teal jaa viivoille. */
-  .hero .cta-note a { color: var(--teal-ink); font-weight: 600; }
+  .hero .cta-note a { color: var(--magenta-deep); font-weight: 600; }
 
   /* Track record -chip herossa: GEN:ACC-CHIP elaa taalla (.num/.lbl) */
   .record-chip {
@@ -253,17 +253,17 @@
   .record-chip .num { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; line-height: 1.1; }
   .record-chip .lbl { font-size: 13px; color: var(--hero-muted); max-width: 40ch; line-height: 1.35; }
   .record-chip .tr-links { font-size: 13px; margin-top: 6px; }
-  .record-chip .tr-links a { color: var(--teal-ink); font-weight: 600; }
+  .record-chip .tr-links a { color: var(--magenta-deep); font-weight: 600; }
 
   /* #72: GW-deadline-countdown herossa (tummat tokenit) */
   .countdown { display: flex; flex-direction: column; gap: 8px; margin: 24px 0 0; }
   .countdown .cd-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--hero-muted); }
   .cd-clock { display: flex; align-items: baseline; gap: 6px; }
-  .cd-box { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; padding: 7px 11px; min-width: 54px; text-align: center; }
+  .cd-box { background: transparent; border: 1px solid var(--line); border-radius: 2px; padding: 7px 11px; min-width: 54px; text-align: center; }
   .cd-box .cd-num { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1.1; }
   .cd-box .cd-unit { display: block; font-size: 10px; font-weight: 600; color: var(--hero-muted); text-transform: uppercase; letter-spacing: 0.08em; }
   .cd-sep { font-size: 18px; font-weight: 700; color: var(--hero-muted); }
-  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--teal-ink); text-decoration: none; }
+  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--gold-deep); text-decoration: none; }
   .countdown .cd-cta:hover { text-decoration: underline; }
 
   /* ============ CSS-tuotemockup (oikeat mallin luvut, paivitetaan kasin
@@ -274,7 +274,7 @@
     overflow: hidden; max-width: 420px; justify-self: end; width: 100%;
     transform: rotate(1.2deg);
   }
-  .mock-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--ink); color: #fff; }
+  .mock-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg-alt); color: var(--ink); border-bottom: 1px solid var(--line); }
   .mock-head .t { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
   .mock-head .gw { font-size: 11px; color: var(--hero-muted); }
   .mock-tabs { display: flex; gap: 6px; padding: 12px 14px 4px; }
@@ -289,12 +289,12 @@
   .mock-name { font-weight: 700; font-size: 13.5px; }
   .mock-meta { font-size: 10.5px; color: var(--muted); }
   .mock-spacer { flex: 1; }
-  .mock-xp { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--magenta-deep); font-variant-numeric: tabular-nums; }
+  .mock-xp { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--gold-deep); font-variant-numeric: tabular-nums; }
   .mock-xp small { display: block; font-size: 9px; color: var(--muted); font-weight: 600; text-align: right; }
   .mock-bar { height: 4px; border-radius: 2px; background: rgba(10,8,32,0.08); margin-top: 3px; overflow: hidden; }
-  .mock-bar i { display: block; height: 100%; background: var(--teal); }
+  .mock-bar i { display: block; height: 100%; background: var(--gold); }
   .mock-foot { padding: 10px 18px 14px; background: var(--bg-alt); font-size: 11px; color: var(--muted); }
-  .mock-foot strong { color: var(--teal-ink); }
+  .mock-foot strong { color: var(--gold-deep); }
 
   /* ============ Light content ============ */
   .section-head { max-width: 640px; margin: 0 auto 44px; text-align: center; }
@@ -303,21 +303,21 @@
 
   .toolkit { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: stretch; }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow-1); }
-  .panel.premium-p { border: 2px solid var(--magenta); }
+  .panel.premium-p { border: 1px solid var(--gold); }
   .panel .tier { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-  .panel .tier.free { color: var(--teal-ink); }
-  .panel .tier.prem { color: var(--magenta-deep); }
+  .panel .tier.free { color: var(--muted); }
+  .panel .tier.prem { color: var(--gold-deep); }
   .panel h3 { font-size: 21px; margin: 6px 0 14px; }
   .tool-list { list-style: none; }
   .tool-list li { padding: 7px 0 7px 28px; position: relative; font-size: 15px; }
   .tool-list li::before { content: "✓"; position: absolute; left: 0; font-weight: 800; }
-  .panel .tool-list li::before { color: var(--teal-ink); }
-  .panel.premium-p .tool-list li::before { color: var(--magenta); }
+  .panel .tool-list li::before { color: var(--gold-deep); }
+  .panel.premium-p .tool-list li::before { color: var(--gold-deep); }
   .panel .panel-cta { margin-top: 18px; }
   .price-tag { font-family: var(--font-display); font-size: 30px; font-weight: 700; }
   .price-tag span { font-size: 14px; color: var(--muted); font-weight: 500; font-family: var(--font-body); }
-  .btn-teal { background: var(--teal-ink); }
-  .btn-teal:hover { background: #00655A; }
+  .btn-teal { background: transparent; color: var(--gold-deep); border: 1px solid var(--gold); }
+  .btn-teal:hover { background: rgba(182,130,53,0.08); }
   .early-offer {
     background: rgba(255,201,60,0.16); border: 1px solid rgba(244,168,0,0.45);
     border-radius: 12px; padding: 10px 14px; margin: 14px 0 0;
@@ -347,7 +347,7 @@
   .trust-band .tr-note a { color: var(--magenta-deep); font-weight: 600; }
   .trust-band .bycomp { margin-left: auto; margin-right: auto; }
   .wc-visual { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 26px; max-width: 620px; margin: 22px auto 0; text-align: left; }
-  .wc-visual a { color: var(--teal-ink); font-weight: 700; }
+  .wc-visual a { color: var(--magenta-deep); font-weight: 700; }
 
   /* How it works */
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
@@ -362,7 +362,7 @@
   .leagues { background: var(--bg-alt); }
   .league-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 760px; margin: 0 auto; }
   .league-chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 12px 22px; font-weight: 600; font-size: 15px; }
-  .league-chip.live-chip { border-color: rgba(25,227,210,0.5); color: var(--teal-ink); }
+  .league-chip.live-chip { border-color: rgba(255,46,126,0.45); color: var(--magenta-deep); }
 
   /* FAQ (#58 GEO): nakyva vastine head-osan FAQPage-JSON-LD:lle */
   .faq-list { max-width: 760px; margin: 0 auto; }
