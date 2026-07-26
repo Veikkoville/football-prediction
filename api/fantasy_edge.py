@@ -262,18 +262,40 @@ _CSV_BASE_COLUMNS = [
 ]
 
 
+def _csv_cell(v, dec_comma: bool):
+    """Desimaalierotin EU-muodossa. MIKSI (Villen bugiloyto 26.7): pisteelliset
+    desimaalit (1.10, 2.11) tulkitaan fi/eu-locale-Excelissa PAIVAMAARIKSI,
+    koska piste on siella paivamaaraerotin -> liian kapea paivamaarasolu
+    renderoityy '####'. Muut desimaalit paatyvat tekstiksi, jolloin niilla ei
+    voi laskea. EU-muodossa desimaali on pilkku ja erotin ';', jolloin Excel
+    lukee ne oikeina lukuina."""
+    if dec_comma and isinstance(v, float):
+        return repr(v).replace(".", ",")
+    return v
+
+
 @router.get("/api/fantasy/xp.csv")
-def fantasy_xp_csv(request: Request, response: Response):
+def fantasy_xp_csv(
+    request: Request,
+    response: Response,
+    sep: str = Query(default=",", pattern="^[,;]$",
+                     description="Kenttaerotin. ';' = eurooppalainen Excel "
+                                 "(desimaalit pilkulla)."),
+):
     """xP-projektiot CSV:na (Excel/Sheets-export). Sarakkeet: perustiedot +
     kontraktin defensiiviset kentat (owned_pct, p_start/p_cameo/p_bench,
     e_bonus, set_pieces_*; tyhja jos dataa ei viela ole) + xp_gw{N} per
-    katettu GW. PREMIUM_ENFORCE=on + free -> top-10 rivia (teaser)."""
+    katettu GW. PREMIUM_ENFORCE=on + free -> top-10 rivia (teaser).
+
+    ?sep=; -> eurooppalainen muoto (';' erottimena, ',' desimaalina). Oletus
+    ',' pysyy UK/US-Excelille, Sheetsille ja pandasille."""
     data = load_xp()
     if not data.get("meta", {}).get("available") or not data.get("players"):
         raise HTTPException(status_code=503,
                             detail="xP projections are not available yet.")
     premium = is_premium_request(request)
-    cache_key = ("xp_csv", data["meta"].get("generated_at"), premium)
+    dec_comma = (sep == ";")
+    cache_key = ("xp_csv", data["meta"].get("generated_at"), premium, sep)
     cached = _cache_get(cache_key)
     if cached is None:
         try:
@@ -289,7 +311,7 @@ def fantasy_xp_csv(request: Request, response: Response):
         gws = sorted({g.get("gw") for p in players
                       for g in (p.get("gameweeks") or [])})
         buf = io.StringIO()
-        w = csv.writer(buf, lineterminator="\n")
+        w = csv.writer(buf, delimiter=sep, lineterminator="\n")
         w.writerow(_CSV_BASE_COLUMNS + [f"xp_gw{g}" for g in gws])
         for p in players:
             b = boot.get(p.get("id")) or {}
@@ -297,7 +319,7 @@ def fantasy_xp_csv(request: Request, response: Response):
             gw_xp = {g.get("gw"): g.get("xp")
                      for g in (p.get("gameweeks") or [])}
             price = b.get("now_cost")
-            w.writerow([
+            w.writerow([_csv_cell(v, dec_comma) for v in ([
                 p.get("id"), p.get("web_name"), p.get("full_name"),
                 p.get("team"), p.get("team_short"), p.get("pos"),
                 (price / 10.0 if isinstance(price, (int, float)) else ""),
@@ -308,12 +330,12 @@ def fantasy_xp_csv(request: Request, response: Response):
                 p.get("p_bench", ""), p.get("e_bonus", ""),
                 sp.get("pens", ""), sp.get("corners", ""), sp.get("fk", ""),
                 p.get("xp_per_gw"), p.get("xp_horizon_total"),
-            ] + [gw_xp.get(g, "") for g in gws])
+            ] + [gw_xp.get(g, "") for g in gws])])
         # Excel-yhteensopivuus (Villen bugilöytö 25.7): UTF-8 BOM (aksentilliset
         # nimet, esim. Kadıoğlu) + "sep=,"-vihjerivi, jota ilman fi/eu-locale-
         # Excel (listaerotin ";") kaataa kaiken yhteen sarakkeeseen. Sheets ja
         # pandas sietavat vihjerivin (pandas: skiprows=1).
-        cached = "﻿sep=,\n" + buf.getvalue()
+        cached = f"﻿sep={sep}\n" + buf.getvalue()
         _cache_put(cache_key, cached)
     season = str(data["meta"].get("season") or "").replace("/", "-")
     response.headers["Cache-Control"] = "no-store"

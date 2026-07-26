@@ -641,11 +641,16 @@ export function fetchEdge(entry: number, mode: EdgeMode): Promise<EdgeResponse> 
 /* ---------- Edge-sprint: CSV-lataus (premium) ---------- */
 
 /** Hakee xP-projektiot CSV:nä Bearer-headerilla ja käynnistää selainlatauksen.
- * Palauttaa null onnistuessa, virheviestin epäonnistuessa (inline-banneriin). */
-export async function downloadXpCsv(): Promise<string | null> {
+ * Palauttaa null onnistuessa, virheviestin epäonnistuessa (inline-banneriin).
+ *
+ * eu=true → ';'-erotin ja pilkkudesimaalit. MIKSI: fi/eu-locale-Excel tulkitsee
+ * pisteellisen desimaalin (1.10) päivämääräksi ja näyttää '####'. Oletus jää
+ * pilkkuerottimeen, joka on oikea UK/US-Excelille, Sheetsille ja pandasille. */
+export async function downloadXpCsv(eu = false): Promise<string | null> {
 	try {
 		const headers = await authHeaders();
-		const r = await fetch(`${API_BASE}/api/fantasy/xp.csv`, { headers });
+		const q = eu ? '?sep=%3B' : '';
+		const r = await fetch(`${API_BASE}/api/fantasy/xp.csv${q}`, { headers });
 		if (!r.ok) {
 			const detail = (await r.json().catch(() => null))?.detail;
 			return typeof detail === 'string' && detail
@@ -656,7 +661,8 @@ export async function downloadXpCsv(): Promise<string | null> {
 		// filename Content-Dispositionista jos saatavilla, muuten oletus
 		const cd = r.headers.get('Content-Disposition') ?? '';
 		const m = cd.match(/filename="([^"]+)"/);
-		const name = m?.[1] ?? 'goaliq_xp.csv';
+		let name = m?.[1] ?? 'goaliq_xp.csv';
+		if (eu) name = name.replace(/\.csv$/, '_eu.csv');
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;

@@ -167,10 +167,10 @@
 	// downloadXpCsv-helperissä). Virhe inline-banneriin, ei heitetä.
 	let csvBusy = $state(false);
 	let csvError = $state<string | null>(null);
-	async function onCsv() {
+	async function onCsv(eu = false) {
 		if (csvBusy) return;
 		csvBusy = true;
-		csvError = await downloadXpCsv();
+		csvError = await downloadXpCsv(eu);
 		csvBusy = false;
 	}
 </script>
@@ -250,10 +250,19 @@
 		{/if}
 	</div>
 	<!-- Edge-sprint kohta 5: koko projektio CSV:nä (premium-pinta) -->
-	<button type="button" class="ghost csv-btn" disabled={csvBusy} onclick={() => void onCsv()}>
+	<button type="button" class="ghost csv-btn" disabled={csvBusy} onclick={() => void onCsv(false)}>
 		{csvBusy ? 'Preparing CSV…' : 'Download CSV'}
 	</button>
 </div>
+<!-- fi/eu-Excel lukee pisteellisen desimaalin paivamaaraksi ja nayttaa '####'.
+     Tama variantti kayttaa ';'-erotinta ja pilkkudesimaaleja. -->
+<p class="csv-eu">
+	Numbers showing as #### in Excel?
+	<button type="button" class="linklike" disabled={csvBusy} onclick={() => void onCsv(true)}>
+		Download the European format
+	</button>
+	(semicolons, comma decimals).
+</p>
 {#if csvError}
 	<p class="banner error">{csvError}</p>
 {/if}
@@ -486,6 +495,25 @@
 		font-size: 16px;
 		cursor: pointer;
 		padding: 2px 6px;
+	}
+	.csv-eu {
+		color: var(--muted);
+		font-size: var(--step--1);
+		margin: var(--s-3) 0 0;
+	}
+	.linklike {
+		background: none;
+		border: 0;
+		padding: 0;
+		color: var(--giq-magenta-deep, #d6006e);
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+		text-decoration: underline;
+	}
+	.linklike:disabled {
+		opacity: 0.6;
+		cursor: default;
 	}
 	/* Edge-sprint kohta 5: CSV-nappi controls-rivin oikeaan laitaan */
 	.csv-btn {
