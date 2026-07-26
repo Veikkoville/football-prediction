@@ -608,6 +608,12 @@ XG_JS = """
 <script>
 (function(){
  var D=window.__XG__||[],w=5,per90=false,pos='',team='',key=5,desc=true;
+ // Nayta oletuksena 100 rivia. MIKSI: 373 riviä = ~5000 DOM-solmua ja jokainen
+ // kontrolliklikkaus rakensi ne kaikki uudelleen innerHTML:lla -> sivu lagasi
+ // pahasti. 100 riittaa kaytannossa kaikkeen, ja "show all" on yhden klikin
+ // paassa. Payloadissa on silti kaikki, joten suodatus ja lajittelu koskevat
+ // koko aineistoa - vain NAYTTO on rajattu.
+ var LIMIT=100,showAll=false;
  // Sama neutraali paitasiluetti kuin palvelinrenderoinnissa ja
  // TeamKit.svelte/TeamKit.tsx:ssa. Ei krestia eika pelaajakuvaa (IP).
  var JP='M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 '
@@ -667,7 +673,8 @@ XG_JS = """
  }
  function draw(){
   var r=rows(),h='';
-  for(var i=0;i<r.length;i++){
+  var n=showAll?r.length:Math.min(LIMIT,r.length);
+  for(var i=0;i<n;i++){
    var a=r[i];
    h+='<tr><td class="n">'+(i+1)+'</td><td>'+a.n+'</td><td class="tm">'
     +kit(a.k,a.t)+'<span>'+a.t+'</span></td><td>'
@@ -677,6 +684,12 @@ XG_JS = """
     +'</td></tr>';
   }
   tb.innerHTML=h;
+  var more=document.getElementById('xgmore');
+  if(more){
+   if(showAll||r.length<=LIMIT){more.style.display='none';}
+   else{more.style.display='';
+        more.textContent='Show all '+r.length+' players';}
+  }
   // Kausitilassa viimeisessa sarakkeessa on AVAUKSET, ei esiintymisia
   // (bootstrap antaa startsin). Otsikko kertoo kumpi, ei arvata.
   var hh=document.querySelectorAll('#xgt2 thead th');
@@ -739,6 +752,8 @@ XG_JS = """
    };
   })(i);
  }
+ var moreBtn=document.getElementById('xgmore');
+ if(moreBtn)moreBtn.onclick=function(){showAll=true;draw();};
  sync();
 })();
 </script>
@@ -804,7 +819,10 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         f'<td class="n">{mins5.get(r["id"], 0)}</td>'
         f'<td class="n">{r["games"]}</td>'
         "</tr>"
-        for i, r in enumerate(rows)
+        # Palvelin renderoi 100 riviä, sama raja kuin JS:n oletus. Koko
+        # aineisto on payloadissa (suodatus/lajittelu koskee kaikkia), joten
+        # tama on puhtaasti DOM-painon rajaus: 373 riviä teki sivusta laggaavan.
+        for i, r in enumerate(rows[:100])
     )
     kitdefs = _kit_defs(p.get("team_short") for p in (leaders.get("players") or []))
     controls = (
@@ -827,6 +845,8 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         '<th class="n">Mins</th><th class="n">Games</th>'
         "</tr></thead>"
         f'<tbody id="xgb">{trows}</tbody></table></div>'
+        '<button type="button" class="chip" id="xgmore" '
+        'style="margin:4px 0 8px;">Show all players</button>'
     )
     payload = (
         '<script id="xgdata">window.__XG__='
