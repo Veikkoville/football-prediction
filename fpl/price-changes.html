@@ -91,6 +91,19 @@ color:var(--muted);font-weight:700;}
 .lb td.n,.lb th.n{text-align:right;font-variant-numeric:tabular-nums;}
 .lb td.hi{color:var(--magenta-deep);font-weight:700;}
 .lb tbody tr:last-child td{border-bottom:none;}
+.lb thead th:hover{color:var(--magenta-deep);}
+.lbctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 6px;}
+.lbctl .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+color:var(--muted);font-weight:700;margin-left:6px;}
+.lbctl .lbl:first-child{margin-left:0;}
+.chips{display:inline-flex;gap:6px;}
+.chip{min-width:34px;border:1px solid var(--line);background:var(--paper);
+color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
+font-weight:600;cursor:pointer;}
+.chip.on{background:var(--magenta);border-color:var(--magenta);color:#fff;}
+.lbctl select{border:1px solid var(--line);background:var(--paper);
+color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
+font-weight:600;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 </style>

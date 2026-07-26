@@ -287,10 +287,11 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
                 "Yes. GoalIQ is built FPL-first: clean sheet probability, fixture "
                 "difficulty, rate my team with a captain pick, a fit checker "
                 "that builds the best legal 15 around your must-have players, "
-                "a pre-season draft rater (no team ID needed), and price watch "
+                "a pre-season draft rater (no team ID needed), price watch and "
+                "the full xG/xA/xGI leaderboard for every player "
                 "are free, and GoalIQ Premium adds an interactive team manager "
                 "with a gameweek planner, player expected points (xP), the "
-                "captain ranker, a player value ranking, xG leaders, a DefCon "
+                "captain ranker, a player value ranking, a DefCon "
                 "tracker, differentials and transfer suggestions you can apply "
                 "to your planned squad. Every number comes from a match model "
                 "with a published, pre-match-logged track record."
@@ -957,10 +958,11 @@ def render_page(c: dict) -> str:
 
     title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ"
     meta_desc = (
-        "Free FPL tools: clean sheet probability & FDR, rate my team with a captain pick, "
+        "Free FPL tools: clean sheet probability & FDR, xG/xA/xGI leaders for "
+        "every player, rate my team with a captain pick, "
         "fit checker, pre-season draft rater "
         "and price watch. Premium adds a team manager with gameweek planner, "
-        "player xP, value ranking, xG leaders and a DefCon tracker. "
+        "player xP, value ranking and a DefCon tracker. "
         "Published track record. Not betting."
     )
 

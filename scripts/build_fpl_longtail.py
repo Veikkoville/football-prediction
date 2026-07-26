@@ -133,6 +133,19 @@ color:var(--muted);font-weight:700;}
 .lb td.n,.lb th.n{text-align:right;font-variant-numeric:tabular-nums;}
 .lb td.hi{color:var(--magenta-deep);font-weight:700;}
 .lb tbody tr:last-child td{border-bottom:none;}
+.lb thead th:hover{color:var(--magenta-deep);}
+.lbctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 6px;}
+.lbctl .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+color:var(--muted);font-weight:700;margin-left:6px;}
+.lbctl .lbl:first-child{margin-left:0;}
+.chips{display:inline-flex;gap:6px;}
+.chip{min-width:34px;border:1px solid var(--line);background:var(--paper);
+color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
+font-weight:600;cursor:pointer;}
+.chip.on{background:var(--magenta);border-color:var(--magenta);color:#fff;}
+.lbctl select{border:1px solid var(--line);background:var(--paper);
+color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
+font-weight:600;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 """
@@ -352,6 +365,150 @@ def render_price_changes(pw: dict, now: datetime) -> str:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+def _xg_payload(leaders: dict) -> str:
+    """Kompakti JSON selainlaskentaa varten: [nimi, joukkue, pos, hinta,
+    [[min, xg, xa, xgi], ...enintaan 10 viimeisinta]].
+
+    Selain laskee tasta 3/5/10 pelin ikkunat seka per-game- ja per-90-luvut,
+    joten yksi payload kattaa lajittelun, suodattimet ja ikkunavalinnan ilman
+    yhtaan API-kutsua. Ikkunasemantiikka on sama kuin palvelimella
+    (fpl_leaders._window_rows = recent_games[-window:]) -> JS kayttaa
+    slice(-w), jolloin luvut tasmaavat bitilleen server-renderoidyn
+    oletustaulukon kanssa.
+    """
+    out = []
+    for p in leaders.get("players") or []:
+        games = p.get("recent_games") or []
+        if not games:
+            continue
+        rows = [[
+            int(g.get("minutes") or 0),
+            round(float(g.get("xg") or 0.0), 2),
+            round(float(g.get("xa") or 0.0), 2),
+            round(float(g.get("xgi") or 0.0), 2),
+        ] for g in games[-10:]]
+        out.append([
+            p.get("web_name", ""), p.get("team_short", ""), p.get("pos", ""),
+            round(float(p.get("price") or 0.0), 1), rows,
+        ])
+    return json.dumps(out, separators=(",", ":"), ensure_ascii=False)
+
+
+# Selainlogiikka: ikkuna (3/5/10), per game vs per 90, lajittelu, suodattimet.
+# Ei em dashia missaan nakyvassa tekstissa (viestintatyyli SS1b).
+XG_JS = """
+<script>
+(function(){
+ var D=window.__XG__||[],w=5,per90=false,pos='',team='',key=5,desc=true;
+ // Minuuttikynnys. Per 90 ilman tata on rikki: 2 minuuttia pelannut nousee
+ // karkeen puhtaana kohinana. Kynnys on NAKYVA ja saadettava, ei hiljainen
+ // piilotus: kayttaja nakee mika suodatin on paalla ja voi ottaa sen pois.
+ var minm=0;
+ var tb=document.getElementById('xgb'),cnt=document.getElementById('xgc');
+ if(!tb)return;
+ function agg(p){
+  var g=p[4].slice(-w),m=0,xg=0,xa=0,xgi=0;
+  for(var i=0;i<g.length;i++){m+=g[i][0];xg+=g[i][1];xa+=g[i][2];xgi+=g[i][3];}
+  var d=per90?(m/90):g.length;
+  if(!d)d=1;
+  return {n:p[0],t:p[1],p:p[2],c:p[3],g:g.length,m:m,
+          xg:xg/d,xa:xa/d,xgi:xgi/d};
+ }
+ function rows(){
+  var r=[];
+  for(var i=0;i<D.length;i++){
+   // Sama saanto kuin palvelimella (fpl_leaders.rank_xg_leaders): maalivahdit
+   // pois oletuksena, koska tama on xG-lista eika torjuntalista. GKP-suodatin
+   // nayttaa ne erikseen. Ilman tata sivu antaisi kaksi eri lukua.
+   if(D[i][2]==='GKP'&&pos!=='GKP')continue;
+   if(pos&&D[i][2]!==pos)continue;
+   if(team&&D[i][1]!==team)continue;
+   var a=agg(D[i]);
+   if(per90&&a.m<1)continue;
+   if(a.m<minm)continue;
+   r.push(a);
+  }
+  // Indeksit vastaavat sarakeotsikoita: 0 #, 1 Player, 2 Team, 3 Pos,
+  // 4 Price, 5 xG, 6 xA, 7 xGI, 8 Mins, 9 Games.
+  var ks=['n','n','t','p','c','xg','xa','xgi','m','g'];
+  var k=ks[key];
+  r.sort(function(x,y){
+   var A=x[k],B=y[k];
+   if(typeof A==='string')return desc?B.localeCompare(A):A.localeCompare(B);
+   return desc?B-A:A-B;
+  });
+  return r;
+ }
+ function draw(){
+  var r=rows(),h='';
+  for(var i=0;i<r.length;i++){
+   var a=r[i];
+   h+='<tr><td class="n">'+(i+1)+'</td><td>'+a.n+'</td><td>'+a.t+'</td><td>'
+    +a.p+'</td><td class="n">'+a.c.toFixed(1)+'</td><td class="n hi">'
+    +a.xg.toFixed(2)+'</td><td class="n">'+a.xa.toFixed(2)+'</td><td class="n">'
+    +a.xgi.toFixed(2)+'</td><td class="n">'+a.m+'</td><td class="n">'+a.g
+    +'</td></tr>';
+  }
+  tb.innerHTML=h;
+  if(cnt)cnt.textContent=r.length+' players'+(per90?', per 90 minutes':', per game')
+   +', last '+w+' games each'
+   +(minm?', at least '+minm+' minutes played':', no minutes filter');
+ }
+ function chips(id,vals,cur,set){
+  var e=document.getElementById(id);if(!e)return;
+  e.innerHTML='';
+  vals.forEach(function(v){
+   var b=document.createElement('button');
+   b.type='button';b.className='chip'+(cur()===v[0]?' on':'');b.textContent=v[1];
+   b.onclick=function(){set(v[0]);sync();};
+   e.appendChild(b);
+  });
+ }
+ function sync(){
+  chips('xgw',[[3,'3'],[5,'5'],[10,'10']],function(){return w;},
+        function(v){w=v;});
+  chips('xgr',[[0,'Per game'],[1,'Per 90']],function(){return per90?1:0;},
+        function(v){
+         var was=per90;per90=!!v;
+         // Per 90:een siirryttaessa oletuskynnys paalle, takaisin per game:een
+         // siirryttaessa pois. Kayttajan oma valinta jaa voimaan jos han on
+         // sita jo koskenut talla naytolla.
+         if(!was&&per90&&minm===0)minm=180;
+         if(was&&!per90&&minm===180)minm=0;
+        });
+  chips('xgm',[[0,'Any'],[90,'90+'],[180,'180+'],[270,'270+']],
+        function(){return minm;},function(v){minm=v;});
+  chips('xgp',[['','All'],['GKP','GKP'],['DEF','DEF'],['MID','MID'],
+        ['FWD','FWD']],function(){return pos;},function(v){pos=v;});
+  draw();
+ }
+ var ts=[];for(var i=0;i<D.length;i++){if(ts.indexOf(D[i][1])<0)ts.push(D[i][1]);}
+ ts.sort();
+ var sel=document.getElementById('xgt');
+ if(sel){
+  sel.innerHTML='<option value="">All teams</option>';
+  ts.forEach(function(t){
+   var o=document.createElement('option');o.value=t;o.textContent=t;
+   sel.appendChild(o);
+  });
+  sel.onchange=function(){team=sel.value;draw();};
+ }
+ var hs=document.querySelectorAll('#xgt2 thead th');
+ for(var i=0;i<hs.length;i++){
+  (function(i){
+   hs[i].style.cursor='pointer';
+   hs[i].onclick=function(){
+    if(key===i)desc=!desc;else{key=i;desc=(i>=4);}
+    draw();
+   };
+  })(i);
+ }
+ sync();
+})();
+</script>
+"""
+
+
 def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
     """#128/#120: 'Top xG performers'.
 
@@ -365,7 +522,11 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
     from src.models.fpl_leaders import rank_xg_leaders
     if not leaders.get("meta", {}).get("available"):
         return None
-    out = rank_xg_leaders(leaders, window=5, top_n=100)
+    # Ei keinotekoista kattoa: sivu listaa JOKAISEN pelaajan jolla on dataa
+    # ikkunassa (~497). API:n top_n on rajattu 100:aan (le=100), mutta tämä
+    # generaattori kutsuu mallia suoraan → ei kattoa. SPA/mobiili jäävät
+    # 100:aan kunnes API:n raja nostetaan (vaatii backend-deployn).
+    out = rank_xg_leaders(leaders, window=5, top_n=100000)
     rows = out["players"]
     if not rows:
         return None
@@ -386,6 +547,13 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
     )
     # Koko lista taulukkona. Kaksi desimaalia on tarkoituksellista: 0.46 ja
     # 0.54 eivät saa näyttää samalta (FPL-yhteisön palaute 26.7).
+    # Minuutit oletusikkunalle (w=5) server-renderoityyn tauluun. rank_xg_
+    # leaders ei palauta minuutteja, joten haetaan ne samasta lahteesta id:lla.
+    mins5 = {
+        p["id"]: sum(int(g.get("minutes") or 0)
+                     for g in (p.get("recent_games") or [])[-5:])
+        for p in (leaders.get("players") or [])
+    }
     trows = "".join(
         "<tr>"
         f'<td class="n">{i + 1}</td>'
@@ -396,19 +564,35 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         f'<td class="n hi">{r["xg_per_game"]:.2f}</td>'
         f'<td class="n">{r["xa_per_game"]:.2f}</td>'
         f'<td class="n">{r["xgi_per_game"]:.2f}</td>'
+        f'<td class="n">{mins5.get(r["id"], 0)}</td>'
         f'<td class="n">{r["games"]}</td>'
         "</tr>"
         for i, r in enumerate(rows)
     )
+    controls = (
+        '<div class="lbctl">'
+        '<span class="lbl">Games</span><span id="xgw" class="chips"></span>'
+        '<span class="lbl">Rate</span><span id="xgr" class="chips"></span>'
+        '<span class="lbl">Min mins</span><span id="xgm" class="chips"></span>'
+        '<span class="lbl">Position</span><span id="xgp" class="chips"></span>'
+        '<select id="xgt" aria-label="Filter by team"></select>'
+        "</div>"
+        f'<p class="note" id="xgc">{len(rows)} players, per game, '
+        "last 5 games each. Click a column to sort.</p>"
+    )
     table = (
-        '<div class="lb-wrap"><table class="lb">'
+        '<div class="lb-wrap"><table class="lb" id="xgt2">'
         "<thead><tr>"
         '<th class="n">#</th><th>Player</th><th>Team</th><th>Pos</th>'
-        '<th class="n">Price</th><th class="n">xG/game</th>'
-        '<th class="n">xA/game</th><th class="n">xGI/game</th>'
-        '<th class="n">Games</th>'
+        '<th class="n">Price</th><th class="n">xG</th>'
+        '<th class="n">xA</th><th class="n">xGI</th>'
+        '<th class="n">Mins</th><th class="n">Games</th>'
         "</tr></thead>"
-        f"<tbody>{trows}</tbody></table></div>"
+        f'<tbody id="xgb">{trows}</tbody></table></div>'
+    )
+    payload = (
+        '<script id="xgdata">window.__XG__='
+        f"{_xg_payload(leaders)};</script>"
     )
     hero = (
         "<h1>Top xG performers in FPL</h1>"
@@ -419,11 +603,13 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
     body = (
         f'<p class="note"><strong>{escape(basis)}</strong></p>'
         f'<div class="stat-row">{top3}</div>'
-        f"<h2>Full leaderboard: top {len(rows)}</h2>"
-        '<p class="note">xG, xA and xGI per game, to two decimals. All of it '
-        "free: this is public FPL match data, so it is not behind a "
-        "subscription.</p>"
-        f"{table}"
+        f"<h2>Full leaderboard: every player with data ({len(rows)})</h2>"
+        '<p class="note">Two decimals, because 0.46 and 0.54 are not the same '
+        "player. Switch between per game and per 90 minutes, pick a 3, 5 or 10 "
+        "game window, filter by position or team, and sort any column. No "
+        "cut-off and no sign-in: this is public FPL match data, so it is not "
+        "behind a subscription.</p>"
+        f"{controls}{table}{payload}{XG_JS}"
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )
