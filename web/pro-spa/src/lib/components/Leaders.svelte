@@ -14,9 +14,9 @@
 	 * (xP, captain ranker, chips, edge), ei menneisyyteen.
 	 */
 	import { capture } from '$lib/analytics';
-	// 26.7 visuaalinen remontti: joukkuepaita riveihin. IP-turva: neutraali
-	// siluetti + klubin primary-vari, EI pelaajakuvia eika krestejä.
-	import TeamKit from './TeamKit.svelte';
+	// 26.7: joukkuepaidat riveilla. IP-turva: neutraali siluetti + klubin
+	// primary-vari, EI pelaajakuvia eika krestejä. Renderoidaan <symbol>+<use>
+	// -parina (ks. PERF-huomio alempana), joten TeamKit-komponenttia ei tarvita.
 	import { teamColorByShort } from '$lib/teamColors';
 	import {
 		fetchDefconLeaders,
@@ -172,7 +172,50 @@
 		capture('upgrade_tapped', { source: 'fantasy_leaders' });
 		onUpgrade?.();
 	}
+
+	// 26.7 PERF: TeamKit renderoi per rivi 4 polkua + tekstin = ~500 SVG-solmua
+	// 100 rivilla, ja lajittelu siirtelee ne kaikki -> lagi. Sama korjaus kuin
+	// staattisella /fpl/xg-leaders-sivulla: yksi <symbol> per joukkue kerran,
+	// rivit viittaavat siihen <use>:lla.
+	const JERSEY =
+		'M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 ' +
+		'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
+	const SLEEVE_L = 'M 33 15 L 16 27 L 24 42 L 33 36 Z';
+	const SLEEVE_R = 'M 67 15 L 84 27 L 76 42 L 67 36 Z';
+	function darken(hex: string, f = 0.7): string {
+		const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+		if (!m) return hex;
+		const n = parseInt(m[1], 16);
+		const p = [16, 8, 0].map((s) => Math.max(0, Math.round(((n >> s) & 0xff) * f)));
+		return `#${p.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+	}
+	const kitDefs = $derived(
+		teams.map((t) => {
+			const c = teamColorByShort(t);
+			return { short: t, color: c.color, sleeve: darken(c.color) };
+		})
+	);
 </script>
+
+<!-- Paitakirjasto kerran: rivit viittaavat naihin <use>:lla (perf). -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+	<defs>
+		{#each kitDefs as k (k.short)}
+			<symbol id="lk{k.short}" viewBox="0 0 100 100">
+				<path d={JERSEY} fill={k.color} />
+				<path d={SLEEVE_L} fill={k.sleeve} />
+				<path d={SLEEVE_R} fill={k.sleeve} />
+				<path
+					d={JERSEY}
+					fill="none"
+					stroke="rgba(10,8,32,0.28)"
+					stroke-width="3"
+					stroke-linejoin="round"
+				/>
+			</symbol>
+		{/each}
+	</defs>
+</svg>
 
 <h2>xG leaders</h2>
 <p class="muted">
@@ -263,12 +306,9 @@
 						<tr>
 							<td class="muted">{i + 1}</td>
 							<td class="pl">
-								<TeamKit
-									color={teamColorByShort(a.row.team_short).color}
-									textColor={teamColorByShort(a.row.team_short).textColor}
-									label={a.row.team_short}
-									size={26}
-								/>
+								<svg class="kit" width="26" height="26" aria-hidden="true">
+									<use href="#lk{a.row.team_short}" />
+								</svg>
 								<span>{a.row.web_name} <span class="muted">({a.row.team_short})</span></span>
 							</td>
 							<td>{a.row.pos}</td>
@@ -329,12 +369,9 @@
 						<tr>
 							<td class="muted">{i + 1}</td>
 							<td class="pl">
-								<TeamKit
-									color={teamColorByShort(p.team_short).color}
-									textColor={teamColorByShort(p.team_short).textColor}
-									label={p.team_short}
-									size={26}
-								/>
+								<svg class="kit" width="26" height="26" aria-hidden="true">
+									<use href="#lk{p.team_short}" />
+								</svg>
 								<span>{p.web_name} <span class="muted">({p.team_short})</span></span>
 							</td>
 							<td>{p.pos}</td>
@@ -399,6 +436,10 @@
 	}
 	.pl :global(svg) {
 		flex: 0 0 auto;
+	}
+	.kit {
+		flex: 0 0 auto;
+		display: block;
 	}
 	.basis {
 		color: var(--giq-gold-deep, #f4a800);
