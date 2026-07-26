@@ -38,6 +38,9 @@ raw_data/
 !/data/accuracy.json
 # FPL Phase 0 -projektio: ajastettu refresh ylläpitää, Render lukee gitistä (/api/fantasy).
 !/data/fpl_projections_phase0.json
+# xP-backtestin tiiviste (26.7): rate-team-selite kertoo projektioiden
+# osuvuuden, ja taysi raportti on logs/-alla gitignorattuna -> Render lukee taman.
+!/data/fpl_xp_accuracy.json
 # FPL Phase 1 xP -projektio: sama refresh-konventio (/api/fantasy/xp).
 !/data/fpl_xp_projections.json
 # Koko kauden 380 fixturen CS/FDR/1X2 (chip-EV lukee Renderilla gitista;

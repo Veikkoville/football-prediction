@@ -103,6 +103,18 @@ export interface RateTeamResponse {
 		note?: string;
 		/** #50: backendin uusi semantiikka ('optimal_team'), defensiivinen */
 		rating_method?: string;
+		/** 26.7: walk-forward-backtestin tiiviste, jotta rating on falsifioituva. */
+		projection_accuracy?: {
+			meta?: { season?: string; gate_passed?: boolean; method?: string };
+			played: {
+				n_gws: number;
+				mae_xp: number;
+				mae_baseline: number;
+				rho_xp: number;
+				rho_baseline: number;
+			};
+			known_bias?: { signed_bias_xp?: number; note?: string };
+		} | null;
 		[key: string]: unknown;
 	};
 	team: {

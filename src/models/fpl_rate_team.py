@@ -18,12 +18,34 @@ koskemattomaksi — tämä moduuli vain LUKEE saman projektion.
 """
 from __future__ import annotations
 
+import json
 import threading
 import time
+from pathlib import Path
 
 import requests
 
 from src.models.fpl_xp import load_xp
+
+# 26.7: projektioiden osuvuus rating-vastaukseen. Committoitu tiiviste
+# (logs/ on gitignored -> Render ei nakisi sita). Puuttuva tiedosto EI kaada
+# rate-teamia: palautetaan None ja UI jattaa rivin pois.
+_XP_ACCURACY_PATH = (Path(__file__).resolve().parents[2] / "data"
+                     / "fpl_xp_accuracy.json")
+_XP_ACCURACY_UNSET = object()
+_xp_accuracy_cache: object = _XP_ACCURACY_UNSET
+
+
+def _load_xp_accuracy() -> dict | None:
+    """Luetaan kerran prosessin elinaikana. Puuttuva/rikki tiedosto -> None."""
+    global _xp_accuracy_cache
+    if _xp_accuracy_cache is _XP_ACCURACY_UNSET:
+        try:
+            _xp_accuracy_cache = json.loads(
+                _XP_ACCURACY_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            _xp_accuracy_cache = None
+    return _xp_accuracy_cache  # type: ignore[return-value]
 
 FPL_BASE = "https://fantasy.premierleague.com/api"
 FPL_TIMEOUT_SEC = 15
@@ -702,6 +724,10 @@ def rate_team(entry: int | None = None, gw: int | None = None,
             "generated_at": xp_data["meta"].get("generated_at"),
             "horizon_gw": xp_data["meta"].get("horizon_gw"),
             "rating_method": "vs_optimal_budget_team",
+            # 26.7: projektioiden osuvuus mukaan vastaukseen, jotta rating on
+            # falsifioituva eika vain sisaisesti johdonmukainen. Lahde on
+            # committoitu tiiviste walk-forward-backtestista (koko 25/26).
+            "projection_accuracy": _load_xp_accuracy(),
             "note": ("GoalIQ model projections, not FPL official expected "
                      "points. For fun and planning, not betting advice."),
         },

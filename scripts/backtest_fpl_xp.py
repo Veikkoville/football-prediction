@@ -421,6 +421,50 @@ def main() -> int:
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2),
                    encoding="utf-8")
     print(f"\nRaportti: {out}")
+
+    # 26.7: committoitava tiiviste rate-team-selitetta varten. Taysi raportti
+    # on gitignored (logs/), joten Render ei nakisi sita — ja ilman tata luvut
+    # olisi pitanyt kovakoodata copyyn, jolloin ne vanhenisivat hiljaa
+    # seuraavassa refitissa. Vain paaajo kirjoittaa (ei --raw/--legacy-bps,
+    # jotka ovat vertailuajoja).
+    if not args.raw and not args.legacy_bps:
+        agg = report["aggregates"]["played_full"]
+        summary = {
+            "meta": {
+                "source": out.name,
+                "generated_at": report["generated_at"],
+                "season": report["season"],
+                "method": ("walk-forward backtest on the completed season; the "
+                           "model only ever saw gameweeks before the one it "
+                           "predicted"),
+                "population": report["gate"].get("population"),
+                "gate_passed": bool(report["gate"]["PASS"]),
+            },
+            "played": {
+                "gw_range": agg["gw_range"], "n_gws": agg["n_gws"],
+                "mae_xp": round(agg["mae_xp"], 3),
+                "mae_baseline": round(agg["mae_base"], 3),
+                "rho_xp": round(agg["rho_xp"], 3),
+                "rho_baseline": round(agg["rho_base"], 3),
+            },
+            "by_position": {
+                k: {"n": v["n"], "mae_xp": round(v["mae_xp"], 3),
+                    "mae_baseline": round(v["mae_base"], 3)}
+                for k, v in report.get("by_position", {}).items()
+            },
+            "known_bias": {
+                "signed_bias_xp": round(
+                    report["slices"]["muut (ei nousijaa, GW7+)"]["bias_xp"], 3),
+                "note": ("negative = the model under-predicts points on "
+                         "average; ranking is unaffected, absolute values run "
+                         "low"),
+            },
+        }
+        acc = config.PROJECT_ROOT / "data" / "fpl_xp_accuracy.json"
+        acc.write_text(json.dumps(summary, ensure_ascii=False, indent=1),
+                       encoding="utf-8")
+        print(f"Tiiviste (committoitava): {acc}")
+
     return 0 if report["gate"]["PASS"] else 2
 
 

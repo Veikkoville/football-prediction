@@ -434,6 +434,28 @@
 						your squad capture? It says nothing about your rank, and projections are estimates,
 						not outcomes.
 					</p>
+					<!-- 26.7: rating on vain niin hyva kuin projektiot sen alla, joten
+					     ne on graded ja luku naytetaan. Tekee ratingista falsifioituvan
+					     eika vain sisaisesti johdonmukaisen. -->
+					{#if data.meta.projection_accuracy}
+						{@const acc = data.meta.projection_accuracy}
+						<p>
+							<strong>How good are the projections?</strong> Graded on the whole
+							{acc.meta?.season ?? 'previous'} season, walk-forward, so the model only ever saw
+							gameweeks before the one it predicted. Average error
+							<strong>{acc.played.mae_xp}</strong> points per player per gameweek against
+							{acc.played.mae_baseline} for a form-based baseline, over {acc.played.n_gws}
+							gameweeks. Rank correlation {acc.played.rho_xp} against {acc.played.rho_baseline}.
+						</p>
+						{#if acc.known_bias?.signed_bias_xp != null}
+							<p>
+								One known flaw, stated rather than hidden: the model under-predicts by about
+								{Math.abs(acc.known_bias.signed_bias_xp).toFixed(2)} points per player per gameweek.
+								That shifts every projection the same way, so the ranking holds, but absolute
+								xP runs low.
+							</p>
+						{/if}
+					{/if}
 				</details>
 			</div>
 		</div>
