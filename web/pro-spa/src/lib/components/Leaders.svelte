@@ -58,8 +58,108 @@
 		}
 	});
 
-	// xG: koko lista kaikille, myös ilmaiskäyttäjille.
-	const xgVisible = $derived(xg?.players ?? []);
+	// 26.7: sama kontrollisetti kuin julkisella /fpl/xg-leaders-sivulla. Ilman
+	// naita SPA oli kapeampi kuin ilmainen SEO-sivu, mika on vaara suunta.
+	// Season-nakymassa vasen vaihtoehto on TOTAALI, ei per ottelu: meilla on
+	// avaukset (starts) muttei esiintymisia, joten aitoa per-ottelu-jakajaa ei ole.
+	let per90 = $state(false);
+	let minMins = $state(0);
+	let posFilter = $state('');
+	let teamFilter = $state('');
+	let sortKey = $state<'xg' | 'xa' | 'xgi' | 'mins' | 'price' | 'games' | 'name'>('xg');
+	let sortDesc = $state(true);
+	let seasonView = $state(false);
+
+	const MIN_MINS = [0, 90, 180, 270];
+
+	type Agg = {
+		row: (typeof xgRowsRaw)[number];
+		xg: number;
+		xa: number;
+		xgi: number;
+		mins: number;
+		games: number;
+	};
+
+	const xgRowsRaw = $derived(xg?.players ?? []);
+
+	function agg(r: (typeof xgRowsRaw)[number]): Agg {
+		if (seasonView) {
+			const s = r.season;
+			const mins = s?.mins ?? 0;
+			const d = per90 ? mins / 90 : 1;
+			const k = d > 0 ? d : 1;
+			return {
+				row: r,
+				xg: (s?.xg ?? 0) / k,
+				xa: (s?.xa ?? 0) / k,
+				xgi: (s?.xgi ?? 0) / k,
+				mins,
+				games: s?.starts ?? 0
+			};
+		}
+		const mins = r.mins ?? 0;
+		const d = per90 ? mins / 90 : r.games;
+		const k = d > 0 ? d : 1;
+		return {
+			row: r,
+			xg: (r.xg_per_game * r.games) / k,
+			xa: (r.xa_per_game * r.games) / k,
+			xgi: (r.xgi_per_game * r.games) / k,
+			mins,
+			games: r.games
+		};
+	}
+
+	const teams = $derived([...new Set(xgRowsRaw.map((r) => r.team_short))].sort());
+
+	const xgVisible = $derived.by(() => {
+		const out: Agg[] = [];
+		for (const r of xgRowsRaw) {
+			if (posFilter && r.pos !== posFilter) continue;
+			if (teamFilter && r.team_short !== teamFilter) continue;
+			if (seasonView && !r.season) continue;
+			const a = agg(r);
+			if (per90 && a.mins < 1) continue;
+			if (a.mins < minMins) continue;
+			out.push(a);
+		}
+		const dir = sortDesc ? -1 : 1;
+		out.sort((x, y) => {
+			if (sortKey === 'name') return dir * y.row.web_name.localeCompare(x.row.web_name);
+			if (sortKey === 'price') return dir * (y.row.price - x.row.price);
+			return dir * ((y[sortKey] as number) - (x[sortKey] as number));
+		});
+		return out;
+	});
+
+	// Naytetaan 100 riviä kerrallaan. Sama oppi kuin /fpl/xg-leaders-sivulla:
+	// koko listan (373) renderointi jokaisella suodatinklikkauksella lagasi.
+	// Suodatus ja lajittelu koskevat silti KOKO aineistoa.
+	const RENDER_LIMIT = 100;
+	let showAllXg = $state(false);
+	const xgShown = $derived(showAllXg ? xgVisible : xgVisible.slice(0, RENDER_LIMIT));
+
+	function sortBy(k: typeof sortKey) {
+		if (sortKey === k) sortDesc = !sortDesc;
+		else {
+			sortKey = k;
+			sortDesc = k !== 'name';
+		}
+	}
+
+	function setSeason(v: boolean) {
+		seasonView = v;
+		// Per 90:een siirryttaessa oletuskynnys paalle, takaisin pois.
+		if (!v && minMins === 180 && !per90) minMins = 0;
+	}
+
+	function setPer90(v: boolean) {
+		const was = per90;
+		per90 = v;
+		if (!was && v && minMins === 0) minMins = 180;
+		if (was && !v && minMins === 180) minMins = 0;
+	}
 	const dcVisible = $derived(
 		premium ? (defcon?.players ?? []) : (defcon?.players ?? []).slice(0, FREE_ROWS)
 	);
@@ -76,19 +176,56 @@
 	Top expected-goals producers over each player's last {xg?.meta?.window ?? gameWindow} games, from
 	official FPL match data.
 </p>
-<!-- #137: pelimäärävalitsin — vaihtaa window-parametrin molemmille listoille -->
+<!-- #137 + 26.7: sama kontrollisetti kuin julkisella /fpl/xg-leaders-sivulla.
+     Games vaihtaa window-parametrin molemmille listoille; Season, Rate, Min
+     mins, Position ja Team ovat klienttipuolen suodattimia xG-listalle. -->
 <div class="window-row">
 	<span class="muted">Games:</span>
 	{#each WINDOWS as w (w)}
 		<button
 			type="button"
 			class="window-chip"
-			class:on={gameWindow === w}
-			onclick={() => (gameWindow = w)}
+			class:on={!seasonView && gameWindow === w}
+			onclick={() => {
+				setSeason(false);
+				gameWindow = w;
+			}}
 		>
 			{w}
 		</button>
 	{/each}
+	<button
+		type="button"
+		class="window-chip"
+		class:on={seasonView}
+		onclick={() => setSeason(true)}>Season</button
+	>
+	<span class="muted">Rate:</span>
+	<button type="button" class="window-chip" class:on={!per90} onclick={() => setPer90(false)}>
+		{seasonView ? 'Total' : 'Per game'}
+	</button>
+	<button type="button" class="window-chip" class:on={per90} onclick={() => setPer90(true)}>
+		Per 90
+	</button>
+	<span class="muted">Min mins:</span>
+	{#each MIN_MINS as m (m)}
+		<button type="button" class="window-chip" class:on={minMins === m} onclick={() => (minMins = m)}>
+			{m === 0 ? 'Any' : `${m}+`}
+		</button>
+	{/each}
+	<span class="muted">Pos:</span>
+	{#each ['', 'GKP', 'DEF', 'MID', 'FWD'] as pp (pp)}
+		<button
+			type="button"
+			class="window-chip"
+			class:on={posFilter === pp}
+			onclick={() => (posFilter = pp)}>{pp === '' ? 'All' : pp}</button
+		>
+	{/each}
+	<select bind:value={teamFilter} aria-label="Filter by team">
+		<option value="">All teams</option>
+		{#each teams as tt (tt)}<option value={tt}>{tt}</option>{/each}
+	</select>
 </div>
 {#if basisLabel}
 	<!-- Data-rajoitus ensiluokkaisena: basis-label aina näkyvissä -->
@@ -108,39 +245,53 @@
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Player</th>
+						<th><button type="button" class="sortbtn" onclick={() => sortBy('name')}>Player</button></th>
 						<th>Pos</th>
-						<th class="num">Price</th>
-						<th class="num"><abbr title="Expected goals per game over the window">xG/game</abbr></th>
-						<th class="num"><abbr title="Expected assists per game over the window">xA/game</abbr></th>
-						<th class="num"><abbr title="Expected goal involvements (goals + assists) per game">xGI/game</abbr></th>
-						<th class="num"><abbr title="Games played in the window (real sample size)">Games</abbr></th>
+						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('price')}>Price</button></th>
+						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xg')}>xG</button></th>
+						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xa')}>xA</button></th>
+						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xgi')}>xGI</button></th>
+						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('mins')}>Mins</button></th>
+						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('games')}>{seasonView ? 'Starts' : 'Games'}</button></th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each xgVisible as p, i (p.id)}
+					{#each xgShown as a, i (a.row.id)}
 						<tr>
 							<td class="muted">{i + 1}</td>
 							<td class="pl">
 								<TeamKit
-									color={teamColorByShort(p.team_short).color}
-									textColor={teamColorByShort(p.team_short).textColor}
-									label={p.team_short}
+									color={teamColorByShort(a.row.team_short).color}
+									textColor={teamColorByShort(a.row.team_short).textColor}
+									label={a.row.team_short}
 									size={26}
 								/>
-								<span>{p.web_name} <span class="muted">({p.team_short})</span></span>
+								<span>{a.row.web_name} <span class="muted">({a.row.team_short})</span></span>
 							</td>
-							<td>{p.pos}</td>
-							<td class="num">{p.price.toFixed(1)}</td>
-							<td class="num strong">{p.xg_per_game.toFixed(2)}</td>
-							<td class="num">{p.xa_per_game.toFixed(2)}</td>
-							<td class="num">{p.xgi_per_game.toFixed(2)}</td>
-							<td class="num">{p.games}</td>
+							<td>{a.row.pos}</td>
+							<td class="num">{a.row.price.toFixed(1)}</td>
+							<td class="num strong">{a.xg.toFixed(2)}</td>
+							<td class="num">{a.xa.toFixed(2)}</td>
+							<td class="num">{a.xgi.toFixed(2)}</td>
+							<td class="num">{a.mins}</td>
+							<td class="num">{a.games}</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 		</div>
+		{#if !showAllXg && xgVisible.length > RENDER_LIMIT}
+			<button type="button" class="window-chip" onclick={() => (showAllXg = true)}>
+				Show all {xgVisible.length} players
+			</button>
+		{/if}
+		<p class="muted count">
+			{xgVisible.length} players{per90 ? ', per 90 minutes' : seasonView ? ', season totals' : ', per game'}{seasonView
+				? ', full season'
+				: `, last ${xg?.meta?.window ?? gameWindow} games each`}{minMins
+				? `, at least ${minMins} minutes played`
+				: ''}
+		</p>
 	{/if}
 
 	<h2 class="dc-title">DefCon leaders</h2>
@@ -209,6 +360,32 @@
 {/if}
 
 <style>
+	/* 26.7: aktiivinen suodatin auki tekstina, ei hiljaista rajausta */
+	.count {
+		font-size: var(--step--1);
+		margin: var(--s-2) 0 0;
+	}
+	/* 26.7: lajitteluotsikot ja joukkuevalitsin (pariteetti xg-leaders-sivun kanssa) */
+	.sortbtn {
+		background: none;
+		border: 0;
+		padding: 0;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+	}
+	.sortbtn:hover {
+		color: var(--giq-magenta-deep, #d6006e);
+	}
+	.window-row select {
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text);
+		font-weight: 600;
+		font-size: var(--step--1);
+		padding: 4px 10px;
+	}
 	/* 26.7: paita + nimi samalle riville, paita ei kutistu */
 	.pl {
 		display: flex;

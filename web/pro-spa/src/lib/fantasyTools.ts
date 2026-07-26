@@ -410,6 +410,16 @@ export interface XgLeaderRow {
 	xa_total: number;
 	xa_per_game: number;
 	xgi_per_game: number;
+	/** 26.7: minuutit ikkunassa (per 90 + minuuttikynnys). */
+	mins?: number;
+	/** 26.7: kausitotaalit koko kauden nakymaa varten. */
+	season?: {
+		mins: number;
+		starts: number;
+		xg: number;
+		xa: number;
+		xgi: number;
+	} | null;
 }
 
 export interface XgLeadersResponse {
@@ -444,8 +454,10 @@ export interface DefconLeadersResponse {
 
 /** #137: window = pelien lukumäärä (3-10). Vanha backend ignoroi → oletusikkuna. */
 export function fetchXgLeaders(window = 5): Promise<XgLeadersResponse> {
-	// 26.7: xG vapautettu ilmaiseksi → API:n maksimi (100) oletuksen 20 sijaan.
-	return getTool(`/api/fantasy/xg-leaders?window=${window}&top_n=100`, 'xg_leaders');
+	// 26.7: xG vapautettu ilmaiseksi ja klientilla on joukkue-/sijaintisuodattimet
+	// → haetaan koko aineisto, muuten suodattimet toimisivat vain top-100:aan.
+	// Naytto rajataan komponentissa (renderointi on hidas osa, ei fetch).
+	return getTool(`/api/fantasy/xg-leaders?window=${window}&top_n=1000`, 'xg_leaders');
 }
 
 export function fetchDefconLeaders(window = 5): Promise<DefconLeadersResponse> {

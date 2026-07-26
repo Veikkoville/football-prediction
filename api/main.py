@@ -2747,7 +2747,11 @@ def fantasy_xg_leaders(
     response: Response,
     window: int = Query(default=5, ge=3, le=10),
     pos: str | None = Query(default=None, pattern="^(GKP|DEF|MID|FWD)$"),
-    top_n: int = Query(default=20, ge=1, le=100),
+    # 26.7: katto 100 -> 1000. Klientti tarjoaa nyt joukkue- ja
+    # sijaintisuodattimet (pariteetti /fpl/xg-leaders-sivun kanssa), ja 100
+    # rivilla joukkuesuodatin antaisi 3-5 pelaajaa per klubi eli olisi
+    # kaytannossa hyodyton. Rankkaus on valmiiksi cachessa, ei laskentaa.
+    top_n: int = Query(default=20, ge=1, le=1000),
 ):
     """#124: top xG-tekijät rolling-windowilla (FPLWolfy-ehdotus). Rankkaa
     committatusta nightly-cachesta (data/fpl_player_leaders.json) — meta

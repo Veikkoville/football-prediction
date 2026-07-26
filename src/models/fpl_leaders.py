@@ -99,6 +99,12 @@ def rank_xg_leaders(data: dict, window: int = WINDOW_DEFAULT,
             "xa_total": round(xa, 2),
             "xa_per_game": round(xa / games, 2),
             "xgi_per_game": round(xgi / games, 2),
+            # 26.7: minuutit ikkunassa + kausitotaalit, jotta klientti voi
+            # tarjota samat valinnat kuin staattinen /fpl/xg-leaders-sivu:
+            # per 90 (tarvitsee minuutit), minuuttikynnys ja koko kausi.
+            # Ilman naita SPA jai kapeammaksi kuin julkinen ilmaissivu.
+            "mins": sum(int(g.get("minutes") or 0) for g in recent),
+            "season": p.get("season"),
         })
         rows.append(row)
     rows.sort(key=lambda r: (r["xg_per_game"], r["xg_total"]), reverse=True)
