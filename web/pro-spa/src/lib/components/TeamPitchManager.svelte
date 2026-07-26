@@ -421,9 +421,9 @@
 		cursor: pointer;
 	}
 	.chip.on {
-		background: var(--giq-magenta);
-		border-color: var(--giq-magenta);
-		color: #fff;
+		background: transparent;
+		border-color: var(--accent);
+		color: var(--accent-strong);
 	}
 	.xp-row {
 		display: flex;

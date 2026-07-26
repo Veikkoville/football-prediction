@@ -86,13 +86,14 @@
 		color: var(--text);
 		border-color: var(--text-muted);
 	}
+	/* 26.7 classic: aktiivinen segmentti = kulta-outline, ei täyttöä */
 	.seg-nav button.active {
-		background: var(--accent);
+		background: transparent;
 		border-color: var(--accent);
-		color: var(--accent-contrast);
+		color: var(--accent-strong);
 	}
 	.seg-nav button.active:hover {
-		background: var(--giq-magenta-deep);
-		border-color: var(--giq-magenta-deep);
+		background: rgba(182, 130, 53, 0.08);
+		border-color: var(--accent-strong);
 	}
 </style>

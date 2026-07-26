@@ -32,14 +32,16 @@
 		display: flex;
 		align-items: center;
 		gap: 0.7rem;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-left: 4px solid var(--giq-magenta);
-		border-radius: var(--radius, 12px);
+		/* 26.7 classic: tumma gradienttinauha → paperi + kulta-vasenrule.
+		   Sama kieli kuin muillakin korostuksilla: viiva kantaa painon. */
+		border: 1px solid var(--border);
+		border-left: 2px solid var(--accent);
+		border-radius: var(--radius, 2px);
 		padding: 0.75rem 0.9rem;
 		margin: 0 0 1rem;
 		text-decoration: none;
-		color: #fff;
-		background: linear-gradient(160deg, var(--giq-ink), var(--giq-ink-2));
+		color: var(--text);
+		background: var(--surface);
 	}
 	.league-banner:hover .cta {
 		text-decoration: underline;
@@ -57,10 +59,11 @@
 		font-size: var(--step--1, 0.85rem);
 	}
 	.text {
-		color: #c9c3da;
+		color: var(--text-muted);
 	}
 	.cta {
-		color: var(--giq-gold);
+		/* gold-deep, koska nauha on nyt vaalealla paperilla (AA pienessä koossa) */
+		color: var(--accent-strong);
 		font-weight: 700;
 	}
 </style>

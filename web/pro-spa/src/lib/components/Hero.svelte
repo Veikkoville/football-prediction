@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { auth, sendPasswordReset, signOut } from '$lib/auth.svelte';
 	import { capture } from '$lib/analytics';
-	import icon from '$lib/assets/goaliq-appicon-192.png';
 	import SetPassword from './SetPassword.svelte';
 
 	// #149: tilaustaso-badge lukee SAMAN auth.sub-tilan jota ProView gateaa →
@@ -49,7 +48,33 @@
 
 <header class="hero">
 	<div class="brand">
-		<img src={icon} alt="" width="44" height="44" />
+		<!-- 26.7 classic: merkki outlineksi. App-ikoni (magentatäytteinen PNG)
+		     oli sivun ainoa magentaläikkä ja rikkoi ilmeen omaa sääntöä
+		     (magenta = mark/captain/live, ei koskaan täyttö). Muoto säilyy —
+		     pyöristetty neliö + IQ-aksentti, sama kaava kuin wordmarkissa.
+		     HUOM: app-ikonia/faviconia EI muuteta; ne tarvitsevat täytön
+		     erottuakseen kotinäytöllä ja kauppalistauksella. -->
+		<svg class="mark" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+			<rect
+				x="1.2"
+				y="1.2"
+				width="41.6"
+				height="41.6"
+				rx="9"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.4"
+			/>
+			<text
+				x="22"
+				y="29"
+				text-anchor="middle"
+				font-family="var(--font-display)"
+				font-size="20"
+				font-weight="600"
+				fill="currentColor">I<tspan fill="var(--giq-magenta)">Q</tspan></text
+			>
+		</svg>
 		<div>
 			<div class="word">Goal<span>IQ</span> Premium</div>
 			<div class="tag">
@@ -107,21 +132,17 @@
 
 <style>
 	.hero {
-		/* #53: tumma ink-bändi vaalealla sivulla = brändin header-kieli
-		   (vrt. privacy.html). Token-overridet: lapset (.muted, ghost-nappi)
-		   perivät bändin tummat roolivärit ilman komponenttimuutoksia. */
-		--text: var(--giq-cream);
-		--text-muted: #c9c3da;
-		--border: rgba(255, 255, 255, 0.25);
+		/* 26.7 classic: tumma bändi pois. Ohjelmalehden ylätunniste on samaa
+		   paperia kuin sivu, ja sen erottaa VAIN hiusviiva alla — ei täyttöä,
+		   ei gradienttia, ei varjoa. Aiemmat token-overridet (vaalea teksti
+		   tummalla) poistettiin, koska pohja on nyt paperi. */
 		color: var(--text);
-		/* 24.7 redesign-pariteetti: sama gradientti + magenta-alaraita kuin
-		   goaliq.app-landingin hero-shellissä */
-		background: linear-gradient(160deg, var(--giq-ink) 0%, var(--giq-ink-2) 70%, #1c1030 100%);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-bottom: 4px solid var(--giq-magenta);
-		border-radius: 16px;
-		box-shadow: 0 8px 24px rgba(10, 8, 32, 0.18);
-		padding: var(--s-6) var(--s-6);
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid var(--border);
+		border-radius: 0;
+		box-shadow: none;
+		padding: var(--s-4) 0 var(--s-5);
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--s-4);
@@ -133,9 +154,10 @@
 		align-items: center;
 		gap: var(--s-3);
 	}
-	.brand img {
-		border-radius: 11px;
+	.mark {
 		display: block;
+		color: var(--text);
+		flex: 0 0 auto;
 	}
 	.word {
 		font-size: 26px;
@@ -225,9 +247,11 @@
 		border-radius: 999px;
 		white-space: nowrap;
 	}
+	/* 26.7 classic: premium-merkki on outline, ei magentaläikkä */
 	.plan.premium {
-		background: var(--giq-magenta);
-		color: var(--giq-ink);
+		background: transparent;
+		border: 1px solid var(--accent);
+		color: var(--accent-strong);
 	}
 	.plan.free {
 		background: none;

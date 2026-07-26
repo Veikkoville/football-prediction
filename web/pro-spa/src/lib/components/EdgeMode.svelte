@@ -222,10 +222,11 @@
 		color: var(--text);
 		border-color: var(--text-muted);
 	}
+	/* 26.7 classic: outline, ei täyttöä */
 	.mode-btn.active {
-		background: var(--accent);
+		background: transparent;
 		border-color: var(--accent);
-		color: var(--accent-contrast);
+		color: var(--accent-strong);
 	}
 	.edge-form {
 		display: flex;

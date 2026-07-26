@@ -91,10 +91,12 @@
 		padding: var(--s-2) var(--s-4);
 		min-height: 44px;
 	}
+	/* 26.7 classic: aktiivinen tila = kulta-outline + kulta teksti. Magenta on
+	   varattu mark/captain/live-käyttöön eikä sitä käytetä täyttönä. */
 	.tabs button.active {
-		background: var(--giq-magenta);
-		border-color: var(--giq-magenta);
-		color: #fff;
+		background: transparent;
+		border-color: var(--accent);
+		color: var(--accent-strong);
 	}
 	.tabs button:hover:not(.active) {
 		color: var(--text);

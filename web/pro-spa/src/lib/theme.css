@@ -1,39 +1,49 @@
 /* GoalIQ Pro: brändi-tokenit (goaliq-app/assets/brand/brand-tokens.md,
-   TÄSMÄHEXIT) + mittakaavat. Vaalea kanoninen brändi-ilme (#53):
-   kerma-pinnat, ink-teksti, magenta-aksentti (pariteetti mobiilin kanssa).
-   Muuttujien NIMET säilyvät, vain arvot vaihtuvat vaaleiksi. */
+   TÄSMÄHEXIT) + mittakaavat.
+   26.7 CLASSIC-ILME (Villen päätös): matchday-ohjelma dashboardin sijaan.
+   Sama tekniikka kuin 25.7. dark→light -vaihdossa: muuttujien NIMET
+   säilyvät, vain arvot vaihtuvat → komponentit seuraavat automaattisesti.
+
+   VÄRIDISIPLIINI (designin sääntö, ei saa rikkoa komponenteissa):
+     magenta #FF2E7E — VAIN mark, captain-rengas, live-tila. EI KOSKAAN täyttönä.
+     kulta   #B68235 — luvut, viivat, primary action (aina outline)
+     teal    #00C2AD — voitot, vain tekstinä tai viivana
+     coral   #FF6A3D — hitit, pudotukset, saatavuusliput
+   Numerot ovat sivun äänekkäin asia; väri kantaa merkitystä, ei koristetta. */
 :root {
 	/* brändi */
 	--giq-magenta: #ff2e7e;
-	--giq-magenta-deep: #d6006e;
+	--giq-magenta-deep: #c4005f;
 	--giq-magenta-light: #ff4d90;
 	--giq-coral: #ff6a3d;
-	--giq-gold: #ffc93c;
-	--giq-gold-deep: #f4a800;
+	/* kulta on nyt hillitty messinki (oli #ffc93c): se kantaa lukuja ja
+	   viivoja, joten sen on luettava myös pienenä tekstinä */
+	--giq-gold: #b68235;
+	--giq-gold-deep: #8c6428;
 	--giq-teal: #19e3d2;
 	--giq-teal-deep: #00c2ad;
-	--giq-ink: #0a0820;
-	--giq-ink-2: #140f1e;
-	--giq-cream: #fff6ec;
-	--giq-paper: #f6f4ff;
+	/* lämmin musta sinertävän inkin tilalla — paperi, ei ruutu */
+	--giq-ink: #201f1d;
+	--giq-ink-2: #2e2c28;
+	--giq-cream: #f3f2f2;
+	--giq-paper: #eae9e9;
 
-	/* roolit (vaalea pohja). Teksti-aksentit AA-kontrastilla kermalla:
-	   magenta-deep 4.8:1, positive 4.9:1, negative 4.8:1, muted 7.0:1. */
+	/* roolit (vaalea pohja). Teksti-aksentit AA-kontrastilla: gold-deep
+	   5.9:1, magenta-deep 5.6:1, negative 4.6:1, muted 5.4:1. */
 	--bg: var(--giq-cream);
 	--surface: #ffffff;
 	--surface-2: var(--giq-paper);
-	--border: rgba(10, 8, 32, 0.14);
+	/* hiusviiva kantaa rakenteen — siksi hieman vahvempi kuin ennen */
+	--border: rgba(32, 31, 29, 0.18);
 	--text: var(--giq-ink);
-	--text-muted: #575170;
-	--accent: var(--giq-magenta);
-	/* aksentti TEKSTINÄ vaalealla pohjalla (magenta ei riitä pieneen tekstiin) */
-	--accent-strong: var(--giq-magenta-deep);
+	--text-muted: #5c574f;
+	/* primary action = kulta, ei magenta (magenta on varattu kolmeen työhön) */
+	--accent: var(--giq-gold);
+	--accent-strong: var(--giq-gold-deep);
 	--accent-contrast: #ffffff;
-	/* syvennetyt teal/coral/kulta tekstikäyttöön vaalealla (teal-deep ja
-	   gold-deep jäävät alle AA:n leipätekstissä, siksi omat ink-sävyt) */
-	--positive: #00c2ad; /* #54: Teal Deep (kanoninen paletti) - ei vihreaa */
-	--negative: #c2410c;
-	--warn-text: #946300;
+	--positive: #00a896; /* teal, tekstitasoon syvennettynä */
+	--negative: #c4441a; /* coral, tekstitasoon syvennettynä */
+	--warn-text: #8c6428;
 
 	/* FDR 1-5 brändiasteikko (sama kuin fpl.html + Streamlit); käytetään
 	   vain ~14 % tint-taustoina vaalealla, joten kirkkaat hexit toimivat */
@@ -43,10 +53,13 @@
 	--fdr-4: var(--giq-coral);
 	--fdr-5: var(--giq-magenta-deep);
 
-	/* typografia — pariteetti goaliq.app-landingin kanssa (25.7, Villen havainto):
-	   Space Grotesk = VAIN display (otsikot, brändi, isot luvut), leipäteksti = system-stack */
-	--font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-	--font-display: 'Space Grotesk', -apple-system, 'Segoe UI', sans-serif;
+	/* typografia — 26.7 classic: tyyppi kantaa hierarkian. Cormorant Garamond
+	   otsikoihin (korkea kontrasti, ohjelmalehti-sävy), Lora leipään ja
+	   lukuihin (luettava serif). Nimet --font-sans/--font-display säilyvät,
+	   jotta komponentteja ei tarvitse käydä läpi; --font-sans ei siis enää
+	   tarkoita groteskia vaan "leipäteksti". */
+	--font-sans: 'Lora', Georgia, 'Times New Roman', serif;
+	--font-display: 'Cormorant Garamond', 'Lora', Georgia, serif;
 	--step--1: clamp(0.82rem, 0.8rem + 0.1vw, 0.88rem);
 	--step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1rem);
 	--step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.3rem);
@@ -62,9 +75,11 @@
 	--s-8: 2rem;
 	--s-12: 3rem;
 
-	--radius: 12px;
-	--radius-sm: 7px;
-	--shadow-1: 0 1px 2px rgba(10, 8, 32, 0.06), 0 2px 8px rgba(10, 8, 32, 0.08);
+	/* 26.7 classic: hiusviivat kantavat rakenteen, ei varjot eikä pyöristys.
+	   Nimet säilyvät, jotta komponenttien var()-viittaukset toimivat. */
+	--radius: 2px;
+	--radius-sm: 2px;
+	--shadow-1: none;
 	--shell: 1180px;
 }
 
@@ -90,9 +105,11 @@ h1,
 h2,
 h3 {
 	font-family: var(--font-display);
-	line-height: 1.15;
-	letter-spacing: -0.4px;
-	font-weight: 700;
+	line-height: 1.1;
+	/* Cormorant on kapea ja korkea — negatiivinen välistys tekisi siitä
+	   tukkoisen, joten se nollataan ja paino jää kevyeksi (600, ei 700). */
+	letter-spacing: 0;
+	font-weight: 600;
 	margin: 0 0 var(--s-3);
 }
 
@@ -139,14 +156,19 @@ abbr[title] {
 	cursor: help;
 }
 
+/* 26.7 classic: napit ovat outline-muotoisia — myös primary. Designin sääntö
+   1j:stä: "Primary stays an outline even here". Täyttö on varattu käytännössä
+   olemattomaksi, jotta luvut pysyvät sivun äänekkäimpänä asiana. */
 button {
-	font-family: inherit;
+	font-family: var(--font-sans);
 	font-size: var(--step-0);
 	cursor: pointer;
-	border-radius: 999px;
-	border: 2px solid transparent;
-	padding: 0.6em 1.4em;
-	font-weight: 700;
+	border-radius: var(--radius);
+	border: 1px solid var(--border);
+	background: transparent;
+	color: var(--text);
+	padding: 0.6em 1.3em;
+	font-weight: 600;
 	min-height: 44px;
 	transition:
 		background 150ms ease-out,
@@ -155,20 +177,23 @@ button {
 }
 
 button.primary {
-	background: var(--accent);
-	color: var(--accent-contrast);
+	background: transparent;
+	color: var(--accent-strong);
+	border-color: var(--accent);
 }
 button.primary:hover {
-	background: var(--giq-magenta-deep);
+	background: rgba(182, 130, 53, 0.08);
+	border-color: var(--accent-strong);
 }
 
 button.secondary {
 	background: transparent;
 	color: var(--text);
-	border-color: var(--accent);
+	border-color: var(--border);
 }
 button.secondary:hover {
-	background: rgba(255, 46, 126, 0.1);
+	border-color: var(--accent);
+	color: var(--accent-strong);
 }
 
 button.ghost {

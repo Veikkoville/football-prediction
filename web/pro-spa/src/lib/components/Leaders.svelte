@@ -478,10 +478,11 @@
 		white-space: nowrap;
 		line-height: 1.4;
 	}
+	/* 26.7 classic: outline, ei täyttöä */
 	.window-chip.on {
-		background: var(--giq-magenta);
-		border-color: var(--giq-magenta);
-		color: #fff;
+		background: transparent;
+		border-color: var(--accent);
+		color: var(--accent-strong);
 	}
 	.dc-title {
 		margin-top: var(--s-5);

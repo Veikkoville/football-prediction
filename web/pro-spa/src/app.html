@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#fff6ec" />
+		<meta name="theme-color" content="#f3f2f2" />
 		<title>GoalIQ Premium | FPL tools</title>
 		<meta
 			name="description"
@@ -31,10 +31,20 @@
 		<meta name="twitter:image" content="https://pro.goaliq.app/goaliq-appicon-512.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<!-- 26.7 PERF: preload+onload, ei render-blocking stylesheetiä (sama
+		     kaava kuin goaliq.app-sivuilla). noscript = varmistus. -->
 		<link
-			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"
-			rel="stylesheet"
+			rel="preload"
+			as="style"
+			href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap"
+			onload="this.rel='stylesheet'"
 		/>
+		<noscript>
+			<link
+				href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap"
+				rel="stylesheet"
+			/>
+		</noscript>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
