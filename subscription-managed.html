@@ -33,14 +33,14 @@
       -webkit-font-smoothing: antialiased;
     }
     h1, .brand { font-family:"Cormorant Garamond",Georgia,serif; }
-    .site-header { background: var(--cream); color: var(--cream); }
+    .site-header { background: var(--cream); color: var(--ink); }
     .bar { height:1px;background:var(--line); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px; width: 100%;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
-    .brand a { color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand a { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
     .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
     .brand span { color: var(--magenta); }
     main {
@@ -60,17 +60,19 @@
       margin: 0 0 8px;
     }
     p { color: var(--muted); font-size: 14px; line-height: 1.5; margin: 4px 0; }
+    /* 26.7 CLASSIC: magentatayttö -> gold outline (sivuston CTA-konventio). */
     main a {
       display: inline-block;
       margin-top: 24px;
       padding: 12px 24px;
-      background: var(--magenta);
-      color: var(--ink);
+      background: transparent;
+      color: var(--gold-deep,#8C6428);
+      border: 1px solid var(--gold,#B68235);
       text-decoration: none;
       border-radius: 999px;
       font-weight: 700;
     }
-    main a:hover { background: var(--magenta-deep); }
+    main a:hover { background: rgba(182,130,53,0.08); }
   </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
 </head>

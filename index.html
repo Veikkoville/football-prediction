@@ -178,7 +178,7 @@
     --hero-muted: #6E685E;
     --magenta: #FF2E7E;
     --magenta-deep: #C4005F;
-    --teal: #19E3D2;
+    --teal: #00C2AD;
     --teal-ink: #007A6C;
     --gold: #B68235;
     --radius: 2px;
@@ -240,7 +240,9 @@
   }
   .btn-ghost:hover { border-color: var(--gold); }
   .hero .cta-note { color: var(--hero-muted); font-size: 13px; margin-top: 14px; }
-  .hero .cta-note a { color: var(--teal); font-weight: 600; }
+  /* 26.7 CLASSIC: kirkas #19E3D2 on TEKSTINA lukukelvoton cream-pohjalla
+     (~1.9:1). Teksti kayttaa aina --teal-inkia; kirkas teal jaa viivoille. */
+  .hero .cta-note a { color: var(--teal-ink); font-weight: 600; }
 
   /* Track record -chip herossa: GEN:ACC-CHIP elaa taalla (.num/.lbl) */
   .record-chip {
@@ -251,7 +253,7 @@
   .record-chip .num { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; line-height: 1.1; }
   .record-chip .lbl { font-size: 13px; color: var(--hero-muted); max-width: 40ch; line-height: 1.35; }
   .record-chip .tr-links { font-size: 13px; margin-top: 6px; }
-  .record-chip .tr-links a { color: var(--teal); font-weight: 600; }
+  .record-chip .tr-links a { color: var(--teal-ink); font-weight: 600; }
 
   /* #72: GW-deadline-countdown herossa (tummat tokenit) */
   .countdown { display: flex; flex-direction: column; gap: 8px; margin: 24px 0 0; }
@@ -261,7 +263,7 @@
   .cd-box .cd-num { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1.1; }
   .cd-box .cd-unit { display: block; font-size: 10px; font-weight: 600; color: var(--hero-muted); text-transform: uppercase; letter-spacing: 0.08em; }
   .cd-sep { font-size: 18px; font-weight: 700; color: var(--hero-muted); }
-  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--teal); text-decoration: none; }
+  .countdown .cd-cta { font-size: 14px; font-weight: 700; color: var(--teal-ink); text-decoration: none; }
   .countdown .cd-cta:hover { text-decoration: underline; }
 
   /* ============ CSS-tuotemockup (oikeat mallin luvut, paivitetaan kasin
@@ -277,7 +279,9 @@
   .mock-head .gw { font-size: 11px; color: var(--hero-muted); }
   .mock-tabs { display: flex; gap: 6px; padding: 12px 14px 4px; }
   .mock-tab { font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-  .mock-tab.on { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+  /* 26.7 CLASSIC: valittu valilehti oli mockupin ainoa magentatayttö.
+     Outline + kulta = sama kuin sovelluksen oikeat segmenttipillerit. */
+  .mock-tab.on { background: transparent; border-color: var(--gold); color: var(--gold-deep); }
   .mock-rows { padding: 8px 14px 6px; }
   .mock-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--line); }
   .mock-row:last-child { border-bottom: 0; }
@@ -348,7 +352,9 @@
   /* How it works */
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
   .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-1); }
-  .step .n { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,46,126,0.14); color: var(--magenta-deep); font-family: var(--font-display); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 17px; }
+  /* 26.7 CLASSIC: magenta-tinttitaytto -> gold outline (magenta ei koskaan
+     tayttona; sama askelmerkki-kaava kuin delete-account.html:ssa). */
+  .step .n { width: 38px; height: 38px; border-radius: 999px; background: transparent; border: 1px solid var(--gold); color: var(--gold-deep); font-family: var(--font-display); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 17px; }
   .step h3 { font-size: 19px; margin-bottom: 8px; }
   .step p { color: var(--muted); font-size: 15px; }
 

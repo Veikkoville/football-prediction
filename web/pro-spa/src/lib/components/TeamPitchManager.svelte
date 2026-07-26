@@ -494,15 +494,20 @@
 		position: relative;
 		display: inline-block;
 	}
+	/* 26.7 CLASSIC: kapteenimerkki on RENGAS, ei täyttö. Magenta on varattu
+	   kolmeen työhön (mark, captain, live) ja aina outlinena — täytetty
+	   pallo oli kentän ainoa magentaläikkä ja rikkoi ilmeen omaa sääntöä.
+	   Tausta on paperi eikä läpinäkyvä, jotta rengas erottuu paidan päällä. */
 	.badge {
 		position: absolute;
 		top: -3px;
 		right: -5px;
 		width: 15px;
 		height: 15px;
-		border-radius: 8px;
-		background: var(--giq-magenta);
-		color: #fff;
+		border-radius: 999px;
+		background: var(--surface);
+		border: 1.5px solid var(--giq-magenta);
+		color: var(--giq-magenta-deep);
 		font-size: 9px;
 		font-weight: 800;
 		display: flex;
@@ -510,7 +515,8 @@
 		justify-content: center;
 	}
 	.badge.vice {
-		background: var(--text-muted);
+		border-color: var(--border);
+		color: var(--text-muted);
 	}
 	.pname {
 		font-size: 10px;

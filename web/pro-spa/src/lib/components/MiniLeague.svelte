@@ -294,13 +294,15 @@
 	.h2h-head {
 		margin: 0 0 var(--s-2);
 	}
+	/* 26.7 CLASSIC: palkki oli 18px täyttöä kolmella brändivärillä — ilme
+	   sallii värin VIIVANA, ei täyttönä. Sama tieto luetaan 4px:n viivalta,
+	   ja prosentit ovat joka tapauksessa legendassa lukuina (= sivun
+	   äänekkäin asia). Legendan pallot ovat samasta syystä viivapätkiä. */
 	.h2h-bar {
 		display: flex;
-		height: 18px;
-		border-radius: 999px;
+		height: 4px;
 		overflow: hidden;
-		border: 1px solid var(--border);
-		margin-bottom: var(--s-2);
+		margin-bottom: var(--s-3);
 	}
 	.seg.a,
 	.dot.a {
@@ -322,10 +324,10 @@
 	}
 	.dot {
 		display: inline-block;
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-		margin-right: 5px;
+		width: 14px;
+		height: 3px;
+		vertical-align: middle;
+		margin-right: 6px;
 	}
 	.h2h-note {
 		margin: 0;

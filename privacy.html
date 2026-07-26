@@ -51,8 +51,8 @@
       --card: #FFFFFF;
       --line: rgba(32,31,29,0.18);
       --muted: #5C574F;
-      --hero-muted: #575170;
-      --teal: #19E3D2;
+      --hero-muted: #6E685E;
+      --teal: #00C2AD;
       --radius: 2px;
     }
     * { box-sizing: border-box; }
@@ -66,21 +66,21 @@
       -webkit-font-smoothing: antialiased;
     }
     h1, h2, h3, .brand { font-family:"Cormorant Garamond",Georgia,serif; }
-    .site-header { background: var(--cream); color: var(--cream); border-bottom: 1px solid var(--line); }
+    .site-header { background: var(--cream); color: var(--ink); border-bottom: 1px solid var(--line); }
     .bar { height:1px;background:var(--line); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
-    .brand a { color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand a { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
     .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
     .brand span { color: var(--magenta); }
     .nav-cta {
       display: inline-block; background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235);
       text-decoration: none; padding: 11px 20px; border-radius: 999px; font-weight: 800; font-size: 14px;
     }
-    .nav-cta:hover { background: var(--magenta-deep); }
+    .nav-cta:hover { background: rgba(182,130,53,0.08); }
     .site-footer { border-top: 1px solid var(--line); padding: 30px 0 40px; font-size: 14px; }
     .site-footer .foot { max-width: 960px; margin: 0 auto; padding: 0 20px; color: var(--hero-muted); }
     .site-footer a { color: var(--hero-muted); }

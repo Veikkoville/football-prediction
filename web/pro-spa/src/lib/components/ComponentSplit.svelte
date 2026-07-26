@@ -72,16 +72,16 @@
 		width: 130px;
 		flex: none;
 	}
+	/* 26.7 CLASSIC: 10px:n täyttöpalkki -> 3px:n viiva. Väri kantaa
+	   merkityksen viivana, ja luku oikealla on se mitä oikeasti luetaan. */
 	.bar {
 		flex: 1;
-		background: rgba(10, 8, 32, 0.08);
-		border-radius: 4px;
-		height: 10px;
+		background: rgba(32, 31, 29, 0.1);
+		height: 3px;
 	}
 	.fill {
-		background: var(--positive);
-		border-radius: 4px;
-		height: 10px;
+		background: var(--accent);
+		height: 3px;
 	}
 	.val {
 		width: 105px;

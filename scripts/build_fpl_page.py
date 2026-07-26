@@ -102,7 +102,8 @@ API_BASE = "https://goaliq-api.onrender.com"   # #85: accuracy-Datasetin distrib
 # täsmähexit, EI approksimaatioita): 1 helpoin = Teal → Gold → Gold Deep →
 # Coral → 5 vaikein = Magenta Deep. Tekstiväri kontrastin mukaan (1-4 ink,
 # 5 valkoinen) - arvot CSS:ssä.
-FDR_COLORS = {1: "#19E3D2", 2: "#FFC93C", 3: "#F4A800", 4: "#FF6A3D", 5: "#D6006E"}
+# 26.7 CLASSIC: FDR_COLORS poistettu — lämpökartta ei ole enää käytössä
+# (ks. cs_cell_class/fdr_cell_class). Vaikeus kannetaan luvun painolla.
 
 
 # ---------------------------------------------------------------------------
@@ -552,24 +553,30 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         f"<style>{BYCOMP_CSS}"
         ".rec-filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;}"
         ".rec-filter{border:1px solid rgba(128,128,128,.4);background:transparent;"
-        "color:inherit;border-radius:20px;padding:6px 14px;font-size:13px;"
+        "color:inherit;border-radius:2px;padding:6px 14px;font-size:13px;"
         "font-weight:600;cursor:pointer;}"
         ".rec-filter.on{background:transparent;border-color:#B68235;color:#8C6428;}"
         ".rec-scroll{overflow-x:auto;overflow-y:auto;max-height:560px;"
         "-webkit-overflow-scrolling:touch;border:1px solid rgba(128,128,128,.3);"
-        "border-radius:14px;}"
+        "border-radius:2px;}"
         ".rec-scroll table{width:100%;border-collapse:collapse;min-width:640px;}"
         ".rec-scroll th,.rec-scroll td{text-align:left;padding:8px 10px;"
         "border-bottom:1px solid rgba(128,128,128,.2);font-size:14px;}"
-        ".rec-scroll th{position:sticky;top:0;background:#FFF6EC;font-size:12px;"
+        # 26.7 CLASSIC: nämä värit ovat kovakoodattuja tähän Python-stringiin,
+        # joten kolme token-ajoa eivät nähneet niitä (var()-vaihto ei osu
+        # literaaliin). Vihreä #0A9E75 ja magenta-miss #D6006E olivat sivun
+        # viimeiset paletin ulkopuoliset värit. Uudet: osuma = teal tekstinä
+        # (designin "voitot"), huti = coral (designin "pudotukset"), pending
+        # = kulta. Kaikki AA-kontrastissa cream-pohjalla.
+        ".rec-scroll th{position:sticky;top:0;background:#EAE9E9;font-size:12px;"
         "font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#54506B;}"
         ".rec-scroll td.team{font-weight:600;white-space:nowrap;}"
         ".rec-scroll .num{white-space:nowrap;font-variant-numeric:tabular-nums;}"
-        ".rec-hit{color:#0A9E75;font-weight:800;}"
-        ".rec-miss{color:#D6006E;font-weight:800;}"
+        ".rec-hit{color:#007A6C;font-weight:800;}"
+        ".rec-miss{color:#C4441A;font-weight:800;}"
         ".rec-note{font-size:13px;opacity:.7;margin:10px 0 0;}"
         ".rec-subhead{font-size:18px;margin:26px 0 4px;}"
-        ".rec-pending{color:#F4A800;font-weight:700;font-size:12px;"
+        ".rec-pending{color:#8C6428;font-weight:700;font-size:12px;"
         "white-space:nowrap;}"
         ".rec-pct{color:#54506B;font-variant-numeric:tabular-nums;}"
         "</style>"
@@ -607,7 +614,7 @@ def cs_table_html(c: dict) -> str:
             f'<td class="team">{escape(r["team"])}</td>'
             f'<td class="num">{fmt_pct(r["cs_pct"])}</td>'
             f'<td>{escape(r["opponent"])} ({r["venue"]})</td>'
-            f'<td class="num"><span class="fdr fdr{fdr}">{fdr}</span></td>'
+            f'<td class="num fdr {fdr_cell_class(fdr)}">{fdr}</td>'
             "</tr>"
         )
     return (
@@ -623,42 +630,35 @@ def cs_table_html(c: dict) -> str:
     )
 
 
-# #148: jatkuva CS%-väriskaala grid-soluihin (#144-mobiilipariteetti).
-# Ankkurit = olemassa olevat FDR-chippien brändivärit (fdr5→fdr1) samoissa
-# cs_pct-pisteissä kuin mobiilin CS_STOPS — FDR-bucket ei säilytä edes
-# järjestystä cs_pct:ssä (luokkaparit menevät päällekkäin).
-CS_COLOR_STOPS = [
-    (8.0, "#D6006E"),   # magenta-deep = vaikein
-    (20.0, "#FF6A3D"),  # coral
-    (32.0, "#F4A800"),  # gold-deep
-    (44.0, "#FFC93C"),  # gold
-    (58.0, "#19E3D2"),  # teal = helpoin
-]
+# 26.7 CLASSIC: lämpökarttatäyttö POISTETTU. Aiemmin (#148) solu sai jatkuvan
+# CS%-tintin; uusi ilme kieltää lämpökartan eksplisiittisesti — vaikeus
+# kannetaan LUVUN painolla ja värillä, ei solun taustalla, jotta numerot
+# pysyvät sivun äänekkäimpänä asiana. Sama kaava kuin SPA:n FreeView.svelte
+# (csCellClass/fdrCellClass) -> pinnat eivät eriydy.
+#
+# Kynnykset ovat vanhan skaalan ankkureita (44 = gold, 20 = coral), joten
+# tulkinta ei muutu. Väri EI ole ainoa signaali — paino kulkee mukana, joten
+# rivi luetaan myös värisokeana ja mustavalkotulosteessa.
+CS_EASY_MIN = 44.0
+CS_HARD_MAX = 20.0
 
 
-def _hex_rgb(h: str) -> tuple[int, int, int]:
-    return int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
+def cs_cell_class(cs_pct: float) -> str:
+    """'' | 'is-easy' | 'is-hard' clean sheet -todennäköisyydestä."""
+    if cs_pct >= CS_EASY_MIN:
+        return "is-easy"
+    if cs_pct <= CS_HARD_MAX:
+        return "is-hard"
+    return ""
 
 
-def cs_cell_colors(cs_pct: float) -> tuple[str, str]:
-    """(background, text) jatkuvana cs_pct:stä. Teksti valkoinen tummilla."""
-    stops = CS_COLOR_STOPS
-    if cs_pct <= stops[0][0]:
-        bg = _hex_rgb(stops[0][1])
-    elif cs_pct >= stops[-1][0]:
-        bg = _hex_rgb(stops[-1][1])
-    else:
-        bg = None
-        for (p0, c0), (p1, c1) in zip(stops, stops[1:]):
-            if cs_pct <= p1:
-                t = (cs_pct - p0) / (p1 - p0)
-                a, b = _hex_rgb(c0), _hex_rgb(c1)
-                bg = tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
-                break
-        assert bg is not None
-    lum = 0.299 * bg[0] + 0.587 * bg[1] + 0.114 * bg[2]
-    fg = "#fff" if lum < 140 else "#0A0820"
-    return f"#{bg[0]:02X}{bg[1]:02X}{bg[2]:02X}", fg
+def fdr_cell_class(fdr: int) -> str:
+    """Sama logiikka FDR 1-5:lle (1 = helpoin)."""
+    if fdr <= 2:
+        return "is-easy"
+    if fdr >= 4:
+        return "is-hard"
+    return ""
 
 
 def _pred_slug(s: str) -> str:
@@ -695,11 +695,11 @@ def fdr_grid_html(c: dict) -> str:
                 # #148: solussa vastustaja + venue + per-fixture CS% (pariteetti
                 # mobiilin #144:n kanssa); FDR-luokka siirtyi tooltippiin.
                 # #152: solu on linkki predict-pinnalle (mobiilin solu-tap-pariteetti).
-                bg, fg = cs_cell_colors(float(fx["cs_pct"]))
+                # 26.7 CLASSIC: ei taustatäyttöä — luokka värittää LUVUN.
+                cls = cs_cell_class(float(fx["cs_pct"]))
                 href = predict_cell_href(r["team"], fx["opponent"], fx["venue"])
                 cells.append(
-                    f'<td class="num"><a class="fdr" href="{href}" '
-                    f'style="background:{bg};color:{fg}" '
+                    f'<td class="num {cls}"><a class="fdr" href="{href}" '
                     f'title="{escape(fx["opponent"])} ({fx["venue"]}) '
                     f'&middot; FDR {fx["fdr"]} &middot; view model prediction">'
                     f'{escape(fx["opponent_short"])} ({fx["venue"]}) '
@@ -716,8 +716,9 @@ def fdr_grid_html(c: dict) -> str:
     return (
         '<div class="scroll"><table>'
         f"<caption>Clean sheet probability per fixture for the next "
-        f"{len(c['gws'])} gameweeks, with opponent and venue. Colour follows the "
-        f"clean sheet probability (model FDR in the cell tooltip). "
+        f"{len(c['gws'])} gameweeks, with opponent and venue. Easy fixtures "
+        f"({CS_EASY_MIN:.0f}% or more) are picked out in gold, hard ones "
+        f"({CS_HARD_MAX:.0f}% or less) in coral (model FDR in the cell tooltip). "
         f"Sorted by easiest run.</caption>"
         "<thead><tr>"
         '<th scope="col">Team</th>' + head + '<th scope="col" class="num">Avg</th>'
@@ -876,11 +877,16 @@ def accuracy_dataset_ld(c: dict, page_url: str) -> dict:
 # Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) - täsmähexit.
 # Hero = tumma (Ink) + magenta, sisältö = vaalea (Cream/Paper) + ink-teksti.
 CSS = """
-  :root{ --magenta:#FF2E7E; --magenta-deep:#C4005F; --coral:#FF6A3D; --gold:#B68235; --gold-deep:#8C6428; --teal:#19E3D2; --ink:#201F1D; --ink2:#140F1E; --cream:#F3F2F2; --paper:#EAE9E9; --ink-muted:#54506B; --hero-muted:#6E685E; --line:#DAD8D4; }
+  :root{ --magenta:#FF2E7E; --magenta-deep:#C4005F; --coral:#FF6A3D; --gold:#B68235; --gold-deep:#8C6428; --teal:#00C2AD; --ink:#201F1D; --ink2:#140F1E; --cream:#F3F2F2; --paper:#EAE9E9; --ink-muted:#54506B; --hero-muted:#6E685E; --line:#DAD8D4; --negative:#C4441A; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:"Lora",Georgia,"Times New Roman",serif; background:var(--cream); color:var(--ink); line-height:1.6; font-size:17px; }
   h1,h2,h3,.brand{ font-family:"Cormorant Garamond",Georgia,serif; }
-  .dark{ background:var(--cream); color:var(--cream); }
+  /* Peruslinkki: ilman tata .content-lohkon ULKOPUOLISET linkit (esim.
+     .note-kappaleen mini-liigalinkki) jaavat selaimen oletussiniseksi
+     #0000EE:ksi. Elementtivalitsin (0,0,1) haviaa kaikille luokkasaannoille,
+     joten se osuu vain aidosti tyylittelemattomiin linkkeihin. */
+  a{ color:var(--magenta-deep); }
+  .dark{ background:var(--cream); color:var(--ink); }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
   .bar{ height:1px;background:var(--line); }
   .nav{ max-width:960px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
@@ -889,7 +895,7 @@ CSS = """
   .brand span{ color:var(--magenta); }
   .brand-icon{ width:26px; height:26px; border-radius:7px; display:block; }
   .cta{ display:inline-block; background:transparent; color:var(--gold-deep,#8C6428); border:1px solid var(--gold,#B68235); text-decoration:none; padding:14px 24px; border-radius:30px; font-weight:800; min-height:48px; }
-  .cta:hover{ background:var(--magenta-deep); }
+  .cta:hover{ background:rgba(182,130,53,0.08); }
   .cta.secondary{ background:transparent; border:1px solid var(--line); color:inherit; }
   .cta-row{ display:flex; flex-wrap:wrap; gap:12px; margin:26px 0 8px; }
   .hero{ padding:44px 0 52px; }
@@ -911,9 +917,17 @@ CSS = """
   th{ color:var(--ink-muted); font-weight:600; font-size:13px; }
   th.num,td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
   td.team{ font-weight:700; white-space:nowrap; }
-  .fdr{ display:inline-block; min-width:34px; padding:3px 8px; border-radius:8px; color:var(--ink); font-weight:700; text-align:center; font-size:13px; text-decoration:none; }
-  a.fdr:hover{ filter:brightness(0.92); }
-  .fdr1{ background:#19E3D2; } .fdr2{ background:#FFC93C; } .fdr3{ background:#F4A800; } .fdr4{ background:#FF6A3D; } .fdr5{ background:#D6006E; color:#fff; }
+  /* 26.7 CLASSIC: lämpökartta pois. Väri ja paino ovat LUVUSSA, ei solun
+     taustassa; paino kulkee värin mukana, joten sarake luetaan myös
+     värisokeana. Sama kaava kuin SPA:n FreeView (is-easy/is-hard). */
+  .fdr{ display:inline-block; min-width:34px; text-align:center; font-size:13px; text-decoration:none; color:inherit; font-variant-numeric:tabular-nums; }
+  /* .content a värittää linkit magentaksi ja voittaa .fdr:n spesifisyydessä
+     (0,1,1 > 0,1,0) -> ilman tätä JOKA neutraali solu olisi magenta. Löytyi
+     vain selaimesta; portit eivät näe kaskadia. */
+  .content a.fdr{ color:inherit; }
+  a.fdr:hover{ text-decoration:underline; }
+  td.is-easy,td.is-easy .fdr,span.fdr.is-easy{ color:var(--gold-deep); font-weight:600; }
+  td.is-hard,td.is-hard .fdr,span.fdr.is-hard{ color:var(--negative); }
   .legend{ color:var(--ink-muted); font-size:14px; margin:8px 0 0; }
   .stat-row{ display:flex; flex-wrap:wrap; gap:14px; margin:18px 0; }
   .stat{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:16px 20px; flex:1 1 180px; }
@@ -929,7 +943,10 @@ CSS = """
   .upsell .price-note{ color:var(--ink-muted); font-size:14px; margin:10px 0 0; }
   footer{ padding:30px 0 40px; font-size:14px; }
   footer .wrap{ color:var(--hero-muted); }
-  footer a{ color:var(--cream); }
+  /* 🐛 26.7: tama oli var(--cream) = cream cream-pohjalla -> 8 footer-
+     linkkia oli TAYSIN nakymattomia (kontrasti 1.00). Jaanne tummasta
+     footerista; classic-vaihto teki pohjasta vaalean muttei tasta. */
+  footer a{ color:var(--hero-muted); text-decoration:underline; }
   footer a:hover{ color:var(--magenta); }
   @media (max-width:640px){ .hero h1{ font-size:29px; } .hero .lede{ font-size:17px; } .nav{ padding:14px 16px; } .hero{ padding:30px 0 40px; } }
   /* Kapea mobiili: CTA-napit pinoon täysleveinä, pitkä label ei ylivuoda (#15) */
@@ -947,12 +964,10 @@ def render_page(c: dict) -> str:
     jsonld = jsonld_blocks(c, faq)
     cs_table = cs_table_html(c)
     fdr_grid = fdr_grid_html(c)
-    # #148: legenda samalla jatkuvalla CS%-skaalalla kuin solut (koherenssi —
-    # ei FDR 1-5 -laatikoita cs%-värien päällä, #144-oppi).
+    # 26.7 CLASSIC: legenda seuraa solujen kaavaa (kolme luokkaa, ei
+    # jatkuvaa skaalaa) — legenda ja solu eivät saa kertoa eri tarinaa.
     cs_legend = " ".join(
-        '<span class="fdr" style="background:{bg};color:{fg}">{p}%</span>'.format(
-            bg=cs_cell_colors(p)[0], fg=cs_cell_colors(p)[1], p=p
-        )
+        '<span class="fdr {cls}">{p}%</span>'.format(cls=cs_cell_class(p), p=p)
         for p in (10, 22, 34, 46, 58)
     )
 
@@ -1081,10 +1096,11 @@ baseline. The numbers sharpen as {c["season"]} results arrive.</p>
 
 <h2 id="fixture-difficulty">Fixture difficulty for the next six gameweeks</h2>
 <p>Clean sheet probability per team and gameweek. Each cell shows the opponent,
-venue and the model's clean sheet probability for that match; the colour follows
-the same probability on a continuous scale, so two fixtures in the same FDR
-class no longer look identical. Model FDR (1 easiest, 5 hardest) stays in the
-cell tooltip. Model-derived, not the official FPL difficulty.</p>
+venue and the model's clean sheet probability for that match, so two fixtures in
+the same FDR class no longer look identical. Easy runs stand out in gold and
+hard ones in coral; there is no colour wash behind the numbers, because the
+numbers are the point. Model FDR (1 easiest, 5 hardest) stays in the cell
+tooltip. Model-derived, not the official FPL difficulty.</p>
 {fdr_grid}
 <p class="legend">Clean sheet scale: {cs_legend}
 (low CS% = hard fixture, high CS% = easy). H home, A away.</p>

@@ -27,7 +27,7 @@
       /* teal TEKSTINÄ vaalealla pohjalla: syvennetty sävy (AA 4.9:1 kermalla) */
       --accent2: #007A6C;
       /* coral-teksti vaalealla: syvennetty (AA 4.8:1 kermalla) */
-      --warn: #C2410C;
+      --warn: #C4441A;
       --radius: 2px;
     }
     * { box-sizing: border-box; }
@@ -41,21 +41,21 @@
       -webkit-font-smoothing: antialiased;
     }
     h1, h2, h3, .brand { font-family:"Cormorant Garamond",Georgia,serif; }
-    .site-header { background: var(--cream); color: var(--cream); border-bottom: 1px solid var(--line); }
+    .site-header { background: var(--cream); color: var(--ink); border-bottom: 1px solid var(--line); }
     .bar { height:1px;background:var(--line); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
-    .brand a { color: var(--cream); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+    .brand a { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
     .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
     .brand span { color: var(--magenta); }
     .nav-cta {
       display: inline-block; background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235);
       text-decoration: none; padding: 11px 20px; border-radius: 999px; font-weight: 800; font-size: 14px;
     }
-    .nav-cta:hover { background: var(--magenta-deep); }
+    .nav-cta:hover { background: rgba(182,130,53,0.08); }
     .site-footer { border-top: 1px solid var(--line); padding: 30px 0 40px; font-size: 14px; }
     .site-footer .foot { max-width: 960px; margin: 0 auto; padding: 0 20px; color: var(--muted); }
     .site-footer a { color: var(--muted); }
@@ -100,26 +100,29 @@
       flex-shrink: 0;
       width: 28px;
       height: 28px;
-      border-radius: 14px;
-      background: var(--magenta);
-      color: var(--ink);
+      border-radius: 999px;
+      background: transparent;
+      border: 1px solid var(--gold,#B68235);
+      color: var(--gold-deep,#8C6428);
       font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 14px;
     }
+    /* 26.7 CLASSIC: magentatayttö -> gold outline (sivun muu CTA-konventio). */
     .email-btn {
       display: inline-block;
       margin-top: 8px;
       padding: 12px 22px;
-      background: var(--magenta);
-      color: var(--ink);
+      background: transparent;
+      color: var(--gold-deep,#8C6428);
+      border: 1px solid var(--gold,#B68235);
       border-radius: 999px;
       font-weight: 700;
     }
     .email-btn:hover {
-      background: var(--magenta-deep);
+      background: rgba(182,130,53,0.08);
       text-decoration: none;
     }
   </style>

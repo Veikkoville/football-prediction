@@ -49,7 +49,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     --hero-muted: #6E685E;
     --magenta: #FF2E7E;
     --magenta-deep: #C4005F;
-    --teal: #19E3D2;
+    --teal: #00C2AD;
     --teal-ink: #007A6C;
     --radius: 2px;
   }
@@ -83,7 +83,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .logo span { color: var(--magenta); }
   .logo-mark-img { width: 32px; height: 32px; border-radius: 9px; display: block; }
   .nav-cta { background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235); font-weight: 700; padding: 10px 18px; border-radius: 999px; text-decoration: none; font-size: 14px; }
-  .nav-cta:hover { background: var(--magenta-deep); }
+  .nav-cta:hover { background: rgba(182,130,53,0.08); }
   h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; margin: 44px 0 14px; }
   h1 span { color: var(--magenta); }
   .lede { font-size: 18px; color: var(--muted); max-width: 56ch; line-height: 1.7; }
@@ -97,7 +97,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     display: inline-block; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 16px;
     background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235); padding: 12px 24px; border-radius: 999px; text-decoration: none;
   }
-  .btn:hover { background: var(--magenta-deep); }
+  .btn:hover { background: rgba(182,130,53,0.08); }
   .btn.secondary { background: var(--card); color: var(--text); border: 1px solid var(--line); }
   .btn.secondary:hover { background: var(--bg-alt); }
   .hint { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 62ch; margin-top: 2px; }
@@ -216,8 +216,13 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   var currentEntry = null;
   var accuracyLine = null; // haetaan livena, ei kovakoodata (stale-suoja)
 
-  var INK = '#0A0820', CREAM = '#FFF6EC', MAGENTA = '#FF2E7E',
-      MUTED = '#575170', WHITE = '#FFFFFF', LINE = 'rgba(10,8,32,0.14)';
+  // 26.7 CLASSIC: kortin paletti oli yha vanha (sinertava ink #0A0820,
+  // lampin cream #FFF6EC, sinertava muted #575170) - vakiot ovat JS:ssa,
+  // joten CSS-token-ajot eivat nahneet niita. Fontit olivat jo Cormorantia.
+  // Magenta jaa: se on tassa merkki (IQ), 14px:n ylapalkkiviiva ja
+  // laatikon reunaviiva - ei tayttoa, eli ilmeen saannon mukainen.
+  var INK = '#201F1D', CREAM = '#F3F2F2', MAGENTA = '#FF2E7E',
+      MUTED = '#6E685E', WHITE = '#FFFFFF', LINE = 'rgba(32,31,29,0.18)';
 
   function setStatus(msg, isError) {
     statusEl.textContent = msg || '';
