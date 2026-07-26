@@ -201,9 +201,17 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
     ja rehellinen benchmark):
       1. Penkkireservi: halvin GKP + 3 halvinta kenttäpelaajaa (XI:n
          ulkopuolinen raha minimiin) → XI-budjetti = 100.0m − reservi.
-      2. XI: ahne valinta horisontti-xP:llä; kiintiöt XI_MIN/MAX:n sisällä,
-         max 3/klubi, ja joka poiminnalla varmistetaan että loput XI-paikat
-         voi vielä täyttää halvimmalla mahdollisella (budjetti ei lukkiudu).
+      2. Jokainen laillinen MUODOSTELMA erikseen (3-5 DEF, 2-5 MID, 1-3 FWD),
+         kussakin ahne valinta horisontti-xP:llä; max 3/klubi ja joka
+         poiminnalla varmistetaan että loput paikat voi vielä täyttää
+         halvimmalla mahdollisella (budjetti ei lukkiudu). Paras voittaa.
+
+    KORJAUS 26.7 (Villen bugilöytö): aiemmin ajettiin YKSI ahne passi ilman
+    muodostelmavertailua, jolloin muoto valikoitui sivutuotteena. Se jätti
+    paremmat muodot löytämättä: Villen oikea joukkue (5-4-2, 279.4 xP, 82.5m)
+    voitti benchmarkin (4-4-2, 277.7 xP, 84.0m) ja sai clampista harhaanjohtavan
+    "100 % of the best possible team". Muodostelmien läpikäynti poistaa juuri
+    tämän aukon.
 
     Palauttaa [] jos laillista XI:tä ei saada kokoon.
     """
@@ -220,33 +228,45 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
     min_price = min(p["price"] for p in pool)
 
     ranked = sorted(pool, key=lambda p: p["xp_horizon_total"], reverse=True)
-    xi: list[dict] = []
-    counts = {1: 0, 2: 0, 3: 0, 4: 0}
-    clubs: dict[int, int] = {}
-    cost = 0
-    for p in ranked:
-        if len(xi) == 11:
-            break
-        t = p["element_type"]
-        if counts[t] >= XI_MAX[t]:
-            continue
-        if clubs.get(p["club"], 0) >= MAX_PER_CLUB:
-            continue
-        # Minimipaikkojen turvaus: jäljellä olevien pakollisten slotien on
-        # mahduttava vielä valinnan jälkeen.
-        need_min = sum(max(0, XI_MIN[q] - counts[q] - (1 if q == t else 0))
-                       for q in XI_MIN)
-        slots_left = 11 - len(xi) - 1
-        if need_min > slots_left:
-            continue
-        # Budjettiturvaus: loput paikat halvimmalla täytettävissä.
-        if cost + p["price"] + slots_left * min_price > xi_budget:
-            continue
-        xi.append(p)
-        counts[t] += 1
-        clubs[p["club"]] = clubs.get(p["club"], 0) + 1
-        cost += p["price"]
-    return xi if len(xi) == 11 else []
+
+    def _fill(shape: dict[int, int]) -> list[dict]:
+        """Ahne täyttö KIINTEÄLLE muodostelmalle. Palauttaa [] jos ei onnistu."""
+        xi: list[dict] = []
+        counts = {1: 0, 2: 0, 3: 0, 4: 0}
+        clubs: dict = {}
+        cost = 0
+        for p in ranked:
+            if len(xi) == 11:
+                break
+            t = p["element_type"]
+            if counts[t] >= shape[t]:
+                continue
+            if clubs.get(p["club"], 0) >= MAX_PER_CLUB:
+                continue
+            slots_left = 11 - len(xi) - 1
+            # Budjettiturvaus: loput paikat halvimmalla täytettävissä.
+            if cost + p["price"] + slots_left * min_price > xi_budget:
+                continue
+            xi.append(p)
+            counts[t] += 1
+            clubs[p["club"]] = clubs.get(p["club"], 0) + 1
+            cost += p["price"]
+        return xi if len(xi) == 11 else []
+
+    best: list[dict] = []
+    best_total = -1.0
+    for n_def in range(XI_MIN[2], XI_MAX[2] + 1):
+        for n_mid in range(XI_MIN[3], XI_MAX[3] + 1):
+            n_fwd = 10 - n_def - n_mid
+            if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
+                continue
+            cand = _fill({1: 1, 2: n_def, 3: n_mid, 4: n_fwd})
+            if not cand:
+                continue
+            total = sum(p["xp_horizon_total"] for p in cand)
+            if total > best_total:
+                best_total, best = total, cand
+    return best
 
 
 def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
@@ -649,13 +669,19 @@ def rate_team(entry: int | None = None, gw: int | None = None,
 
     # #50: rating = vertailu PARHAASEEN mahdolliseen budjettijoukkueeseen
     # (satunnaisotos antoi kaikille ~100 % = ontto). percentile-kenttä säilyy
-    # yhteensopivuuden takia mutta tarkoittaa nyt "% of the best possible
-    # budget team" (clampattu 100:aan — ahne benchmark voi alittaa aidon
-    # optimin marginaalisesti).
+    # yhteensopivuuden takia mutta tarkoittaa "% of the best possible budget
+    # team".
+    #
+    # 26.7: rating = sama luku kokonaislukuna 0-100 (luettavampi otsikkoluku
+    # kuin desimaalinen prosentti). beats_benchmark kertoo jos joukkue YLITTÄÄ
+    # benchmarkin: aiemmin se leikattiin hiljaa sataan, jolloin tieto katosi ja
+    # luku näytti ontolta imartelulta. Nyt se on eksplisiittinen ja ansaittu.
     cache_key = str(xp_data["meta"].get("generated_at"))
     optimal_xp = optimal_budget_team_xp(pool, cache_key)
-    pct_of_optimal = (round(min(100.0, 100.0 * team_xp_horizon / optimal_xp), 1)
-                      if optimal_xp > 0 else 0.0)
+    raw_pct = (100.0 * team_xp_horizon / optimal_xp) if optimal_xp > 0 else 0.0
+    pct_of_optimal = round(min(100.0, raw_pct), 1)
+    rating = int(round(min(100.0, raw_pct)))
+    beats_benchmark = raw_pct > 100.0
     gap_to_optimal = round(max(0.0, optimal_xp - team_xp_horizon), 2)
     strongest, weakest = _line_strength(xi, pool)
 
@@ -702,6 +728,9 @@ def rate_team(entry: int | None = None, gw: int | None = None,
             "team_xp_horizon": round(team_xp_horizon_c, 2),
             "team_xp_horizon_no_captain": round(team_xp_horizon, 2),
             "percentile": pct_of_optimal,
+            "rating": rating,
+            "rating_max": 100,
+            "beats_benchmark": beats_benchmark,
             "optimal_team_xp": round(optimal_xp, 2),
             "gap_to_optimal_xp": gap_to_optimal,
             "strongest_line": strongest,

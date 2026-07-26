@@ -117,6 +117,11 @@ export interface RateTeamResponse {
 		/** #50: uusi semantiikka = % parhaasta mahdollisesta budjettitiimistä
 		 * (backend clampaa <=100; UI clampaa silti defensiivisesti) */
 		percentile: number;
+		/** 26.7: sama luku 0-100 kokonaislukuna (luettavampi otsikkoluku). */
+		rating?: number;
+		rating_max?: number;
+		/** true jos XI ylittaa parhaan budjettijoukkueen (ennen: leikattiin 100:aan). */
+		beats_benchmark?: boolean;
 		strongest_line: string;
 		weakest_line: string;
 		/** #50: uudet additiiviset kentät, voivat puuttua vanhasta API:sta */

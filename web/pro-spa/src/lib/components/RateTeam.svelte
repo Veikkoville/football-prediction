@@ -399,12 +399,20 @@
 						>next {data.meta.horizon_gw ?? 6} GWs</abbr
 					>: <strong>{data.rating.team_xp_horizon.toFixed(1)}</strong>
 				</p>
+				<!-- 26.7: beats_benchmark eksplisiittisesti. Aiemmin ylitys leikattiin
+				     hiljaa 100 %:iin, jolloin tieto katosi ja luku luki ontolta
+				     imartelulta. -->
 				<p class="subline">
-					That is <strong>{Math.min(100, Math.round(data.rating.percentile))}%</strong> of the
-					best possible budget team{#if typeof data.rating.gap_to_optimal_xp === 'number'}
-						({data.rating.gap_to_optimal_xp > 0.05
-							? `-${data.rating.gap_to_optimal_xp.toFixed(1)} xP vs the best possible team`
-							: 'level with the best possible team'}){/if}.
+					{#if data.rating.beats_benchmark}
+						Your XI <strong>beats</strong> the best team the model can build inside the
+						budget. The model would pick your squad over its own.
+					{:else}
+						Team rating <strong>{data.rating.rating ?? Math.round(data.rating.percentile)}/100</strong>,
+						measured against the best possible budget team{#if typeof data.rating.gap_to_optimal_xp === 'number'}
+							({data.rating.gap_to_optimal_xp > 0.05
+								? `-${data.rating.gap_to_optimal_xp.toFixed(1)} xP`
+								: 'level with it'}){/if}.
+					{/if}
 				</p>
 			</div>
 		</div>
