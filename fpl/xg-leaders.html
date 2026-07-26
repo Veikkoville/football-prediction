@@ -202,7 +202,11 @@ font-weight:600;}
  function sync(){
   chips('xgw',[[3,'3'],[5,'5'],[10,'10'],['S','Season']],
         function(){return w;},function(v){w=v;});
-  chips('xgr',[[0,'Per game'],[1,'Per 90']],function(){return per90?1:0;},
+  // Kausitilassa vasen vaihtoehto EI ole per ottelu vaan summa (meilla on
+  // avaukset, ei esiintymisia -> aitoa per-ottelu-jakajaa ei ole). Chipin
+  // teksti kertoo sen, muuten 25.50 nayttaisi "per game" -lukemalta.
+  chips('xgr',[[0,(w==='S')?'Total':'Per game'],[1,'Per 90']],
+        function(){return per90?1:0;},
         function(v){
          var was=per90;per90=!!v;
          // Per 90:een siirryttaessa oletuskynnys paalle, takaisin per game:een
