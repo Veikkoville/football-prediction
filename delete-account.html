@@ -48,8 +48,8 @@
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
-    .brand a { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
-    .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
+    .brand a { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap:0; }
+    .brand-icon { margin-right:10px; width: 32px; height: 32px; border-radius: 9px; display: block; }
     .brand span { color: var(--magenta); }
     .nav-cta {
       display: inline-block; background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235);
@@ -132,7 +132,7 @@
   <header class="site-header">
     <div class="bar"></div>
     <div class="nav">
-      <div class="brand"><a href="./"><img class="brand-icon" src="assets/brand/goaliq-appicon-192.png" width="32" height="32" alt="">Goal<span>IQ</span></a></div>
+      <div class="brand"><a href="./"><svg class="brand-icon" width="32" height="32" viewBox="0 0 44 44" role="img" aria-label="GoalIQ" focusable="false"><rect x="1.4" y="1.4" width="41.2" height="41.2" rx="9" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="22" y="29.5" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="21" font-weight="600" fill="currentColor">I<tspan fill="#FF2E7E">Q</tspan></text></svg>Goal<span>IQ</span></a></div>
       <a class="nav-cta" href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Get the free app</a>
     </div>
   </header>
