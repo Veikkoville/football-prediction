@@ -16,7 +16,7 @@
 		persistEntry,
 		toggleRemember
 	} from '$lib/fplEntry.svelte';
-	import { loadDraftIds, saveDraftIds } from '$lib/draft';
+	import { loadDraftIds, saveDraftIds, syncDraft, pushRemoteDraftSoon } from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import ModelWorking from './ModelWorking.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -102,6 +102,22 @@
 	let savedDraftIds: number[] | null = loadDraftIds();
 	let draftCanSave = savedDraftIds == null;
 	if (savedDraftIds && savedDraftIds.length > 0) draftOpen = true; // triggaa pool-fetchin
+
+	// 26.7 (Villen pyyntö): sama joukkue webissä ja apissa. Kirjautuneelle
+	// tilin draft on totuus, kirjautumattomalle localStorage kuten ennen.
+	// Synkka ajetaan kerran mountissa; jos tili oli edellä, hydraatio ottaa
+	// palautetut ID:t (savedDraftIds asetetaan uudelleen ja draftCanSave
+	// palautetaan false:ksi, jotta alla oleva persistointi-effect ei kirjoita
+	// tyhjää päälle ennen kuin pooli on resolvoinut ne).
+	let draftSynced = $state(false);
+	void syncDraft().then((remoteIds) => {
+		draftSynced = true;
+		if (!remoteIds || remoteIds.length === 0) return;
+		if (picks.length > 0) return; // käyttäjä ehti valita → ei ylikirjoiteta
+		savedDraftIds = remoteIds;
+		draftCanSave = false;
+		draftOpen = true;
+	});
 	// UX-palaute-erä kohta 4: täysi tallennettu draft → tulosnäkymä palautuu
 	// automaattisesti ilman uutta "Rate my draft" -painallusta, ja valitsin
 	// menee collapse-tilaan kun tulos näkyy (auki muokkausta varten).
@@ -141,11 +157,22 @@
 			void submitDraft(true);
 		}
 	});
-	// Persistoi jokainen muutos hydraation jälkeen.
+	// Persistoi jokainen muutos hydraation jälkeen. 26.7: sama kirjoitus menee
+	// myös tilille (debounced — pick-muutoksia tulee useita peräkkäin).
+	//
+	// TYHJÄÄ LISTAA EI TYÖNNETÄ ennen kuin tällä sivulatauksella on ollut
+	// pelaajia. Ilman tätä pelkkä työkalun avaaminen webissä (picks = []) olisi
+	// työntänyt tyhjän listan tilille ja PYYHKINYT puhelimella tehdyn draftin.
+	// Havaittu live-testissä heti ensimmäisellä deployllä.
+	let draftEverHadPicks = $state(false);
 	$effect(() => {
 		const ids = picks.map((p) => p.id);
 		if (!draftCanSave) return;
 		saveDraftIds(ids);
+		if (ids.length > 0) draftEverHadPicks = true;
+		if (draftSynced && (ids.length > 0 || draftEverHadPicks)) {
+			pushRemoteDraftSoon(ids);
+		}
 	});
 	const posCount = $derived.by(() => {
 		const c: Record<string, number> = { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
@@ -203,10 +230,14 @@
 		loading = false;
 	}
 
-	// #121: apply-to-planner (read-only what-if) — siirtoehdotukset sovelletaan
-	// LOKAALISTI planned-tiimiin (pitch + xP + budjetti heti). EI write-backia
-	// oikeaan FPL:ään. Uusi rate-ajo nollaa suunnitelman.
+	// #121: apply-to-planner — siirtoehdotukset sovelletaan planned-tiimiin
+	// (pitch + xP + budjetti heti). EI write-backia oikeaan FPL:ään: FPL:llä ei
+	// ole julkista kirjoitus-APIa, joten siirto on aina tehtävä lopuksi itse
+	// heidän sivuillaan. 26.7 (Villen havainto "apply toimii mutta ei tallenna
+	// sitä"): sovellettu suunnitelma kirjoitetaan nyt draftiin — se säilyy
+	// sivun latauksen yli ja kulkee tilin kautta myös puhelimeen.
 	let appliedTransfers = $state<TransferSuggestion[]>([]);
+	let planSaved = $state(false);
 	$effect(() => {
 		void data; // riippuvuus: uusi rate-ajo → suunnitelma nollaan
 		appliedTransfers = [];
@@ -246,6 +277,33 @@
 	const appliedKeys = $derived(
 		new Set(appliedTransfers.map((s) => `${s.out.id}-${s.in.id}`))
 	);
+	/** Rosteri annetun siirtoketjun jälkeen — laskettuna suoraan, ei $derivedin
+	 *  kautta, jotta tallennus näkee uuden tilan samalla klikillä. */
+	function planIdsAfter(list: TransferSuggestion[]): number[] {
+		let ids = (data?.team.players ?? []).map((p) => p.id);
+		for (const s of list) ids = ids.map((id) => (id === s.out.id ? s.in.id : id));
+		return ids;
+	}
+	/** Apply / Undo / Reset — kaikki kolme kirjoittavat draftiin, jotta
+	 *  tallennettu joukkue on aina se mikä ruudulla näkyy. */
+	function setPlan(list: TransferSuggestion[]): void {
+		appliedTransfers = list;
+		const ids = planIdsAfter(list);
+		if (ids.length === 0) return;
+		saveDraftIds(ids);
+		pushRemoteDraftSoon(ids);
+		planSaved = true;
+		// Draft-valitsin seuraa perässä, jotta "Edit draft" näyttää saman
+		// joukkueen. Jos pooli ei ole vielä ladattu, storage riittää —
+		// hydraatio resolvoi ID:t seuraavalla kerralla.
+		if (pool.length > 0) {
+			const byId = new Map(pool.map((p) => [p.id, p]));
+			const resolved = ids
+				.map((id) => byId.get(id))
+				.filter((p): p is XpPlayer => p != null);
+			if (resolved.length === ids.length) picks = resolved;
+		}
+	}
 	function canApply(s: TransferSuggestion): boolean {
 		return (
 			s.in.xp_per_gw != null && // vanha backend ilman planner-kenttiä → ei applya
@@ -566,7 +624,7 @@
 											class="apply-btn"
 											class:applied={isApplied}
 											disabled={isApplied || !canApply(s)}
-											onclick={() => (appliedTransfers = [...appliedTransfers, s])}
+											onclick={() => setPlan([...appliedTransfers, s])}
 										>
 											{isApplied ? 'Applied' : 'Apply'}
 										</button>
@@ -593,17 +651,18 @@
 					<button
 						type="button"
 						class="plan-btn"
-						onclick={() => (appliedTransfers = appliedTransfers.slice(0, -1))}
+						onclick={() => setPlan(appliedTransfers.slice(0, -1))}
 					>
 						Undo last
 					</button>
-					<button type="button" class="plan-btn" onclick={() => (appliedTransfers = [])}>
+					<button type="button" class="plan-btn" onclick={() => setPlan([])}>
 						Reset plan
 					</button>
 				</div>
 				<p class="muted plan-note">
-					A planning sandbox: nothing is sent to FPL. Apply your final team in the official FPL
-					app.
+					{#if planSaved}<strong>Saved to your draft</strong> — it stays here and, when you
+						are signed in, on your phone too.{/if} Nothing is sent to FPL: they have no public
+					write API, so make the final move in the official FPL app.
 				</p>
 			</div>
 		{/if}
