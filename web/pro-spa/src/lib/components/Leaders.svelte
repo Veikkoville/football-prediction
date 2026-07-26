@@ -14,6 +14,10 @@
 	 * (xP, captain ranker, chips, edge), ei menneisyyteen.
 	 */
 	import { capture } from '$lib/analytics';
+	// 26.7 visuaalinen remontti: joukkuepaita riveihin. IP-turva: neutraali
+	// siluetti + klubin primary-vari, EI pelaajakuvia eika krestejä.
+	import TeamKit from './TeamKit.svelte';
+	import { teamColorByShort } from '$lib/teamColors';
 	import {
 		fetchDefconLeaders,
 		fetchXgLeaders,
@@ -117,7 +121,15 @@
 					{#each xgVisible as p, i (p.id)}
 						<tr>
 							<td class="muted">{i + 1}</td>
-							<td>{p.web_name} <span class="muted">({p.team_short})</span></td>
+							<td class="pl">
+								<TeamKit
+									color={teamColorByShort(p.team_short).color}
+									textColor={teamColorByShort(p.team_short).textColor}
+									label={p.team_short}
+									size={26}
+								/>
+								<span>{p.web_name} <span class="muted">({p.team_short})</span></span>
+							</td>
 							<td>{p.pos}</td>
 							<td class="num">{p.price.toFixed(1)}</td>
 							<td class="num strong">{p.xg_per_game.toFixed(2)}</td>
@@ -162,7 +174,15 @@
 					{#each dcVisible as p, i (p.id)}
 						<tr>
 							<td class="muted">{i + 1}</td>
-							<td>{p.web_name} <span class="muted">({p.team_short})</span></td>
+							<td class="pl">
+								<TeamKit
+									color={teamColorByShort(p.team_short).color}
+									textColor={teamColorByShort(p.team_short).textColor}
+									label={p.team_short}
+									size={26}
+								/>
+								<span>{p.web_name} <span class="muted">({p.team_short})</span></span>
+							</td>
 							<td>{p.pos}</td>
 							<td class="num">{p.price.toFixed(1)}</td>
 							<td class="num">{p.dc_per_game.toFixed(1)}</td>
@@ -189,6 +209,15 @@
 {/if}
 
 <style>
+	/* 26.7: paita + nimi samalle riville, paita ei kutistu */
+	.pl {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.pl :global(svg) {
+		flex: 0 0 auto;
+	}
 	.basis {
 		color: var(--giq-gold-deep, #f4a800);
 		font-weight: 600;
