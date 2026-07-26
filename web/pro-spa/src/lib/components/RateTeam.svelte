@@ -414,6 +414,23 @@
 								: 'level with it'}){/if}.
 					{/if}
 				</p>
+				<!-- 26.7: metodologia auki. Villen havainto: FFS antoi samasta
+				     joukkueesta 83, me 97 -> ilman selitysta nayttaa silta etta
+				     joku on vaarassa. Kumpikaan ei ole: mittarit ovat eri. -->
+				<details class="method">
+					<summary>How this rating is calculated</summary>
+					<p>
+						We compare your XI's projected points over the next {data.meta.horizon_gw ?? 6} gameweeks
+						to the best legal XI our model can build inside the same 100.0m budget. 100 means you
+						captured every projected point that budget allows.
+					</p>
+					<p>
+						Other FPL sites rate teams differently, so their number and ours are not comparable
+						and neither is wrong. Ours answers one narrow question: how much of the available
+						projected points did your squad capture? It says nothing about your rank, and
+						projections are estimates, not outcomes.
+					</p>
+				</details>
 			</div>
 		</div>
 		<div class="facts">
@@ -754,6 +771,21 @@
 		margin: 0;
 		color: var(--text-muted);
 		font-size: var(--step--1);
+	}
+	/* 26.7: metodologia auki, oletuksena kiinni (ei vie tilaa herolta) */
+	.method {
+		margin: var(--s-2) 0 0;
+		color: var(--text-muted);
+		font-size: var(--step--1);
+	}
+	.method summary {
+		cursor: pointer;
+		font-weight: 600;
+		color: var(--giq-magenta-deep, #d6006e);
+	}
+	.method p {
+		margin: var(--s-2) 0 0;
+		max-width: 60ch;
 	}
 	.line-strong {
 		color: var(--positive);
