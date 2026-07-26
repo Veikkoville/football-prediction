@@ -127,7 +127,21 @@ def build() -> dict:
         merged = []
         for p in players:
             if p["games_total"] < MIN_CURRENT_GAMES and p.get("code") in prev_by_code:
-                merged.append(prev_by_code[p["code"]])
+                # KORJAUS 26.7: aiemmin tassa otettiin KOKO edellisen kauden rivi,
+                # jolloin taulukkoon jai viime kauden HINTA, omistus-% ja seura.
+                # Esikaudella se koski kaikkia pelaajia -> esim. Haaland 14.7
+                # vaikka FPL:n 26/27-hinta on 15.5, ja seuraa vaihtanut pelaaja
+                # nakyi vanhassa seurassaan.
+                #
+                # Historialliset ottelustatsit KUULUU perii vanhasta (niita ei ole
+                # uudelta kaudelta), mutta hinta, omistus, seura ja pelipaikka ovat
+                # KULUVAN kauden attribuutteja ja tulevat elavasta bootstrapista.
+                old = prev_by_code[p["code"]]
+                row = dict(p)                      # tuore rivi = tuoreet attribuutit
+                row["recent_games"] = old.get("recent_games") or []
+                row["games_total"] = old.get("games_total", 0)
+                row["basis"] = old.get("basis")    # rehellinen label sailyy
+                merged.append(row)
             else:
                 merged.append(p)
         players = merged
@@ -217,6 +231,49 @@ def sanity(data: dict) -> list[str]:
     return fails[:10]
 
 
+def refresh_current_attrs(boot: dict) -> dict | None:
+    """Esikausipäivitys: pidä historialliset ottelurivit, mutta päivitä
+    KULUVAN kauden attribuutit elävästä bootstrapista. Vain 1 API-kutsu.
+
+    MIKSI (26.7.2026): kausivaihto-guard jäädytti koko snapshotin, jolloin
+    taulukko näytti viime kauden hintoja (Haaland 14.7 vaikka 26/27-hinta on
+    15.5, B.Fernandes 10.4 vaikka 12.0) ja seuraa vaihtaneet pelaajat näkyivät
+    vanhassa seurassaan. Ottelustatsit KUULUU periä vanhasta (niitä ei ole
+    uudelta kaudelta), mutta hinta, omistus-%, seura ja pelipaikka ovat
+    kuluvan kauden attribuutteja.
+
+    Pelaajat jotka eivät ole enää 26/27-pelissä pudotetaan: heitä ei voi
+    valita, joten heidän näyttämisensä on harhaanjohtavaa.
+    """
+    if not LEADERS_PATH.exists():
+        return None
+    data = json.loads(LEADERS_PATH.read_text(encoding="utf-8"))
+    teams = {t["id"]: t["short_name"] for t in boot["teams"]}
+    by_code = {e["code"]: e for e in boot["elements"]}
+    kept, dropped = [], 0
+    for p in data.get("players", []):
+        e = by_code.get(p.get("code"))
+        pos = POS_NAME.get(e["element_type"]) if e else None
+        if e is None or pos is None:
+            dropped += 1
+            continue
+        p["id"] = e["id"]
+        p["web_name"] = e["web_name"]
+        p["team_short"] = teams.get(e["team"], p.get("team_short", ""))
+        p["pos"] = pos
+        p["price"] = e["now_cost"] / 10.0
+        p["owned_pct"] = float(e.get("selected_by_percent") or 0.0)
+        kept.append(p)
+    data["players"] = kept
+    meta = data.setdefault("meta", {})
+    meta["n_players"] = len(kept)
+    meta["current_attrs_refreshed_at"] = _dt.datetime.now(
+        _dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    print(f"  attribuutit paivitetty: {len(kept)} pelaajaa, "
+          f"pudotettu (ei 26/27-pelissa): {dropped}")
+    return data
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
     ap = argparse.ArgumentParser()
@@ -235,10 +292,16 @@ def main(argv: list[str] | None = None) -> int:
         # voimaan EIKÄ haeta 841 tyhjää element-summarya turhaan.
         if season == TARGET_SEASON and not any(
                 ev.get("finished") for ev in boot.get("events", [])):
-            print(f"PRE-SEASON ({season}, 0 pelattua GW:tä) — {LEADERS_PATH.name} "
-                  f"jää ennalleen (edelliskauden basis, label rehellinen).")
-            return 0
-        data = build()
+            # Historiarivit jäävät ennalleen (ei haeta 841 tyhjää summarya),
+            # mutta hinta/omistus/seura/pelipaikka päivitetään bootstrapista.
+            print(f"PRE-SEASON ({season}, 0 pelattua GW:tä) — ottelurivit "
+                  f"ennallaan, kuluvan kauden attribuutit päivitetään.")
+            data = refresh_current_attrs(boot)
+            if data is None:
+                print("  ei aiempaa snapshottia — ei mitään päivitettävää.")
+                return 0
+        else:
+            data = build()
     fails = sanity(data)
     if fails:
         print("SANITY FAIL — dataa EI kirjoiteta:")
