@@ -457,7 +457,7 @@
 				<p class="verdict-line">
 					Weak spot: <strong>{data.rating.weakest_line}</strong>. Top upgrade:
 					<strong>{top.out.web_name}</strong> to <strong>{top.in.web_name}</strong>,
-					<span class="gain-text">+{top.delta_xp_horizon.toFixed(1)} xP</span>.
+					<span class="gain-text">+{top.delta_xp_horizon.toFixed(2)} xP</span>.
 				</p>
 			{/if}
 		{:else if data.transfers.hold}
@@ -472,7 +472,7 @@
 			<p class="verdict-line">
 				Weak spot: <strong>{data.rating.weakest_line}</strong>. Top upgrade:
 				<strong>{top.out.web_name}</strong> to <strong>{top.in.web_name}</strong>,
-				<span class="gain-text">+{top.delta_xp_horizon.toFixed(1)} xP</span>.
+				<span class="gain-text">+{top.delta_xp_horizon.toFixed(2)} xP</span>.
 			</p>
 		{/if}
 		<h3>Transfer suggestions</h3>

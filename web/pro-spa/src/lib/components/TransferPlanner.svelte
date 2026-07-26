@@ -127,7 +127,7 @@
 								{t.out.web_name} <span class="muted">({t.out.team_short})</span>
 								<span class="arrow">→</span>
 								{t.in.web_name} <span class="muted">({t.in.team_short})</span>
-								<span class="gain">+{t.gain_xp_remaining.toFixed(1)} xP</span>
+								<span class="gain">+{t.gain_xp_remaining.toFixed(2)} xP</span>
 								{#if t.hit}<span class="hit">{t.hit} hit</span>{/if}
 							</li>
 						{/each}

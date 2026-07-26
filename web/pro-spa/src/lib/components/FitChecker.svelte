@@ -200,7 +200,7 @@
 				<div>
 					<dt>vs the model's best free squad</dt>
 					<dd class:cost={result.totals.delta_xp < -0.005}>
-						{result.totals.delta_xp >= -0.005 ? 'no cost' : result.totals.delta_xp.toFixed(1)}
+						{result.totals.delta_xp >= -0.005 ? 'no cost' : result.totals.delta_xp.toFixed(2)}
 					</dd>
 				</div>
 				<div>

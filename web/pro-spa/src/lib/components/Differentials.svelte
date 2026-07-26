@@ -117,7 +117,7 @@
 						{#if hasDelta}
 							<td class="num" class:delta-pos={(p.model_vs_crowd_delta ?? 0) > 0}>
 								{p.model_vs_crowd_delta != null
-									? (p.model_vs_crowd_delta > 0 ? '+' : '') + p.model_vs_crowd_delta.toFixed(1)
+									? (p.model_vs_crowd_delta > 0 ? '+' : '') + p.model_vs_crowd_delta.toFixed(2)
 									: '–'}
 							</td>
 						{/if}
@@ -147,7 +147,7 @@
 									<span>{p.web_name} <span class="muted">{p.team_short} · {p.pos}</span></span>
 									<span class="num"
 										>{p.owned_pct.toFixed(1)}% owned ·
-										<strong class="delta-pos">+{(p.model_vs_crowd_delta ?? 0).toFixed(1)}</strong
+										<strong class="delta-pos">+{(p.model_vs_crowd_delta ?? 0).toFixed(2)}</strong
 										></span
 									>
 								</li>
@@ -166,7 +166,7 @@
 									<span>{p.web_name} <span class="muted">{p.team_short} · {p.pos}</span></span>
 									<span class="num"
 										>{p.owned_pct.toFixed(1)}% owned ·
-										<strong class="delta-neg">{(p.model_vs_crowd_delta ?? 0).toFixed(1)}</strong
+										<strong class="delta-neg">{(p.model_vs_crowd_delta ?? 0).toFixed(2)}</strong
 										></span
 									>
 								</li>

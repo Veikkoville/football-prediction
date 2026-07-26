@@ -20,7 +20,7 @@
 	const gainText = $derived(
 		verdict.best_move_gain_xp === null
 			? null
-			: `${verdict.best_move_gain_xp >= 0 ? '+' : ''}${verdict.best_move_gain_xp.toFixed(1)}`
+			: `${verdict.best_move_gain_xp >= 0 ? '+' : ''}${verdict.best_move_gain_xp.toFixed(2)}`
 	);
 	const hitNote = $derived(verdict.hit_applied_xp ? ', after a -4 hit' : '');
 </script>
