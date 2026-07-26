@@ -425,11 +425,9 @@
 						captured every projected point that budget allows.
 					</p>
 					<p>
-						Some other FPL sites score you against other managers' submitted teams instead, so
-						their number is a percentile in a crowd. Both can be right at once: you can sit in
-						the top fifth of submitted squads while still leaving points on the table against
-						the budget ceiling. A crowd percentile also drifts as the crowd changes; a ceiling
-						does not.
+						Other FPL sites run their own projections and their own scale, so their number and
+						ours are not comparable and neither is wrong. Two ratings can disagree simply
+						because they measure against different reference points, not because one is broken.
 					</p>
 					<p>
 						Ours answers one narrow question: how much of the available projected points did

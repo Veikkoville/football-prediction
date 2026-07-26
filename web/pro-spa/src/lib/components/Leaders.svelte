@@ -381,6 +381,7 @@
 		color: var(--giq-magenta-deep, #d6006e);
 	}
 	.window-row select {
+		flex: 0 0 auto;
 		border: 1px solid var(--border);
 		border-radius: 999px;
 		background: var(--surface);
@@ -388,6 +389,7 @@
 		font-weight: 600;
 		font-size: var(--step--1);
 		padding: 4px 10px;
+		line-height: 1.4;
 	}
 	/* 26.7: paita + nimi samalle riville, paita ei kutistu */
 	.pl {
@@ -405,14 +407,23 @@
 		margin: 0 0 var(--s-3);
 	}
 	/* #137: pelimäärävalitsin */
+	/* 26.7: rivi karii. Kontrolleja on nyt ~18 (Games/Season/Rate/Min mins/Pos/
+	   Team) yhden pelimaaravalitsimen sijaan, ja ilman wrapia flex puristi ne
+	   samalle riville -> "Season" ja "Per game" eivat mahtuneet pallukkaan. */
 	.window-row {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--s-2);
+		row-gap: var(--s-2);
 		margin: 0 0 var(--s-2);
 		font-size: var(--step--1);
 	}
+	.window-row > span {
+		flex: 0 0 auto;
+	}
 	.window-chip {
+		flex: 0 0 auto;
 		min-width: 36px;
 		border: 1px solid var(--border);
 		border-radius: 999px;
@@ -422,6 +433,9 @@
 		font-size: var(--step--1);
 		padding: 4px 12px;
 		cursor: pointer;
+		text-align: center;
+		white-space: nowrap;
+		line-height: 1.4;
 	}
 	.window-chip.on {
 		background: var(--giq-magenta);
