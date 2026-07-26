@@ -263,6 +263,16 @@ def refresh_current_attrs(boot: dict) -> dict | None:
         p["pos"] = pos
         p["price"] = e["now_cost"] / 10.0
         p["owned_pct"] = float(e.get("selected_by_percent") or 0.0)
+        # Kausitotaalit suoraan bootstrapista (sama lahde kuin per-ottelu-
+        # rivit). Nailla saa "koko kausi" -ikkunan ilman yhtaan lisahakua:
+        # rullaava 3/5/10 kertoo vireesta, kausitotaali otoskoosta.
+        p["season"] = {
+            "mins": int(e.get("minutes") or 0),
+            "starts": int(e.get("starts") or 0),
+            "xg": round(float(e.get("expected_goals") or 0.0), 2),
+            "xa": round(float(e.get("expected_assists") or 0.0), 2),
+            "xgi": round(float(e.get("expected_goal_involvements") or 0.0), 2),
+        }
         kept.append(p)
     data["players"] = kept
     meta = data.setdefault("meta", {})

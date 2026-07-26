@@ -387,9 +387,14 @@ def _xg_payload(leaders: dict) -> str:
             round(float(g.get("xa") or 0.0), 2),
             round(float(g.get("xgi") or 0.0), 2),
         ] for g in games[-10:]]
+        s = p.get("season") or {}
         out.append([
             p.get("web_name", ""), p.get("team_short", ""), p.get("pos", ""),
             round(float(p.get("price") or 0.0), 1), rows,
+            # kausitotaalit: [minuutit, avaukset, xG, xA, xGI]
+            [int(s.get("mins") or 0), int(s.get("starts") or 0),
+             float(s.get("xg") or 0.0), float(s.get("xa") or 0.0),
+             float(s.get("xgi") or 0.0)],
         ])
     return json.dumps(out, separators=(",", ":"), ensure_ascii=False)
 
@@ -407,6 +412,15 @@ XG_JS = """
  var tb=document.getElementById('xgb'),cnt=document.getElementById('xgc');
  if(!tb)return;
  function agg(p){
+  if(w==='S'){
+   // Koko kausi: bootstrapin totaalit. "Per game" -tilassa naytetaan
+   // TOTAALIT (kaudelle per-ottelu ei ole mielekas: meilla on avaukset,
+   // ei esiintymisia), "Per 90" jakaa minuuteilla.
+   var s=p[5]||[0,0,0,0,0],d=per90?(s[0]/90):1;
+   if(!d)d=1;
+   return {n:p[0],t:p[1],p:p[2],c:p[3],g:s[1],m:s[0],
+           xg:s[2]/d,xa:s[3]/d,xgi:s[4]/d};
+  }
   var g=p[4].slice(-w),m=0,xg=0,xa=0,xgi=0;
   for(var i=0;i<g.length;i++){m+=g[i][0];xg+=g[i][1];xa+=g[i][2];xgi+=g[i][3];}
   var d=per90?(m/90):g.length;
@@ -450,8 +464,13 @@ XG_JS = """
     +'</td></tr>';
   }
   tb.innerHTML=h;
-  if(cnt)cnt.textContent=r.length+' players'+(per90?', per 90 minutes':', per game')
-   +', last '+w+' games each'
+  // Kausitilassa viimeisessa sarakkeessa on AVAUKSET, ei esiintymisia
+  // (bootstrap antaa startsin). Otsikko kertoo kumpi, ei arvata.
+  var hh=document.querySelectorAll('#xgt2 thead th');
+  if(hh&&hh[9])hh[9].textContent=(w==='S')?'Starts':'Games';
+  var span=(w==='S')?', full season':', last '+w+' games each';
+  var rate=per90?', per 90 minutes':((w==='S')?', season totals':', per game');
+  if(cnt)cnt.textContent=r.length+' players'+rate+span
    +(minm?', at least '+minm+' minutes played':', no minutes filter');
  }
  function chips(id,vals,cur,set){
@@ -465,8 +484,8 @@ XG_JS = """
   });
  }
  function sync(){
-  chips('xgw',[[3,'3'],[5,'5'],[10,'10']],function(){return w;},
-        function(v){w=v;});
+  chips('xgw',[[3,'3'],[5,'5'],[10,'10'],['S','Season']],
+        function(){return w;},function(v){w=v;});
   chips('xgr',[[0,'Per game'],[1,'Per 90']],function(){return per90?1:0;},
         function(v){
          var was=per90;per90=!!v;
