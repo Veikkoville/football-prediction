@@ -425,10 +425,16 @@
 						captured every projected point that budget allows.
 					</p>
 					<p>
-						Other FPL sites rate teams differently, so their number and ours are not comparable
-						and neither is wrong. Ours answers one narrow question: how much of the available
-						projected points did your squad capture? It says nothing about your rank, and
-						projections are estimates, not outcomes.
+						Some other FPL sites score you against other managers' submitted teams instead, so
+						their number is a percentile in a crowd. Both can be right at once: you can sit in
+						the top fifth of submitted squads while still leaving points on the table against
+						the budget ceiling. A crowd percentile also drifts as the crowd changes; a ceiling
+						does not.
+					</p>
+					<p>
+						Ours answers one narrow question: how much of the available projected points did
+						your squad capture? It says nothing about your rank, and projections are estimates,
+						not outcomes.
 					</p>
 				</details>
 			</div>
