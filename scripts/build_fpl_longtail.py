@@ -22,6 +22,7 @@ Ajo: python -m scripts.build_fpl_longtail  (accuracy-log.yml, 3 h)
 from __future__ import annotations
 
 import json
+import re
 import sys
 import urllib.request
 from datetime import datetime, timezone
@@ -146,6 +147,9 @@ font-weight:600;cursor:pointer;}
 .lbctl select{border:1px solid var(--line);background:var(--paper);
 color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
 font-weight:600;}
+/* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
+.lb td.tm{display:flex;align-items:center;gap:7px;}
+.kit{flex:0 0 auto;display:block;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 """
@@ -365,6 +369,92 @@ def render_price_changes(pw: dict, now: datetime) -> str:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+# Joukkuevarit lyhytkoodilla. LAHDE: web/pro-spa/src/lib/teamColors.ts
+# (joka on generoitu mobiilin lib/teamMeta.ts:sta) -> sama vari kaikilla
+# kolmella pinnalla. Klubien primary-varit ovat julkista tietoa.
+#
+# IP-TURVA: emme kayta pelaajakuvia emmeka klubien krestejä. Ne ovat Premier
+# Leaguen/klubien tekijanoikeus- ja tavaramerkkiaineistoa, ja appi on
+# molemmissa kaupoissa IP-puhtaana. Tassa renderoidaan NEUTRAALI paitasiluetti
+# joukkueen varilla + lyhenne, sama SVG-polku kuin TeamKit.svelte/TeamKit.tsx.
+_TEAM_COLORS = {
+    "ARS": ("#EF0107", "#FFFFFF"), "AVL": ("#670E36", "#FFFFFF"),
+    "BOU": ("#DA291C", "#FFFFFF"), "BRE": ("#E30613", "#FFFFFF"),
+    "BHA": ("#0057B8", "#FFFFFF"), "BUR": ("#6C1D45", "#FFFFFF"),
+    "CHE": ("#034694", "#FFFFFF"), "CRY": ("#1B458F", "#FFFFFF"),
+    "EVE": ("#003399", "#FFFFFF"), "FUL": ("#000000", "#FFFFFF"),
+    "IPS": ("#4172B5", "#FFFFFF"), "LEE": ("#FFCD00", "#1D428A"),
+    "LEI": ("#003090", "#FFFFFF"), "LIV": ("#C8102E", "#FFFFFF"),
+    "MCI": ("#6CABDD", "#FFFFFF"), "MUN": ("#DA291C", "#FFFFFF"),
+    "NEW": ("#241F20", "#FFFFFF"), "NFO": ("#DD0000", "#FFFFFF"),
+    "SHU": ("#EE2737", "#FFFFFF"), "SOU": ("#D71920", "#FFFFFF"),
+    "SUN": ("#EB172B", "#FFFFFF"), "TOT": ("#132257", "#FFFFFF"),
+    "WHU": ("#7A263A", "#FFFFFF"), "WOL": ("#FDB913", "#231F20"),
+}
+
+# Sama siluetti kuin TeamKit.svelte / TeamKit.tsx (1:1).
+_JERSEY = ("M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 "
+           "L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z")
+_SLEEVE_L = "M 33 15 L 16 27 L 24 42 L 33 36 Z"
+_SLEEVE_R = "M 67 15 L 84 27 L 76 42 L 67 36 Z"
+
+
+def _hash_color(name: str) -> str:
+    """Deterministinen fallback, peili teamColors.ts:n hashColorista."""
+    h = 0
+    for ch in name:
+        h = (h * 31 + ord(ch)) & 0xFFFFFF
+    return f"hsl({h % 360}, 45%, 32%)"
+
+
+def _team_color(short: str) -> tuple[str, str]:
+    hit = _TEAM_COLORS.get((short or "").upper())
+    return hit if hit else (_hash_color(short or "?"), "#FFFFFF")
+
+
+def _darken(hex_color: str, factor: float = 0.7) -> str:
+    m = re.fullmatch(r"#?([0-9a-fA-F]{6})", (hex_color or "").strip())
+    if not m:
+        return hex_color
+    n = int(m.group(1), 16)
+    parts = [max(0, round(((n >> s) & 0xFF) * factor)) for s in (16, 8, 0)]
+    return "#{:02x}{:02x}{:02x}".format(*parts)
+
+
+def _kit_defs(shorts) -> str:
+    """Yksi <symbol> per joukkue kerran sivun alussa.
+
+    MIKSI: rivikohtainen inline-SVG toisti saman polun 373 kertaa ja kasvatti
+    sivun 175 kB -> 468 kB. Joukkueita on ~20, joten symboli per joukkue +
+    pieni <use> per rivi pitaa sivun kevyena.
+    """
+    out = []
+    for s in sorted({(x or "").upper() for x in shorts if x}):
+        color, _ = _team_color(s)
+        sleeve = _darken(color)
+        # EI lyhennetta paidan sisalle: 26 px:ssa se on lukukelvoton ja sotkee
+        # siluetin, ja sama lyhenne on jo paidan vieressa omana solunaan.
+        # (TeamKit.svelte/tsx pitaa tekstin, koska ne renderoivat 44 px:ssa.)
+        out.append(
+            f'<symbol id="k{escape(s)}" viewBox="0 0 100 100">'
+            f'<path d="{_JERSEY}" fill="{color}"/>'
+            f'<path d="{_SLEEVE_L}" fill="{sleeve}"/>'
+            f'<path d="{_SLEEVE_R}" fill="{sleeve}"/>'
+            f'<path d="{_JERSEY}" fill="none" stroke="rgba(10,8,32,0.28)" '
+            f'stroke-width="3" stroke-linejoin="round"/>'
+            f"</symbol>"
+        )
+    return ('<svg width="0" height="0" style="position:absolute" '
+            'aria-hidden="true"><defs>' + "".join(out) + "</defs></svg>")
+
+
+def _kit_svg(short: str, size: int = 26) -> str:
+    """Viittaus valmiiseen symboliin. Ei krestia, ei sponsoria, ei pelaajakuvaa."""
+    s = escape((short or "").upper())
+    return (f'<svg class="kit" width="{size}" height="{size}" aria-hidden="true">'
+            f'<use href="#k{s}"/></svg>')
+
+
 def _xg_payload(leaders: dict) -> str:
     """Kompakti JSON selainlaskentaa varten: [nimi, joukkue, pos, hinta,
     [[min, xg, xa, xgi], ...enintaan 10 viimeisinta]].
@@ -395,6 +485,10 @@ def _xg_payload(leaders: dict) -> str:
             [int(s.get("mins") or 0), int(s.get("starts") or 0),
              float(s.get("xg") or 0.0), float(s.get("xa") or 0.0),
              float(s.get("xgi") or 0.0)],
+            # paidan varit [pohja, hiha, teksti] -> JS piirtaa saman kitin
+            list(_team_color(p.get("team_short", ""))[:1])
+            + [_darken(_team_color(p.get("team_short", ""))[0])]
+            + [_team_color(p.get("team_short", ""))[1]],
         ])
     return json.dumps(out, separators=(",", ":"), ensure_ascii=False)
 
@@ -405,6 +499,15 @@ XG_JS = """
 <script>
 (function(){
  var D=window.__XG__||[],w=5,per90=false,pos='',team='',key=5,desc=true;
+ // Sama neutraali paitasiluetti kuin palvelinrenderoinnissa ja
+ // TeamKit.svelte/TeamKit.tsx:ssa. Ei krestia eika pelaajakuvaa (IP).
+ var JP='M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 '
+  +'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
+ function kit(c,lbl){
+  // Viittaa samaan <symbol>-kirjastoon jonka palvelin renderoi kerran.
+  return '<svg class="kit" width="26" height="26" aria-hidden="true">'
+   +'<use href="#k'+(lbl||'').toUpperCase()+'"/></svg>';
+ }
  // Minuuttikynnys. Per 90 ilman tata on rikki: 2 minuuttia pelannut nousee
  // karkeen puhtaana kohinana. Kynnys on NAKYVA ja saadettava, ei hiljainen
  // piilotus: kayttaja nakee mika suodatin on paalla ja voi ottaa sen pois.
@@ -418,14 +521,14 @@ XG_JS = """
    // ei esiintymisia), "Per 90" jakaa minuuteilla.
    var s=p[5]||[0,0,0,0,0],d=per90?(s[0]/90):1;
    if(!d)d=1;
-   return {n:p[0],t:p[1],p:p[2],c:p[3],g:s[1],m:s[0],
+   return {n:p[0],t:p[1],p:p[2],c:p[3],g:s[1],m:s[0],k:p[6],
            xg:s[2]/d,xa:s[3]/d,xgi:s[4]/d};
   }
   var g=p[4].slice(-w),m=0,xg=0,xa=0,xgi=0;
   for(var i=0;i<g.length;i++){m+=g[i][0];xg+=g[i][1];xa+=g[i][2];xgi+=g[i][3];}
   var d=per90?(m/90):g.length;
   if(!d)d=1;
-  return {n:p[0],t:p[1],p:p[2],c:p[3],g:g.length,m:m,
+  return {n:p[0],t:p[1],p:p[2],c:p[3],g:g.length,m:m,k:p[6],
           xg:xg/d,xa:xa/d,xgi:xgi/d};
  }
  function rows(){
@@ -457,7 +560,8 @@ XG_JS = """
   var r=rows(),h='';
   for(var i=0;i<r.length;i++){
    var a=r[i];
-   h+='<tr><td class="n">'+(i+1)+'</td><td>'+a.n+'</td><td>'+a.t+'</td><td>'
+   h+='<tr><td class="n">'+(i+1)+'</td><td>'+a.n+'</td><td class="tm">'
+    +kit(a.k,a.t)+'<span>'+a.t+'</span></td><td>'
     +a.p+'</td><td class="n">'+a.c.toFixed(1)+'</td><td class="n hi">'
     +a.xg.toFixed(2)+'</td><td class="n">'+a.xa.toFixed(2)+'</td><td class="n">'
     +a.xgi.toFixed(2)+'</td><td class="n">'+a.m+'</td><td class="n">'+a.g
@@ -581,7 +685,8 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         "<tr>"
         f'<td class="n">{i + 1}</td>'
         f'<td>{escape(r["web_name"])}</td>'
-        f'<td>{escape(r["team_short"])}</td>'
+        f'<td class="tm">{_kit_svg(r["team_short"])}'
+        f'<span>{escape(r["team_short"])}</span></td>'
         f'<td>{escape(r["pos"])}</td>'
         f'<td class="n">{r["price"]:.1f}</td>'
         f'<td class="n hi">{r["xg_per_game"]:.2f}</td>'
@@ -592,6 +697,7 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         "</tr>"
         for i, r in enumerate(rows)
     )
+    kitdefs = _kit_defs(p.get("team_short") for p in (leaders.get("players") or []))
     controls = (
         '<div class="lbctl">'
         '<span class="lbl">Games</span><span id="xgw" class="chips"></span>'
@@ -632,7 +738,7 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         "game window, filter by position or team, and sort any column. No "
         "cut-off and no sign-in: this is public FPL match data, so it is not "
         "behind a subscription.</p>"
-        f"{controls}{table}{payload}{XG_JS}"
+        f"{kitdefs}{controls}{table}{payload}{XG_JS}"
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )
