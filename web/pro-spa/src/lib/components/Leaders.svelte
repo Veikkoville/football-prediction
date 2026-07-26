@@ -124,7 +124,10 @@
 			if (a.mins < minMins) continue;
 			out.push(a);
 		}
-		const dir = sortDesc ? -1 : 1;
+		// HUOM: vertailut ovat muotoa (y - x) eli VALMIIKSI laskevia, joten
+		// laskevassa kertoimen on oltava +1. Aiempi -1 kaansi listan nurin
+		// (xG 0.00 karjessa).
+		const dir = sortDesc ? 1 : -1;
 		out.sort((x, y) => {
 			if (sortKey === 'name') return dir * y.row.web_name.localeCompare(x.row.web_name);
 			if (sortKey === 'price') return dir * (y.row.price - x.row.price);
