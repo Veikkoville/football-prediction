@@ -188,10 +188,14 @@ def _squad_clubs_ok(squad: list[dict]) -> bool:
 _OPTIMAL_XP_CACHE: dict[str, float] = {}
 
 
-def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
-    """#50: paras mahdollinen laillinen budjettijoukkue -benchmark (XI:n
-    horisontti-xP). Korvaa satunnaisotoksen: "300 random squads" antoi lähes
-    kaikille oikeille joukkueille ~100 % = ontto imartelu (Hub 2,0★ -oppi 4).
+def optimal_budget_xi(pool: list[dict]) -> list[dict]:
+    """Sama heuristiikka kuin optimal_budget_team_xp, mutta palauttaa XI:n
+    PELAAJAT eikä pelkkää summaa.
+
+    MIKSI ERIKSEEN (26.7): "Model XI" halutaan renderöidä kenttägrafiikkana
+    julkiselle webille, ja siihen tarvitaan rivit eikä yhtä lukua. Logiikka on
+    tässä yhdessä paikassa, ja optimal_budget_team_xp kutsuu tätä → benchmark
+    ja grafiikka eivät voi eriytyä toisistaan.
 
     Heuristiikka (dokumentoitu, deterministinen — ei globaali optimi mutta kova
     ja rehellinen benchmark):
@@ -199,15 +203,15 @@ def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
          ulkopuolinen raha minimiin) → XI-budjetti = 100.0m − reservi.
       2. XI: ahne valinta horisontti-xP:llä; kiintiöt XI_MIN/MAX:n sisällä,
          max 3/klubi, ja joka poiminnalla varmistetaan että loput XI-paikat
-         voi vielä täyttää halvimmalla mahdollisella (budjetti ei lukkiudu)."""
-    hit = _OPTIMAL_XP_CACHE.get(cache_key)
-    if hit is not None:
-        return hit
+         voi vielä täyttää halvimmalla mahdollisella (budjetti ei lukkiudu).
+
+    Palauttaa [] jos laillista XI:tä ei saada kokoon.
+    """
     by_pos: dict[int, list[dict]] = {1: [], 2: [], 3: [], 4: []}
     for p in pool:
         by_pos[p["element_type"]].append(p)
     if any(len(by_pos[t]) < n for t, n in SQUAD_QUOTA.items()):
-        return 0.0
+        return []
 
     cheapest_gk = min(p["price"] for p in by_pos[1])
     outfield_prices = sorted(p["price"] for t in (2, 3, 4) for p in by_pos[t])
@@ -242,7 +246,20 @@ def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
         counts[t] += 1
         clubs[p["club"]] = clubs.get(p["club"], 0) + 1
         cost += p["price"]
-    total = sum(p["xp_horizon_total"] for p in xi) if len(xi) == 11 else 0.0
+    return xi if len(xi) == 11 else []
+
+
+def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
+    """#50: paras mahdollinen laillinen budjettijoukkue -benchmark (XI:n
+    horisontti-xP). Korvaa satunnaisotoksen: "300 random squads" antoi lähes
+    kaikille oikeille joukkueille ~100 % = ontto imartelu (Hub 2,0★ -oppi 4).
+
+    Rakentaa XI:n optimal_budget_xi():lla → yksi heuristiikka, ei kahta."""
+    hit = _OPTIMAL_XP_CACHE.get(cache_key)
+    if hit is not None:
+        return hit
+    xi = optimal_budget_xi(pool)
+    total = sum(p["xp_horizon_total"] for p in xi) if xi else 0.0
     _OPTIMAL_XP_CACHE[cache_key] = total
     return total
 

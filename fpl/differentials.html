@@ -107,6 +107,22 @@ font-weight:600;}
 /* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
 .kit{flex:0 0 auto;display:block;}
+/* Model XI -kentta */
+.pitch{background:linear-gradient(170deg,#0f7a3d,#0a5c2e);
+border:1px solid rgba(10,8,32,.25);border-radius:var(--radius);
+padding:22px 12px;margin:18px 0;
+background-image:repeating-linear-gradient(180deg,
+rgba(255,255,255,.05) 0 34px,rgba(255,255,255,0) 34px 68px),
+linear-gradient(170deg,#0f7a3d,#0a5c2e);}
+.xirow{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 16px;
+margin-bottom:20px;}
+.xirow:last-child{margin-bottom:0;}
+.xip{width:92px;text-align:center;color:#fff;}
+.xip b{display:block;font-size:12px;font-weight:700;margin-top:4px;
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.xip span{display:block;font-size:11px;opacity:.82;
+font-variant-numeric:tabular-nums;}
+@media (max-width:520px){.xip{width:70px;}.xirow{gap:8px 10px;}}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 </style>

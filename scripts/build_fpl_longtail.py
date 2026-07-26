@@ -150,6 +150,22 @@ font-weight:600;}
 /* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
 .kit{flex:0 0 auto;display:block;}
+/* Model XI -kentta */
+.pitch{background:linear-gradient(170deg,#0f7a3d,#0a5c2e);
+border:1px solid rgba(10,8,32,.25);border-radius:var(--radius);
+padding:22px 12px;margin:18px 0;
+background-image:repeating-linear-gradient(180deg,
+rgba(255,255,255,.05) 0 34px,rgba(255,255,255,0) 34px 68px),
+linear-gradient(170deg,#0f7a3d,#0a5c2e);}
+.xirow{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 16px;
+margin-bottom:20px;}
+.xirow:last-child{margin-bottom:0;}
+.xip{width:92px;text-align:center;color:#fff;}
+.xip b{display:block;font-size:12px;font-weight:700;margin-top:4px;
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.xip span{display:block;font-size:11px;opacity:.82;
+font-variant-numeric:tabular-nums;}
+@media (max-width:520px){.xip{width:70px;}.xirow{gap:8px 10px;}}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 """
@@ -453,6 +469,99 @@ def _kit_svg(short: str, size: int = 26) -> str:
     s = escape((short or "").upper())
     return (f'<svg class="kit" width="{size}" height="{size}" aria-hidden="true">'
             f'<use href="#k{s}"/></svg>')
+
+
+def render_model_xi(xp: dict, now: datetime) -> str | None:
+    """Model XI kenttagrafiikkana (26.7).
+
+    MIKSI: sivustolla ei ollut yhtaan grafiikkaa, ja "beat the model" -liigalla
+    ei ollut kotisivua. Mallin oma XI on jo olemassa oleva kasite (se postataan
+    someen gen_card.py:lla) mutta se ei nakynyt webissa missaan.
+
+    XI tulee fpl_rate_team.optimal_budget_xi():sta = SAMA heuristiikka kuin
+    rate-my-teamin benchmark, joten sivu ja tuote eivat voi eriytya.
+    """
+    from src.models.fpl_rate_team import (BUDGET_TENTHS, POS_NAME,
+                                          optimal_budget_xi)
+    players = xp.get("players") or []
+    if not xp.get("meta", {}).get("available") or not players:
+        return None
+    et = {"GKP": 1, "DEF": 2, "MID": 3, "FWD": 4}
+    pool = []
+    for p in players:
+        t = et.get(p.get("pos"))
+        if t is None or p.get("price") in (None, ""):
+            continue
+        pool.append({
+            "element_type": t,
+            "price": int(round(float(p["price"]) * 10)),   # tenths
+            "club": p.get("team_short") or p.get("team"),
+            "xp_horizon_total": float(p.get("xp_horizon_total") or 0.0),
+            "xp_per_gw": float(p.get("xp_per_gw") or 0.0),
+            "web_name": p.get("web_name") or "",
+            "team_short": p.get("team_short") or "",
+        })
+    xi = optimal_budget_xi(pool)
+    if not xi:
+        return None
+
+    rows = {t: [p for p in xi if p["element_type"] == t] for t in (1, 2, 3, 4)}
+    for t in rows:
+        rows[t].sort(key=lambda p: p["xp_horizon_total"], reverse=True)
+    shape = "-".join(str(len(rows[t])) for t in (2, 3, 4))
+    total_xp = sum(p["xp_horizon_total"] for p in xi)
+    cost = sum(p["price"] for p in xi) / 10.0
+
+    def line(ps: list[dict]) -> str:
+        cells = "".join(
+            '<div class="xip">'
+            f'{_kit_svg(p["team_short"], size=42)}'
+            f'<b>{escape(p["web_name"])}</b>'
+            f'<span>{p["xp_horizon_total"]:.1f} xP</span>'
+            "</div>"
+            for p in ps
+        )
+        return f'<div class="xirow">{cells}</div>'
+
+    pitch = ('<div class="pitch">'
+             + "".join(line(rows[t]) for t in (1, 2, 3, 4))
+             + "</div>")
+
+    url = f"{BASE}/fpl/model-xi"
+    title = "The GoalIQ Model XI: best legal FPL squad on xP | GoalIQ"
+    desc = (f"The best legal XI the model can build inside the 100.0m budget: "
+            f"{shape}, {total_xp:.1f} projected points over the horizon. "
+            f"Free, no sign-in, rebuilt daily.")
+    hero = ("<h1>The Model XI</h1>"
+            '<p class="lede">The strongest legal XI the GoalIQ model can build '
+            "inside the standard 100.0m budget, ranked on projected points. "
+            "This is the same squad logic the rate-my-team benchmark uses, so "
+            "the page and the product cannot drift apart.</p>")
+    body = (
+        f'<div class="stat-row">'
+        f'<div class="stat"><b>{shape}</b><span>Shape</span></div>'
+        f'<div class="stat"><b>{total_xp:.1f}</b><span>Projected points, XI</span></div>'
+        f'<div class="stat"><b>{cost:.1f}m</b><span>XI cost of {BUDGET_TENTHS / 10:.1f}m</span></div>'
+        f"</div>"
+        f"{_kit_defs(p['team_short'] for p in xi)}"
+        f"{pitch}"
+        '<p class="note">Shirts show club colours only. GoalIQ is not '
+        "affiliated with the Premier League and uses no club badges or player "
+        "images. Projected points are model estimates, not betting advice.</p>"
+        '<div class="rec">The model plays this season in a public mini-league. '
+        '<a href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9">'
+        "Join with code jgi6j9</a> and try to beat it. Season winner gets a "
+        "year of Premium, free.</div>"
+        f"{UPSELL}{_cta()}"
+        f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
 
 
 def _xg_payload(leaders: dict) -> str:
@@ -817,6 +926,12 @@ def main() -> int:
         if page:
             (OUT_DIR / "best-captain.html").write_text(page, encoding="utf-8")
             built.append("best-captain")
+        # 26.7: Model XI kenttagrafiikkana (sama XI-heuristiikka kuin
+        # rate-my-teamin benchmark) — antaa myos beat-the-model-liigalle kodin.
+        page = render_model_xi(xp, now)
+        if page:
+            (OUT_DIR / "model-xi.html").write_text(page, encoding="utf-8")
+            built.append("model-xi")
 
     diff = _fetch_differentials()
     if diff:
