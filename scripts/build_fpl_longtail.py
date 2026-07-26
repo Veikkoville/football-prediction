@@ -150,22 +150,20 @@ font-weight:600;}
 /* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
 .kit{flex:0 0 auto;display:block;}
-/* Model XI -kentta */
-.pitch{background:linear-gradient(170deg,#0f7a3d,#0a5c2e);
-border:1px solid rgba(10,8,32,.25);border-radius:var(--radius);
-padding:22px 12px;margin:18px 0;
-background-image:repeating-linear-gradient(180deg,
-rgba(255,255,255,.05) 0 34px,rgba(255,255,255,0) 34px 68px),
-linear-gradient(170deg,#0f7a3d,#0a5c2e);}
-.xirow{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 16px;
-margin-bottom:20px;}
-.xirow:last-child{margin-bottom:0;}
-.xip{width:92px;text-align:center;color:#fff;}
-.xip b{display:block;font-size:12px;font-weight:700;margin-top:4px;
+/* Model XI -kentta. 26.7: sama ilme kuin SPA:n TeamPitchManagerilla ja
+   mobiilin #106-pitchilla (teal-tint, #108-paletti) - EI nurmivaria. Villen
+   paatos: brandipaletti voittaa kirjaimellisen nurmen, ja kolmen pinnan
+   pitaa nayttaa samalta. */
+.pitch{background:rgba(0,194,173,0.08);border:1px solid var(--line);
+border-radius:14px;padding:10px 6px;margin:18px 0;}
+.xirow{display:flex;justify-content:space-evenly;flex-wrap:wrap;gap:8px;
+margin:10px 0;}
+.xip{width:76px;text-align:center;color:var(--ink);}
+.xip b{display:block;font-size:11px;font-weight:600;margin-top:2px;
 overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.xip span{display:block;font-size:11px;opacity:.82;
+.xip span{display:block;font-size:10px;color:var(--muted);
 font-variant-numeric:tabular-nums;}
-@media (max-width:520px){.xip{width:70px;}.xirow{gap:8px 10px;}}
+@media (max-width:520px){.xip{width:64px;}.xirow{gap:6px;}}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 """
@@ -515,7 +513,7 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
     def line(ps: list[dict]) -> str:
         cells = "".join(
             '<div class="xip">'
-            f'{_kit_svg(p["team_short"], size=42)}'
+            f'{_kit_svg(p["team_short"], size=44)}'
             f'<b>{escape(p["web_name"])}</b>'
             f'<span>{p["xp_horizon_total"]:.1f} xP</span>'
             "</div>"
