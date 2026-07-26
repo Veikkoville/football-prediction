@@ -161,10 +161,30 @@ def test_adjust_summaries_total_bonus_conserved_no_ties():
 def test_fantasy_xp_endpoint_shape(client):
     r = client.get("/api/fantasy/xp")
     assert r.status_code == 200
-    assert r.headers["cache-control"] == "no-store"
+    # 26.7 PERF: tietoinen poikkeus muiden endpointtien no-storeen — ainoa iso
+    # payload (555 kB) haettiin joka sivulatauksella vaikka data on 3 h vanhaa.
+    # `private` + `Vary: Authorization` ovat pakollisia, koska vastaus riippuu
+    # Bearer-tokenista (mask_xp_payload) eikä saa päätyä jaettuun välimuistiin.
+    assert r.headers["cache-control"] == "private, max-age=300"
+    assert r.headers["vary"] == "Authorization"
+    assert r.headers["etag"].startswith('W/"xp-')
     data = r.json()
     assert "meta" in data and "players" in data
     assert isinstance(data["players"], list)
+
+
+def test_fantasy_xp_etag_revalidates_to_304(client):
+    """Toinen haku samalla ETagilla → 304 eikä payloadia siirretä uudelleen."""
+    first = client.get("/api/fantasy/xp")
+    etag = first.headers["etag"]
+    again = client.get("/api/fantasy/xp", headers={"If-None-Match": etag})
+    assert again.status_code == 304
+    assert again.headers["etag"] == etag
+    assert again.content == b""
+    # Väärä ETag → täysi vastaus (ei hiljaista 304:ää vanhentuneelle datalle)
+    stale = client.get("/api/fantasy/xp", headers={"If-None-Match": 'W/"xp-old-f"'})
+    assert stale.status_code == 200
+    assert "players" in stale.json()
 
 
 # ---------------------------------------------------------------------------

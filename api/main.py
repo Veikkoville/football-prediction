@@ -2537,16 +2537,49 @@ def fantasy_xp(request: Request, response: Response):
     Jos tiedostoa ei ole committattu → available=False-runko.
 
     Premium-portitus hoidetaan frontendissä (backend palauttaa datan) —
-    sama malli kuin /api/fantasy. no-store-perustelu sama kuin /api/accuracy.
+    sama malli kuin /api/fantasy.
+
+    26.7 PERF — POIKKEUS no-store-linjaan (vrt. /api/accuracy #103): tämä on
+    ainoa iso payload (555 kB raakana, ~60 kB br) ja se haettiin uudelleen
+    JOKA sivulatauksella, vaikka projektio päivittyy 3 h välein. Nyt:
+      - `private` + `Vary: Authorization` — vastaus riippuu Bearer-tokenista
+        (mask_xp_payload), joten jaettu välimuisti ei saa tallentaa sitä.
+        `private` kieltää CDN/proxyn, `Vary` suojaa loputkin.
+      - `max-age=300` — 5 min ikkunassa ei verkkokutsua lainkaan. Data on
+        3 h vanhaa joka tapauksessa, joten viive ei tuo uutta epätarkkuutta.
+        Saatavuuslippujen (Garner-case) kannalta 5 min on siedettävä; hard
+        reload ohittaa välimuistin.
+      - ETag `generated_at` + mask-tila → sen jälkeen ehdollinen pyyntö
+        vastaa 304:llä eikä 60 kB:tä siirretä uudelleen.
+    Mobiili (fetchXp) ja SPA hyötyvät molemmat ilman klienttimuutosta.
     """
     from src.models.fpl_xp import load_xp
-    response.headers["Cache-Control"] = "no-store"
     payload = load_xp()
     # Edge-sprint P0c: PREMIUM_ENFORCE=on + ei-premium -> typistetty teaser
     # (top-10 taysia riveja, meta.masked=true). Flagi off (default) -> tama
     # haara ei koskaan aja ja vastaus on bittitarkasti ennallaan.
+    masked = False
     if payload.get("players") and not is_premium_request(request):
         payload = mask_xp_payload(payload)
+        masked = True
+    # ETag erottaa maskatun ja täyden vastauksen: ilman mask-bittiä free-
+    # käyttäjän 304 voisi validoida premium-rivit selaimen välimuistista.
+    generated = str(payload.get("meta", {}).get("generated_at") or "0")
+    etag = 'W/"xp-{}-{}"'.format(generated, "m" if masked else "f")
+    cache_control = "private, max-age=300"
+    inm = request.headers.get("if-none-match", "")
+    if etag in [t.strip() for t in inm.split(",")]:
+        return Response(
+            status_code=304,
+            headers={
+                "ETag": etag,
+                "Cache-Control": cache_control,
+                "Vary": "Authorization",
+            },
+        )
+    response.headers["Cache-Control"] = cache_control
+    response.headers["ETag"] = etag
+    response.headers["Vary"] = "Authorization"
     return payload
 
 

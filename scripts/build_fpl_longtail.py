@@ -189,8 +189,12 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         '<link rel="icon" href="/favicon.ico" sizes="any">\n'
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link href="https://fonts.googleapis.com/css2?family='
-        'Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">\n'
+        # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
+        # odota kolmannen osapuolen CSS:ää. noscript = varmistus.
+        '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family='
+        'Space+Grotesk:wght@500;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
+        '<noscript><link href="https://fonts.googleapis.com/css2?family='
+        'Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>\n'
         '<meta name="theme-color" content="#0A0820">\n'
         f"{ld}"
         f"<style>{CSS}</style>\n"
