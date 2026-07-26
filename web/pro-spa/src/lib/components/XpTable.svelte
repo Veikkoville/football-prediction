@@ -110,11 +110,21 @@
 			)
 			.toSorted(SORTS[sortBy].cmp);
 	});
+	// 26.7 PERF: koko 373 pelaajan lista renderöityi kerralla (~4 500 DOM-solmua
+	// pelkkään tähän tauluun) ja lajittelu/suodatus siirteli ne kaikki. Sama
+	// korjaus kuin Leaders.sveltessä ja /fpl/xg-leaders-sivulla: näytetään 100
+	// riviä, suodatus ja lajittelu koskevat silti KOKO aineistoa. Haku ei osu
+	// tähän rajaan käytännössä (osumia harvoin >100).
+	const RENDER_LIMIT = 100;
+	let showAll = $state(false);
+	let shown = $derived(showAll ? pool : pool.slice(0, RENDER_LIMIT));
+	let hiddenCount = $derived(pool.length - shown.length);
+
 	// Joukkueittain-ryhmittely: seurat aakkosin, pelaajat valitussa sortissa.
 	let groups = $derived.by(() => {
-		if (!groupByTeam) return [{ team: null as string | null, players: pool }];
+		if (!groupByTeam) return [{ team: null as string | null, players: shown }];
 		const byTeam = new Map<string, XpPlayer[]>();
-		for (const p of pool) {
+		for (const p of shown) {
 			const list = byTeam.get(p.team) ?? [];
 			list.push(p);
 			byTeam.set(p.team, list);
@@ -357,6 +367,12 @@
 	</table>
 </div>
 
+{#if hiddenCount > 0}
+	<button type="button" class="show-all" onclick={() => (showAll = true)}>
+		Show all {pool.length} players
+	</button>
+{/if}
+
 {#if compPool.length > 0}
 	<h3>How the GW{compGw} xP is built</h3>
 	<p class="muted">
@@ -400,6 +416,23 @@
 {/if}
 
 <style>
+	/* 26.7 PERF: rivirajauksen purku (sama chip-kieli kuin Leadersissa) */
+	.show-all {
+		margin-top: var(--s-3);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.show-all:hover {
+		color: var(--text);
+		border-color: var(--giq-magenta);
+	}
 	.controls {
 		display: flex;
 		flex-wrap: wrap;

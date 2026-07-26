@@ -37,8 +37,13 @@
 		}
 	});
 
+	// 26.7 PERF: ehtona oli AIEMMIN myös auth.sub, joten 555 kB:n xP-haku lähti
+	// vasta kun tilaustarkistus oli valmis → sarjallinen ketju sessio → tilaus →
+	// data (~1,3 s desktopilla, moninkertainen mobiiliverkossa). Nyt haku lähtee
+	// heti session ratkettua, rinnakkain tilaustarkistuksen kanssa; renderöinti
+	// on yhä auth.sub-haaran takana alla → EI premium-vuotoa UI:hin.
 	$effect(() => {
-		if (auth.user && auth.sub && !xp && !xpError) {
+		if (auth.user && !xp && !xpError) {
 			fetchXp().then(
 				(d) => (xp = d),
 				(e) => (xpError = String(e))

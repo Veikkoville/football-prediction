@@ -109,23 +109,25 @@ export async function refreshSubscription(): Promise<void> {
 	if (!user) return;
 	auth.subLoading = true;
 	try {
-		const { data: rows } = await supabase
-			.from('web_subscriptions')
-			.select('status, plan, current_period_end')
-			.eq('user_id', user.id)
-			.eq('status', 'active')
-			.order('current_period_end', { ascending: false })
-			.limit(1);
+		// 26.7 PERF: nämä kaksi olivat SARJASSA (web_subscriptions → profiles),
+		// ja mobiilitilaaja osuu AINA molempiin → kaksi peräkkäistä RTT:tä ennen
+		// kuin premium-näkymä edes alkaa. Rinnakkain: hinta = yksi ylimääräinen
+		// kevyt profiles-kysely web-tilaajalle, hyöty = yksi RTT pois kaikilta.
+		const [{ data: rows }, { data: prof }] = await Promise.all([
+			supabase
+				.from('web_subscriptions')
+				.select('status, plan, current_period_end')
+				.eq('user_id', user.id)
+				.eq('status', 'active')
+				.order('current_period_end', { ascending: false })
+				.limit(1),
+			// Cross-platform (#7): mobiilitilaajan profiles.is_premium honoroituu
+			supabase.from('profiles').select('is_premium').eq('id', user.id).limit(1)
+		]);
 		if (rows && rows.length > 0) {
 			auth.sub = rows[0] as GiqSub;
 			return;
 		}
-		// Cross-platform (#7): mobiilitilaajan profiles.is_premium honoroituu
-		const { data: prof } = await supabase
-			.from('profiles')
-			.select('is_premium')
-			.eq('id', user.id)
-			.limit(1);
 		auth.sub =
 			prof && prof.length > 0 && prof[0].is_premium
 				? { status: 'active', plan: 'app', current_period_end: null }
