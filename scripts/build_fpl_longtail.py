@@ -123,6 +123,16 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:22px 0 34px;
 color:var(--muted);font-size:13px;}
 footer a{color:var(--magenta-deep);}
 .note{color:var(--muted);font-size:12px;margin:18px 0;}
+/* 26.7: vapautettu xG-leaderboard, koko taulukko ilmaiseksi */
+.lb-wrap{overflow-x:auto;margin:14px 0;}
+.lb{width:100%;border-collapse:collapse;font-size:14px;}
+.lb th,.lb td{padding:8px 10px;text-align:left;
+border-bottom:1px solid var(--line);white-space:nowrap;}
+.lb th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+color:var(--muted);font-weight:700;}
+.lb td.n,.lb th.n{text-align:right;font-variant-numeric:tabular-nums;}
+.lb td.hi{color:var(--magenta-deep);font-weight:700;}
+.lb tbody tr:last-child td{border-bottom:none;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 """
@@ -343,13 +353,19 @@ def render_price_changes(pw: dict, now: datetime) -> str:
 
 
 def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
-    """#128/#120: 'Top xG performers' — top-3 luvuilla (free-pariteetti:
-    top-3 free appissa), sijat 4-10 niminä ilman lukuja → Premium.
-    Basis-label AINA näkyvissä (25/26-esikausidata, ei arvauksia)."""
+    """#128/#120: 'Top xG performers'.
+
+    26.7: VAPAUTETTU. Aiemmin top-3 luvuilla + sijat 4-10 pelkkinä niminä
+    ("Per-game numbers, xGI and position filters are on GoalIQ Premium").
+    Maksumuuri hyödykedatan päällä ei puolustanut mitään — xG/xA/xGI on FPL:n
+    itsensä julkaisemaa taaksepäin katsovaa dataa, jonka kilpailijat antavat
+    ilmaiseksi. Nyt koko top-100 kaikilla sarakkeilla, ei porttia. Upsell
+    siirtyi eteenpäin katsoviin mallin tuotoksiin (xP, captain ranker).
+    Basis-label AINA näkyvissä (esikaudella 25/26-data, ei arvauksia)."""
     from src.models.fpl_leaders import rank_xg_leaders
     if not leaders.get("meta", {}).get("available"):
         return None
-    out = rank_xg_leaders(leaders, window=5, top_n=10)
+    out = rank_xg_leaders(leaders, window=5, top_n=100)
     rows = out["players"]
     if not rows:
         return None
@@ -368,22 +384,46 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         f'xG/game · {r["games"]} games</span></div>'
         for i, r in enumerate(rows[:3])
     )
-    rest = ", ".join(escape(r["web_name"]) for r in rows[3:10])
+    # Koko lista taulukkona. Kaksi desimaalia on tarkoituksellista: 0.46 ja
+    # 0.54 eivät saa näyttää samalta (FPL-yhteisön palaute 26.7).
+    trows = "".join(
+        "<tr>"
+        f'<td class="n">{i + 1}</td>'
+        f'<td>{escape(r["web_name"])}</td>'
+        f'<td>{escape(r["team_short"])}</td>'
+        f'<td>{escape(r["pos"])}</td>'
+        f'<td class="n">{r["price"]:.1f}</td>'
+        f'<td class="n hi">{r["xg_per_game"]:.2f}</td>'
+        f'<td class="n">{r["xa_per_game"]:.2f}</td>'
+        f'<td class="n">{r["xgi_per_game"]:.2f}</td>'
+        f'<td class="n">{r["games"]}</td>'
+        "</tr>"
+        for i, r in enumerate(rows)
+    )
+    table = (
+        '<div class="lb-wrap"><table class="lb">'
+        "<thead><tr>"
+        '<th class="n">#</th><th>Player</th><th>Team</th><th>Pos</th>'
+        '<th class="n">Price</th><th class="n">xG/game</th>'
+        '<th class="n">xA/game</th><th class="n">xGI/game</th>'
+        '<th class="n">Games</th>'
+        "</tr></thead>"
+        f"<tbody>{trows}</tbody></table></div>"
+    )
     hero = (
         "<h1>Top xG performers in FPL</h1>"
         '<p class="lede">Which players generate the most expected goals (xG) '
         "per game? Ranked over each player's last five played matches from "
-        "official FPL match data.</p>"
+        "official FPL match data. Free, no sign-in, updated daily.</p>"
     )
     body = (
         f'<p class="note"><strong>{escape(basis)}</strong></p>'
         f'<div class="stat-row">{top3}</div>'
-        + (
-            f'<p class="note">Also in the top 10: {rest}. Per-game numbers, '
-            f"xGI and position filters are on GoalIQ Premium.</p>"
-            if rest
-            else ""
-        )
+        f"<h2>Full leaderboard: top {len(rows)}</h2>"
+        '<p class="note">xG, xA and xGI per game, to two decimals. All of it '
+        "free: this is public FPL match data, so it is not behind a "
+        "subscription.</p>"
+        f"{table}"
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )

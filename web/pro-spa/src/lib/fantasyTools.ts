@@ -439,7 +439,8 @@ export interface DefconLeadersResponse {
 
 /** #137: window = pelien lukumäärä (3-10). Vanha backend ignoroi → oletusikkuna. */
 export function fetchXgLeaders(window = 5): Promise<XgLeadersResponse> {
-	return getTool(`/api/fantasy/xg-leaders?window=${window}`, 'xg_leaders');
+	// 26.7: xG vapautettu ilmaiseksi → API:n maksimi (100) oletuksen 20 sijaan.
+	return getTool(`/api/fantasy/xg-leaders?window=${window}&top_n=100`, 'xg_leaders');
 }
 
 export function fetchDefconLeaders(window = 5): Promise<DefconLeadersResponse> {

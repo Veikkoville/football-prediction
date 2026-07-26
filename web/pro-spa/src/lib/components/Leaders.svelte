@@ -1,10 +1,17 @@
 <script lang="ts">
 	/**
 	 * Leaders (#124/#125) — xG leaders + DefCon tracker (FPLWolfy-ehdotukset).
-	 * Sama korttikieli kuin value/differentials. Top-3 free + koko lista
-	 * premium (#114-linja, source fantasy_leaders). Basis-label AINA näkyvissä
+	 * Sama korttikieli kuin value/differentials. Basis-label AINA näkyvissä
 	 * (datarajoitukset ensiluokkaisena: esikausi = 25/26-data, otoskoko per
 	 * rivi, ei arvauksia).
+	 *
+	 * 26.7: xG-lista VAPAUTETTU kokonaan ilmaiseksi. xG/xA/xGI on FPL:n itsensä
+	 * julkaisemaa taaksepäin katsovaa dataa, jonka kilpailijat (fpl.page ym.)
+	 * antavat ilmaiseksi — maksumuuri hyödykedatan päällä ei puolusta mitään ja
+	 * on ristiriidassa "ilmaistaso on aidosti hyödyllinen" -lupauksen kanssa.
+	 * DefCon PYSYY premiumissa: hit rate + kynnysanalyysi on oma johdannaisemme,
+	 * ei julkista dataa. Maksumuuri kuuluu eteenpäin katsoviin mallin tuotoksiin
+	 * (xP, captain ranker, chips, edge), ei menneisyyteen.
 	 */
 	import { capture } from '$lib/analytics';
 	import {
@@ -40,12 +47,15 @@
 	});
 
 	$effect(() => {
-		if (!premium && ((xg?.players?.length ?? 0) > 0 || (defcon?.players?.length ?? 0) > 0)) {
+		// Paywall koskee enää DefConia — xG on ilmainen, joten sen näyttäminen
+		// ei ole paywall-tapahtuma.
+		if (!premium && (defcon?.players?.length ?? 0) > 0) {
 			capture('paywall_shown', { source: 'fantasy_leaders' }, 'paywall_shown_fantasy_leaders');
 		}
 	});
 
-	const xgVisible = $derived(premium ? (xg?.players ?? []) : (xg?.players ?? []).slice(0, FREE_ROWS));
+	// xG: koko lista kaikille, myös ilmaiskäyttäjille.
+	const xgVisible = $derived(xg?.players ?? []);
 	const dcVisible = $derived(
 		premium ? (defcon?.players ?? []) : (defcon?.players ?? []).slice(0, FREE_ROWS)
 	);
@@ -166,11 +176,11 @@
 		</div>
 	{/if}
 
-	{#if !premium && ((xg?.players?.length ?? 0) > FREE_ROWS || (defcon?.players?.length ?? 0) > FREE_ROWS)}
-		<!-- 🔒 top-3 free → loput premium (#114-linja) -->
+	{#if !premium && (defcon?.players?.length ?? 0) > FREE_ROWS}
+		<!-- 🔒 DefCon top-3 free → koko lista premium. xG-lista on ilmainen. -->
 		<button type="button" class="teaser-row" onclick={unlock}>
 			<span>
-				Full xG and DefCon leaderboards <span class="muted">(top 3 shown free)</span>
+				Full DefCon leaderboard <span class="muted">(top 3 shown free)</span>
 			</span>
 			<span class="locked" aria-label="Locked">•.••</span>
 			<span class="cta">Unlock with Premium</span>
