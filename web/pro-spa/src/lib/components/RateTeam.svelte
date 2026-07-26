@@ -734,7 +734,7 @@
 		opacity: 1;
 	}
 	.plan-box {
-		background: var(--giq-paper, #f6f4ff);
+		background: var(--giq-paper);
 		border: 1px solid var(--border);
 		border-radius: var(--radius);
 		padding: var(--s-3);
@@ -866,7 +866,7 @@
 	.method summary {
 		cursor: pointer;
 		font-weight: 600;
-		color: var(--giq-magenta-deep, #d6006e);
+		color: var(--giq-magenta-deep);
 	}
 	.method p {
 		margin: var(--s-2) 0 0;

@@ -44,13 +44,15 @@
 		align-items: center;
 		gap: var(--s-2);
 		font-size: 14px;
-		color: var(--muted, #575170);
+		/* --muted ei ole olemassa, joten VANHA sinertava #575170 renderoitui
+		   yha classic-vaihdon jalkeen. Oikea token on --text-muted. */
+		color: var(--text-muted);
 		opacity: 0.45;
 		transition: opacity 0.2s ease;
 	}
 	.step.active {
 		opacity: 1;
-		color: var(--text, inherit);
+		color: var(--text);
 		font-weight: 600;
 	}
 	.step.done {
@@ -68,12 +70,12 @@
 		flex: none;
 	}
 	.step.active .marker {
-		border-color: var(--positive, #00c2ad);
+		border-color: var(--positive);
 		animation: pulse 1s ease-in-out infinite;
 	}
 	.step.done .marker {
-		border-color: var(--positive, #00c2ad);
-		color: var(--positive, #00c2ad);
+		border-color: var(--positive);
+		color: var(--positive);
 	}
 	@keyframes pulse {
 		0%,

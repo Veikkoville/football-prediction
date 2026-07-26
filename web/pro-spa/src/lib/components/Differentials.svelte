@@ -195,10 +195,10 @@
 		color: var(--text);
 	}
 	.delta-pos {
-		color: var(--positive, #00c2ad);
+		color: var(--positive);
 	}
 	.delta-neg {
-		color: var(--negative, #d64550);
+		color: var(--negative);
 	}
 	.mvc {
 		margin-top: var(--s-5);

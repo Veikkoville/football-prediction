@@ -36,7 +36,12 @@
 	/* hiusviiva kantaa rakenteen — siksi hieman vahvempi kuin ennen */
 	--border: rgba(32, 31, 29, 0.18);
 	--text: var(--giq-ink);
-	--text-muted: #5c574f;
+	/* --giq-muted on brandi-tason alias, jotta komponentti joka JOUTUU
+	   ylikirjoittamaan --text-mutedin (Hero-bandin .menu) voi viitata samaan
+	   arvoon eika kovakoodaa omaansa. Juuri sellainen kovakoodaus jatti
+	   vanhan sinertavan #5c566b elamaan classic-vaihdon yli. */
+	--giq-muted: #5c574f;
+	--text-muted: var(--giq-muted);
 	/* primary action = kulta, ei magenta (magenta on varattu kolmeen työhön) */
 	--accent: var(--giq-gold);
 	--accent-strong: var(--giq-gold-deep);
@@ -71,6 +76,12 @@
 	--s-2: 0.5rem;
 	--s-3: 0.75rem;
 	--s-4: 1rem;
+	/* --s-5 PUUTTUI, vaikka nelja komponenttia kayttaa sita (Differentials,
+	   Hero, Leaders, Value). Maarittelematon var() ilman fallbackia tekee
+	   koko deklaraatiosta virheellisen -> selain PUDOTTAA sen, eli nailta
+	   neljalta katosi margin/padding kokonaan. Portit eivat nae tallaista:
+	   CSS on syntaktisesti validia ja svelte-check ei tarkista tokeneita. */
+	--s-5: 1.25rem;
 	--s-6: 1.5rem;
 	--s-8: 2rem;
 	--s-12: 3rem;

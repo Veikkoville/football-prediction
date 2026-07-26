@@ -56,7 +56,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.15rem;
-		font-size: var(--step--1, 0.85rem);
+		font-size: var(--step--1);
 	}
 	.text {
 		color: var(--text-muted);

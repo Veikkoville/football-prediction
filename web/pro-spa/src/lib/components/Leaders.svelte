@@ -415,7 +415,7 @@
 		cursor: pointer;
 	}
 	.sortbtn:hover {
-		color: var(--giq-magenta-deep, #d6006e);
+		color: var(--giq-magenta-deep);
 	}
 	.window-row select {
 		flex: 0 0 auto;
@@ -442,7 +442,7 @@
 		display: block;
 	}
 	.basis {
-		color: var(--giq-gold-deep, #f4a800);
+		color: var(--giq-gold-deep);
 		font-weight: 600;
 		font-size: var(--step--1);
 		margin: 0 0 var(--s-3);

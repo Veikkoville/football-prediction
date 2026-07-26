@@ -430,7 +430,7 @@
 		align-items: baseline;
 		justify-content: space-between;
 		gap: var(--s-3);
-		background: var(--giq-paper, #f6f4ff);
+		background: var(--giq-paper);
 		border-radius: var(--radius);
 		padding: var(--s-2) var(--s-3);
 		margin-bottom: var(--s-3);

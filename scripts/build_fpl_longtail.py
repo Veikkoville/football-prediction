@@ -194,9 +194,9 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
         # odota kolmannen osapuolen CSS:ää. noscript = varmistus.
         '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family='
-        'Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
+        'Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
         '<noscript><link href="https://fonts.googleapis.com/css2?family='
-        'Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>\n'
+        'Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet"></noscript>\n'
         '<meta name="theme-color" content="#F3F2F2">\n'
         f"{ld}"
         f"<style>{CSS}</style>\n"

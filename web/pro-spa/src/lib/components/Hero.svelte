@@ -187,7 +187,9 @@
 	   .muted, inputit perivät nämä). */
 	.menu {
 		--text: var(--giq-ink);
-		--text-muted: #5c566b;
+		/* oli kovakoodattu vanha sinertava #5c566b, joka jai elamaan classic-
+		   vaihdon yli. Viittaa nyt samaan lahteeseen kuin :root. */
+		--text-muted: var(--giq-muted);
 		--border: rgba(10, 8, 32, 0.18);
 		position: absolute;
 		top: calc(100% + 10px);

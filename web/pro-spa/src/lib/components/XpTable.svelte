@@ -530,7 +530,9 @@
 		padding: 2px 6px;
 	}
 	.csv-eu {
-		color: var(--muted);
+		/* --muted ei ole olemassa (oikea nimi on --text-muted) -> ilman
+		   fallbackia tama rivi putosi ja teksti peri viereisen varin. */
+		color: var(--text-muted);
 		font-size: var(--step--1);
 		margin: var(--s-3) 0 0;
 	}
@@ -538,7 +540,7 @@
 		background: none;
 		border: 0;
 		padding: 0;
-		color: var(--giq-magenta-deep, #d6006e);
+		color: var(--giq-magenta-deep);
 		font: inherit;
 		font-weight: 700;
 		cursor: pointer;
