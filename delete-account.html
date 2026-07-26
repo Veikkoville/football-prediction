@@ -6,29 +6,29 @@
   <title>GoalIQ – Delete Your Account</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" onload="this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>
-  <meta name="theme-color" content="#0A0820">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+  <meta name="theme-color" content="#F3F2F2">
   <style>
     /* #54 OSA B: vaalea branditeema (Ink -> Cream token-flip, brand-tokens.md).
        Header-band pysyy tumman inkin varissa + magenta-bar (on-brand). */
     :root {
       --magenta: #FF2E7E;
-      --magenta-deep: #D6006E;
-      --ink: #0A0820;
+      --magenta-deep: #C4005F;
+      --ink: #201F1D;
       --ink2: #140F1E;
-      --cream: #FFF6EC;
+      --cream: #F3F2F2;
       --card: #FFFFFF;
       --border: rgba(10,8,32,0.12);
-      --line: rgba(10,8,32,0.12);
-      --text: #0A0820;
-      --muted: #575170;
+      --line: rgba(32,31,29,0.18);
+      --text: #201F1D;
+      --muted: #5C574F;
       --accent: #FF2E7E;
       /* teal TEKSTINÄ vaalealla pohjalla: syvennetty sävy (AA 4.9:1 kermalla) */
       --accent2: #007A6C;
       /* coral-teksti vaalealla: syvennetty (AA 4.8:1 kermalla) */
       --warn: #C2410C;
-      --radius: 16px;
+      --radius: 2px;
     }
     * { box-sizing: border-box; }
     html, body { overflow-x: clip; }
@@ -40,9 +40,9 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    h1, h2, h3, .brand { font-family: "Space Grotesk", -apple-system, "Segoe UI", sans-serif; }
-    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); color: var(--cream); border-bottom: 1px solid var(--line); }
-    .bar { height: 6px; background: var(--magenta); }
+    h1, h2, h3, .brand { font-family:"Cormorant Garamond",Georgia,serif; }
+    .site-header { background: var(--cream); color: var(--cream); border-bottom: 1px solid var(--line); }
+    .bar { height:1px;background:var(--line); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -52,7 +52,7 @@
     .brand-icon { width: 32px; height: 32px; border-radius: 9px; display: block; }
     .brand span { color: var(--magenta); }
     .nav-cta {
-      display: inline-block; background: var(--magenta); color: #fff;
+      display: inline-block; background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235);
       text-decoration: none; padding: 11px 20px; border-radius: 999px; font-weight: 800; font-size: 14px;
     }
     .nav-cta:hover { background: var(--magenta-deep); }
@@ -102,7 +102,7 @@
       height: 28px;
       border-radius: 14px;
       background: var(--magenta);
-      color: #fff;
+      color: var(--ink);
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -114,7 +114,7 @@
       margin-top: 8px;
       padding: 12px 22px;
       background: var(--magenta);
-      color: #fff;
+      color: var(--ink);
       border-radius: 999px;
       font-weight: 700;
     }

@@ -41,43 +41,25 @@
 		);
 	});
 
-	// #148: jatkuva CS%-väriskaala soluihin (#144-mobiilipariteetti) — FDR-
-	// bucket-tint ei säilytä edes järjestystä cs_pct:ssä. Ankkurit = FDR-
-	// chippien brändivärit (magenta-deep → coral → gold-deep → gold → teal)
-	// samoissa cs_pct-pisteissä kuin mobiilin CS_STOPS. Tint pitää solun
-	// luettavana vaalealla pohjalla (vahvin = matalin CS% = magenta).
-	const CS_COLOR_STOPS: [number, string][] = [
-		[8, '#D6006E'],
-		[20, '#FF6A3D'],
-		[32, '#F4A800'],
-		[44, '#FFC93C'],
-		[58, '#19E3D2']
-	];
-	function csCellBg(csPct: number): string {
-		const stops = CS_COLOR_STOPS;
-		let hex = stops[0][1];
-		if (csPct >= stops[stops.length - 1][0]) {
-			hex = stops[stops.length - 1][1];
-		} else if (csPct > stops[0][0]) {
-			for (let i = 0; i < stops.length - 1; i++) {
-				if (csPct <= stops[i + 1][0]) {
-					const t = (csPct - stops[i][0]) / (stops[i + 1][0] - stops[i][0]);
-					const a = stops[i][1];
-					const b = stops[i + 1][1];
-					const mix = [1, 3, 5].map((j) =>
-						Math.round(
-							parseInt(a.slice(j, j + 2), 16) +
-								(parseInt(b.slice(j, j + 2), 16) - parseInt(a.slice(j, j + 2), 16)) * t
-						)
-					);
-					hex = `#${mix.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
-					break;
-				}
-			}
-		}
-		// vahvempi tint vaikeimmille (matala CS%) — #96-oppi käännettynä
-		const tint = csPct <= 20 ? 26 : 16;
-		return `color-mix(in srgb, ${hex} ${tint}%, transparent)`;
+	// 26.7 CLASSIC: lämpökarttatäyttö POISTETTU. Aiemmin (#148) solu sai
+	// jatkuvan CS%-tintin; uusi ilme kieltää sen eksplisiittisesti — vaikeus
+	// kannetaan LUVUN painolla ja värillä, ei solun taustalla, jotta numerot
+	// pysyvät sivun äänekkäimpänä asiana.
+	//
+	// Kynnykset ovat samat kuin vanhan skaalan ankkurit, joten tulkinta ei
+	// muutu: helppo (kulta, semibold) / neutraali / vaikea (coral, mykistetty).
+	// Väri EI ole ainoa signaali — paino kulkee mukana, joten rivi luetaan myös
+	// värisokeana ja mustavalkotulosteessa.
+	function csCellClass(csPct: number): string {
+		if (csPct >= 44) return 'is-easy';
+		if (csPct <= 20) return 'is-hard';
+		return '';
+	}
+	/** FDR 1–5 samalla logiikalla (1 = helpoin). */
+	function fdrCellClass(fdr: number): string {
+		if (fdr <= 2) return 'is-easy';
+		if (fdr >= 4) return 'is-hard';
+		return '';
 	}
 
 	let gwCols = $derived(
@@ -186,8 +168,7 @@
 												     Edge-sprint kohta 4: D/A-FDR-chip (def = CS-kulma,
 												     att = maalintekokulma); fallback vanhaan fdr:ään. -->
 												<td
-													class="cs-link-cell"
-													style="background: {csCellBg(f.cs_pct)}"
+													class="cs-link-cell {csCellClass(f.cs_pct)}"
 													title="{f.opponent ?? f.opponent_short} ({f.venue}) · {fdrTitle} · view model prediction"
 												>
 													<a
@@ -202,7 +183,7 @@
 												</td>
 											{:else}
 												<td
-													style="background: color-mix(in srgb, var(--fdr-{Math.min(Math.max(f.fdr, 1), 5)}) {f.fdr >= 5 ? 26 : 14}%, transparent)"
+													class={fdrCellClass(f.fdr)}
 													title={hasDuo ? fdrTitle : undefined}
 												>
 													{f.opponent_short} ({f.venue})
@@ -287,7 +268,18 @@
 		text-decoration: none;
 	}
 	.cs-cell-a:hover {
-		filter: brightness(0.94);
+		background: rgba(32, 31, 29, 0.04);
+	}
+	/* 26.7 CLASSIC: lämpökarttatäytön korvaajat. Väri EI ole ainoa signaali —
+	   paino kulkee mukana, joten sarake luetaan myös värisokeana. */
+	:global(td.is-easy),
+	:global(td.is-easy) .cs-cell-a {
+		color: var(--accent-strong);
+		font-weight: 600;
+	}
+	:global(td.is-hard),
+	:global(td.is-hard) .cs-cell-a {
+		color: var(--negative);
 	}
 	/* Edge-sprint kohta 4: suuntajaettu FDR-chip solun sisällä (hillitty,
 	   ei kilpaile CS%-taustavärin kanssa) */

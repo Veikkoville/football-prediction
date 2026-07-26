@@ -11,9 +11,9 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" onload="this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>
-<meta name="theme-color" content="#0A0820">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<meta name="theme-color" content="#F3F2F2">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="World Cup 2026 Predictions: How Our Model Did">
@@ -103,21 +103,21 @@
   /* Redesign 24.7 (brand-tokens.md): Space Grotesk -display-fontti + tumma
      ink-hero (index-gradientti, 6px magenta-raita) + cream-body.
      GEN:WCRECAP-lohko sailyy: .statrow/.stat/.num/.lbl/.meta tyylit alla. */
-  :root{ --bg:#FFF6EC; --bg2:#F6F4FF; --card:#FFFFFF; --line:rgba(10,8,32,0.12); --accent:#FF2E7E; --accent-deep:#D6006E; --teal:#19E3D2; --teal-ink:#007A6C; --ink:#0A0820; --ink-2:#140F1E; --text:#0A0820; --muted:#575170; --hero-muted:#C9C3DA; --radius:16px; --font-display:"Space Grotesk",-apple-system,"Segoe UI",sans-serif; }
+  :root{ --bg:#F3F2F2; --bg2:#F6F4FF; --card:#FFFFFF; --line:rgba(32,31,29,0.18); --accent:#FF2E7E; --accent-deep:#D6006E; --teal:#19E3D2; --teal-ink:#007A6C; --ink:#201F1D; --ink-2:#2E2C28; --text:#201F1D; --muted:#5C574F; --hero-muted:#6E685E; --radius:2px; --font-display:"Cormorant Garamond", Georgia, serif; }
   *{ box-sizing:border-box; }
-  body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
+  body{ margin:0; font-family:"Lora",Georgia,"Times New Roman",serif; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px 80px; }
   h1,h2,h3,.brand{ font-family:var(--font-display); }
-  header{ background:linear-gradient(160deg,var(--ink) 0%,var(--ink-2) 70%,#1C1030 100%); color:#fff; border-bottom:6px solid var(--accent); }
+  header{ background:var(--cream); color: var(--ink); border-bottom:6px solid var(--accent); }
   .nav{ max-width:960px; margin:0 auto; padding:22px 20px; display:flex; align-items:center; justify-content:space-between; }
   .brand{ font-size:20px; font-weight:700; display:flex; align-items:center; }
   .brand a{ color:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:10px; }
   .brand span{ color:var(--accent); }
   .logo-mark-img{ width:32px; height:32px; border-radius:9px; display:block; }
-  .cta{ display:inline-block; background:var(--accent); color:#fff; text-decoration:none; padding:11px 20px; border-radius:999px; font-weight:700; }
+  .cta{ display:inline-block; background: transparent; color: var(--gold-deep,#8C6428); border: 1px solid var(--gold,#B68235); text-decoration:none; padding:11px 20px; border-radius:999px; font-weight:700; }
   .cta:hover{ background:var(--accent-deep); }
   .hero{ max-width:960px; margin:0 auto; padding:26px 20px 56px; }
-  .hero h1{ margin:14px 0 14px; color:#fff; }
+  .hero h1{ margin:14px 0 14px; color: var(--ink); }
   .hero .lede{ color:var(--hero-muted); }
   .hero .meta{ color:var(--hero-muted); }
   h1{ font-size:40px; line-height:1.15; letter-spacing:-0.02em; margin:48px 0 14px; }

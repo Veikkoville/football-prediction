@@ -554,7 +554,7 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         ".rec-filter{border:1px solid rgba(128,128,128,.4);background:transparent;"
         "color:inherit;border-radius:20px;padding:6px 14px;font-size:13px;"
         "font-weight:600;cursor:pointer;}"
-        ".rec-filter.on{background:#D6006E;border-color:#D6006E;color:#fff;}"
+        ".rec-filter.on{background:transparent;border-color:#B68235;color:#8C6428;}"
         ".rec-scroll{overflow-x:auto;overflow-y:auto;max-height:560px;"
         "-webkit-overflow-scrolling:touch;border:1px solid rgba(128,128,128,.3);"
         "border-radius:14px;}"
@@ -876,24 +876,24 @@ def accuracy_dataset_ld(c: dict, page_url: str) -> dict:
 # Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) - täsmähexit.
 # Hero = tumma (Ink) + magenta, sisältö = vaalea (Cream/Paper) + ink-teksti.
 CSS = """
-  :root{ --magenta:#FF2E7E; --magenta-deep:#D6006E; --coral:#FF6A3D; --gold:#FFC93C; --gold-deep:#F4A800; --teal:#19E3D2; --ink:#0A0820; --ink2:#140F1E; --cream:#FFF6EC; --paper:#F6F4FF; --ink-muted:#54506B; --hero-muted:#C9C3DA; --line:#E7DDCF; }
+  :root{ --magenta:#FF2E7E; --magenta-deep:#C4005F; --coral:#FF6A3D; --gold:#B68235; --gold-deep:#8C6428; --teal:#19E3D2; --ink:#201F1D; --ink2:#140F1E; --cream:#F3F2F2; --paper:#EAE9E9; --ink-muted:#54506B; --hero-muted:#6E685E; --line:#DAD8D4; }
   *{ box-sizing:border-box; }
-  body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--cream); color:var(--ink); line-height:1.6; font-size:17px; }
-  h1,h2,h3,.brand{ font-family:"Space Grotesk",-apple-system,"Segoe UI",sans-serif; }
-  .dark{ background:linear-gradient(165deg,var(--ink2),var(--ink)); color:var(--cream); }
+  body{ margin:0; font-family:"Lora",Georgia,"Times New Roman",serif; background:var(--cream); color:var(--ink); line-height:1.6; font-size:17px; }
+  h1,h2,h3,.brand{ font-family:"Cormorant Garamond",Georgia,serif; }
+  .dark{ background:var(--cream); color:var(--cream); }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
-  .bar{ height:6px; background:var(--magenta); }
+  .bar{ height:1px;background:var(--line); }
   .nav{ max-width:960px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .brand{ font-size:24px; font-weight:800; letter-spacing:.5px; }
-  .brand a{ color:#fff; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+  .brand a{ color:var(--ink); text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
   .brand span{ color:var(--magenta); }
   .brand-icon{ width:26px; height:26px; border-radius:7px; display:block; }
-  .cta{ display:inline-block; background:var(--magenta); color:#fff; text-decoration:none; padding:14px 24px; border-radius:30px; font-weight:800; min-height:48px; }
+  .cta{ display:inline-block; background:transparent; color:var(--gold-deep,#8C6428); border:1px solid var(--gold,#B68235); text-decoration:none; padding:14px 24px; border-radius:30px; font-weight:800; min-height:48px; }
   .cta:hover{ background:var(--magenta-deep); }
-  .cta.secondary{ background:transparent; border:2px solid var(--magenta); color:inherit; }
+  .cta.secondary{ background:transparent; border:1px solid var(--line); color:inherit; }
   .cta-row{ display:flex; flex-wrap:wrap; gap:12px; margin:26px 0 8px; }
   .hero{ padding:44px 0 52px; }
-  .hero h1{ font-size:36px; line-height:1.15; margin:0 0 14px; color:#fff; }
+  .hero h1{ font-size:36px; line-height:1.15; margin:0 0 14px; color:var(--ink); }
   .hero .lede{ font-size:19px; color:var(--hero-muted); max-width:720px; }
   .hero .meta,.hero .note{ color:var(--hero-muted); }
   .meta{ font-size:14px; margin-top:10px; }
@@ -901,7 +901,7 @@ CSS = """
   h2{ font-size:25px; margin:54px 0 10px; }
   .content{ padding-bottom:70px; }
   .content a{ color:var(--magenta-deep); }
-  .content a.cta{ color:#fff; }
+  .content a.cta{ color:var(--gold-deep,#8C6428); }
   .content a.cta.secondary{ color:var(--ink); }
   .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:4px 12px 10px; }
   table{ width:100%; border-collapse:collapse; min-width:560px; }
@@ -922,7 +922,7 @@ CSS = """
   .faq dt{ font-weight:700; margin-top:20px; }
   .faq dd{ margin:6px 0 0; }
   .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:12px; padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
-  .upsell{ border:2px solid var(--magenta); background:var(--paper); border-radius:16px; padding:24px 26px; margin:48px 0 6px; }
+  .upsell{ border:1px solid var(--line); background:var(--paper); border-radius:16px; padding:24px 26px; margin:48px 0 6px; }
   .upsell h2{ margin:0 0 10px; }
   .upsell p{ margin:0 0 6px; }
   .upsell .cta-row{ margin:18px 0 4px; }
@@ -997,8 +997,8 @@ def render_page(c: dict) -> str:
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" onload="this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
@@ -1015,7 +1015,7 @@ def render_page(c: dict) -> str:
 <meta name="twitter:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
 
 {jsonld}
-<meta name="theme-color" content="#0A0820">
+<meta name="theme-color" content="#F3F2F2">
 <style>{CSS}</style>
 {POSTHOG_SNIPPET}
 </head>

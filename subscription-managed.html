@@ -6,19 +6,19 @@
   <title>GoalIQ – Returning to app</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" onload="this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"></noscript>
-  <meta name="theme-color" content="#0A0820">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+  <meta name="theme-color" content="#F3F2F2">
   <style>
     /* Redesign 24.7: brand-tokens + Space Grotesk + tumma ink-header ja magenta-bar
        (sama kieli kuin fpl.html/index.html). */
     :root {
       --magenta: #FF2E7E;
-      --magenta-deep: #D6006E;
-      --ink: #0A0820;
+      --magenta-deep: #C4005F;
+      --ink: #201F1D;
       --ink2: #140F1E;
-      --cream: #FFF6EC;
-      --muted: #575170;
+      --cream: #F3F2F2;
+      --muted: #5C574F;
     }
     * { box-sizing: border-box; }
     html, body { overflow-x: clip; }
@@ -32,9 +32,9 @@
       flex-direction: column;
       -webkit-font-smoothing: antialiased;
     }
-    h1, .brand { font-family: "Space Grotesk", -apple-system, "Segoe UI", sans-serif; }
-    .site-header { background: linear-gradient(165deg, var(--ink2), var(--ink)); color: var(--cream); }
-    .bar { height: 6px; background: var(--magenta); }
+    h1, .brand { font-family:"Cormorant Garamond",Georgia,serif; }
+    .site-header { background: var(--cream); color: var(--cream); }
+    .bar { height:1px;background:var(--line); }
     .nav {
       max-width: 960px; margin: 0 auto; padding: 16px 20px; width: 100%;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -65,7 +65,7 @@
       margin-top: 24px;
       padding: 12px 24px;
       background: var(--magenta);
-      color: #fff;
+      color: var(--ink);
       text-decoration: none;
       border-radius: 999px;
       font-weight: 700;
