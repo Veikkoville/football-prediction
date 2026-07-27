@@ -301,27 +301,13 @@ def fit_model() -> tuple[DixonColesModel, list[str]]:
     return dc, seasons
 
 
-def add_promoted_baseline(dc: DixonColesModel, needed: list[str]) -> dict:
-    """Nousijoille (ei tuoretta ylätason dataa) empiirinen prior = viimeisimmän
-    tunnetun nousijatrion toteutunut PL-voima (ks. 19.6. pohjatyö)."""
-    trio = ["Ipswich", "Leicester", "Southampton"]
-    trio = [t for t in trio if t in dc.attack]
-    if not trio or not needed:
-        return {"trio_used": trio, "applied_to": []}
-    base_att = float(np.mean([dc.attack[t] for t in trio]))
-    base_def = float(np.mean([dc.defence[t] for t in trio]))
-    base_gamma = float(np.mean([dc.home_advantage_per_team[t] for t in trio]))
-    for t in needed:
-        dc.attack[t] = base_att
-        dc.defence[t] = base_def
-        dc.home_advantage_per_team[t] = base_gamma
-    return {
-        "trio_used": trio,
-        "applied_to": list(needed),
-        "attack": round(base_att, 4),
-        "defence": round(base_def, 4),
-        "home_gamma": round(base_gamma, 4),
-    }
+# 27.7: siirretty jaettuun moduuliin src/models/promoted_baseline.py.
+#
+# Sama logiikka oli KOPIOITUNA tässä ja build_fpl_cs_fdr.py:ssä, eikä
+# /api/predict käyttänyt sitä lainkaan — siksi ennuste palautti 404:n
+# Coventrylle vaikka CS%/FDR tunsi sen. Yksi lähde = pinnat eivät voi ajautua
+# erilleen nousijoiden voimasta.
+from src.models.promoted_baseline import add_promoted_baseline  # noqa: E402
 
 
 # ---------------------------------------------------------------------------

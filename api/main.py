@@ -682,7 +682,7 @@ def _fit_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
             default_competition_weight=DEFAULT_COMPETITION_WEIGHT,
         )
     try:
-        return DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
+        dc = DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
             df,
             home_team_col="home_team", away_team_col="away_team",
             home_goals_col="home_score", away_goals_col="away_score",
@@ -693,6 +693,32 @@ def _fit_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Model fit failed: {e}")
+
+    # 27.7 GW1-VALMIUS: täydennä kauden nousijat joilla ei ole yhtään ottelua.
+    #
+    # Ilman tätä /api/predict palauttaa 404:n Coventrylle, Hullille ja
+    # Ipswichille 1.8. alkaen (treeni-ikkuna 2526+2627, Understatissa ei
+    # 2627-dataa) → GW1:ssä 21.8. jopa 3/10 ottelua per kierros ilman
+    # ennustetta, juuri liikennepiikin hetkellä.
+    #
+    # FITIN JÄLKEEN tarkoituksella: injektio lisää avaimia vain joukkueille
+    # joita mallissa ei ole eikä kosketa yhdenkään olemassa olevan joukkueen
+    # estimaattia → domestic-regressio pysyy bittitarkkana. Sama jaettu
+    # funktio kuin FPL-putkessa (build_fpl_phase0 / build_fpl_cs_fdr), joten
+    # /api/predict ja CS%/FDR ovat samaa mieltä nousijoista — aiemmin logiikka
+    # oli kopioituna kahteen generaattoriin eikä predictissä lainkaan.
+    try:
+        from src.models.promoted_baseline import taydenna_nousijat
+        info = taydenna_nousijat(dc, liigat, kaudet)
+        if info.get("applied_to"):
+            print(f"[Promoted] baseline -> {info['applied_to']} "
+                  f"(att={info.get('attack')}, def={info.get('defence')})")
+    except Exception as e:
+        # Ei saa KOSKAAN kaataa fittiä: ilman täydennystä malli on täsmälleen
+        # se mikä se oli ennen tätä muutosta.
+        print(f"[Promoted] baseline ohitettu: {type(e).__name__}: {e}")
+
+    return dc
 
 
 def _taustarefit(key: tuple, liigat: tuple[str, ...], kaudet: tuple[str, ...],
