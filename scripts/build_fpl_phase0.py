@@ -64,6 +64,38 @@ FIT_BAYES = 2.0
 # Kuinka monta tulevaa GW:tä outputtiin (per-joukkue-lista + ticker + aggregaatit).
 HORIZON_GW = 6
 
+# --------------------------------------------------------------------------
+# 27.7 HORISONTTILAAJENNUS (kontrakti:
+# goaliq-app/cos-reports/horizon-extension-contract-2026-07-27.md)
+#
+# Malli laskee CS%:n ja FDR:n JO NYT koko kaudelle: fetch_fixtures() hakee
+# Pulselivesta kaikki kauden ottelut ja add_fdr muodostaa kvintiilibucketit
+# 760 joukkue-fixturen yli. HORIZON_GW=6 oli pelkka ULOSTULON katkaisu.
+# Emitoidaan nyt kaikki jaljella olevat GW:t; endpoint rajaa pyynnossa.
+#
+# KAKSITASOINEN REHELLISYYS:
+#   near (gw <= next_gw + NEAR_HORIZON_GW - 1): cs_pct mukana, taysi paino
+#   far  (siita eteenpain):                     EI cs_pct LAINKAAN, vain FDR
+#
+# cs_pct jatetaan pois RAKENTEESSA eika konventiolla: GW30:n CS-% laskettuna
+# heinakuussa perustuu heinakuun joukkuearvioihin ja on maaliskuussa vaara.
+# Jos kentta lahetetaan, joku renderoi sen ennen pitkaa. FDR jaa, koska se on
+# 1-5 bucket eli jo valmiiksi karkea eika lupaa desimaalitarkkuutta.
+#
+# HUOM next_avg_cs_pct / next_avg_fdr / next_n PYSYVAT LAHIHORISONTISSA.
+# Kaksi syyta: (1) taaksepain-yhteensopivuus, kentat tarkoittavat samaa kuin
+# ennen; (2) sanity_gate nojaa naihin ja sen kynnykset (kärki FDR <= 3.2,
+# nousijat >= 3.5, marginit) on kalibroitu 6 GW:n ikkunalle — koko kauden
+# keskiarvot regressoituisivat keskelle ja portti mittaisi vaaraa asiaa
+# HILJAA. Ala "yksinkertaista" naita koko kauden keskiarvoiksi.
+# --------------------------------------------------------------------------
+NEAR_HORIZON_GW = 6
+
+FAR_BASIS_LABEL = (
+    "Fixture difficulty only, based on today's ratings — "
+    "clean sheet % appears as each gameweek moves closer"
+)
+
 # Lähdenimi (pulselive-pitkä TAI FPL-lyhyt) -> mallin (Understat) nimi.
 NAME_MAP = {
     # pulselive (premierleague.com)
@@ -390,43 +422,59 @@ def next_gameweek(rows: list[dict]) -> int | None:
     return min(gws) if gws else None
 
 
-def build_team_view(rows: list[dict], next_gw: int, horizon_gw: int = HORIZON_GW) -> list[dict]:
-    """Per-joukkue: seuraavien horizon_gw GW:n fixture-lista (vastustaja, H/A,
-    CS-%, FDR) + keskiarvot. Lajiteltu next_avg_cs_pct desc (appin oletusnäkymä)."""
-    gw_cut = next_gw + horizon_gw - 1
+def build_team_view(
+    rows: list[dict], next_gw: int, near_horizon_gw: int = NEAR_HORIZON_GW
+) -> list[dict]:
+    """Per-joukkue: KAIKKI jäljellä olevat fixturet (vastustaja, H/A, FDR) +
+    lähihorisontin keskiarvot. Lajiteltu next_avg_cs_pct desc (appin oletusnäkymä).
+
+    27.7: gw_cut poistettu — emitoidaan koko kausi ja merkitään jokainen rivi
+    tierillä. Endpoint rajaa pyynnössä (?horizon=). Kaukorivit EIVÄT saa
+    cs_pct-kenttää lainkaan; ks. NEAR_HORIZON_GW-lohkon perustelu.
+    """
+    near_cut = next_gw + near_horizon_gw - 1
     teams: dict[str, dict] = {}
     for r in rows:
         gw = r["gameweek"]
-        if not gw or gw < next_gw or gw > gw_cut or r["finished"]:
+        if not gw or gw < next_gw or r["finished"]:
             continue
+        near = gw <= near_cut
         for side, opp_side in (("home", "away"), ("away", "home")):
             team = r[side]
             entry = teams.setdefault(
                 team,
                 {"name": team, "short": short_name(team), "fixtures": []},
             )
-            entry["fixtures"].append(
-                {
-                    "gw": gw,
-                    "opponent": r[opp_side],
-                    "opponent_short": r[f"{opp_side}_short"],
-                    "venue": "H" if side == "home" else "A",
-                    "kickoff_ms": r["kickoff_ms"],
-                    "cs_pct": r[f"cs_{side}_pct"],
-                    "fdr": r[f"fdr_{side}"],
-                    # EDGE: def_fdr = alias nykyiselle CS-pohjaiselle FDR:lle,
-                    # att_fdr = hyökkäyssuunnan vaikeus (ks. add_fdr).
-                    "def_fdr": r[f"fdr_{side}"],
-                    "att_fdr": r[f"att_fdr_{side}"],
-                }
-            )
+            fx = {
+                "gw": gw,
+                "opponent": r[opp_side],
+                "opponent_short": r[f"{opp_side}_short"],
+                "venue": "H" if side == "home" else "A",
+                "kickoff_ms": r["kickoff_ms"],
+                "fdr": r[f"fdr_{side}"],
+                # EDGE: def_fdr = alias nykyiselle CS-pohjaiselle FDR:lle,
+                # att_fdr = hyökkäyssuunnan vaikeus (ks. add_fdr).
+                "def_fdr": r[f"fdr_{side}"],
+                "att_fdr": r[f"att_fdr_{side}"],
+                "tier": "near" if near else "far",
+            }
+            # cs_pct VAIN lähihorisontissa. Kentän puuttuminen on kontrakti,
+            # ei unohdus — kaukoviikon CS-% olisi tarkkuuslupaus jota malli ei
+            # voi pitää. tier on eksplisiittinen, jottei klientin tarvitse
+            # laskea samaa sääntöä uudelleen gw-vertailusta.
+            if near:
+                fx["cs_pct"] = r[f"cs_{side}_pct"]
+            entry["fixtures"].append(fx)
     out = []
     for entry in teams.values():
         entry["fixtures"].sort(key=lambda x: (x["gw"], x["kickoff_ms"] or 0))
-        cs = [f["cs_pct"] for f in entry["fixtures"]]
-        fdr = [f["fdr"] for f in entry["fixtures"]]
-        entry["next_avg_cs_pct"] = round(float(np.mean(cs)), 1)
-        entry["next_avg_fdr"] = round(float(np.mean(fdr)), 2)
+        near_fx = [f for f in entry["fixtures"] if f["tier"] == "near"]
+        # Keskiarvot LÄHIHORISONTISTA (taaksepäin-yhteensopivuus + sanity_gaten
+        # kalibrointi). Tyhjä near-ikkuna on mahdollinen vain kauden lopussa.
+        cs = [f["cs_pct"] for f in near_fx]
+        fdr = [f["fdr"] for f in near_fx]
+        entry["next_avg_cs_pct"] = round(float(np.mean(cs)), 1) if cs else 0.0
+        entry["next_avg_fdr"] = round(float(np.mean(fdr)), 2) if fdr else 0.0
         entry["next_n"] = len(cs)
         out.append(entry)
     out.sort(key=lambda t: (-t["next_avg_cs_pct"], t["name"]))
@@ -436,6 +484,17 @@ def build_team_view(rows: list[dict], next_gw: int, horizon_gw: int = HORIZON_GW
 # ---------------------------------------------------------------------------
 # 6. Sanity-gate (fail-safe: FAIL -> ei kirjoiteta, exit 2)
 # ---------------------------------------------------------------------------
+def _horizon_span(team_view: list[dict]) -> int:
+    """Montako GW:tä team_view kattaa (viimeisin GW - ensimmäinen + 1).
+
+    Lasketaan datasta eikä vakiosta: kauden lopussa jäljellä on vähemmän kuin
+    38, ja väärä luku metassa saisi klientin varaamaan tilaa peliviikoille
+    joita ei ole.
+    """
+    gws = [f["gw"] for t in team_view for f in t["fixtures"]]
+    return (max(gws) - min(gws) + 1) if gws else 0
+
+
 def sanity_gate(team_view: list[dict], promoted: list[str]) -> bool:
     print("\n" + "=" * 64)
     print("SANITY-GATE  (suunta-/separaatiotesti, ei absoluuttiset kynnykset)")
@@ -570,7 +629,14 @@ def main() -> int:
             "sanity_gate": "PASS",
             "next_gameweek": next_gw,
             "deadline_utc": src["deadline_utc"],
-            "horizon_gw": HORIZON_GW,
+            # horizon_gw = montako GW:tä teams[].fixtures TÄSSÄ tiedostossa
+            # sisältää (nyt koko kausi). Endpoint YLIKIRJOITTAA tämän sillä
+            # mitä se pyynnössä palautti, jotta klientti näkee aina totuuden
+            # omasta vastauksestaan eikä tiedoston laajuutta.
+            "horizon_gw": _horizon_span(team_view),
+            "horizon_max": _horizon_span(team_view),
+            "near_horizon_gw": NEAR_HORIZON_GW,
+            "far_basis_label": FAR_BASIS_LABEL,
             "todo": todo,
         },
         "teams": team_view,

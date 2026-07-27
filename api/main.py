@@ -2554,7 +2554,13 @@ async def stripe_web_webhook(request: Request):
 
 
 @app.get("/api/fantasy")
-def fantasy_phase0(response: Response):
+def fantasy_phase0(
+    response: Response,
+    horizon: str = Query(
+        default="6",
+        description="Montako GW:tä teams[].fixtures sisältää: 1-38 tai 'all'.",
+    ),
+):
     """FPL Phase 0 — clean sheet -% + mallipohjainen FDR per PL-joukkue/GW (free-tier).
 
     Palauttaa committatun projektion (data/fpl_projections_phase0.json).
@@ -2565,10 +2571,60 @@ def fantasy_phase0(response: Response):
 
     Sama no-store-perustelu kuin /api/accuracy (#103): refresh päivittyy
     palvelinpäästä, välimuistitasot eivät saa tarjota stalea snapshotia.
+
+    27.7 HORISONTTI (kontrakti:
+    goaliq-app/cos-reports/horizon-extension-contract-2026-07-27.md):
+    tiedosto sisältää koko kauden; tämä rajaa sen pyydettyyn pituuteen.
+
+    OLETUS 6 = TÄSMÄLLEEN NYKYINEN VASTAUS. Vanha klientti ei lähetä
+    parametria eikä siis näe muutosta — laajennus on opt-in.
+
+    `fixtures[]` (ticker) EI kasva horizonin mukana: se on payloadin raskain
+    lohko (per ottelu xG + 1X2 + CS molemmille suunnille) eikä planneri
+    tarvitse sitä kaukoviikoille. Ilman tätä rajausta `horizon=all` olisi
+    ~800 kB; nyt se on murto-osa siitä.
     """
     from src.models.fpl_phase0 import load_phase0
     response.headers["Cache-Control"] = "no-store"
-    return load_phase0()
+    data = load_phase0()
+
+    teams = data.get("teams")
+    meta = data.get("meta")
+    if not isinstance(teams, list) or not isinstance(meta, dict):
+        return data  # available=False-runko tms. → ei rajausta
+
+    next_gw = meta.get("next_gameweek")
+    if next_gw is None:
+        return data
+
+    # Rajaus: 'all' = koko tiedosto, muuten 1-38 (clamp, ei 422 — kyseessä on
+    # näkymän pituus eikä semanttinen virhe, ja vanhat klientit eivät saa
+    # kaatua tuntemattomaan arvoon).
+    raw = (horizon or "").strip().lower()
+    if raw in ("all", "max", "full"):
+        span = meta.get("horizon_max") or 38
+    else:
+        try:
+            span = int(raw)
+        except (TypeError, ValueError):
+            span = 6
+        span = max(1, min(38, span))
+
+    gw_cut = next_gw + span - 1
+    out_teams = []
+    for t in teams:
+        fx = [f for f in t.get("fixtures", []) if f.get("gw", 0) <= gw_cut]
+        out_teams.append({**t, "fixtures": fx})
+
+    # horizon_gw kertoo mitä TÄSSÄ vastauksessa on, ei mitä tiedostossa on.
+    span_actual = max(
+        (f["gw"] for t in out_teams for f in t["fixtures"]), default=next_gw - 1
+    ) - next_gw + 1
+    return {
+        **data,
+        "meta": {**meta, "horizon_gw": max(0, span_actual)},
+        "teams": out_teams,
+    }
 
 
 @app.get("/api/fantasy/xp")
