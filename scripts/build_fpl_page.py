@@ -169,7 +169,11 @@ def build_context(fpl: dict, acc: dict) -> dict:
         ]
         return {**team, "fixtures": fx}
 
-    teams = [_near_only(t) for t in fpl["teams"]]
+    # teams_all = koko kausi (kaukolohkoja varten), teams = lähihorisontti
+    # (yksityiskohtainen CS%-grid). Kaksi eri esitystä samasta datasta, eri
+    # tarkkuuslupauksella.
+    teams_all = fpl["teams"]
+    teams = [_near_only(t) for t in teams_all]
     fixtures = fpl["fixtures"]
     next_gw = meta.get("next_gameweek") or min(
         f["gameweek"] for f in fixtures if f.get("gameweek")
@@ -207,6 +211,51 @@ def build_context(fpl: dict, acc: dict) -> dict:
         )
     fdr_rows.sort(key=lambda r: r["avg_fdr"])
 
+    # ------------------------------------------------------------------
+    # 27.7 KAUKOHORISONTTI, 6 GW:n lohkokeskiarvoina.
+    #
+    # Miksi lohkot eikä 32 saraketta: koko kauden taulukko olisi lukukelvoton
+    # puhelimessa. Ja lohkot kertovat sen mitä kaukokalenterista OIKEASTI
+    # luetaan — missä swingit ovat — eivät desimaaleja joita malli ei voi
+    # luvata GW30:lle.
+    #
+    # Miksi palvelimella renderöitynä eikä välivalitsimena: tämä on SEO-pinta.
+    # Taulukko on indeksoitavaa sisältöä; JS:llä rakennettu ei ole. Naiivi
+    # pariteetti SPA:n kanssa maksaisi sivun tärkeimmällä ominaisuudella
+    # vuorovaikutuksesta jota tämän sivun yleisö ei ole tullut hakemaan.
+    # Suunnittelutyökalu elää SPA:ssa ja appissa.
+    #
+    # VAIN FDR, EI CS%: kaukoriveillä ei ole cs_pct-kenttää lainkaan
+    # (kontraktin rakenteellinen rehellisyysrajoite).
+    # ------------------------------------------------------------------
+    far_blocks: list[tuple[int, int]] = []
+    far_rows: list[dict] = []
+    all_far = [
+        f for t in teams_all for f in (t.get("fixtures") or [])
+        if (f.get("tier") or "near") == "far"
+    ]
+    if all_far:
+        lo, hi = min(f["gw"] for f in all_far), max(f["gw"] for f in all_far)
+        far_blocks = [(s, min(s + 5, hi)) for s in range(lo, hi + 1, 6)]
+        for t in teams_all:
+            cells = []
+            for a, b in far_blocks:
+                fx = [
+                    f for f in (t.get("fixtures") or [])
+                    if a <= f["gw"] <= b and (f.get("tier") or "near") == "far"
+                ]
+                cells.append(
+                    {"avg_fdr": sum(f["fdr"] for f in fx) / len(fx), "n": len(fx)}
+                    if fx else None
+                )
+            vals = [c["avg_fdr"] for c in cells if c]
+            far_rows.append({
+                "team": t["name"],
+                "cells": cells,
+                "avg_fdr": sum(vals) / len(vals) if vals else 99.0,
+            })
+        far_rows.sort(key=lambda r: r["avg_fdr"])
+
     # Track record (/api/accuracy-datan peili)
     at = acc.get("all_time", {})
     n = at.get("n", 0)
@@ -241,6 +290,9 @@ def build_context(fpl: dict, acc: dict) -> dict:
         "cs_rows": cs_rows,
         "fdr_rows": fdr_rows,
         "gws": gws,
+        "far_blocks": far_blocks,
+        "far_rows": far_rows,
+        "far_basis_label": (fpl.get("meta") or {}).get("far_basis_label") or "",
         "top3": cs_rows[:3],
         "acc_n": n,
         "acc_pct_1x2": pct_1x2,
@@ -711,6 +763,50 @@ def predict_cell_href(team: str, opponent: str, venue: str,
     return "/predictions"
 
 
+def far_grid_html(c: dict) -> str:
+    """Kaukohorisontti 6 GW:n lohkokeskiarvoina. Tyhjä jos dataa ei ole.
+
+    Palvelimella renderöity ja indeksoitava — ei JS:ää. Vain FDR: kaukoriveillä
+    ei ole cs_pct:tä, ja se on kontrakti eikä puute.
+    """
+    if not c.get("far_rows") or not c.get("far_blocks"):
+        return ""
+    head = "".join(
+        f'<th scope="col" class="num">GW{a}–{b}</th>' for a, b in c["far_blocks"]
+    )
+    rows = []
+    for r in c["far_rows"]:
+        cells = []
+        for cell in r["cells"]:
+            if not cell:
+                # Ei otteluita lohkossa. Viiva eikä 0 — tyhjä ei ole "helppo".
+                cells.append('<td class="num">–</td>')
+            else:
+                cls = fdr_cell_class(cell["avg_fdr"])
+                # n tooltippiin: 6 GW:n lohkossa voi olla tuplaviikkoja tai
+                # blankkeja, ja keskiarvo yksin ei kerro kumpaa.
+                cells.append(
+                    f'<td class="num {cls}" title="{cell["n"]} fixtures">'
+                    f'{cell["avg_fdr"]:.1f}</td>'
+                )
+        rows.append(
+            f'<tr><th scope="row">{r["team"]}</th>{"".join(cells)}</tr>'
+        )
+    label = c.get("far_basis_label") or (
+        "Fixture difficulty only — based on today's ratings, and it will move "
+        "as the season plays."
+    )
+    return (
+        '<h2 id="long-range">Long-range fixture difficulty</h2>\n'
+        f'<p class="muted">{label} Lower is easier. Each column averages the '
+        'model\'s difficulty over six gameweeks, so what you are reading here '
+        'is where the swings are — not a precise number for any single match.</p>\n'
+        '<div class="table-wrap"><table class="fdr-grid">\n'
+        f'<thead><tr><th scope="col">Team</th>{head}</tr></thead>\n'
+        f'<tbody>{"".join(rows)}</tbody></table></div>\n'
+    )
+
+
 def fdr_grid_html(c: dict) -> str:
     head = "".join(f'<th scope="col" class="num">GW{g}</th>' for g in c["gws"])
     rows = []
@@ -992,6 +1088,7 @@ def render_page(c: dict) -> str:
     jsonld = jsonld_blocks(c, faq)
     cs_table = cs_table_html(c)
     fdr_grid = fdr_grid_html(c)
+    far_grid = far_grid_html(c)
     # 26.7 CLASSIC: legenda seuraa solujen kaavaa (kolme luokkaa, ei
     # jatkuvaa skaalaa) — legenda ja solu eivät saa kertoa eri tarinaa.
     cs_legend = " ".join(
@@ -1130,6 +1227,7 @@ hard ones in coral; there is no colour wash behind the numbers, because the
 numbers are the point. Model FDR (1 easiest, 5 hardest) stays in the cell
 tooltip. Model-derived, not the official FPL difficulty.</p>
 {fdr_grid}
+{far_grid}
 <p class="legend">Clean sheet scale: {cs_legend}
 (low CS% = hard fixture, high CS% = easy). H home, A away.</p>
 
