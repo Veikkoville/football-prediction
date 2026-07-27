@@ -462,6 +462,24 @@ def scale_p_start(mm: dict, factor: float) -> dict:
     return recompute_minutes(out)
 
 
+def set_p_start(mm: dict, p_start: float) -> dict:
+    """Aseta aloitus-tn SUORAAN (manuaalinen ohitus) ja johda minuutit uudelleen.
+
+    Ero `scale_p_start`iin: tuo kertoo nykyisen arvion kertoimella (syvyys-
+    korjaus), tämä korvaa sen. Käytetään vain kun viime kauden minuutit eivät
+    kuvaa nykyistä roolia — ks. src/models/fpl_player_overrides.py.
+
+    Asettaa sekä p_start_raw (minuuttien johtaminen) että p_start (näyttö/
+    kalibrointi) samaan arvoon: ohituksen koko pointti on että historiapohjainen
+    shrinkkaus ei päde tähän pelaajaan.
+    """
+    out = dict(mm)
+    v = min(max(float(p_start), 0.0), 1.0)
+    out["p_start_raw"] = v
+    out["p_start"] = v
+    return recompute_minutes(out)
+
+
 def congestion_multiplier(n_fixtures_in_gw: int, xmins: float) -> float:
     """Tupla-GW → rotaatioriski-kerroin kärkiminuuttien pelaajille.
     Yksi ottelu tai matalat minuutit → neutraali 1.0. Ei koskaan < CONGESTION_MULT."""

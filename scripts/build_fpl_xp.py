@@ -58,6 +58,7 @@ from src.models.fpl_context import (
     promoted_teams,
     xmins_multiplier,
 )
+from src.models.fpl_player_overrides import load_player_overrides
 
 OUT_PATH = config.PROJECT_ROOT / "data" / "fpl_xp_projections.json"
 
@@ -293,6 +294,29 @@ def main(argv: list[str] | None = None) -> int:
         if f != 1.0:
             for p in pids:
                 mm_by_player[p] = xp.scale_p_start(mm_by_player[p], f)
+
+    # Pelaajatason minuuttiohitukset — VIIMEISENÄ, syvyyskorjauksen JÄLKEEN.
+    #
+    # Järjestys on olennainen: depth_factor skaalaa koko klubi+positio-ryhmää
+    # historiallisten starttipaikkojen mukaan, ja jos ohitus tehtäisiin ennen
+    # sitä, se skaalattaisiin osittain pois — eli ohitus ei tarkoittaisi sitä
+    # mitä CSV:ssä lukee.
+    #
+    # Miksi ohituksia on: minuuttimalli käyttää priorina viime kauden
+    # minuutteja eikä erota "ei ollut tarpeeksi hyvä" ja "oli myynnissä tai
+    # loukkaantunut". Isak: 694 min / 8 avausta 25/26 -> p_start 0.30 -> xP
+    # 1.06/GW 9.0M ykköshyökkääjälle. Väliaikainen; hintapriori korvaa.
+    player_overrides = load_player_overrides()
+    override_applied: dict[int, dict] = {}
+    for pid, ov in player_overrides.items():
+        if pid not in mm_by_player:
+            print(f"[Overrides] pelaaja {pid} ei ole bootstrapissa — rivi ohitettu")
+            continue
+        before = mm_by_player[pid]["p_start_raw"]
+        mm_by_player[pid] = xp.set_p_start(mm_by_player[pid], ov["p_start"])
+        override_applied[pid] = ov
+        print(f"[Overrides] {pid}: p_start {before:.2f} -> {ov['p_start']:.2f} "
+              f"(xmins {mm_by_player[pid]['xmins']:.1f}) — {ov['reason'][:60]}")
 
     print("[5/6] xP per pelaaja per GW (horisontti + Phase 1b -konteksti)...")
     # Tulevat fixturet per GW mallinimillä
@@ -541,6 +565,19 @@ def main(argv: list[str] | None = None) -> int:
             # #33: probabilistinen kokoonpanoennuste + rehellinen epävarmuus
             "predicted_starts": round(mm["p_start"] * 100.0, 1),
             "minutes_confidence": mm["confidence"],
+            # 27.7 REHELLISYYSLIPPU: kun minuutit on ohitettu käsin, se SANOTAAN
+            # — sekä koneluettavasti että käyttäjälle näytettävänä perusteluna.
+            # Käsin korotettu projektio jota ei merkitä on täsmälleen se asia
+            # joka syö "todennettava malli" -lupauksen. Kentät puuttuvat kun
+            # ohitusta ei ole (defensiivinen kaikilla pinnoilla).
+            **(
+                {
+                    "minutes_source": "override",
+                    "minutes_override_reason": override_applied[pid]["reason"],
+                }
+                if pid in override_applied
+                else {}
+            ),
             # #143: rehellisyyslippu — paljonko pelaajan omaa PL-dataa
             # estimaatin takana on (puhdas emissio, ei muuta xP-lukuja).
             "data_basis": xp.data_basis(acc_by_player[pid]),

@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-27T16:54:39",
+    "generated_at": "2026-07-27T20:28:21",
     "season": "2026/27",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + jäädytetty 25/26-baseline-artefakti (data/fpl_prev_baselines_2526.json, element code -mappaus)",
@@ -27,7 +27,9 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1552
+      "home_gamma": -0.1553,
+      "source": "measured",
+      "provenance": null
     },
     "data_coverage": {
       "baseline_season": "2526",
@@ -1286,7 +1288,7 @@
       "predicted_starts": 83.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 22.0,
+      "owned_pct": 21.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1526,7 +1528,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 21.2,
+      "owned_pct": 21.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9316,6 +9318,128 @@
       "components_gw": 1
     },
     {
+      "id": 379,
+      "web_name": "Isak",
+      "full_name": "Alexander Isak",
+      "team": "Liverpool",
+      "team_short": "LIV",
+      "pos": "FWD",
+      "xmins": 63.7,
+      "predicted_starts": 85.0,
+      "minutes_confidence": "med",
+      "minutes_source": "override",
+      "minutes_override_reason": "Last season's minutes reflect a transfer window, not his role — priced and signed as Liverpool's first-choice striker",
+      "data_basis": "pl_history",
+      "owned_pct": 11.9,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 9.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 694,
+        "starts": 8,
+        "goals": 3,
+        "assists": 1,
+        "xg": 2.59,
+        "xa": 0.08,
+        "cs": 1,
+        "points": 41,
+        "per90": {
+          "goals": 0.39,
+          "assists": 0.13,
+          "xgi": 0.35
+        }
+      },
+      "p_start": 0.85,
+      "p_cameo": 0.03,
+      "p_bench": 0.12,
+      "set_pieces": {
+        "pens": 1,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.41,
+      "xp_per_gw": 3.15,
+      "xp_horizon_total": 18.93,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.02
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.08
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.55
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.24
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.06
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.98
+        }
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 0.96,
+        "assists": 0.06,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.06,
+        "bonus": 0.4
+      },
+      "components_gw": 1
+    },
+    {
       "id": 25,
       "web_name": "Gyökeres",
       "full_name": "Viktor Gyökeres",
@@ -11636,7 +11760,7 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 19.1,
+      "owned_pct": 19.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11996,7 +12120,7 @@
       "predicted_starts": 71.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.1,
+      "owned_pct": 2.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13196,7 +13320,7 @@
       "predicted_starts": 66.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.0,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13676,7 +13800,7 @@
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 13.2,
+      "owned_pct": 13.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16541,7 +16665,7 @@
       "predicted_starts": 72.0,
       "minutes_confidence": "low",
       "data_basis": "no_history",
-      "owned_pct": 0.0,
+      "owned_pct": 0.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -36976,126 +37100,6 @@
       "components_gw": 1
     },
     {
-      "id": 379,
-      "web_name": "Isak",
-      "full_name": "Alexander Isak",
-      "team": "Liverpool",
-      "team_short": "LIV",
-      "pos": "FWD",
-      "xmins": 19.8,
-      "predicted_starts": 29.5,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 11.9,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 9.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 694,
-        "starts": 8,
-        "goals": 3,
-        "assists": 1,
-        "xg": 2.59,
-        "xa": 0.08,
-        "cs": 1,
-        "points": 41,
-        "per90": {
-          "goals": 0.39,
-          "assists": 0.13,
-          "xgi": 0.35
-        }
-      },
-      "p_start": 0.2953,
-      "p_cameo": 0.1409,
-      "p_bench": 0.5638,
-      "set_pieces": {
-        "pens": 1,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.13,
-      "xp_per_gw": 1.06,
-      "xp_horizon_total": 6.34,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.01
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.03
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.18
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.09
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.03
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.0
-        }
-      ],
-      "components": {
-        "appearance": 0.59,
-        "goals": 0.3,
-        "assists": 0.02,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.02,
-        "bonus": 0.12
-      },
-      "components_gw": 1
-    },
-    {
       "id": 243,
       "web_name": "Alcaraz",
       "full_name": "Carlos Alcaraz Durán",
@@ -45098,7 +45102,7 @@
       "predicted_starts": 19.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 0.9,
+      "owned_pct": 0.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -47964,7 +47968,7 @@
       "team_short": "BOU",
       "pos": "MID",
       "xmins": 2.8,
-      "predicted_starts": 10.7,
+      "predicted_starts": 10.8,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "owned_pct": 0.2,
