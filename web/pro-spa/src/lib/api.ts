@@ -31,7 +31,15 @@ export interface FantasyFixture {
 	opponent?: string;
 	venue: string;
 	fdr: number;
+	/** 27.7 HORISONTTI: puuttuu kaukoriveiltä (tier="far") RAKENTEELLISESTI.
+	 *  GW30:n CS-% heinäkuun arvioista olisi tarkkuuslupaus jota malli ei voi
+	 *  pitää. Älä oleta tätä olevan — se on kontrakti, ei unohdus. */
 	cs_pct?: number;
+	/** 27.7: near = mallin täysi ulostulo, far = pelkkä kalenterin vaikeus.
+	 *  Eksplisiittinen kenttä eikä gw-vertailusta johdettu, jottei
+	 *  rehellisyyssääntöä lasketa uudelleen kahdessa paikassa.
+	 *  Defensiivinen: vanha payload ei tuo kenttää → kohdellaan near-rivinä. */
+	tier?: 'near' | 'far';
 	/** Edge-sprint (contract-data 2b): def_fdr = alias fdr:lle, att_fdr =
 	 * hyökkäyssuunnan vaikeus (1 helpoin - 5 vaikein). Defensiivisiä. */
 	def_fdr?: number;
@@ -174,7 +182,20 @@ export interface XpResponse {
 }
 
 export interface FantasyResponse {
-	meta: { available: boolean; horizon_gw?: number; [key: string]: unknown };
+	meta: {
+		available: boolean;
+		/** Montako GW:tä TÄSSÄ vastauksessa on (ei mitä tiedostossa olisi). */
+		horizon_gw?: number;
+		/** Montako olisi saatavilla kauden loppuun. */
+		horizon_max?: number;
+		/** near/far-raja DATASSA eikä kovakoodattuna: jos raja muuttuu,
+		 *  molemmat pinnat seuraavat itsestään. */
+		near_horizon_gw?: number;
+		/** Pakollinen label kaukoriveille — näytetään sellaisenaan. */
+		far_basis_label?: string;
+		next_gameweek?: number | null;
+		[key: string]: unknown;
+	};
 	teams: FantasyTeam[];
 }
 
@@ -198,8 +219,17 @@ let xpP: Promise<XpResponse> | null = null;
 let xpAuthed = false;
 let accuracyP: Promise<AccuracyResponse> | null = null;
 
+/** 27.7: koko kausi haetaan KERRAN, ja GW-välivalitsin aggregoi klientissä.
+ *
+ *  Miksi ei per-väli-kutsua: välin raahaaminen on jatkuva ele. Jos jokainen
+ *  muutos olisi API-kutsu, se tuntuisi rikkinäiseltä ja kuormittaisi Renderiä
+ *  turhaan. Koko kausi on ~149 kB (ticker ei kasva horisontin mukana), joten
+ *  yksi haku riittää.
+ *
+ *  Oletusnäkymä on silti lähihorisontti — laajennus on työkalu jonka käyttäjä
+ *  ottaa käyttöön, ei seinä johon hän törmää. */
 export function fetchFantasy(): Promise<FantasyResponse> {
-	fantasyP ??= getJson<FantasyResponse>('/api/fantasy');
+	fantasyP ??= getJson<FantasyResponse>('/api/fantasy?horizon=all');
 	return fantasyP;
 }
 
