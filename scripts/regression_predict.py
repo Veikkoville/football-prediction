@@ -40,7 +40,14 @@ def _post(url: str, payload: dict, timeout: float = 180.0):
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
         url, data=data, method="POST",
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            # 27.7 PAKOLLINEN: api.goaliq.app on Cloudflaren takana ja CF
+            # torjuu urllib:n oletus-UA:n ("Python-urllib/3.x") 403:lla.
+            # Todennettu: oletus -> 403, oma UA -> 200. Ilman tätä
+            # regressio- ja golden-ajot kaatuisivat tuotantoa vasten.
+            "User-Agent": "GoalIQ-Regression/1.0 (+https://goaliq.app)",
+        },
     )
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read())

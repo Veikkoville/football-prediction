@@ -188,7 +188,13 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         f"<title>{escape(title)}</title>\n"
         f'<meta name="description" content="{escape(desc)}" />\n'
         f'<link rel="canonical" href="{canonical}" />\n'
+        # 27.7: koko ikonisetti myös alasivuille. Pelkkä .ico jätti selaimet
+        # käyttämään matalaresoluutioista varianttia ja iOS:n kotinäytön ilman
+        # ikonia — 187 alasivua näytti eri merkkiä kuin neljä pääsivua.
         '<link rel="icon" href="/favicon.ico" sizes="any">\n'
+        '<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">\n'
+        '<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">\n'
+        '<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">\n'
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
@@ -227,10 +233,20 @@ def _load(path: Path) -> dict | None:
 
 
 def _fetch_differentials() -> dict | None:
+    # 27.7: EKSPLISIITTINEN User-Agent on PAKOLLINEN. Kun API siirtyi
+    # api.goaliq.app-domainiin Cloudflaren taakse, CF alkoi torjua urllib:n
+    # oletus-UA:n ("Python-urllib/3.x") 403:lla -> differentials-sivu olisi
+    # lakannut paivittymasta HILJAA (builderi nappaa poikkeuksen ja jatkaa
+    # varoituksella). onrender.com-osoite vastasi ilman tata.
+    #
+    # Sama koskee KAIKKIA skripteja jotka hakevat api.goaliq.app:sta
+    # urllibilla — jos lisaat uuden, muista UA.
+    req = urllib.request.Request(
+        f"{API}/api/fantasy/differentials?max_ownership=10",
+        headers={"User-Agent": "GoalIQ-PageBuilder/1.0 (+https://goaliq.app)"},
+    )
     try:
-        with urllib.request.urlopen(
-            f"{API}/api/fantasy/differentials?max_ownership=10", timeout=120
-        ) as r:
+        with urllib.request.urlopen(req, timeout=120) as r:
             return json.load(r)
     except Exception as e:
         print(f"VAROITUS: differentials-haku epäonnistui: {type(e).__name__}: {e}")

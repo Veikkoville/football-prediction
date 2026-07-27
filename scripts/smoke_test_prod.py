@@ -23,9 +23,15 @@ LEAGUES = [
     ("INT-Champions League", ["2425", "2526"], "Real Madrid CF",           "FC Bayern München"),
 ]
 
+# 27.7: PAKOLLINEN. Kun API siirtyi api.goaliq.app-domainiin Cloudflaren
+# taakse, CF alkoi torjua urllib:n oletus-UA:n ("Python-urllib/3.x") 403:lla.
+# Todennettu: oletus-UA -> 403, oma UA -> 200. onrender.com vastasi ilman.
+# Jos lisäät uuden skriptin joka hakee api.goaliq.app:sta, muista UA.
+UA = "GoalIQ-SmokeTest/1.0 (+https://goaliq.app)"
+
 
 def _get(url, timeout=60.0):
-    req = urllib.request.Request(url, headers={"Accept": "application/json"})
+    req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": UA})
     t0 = time.perf_counter()
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -38,8 +44,9 @@ def _get(url, timeout=60.0):
 
 def _post(url, payload, timeout=60.0):
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, method="POST",
-                                  headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(
+        url, data=data, method="POST",
+        headers={"Content-Type": "application/json", "User-Agent": UA})
     t0 = time.perf_counter()
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:

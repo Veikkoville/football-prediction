@@ -220,7 +220,12 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         f"<title>{escape(title)}</title>\n"
         f'<meta name="description" content="{escape(desc)}" />\n'
         f'<link rel="canonical" href="{canonical}" />\n'
+        # 27.7: koko ikonisetti myös ohjelmallisille ottelusivuille (ks.
+        # build_fpl_longtail.py, sama perustelu).
         '<link rel="icon" href="/favicon.ico" sizes="any">\n'
+        '<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">\n'
+        '<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">\n'
+        '<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">\n'
         f"{HEAD_BRAND}"
         f"{ld}"
         f"<style>{CSS}</style>\n"
