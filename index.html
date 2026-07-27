@@ -143,7 +143,7 @@
  "distribution": {
   "@type": "DataDownload",
   "encodingFormat": "application/json",
-  "contentUrl": "https://goaliq-api.onrender.com/api/accuracy"
+  "contentUrl": "https://api.goaliq.app/api/accuracy"
  },
  "isAccessibleForFree": true,
  "dateModified": "2026-07-27",
@@ -708,7 +708,7 @@ document.addEventListener('click', function (e) {
   }
   tick();
   setInterval(tick, 1000);
-  fetch('https://goaliq-api.onrender.com/api/fantasy')
+  fetch('https://api.goaliq.app/api/fantasy')
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
       var iso = data && data.meta && data.meta.deadline_utc;

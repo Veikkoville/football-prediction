@@ -23,7 +23,7 @@ except Exception:
 from scripts.regression_predict import CASES, NUMERIC_FIELDS, snapshot as prod_snapshot
 
 GOLDEN_PATH = Path(__file__).parent / "golden" / "domestic_predict_golden.json"
-PROD_BASE = "https://goaliq-api.onrender.com"
+PROD_BASE = "https://api.goaliq.app"
 
 
 def local_snapshot() -> dict:

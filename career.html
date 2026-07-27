@@ -205,10 +205,12 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <script>
 (function () {
   'use strict';
-  // Lokaalikehitys osoittaa lokaaliin API:in; tuotanto aina Renderiin.
+  // Lokaalikehitys osoittaa lokaaliin API:in; tuotanto omaan domainiin.
+  // 27.7: pois jaetusta *.onrender.com-vyöhykkeestä — DNA:n nimipalvelu esti
+  // koko vyöhykkeen (NXDOMAIN) ja tämä sivu kaatui operaattorin käyttäjillä.
   var API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://127.0.0.1:8000'
-    : 'https://goaliq-api.onrender.com';
+    : 'https://api.goaliq.app';
   var canvas = document.getElementById('cardCanvas');
   var ctx = canvas.getContext('2d');
   var statusEl = document.getElementById('status');

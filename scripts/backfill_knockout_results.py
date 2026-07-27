@@ -153,7 +153,7 @@ def main() -> int:
     df.to_csv(CSV_PATH, index=False, encoding="utf-8", lineterminator="\n")
     print(f"\nCSV: {n_before} -> {len(df)} riviä (union, ei droppeja).")
     print("Deploy: git add data/international_results.csv && commit + push (Render).")
-    print('Verify: curl "https://goaliq-api.onrender.com/api/team/Canada?leagues=INT-World+Cup&seasons=26"')
+    print('Verify: curl "https://api.goaliq.app/api/team/Canada?leagues=INT-World+Cup&seasons=26"')
     return 0
 
 

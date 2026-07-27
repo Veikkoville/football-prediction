@@ -7,8 +7,18 @@
  *
  * Buildissa ylikirjoitettavissa Vite-enveillä (VITE_*).
  */
+/** 27.7: oma domain jaetun `*.onrender.com`-alidomainin tilalle.
+ *
+ * DNA:n nimipalvelu palautti NXDOMAINin koko `onrender.com`-vyöhykkeelle →
+ * SPA:n data-haut JA `POST /api/web/checkout` kaatuivat operaattorin
+ * käyttäjillä. Kirjautuminen toimi (Supabase resolvoituu normaalisti), joten
+ * premium-asiakas näki tyhjän tuotteen virhebannerilla — ja checkout oli poikki.
+ *
+ * `api.goaliq.app` on Cloudflaren proxyn takana, joten klientti ei koskaan
+ * resolvoi `onrender.com`ia. Proxy (oranssi pilvi) on pakollinen: DNS-only-CNAME
+ * seuraisi CNAME-ketjua estettyyn vyöhykkeeseen eikä korjaisi mitään. */
 export const API_BASE =
-	import.meta.env.VITE_API_BASE ?? 'https://goaliq-api.onrender.com';
+	import.meta.env.VITE_API_BASE ?? 'https://api.goaliq.app';
 
 export const SUPABASE_URL =
 	import.meta.env.VITE_SUPABASE_URL ?? 'https://bhcgommvjlhqcktrbtxf.supabase.co';

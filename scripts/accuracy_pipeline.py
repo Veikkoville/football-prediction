@@ -92,7 +92,7 @@ DOMESTIC_COMPETITIONS: dict[str, dict] = {
 # testeihin/lokaaliin ympäristömuuttujalla.
 import os
 PREDICT_API_BASE = os.environ.get(
-    "ACC_PREDICT_API_BASE", "https://goaliq-api.onrender.com"
+    "ACC_PREDICT_API_BASE", "https://api.goaliq.app"
 )
 
 

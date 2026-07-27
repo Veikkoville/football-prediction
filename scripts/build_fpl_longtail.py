@@ -52,7 +52,7 @@ XP_PATH = ROOT / "data" / "fpl_xp_projections.json"
 PW_PATH = ROOT / "data" / "fpl_price_watch.json"
 # #128/#120: xG- + DefCon-leaders-sivut samasta nightly-cachesta kuin API
 LEADERS_PATH = ROOT / "data" / "fpl_player_leaders.json"
-API = "https://goaliq-api.onrender.com"
+API = "https://api.goaliq.app"  # 27.7: pois estetysta onrender.com-vyohykkeesta
 
 UPSELL = (
     '<div class="rec">Powered by the GoalIQ match model with a published, '

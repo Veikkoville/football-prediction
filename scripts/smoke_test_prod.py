@@ -52,7 +52,7 @@ def _post(url, payload, timeout=60.0):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--base", default="https://goaliq-api.onrender.com")
+    p.add_argument("--base", default="https://api.goaliq.app")
     args = p.parse_args()
 
     print(f"\n{'League':<26} {'1. /teams':>11} {'1. /predict':>13} {'2. /teams':>11} {'2. /predict':>13}")

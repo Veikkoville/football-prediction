@@ -96,7 +96,11 @@ X_URL = "https://x.com/goaliqapp"
 TIKTOK_URL = "https://www.tiktok.com/@goaliqfpl"
 IG_URL = "https://www.instagram.com/goaliqfpl/"
 ORG_ID = BASE + "/#organization"
-API_BASE = "https://goaliq-api.onrender.com"   # #85: accuracy-Datasetin distribution
+# 27.7: oma domain jaetun *.onrender.com-vyohykkeen tilalle. DNA:n nimipalvelu
+# palautti NXDOMAINin koko vyohykkeelle -> operaattorin kayttajilta kaatui koko
+# tuotepinta. api.goaliq.app on CF-proxyn takana, joten onrender.com-nimea ei
+# tarvitse selvittaa missaan vaiheessa.
+API_BASE = "https://api.goaliq.app"   # #85: accuracy-Datasetin distribution
 
 # FDR-väriasteikko GoalIQ:n kanonisesta brändipaletista (brand-tokens.md,
 # täsmähexit, EI approksimaatioita): 1 helpoin = Teal → Gold → Gold Deep →
