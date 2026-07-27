@@ -562,16 +562,27 @@ WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
 from src.data.international_results import WC_FIT_DECAY, WC_FIT_BAYES
 
 
+# Kuinka usein warmup-säie tarkistaa onko kausi-ikkuna vaihtunut alta.
+# 30 min: flippi tapahtuu vuorokauden vaihteessa, joten pahin viive on 30 min
+# yöllä — mutta ilman tätä viive on "seuraavaan restarttiin asti", joka voi
+# olla päiviä.
+_SEASON_RECHECK_SEC = 1800
+
+
 @app.on_event("startup")
 def _warmup_default_models():
-    def _fit_all():
-        for liigat, kaudet in WARMUP_LEAGUES:
+    def _fit_seasons(kaudet: tuple[str, ...]) -> None:
+        for (liigat, _vanha) in WARMUP_LEAGUES:
             try:
                 t0 = time.time()
                 _saa_malli(liigat, kaudet)
-                print(f"[Warmup] {liigat[0]} ready in {time.time()-t0:.1f}s")
+                print(f"[Warmup] {liigat[0]} {kaudet} ready in {time.time()-t0:.1f}s")
             except Exception as e:
-                print(f"[Warmup] {liigat[0]} failed: {type(e).__name__}: {e}")
+                print(f"[Warmup] {liigat[0]} {kaudet} failed: {type(e).__name__}: {e}")
+
+    def _fit_all():
+        warmed = tuple(config.current_season_pair())
+        _fit_seasons(warmed)
         # #79: WC-malli on ESIRAKENNETTU (data/wc_model.json) — Render Starter ei
         # jaksa fitata "any"-mallia ajossa. Esiladataan lru-cacheen (instant);
         # ei fittiä, ei livelock-riskiä.
@@ -583,6 +594,40 @@ def _warmup_default_models():
                   f"in {time.time()-t0:.2f}s")
         except Exception as e:
             print(f"[Warmup] WC prebuilt model load failed: {type(e).__name__}: {e}")
+
+        # --------------------------------------------------------------
+        # KAUSIFLIPPI-VAHTI (27.7)
+        #
+        # Ongelma jonka tämä korjaa: `_DOMESTIC_SEASONS` lasketaan MODUULIN
+        # latauksessa eli prosessin käynnistyshetkellä, mutta klientit
+        # resolvoivat kauden joka pyynnössä (mobiili lib/season.ts, sääntö
+        # kuukausi >= 8). Elokuun 1. päivänä appi alkaa lähettää uutta paria,
+        # ja jos prosessi on käynnistetty ennen sitä, warmup on lämmittänyt
+        # VANHAN parin → jokainen ensimmäinen predict per liiga maksaa täyden
+        # synkronisen fitin.
+        #
+        # Hinta mitattu 27.7. tuotantoa vasten: lämmittämätön kausipari =
+        # 63 s, lämmitetty = 0,1 s. Appin predict-timeout on 90 s, eli se
+        # mahtuisi juuri ja juuri — mutta kuudella liigalla se olisi surkea
+        # 1.8., ja aiemmin tämä oli kiinni siitä restarttaako Render
+        # sattumalta oikeaan aikaan (päivittäinen deploy ajaa vain jos
+        # data/** muuttui 24 h:ssa → ei taattu).
+        #
+        # Vahti EI fittaa mitään turhaan: se herää, vertaa paria, ja nukkuu
+        # takaisin jos mikään ei muuttunut.
+        # --------------------------------------------------------------
+        while True:
+            time.sleep(_SEASON_RECHECK_SEC)
+            try:
+                nyt = tuple(config.current_season_pair())
+            except Exception as e:
+                print(f"[Warmup] kausitarkistus epaonnistui: {type(e).__name__}: {e}")
+                continue
+            if nyt == warmed:
+                continue
+            print(f"[Warmup] KAUSIFLIPPI {warmed} -> {nyt}; lammitetaan uusi pari")
+            _fit_seasons(nyt)
+            warmed = nyt
 
     threading.Thread(target=_fit_all, daemon=True).start()
 
