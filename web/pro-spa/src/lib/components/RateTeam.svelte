@@ -18,6 +18,8 @@
 	} from '$lib/fplEntry.svelte';
 	import { loadDraftIds, saveDraftIds, syncDraft, pushRemoteDraftSoon } from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
+	import WeeklyActions, { type WeeklyAction } from './WeeklyActions.svelte';
+	import { fetchFantasy } from '$lib/api';
 	import ModelWorking from './ModelWorking.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import TeamPitchManager from './TeamPitchManager.svelte';
@@ -39,6 +41,59 @@
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let data = $state<RateTeamResponse | null>(null);
+
+	// --- FM-silmukka: mallin suositukset kirjattaviksi päätöksiksi ----------
+	// Deadline haetaan Phase 0 -metasta, EI rate-teamista: rate-team tuntee
+	// vain GW-numeron, ja lukituksen raja on kellonaika. Ilman oikeaa
+	// deadlinea kirjaus joko estyisi turhaan tai sallisi liikaa.
+	// Fail-safe: ilman deadlinea suositukset näkyvät mutta napit eivät.
+	let deadlineUtc = $state<string | null>(null);
+	$effect(() => {
+		fetchFantasy()
+			.then((p) => {
+				deadlineUtc = (p?.meta?.deadline_utc as string | undefined) ?? null;
+			})
+			.catch(() => {});
+	});
+
+	let weeklyActions = $derived.by<WeeklyAction[]>(() => {
+		if (!data) return [];
+		const out: WeeklyAction[] = [];
+		const cap = data.captain?.pick;
+		if (cap) {
+			const alt = data.captain?.alternative;
+			out.push({
+				kind: 'captain',
+				label: 'Captain',
+				modelText: `${cap.web_name} (${cap.team_short}) · ${cap.gw_xp.toFixed(2)} xP`,
+				modelChoice: { id: cap.id, name: cap.web_name, gw_xp: cap.gw_xp },
+				// Lähellä oleva vaihtoehto on itsessään tieto: valinta ei ole
+				// selvä, ja mallin pitää myöntää se.
+				rationale: alt
+					? `${alt.web_name} is only ${(cap.gw_xp - alt.gw_xp).toFixed(2)} xP behind — this one is close.`
+					: undefined
+			});
+		}
+		// Siirto vain jos malli oikeasti suosittelee. "Älä siirrä" on yhtä
+		// lailla päätös, mutta sitä ei kirjata tekemisenä — tyhjä nappi olisi
+		// kohinaa. hold_verdict pysyy omassa kortissaan.
+		const sug = data.transfers?.suggestions?.[0];
+		if (sug && !data.transfers?.hold) {
+			out.push({
+				kind: 'transfer',
+				label: 'Transfer',
+				modelText: `${sug.out.web_name} → ${sug.in.web_name}`,
+				modelChoice: {
+					out_id: sug.out.id,
+					in_id: sug.in.id,
+					out: sug.out.web_name,
+					in: sug.in.web_name
+				},
+				rationale: `+${sug.delta_xp_horizon.toFixed(2)} xP over the horizon, ${sug.delta_cost.toFixed(1)}m cost.`
+			});
+		}
+		return out;
+	});
 
 	let entryValid = $derived(/^\d{1,10}$/.test(fplEntry.entry.trim()));
 
@@ -531,6 +586,12 @@
 				<span class="val line-weak">{data.rating.weakest_line}</span>
 			</div>
 		</div>
+		<!-- FM-silmukan etuovi. Sama sijoitus kuin mobiilissa: rate-team on
+		     ainoa paikka jossa kapteeni JA siirtoehdotus ovat samassa datassa,
+		     ja silmukka alkaa siitä hetkestä kun käyttäjä on juuri nähnyt
+		     mitä malli suosittelee. -->
+		<WeeklyActions gw={data.meta.gw} {deadlineUtc} actions={weeklyActions} />
+
 		<p class="captain">
 			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
 			<span class="muted">({data.captain.pick.team_short})</span>,
