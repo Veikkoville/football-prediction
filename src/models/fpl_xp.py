@@ -462,6 +462,87 @@ def scale_p_start(mm: dict, factor: float) -> dict:
     return recompute_minutes(out)
 
 
+# ---------------------------------------------------------------------------
+# Hintapriori ohuelle otokselle (27.7). Parametrit MITATTU, ei valittu:
+# scripts/backtest_preseason_price_prior.py, koe = ennusta 25/26 GW1-6
+# tiedoilla jotka tiedettiin ennen kauden alkua.
+#
+#   ohut otos  (<900 min edelliskaudella)  Brier 0.0540 -> 0.0454  +15.9 %
+#   paksu otos (>=900 min)                 0.1494 -> 0.1492  +0.2 % (neutraali)
+#
+#   KALLIS + ohut (Isak-tapaus, n=19)      0.1517 -> 0.0987  +35.0 %
+#       baseline arvioi aloitusosuudeksi 0.13, TOTEUTUNUT 0.37
+#   HALPA  + ohut (aito reservi, n=145)    0.0145 -> 0.0147  -1.5 %
+#       baseline 0.01, toteutunut 0.03 -> jo oikeassa, priori ei tee tyota
+#
+# Miksi hinta on informaatiota: FPL:n hinnoittelu on RIIPPUMATON arvio
+# odotetusta roolista, tehty tiedolla jota mallilla ei ole. Malli nakee vain
+# minuuttiluvun eika sita miksi minuutteja on vahan.
+#
+# PAKSUUN OTOKSEEN EI KOSKETA: siella mittaus nayttti neutraalin, eika prioria
+# saa kayttaa korjaamaan sita mika ei ole rikki.
+#
+# ===========================================================================
+# 🔴 EI KYTKETTY TUOTANTOON. ALA KYTKE ILMAN ALLA OLEVAA TYOTA.
+#
+# Kytkettiin kokeeksi 27.7 ja PERUUTETTIIN. Priori itsessaan toimii, mutta sen
+# VUOROVAIKUTUS SYVYYSNORMALISOINNIN kanssa tuottaa systemaattista vahinkoa
+# jota backtest ei mitannut:
+#
+#   paksu otos (n=131, p_start >= 70 %)  xP-muutos mediaani -5.3 %
+#     yli 5 % pudonneita 68/131,  yli 10 % 22/131
+#   Raya       6.0M  24.65 -> 18.05  (-26.8 %)   omistus 29.8 %
+#   Donnarumma 5.5M  20.13 -> 14.91  (-25.9 %)
+#   Pickford   5.5M  24.50 -> 18.49  (-24.5 %)
+#
+# MEKANISMI: maalivahtiryhmassa on YKSI paikka ja 2-3 pelaajaa. Kun priori
+# nostaa kakkosvahdin p_startia, depth_factor skaalaa koko ryhman alas ja
+# ykkosvahti absorboi lahes kaiken. Lisaksi hinta EI EROTTELE maalivahteja
+# (kaikki 4.0-5.5M) -> persentiili ei kanna informaatiota roolista, mutta
+# priori luottaa siihen silti.
+#
+# OPPI: backtest oli patea siihen kysymykseen joka esitettiin, mutta kysymys
+# oli vajaa. Vaikutus mitattiin HINTATASOITTAIN muttei POSITIOITTAIN, eika
+# vuorovaikutusta normalisoinnin kanssa mitattu lainkaan. Otsikkoluku parani
+# ja olisi peittanyt taman alleen.
+#
+# ENNEN KYTKENTAA TARVITAAN:
+#   1. Per-positio-validointi (GK erikseen; hinta ei todennakoisesti kelpaa
+#      siella priorina lainkaan)
+#   2. Mittaus priorin JA depth_factorin yhteisvaikutuksesta, ei pelkastaan
+#      priorista
+#   3. Regressioportti korkean omistuksen pelaajille: yksikaan >10 % omistettu
+#      ei saa pudota merkittavasti ilman eksplisiittista perustelua
+# ===========================================================================
+# ---------------------------------------------------------------------------
+PRICE_PRIOR_WEIGHT = 0.25
+PRICE_PRIOR_THIN_MINUTES = 900
+
+
+def apply_price_prior(mm: dict, price_pct: float, prior_minutes: float,
+                      weight: float = PRICE_PRIOR_WEIGHT,
+                      thin_minutes: float = PRICE_PRIOR_THIN_MINUTES) -> dict:
+    """Sekoita position sisainen hintapersentiili aloitus-tn:aan OHUELLA otoksella.
+
+    price_pct
+        0..1, hintapersentiili SAMAN POSITION sisalla. Positioiden valinen
+        vertailu olisi merkityksetonta: 5.5M puolustaja ja 5.5M hyokkaaja ovat
+        eri rooleja.
+    prior_minutes
+        Otoksen koko minuutteina. >= thin_minutes -> palautetaan muuttumattomana.
+
+    Askelfunktio eika liukuva paino: tasan se muoto joka mitattiin. Liukuva
+    olisi tyylikkaampi mutta validoimaton.
+    """
+    if prior_minutes >= thin_minutes or weight <= 0.0:
+        return mm
+    out = dict(mm)
+    for k in ("p_start", "p_start_raw"):
+        blended = (1.0 - weight) * out[k] + weight * float(price_pct)
+        out[k] = min(max(blended, 0.0), 1.0)
+    return recompute_minutes(out)
+
+
 def set_p_start(mm: dict, p_start: float) -> dict:
     """Aseta aloitus-tn SUORAAN (manuaalinen ohitus) ja johda minuutit uudelleen.
 
