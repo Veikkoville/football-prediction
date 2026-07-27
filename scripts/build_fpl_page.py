@@ -145,7 +145,31 @@ def gw_date_label(fixtures: list[dict], gw: int) -> str:
 
 def build_context(fpl: dict, acc: dict) -> dict:
     meta = fpl["meta"]
-    teams = fpl["teams"]
+    # 27.7 HORISONTTILAAJENNUS: teams[].fixtures sisältää nyt KOKO KAUDEN, ja
+    # kaukorivit (tier="far") EIVÄT kanna cs_pct-kenttää — se on kontraktin
+    # rakenteellinen rehellisyysrajoite, ei unohdus
+    # (goaliq-app/cos-reports/horizon-extension-contract-2026-07-27.md).
+    #
+    # Tämä sivu lukee cs_pct:tä ehdoitta viidessä kohdassa (CS-taulu, FDR-grid,
+    # JSON-LD, meta-description), joten se KAATUI KeyErroriin heti kun
+    # projektio-JSON regeneroitiin. Havaittu accuracy-log-ajon punaisena
+    # 27.7 16:57 UTC — "Page-build health (fail loud)" teki työnsä.
+    #
+    # Staattinen sivu näyttää LÄHIHORISONTIN (kontrakti §6: fpl.html tulee
+    # horisonttiominaisuuteen viimeisenä), joten suodatus tehdään tässä
+    # YHDESSÄ paikassa eikä viidessä kutsukohdassa erikseen. Kun sivu joskus
+    # saa GW-välivalitsimen, tämä on se rivi joka poistetaan.
+    #
+    # Defensiivinen molempiin suuntiin: vanha payload ilman tier-kenttää
+    # käyttäytyy täsmälleen kuten ennen (kaikki rivit läpi).
+    def _near_only(team: dict) -> dict:
+        fx = [
+            f for f in team.get("fixtures", [])
+            if f.get("tier", "near") == "near" and f.get("cs_pct") is not None
+        ]
+        return {**team, "fixtures": fx}
+
+    teams = [_near_only(t) for t in fpl["teams"]]
     fixtures = fpl["fixtures"]
     next_gw = meta.get("next_gameweek") or min(
         f["gameweek"] for f in fixtures if f.get("gameweek")
