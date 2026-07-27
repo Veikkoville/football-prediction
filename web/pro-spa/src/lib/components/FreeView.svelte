@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fetchFantasy, type FantasyResponse } from '$lib/api';
+	import { fetchFantasy, type FantasyResponse, type FantasyTeam } from '$lib/api';
 	import MethodNote from './MethodNote.svelte';
 	import Provenance from './Provenance.svelte';
 	import LeagueBanner from './LeagueBanner.svelte';
@@ -62,9 +62,91 @@
 		return '';
 	}
 
-	let gwCols = $derived(
-		data?.teams?.[0]?.fixtures?.map((f) => f.gw) ?? []
+	// ------------------------------------------------------------------
+	// 27.7 HORISONTTI: GW-välivalitsin + lajittelu
+	// (kontrakti: goaliq-app/cos-reports/horizon-extension-contract-2026-07-27.md)
+	//
+	// Aggregaatit lasketaan KLIENTISSÄ, ei palvelimella: välin raahaaminen on
+	// jatkuva ele, ja per-kutsu tuntuisi rikkinäiseltä. Koko kausi tulee
+	// yhdessä vastauksessa.
+	// ------------------------------------------------------------------
+	let nearHorizon = $derived(data?.meta?.near_horizon_gw ?? 6);
+	let allGws = $derived(
+		[...new Set((data?.teams ?? []).flatMap((t) => t.fixtures.map((f) => f.gw)))].sort(
+			(a, b) => a - b
+		)
 	);
+	let minGw = $derived(allGws[0] ?? 1);
+	let maxGw = $derived(allGws[allGws.length - 1] ?? 1);
+
+	let gwFrom = $state(0);
+	let gwTo = $state(0);
+	let rangeTouched = $state(false);
+
+	// Oletusväli = lähihorisontti eli TÄSMÄLLEEN nykyinen näkymä. Kukaan ei
+	// avaa sivua 38 peliviikon seinään; laajennus on työkalu jonka käyttäjä
+	// ottaa käyttöön. Ei ylikirjoiteta käyttäjän valintaa datan päivittyessä.
+	$effect(() => {
+		if (!rangeTouched && allGws.length) {
+			gwFrom = minGw;
+			gwTo = Math.min(minGw + nearHorizon - 1, maxGw);
+		}
+	});
+
+	let gwCols = $derived(allGws.filter((g) => g >= gwFrom && g <= gwTo));
+
+	type RangeAgg = {
+		n: number;
+		avgFdr: number | null;
+		avgCs: number | null;
+		allNear: boolean;
+	};
+
+	/** Yhden joukkueen luvut valitulla välillä.
+	 *
+	 *  KOLME REUNATAPAUSTA (kontrakti §4), kaikki hoidettu tässä jotta molemmat
+	 *  pinnat käyttäytyvät samoin:
+	 *   1. BLANK GW — 0 fixturea välillä. avgFdr = null, EI 0: tyhjän keskiarvo
+	 *      lajittuisi "helpoimmaksi" ja nostaisi pelaamattoman joukkueen kärkeen.
+	 *   2. DOUBLE GW — 2 fixturea samassa GW:ssä. Keskiarvo laimentaa, joten
+	 *      n näytetään lukuna eikä pelkkänä keskiarvona.
+	 *   3. SEKAVÄLI — väli ylittää near/far-rajan → avgCs = null. Osittainen
+	 *      keskiarvo olisi eri asioiden keskiarvo, ei epätarkka luku. */
+	function rangeAgg(t: FantasyTeam): RangeAgg {
+		const fx = t.fixtures.filter((f) => f.gw >= gwFrom && f.gw <= gwTo);
+		if (!fx.length) return { n: 0, avgFdr: null, avgCs: null, allNear: false };
+		const allNear = fx.every((f) => (f.tier ?? 'near') === 'near');
+		const cs = fx.map((f) => f.cs_pct).filter((v): v is number => typeof v === 'number');
+		return {
+			n: fx.length,
+			avgFdr: fx.reduce((s, f) => s + f.fdr, 0) / fx.length,
+			avgCs: allNear && cs.length === fx.length ? cs.reduce((s, v) => s + v, 0) / cs.length : null,
+			allNear
+		};
+	}
+
+	let sortKey = $state<'fdr' | 'cs' | 'n' | 'name'>('fdr');
+
+	let sortedTeams = $derived.by(() => {
+		const rows = (data?.teams ?? []).map((t) => ({ t, a: rangeAgg(t) }));
+		rows.sort((x, y) => {
+			// Blank GW aina viimeisenä riippumatta lajittelusta — sillä ei ole
+			// mielekästä vaikeutta eikä sitä saa esittää helpoimpana.
+			if (x.a.n === 0 !== (y.a.n === 0)) return x.a.n === 0 ? 1 : -1;
+			if (sortKey === 'name') return x.t.name.localeCompare(y.t.name);
+			if (sortKey === 'n') return y.a.n - x.a.n;
+			if (sortKey === 'cs') {
+				if (x.a.avgCs == null && y.a.avgCs == null) return 0;
+				if (x.a.avgCs == null) return 1;
+				if (y.a.avgCs == null) return -1;
+				return y.a.avgCs - x.a.avgCs; // korkein CS% ensin
+			}
+			return (x.a.avgFdr ?? 99) - (y.a.avgFdr ?? 99); // helpoin ensin
+		});
+		return rows;
+	});
+
+	let rangeHasFar = $derived(gwTo > minGw + nearHorizon - 1);
 	// Edge-sprint kohta 4: selite näkyviin vain jos payload tuo D/A-kentät.
 	let hasDuoAny = $derived(
 		data?.teams?.some((t) =>
@@ -100,10 +182,14 @@
 			<p class="banner success">Projections go live before Gameweek 1. Check back soon.</p>
 		{:else}
 			<section class="tool-card">
-				<h2>Clean sheet outlook, next {data.meta.horizon_gw ?? 6} gameweeks</h2>
+				<h2>
+					Clean sheet outlook, GW{gwFrom}–{gwTo}
+				</h2>
 				<p class="muted">
 					Free · <strong>Avg CS%</strong> = the team's average chance of a clean sheet from the
-					match model over the next {data.meta.horizon_gw ?? 6} gameweeks.
+					match model across the gameweeks you select. It is shown only while the whole range
+					sits inside the modelled window — beyond that the calendar still tells you where the
+					swings are, but a precise percentage would not be honest.
 					<strong>Avg FDR</strong> = average fixture difficulty from the GoalIQ model (win% +
 					xG), not FPL's official FDR; 1 = easiest, 5 = hardest. Each GW cell shows opponent,
 					venue and that fixture's clean sheet probability; the cell colour follows the same
@@ -131,24 +217,85 @@
 					</p>
 				</MethodNote>
 
+				<!-- 27.7: GW-välivalitsin. Oletus = lähihorisontti (nykyinen näkymä);
+				     laajennus on työkalu jonka käyttäjä ottaa käyttöön. -->
+				<div class="gw-range">
+					<label>
+						<span class="muted">From GW</span>
+						<select
+							bind:value={gwFrom}
+							onchange={() => {
+								rangeTouched = true;
+								if (gwTo < gwFrom) gwTo = gwFrom;
+							}}
+						>
+							{#each allGws as g (g)}<option value={g}>{g}</option>{/each}
+						</select>
+					</label>
+					<label>
+						<span class="muted">to GW</span>
+						<select
+							bind:value={gwTo}
+							onchange={() => {
+								rangeTouched = true;
+								if (gwFrom > gwTo) gwFrom = gwTo;
+							}}
+						>
+							{#each allGws as g (g)}<option value={g}>{g}</option>{/each}
+						</select>
+					</label>
+					<label>
+						<span class="muted">Sort by</span>
+						<select bind:value={sortKey}>
+							<option value="fdr">Easiest fixtures</option>
+							<option value="cs">Best clean sheet %</option>
+							<option value="n">Most fixtures</option>
+							<option value="name">Team name</option>
+						</select>
+					</label>
+					{#if rangeTouched && (gwFrom !== minGw || gwTo !== Math.min(minGw + nearHorizon - 1, maxGw))}
+						<button
+							type="button"
+							class="gw-reset"
+							onclick={() => {
+								gwFrom = minGw;
+								gwTo = Math.min(minGw + nearHorizon - 1, maxGw);
+							}}>Reset</button
+						>
+					{/if}
+				</div>
+
+				{#if rangeHasFar}
+					<!-- Kaukorivien pakollinen label. Ei piiloteta eikä pehmennetä:
+					     malli ei voi luvata GW30:n tarkkuutta heinäkuussa. -->
+					<p class="banner">
+						{data.meta.far_basis_label ??
+							'Fixture difficulty only beyond the next few gameweeks — clean sheet % appears as each gameweek moves closer.'}
+					</p>
+				{/if}
+
 				<div class="table-wrap">
 					<table>
 						<thead>
 							<tr>
 								<th>Team</th>
-								<th class="num"><abbr title="Chance of a clean sheet from the match model, averaged over the next gameweeks">Avg CS%</abbr></th>
+								<th class="num"><abbr title="Chance of a clean sheet from the match model, averaged over the selected gameweeks. Blank when the range reaches beyond the modelled window.">Avg CS%</abbr></th>
 								<th class="num"><abbr title="Fixture difficulty from the GoalIQ model (win% + xG), not FPL's official FDR; 1 easiest to 5 hardest">Avg FDR</abbr></th>
+								<th class="num"><abbr title="Fixtures in the selected range: 0 = blank gameweek, 2+ = double gameweek">Games</abbr></th>
 								{#each gwCols as gw (gw)}
-									<th>GW{gw}</th>
+									<th class:is-far={gw > minGw + nearHorizon - 1}>GW{gw}</th>
 								{/each}
 							</tr>
 						</thead>
 						<tbody>
-							{#each data.teams as t (t.name)}
-								<tr>
+							{#each sortedTeams as { t, a } (t.name)}
+								<tr class:is-blank={a.n === 0}>
 									<td>{t.name}</td>
-									<td class="num">{t.next_avg_cs_pct.toFixed(1)}</td>
-									<td class="num">{t.next_avg_fdr.toFixed(2)}</td>
+									<!-- avgCs null = sekaväli tai blank. Näytetään viiva, EI 0:
+									     eri asioiden keskiarvo olisi väärä luku, ei epätarkka. -->
+									<td class="num">{a.avgCs != null ? a.avgCs.toFixed(1) : '—'}</td>
+									<td class="num">{a.avgFdr != null ? a.avgFdr.toFixed(2) : '—'}</td>
+									<td class="num">{a.n}</td>
 									{#each gwCols as gw (gw)}
 										{@const f = t.fixtures.find((x) => x.gw === gw)}
 										{#if f}
@@ -246,6 +393,49 @@
 </div>
 
 <style>
+	/* 27.7 horisontti: välivalitsin + near/far-erottelu */
+	.gw-range {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--s-3);
+		margin: var(--s-3) 0;
+	}
+	.gw-range label {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--s-2);
+		font-size: var(--step--1);
+	}
+	.gw-range select {
+		font: inherit;
+		padding: 0.2em 0.4em;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		background: var(--surface);
+		color: var(--text);
+	}
+	.gw-reset {
+		font: inherit;
+		font-size: var(--step--1);
+		padding: 0.2em 0.7em;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		background: transparent;
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+	/* Kaukohorisontti kevennettynä: sama data, pienempi lupaus. Erottelu
+	   tehdään painolla eikä värillä, koska väri on jo varattu vaikeusasteikolle. */
+	th.is-far {
+		opacity: 0.62;
+		font-weight: 400;
+	}
+	/* Blank GW: rivi himmennetään ja se lajitellaan viimeiseksi (ks. sortedTeams).
+	   Sitä ei saa esittää "helpoimpana" vain koska keskiarvoa ei ole. */
+	tbody tr.is-blank {
+		opacity: 0.55;
+	}
 	.free-view {
 		min-height: 82vh;
 	}
