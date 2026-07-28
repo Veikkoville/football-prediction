@@ -467,6 +467,13 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # 28.7: PAKOLLINEN custom-headereille. Selain EI anna JS:n lukea muuta kuin
+    # CORS-safelisted-headereita cross-originissa, vaikka palvelin lähettäisi ne.
+    # pro.goaliq.app -> api.goaliq.app on cross-origin, joten ilman tätä
+    # X-GoalIQ-Error-Code oli olemassa vastauksessa mutta näkymätön klientille,
+    # ja PI-16:n haara jäi laukeamatta HILJAA: käyttäjä näki yhä punaisen
+    # virhelaatikon. Todettu katsomalla livesivua, ei koodia lukemalla.
+    expose_headers=["X-GoalIQ-Error-Code"],
 )
 
 # Edge-sprint: uudet fantasy-endpointit (chip-ev, plan-chains, league, h2h,

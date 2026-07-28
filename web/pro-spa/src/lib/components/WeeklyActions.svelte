@@ -84,7 +84,12 @@
 
 {#if gw != null && actions.length > 0}
 	<section class="weekly">
-		<h3>{actions.length} things to do this week</h3>
+		<!-- 28.7: monikkobugi. Livesivulla luki "1 things to do this week", ja
+	     yksi tehtava on esikaudella tavallisin tila. -->
+			<h3>
+				{actions.length}
+				{actions.length === 1 ? 'thing' : 'things'} to do this week
+			</h3>
 		{#if !open}
 			<p class="muted locked">
 				This gameweek is locked. Decisions can only be logged before the deadline, and that is what
