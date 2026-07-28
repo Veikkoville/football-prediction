@@ -8,7 +8,7 @@ import pytest
 import src.models.fpl_planner as pl
 import src.models.fpl_rate_team as rt
 from tests.test_fpl_rate_team import (  # noqa: F401 — _mock_fpl-fixture käyttöön
-    FAKE_BOOTSTRAP, POOL_BOOT, SQUAD_IDS, _mock_fpl,
+    FAKE_BOOTSTRAP, FAKE_XP, POOL_BOOT, SQUAD_IDS, _mock_fpl,
 )
 
 # Heikko runko: huonoimmat MID:t (20-24) + huonoimmat DEF:t → plannerilla
@@ -270,3 +270,70 @@ def test_draft_mode_works_without_entry(client, url):
 def test_plan_chains_requires_entry_or_players(client):
     r = client.get("/api/fantasy/plan-chains?horizon=3")
     assert r.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# 28.7 (Villen bugilöytö): siirtoehdotuksen delta on AVAUSKOKOONPANON hyöty.
+#
+# Vanha kaava (in.xP - out.xP) lupasi kakkosvahdin vaihdosta "+18.74 xP over
+# the horizon", vaikka XI-xP ei muuttunut lainkaan (todennettu tuotannosta:
+# 315.31 -> 315.31). Syvyysparannus ei ole pisteparannus.
+# ---------------------------------------------------------------------------
+
+def test_bench_only_upgrade_reports_no_xi_gain():
+    """Kakkosvahdin paivitys ei saa nayttaa hyotya jos ykkosvahti ei vaihdu.
+
+    Synteettinen pooli, koska jaettu mock-runko ei osunut tahan haaraan
+    lainkaan: sen klubit olivat jo taynna ja kandidaatit karsiutuivat ennen
+    deltan laskentaa (0 ehdotusta molemmilla toteutuksilla). Testi jonka
+    negatiivinen kontrolli ei kaada ei mittaa mitaan.
+    """
+    pool, pid = [], 0
+
+    def mk(t, price, xp, club):
+        nonlocal_pid = None
+        return {"id": 0, "web_name": "", "element_type": t, "price": price,
+                "xp_horizon_total": xp, "xp_per_gw": xp / 6, "club": club,
+                "team_short": f"C{club:02d}", "gameweeks": []}
+
+    def add(t, price, xp, club, name):
+        nonlocal pid
+        pid += 1
+        p = mk(t, price, xp, club)
+        p["id"], p["web_name"] = pid, name
+        pool.append(p)
+        return p
+
+    gk_start = add(1, 45, 60.0, 1, "GK_START")     # pelaa
+    gk_bench = add(1, 45, 6.0, 2, "GK_BENCH")      # penkilla
+    gk_free = add(1, 45, 30.0, 9, "GK_FREE")       # parempi kuin penkki,
+    #                                                heikompi kuin ykkonen
+    squad = [gk_start, gk_bench]
+    for i in range(5):
+        squad.append(add(2, 45, 30.0 - i, 10 + i, f"DEF{i}"))
+    for i in range(5):
+        squad.append(add(3, 45, 40.0 - i, 20 + i, f"MID{i}"))
+    for i in range(3):
+        squad.append(add(4, 45, 35.0 - i, 30 + i, f"FWD{i}"))
+    assert len(squad) == 15
+
+    out = rt.transfer_suggestions(squad, pool, bank_tenths=0)
+    names = [(s["out"]["web_name"], s["in"]["web_name"],
+              s["delta_xp_horizon"]) for s in out["suggestions"]]
+    assert not any(o == "GK_BENCH" and i == "GK_FREE" for o, i, _d in names), (
+        f"kakkosvahdin vaihto luvattiin hyotyna: {names}")
+    assert out["hold"] is True, f"ei aitoja parannuksia, mutta hold=False: {names}"
+
+
+def test_delta_never_exceeds_raw_player_difference():
+    """XI-hyöty on aina <= pelaajien raakaerotus (matemaattinen yläraja).
+    Jos tämä kaatuu, haarukointi karsii vääriä kandidaatteja."""
+    pool = rt._projection_pool(FAKE_XP, {e["id"]: e for e in POOL_BOOT})
+    by_id = {p["id"]: p for p in pool}
+    # SQUAD_IDS on poolin PARAS runko -> ei parannuksia. Heikko runko on se
+    # jolla siirtoja ylipaataan on (sama fixture kuin planner-testeissa).
+    squad = [by_id[i] for i in WEAK_SQUAD]
+    out = rt.transfer_suggestions(squad, pool, bank_tenths=30)
+    assert out["suggestions"], "heikolle rungolle pitää löytyä parannuksia"
+    for s in out["suggestions"]:
+        assert s["delta_xp_horizon"] <= s["delta_xp_squad"] + 1e-6

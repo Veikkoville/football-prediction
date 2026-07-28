@@ -543,6 +543,11 @@
 					<abbr title="The horizon: how many upcoming gameweeks the projection covers"
 						>next {data.meta.horizon_gw ?? 6} GWs</abbr
 					>: <strong>{data.rating.team_xp_horizon.toFixed(1)}</strong>
+					<!-- 28.7 (Villen havainto): ilman tata merkintaa lukija vertaa
+					     315.3:a model-xi-sivun 303.4:aan ja paattelee voittaneensa
+					     mallin. Perusteet ovat eri: hero tuplaa kapteenin, benchmark
+					     ei. Sama virhe tehtiin kahdesti samana paivana. -->
+					<span class="basis-note">captain doubled</span>
 				</p>
 				<!-- 26.7: beats_benchmark eksplisiittisesti. Aiemmin ylitys leikattiin
 				     hiljaa 100 %:iin, jolloin tieto katosi ja luku luki ontolta
@@ -576,7 +581,12 @@
 						<span class="rating-basis"
 							>{data.rating.optimal_proven === false
 								? '100 = the strongest squad the model found inside the 100.0m budget.'
-								: '100 = the best squad the rules allow inside the 100.0m budget.'}</span
+								: '100 = the best squad the rules allow inside the 100.0m budget.'}
+							{#if typeof data.rating.team_xp_horizon_no_captain === 'number' && typeof data.rating.optimal_team_xp === 'number'}
+								Like for like, without the captain bonus on either side:
+								{data.rating.team_xp_horizon_no_captain.toFixed(1)} vs
+								{data.rating.optimal_team_xp.toFixed(1)}.
+							{/if}</span
 						>
 					{/if}
 				</p>
@@ -981,6 +991,12 @@
 	.rating-basis {
 		display: block;
 		font-size: var(--step--2);
+	}
+	/* Hero-luvun peruste samalla rivilla, pienempana */
+	.basis-note {
+		font-size: var(--step--2);
+		color: var(--text-muted);
+		white-space: nowrap;
 	}
 	/* 26.7: metodologia auki, oletuksena kiinni (ei vie tilaa herolta) */
 	.method {

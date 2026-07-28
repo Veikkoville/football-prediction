@@ -583,7 +583,29 @@ def transfer_suggestions(squad: list[dict], pool: list[dict],
     for p in squad:
         club_counts[p["club"]] = club_counts.get(p["club"], 0) + 1
 
-    suggestions = []
+    # 28.7 (Villen bugilöytö): delta lasketaan AVAUSKOKOONPANOSTA, ei pelaajien
+    # raakaerotuksesta.
+    #
+    # Vanha kaava (in.xP - out.xP) lupasi Villelle "+18.74 xP over the horizon"
+    # kakkosvahdin vaihdosta. Todennettu tuotannosta ajamalla sama 15 ennen ja
+    # jälkeen: XI-xP 315.31 -> 315.31, rating 92 -> 92. Muutos oli TASAN NOLLA,
+    # koska kumpikaan vahti ei nouse Verbruggenin ohi. Luku oli tosi pelaajien
+    # välillä ja epätosi pisteinä — ja se on silmukan pääsuositus, johon
+    # käyttäjä kirjaa "following the model".
+    #
+    # Raakaerotus säilyy YLÄRAJANA ja siksi kelpaa haarukointiin: jos uusi XI
+    # käyttää tulokasta, hänen korvaamisensa lähtijällä antaa laillisen vanhan
+    # XI:n (sama positio) → XI-hyöty ≤ raakaerotus. Käydään kandidaatit läpi
+    # raakaerotus laskevassa järjestyksessä ja lopetetaan kun se alittaa jo
+    # löydetyn parhaan todellisen hyödyn: tulos on eksakti, ei otos.
+    base_xi_xp = sum(p["xp_horizon_total"] for p in optimal_xi(squad))
+    squad_by_id = {p["id"]: p for p in squad}
+
+    def _xi_gain(out_p: dict, in_p: dict) -> float:
+        new_squad = [in_p if p["id"] == out_p["id"] else p for p in squad]
+        return sum(p["xp_horizon_total"] for p in optimal_xi(new_squad)) - base_xi_xp
+
+    cands = []
     for out_p in squad:
         budget = bank_tenths + out_p["price"]
         for in_p in pool:
@@ -597,26 +619,50 @@ def transfer_suggestions(squad: list[dict], pool: list[dict],
             after = club_counts.get(in_p["club"], 0) + 1
             if in_p["club"] != out_p["club"] and after > MAX_PER_CLUB:
                 continue
-            delta = in_p["xp_horizon_total"] - out_p["xp_horizon_total"]
-            if delta <= 0:
+            raw = in_p["xp_horizon_total"] - out_p["xp_horizon_total"]
+            if raw <= 0:
                 continue
-            suggestions.append({
-                "out": {"id": out_p["id"], "web_name": out_p["web_name"],
-                        "team_short": out_p["team_short"],
-                        "price": out_p["price"] / 10.0},
-                # #121: in-pelaajalle täydet planner-kentät → apply-to-planner
-                # voi liittää pelaajan pitchiin ilman lisäkutsua.
-                "in": {"id": in_p["id"], "web_name": in_p["web_name"],
-                       "team_short": in_p["team_short"],
-                       "price": in_p["price"] / 10.0,
-                       "xp_per_gw": round(in_p["xp_per_gw"], 2),
-                       "xp_horizon_total": round(in_p["xp_horizon_total"], 2),
-                       "gameweeks": _player_gameweeks(in_p)},
-                "pos": POS_NAME[out_p["element_type"]],
-                "delta_xp_horizon": round(delta, 2),
-                "delta_cost": round((in_p["price"] - out_p["price"]) / 10.0, 1),
-            })
-    suggestions.sort(key=lambda s: s["delta_xp_horizon"], reverse=True)
+            cands.append((raw, out_p["id"], in_p["id"], out_p, in_p))
+
+    cands.sort(key=lambda c: c[0], reverse=True)
+    scored: list[tuple[float, float, dict, dict]] = []
+    best_gain = 0.0
+    for raw, _oid, _iid, out_p, in_p in cands:
+        # Haarukointi: raakaerotus on yläraja, joten tästä eteenpäin ei voi
+        # enää löytyä 5. parasta parempaa kun lista on jo täynnä.
+        if len(scored) >= 5 and raw <= min(s[0] for s in scored):
+            break
+        gain = _xi_gain(out_p, in_p)
+        if gain <= 0:
+            continue
+        best_gain = max(best_gain, gain)
+        scored.append((gain, raw, out_p, in_p))
+        scored.sort(key=lambda s: s[0], reverse=True)
+        del scored[5:]
+
+    suggestions = []
+    for gain, raw, out_p, in_p in scored:
+        suggestions.append({
+            "out": {"id": out_p["id"], "web_name": out_p["web_name"],
+                    "team_short": out_p["team_short"],
+                    "price": out_p["price"] / 10.0},
+            # #121: in-pelaajalle täydet planner-kentät → apply-to-planner
+            # voi liittää pelaajan pitchiin ilman lisäkutsua.
+            "in": {"id": in_p["id"], "web_name": in_p["web_name"],
+                   "team_short": in_p["team_short"],
+                   "price": in_p["price"] / 10.0,
+                   "xp_per_gw": round(in_p["xp_per_gw"], 2),
+                   "xp_horizon_total": round(in_p["xp_horizon_total"], 2),
+                   "gameweeks": _player_gameweeks(in_p)},
+            "pos": POS_NAME[out_p["element_type"]],
+            # Hyöty AVAUSKOKOONPANOON, ei pelaajien raakaerotus (28.7).
+            "delta_xp_horizon": round(gain, 2),
+            # Raakaerotus jää näkyviin läpinäkyvyyden vuoksi: se kertoo
+            # pelaajien eron, ja ero näihin kahteen lukuun ON se asia jonka
+            # vanha versio piilotti (syvyysparannus ≠ pisteparannus).
+            "delta_xp_squad": round(raw, 2),
+            "delta_cost": round((in_p["price"] - out_p["price"]) / 10.0, 1),
+        })
     top = suggestions[:5]
     hold = not top or top[0]["delta_xp_horizon"] < HOLD_THRESHOLD_XP
     return {
