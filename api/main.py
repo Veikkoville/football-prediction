@@ -561,6 +561,19 @@ WARMUP_LEAGUES: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
     (("ITA-Serie A-FD",),        _DOMESTIC_SEASONS),
     (("FRA-Ligue 1-FD",),        _DOMESTIC_SEASONS),
     (("INT-Champions League",),  _DOMESTIC_SEASONS),
+    # 28.7: neljä puuttuvaa. Villen havainto: "hitaus ei oo korjaantunu kun
+    # vaihtaa leaguee predict any matchissa". Syy oli tämä lista, ei klientti.
+    # Webin valitsin tarjoaa 10 liigaa (sama kuratoitu lista kuin mobiililla),
+    # mutta warmup kattoi vain 6 → nämä neljä fitattiin lazy ensimmäisellä
+    # /api/teams-kutsulla ja käyttäjä odotti. Mitattu Primeira Liga 6,5 s.
+    #
+    # Sama vika kuin #71 (silloin warmup kattoi vain PL:n), joten korjaus on
+    # sama: lisää lista tänne kun valitsin kasvaa. Sarjallinen ajo säilyy,
+    # joten CPU ei ylikuormiu eikä FD:n rate-limit rikkoudu.
+    (("ENG-Championship",),      _DOMESTIC_SEASONS),
+    (("NED-Eredivisie",),        _DOMESTIC_SEASONS),
+    (("POR-Primeira Liga",),     _DOMESTIC_SEASONS),
+    (("BRA-Serie A",),           _DOMESTIC_SEASONS),
 ]
 
 # #79: WC-mallin fit-parametrit (kanoninen lähde = international_results).
