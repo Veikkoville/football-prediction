@@ -382,10 +382,23 @@ export function fetchStandings(league: string, season: string): Promise<Standing
 	);
 }
 
-export function fetchFixtures(league: string, days: number): Promise<FixturesResponse> {
-	return getJson<FixturesResponse>(
-		`/api/fixtures?league=${encodeURIComponent(league)}&days=${days}`
-	);
+/** Heitetään `unsupported`-lippu 404:lle, jotta UI voi sanoa TOTUUDEN.
+ *  Kaikilla liigoilla ei ole otteluohjelmasyötettä lainkaan (esim. League One,
+ *  Veikkausliiga), ja "please try again shortly" on niille suora valhe:
+ *  odottaminen ei auta koskaan. */
+export class LeagueUnsupportedError extends Error {
+	unsupported = true;
+}
+
+export async function fetchFixtures(league: string, days: number): Promise<FixturesResponse> {
+	const headers = await authHeaders();
+	const path = `/api/fixtures?league=${encodeURIComponent(league)}&days=${days}`;
+	const r = await fetch(`${API_BASE}${path}`, { headers });
+	if (r.status === 404 || r.status === 403) {
+		throw new LeagueUnsupportedError('no fixture feed for this league');
+	}
+	if (!r.ok) throw new Error(`${path} -> HTTP ${r.status}`);
+	return r.json() as Promise<FixturesResponse>;
 }
 
 export function fetchAccuracy(): Promise<AccuracyResponse> {

@@ -8,7 +8,12 @@
 	 * Jokainen rivi vie ottelu-ennusteeseen. Se on tämän näkymän koko pointti:
 	 * otteluohjelma ilman "entä miten tässä käy" on kalenteri, ei työkalu.
 	 */
-	import { fetchLeagues, fetchFixtures, type FixtureRow } from '$lib/api';
+	import {
+		fetchLeagues,
+		fetchFixtures,
+		LeagueUnsupportedError,
+		type FixtureRow
+	} from '$lib/api';
 	import { capture } from '$lib/analytics';
 
 	let {
@@ -51,9 +56,16 @@
 				all = d.fixtures ?? [];
 				loading = false;
 			},
-			() => {
+			(e) => {
 				all = [];
-				error = 'Could not load fixtures right now. Please try again shortly.';
+				// 28.7 REHELLISYYS: aiempi copy sanoi kaikille virheille "please try
+				// again shortly". Mitattu: 24 liigasta vain 5 palauttaa dataa, joten
+				// se lupasi 19 liigalle odottamista joka ei auta koskaan. Nyt syy
+				// erotellaan: ei syotetta vs. oikea hairio.
+				error =
+					e instanceof LeagueUnsupportedError
+						? 'We do not have a fixture feed for this league yet. The prediction tool still works for it.'
+						: 'Could not load fixtures right now. Please try again shortly.';
 				loading = false;
 			}
 		);

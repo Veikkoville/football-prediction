@@ -1022,8 +1022,19 @@ def list_teams(
 # endpointit (/api/standings, /api/fixtures) tarvitsevat -FD-suffiksin
 # saadakseen kilpailukoodin "PL". Muut liigat tulevat frontendiltä jo
 # "X-Y-FD"-muodossa.
+# 28.7: laajennettu kattamaan koko Top-5. Mitattu: /api/fixtures palautti 404:n
+# La Ligalle, Bundesliigalle, Serie A:lle ja Ligue 1:lle, koska alias oli vain
+# Valioliigalle. Mobiili ei paljastanut tata, koska se lahettaa -FD-koodit
+# valmiiksi (lib/leagues.ts) - mutta /api/leagues palauttaa nimet ILMAN
+# -FD-suffiksia, joten kuka tahansa uusi klientti joka kayttaa sita listaa
+# osuu 404:aan. Korjaus tehdaan palvelimelle eika klientille, jotta kumpikaan
+# pinta ei voi ajautua eroon: -FD-koodi kulkee taman lapi muuttumattomana.
 FD_LEAGUE_ALIASES = {
     "ENG-Premier League": "ENG-Premier League-FD",
+    "ESP-La Liga": "ESP-La Liga-FD",
+    "GER-Bundesliga": "GER-Bundesliga-FD",
+    "ITA-Serie A": "ITA-Serie A-FD",
+    "FRA-Ligue 1": "FRA-Ligue 1-FD",
 }
 
 
@@ -2966,9 +2977,9 @@ def fantasy_defcon_leaders(
 @app.get("/api/fantasy/compare")
 def fantasy_compare(
     response: Response,
-    players: str = Query(..., description="2-3 FPL element-ID:tä pilkuilla"),
+    players: str = Query(..., description="2-4 FPL element-ID:tä pilkuilla"),
 ):
-    """FPL pelaajavertailu (#35): 2-3 pelaajan xP-komponenttierittely +
+    """FPL pelaajavertailu (#35): 2-4 pelaajan xP-komponenttierittely +
     hinta/EO/predicted minutes + suora kanta xP-erolla."""
     from src.models.fpl_planner import compare_players
     from src.models.fpl_rate_team import RateTeamError

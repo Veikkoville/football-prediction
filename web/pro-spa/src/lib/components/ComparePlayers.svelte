@@ -24,8 +24,10 @@
 	};
 	const CONF_LABEL = { low: 'low', med: 'medium', high: 'high' } as const;
 
-	let idA = $state<number | null>(null);
-	let idB = $state<number | null>(null);
+	// 28.7: 2 -> 4 pelaajaa. Kaksi ensimmaista pakollisia, kolmas ja neljas
+	// valinnaisia. Neljä on realistinen kun mietit kahta siirtoa samalla
+	// kertaa, ja se on myös se lupaus jolla kilpailijat myyvät vertailua.
+	let ids = $state<(number | null)[]>([null, null, null, null]);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let data = $state<CompareResponse | null>(null);
@@ -35,15 +37,18 @@
 			(a, b) => a.web_name.localeCompare(b.web_name) || a.team_short.localeCompare(b.team_short)
 		)
 	);
-	let ready = $derived(idA != null && idB != null && idA !== idB);
+	/** Valitut, jarjestys sailyttaen ja tyhjat pois. */
+	let picked = $derived(ids.filter((v): v is number => v != null));
+	let hasDupes = $derived(new Set(picked).size !== picked.length);
+	let ready = $derived(picked.length >= 2 && !hasDupes);
 
 	async function compare(e: SubmitEvent) {
 		e.preventDefault();
-		if (!ready || loading || idA == null || idB == null) return;
+		if (!ready || loading) return;
 		loading = true;
 		error = null;
 		try {
-			data = await fetchComparePlayers([idA, idB]);
+			data = await fetchComparePlayers(picked);
 		} catch (err) {
 			data = null;
 			error = err instanceof Error ? err.message : String(err);
@@ -60,35 +65,30 @@
 
 <h2>Compare players</h2>
 <p class="muted">
-	Head to head on the GoalIQ projections: xP, price, ownership, predicted minutes and the
-	per-component split for the next gameweek.
+	Up to four players side by side on the GoalIQ projections: xP, price, ownership, predicted
+	minutes and the per-component split for the next gameweek.
 </p>
 
 <form class="cmp-form" onsubmit={compare}>
-	<div>
-		<label for="cmp-a">Player A</label>
-		<select id="cmp-a" bind:value={idA}>
-			<option value={null} disabled>Select a player</option>
-			{#each options as p (p.id)}
-				<option value={p.id}>{p.web_name} ({p.team_short}, {p.pos})</option>
-			{/each}
-		</select>
-	</div>
-	<div>
-		<label for="cmp-b">Player B</label>
-		<select id="cmp-b" bind:value={idB}>
-			<option value={null} disabled>Select a player</option>
-			{#each options as p (p.id)}
-				<option value={p.id}>{p.web_name} ({p.team_short}, {p.pos})</option>
-			{/each}
-		</select>
-	</div>
+	{#each [0, 1, 2, 3] as i (i)}
+		<div>
+			<label for="cmp-{i}">
+				Player {i + 1}{i > 1 ? ' (optional)' : ''}
+			</label>
+			<select id="cmp-{i}" bind:value={ids[i]}>
+				<option value={null}>{i > 1 ? 'None' : 'Select a player'}</option>
+				{#each options as p (p.id)}
+					<option value={p.id}>{p.web_name} ({p.team_short}, {p.pos})</option>
+				{/each}
+			</select>
+		</div>
+	{/each}
 	<button class="primary" type="submit" disabled={!ready || loading}>
 		{loading ? 'Comparing…' : 'Compare'}
 	</button>
 </form>
-{#if idA != null && idA === idB}
-	<p class="muted">Pick two different players.</p>
+{#if hasDupes}
+	<p class="muted">Each slot needs a different player.</p>
 {/if}
 
 {#if error}

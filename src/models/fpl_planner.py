@@ -399,9 +399,15 @@ def differential_finder(max_ownership: float = DIFFERENTIAL_MAX_OWNERSHIP,
 
 
 def compare_players(player_ids: list[int]) -> dict:
-    """2–3 pelaajan rinnakkaisvertailu + suora kanta xP-erolla."""
-    if not 2 <= len(player_ids) <= 3:
-        raise RateTeamError(400, "compare takes 2 or 3 player IDs.")
+    """2–4 pelaajan rinnakkaisvertailu + suora kanta xP-erolla.
+
+    28.7: katto 3 -> 4. Neljä on realistinen kun mietit kahta siirtoa samalla
+    kertaa, ja se on myös se lupaus jolla kilpailijat myyvät vertailutyökalua.
+    Verdict on aina kahden kärjen välinen ero, joten laajennus ei muuta
+    olemassa olevien 2:n ja 3:n vastauksia millään tavalla.
+    """
+    if not 2 <= len(player_ids) <= 4:
+        raise RateTeamError(400, "compare takes 2 to 4 player IDs.")
     if len(set(player_ids)) != len(player_ids):
         raise RateTeamError(400, "compare IDs must be distinct.")
     xp_data, _bootstrap, _pool, pool_by_id = build_context()
