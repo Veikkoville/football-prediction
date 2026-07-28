@@ -19,9 +19,7 @@
 	import {
 		fetchLeagues,
 		fetchTeams,
-		fetchFixtures,
 		predictMatch,
-		type FixturesResponse,
 		type PredictResponse
 	} from '$lib/api';
 	import { capture } from '$lib/analytics';
@@ -87,26 +85,13 @@
 			.replace(/\b(fc|afc|cf|sc|ac|as|ss|us)\b/g, '')
 			.replace(/[^a-z0-9]/g, '');
 	}
-
-	/** Nimet joita normalisointi EI saa kiinni: lyhenne ei ole mallin nimen
-	 *  etuliite eika painvastoin ("Man City" vs "Manchester City"). Nama
-	 *  kirjataan eksplisiittisesti, koska yleistetty samankaltaisuussaanto
-	 *  sekoittaisi Man Cityn ja Man Unitedin keskenaan. */
-	const NAME_ALIASES: Record<string, string> = {
-		mancity: 'manchestercity',
-		manutd: 'manchesterunited',
-		manunited: 'manchesterunited',
-		spurs: 'tottenham'
-	};
-
 	function matchTeam(name: string): string | null {
 		if (teams.includes(name)) return name;
-		let n = norm(name);
-		n = NAME_ALIASES[n] ?? n;
+		const n = norm(name);
 		const exact = teams.find((t) => norm(t) === n);
 		if (exact) return exact;
 		// "Coventry City" -> "Coventry": salli etuliiteosuma molempiin suuntiin,
-		// mutta vain jos se on YKSIKASITTEINEN.
+		// mutta vain jos se on YKSIKASITTEINEN (Man City / Man United -ansa).
 		const partial = teams.filter((t) => n.startsWith(norm(t)) || norm(t).startsWith(n));
 		return partial.length === 1 ? partial[0] : null;
 	}
@@ -124,7 +109,6 @@
 	$effect(() => {
 		const lg = league;
 		teams = [];
-		roster = [];
 		home = '';
 		away = '';
 		fetchTeams(lg).then(
@@ -134,38 +118,7 @@
 			},
 			() => (teams = [])
 		);
-		// 28.7 (Villen havainto: "miksi tuolla on Leicester, missa Coventry?").
-		// /api/teams palauttaa MALLIN TREENIDATAN joukkueet, ei kauden sarjaa.
-		// Mitattu PL: mallissa 23, kaudella 20, ja ero on 5 pudonnutta liikaa +
-		// 2 noussutta puuttuu. Se EI korjaannu itsestaan kausiflipissa: silloin
-		// putoavat 24/25:n kolme, mutta 25/26:n putoajat jaavat sisaan.
-		// Siksi valitsin ajetaan OTTELUOHJELMASTA, joka on kauden totuus.
-		// Fallback mallilistaan niille liigoille joilla ei ole syotetta.
-		fetchFixtures(lg, 60).then(
-			(f: FixturesResponse) => {
-				const names = new Set<string>();
-				for (const x of f.fixtures ?? []) {
-					names.add(x.home_team_short_name || x.home_team);
-					names.add(x.away_team_short_name || x.away_team);
-				}
-				roster = [...names].sort((a, b) => a.localeCompare(b));
-			},
-			() => (roster = [])
-		);
 	});
-
-	/** Kauden joukkueet otteluohjelmasta; tyhja = ei syotetta -> mallilista. */
-	let roster = $state<string[]>([]);
-
-	/** Valitsimen rivit. `value` on mallin nimi tai null jos mallilla ei ole
-	 *  joukkuetta viela (nousija ennen ensimmaisia otteluita). */
-	let pickable = $derived.by(() => {
-		if (roster.length === 0 || teams.length === 0) {
-			return teams.map((t) => ({ label: t, value: t as string | null }));
-		}
-		return roster.map((name) => ({ label: name, value: matchTeam(name) }));
-	});
-	let missingCount = $derived(pickable.filter((p) => p.value == null).length);
 
 	let canPredict = $derived(!!home && !!away && home !== away && !loading);
 
@@ -213,10 +166,8 @@
 		<label for="pred-home">Home team</label>
 		<select id="pred-home" bind:value={home} disabled={teams.length === 0}>
 			<option value="">Select</option>
-			{#each pickable as p (p.label)}
-				<option value={p.value ?? ''} disabled={p.value == null}>
-					{p.label}{p.value == null ? ' (no data yet)' : ''}
-				</option>
+			{#each teams as t (t)}
+				<option value={t}>{t}</option>
 			{/each}
 		</select>
 	</div>
@@ -224,10 +175,8 @@
 		<label for="pred-away">Away team</label>
 		<select id="pred-away" bind:value={away} disabled={teams.length === 0}>
 			<option value="">Select</option>
-			{#each pickable as p (p.label)}
-				<option value={p.value ?? ''} disabled={p.value == null}>
-					{p.label}{p.value == null ? ' (no data yet)' : ''}
-				</option>
+			{#each teams as t (t)}
+				<option value={t}>{t}</option>
 			{/each}
 		</select>
 	</div>
@@ -240,16 +189,16 @@
 	<p class="muted hint">Home and away cannot be the same team.</p>
 {/if}
 
-<!-- 28.7: valitsin ajetaan otteluohjelmasta, joten listassa on TÄMÄN kauden
-     seurat. Osalla ei vielä ole mallidataa (nousijat) ja se sanotaan suoraan
-     sen sijaan että ne jätettäisiin pois selittämättä. -->
-{#if missingCount > 0}
-	<p class="muted hint roster">
-		{missingCount === 1 ? 'One club is' : `${missingCount} clubs are`} greyed out: newly promoted
-		sides have no top flight matches for the model to read yet. They join once they have played
-		their first league games.
-	</p>
-{/if}
+<!-- 28.7 REHELLISYYS (Villen havainto): lista on mallin treeni-ikkunan
+     joukkueet, ei kauden 26/27 sarjataulukko. Ennen ensimmäisiä otteluita ne
+     eroavat: pudonneet ovat vielä mukana ja nousseilla ei ole yhtään ottelua
+     joista mallintaa. Tämä SANOTAAN, koska vaihtoehto olisi näyttää joukkueita
+     ilman selitystä ja antaa lukijan päätellä että data on vanhentunut.
+     Mobiilissa on sama selite (predict.info_prefill_team_missing). -->
+<p class="muted hint roster">
+	The list shows the clubs the model has match data for. Before the season starts that is last
+	season's field: promoted clubs join once they have played their first league matches.
+</p>
 
 {#if error}
 	<p class="errorbox">{error}</p>
