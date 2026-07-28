@@ -344,3 +344,50 @@ def test_expected_conceded_penalty():
     assert xp.expected_conceded_penalty([0.0, 0.0, 0.0, 1.0]) == pytest.approx(1.0)
     # P(0)=1 -> 0
     assert xp.expected_conceded_penalty([1.0]) == 0.0
+
+
+# ---------------------------------------------------------------------------
+# 28.7: bonus skaalautuu ottelun mukaan, DefCon ja kortit EIVÄT.
+#
+# Mitattu 25/26:n per-ottelu-historiasta (7382 ottelua, >=60 min, pelaajan
+# sisäiset poikkeamat): bonus r=+0.074 / BPS r=+0.167 vastustajan heikkoutta
+# vastaan, mutta DefCon vain +0.026 ja kortit +0.034 — ja koska DefCon-pisteet
+# laukeavat 10/12 toiminnon kynnyksellä, 0.16 toiminnon siirtymä tasolla 6.5
+# ei liikuta pisteitä. Tämä testi lukitsee molemmat puolet.
+# ---------------------------------------------------------------------------
+
+def _bonus_rates():
+    return {"xg90": 0.4, "xa90": 0.3, "yc90": 0.15, "bonus90": 0.6,
+            "saves90": 0.0, "dc_freq": 0.5}
+
+
+def _bonus_ctx(goal_mult: float):
+    return {"goal_mult": goal_mult, "cs_prob": 0.25,
+            "conceded_dist": [0.25, 0.35, 0.25, 0.15], "opp_goal_mult": 1.0}
+
+
+def test_bonus_scales_with_fixture():
+    from src.models import fpl_xp as m
+    easy = m.xp_components(3, _bonus_rates(), 85.0, 0.9, 0.05, _bonus_ctx(1.30))
+    hard = m.xp_components(3, _bonus_rates(), 85.0, 0.9, 0.05, _bonus_ctx(0.75))
+    assert easy["bonus"] > hard["bonus"], "bonus ei reagoi otteluun"
+    # Kerroin on 1 + beta*(goal_mult-1) -> suhde on ennustettava.
+    exp = ((1 + m.BONUS_FIXTURE_BETA * 0.30)
+           / (1 + m.BONUS_FIXTURE_BETA * -0.25))
+    assert abs(easy["bonus"] / hard["bonus"] - exp) < 1e-9
+
+
+def test_defcon_and_cards_stay_fixture_blind():
+    """Mitattu vaikutus oli olematon -> niitä EI saa skaalata vahingossa."""
+    from src.models import fpl_xp as m
+    easy = m.xp_components(2, _bonus_rates(), 85.0, 0.9, 0.05, _bonus_ctx(1.30))
+    hard = m.xp_components(2, _bonus_rates(), 85.0, 0.9, 0.05, _bonus_ctx(0.75))
+    assert easy["def_contribution"] == hard["def_contribution"]
+    assert easy["cards"] == hard["cards"]
+    assert easy["appearance"] == hard["appearance"]
+
+
+def test_bonus_multiplier_cannot_go_negative():
+    from src.models import fpl_xp as m
+    assert m._bonus_fixture_mult(-5.0) == 0.0
+    assert m._bonus_fixture_mult(1.0) == 1.0

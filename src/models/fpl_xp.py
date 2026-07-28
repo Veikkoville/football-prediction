@@ -577,6 +577,17 @@ def expected_conceded_penalty(conceded_dist: list[float]) -> float:
     return sum(p * (k // 2) for k, p in enumerate(conceded_dist))
 
 
+# Bonuksen fixture-herkkyys. 0.0 = vanha kayttaytyminen (vastustajasokea).
+# Kalibrointi ja perustelu: ks. xp_components / "bonus".
+BONUS_FIXTURE_BETA = 0.837
+
+
+def _bonus_fixture_mult(goal_mult: float) -> float:
+    """Bonuskerroin ottelulle. Rajattu >=0, jotta aariarvo ei tee negatiivista
+    bonusta (goal_mult voi periaatteessa olla hyvin pieni)."""
+    return max(0.0, 1.0 + BONUS_FIXTURE_BETA * (goal_mult - 1.0))
+
+
 def xp_components(pos: int, rates: dict, xmins: float, p60: float, p1_59: float,
                   ctx: dict) -> dict:
     """xP-komponentit yhdelle fixturelle.
@@ -598,7 +609,19 @@ def xp_components(pos: int, rates: dict, xmins: float, p60: float, p1_59: float,
         "saves": 0.0,
         "def_contribution": 0.0,
         "cards": -1.0 * rates["yc90"] * share,
-        "bonus": min(rates["bonus90"] * share, 3.0),
+        # 28.7: bonus skaalataan OTTELUN mukaan. Mitattu 25/26:n per-ottelu-
+        # historiasta (7382 ottelua, >=60 min, pelaajan sisaiset poikkeamat eli
+        # pelaajan taso ei sekoita tulosta): bonus korreloi vastustajan
+        # heikkouden kanssa r=+0.074 ja BPS r=+0.167 (bonus on vain top-3-
+        # leikkaus BPS:sta, mika puristaa signaalin kasaan). Ero helpoimman ja
+        # vaikeimman vastustajan valilla oli 0.14 pistetta/ottelu.
+        # Beta kalibroitu LEAVE-ONE-OUT (vastustajan kausisummista poistettiin
+        # kysessa oleva ottelu) samaan muotoon jota malli kayttaa:
+        # d(bonus)/d(goal_mult) = 0.252, keskibonus 0.301 -> beta 0.837.
+        # SAMASSA mittauksessa DefCon (+0.026) ja kortit (+0.034) osoittautuivat
+        # kaytannossa vastustajariippumattomiksi -> ne jatetaan ennalleen.
+        "bonus": min(rates["bonus90"] * share * _bonus_fixture_mult(goal_mult),
+                     3.0),
     }
     if pos in (1, 2):
         comp["conceded"] = -expected_conceded_penalty(

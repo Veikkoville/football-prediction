@@ -109,13 +109,58 @@ def rho(pred: list[float], actual: list[float]) -> float:
 # ---------------------------------------------------------------------------
 # Backtest
 # ---------------------------------------------------------------------------
+def _load_archive_2526():
+    """25/26-data levyarkistosta (28.7).
+
+    MIKSI: kausiflipin (26/27) jalkeen elava bootstrap + element-summary
+    palauttavat tyhjan uuden kauden, jolloin tama ship-gate ajoi lapi
+    n=0 pelannutta joka kierroksella ja kaatui aggregointiin. Portti oli siis
+    HILJAA ajokelvoton juuri silloin kun malliin tehdaan muutoksia.
+
+    fixtures.json on samoin jo 26/27, joten 25/26:n ottelut rekonstruoidaan
+    summary-riveista (jokainen rivi kantaa fixture-id:n, kierroksen,
+    vastustajan, koti/vieras-lipun, kickoffin ja molempien maalit).
+    """
+    boot = json.loads((config.RAW_DATA_DIR / "fpl"
+                       / "bootstrap_static_2526.archive.json")
+                      .read_text(encoding="utf-8"))
+    team_of = {e["id"]: e["team"] for e in boot["elements"]}
+    summaries = {}
+    sdir = config.RAW_DATA_DIR / "fpl" / "summary_2526"
+    for f in sorted(sdir.glob("element_*.json")):
+        eid = int(f.stem.split("_")[1])
+        summaries[eid] = json.loads(f.read_text(encoding="utf-8"))
+    # fetch_all_summaries palauttaa {id: history-lista}, ei koko dokumenttia
+    hist_only = {eid: (d.get("history") or []) for eid, d in summaries.items()}
+    fx = {}
+    for eid, d in summaries.items():
+        for r in d.get("history") or []:
+            fid = r["fixture"]
+            if fid in fx:
+                continue
+            team = team_of.get(eid)
+            if team is None:
+                continue
+            h, a = (team, r["opponent_team"]) if r["was_home"] else (
+                r["opponent_team"], team)
+            fx[fid] = {"id": fid, "event": r["round"], "team_h": h, "team_a": a,
+                       "kickoff_time": r["kickoff_time"], "finished": True,
+                       "team_h_score": r["team_h_score"],
+                       "team_a_score": r["team_a_score"]}
+    return boot, sorted(fx.values(), key=lambda f: f["id"]), hist_only, "2526"
+
+
 def run_backtest(force_refresh: bool = False, use_context: bool = True,
-                 bps_2627: bool = True) -> dict:
+                 bps_2627: bool = True, archive: bool = False) -> dict:
     print("[1/4] FPL-data (bootstrap + fixtures + 841 element-historiaa)...")
-    boot = fpl_api.fetch_bootstrap(force=force_refresh)
-    fixtures = fpl_api.fetch_fixtures(force=force_refresh)
-    season_key = fpl_api.season_key_from_bootstrap(boot)
-    summaries = fpl_api.fetch_all_summaries(boot, force=force_refresh)
+    if archive:
+        boot, fixtures, summaries, season_key = _load_archive_2526()
+        print("      LEVYARKISTO 25/26 (elava API on jo 26/27)")
+    else:
+        boot = fpl_api.fetch_bootstrap(force=force_refresh)
+        fixtures = fpl_api.fetch_fixtures(force=force_refresh)
+        season_key = fpl_api.season_key_from_bootstrap(boot)
+        summaries = fpl_api.fetch_all_summaries(boot, force=force_refresh)
     print(f"      kausi {season_key}: {len(boot['elements'])} pelaajaa, "
           f"{len(fixtures)} fixturea")
     # #151: sama bonus-oikaisu kuin tuotanto-builderissa — ship-gate mittaa
@@ -406,13 +451,15 @@ def main() -> int:
                     help="pakota FPL-datan uudelleenhaku (ohita välimuisti)")
     ap.add_argument("--raw", action="store_true",
                     help="aja ILMAN Phase 1b -kontekstikerrosta (vertailuajo)")
+    ap.add_argument("--archive", action="store_true",
+                    help="lue 25/26 levyarkistosta (pakollinen kausiflipin jalkeen)")
     ap.add_argument("--legacy-bps", action="store_true",
                     help="OHITA 26/27 BPS-oikaisu (#151) — vain ennen/jälkeen-"
                          "vertailuajoihin")
     args = ap.parse_args()
 
     report = run_backtest(force_refresh=args.refresh, use_context=not args.raw,
-                          bps_2627=not args.legacy_bps)
+                          bps_2627=not args.legacy_bps, archive=args.archive)
 
     out_dir = config.PROJECT_ROOT / "logs"
     out_dir.mkdir(exist_ok=True)
