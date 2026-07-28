@@ -37,7 +37,10 @@
 			class:active={tab === 'free'}
 			onclick={() => (tab = 'free')}
 		>
-			Clean sheets &amp; FDR (free)
+			<!-- 28.7 (Villen havainto): valilehdet oli nimetty yhden ominaisuuden
+			     mukaan, vaikka taman takana on 11 tyokalua (ml. ottelu-ennuste,
+			     otteluohjelma ja sarjataulukko, jotka tulivat webiin 28.7.). -->
+			Free tools
 		</button>
 		<button
 			role="tab"
@@ -45,7 +48,7 @@
 			class:active={tab === 'pro'}
 			onclick={() => (tab = 'pro')}
 		>
-			Expected points (Premium)
+			Premium: xP + team manager
 		</button>
 	</div>
 
