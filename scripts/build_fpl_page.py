@@ -636,30 +636,37 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         ".rec-filter{border:1px solid rgba(128,128,128,.4);background:transparent;"
         "color:inherit;border-radius:2px;padding:6px 14px;font-size:13px;"
         "font-weight:600;cursor:pointer;}"
-        ".rec-filter.on{background:transparent;border-color:#B68235;color:#8C6428;}"
+        ".rec-filter.on{background:var(--rec-on-bg,transparent);"
+        "border-color:var(--rec-on-line,#B68235);color:var(--rec-on-fg,#8C6428);}"
         ".rec-scroll{overflow-x:auto;overflow-y:auto;max-height:560px;"
         "-webkit-overflow-scrolling:touch;border:1px solid rgba(128,128,128,.3);"
         "border-radius:2px;}"
         ".rec-scroll table{width:100%;border-collapse:collapse;min-width:640px;}"
         ".rec-scroll th,.rec-scroll td{text-align:left;padding:8px 10px;"
         "border-bottom:1px solid rgba(128,128,128,.2);font-size:14px;}"
-        # 26.7 CLASSIC: nämä värit ovat kovakoodattuja tähän Python-stringiin,
+        # 28.7 TELETEXT: tama lohko injektoidaan KAHTEEN sivuun joilla on eri
+        # paletti (fpl.html tumma, predictions.html classic-vaalea), joten
+        # yksikaan kovakoodattu vari ei kelpaa molempiin: amber on vaalealla
+        # 1.9:1 ja #007A6C tummalla 2.4:1. Arvot tulevat nyt sivun omasta
+        # :root-lohkosta var()-tokeneina, ja FALLBACK on classic — eli
+        # predictions.html sailyy ennallaan ilman etta sita kosketaan.
+        # 26.7 CLASSIC (tausta): nämä värit olivat kovakoodattuja stringiin,
         # joten kolme token-ajoa eivät nähneet niitä (var()-vaihto ei osu
         # literaaliin). Vihreä #0A9E75 ja magenta-miss #D6006E olivat sivun
         # viimeiset paletin ulkopuoliset värit. Uudet: osuma = teal tekstinä
         # (designin "voitot"), huti = coral (designin "pudotukset"), pending
         # = kulta. Kaikki AA-kontrastissa cream-pohjalla.
-        ".rec-scroll th{position:sticky;top:0;background:#EAE9E9;font-size:12px;"
-        "font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#54506B;}"
+        ".rec-scroll th{position:sticky;top:0;background:var(--rec-thead-bg,#EAE9E9);font-size:12px;"
+        "font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--rec-thead-fg,#54506B);}"
         ".rec-scroll td.team{font-weight:600;white-space:nowrap;}"
         ".rec-scroll .num{white-space:nowrap;font-variant-numeric:tabular-nums;}"
-        ".rec-hit{color:#007A6C;font-weight:800;}"
-        ".rec-miss{color:#C4441A;font-weight:800;}"
+        ".rec-hit{color:var(--rec-hit,#007A6C);font-weight:800;}"
+        ".rec-miss{color:var(--rec-miss,#C4441A);font-weight:800;}"
         ".rec-note{font-size:13px;opacity:.7;margin:10px 0 0;}"
         ".rec-subhead{font-size:18px;margin:26px 0 4px;}"
-        ".rec-pending{color:#8C6428;font-weight:700;font-size:12px;"
+        ".rec-pending{color:var(--rec-pending,#8C6428);font-weight:700;font-size:12px;"
         "white-space:nowrap;}"
-        ".rec-pct{color:#54506B;font-variant-numeric:tabular-nums;}"
+        ".rec-pct{color:var(--rec-pct,#54506B);font-variant-numeric:tabular-nums;}"
         "</style>"
         + by_comp_html(c)
         + f'<div class="rec-filters" role="group" aria-label="Filter by competition">{filter_btns}</div>'
@@ -1004,39 +1011,51 @@ def accuracy_dataset_ld(c: dict, page_url: str) -> dict:
 # Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) - täsmähexit.
 # Hero = tumma (Ink) + magenta, sisältö = vaalea (Cream/Paper) + ink-teksti.
 CSS = """
-  :root{ --magenta:#FF2E7E; --magenta-deep:#C4005F; --coral:#FF6A3D; --gold:#B68235; --gold-deep:#8C6428; --teal:#00C2AD; --ink:#201F1D; --ink2:#140F1E; --cream:#F3F2F2; --paper:#EAE9E9; --ink-muted:#54506B; --hero-muted:#6E685E; --line:#DAD8D4; --negative:#C4441A; }
+  /* 28.7 TELETEXT. Arvot ovat tasan samat kuin landingin :root-lohkossa,
+     pro-spa/theme.css:ssa ja goaliq-app/lib/theme.ts:ssa.
+     Mitatut kontrastit --ink #0B0A09 -pohjaa vasten:
+       --cream 17.70:1  --ink-muted 7.82:1  --amber 12.20:1
+       --teal 10.85:1   --negative 8.52:1   --faint 5.33:1
+     HUOM --magenta-deep on tummalla 3.31:1 eli AA:n ALLE: se ei ole
+     enaa linkki- eika lukuvari, vain mark. Linkit = teal, luvut = amber. */
+  :root{ --magenta:#FF2E7E; --magenta-deep:#C4005F; --coral:#FF8A5C; --gold:#FFD873; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#C99A17; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
+    /* jaetun record-lohkon tokenit (build_fpl_page.by_comp/record).
+       predictions.html EI maarita naita -> se saa classic-fallbackit. */
+    --rec-thead-bg:#1F1D1A; --rec-thead-fg:#A8A29A; --rec-hit:#5FD97A;
+    --rec-miss:#FF8A5C; --rec-pending:#F5C542; --rec-pct:#A8A29A;
+    --rec-on-bg:#F5C542; --rec-on-line:#F5C542; --rec-on-fg:#0B0A09; }
   *{ box-sizing:border-box; }
-  body{ margin:0; font-family:"Lora",Georgia,"Times New Roman",serif; background:var(--cream); color:var(--ink); line-height:1.6; font-size:17px; }
-  h1,h2,h3,.brand{ font-family:"Cormorant Garamond",Georgia,serif; }
+  body{ margin:0; font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:var(--ink); color:var(--cream); line-height:1.6; font-size:17px; }
+  h1,h2,h3,.brand{ font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; text-transform:uppercase; letter-spacing:-0.01em; }
   /* Peruslinkki: ilman tata .content-lohkon ULKOPUOLISET linkit (esim.
      .note-kappaleen mini-liigalinkki) jaavat selaimen oletussiniseksi
      #0000EE:ksi. Elementtivalitsin (0,0,1) haviaa kaikille luokkasaannoille,
      joten se osuu vain aidosti tyylittelemattomiin linkkeihin. */
-  a{ color:var(--magenta-deep); }
-  .dark{ background:var(--cream); color:var(--ink); }
+  a{ color:var(--teal); }
+  .dark{ background:var(--ink); color:var(--cream); }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
   .bar{ height:1px;background:var(--line); }
   .nav{ max-width:960px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .brand{ font-size:24px; font-weight:800; letter-spacing:.5px; }
-  .brand a{ color:var(--ink); text-decoration:none; display:inline-flex; align-items:center; gap:0; }
+  .brand a{ color:var(--cream); text-decoration:none; display:inline-flex; align-items:center; gap:0; }
   .brand span{ color:var(--magenta); }
-  .brand-icon{ margin-right:8px; width:26px; height:26px; border-radius:7px; display:block; }
-  .cta{ display:inline-block; background:transparent; color:var(--gold-deep,#8C6428); border:1px solid var(--gold,#B68235); text-decoration:none; padding:14px 24px; border-radius:30px; font-weight:800; min-height:48px; }
-  .cta:hover{ background:rgba(182,130,53,0.08); }
-  .cta.secondary{ background:transparent; border:1px solid var(--line); color:inherit; }
+  .brand-icon{ margin-right:8px; width:26px; height:26px; border-radius:var(--radius); display:block; }
+  .cta{ display:inline-block; background:transparent; color:var(--amber); border:1px solid var(--amber); text-decoration:none; padding:14px 24px; border-radius:var(--radius); font-weight:800; min-height:48px; }
+  .cta:hover{ background:var(--amber); color:var(--ink); }
+  .cta.secondary{ background:transparent; border:1px solid var(--line-strong); color:inherit; }
   .cta-row{ display:flex; flex-wrap:wrap; gap:12px; margin:26px 0 8px; }
   .hero{ padding:44px 0 52px; }
-  .hero h1{ font-size:36px; line-height:1.15; margin:0 0 14px; color:var(--ink); }
+  .hero h1{ font-size:36px; line-height:1.15; margin:0 0 14px; color:var(--cream); }
   .hero .lede{ font-size:19px; color:var(--hero-muted); max-width:720px; }
   .hero .meta,.hero .note{ color:var(--hero-muted); }
   .meta{ font-size:14px; margin-top:10px; }
   .note{ color:var(--ink-muted); font-size:14px; }
   h2{ font-size:25px; margin:54px 0 10px; }
   .content{ padding-bottom:70px; }
-  .content a{ color:var(--magenta-deep); }
-  .content a.cta{ color:var(--gold-deep,#8C6428); }
-  .content a.cta.secondary{ color:var(--ink); }
-  .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:4px 12px 10px; }
+  .content a{ color:var(--teal); }
+  .content a.cta{ color:var(--amber); }
+  .content a.cta.secondary{ color:var(--cream); }
+  .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:4px 12px 10px; }
   table{ width:100%; border-collapse:collapse; min-width:560px; }
   caption{ caption-side:bottom; color:var(--ink-muted); font-size:13px; text-align:left; padding:10px 2px 4px; }
   th,td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); font-size:15px; }
@@ -1053,20 +1072,20 @@ CSS = """
      vain selaimesta; portit eivät näe kaskadia. */
   .content a.fdr{ color:inherit; }
   a.fdr:hover{ text-decoration:underline; }
-  td.is-easy,td.is-easy .fdr,span.fdr.is-easy{ color:var(--gold-deep); font-weight:600; }
+  td.is-easy,td.is-easy .fdr,span.fdr.is-easy{ color:var(--amber); font-weight:600; }
   td.is-hard,td.is-hard .fdr,span.fdr.is-hard{ color:var(--negative); }
   .legend{ color:var(--ink-muted); font-size:14px; margin:8px 0 0; }
   .stat-row{ display:flex; flex-wrap:wrap; gap:14px; margin:18px 0; }
-  .stat{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:16px 20px; flex:1 1 180px; }
-  .stat b{ display:block; font-size:30px; color:var(--magenta-deep); font-variant-numeric:tabular-nums; }
+  .stat{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:16px 20px; flex:1 1 180px; }
+  .stat b{ display:block; font-size:30px; color:var(--amber); font-variant-numeric:tabular-nums; }
   .stat span{ color:var(--ink-muted); font-size:14px; }
   .faq dt{ font-weight:700; margin-top:20px; }
   .faq dd{ margin:6px 0 0; }
   .toollist{ margin:14px 0 8px; padding-left:20px; }
   .toollist li{ margin:10px 0; }
   .toollist a{ font-weight:700; }
-  .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:12px; padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
-  .upsell{ border:1px solid var(--line); background:var(--paper); border-radius:16px; padding:24px 26px; margin:48px 0 6px; }
+  .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:var(--radius); padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
+  .upsell{ border:1px solid var(--line); background:var(--paper); border-radius:var(--radius); padding:24px 26px; margin:48px 0 6px; }
   .upsell h2{ margin:0 0 10px; }
   .upsell p{ margin:0 0 6px; }
   .upsell .cta-row{ margin:18px 0 4px; }
@@ -1077,7 +1096,7 @@ CSS = """
      linkkia oli TAYSIN nakymattomia (kontrasti 1.00). Jaanne tummasta
      footerista; classic-vaihto teki pohjasta vaalean muttei tasta. */
   footer a{ color:var(--hero-muted); text-decoration:underline; }
-  footer a:hover{ color:var(--magenta); }
+  footer a:hover{ color:var(--amber); }
   @media (max-width:640px){ .hero h1{ font-size:29px; } .hero .lede{ font-size:17px; } .nav{ padding:14px 16px; } .hero{ padding:30px 0 40px; } }
   /* Kapea mobiili: CTA-napit pinoon täysleveinä, pitkä label ei ylivuoda (#15) */
   @media (max-width:520px){
@@ -1143,8 +1162,8 @@ def render_page(c: dict) -> str:
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" onload="this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
@@ -1161,7 +1180,7 @@ def render_page(c: dict) -> str:
 <meta name="twitter:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
 
 {jsonld}
-<meta name="theme-color" content="#F3F2F2">
+<meta name="theme-color" content="#0B0A09">
 <style>{CSS}</style>
 {POSTHOG_SNIPPET}
 </head>
@@ -1169,7 +1188,7 @@ def render_page(c: dict) -> str:
 <header class="dark">
   <div class="bar"></div>
   <div class="nav">
-    <div class="brand"><a href="./"><svg class="brand-icon" width="26" height="26" viewBox="0 0 44 44" role="img" aria-label="GoalIQ" focusable="false"><rect x="1.4" y="1.4" width="41.2" height="41.2" rx="9" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="22" y="29.5" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="21" font-weight="600" fill="currentColor">I<tspan fill="#FF2E7E">Q</tspan></text></svg>Goal<span>IQ</span></a></div>
+    <div class="brand"><a href="./"><svg class="brand-icon" width="26" height="26" viewBox="0 0 44 44" role="img" aria-label="GoalIQ" focusable="false"><rect x="0" y="0" width="44" height="44" fill="#F5C542"/><text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,ui-monospace,Consolas,monospace" font-size="20" font-weight="700" letter-spacing="-0.5" fill="#0B0A09">IQ</text></svg>Goal<span>IQ</span></a></div>
     <a class="cta" href="{PRO_TAB_URL}" data-cta="nav">Open GoalIQ Premium</a>
   </div>
 </header>

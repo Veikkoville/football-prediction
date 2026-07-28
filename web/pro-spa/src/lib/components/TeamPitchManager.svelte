@@ -466,7 +466,7 @@
 		   kaytannossa nakymaton, ja kuvakaappauksessa/skaalauksessa se katoaa
 		   kokonaan - jaljelle jaa vain 1 px:n reuna. Mitattu 0.24 = 1.215:1.
 		   Sama arvo kaikilla kolmella pinnalla (SPA, mobiili, longtail). */
-		background: rgba(0, 194, 173, 0.24);
+		background: rgba(46, 214, 194, 0.24);
 		border: 1px solid var(--border);
 		border-radius: 14px;
 		padding: var(--s-2) var(--s-1);

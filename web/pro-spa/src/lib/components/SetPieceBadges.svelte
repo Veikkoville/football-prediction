@@ -41,7 +41,7 @@
 		margin-left: 5px;
 		padding: 0 5px;
 		border-radius: 4px;
-		border: 1px solid rgba(0, 194, 173, 0.45);
+		border: 1px solid rgba(46, 214, 194, 0.45);
 		color: var(--giq-ink);
 		background: rgba(25, 227, 210, 0.14);
 		font-size: 0.68em;

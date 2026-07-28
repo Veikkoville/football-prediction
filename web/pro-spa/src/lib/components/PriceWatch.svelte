@@ -116,12 +116,12 @@
 	}
 	.badge.up {
 		color: var(--positive);
-		background: rgba(0, 194, 173, 0.12);
+		background: rgba(46, 214, 194, 0.12);
 		border-color: rgba(0, 148, 130, 0.4);
 	}
 	.badge.down {
 		color: var(--negative);
-		background: rgba(255, 106, 61, 0.12);
+		background: rgba(255, 138, 92, 0.12);
 		border-color: rgba(194, 65, 12, 0.4);
 	}
 	/* confidence-merkki: sama väriasteikko kuin XpTable #33f */

@@ -489,7 +489,8 @@
 		text-decoration: none;
 	}
 	.cs-cell-a:hover {
-		background: rgba(32, 31, 29, 0.04);
+		/* 28.7: korostus valolla, ei varjolla */
+		background: rgba(243, 242, 242, 0.06);
 	}
 	/* 26.7 CLASSIC: lämpökarttatäytön korvaajat. Väri EI ole ainoa signaali —
 	   paino kulkee mukana, joten sarake luetaan myös värisokeana. */
@@ -508,10 +509,13 @@
 		display: inline-block;
 		margin-left: 6px;
 		padding: 0 5px;
-		border: 1px solid rgba(10, 8, 32, 0.22);
-		border-radius: 4px;
-		background: rgba(255, 255, 255, 0.55);
-		color: var(--giq-ink);
+		/* 28.7 TELETEXT: oli vaalea siru ink-tekstilla. Tummalla pohjalla
+		   rgba(255,255,255,0.55) olisi sekoittunut keskiharmaaksi ja ink-teksti
+		   sen paalla ~1.6:1. Siru kaannettiin: tumma pohja, cream-teksti. */
+		border: 1px solid rgba(243, 242, 242, 0.4);
+		border-radius: var(--radius);
+		background: rgba(11, 10, 9, 0.72);
+		color: var(--giq-cream);
 		font-size: 0.72em;
 		font-weight: 700;
 		line-height: 1.6;

@@ -186,11 +186,15 @@
 	   sivun roolivärit hero-bändin overridejen alta lapsille (SetPassword,
 	   .muted, inputit perivät nämä). */
 	.menu {
-		--text: var(--giq-ink);
+		/* 28.7 TELETEXT: tama oli `var(--giq-ink)`. Kun --giq-paper kaantyi
+		   tummaksi, ink-teksti olisi ollut mustaa mustalla eli valikko olisi
+		   kadonnut kokonaan. Sama ansa kuin 26.7. kovakoodattu #5c566b, vain
+		   yhta astetta pahempi: se ei nakynyt haaleana vaan ei lainkaan. */
+		--text: var(--giq-cream);
 		/* oli kovakoodattu vanha sinertava #5c566b, joka jai elamaan classic-
 		   vaihdon yli. Viittaa nyt samaan lahteeseen kuin :root. */
 		--text-muted: var(--giq-muted);
-		--border: rgba(10, 8, 32, 0.18);
+		--border: rgba(243, 242, 242, 0.24);
 		position: absolute;
 		top: calc(100% + 10px);
 		right: 0;
@@ -200,9 +204,11 @@
 		background: var(--giq-paper);
 		color: var(--text);
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		/* teletext: ei pyoristysta, ei varjoa. Varjo ei erota tummaa tummasta,
+		   joten kelluvan valikon rajaa reuna. */
+		border-radius: var(--radius);
 		padding: var(--s-4);
-		box-shadow: 0 12px 32px rgba(10, 8, 32, 0.35);
+		box-shadow: none;
 		display: grid;
 		gap: var(--s-2);
 		text-align: left;

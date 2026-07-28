@@ -68,30 +68,32 @@ UPSELL = (
 # OMA template — build_prediction_pages.CSS/NAV/_page jää prediction-sivujen
 # vanhaan asuun, ei sivuvaikutuksia sinne.
 CSS = """
-:root{--magenta:#FF2E7E;--magenta-deep:#C4005F;--teal:#00C2AD;
---teal-ink:#007A6C;--ink:#201F1D;--ink2:#140F1E;--cream:#F3F2F2;
---paper:#EAE9E9;--muted:#5C574F;--hero-muted:#6E685E;
---line:rgba(32,31,29,0.18);--radius:14px;}
+:root{--magenta:#FF2E7E;--magenta-deep:#C4005F;--teal:#2ED6C2;
+--teal-ink:#12B8A4;--amber:#F5C542;--amber-deep:#C99A17;
+--gold:#FFD873;--gold-deep:#F5C542;--coral:#FF8A5C;
+--ink:#0B0A09;--ink2:#141311;--cream:#F3F2F2;
+--paper:#1F1D1A;--muted:#A8A29A;--hero-muted:#A8A29A;--faint:#8A847A;
+--line:rgba(243,242,242,0.24);--line-strong:rgba(243,242,242,0.40);--radius:0;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--cream);color:var(--ink);font-family:"Lora",Georgia,"Times New Roman",serif;line-height:1.6;}
-h1,h2,h3,.brand{font-family:"Cormorant Garamond",Georgia,serif;}
+body{background:var(--ink);color:var(--cream);font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;line-height:1.6;}
+h1,h2,h3,.brand{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-transform:uppercase;letter-spacing:-0.01em;}
 .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
 .bar{height:1px;background:var(--line);}
 /* 🐛 26.7: color oli var(--cream) = cream cream-pohjalla -> kaikki
    color:inherit -lapset olisivat nakymattomia. Jaanne tumma->vaalea-
    vaihdosta. */
-.dark{background:var(--cream);
-color:var(--ink);}
+.dark{background:var(--ink);
+color:var(--cream);}
 nav{display:flex;align-items:center;justify-content:space-between;
 padding:18px 0;font-size:14px;}
-nav a{text-decoration:none;color:var(--ink);font-weight:600;}
+nav a{text-decoration:none;color:var(--cream);font-weight:600;}
 .brand{font-size:20px;font-weight:700;letter-spacing:.5px;}
 .brand span{color:var(--magenta);}
-.nav-cta{background:transparent;color:var(--gold-deep,#8C6428);border:1px solid var(--gold,#B68235);padding:8px 16px;
-border-radius:999px;font-weight:700;}
-.nav-cta:hover{background:rgba(182,130,53,0.08);}
+.nav-cta{background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 16px;
+border-radius:var(--radius);font-weight:700;}
+.nav-cta:hover{background:var(--amber);color:var(--ink);}
 .hero{padding:26px 0 44px;}
-.hero h1{color:var(--ink);font-size:31px;line-height:1.15;margin:0 0 12px;
+.hero h1{color:var(--cream);font-size:31px;line-height:1.15;margin:0 0 12px;
 letter-spacing:-0.01em;}
 .hero .lede{color:var(--hero-muted);max-width:640px;}
 h2{font-size:22px;margin:30px 0 10px;}
@@ -101,30 +103,30 @@ border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;}
 .lede{color:var(--muted);margin-bottom:22px;}
 .stat-row{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0;}
 .stat{background:var(--paper);border:1px solid var(--line);
-border-radius:16px;padding:14px 18px;flex:1 1 140px;}
-.stat b{display:block;font-size:22px;color:var(--magenta-deep);
-font-family:"Cormorant Garamond",Georgia,serif;}
+border-radius:var(--radius);padding:14px 18px;flex:1 1 140px;}
+.stat b{display:block;font-size:22px;color:var(--amber);
+font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
 .stat span{color:var(--muted);font-size:12px;}
 .rec{border:1px solid var(--line);background:var(--paper);
-border-radius:16px;padding:16px 20px;font-size:14px;color:var(--muted);
+border-radius:var(--radius);padding:16px 20px;font-size:14px;color:var(--muted);
 margin:24px 0 16px;}
-.rec a{color:var(--magenta-deep);font-weight:700;}
+.rec a{color:var(--teal);font-weight:700;}
 .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0;}
-.btn{background:transparent;color:var(--gold-deep,#8C6428);border:1px solid var(--gold,#B68235);font-weight:700;padding:12px 22px;
-border-radius:999px;text-decoration:none;font-size:14px;}
-.btn:hover{background:rgba(182,130,53,0.08);}
-.btn.ghost{background:transparent;color:var(--ink);
+.btn{background:transparent;color:var(--amber);border:1px solid var(--amber);font-weight:700;padding:12px 22px;
+border-radius:var(--radius);text-decoration:none;font-size:14px;}
+.btn:hover{background:var(--amber);color:var(--ink);}
+.btn.ghost{background:transparent;color:var(--cream);
 border:1px solid var(--line);}
-.btn.ghost:hover{background:transparent;color:var(--magenta-deep);}
+.btn.ghost:hover{background:transparent;color:var(--amber);}
 .mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;
 padding:12px 0;border-bottom:1px solid var(--line);}
 .mrow:last-child{border-bottom:none;}
-.mrow a{color:var(--magenta-deep);font-weight:700;text-decoration:none;}
+.mrow a{color:var(--teal);font-weight:700;text-decoration:none;}
 .mrow .meta{color:var(--muted);font-size:12px;}
 .pick{color:var(--teal-ink);font-weight:700;font-size:13px;white-space:nowrap;}
 footer{border-top:1px solid var(--line);margin-top:36px;padding:22px 0 34px;
 color:var(--muted);font-size:13px;}
-footer a{color:var(--magenta-deep);}
+footer a{color:var(--teal);}
 .note{color:var(--muted);font-size:12px;margin:18px 0;}
 /* 26.7: vapautettu xG-leaderboard, koko taulukko ilmaiseksi */
 .lb-wrap{overflow-x:auto;margin:14px 0;}
@@ -134,20 +136,20 @@ border-bottom:1px solid var(--line);white-space:nowrap;}
 .lb th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
 color:var(--muted);font-weight:700;}
 .lb td.n,.lb th.n{text-align:right;font-variant-numeric:tabular-nums;}
-.lb td.hi{color:var(--magenta-deep);font-weight:700;}
+.lb td.hi{color:var(--amber);font-weight:700;}
 .lb tbody tr:last-child td{border-bottom:none;}
-.lb thead th:hover{color:var(--magenta-deep);}
+.lb thead th:hover{color:var(--amber);}
 .lbctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 6px;}
 .lbctl .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
 color:var(--muted);font-weight:700;margin-left:6px;}
 .lbctl .lbl:first-child{margin-left:0;}
 .chips{display:inline-flex;gap:6px;}
-.chip{min-width:34px;border:1px solid var(--line);background:var(--paper);
-color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
+.chip{min-width:34px;border:1px solid var(--line-strong);background:var(--paper);
+color:var(--cream);border-radius:var(--radius);padding:6px 12px;font-size:13px;
 font-weight:600;cursor:pointer;}
-.chip.on{background:transparent;border-color:var(--gold,#B68235);color:var(--gold-deep,#8C6428);}
-.lbctl select{border:1px solid var(--line);background:var(--paper);
-color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px;
+.chip.on{background:var(--amber);border-color:var(--amber);color:var(--ink);}
+.lbctl select{border:1px solid var(--line-strong);background:var(--paper);
+color:var(--cream);border-radius:var(--radius);padding:6px 12px;font-size:13px;
 font-weight:600;}
 /* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
@@ -156,11 +158,11 @@ font-weight:600;}
    mobiilin #106-pitchilla (teal-tint, #108-paletti) - EI nurmivaria. Villen
    paatos: brandipaletti voittaa kirjaimellisen nurmen, ja kolmen pinnan
    pitaa nayttaa samalta. */
-.pitch{background:rgba(0,194,173,0.24);border:1px solid var(--line);
-border-radius:14px;padding:10px 6px;margin:18px 0;}
+.pitch{background:rgba(46,214,194,0.22);border:1px solid var(--line);
+border-radius:var(--radius);padding:10px 6px;margin:18px 0;}
 .xirow{display:flex;justify-content:space-evenly;flex-wrap:wrap;gap:8px;
 margin:10px 0;}
-.xip{width:76px;text-align:center;color:var(--ink);}
+.xip{width:76px;text-align:center;color:var(--cream);}
 .xip b{display:block;font-size:11px;font-weight:600;margin-top:2px;
 overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .xip span{display:block;font-size:10px;color:var(--muted);
@@ -172,7 +174,7 @@ font-variant-numeric:tabular-nums;}
 display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;}
 .toolnav b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
 color:var(--muted);font-weight:600;margin-right:2px;}
-.toolnav a{font-size:15px;color:var(--ink);text-decoration:none;
+.toolnav a{font-size:15px;color:var(--cream);text-decoration:none;
 border-bottom:1px solid var(--line);padding-bottom:1px;}
 .toolnav a:hover{border-bottom-color:currentColor;}
 """
@@ -242,10 +244,10 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
         # odota kolmannen osapuolen CSS:ää. noscript = varmistus.
         '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family='
-        'Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
+        'IBM+Plex+Mono:wght@400;500;600;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
         '<noscript><link href="https://fonts.googleapis.com/css2?family='
-        'Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet"></noscript>\n'
-        '<meta name="theme-color" content="#F3F2F2">\n'
+        'IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>\n'
+        '<meta name="theme-color" content="#0B0A09">\n'
         f"{ld}"
         f"<style>{CSS}</style>\n"
         "</head>\n<body>\n"

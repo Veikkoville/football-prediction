@@ -59,9 +59,9 @@
 		background: var(--surface);
 	}
 	.verdict-hero.hold {
-		border-color: rgba(0, 194, 173, 0.5);
+		border-color: rgba(46, 214, 194, 0.5);
 		border-left: 4px solid var(--positive);
-		background: linear-gradient(160deg, rgba(0, 194, 173, 0.08), transparent 60%), var(--surface);
+		background: linear-gradient(160deg, rgba(46, 214, 194, 0.08), transparent 60%), var(--surface);
 	}
 	.verdict-hero.go {
 		border-left: 4px solid var(--giq-magenta-deep);

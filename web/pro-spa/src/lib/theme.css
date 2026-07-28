@@ -1,70 +1,86 @@
-/* GoalIQ Pro: brändi-tokenit (goaliq-app/assets/brand/brand-tokens.md,
-   TÄSMÄHEXIT) + mittakaavat.
-   26.7 CLASSIC-ILME (Villen päätös): matchday-ohjelma dashboardin sijaan.
-   Sama tekniikka kuin 25.7. dark→light -vaihdossa: muuttujien NIMET
-   säilyvät, vain arvot vaihtuvat → komponentit seuraavat automaattisesti.
+/* GoalIQ Pro: brändi-tokenit + mittakaavat.
+   28.7 TELETEXT (Villen päätös): musta ruutu, monospace, litteä.
+   Sama tekniikka kuin 25.7. dark→light ja 26.7. classic -vaihdoissa:
+   muuttujien NIMET säilyvät, vain arvot vaihtuvat → komponentit seuraavat
+   automaattisesti. Arvot ovat tasan samat kuin landingin :root-lohkossa ja
+   goaliq-app/lib/theme.ts:ssä — viisi pintaa, yksi paletti.
 
    VÄRIDISIPLIINI (designin sääntö, ei saa rikkoa komponenteissa):
      magenta #FF2E7E — VAIN mark, captain-rengas, live-tila. EI KOSKAAN täyttönä.
-     kulta   #B68235 — luvut, viivat, primary action (aina outline)
-     teal    #00C2AD — voitot, vain tekstinä tai viivana
-     coral   #FF6A3D — hitit, pudotukset, saatavuusliput
-   Numerot ovat sivun äänekkäin asia; väri kantaa merkitystä, ei koristetta. */
+     amber   #F5C542 — luvut, viivat, primary action
+     teal    #2ED6C2 — voitot, linkit
+     coral   #FF8A5C — hitit, pudotukset, saatavuusliput
+   Numerot ovat sivun äänekkäin asia; väri kantaa merkitystä, ei koristetta.
+
+   KONTRASTIT (WCAG 2.1, mitattu — ei arvioitu; pohja --bg #0B0A09):
+     --text        #F3F2F2  17.70:1   --accent      #F5C542  12.20:1
+     --text-muted  #A8A29A   7.82:1   --accent-strong #C99A17 7.65:1
+     --faint       #8A847A   5.33:1   --positive    #5FD97A  11.01:1
+     --negative    #FF8A5C   8.52:1   --giq-teal    #2ED6C2  10.85:1
+     --giq-magenta #FF2E7E   5.60:1 (vain mark/live)
+     ink --accentin päällä  12.20:1 (täyttönapin teksti)
+     --border 0.24 = 1.97:1 (pintaero), --border-strong 0.40 = 3.50:1 (1.4.11)
+   Jos muutat hexiä, laske suhde uudelleen — älä arvaa. */
 :root {
-	/* brändi */
+	/* brändi — teletext-askelmat. magenta säilyy: mark on sama kaikkialla. */
 	--giq-magenta: #ff2e7e;
+	/* ⚠️ magenta-deep #C4005F on tummalla 3.31:1 eli AA:n ALLE. Se ei enää
+	   kelpaa tekstiksi/linkiksi; jätetty tokeniksi vain FDR-5-tintin pohjaksi. */
 	--giq-magenta-deep: #c4005f;
 	--giq-magenta-light: #ff4d90;
-	--giq-coral: #ff6a3d;
-	/* kulta on nyt hillitty messinki (oli #ffc93c): se kantaa lukuja ja
-	   viivoja, joten sen on luettava myös pienenä tekstinä */
-	--giq-gold: #b68235;
-	--giq-gold-deep: #8c6428;
-	--giq-teal: #19e3d2;
-	--giq-teal-deep: #00c2ad;
-	/* lämmin musta sinertävän inkin tilalla — paperi, ei ruutu */
-	--giq-ink: #201f1d;
-	--giq-ink-2: #2e2c28;
+	--giq-coral: #ff8a5c;
+	/* messinki sammuu mustaa vasten (lukuina se katoaa) -> amber */
+	--giq-gold: #ffd873;
+	--giq-gold-deep: #f5c542;
+	--giq-teal: #2ed6c2;
+	--giq-teal-deep: #12b8a4;
+	/* ruutumusta, lämmin */
+	--giq-ink: #0b0a09;
+	--giq-ink-2: #141311;
 	--giq-cream: #f3f2f2;
-	--giq-paper: #eae9e9;
+	--giq-paper: #1f1d1a;
 
-	/* roolit (vaalea pohja). Teksti-aksentit AA-kontrastilla: gold-deep
-	   5.9:1, magenta-deep 5.6:1, negative 4.6:1, muted 5.4:1. */
-	--bg: var(--giq-cream);
-	--surface: #ffffff;
+	/* roolit (tumma pohja) */
+	--bg: var(--giq-ink);
+	--surface: var(--giq-ink-2);
 	--surface-2: var(--giq-paper);
-	/* hiusviiva kantaa rakenteen — siksi hieman vahvempi kuin ennen */
-	--border: rgba(32, 31, 29, 0.18);
-	--text: var(--giq-ink);
+	/* surface vs bg on tarkoituksella 1.07:1 -> viiva kantaa koko rakenteen,
+	   joten sen ON erotuttava: 0.24 = 1.97:1. Kontrollien reunat käyttävät
+	   --border-strongia (3.50:1), koska 1.4.11 koskee niitä. */
+	--border: rgba(243, 242, 242, 0.24);
+	--border-strong: rgba(243, 242, 242, 0.4);
+	--text: var(--giq-cream);
 	/* --giq-muted on brandi-tason alias, jotta komponentti joka JOUTUU
 	   ylikirjoittamaan --text-mutedin (Hero-bandin .menu) voi viitata samaan
 	   arvoon eika kovakoodaa omaansa. Juuri sellainen kovakoodaus jatti
 	   vanhan sinertavan #5c566b elamaan classic-vaihdon yli. */
-	--giq-muted: #5c574f;
+	--giq-muted: #a8a29a;
 	--text-muted: var(--giq-muted);
-	/* primary action = kulta, ei magenta (magenta on varattu kolmeen työhön) */
-	--accent: var(--giq-gold);
-	--accent-strong: var(--giq-gold-deep);
-	--accent-contrast: #ffffff;
-	--positive: #00a896; /* teal, tekstitasoon syvennettynä */
-	--negative: #c4441a; /* coral, tekstitasoon syvennettynä */
-	--warn-text: #8c6428;
+	/* tertiääri: #7A746B olisi 4.27:1 eli AA:n alle -> #8A847A (5.33:1) */
+	--faint: #8a847a;
+	/* primary action = amber (magenta on varattu kolmeen työhön) */
+	--accent: var(--giq-gold-deep);
+	--accent-strong: #c99a17;
+	/* ⚠️ KÄÄNTYI: täytön päällä on nyt ink, ei valkoinen. Valkoinen amberilla
+	   on 1.45:1. Sama flippi kuin mobiilin theme.textOnAccent. */
+	--accent-contrast: var(--giq-ink);
+	--positive: #5fd97a;
+	--negative: #ff8a5c;
+	--warn-text: #f5c542;
 
-	/* FDR 1-5 brändiasteikko (sama kuin fpl.html + Streamlit); käytetään
-	   vain ~14 % tint-taustoina vaalealla, joten kirkkaat hexit toimivat */
+	/* FDR 1-5 brändiasteikko; käytetään ~14-18 % tint-taustoina, joten
+	   pohjahexit saavat olla kylläisiä */
 	--fdr-1: var(--giq-teal-deep);
 	--fdr-2: var(--giq-teal);
 	--fdr-3: var(--giq-gold-deep);
 	--fdr-4: var(--giq-coral);
 	--fdr-5: var(--giq-magenta-deep);
 
-	/* typografia — 26.7 classic: tyyppi kantaa hierarkian. Cormorant Garamond
-	   otsikoihin (korkea kontrasti, ohjelmalehti-sävy), Lora leipään ja
-	   lukuihin (luettava serif). Nimet --font-sans/--font-display säilyvät,
-	   jotta komponentteja ei tarvitse käydä läpi; --font-sans ei siis enää
-	   tarkoita groteskia vaan "leipäteksti". */
-	--font-sans: 'Lora', Georgia, 'Times New Roman', serif;
-	--font-display: 'Cormorant Garamond', 'Lora', Georgia, serif;
+	/* typografia — 28.7 teletext: yksi monospace kantaa kaiken. Nimet
+	   --font-sans/--font-display säilyvät, jotta komponentteja ei tarvitse
+	   käydä läpi; kumpikaan ei enää tarkoita groteskia tai antiikvaa. */
+	--font-sans: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--font-display: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	--step--1: clamp(0.82rem, 0.8rem + 0.1vw, 0.88rem);
 	--step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1rem);
 	--step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.3rem);
@@ -88,8 +104,9 @@
 
 	/* 26.7 classic: hiusviivat kantavat rakenteen, ei varjot eikä pyöristys.
 	   Nimet säilyvät, jotta komponenttien var()-viittaukset toimivat. */
-	--radius: 2px;
-	--radius-sm: 2px;
+	/* teletext: ei pyöristystä lainkaan (classicissa 2px) */
+	--radius: 0;
+	--radius-sm: 0;
 	--shadow-1: none;
 	--shell: 1180px;
 }
@@ -99,7 +116,7 @@
 }
 
 html {
-	color-scheme: light;
+	color-scheme: dark;
 }
 
 body {
@@ -175,7 +192,8 @@ button {
 	font-size: var(--step-0);
 	cursor: pointer;
 	border-radius: var(--radius);
-	border: 1px solid var(--border);
+	/* kontrollin reuna, ei koriste -> 1.4.11 vaatii 3:1 (--border-strong) */
+	border: 1px solid var(--border-strong);
 	background: transparent;
 	color: var(--text);
 	padding: 0.6em 1.3em;
@@ -193,14 +211,14 @@ button.primary {
 	border-color: var(--accent);
 }
 button.primary:hover {
-	background: rgba(182, 130, 53, 0.08);
-	border-color: var(--accent-strong);
+	background: rgba(245, 197, 66, 0.14);
+	border-color: var(--accent);
 }
 
 button.secondary {
 	background: transparent;
 	color: var(--text);
-	border-color: var(--border);
+	border-color: var(--border-strong);
 }
 button.secondary:hover {
 	border-color: var(--accent);
@@ -210,7 +228,7 @@ button.secondary:hover {
 button.ghost {
 	background: transparent;
 	color: var(--text-muted);
-	border-color: var(--border);
+	border-color: var(--border-strong);
 	font-weight: 500;
 }
 button.ghost:hover {
@@ -224,9 +242,11 @@ button.ghost:hover {
    voita disabled-tilaa (sama spesifisyys → järjestys ratkaisee). */
 button:disabled,
 button:disabled:hover {
-	background: var(--giq-paper);
+	background: #1a1815;
 	border-color: var(--border);
-	color: var(--text-muted);
+	/* tietoinen poikkeus: WCAG 1.4.3 rajaa disabloidut kontrollit ulkopuolelle,
+	   ja AA-tason teksti saisi disabloidun napin näyttämään aktiiviselta */
+	color: #5a554e;
 	opacity: 1;
 	cursor: default;
 }
@@ -237,7 +257,8 @@ select {
 	font-size: var(--step-0);
 	background: var(--surface);
 	color: var(--text);
-	border: 1px solid var(--border);
+	/* lomakekontrolli: 1.4.11 koskee sen reunaa */
+	border: 1px solid var(--border-strong);
 	border-radius: var(--radius-sm);
 	padding: 0.55em 0.8em;
 	min-height: 44px;
@@ -304,7 +325,9 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover td {
-	background: rgba(10, 8, 32, 0.04);
+	/* 28.7: oli rgba(10,8,32,.04) = tumma tummalla eli näkymätön. Tummalla
+	   teemalla korostus tehdään valolla, ei varjolla. */
+	background: rgba(243, 242, 242, 0.06);
 }
 
 /* apuluokat */
@@ -320,16 +343,17 @@ tbody tr:hover td {
 	padding: var(--s-3) var(--s-4);
 	font-size: var(--step--1);
 }
+/* 28.7 teletext: banneri-teksti KÄÄNTYI. Classicissa success-teksti oli ink,
+   koska teal ei kantanut creamilla. Tummalla pohjalla se on päinvastoin:
+   ink olisi näkymätön (1.1:1 tintin päällä) ja teal on 10.85:1. */
 .banner.success {
-	background: rgba(0, 194, 173, 0.1);
-	border: 1px solid rgba(0, 148, 130, 0.4);
-	/* #54-kontrastivahti: #00C2AD creamilla < AA -> teksti ink, teal-identiteetti
-	   kantaa taustasta+reunasta (promptin fallback; EI vihreaa) */
-	color: var(--giq-ink);
+	background: rgba(46, 214, 194, 0.12);
+	border: 1px solid rgba(46, 214, 194, 0.42);
+	color: var(--giq-teal);
 }
 .banner.error {
-	background: rgba(255, 106, 61, 0.1);
-	border: 1px solid rgba(194, 65, 12, 0.4);
+	background: rgba(255, 138, 92, 0.12);
+	border: 1px solid rgba(255, 138, 92, 0.42);
 	color: var(--negative);
 }
 

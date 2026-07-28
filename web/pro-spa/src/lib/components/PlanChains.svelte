@@ -257,7 +257,7 @@
 		margin: 0;
 	}
 	.net-pill {
-		background: rgba(0, 194, 173, 0.12);
+		background: rgba(46, 214, 194, 0.12);
 		border: 1px solid rgba(0, 148, 130, 0.4);
 		color: var(--giq-ink);
 		border-radius: 999px;

@@ -76,7 +76,8 @@
 	   merkityksen viivana, ja luku oikealla on se mitä oikeasti luetaan. */
 	.bar {
 		flex: 1;
-		background: rgba(32, 31, 29, 0.1);
+		/* 28.7: track kaannettiin valoksi — tumma tummalla ei ollut track */
+		background: rgba(243, 242, 242, 0.14);
 		height: 3px;
 	}
 	.fill {

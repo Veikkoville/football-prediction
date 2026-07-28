@@ -149,7 +149,7 @@
 		white-space: nowrap;
 	}
 	.flag.out {
-		background: rgba(255, 106, 61, 0.12);
+		background: rgba(255, 138, 92, 0.12);
 		color: var(--negative);
 	}
 	.flag.warn {

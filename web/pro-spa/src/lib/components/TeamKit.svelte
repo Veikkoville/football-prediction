@@ -40,7 +40,7 @@
 	<path
 		d={JERSEY_PATH}
 		fill="none"
-		stroke="rgba(10,8,32,0.28)"
+		stroke="rgba(243,242,242,0.35)"
 		stroke-width="3"
 		stroke-linejoin="round"
 	/>

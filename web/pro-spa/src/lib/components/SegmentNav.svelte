@@ -93,7 +93,7 @@
 		color: var(--accent-strong);
 	}
 	.seg-nav button.active:hover {
-		background: rgba(182, 130, 53, 0.08);
+		background: rgba(245, 197, 66, 0.08);
 		border-color: var(--accent-strong);
 	}
 </style>
