@@ -67,6 +67,40 @@
 	// Fixtures-näkymästä tuleva esitäyttö. Käsitellään ENNEN liigaefektiä ja
 	// vasta joukkuelistan latauduttua: liigan vaihto tyhjentää valinnat, joten
 	// naiivi "aseta kaikki kerralla" hävittäisi kotijoukkueen välittömästi.
+	/** 28.7 (Villen havainto): otteluohjelman nimet ovat football-data.orgin
+	 *  muodossa ("Brighton Hove", "Nottingham", "Man City") ja mallin lista on
+	 *  omassaan ("Brighton", "Nottingham Forest", "Manchester City"). Tarkka
+	 *  vertailu jatti kotijoukkueen tyhjaksi aina kun nimet erosivat.
+	 *
+	 *  Tavallisia funktioita tarkoituksella: ei $state, ei $derived, ei uusia
+	 *  efekteja. Juuri uusi efekti rikkoi bind:valuen aiemmin tanaan. */
+	function norm(s: string): string {
+		return s
+			.toLowerCase()
+			.replace(/\b(fc|afc|cf|sc|ac|as|ss|us)\b/g, '')
+			.replace(/[^a-z0-9]/g, '');
+	}
+	/** Nimet joita etuliitesaanto ei saa kiinni: lyhenne ei ole mallin nimen
+	 *  etuliite eika painvastoin. Yleistetty samankaltaisuus sekoittaisi
+	 *  Man Cityn ja Man Unitedin, joten nama kirjataan kasin. */
+	const NAME_ALIASES: Record<string, string> = {
+		mancity: 'manchestercity',
+		manutd: 'manchesterunited',
+		manunited: 'manchesterunited',
+		spurs: 'tottenham'
+	};
+	function matchTeam(name: string, pool: string[]): string | null {
+		if (pool.includes(name)) return name;
+		let n = norm(name);
+		n = NAME_ALIASES[n] ?? n;
+		const exact = pool.find((x) => norm(x) === n);
+		if (exact) return exact;
+		// "Brighton Hove" -> "Brighton", "Nottingham" -> "Nottingham Forest".
+		// Vain YKSIKASITTEINEN osuma kelpaa, muuten jatetaan tyhjaksi eika arvata.
+		const partial = pool.filter((x) => n.startsWith(norm(x)) || norm(x).startsWith(n));
+		return partial.length === 1 ? partial[0] : null;
+	}
+
 	let pending = $state<{ home: string; away: string } | null>(null);
 	$effect(() => {
 		if (!prefill) return;
@@ -99,8 +133,10 @@
 					// Nimet tulevat otteluohjelmasta (football-data.org) ja
 					// joukkuelista mallista. Täsmäytetään vain jos nimi löytyy,
 					// muuten jätetään käyttäjän valittavaksi eikä arvata.
-					if (teams.includes(pending.home)) home = pending.home;
-					if (teams.includes(pending.away)) away = pending.away;
+					const h = matchTeam(pending.home, teams);
+					const a = matchTeam(pending.away, teams);
+					if (h) home = h;
+					if (a) away = a;
 					pending = null;
 				}
 			},
