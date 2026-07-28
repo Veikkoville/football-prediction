@@ -137,6 +137,12 @@
 					const a = matchTeam(pending.away, teams);
 					if (h) home = h;
 					if (a) away = a;
+					// Villen havainto: otteluohjelman Predict vei valilehdelle mutta
+					// vaati viela napin painalluksen. Jos molemmat joukkueet
+					// ratkesivat, ajetaan ennuste heti. Jos toinen jai auki (esim.
+					// nousija jota ei viela ole mallissa), EI ajeta: silloin
+					// kayttajan pitaa valita se itse.
+					if (h && a && h !== a) void doPredict();
 					pending = null;
 				}
 			},
@@ -152,6 +158,10 @@
 
 	async function run(e: SubmitEvent) {
 		e.preventDefault();
+		void doPredict();
+	}
+
+	async function doPredict() {
 		if (!canPredict) return;
 		loading = true;
 		error = null;
