@@ -596,9 +596,17 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
     desc = (f"The best XI the model can build inside the 100.0m budget: "
             f"{shape}, {total_xp:.1f} projected points over the horizon. "
             f"Free, no sign-in, rebuilt daily.")
+    # 28.7: vaite optimaalisuudesta VAIN kun ratkaisija on sen todistanut.
+    # Ennen tata paivaa sivu vaitti "strongest" ahneesta heuristiikasta joka
+    # jai tuotantodatalla 15.2 xP optimista.
+    from src.models.fpl_rate_team import optimal_xi_proven
+    claim = ("The highest-scoring XI that fits inside the standard 100.0m "
+             "budget, proven optimal by exhaustive search"
+             if optimal_xi_proven() else
+             "The strongest XI the GoalIQ model found inside the standard "
+             "100.0m budget")
     hero = ("<h1>The Model XI</h1>"
-            '<p class="lede">The strongest XI the GoalIQ model can build '
-            "inside the standard 100.0m budget, ranked on projected points. "
+            f'<p class="lede">{claim}, ranked on projected points. '
             "This is the same squad logic the rate-my-team benchmark uses, so "
             "the page and the product cannot drift apart.</p>")
     body = (

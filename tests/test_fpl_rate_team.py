@@ -378,3 +378,106 @@ def test_fetch_fpl_stale_fallback_on_failure(monkeypatch):
     with pytest.raises(rt.RateTeamError) as e:
         rt._fetch_fpl("/stale-test/")
     assert e.value.status_code == 503
+
+
+# ---------------------------------------------------------------------------
+# 28.7: benchmark-optimoija. Villen havainto ("sain itse sitä paremman") oli
+# tosi: ahne heuristiikka jäi tuotantodatalla 15.2 xP optimista, ja copy väitti
+# silti "best possible". Nämä testit lukitsevat sekä optimaalisuuden että sen
+# ETTEI todistuslippua nosteta ilman todistetta.
+# ---------------------------------------------------------------------------
+
+def _legal_xi(xi):
+    from collections import Counter
+    if len(xi) != 11:
+        return False
+    counts = Counter(p["element_type"] for p in xi)
+    if counts[1] != 1:
+        return False
+    if not (3 <= counts[2] <= 5 and 2 <= counts[3] <= 5 and 1 <= counts[4] <= 3):
+        return False
+    return max(Counter(p["club"] for p in xi).values()) <= rt.MAX_PER_CLUB
+
+
+def test_optimal_xi_is_legal_and_locally_unimprovable():
+    """Yksikään yhden pelaajan vaihto ei saa parantaa tulosta."""
+    pool = rt._projection_pool(FAKE_XP, {e['id']: e for e in POOL_BOOT})
+    xi = rt.optimal_budget_xi(pool)
+    assert _legal_xi(xi)
+    cheapest_gk = min(p["price"] for p in pool if p["element_type"] == 1)
+    outfield = sorted(p["price"] for p in pool if p["element_type"] != 1)
+    xi_budget = rt.BUDGET_TENTHS - (cheapest_gk + sum(outfield[:3]))
+    assert sum(p["price"] for p in xi) <= xi_budget
+
+    ids = {p["id"] for p in xi}
+    for i, out in enumerate(xi):
+        for cand in pool:
+            if (cand["element_type"] != out["element_type"] or cand["id"] in ids
+                    or cand["xp_horizon_total"] <= out["xp_horizon_total"]):
+                continue
+            swapped = xi[:i] + [cand] + xi[i + 1:]
+            assert not (sum(p["price"] for p in swapped) <= xi_budget
+                        and _legal_xi(swapped)), (
+                f'{cand["web_name"]} parantaisi {out["web_name"]}:n tilalla '
+                "- optimoija ei ole edes paikallisesti optimaalinen")
+
+
+def test_optimum_matches_independent_brute_force():
+    """Riippumaton tarkistus: pieni pooli jossa pelaajat ovat luokiteltavissa
+    (hinta, xP) -pareiksi, jolloin optimi voidaan laskea raa'alla voimalla
+    luokkamaarien yli. Solverin arvon on OSUTTAVA siihen tasan.
+
+    Miksi nain eika 'ansapelaaja ei saa olla mukana': kirjoitin ensin kaksi
+    tallaista vaitetta ja MOLEMMAT olivat vaaria - solver loysi paremman
+    ratkaisun kuin oma kasinlaskuni. Testi ei saa olettaa vastausta, vaan
+    laskea se itse.
+    """
+    from itertools import product
+    # (positio, hinta kymmenyksina, xP, kpl)
+    classes = [(1, 40, 10.0, 4), (2, 40, 10.0, 12), (3, 40, 10.0, 12),
+               (3, 100, 14.0, 4), (4, 40, 10.0, 8), (4, 300, 20.0, 1)]
+    pool, pid = [], 0
+    for t, price, xp, n in classes:
+        for _ in range(n):
+            pid += 1
+            pool.append({"id": pid, "web_name": f"p{pid}", "element_type": t,
+                         "price": price, "xp_horizon_total": xp,
+                         "xp_per_gw": xp / 6, "club": 500 + pid})  # eri klubit
+
+    cheapest_gk = min(p["price"] for p in pool if p["element_type"] == 1)
+    outfield = sorted(p["price"] for p in pool if p["element_type"] != 1)
+    xi_budget = rt.BUDGET_TENTHS - (cheapest_gk + sum(outfield[:3]))
+
+    best = 0.0
+    for counts in product(*[range(n + 1) for _, _, _, n in classes]):
+        per_pos = {1: 0, 2: 0, 3: 0, 4: 0}
+        cost = 0
+        xp_sum = 0.0
+        for k, (t, price, xp, _n) in zip(counts, classes):
+            per_pos[t] += k
+            cost += k * price
+            xp_sum += k * xp
+        if sum(per_pos.values()) != 11 or cost > xi_budget:
+            continue
+        if per_pos[1] != 1 or not (3 <= per_pos[2] <= 5
+                                   and 2 <= per_pos[3] <= 5
+                                   and 1 <= per_pos[4] <= 3):
+            continue
+        best = max(best, xp_sum)
+
+    # Kutsu EKSAKTIA polkua suoraan. Kaaren lapi testattuna tama ei erottelisi:
+    # negatiivinen kontrolli (eksakti polku pois paalta) meni lapi, koska tama
+    # pooli on niin pieni etta ahne+paikallishaku osuu samaan optimiin.
+    # Erotteleva todiste on tuotantodata: 288.23 -> 303.43 xP (28.7).
+    exact, exact_total = rt._unconstrained_optimum(pool, xi_budget)
+    assert exact is not None
+    assert abs(exact_total - best) < 1e-6, (
+        f"eksakti {exact_total:.2f} vs raaka voima {best:.2f}")
+    assert abs(sum(p["xp_horizon_total"] for p in exact) - exact_total) < 1e-6
+
+    xi = rt.optimal_budget_xi(pool)
+    got = sum(p["xp_horizon_total"] for p in xi)
+    assert _legal_xi(xi)
+    assert sum(p["price"] for p in xi) <= xi_budget
+    assert abs(got - best) < 1e-6, f"solver {got:.2f} vs raaka voima {best:.2f}"
+    assert rt.optimal_xi_proven() is True

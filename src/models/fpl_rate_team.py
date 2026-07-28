@@ -229,6 +229,179 @@ def _squad_clubs_ok(squad: list[dict]) -> bool:
 
 
 _OPTIMAL_XP_CACHE: dict[str, float] = {}
+_NEG = float("-inf")
+# Viimeisimmän optimoinnin todistustila. Copy saa väittää "paras mahdollinen"
+# VAIN kun tämä on True (28.7: aiempi ahne heuristiikka jäi mitatusti 14.19 xP
+# optimista ja copy väitti silti parasta mahdollista).
+_LAST_OPTIMAL_PROVEN: dict[str, bool] = {"v": False}
+
+
+def optimal_xi_proven() -> bool:
+    """Oliko viimeisin optimal_budget_xi-ajo todistetusti optimaalinen?"""
+    return _LAST_OPTIMAL_PROVEN["v"]
+
+
+def _price_unit(pool: list[dict]) -> int:
+    """Suurin yhteinen hintayksikkö (kymmenyksinä). FPL:n esikausihinnat ovat
+    tyypillisesti 0.5m:n monikertoja, jolloin DP:n kustannusakseli lyhenee
+    viidesosaan ilman että mitään pyöristetään. Kauden aikana hinnat liikkuvat
+    0.1m:n askelin → palaa automaattisesti kymmenyksiin."""
+    from math import gcd
+    u = 0
+    for p in pool:
+        u = gcd(u, int(p["price"]))
+    return u or 1
+
+
+def _pos_dp(players: list[dict], kmax: int, budget: int, unit: int):
+    """0/1-knapsack per positio: dp[k][c] = paras xP kun valittu TASAN k
+    pelaajaa hinnalla TASAN c. pick[k][c] = (pelaaja, edellinen c).
+
+    Karsinta on eksakti: samalla hinnalla riittää säilyttää kmax parasta,
+    koska useampaa saman hintaista ei voi koskaan valita enempää."""
+    by_price: dict[int, list[dict]] = {}
+    for p in sorted(players, key=lambda x: -x["xp_horizon_total"]):
+        by_price.setdefault(p["price"], [])
+        if len(by_price[p["price"]]) < kmax:
+            by_price[p["price"]].append(p)
+    keep = [p for lst in by_price.values() for p in lst]
+
+    dp = [[_NEG] * (budget + 1) for _ in range(kmax + 1)]
+    pick: list[list] = [[None] * (budget + 1) for _ in range(kmax + 1)]
+    dp[0][0] = 0.0
+    for p in keep:
+        c_p = p["price"] // unit
+        xp = p["xp_horizon_total"]
+        for k in range(kmax - 1, -1, -1):
+            row, nxt = dp[k], dp[k + 1]
+            for c in range(budget - c_p, -1, -1):
+                base = row[c]
+                if base == _NEG:
+                    continue
+                v = base + xp
+                if v > nxt[c + c_p]:
+                    nxt[c + c_p] = v
+                    pick[k + 1][c + c_p] = (p, c)
+    return dp, pick
+
+
+def _maxplus(a: list[float], b: list[float], budget: int) -> list[float]:
+    """(max, +) -konvoluutio: paras summa kun kustannukset lasketaan yhteen."""
+    out = [_NEG] * (budget + 1)
+    for ca, va in enumerate(a):
+        if va == _NEG:
+            continue
+        room = budget - ca
+        for cb in range(room + 1):
+            vb = b[cb]
+            if vb == _NEG:
+                continue
+            s = va + vb
+            if s > out[ca + cb]:
+                out[ca + cb] = s
+    return out
+
+
+def _unconstrained_optimum(pool: list[dict], xi_budget: int):
+    """Eksakti paras XI ILMAN 3/klubi-rajaa → todistettu YLÄRAJA.
+
+    Jos tuloksena oleva XI sattuu täyttämään klubikaton, se on samalla
+    todistetusti paras LAILLINEN XI: rajoitteen poistaminen ei voi huonontaa
+    optimia, joten kelvollinen ratkaisu ylärajan arvolla on optimi.
+
+    Palauttaa (xi, total) tai (None, -inf).
+    """
+    unit = _price_unit(pool)
+    B = xi_budget // unit
+    by_pos: dict[int, list[dict]] = {1: [], 2: [], 3: [], 4: []}
+    for p in pool:
+        by_pos[p["element_type"]].append(p)
+
+    kmax = {1: 1, 2: XI_MAX[2], 3: XI_MAX[3], 4: XI_MAX[4]}
+    tables = {t: _pos_dp(by_pos[t], kmax[t], B, unit) for t in (1, 2, 3, 4)}
+
+    best = (_NEG, None)
+    for n_def in range(XI_MIN[2], XI_MAX[2] + 1):
+        for n_mid in range(XI_MIN[3], XI_MAX[3] + 1):
+            n_fwd = 10 - n_def - n_mid
+            if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
+                continue
+            shape = {1: 1, 2: n_def, 3: n_mid, 4: n_fwd}
+            rows = [tables[t][0][n] for t, n in shape.items()]
+            acc = rows[0]
+            for r in rows[1:]:
+                acc = _maxplus(acc, r, B)
+            top = max(acc)
+            if top > best[0]:
+                best = (top, (shape, acc))
+    if best[1] is None:
+        return None, _NEG
+
+    # Rekonstruktio: etsi kustannusjako joka toteuttaa optimin, sitten pelaajat.
+    shape, _acc = best[1]
+    order = [1, 2, 3, 4]
+    rows = {t: tables[t][0][shape[t]] for t in order}
+
+    def _split(idx: int, budget_left: int, target: float, chosen: list[int]):
+        t = order[idx]
+        if idx == len(order) - 1:
+            for c in range(budget_left + 1):
+                if rows[t][c] != _NEG and abs(rows[t][c] - target) < 1e-6:
+                    return chosen + [c]
+            return None
+        for c in range(budget_left + 1):
+            v = rows[t][c]
+            if v == _NEG:
+                continue
+            got = _split(idx + 1, budget_left - c, target - v, chosen + [c])
+            if got is not None:
+                return got
+        return None
+
+    costs = _split(0, B, best[0], [])
+    if costs is None:
+        return None, _NEG
+    xi: list[dict] = []
+    for t, c in zip(order, costs):
+        _dp, pick = tables[t]
+        k, cur = shape[t], c
+        while k > 0:
+            entry = pick[k][cur]
+            if entry is None:
+                return None, _NEG
+            p, prev = entry
+            xi.append(p)
+            k, cur = k - 1, prev
+    return (xi, best[0]) if len(xi) == 11 else (None, _NEG)
+
+
+def _improve_legal(xi: list[dict], pool: list[dict], xi_budget: int) -> list[dict]:
+    """Paikallishaku: vaihda yksi pelaaja kerrallaan parempaan samassa
+    positiossa niin kauan kuin budjetti ja klubikatto sallivat. Käytetään VAIN
+    kun eksakti optimi rikkoo klubikaton — ahne lähtökohta jää muuten
+    todistettavasti kauas (mitattu 28.7: 288.23 vs 302.42)."""
+    cur = list(xi)
+    ids = {p["id"] for p in cur}
+    improved = True
+    while improved:
+        improved = False
+        for i, out in enumerate(cur):
+            for cand in pool:
+                if (cand["element_type"] != out["element_type"]
+                        or cand["id"] in ids
+                        or cand["xp_horizon_total"] <= out["xp_horizon_total"]):
+                    continue
+                new = cur[:i] + [cand] + cur[i + 1:]
+                if (sum(p["price"] for p in new) <= xi_budget
+                        and _squad_clubs_ok(new)):
+                    ids.discard(out["id"])
+                    ids.add(cand["id"])
+                    cur = new
+                    improved = True
+                    break
+            if improved:
+                break
+    return cur
 
 
 def optimal_budget_xi(pool: list[dict]) -> list[dict]:
@@ -296,6 +469,15 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
             cost += p["price"]
         return xi if len(xi) == 11 else []
 
+    # --- 1. EKSAKTI polku (28.7): DP ilman klubikattoa = todistettu yläraja.
+    exact, exact_total = _unconstrained_optimum(pool, xi_budget)
+    if exact and _squad_clubs_ok(exact):
+        # Kelvollinen ratkaisu ylärajan arvolla ⇒ todistetusti optimi.
+        _LAST_OPTIMAL_PROVEN["v"] = True
+        return exact
+
+    # --- 2. Varapolku: klubikatto sitoo → ahne + paikallishaku.
+    _LAST_OPTIMAL_PROVEN["v"] = False
     best: list[dict] = []
     best_total = -1.0
     for n_def in range(XI_MIN[2], XI_MAX[2] + 1):
@@ -306,9 +488,13 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
             cand = _fill({1: 1, 2: n_def, 3: n_mid, 4: n_fwd})
             if not cand:
                 continue
+            cand = _improve_legal(cand, pool, xi_budget)
             total = sum(p["xp_horizon_total"] for p in cand)
             if total > best_total:
                 best_total, best = total, cand
+    # Jos paikallishaku osuu ylärajaan, ratkaisu on silti todistetusti optimi.
+    if best and exact_total != _NEG and abs(best_total - exact_total) < 1e-6:
+        _LAST_OPTIMAL_PROVEN["v"] = True
     return best
 
 
@@ -778,6 +964,11 @@ def rate_team(entry: int | None = None, gw: int | None = None,
             "rating": rating,
             "rating_max": 100,
             "beats_benchmark": beats_benchmark,
+            # 28.7: onko vertailukohta TODISTETUSTI paras mahdollinen. Copy saa
+            # sanoa "best possible" vain kun tama on True. Ennen tata paivaa
+            # vertailukohta oli ahne heuristiikka joka jai tuotantodatalla
+            # 15.2 xP optimista, ja copy vaitti silti parasta mahdollista.
+            "optimal_proven": optimal_xi_proven(),
             "optimal_team_xp": round(optimal_xp, 2),
             "gap_to_optimal_xp": gap_to_optimal,
             "strongest_line": strongest,

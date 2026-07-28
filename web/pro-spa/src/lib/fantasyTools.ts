@@ -134,6 +134,10 @@ export interface RateTeamResponse {
 		rating_max?: number;
 		/** true jos XI ylittaa parhaan budjettijoukkueen (ennen: leikattiin 100:aan). */
 		beats_benchmark?: boolean;
+		/** 28.7: onko vertailukohta TODISTETUSTI optimi (eksakti haku onnistui).
+		 *  false = klubikatto sitoi ja jouduttiin paikallishakuun → copy ei saa
+		 *  sanoa "best possible". Puuttuu vanhalta APIlta → kohdellaan tosina. */
+		optimal_proven?: boolean;
 		strongest_line: string;
 		weakest_line: string;
 		/** #50: uudet additiiviset kentät, voivat puuttua vanhasta API:sta */

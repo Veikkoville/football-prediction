@@ -570,8 +570,13 @@
 							({data.rating.gap_to_optimal_xp > 0.05
 								? `-${data.rating.gap_to_optimal_xp.toFixed(1)} xP`
 								: 'level with it'}){/if}.
+						<!-- 28.7: "best" vain kun backend on TODISTANUT sen. Vanha
+						     vertailukohta oli ahne heuristiikka joka jai 15.2 xP
+						     optimista, ja copy vaitti silti parasta mahdollista. -->
 						<span class="rating-basis"
-							>100 = the best squad the rules allow inside the 100.0m budget.</span
+							>{data.rating.optimal_proven === false
+								? '100 = the strongest squad the model found inside the 100.0m budget.'
+								: '100 = the best squad the rules allow inside the 100.0m budget.'}</span
 						>
 					{/if}
 				</p>
