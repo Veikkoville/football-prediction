@@ -2796,17 +2796,30 @@ def fantasy_rate_team(
         return rate_team(entry=entry, gw=gw, players=player_ids,
                          captain=captain, bank=bank, ft=ft)
     except RateTeamError as e:
-        # 28.7: `code` mukaan vastaukseen ADDITIIVISESTI. `detail` sailyy
-        # merkkijonona, joten jo julkaistut klientit (mobiili 1.0.3, SPA)
-        # lukevat sen ennallaan; uudet osaavat haarautua koodilla ilman
-        # virheviestin merkkijonovertailua.
-        if getattr(e, "code", None):
-            raise HTTPException(
-                status_code=e.status_code,
-                detail=e.detail,
-                headers={"X-GoalIQ-Error-Code": e.code},
-            )
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+        raise _http_from_rate_team_error(e)
+
+
+def _http_from_rate_team_error(e) -> HTTPException:
+    """RateTeamError -> HTTPException, koneluettava `code` headeriin.
+
+    28.7: `code` mukaan vastaukseen ADDITIIVISESTI. `detail` sailyy
+    merkkijonona, joten jo julkaistut klientit (mobiili 1.0.3, SPA) lukevat
+    sen ennallaan; uudet osaavat haarautua koodilla ilman virheviestin
+    merkkijonovertailua.
+
+    PI-16b (28.7): tama oli aiemmin inline VAIN rate-teamissa, joten planner,
+    kapteenirankkeri ja plan-chains pudottivat koodin hiljaa -> niiden UI ei
+    voinut erottaa "vaara ID:ta" ja "FPL ei ole viela julkaissut kokoonpanoja"
+    toisistaan, ja koko esikausi nayttyi umpikujana. Yksi paikka, kaikki
+    joukkuepohjaiset tyokalut.
+    """
+    if getattr(e, "code", None):
+        return HTTPException(
+            status_code=e.status_code,
+            detail=e.detail,
+            headers={"X-GoalIQ-Error-Code": e.code},
+        )
+    return HTTPException(status_code=e.status_code, detail=e.detail)
 
 
 def _parse_id_csv(raw: str, label: str) -> list[int]:
@@ -2858,7 +2871,7 @@ def fantasy_plan(
         payload = plan_transfers(entry=entry, gw=gw, players=player_ids,
                                  bank=bank, horizon=horizon, ft=ft)
     except RateTeamError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+        raise _http_from_rate_team_error(e)
     # Edge-sprint P0c: enforcement paalla ei-premium saa vain 1. GW:n askeleen
     # (taysi rivi -> renderointi ei kaadu). Default off -> ennallaan.
     if not is_premium_request(request):
@@ -2882,7 +2895,7 @@ def fantasy_captain(
     try:
         payload = captain_picker(entry=entry, gw=gw, players=player_ids)
     except RateTeamError as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+        raise _http_from_rate_team_error(e)
     # Edge-sprint (additiivinen, defensiivinen): jos xP-projektio tuo
     # e_bonus/set_pieces-kentat (contract-data.md), liitetaan ne captain-
     # riveihin. Kenttien puuttuessa vastaus on tasmalleen ennallaan.

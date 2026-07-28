@@ -3,7 +3,12 @@
 	// plans[0] = hero, 2 seuraavaa kompakteina vaihtoehtoina (backend dedupaa,
 	// mutta ketjut voivat silti erota vain yhdellä siirrolla — contract-api).
 	// Pre-GW1: backend palauttaa 404 + selitteen → näytetään siististi.
-	import { fetchPlanChains, type PlanChainsResponse } from '$lib/fantasyTools';
+	import {
+		fetchPlanChains,
+		fetchPlanChainsDraft,
+		type PlanChainsResponse
+	} from '$lib/fantasyTools';
+	import { runWithSquadFallback, NoSquadInputError, type SquadBasis } from '$lib/squadInput';
 	import { capture } from '$lib/analytics';
 	import { fplEntry, persistEntry } from '$lib/fplEntry.svelte';
 	import MethodNote from './MethodNote.svelte';
@@ -21,6 +26,10 @@
 	let horizon = $state(3);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
+	/** PI-16b: 'draft' = ajettu tallennetulla 15:llä, koska FPL ei ole vielä
+	 *  julkaissut kokoonpanoja. */
+	let basedOn = $state<SquadBasis>('entry');
+	let needsDraft = $state(false);
 	let data = $state<PlanChainsResponse | null>(null);
 
 	let entryValid = $derived(/^\d{1,10}$/.test(fplEntry.entry.trim()));
@@ -30,14 +39,27 @@
 		if (!entryValid || loading) return;
 		loading = true;
 		error = null;
+		needsDraft = false;
 		try {
 			const id = Number(fplEntry.entry.trim());
-			data = await fetchPlanChains(id, horizon);
+			// PI-16b (28.7): sama esikausifallback kuin plannerissa. Ilman tätä
+			// tämä työkalu oli 404 kaikille GW1-deadlineen (21.8) asti.
+			const run = await runWithSquadFallback(
+				id,
+				(entry) => fetchPlanChains(entry, horizon),
+				(ids) => fetchPlanChainsDraft(ids, horizon)
+			);
+			data = run.data;
+			basedOn = run.basedOn;
 			void persistEntry(id); // #66: talteen vasta onnistuneesta hausta
-			capture('plan_chains_viewed', { source: 'pro_spa', horizon });
+			capture('plan_chains_viewed', { source: 'pro_spa', horizon, basis: run.basedOn });
 		} catch (err) {
 			data = null;
-			error = err instanceof Error ? err.message : String(err);
+			if (err instanceof NoSquadInputError) {
+				needsDraft = true;
+			} else {
+				error = err instanceof Error ? err.message : String(err);
+			}
 		}
 		loading = false;
 	}
@@ -87,10 +109,13 @@
 	</button>
 </form>
 {#if !entryValid}
+	<!-- PI-16b (28.7): vanha teksti sanoi "before that this tool has no squad to
+	     plan from". Se piti paikkansa ennen tätä korjausta eikä pidä enää:
+	     tallennettu draft kelpaa syötteeksi. -->
 	<p class="muted hint">
-		Enter your public FPL entry ID (the number in your Points page URL). Note: FPL
-		publishes squads only after the Gameweek 1 deadline, so before that this tool has no
-		squad to plan from.
+		Enter your public FPL entry ID (the number in your Points page URL). Before the Gameweek 1
+		deadline FPL keeps every squad private, so the chains run on the 15 you drafted in Rate my
+		team instead.
 	</p>
 {/if}
 
@@ -98,9 +123,21 @@
 	<ModelWorking steps={WORKING_STEPS} />
 {/if}
 
-{#if error}
+{#if needsDraft}
+	<p class="notice-preseason">
+		<strong>Your squad is not public yet.</strong> FPL publishes every team only after the
+		Gameweek 1 deadline. Until then, draft your 15 in Rate my team and the chain search runs on
+		that draft.
+	</p>
+{:else if error}
 	<p class="banner error">{error}</p>
 {:else if data && hero}
+	{#if basedOn === 'draft'}
+		<p class="notice-preseason">
+			Based on your saved draft of 15, because FPL does not publish squads until the Gameweek
+			1 deadline.
+		</p>
+	{/if}
 	{#if data.meta.timeout_degraded}
 		<p class="muted">
 			The search hit its time budget and was trimmed, results are still valid plans but

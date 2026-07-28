@@ -333,6 +333,21 @@ tbody tr:hover td {
 	color: var(--negative);
 }
 
+/* PI-16 (28.7) / PI-16b: esikauden selite. EI virhevärejä — "FPL ei ole vielä
+   julkaissut kokoonpanoja" on kalenterin tila eikä käyttäjän virhe, ja se on
+   koko esikauden normaalitila kaikissa joukkuepohjaisissa työkaluissa.
+   Nostettu RateTeamin scoped-tyylistä tänne kun planner ja siirtoketjut saivat
+   saman tilan: kolme kopiota olisi ajautunut eroon. */
+.notice-preseason {
+	max-width: 640px;
+	border: 1px solid var(--border);
+	border-left: 3px solid var(--accent, var(--border));
+	border-radius: var(--radius);
+	padding: var(--s-3) var(--s-4);
+	margin: 0 0 var(--s-3);
+	font-size: var(--step--1);
+}
+
 /* #48: FPL-työkalupaneeli (dashboard-kortti segmenttinavin alla).
    Sama radius/border-kieli kuin .table-wrap/.card; paper-pohja jolloin
    sisällä olevat valkoiset surface-kortit ja taulukot erottuvat. */

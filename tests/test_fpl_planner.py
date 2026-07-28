@@ -216,3 +216,57 @@ def test_endpoint_compare(client):
     assert r.json()["verdict"]["pick"]["id"] == 15
     r = client.get("/api/fantasy/compare?players=15,abc")
     assert r.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# PI-16b (28.7): esikausi-polku KAIKISSA joukkuepohjaisissa työkaluissa
+#
+# Taustaa: FPL julkaisee kokoonpanot vasta GW1-deadlinen jälkeen, joten
+# entry-ID-polku palauttaa 404:n koko esikauden. rate-team sai 28.7. sekä
+# koneluettavan koodin että draft-fallbackin; planner, kapteenirankkeri ja
+# plan-chains eivät. Nämä testit lukitsevat molemmat puolet sopimuksesta:
+# (a) `X-GoalIQ-Error-Code` tulee kaikista, (b) `players=` toimii kaikissa.
+# ---------------------------------------------------------------------------
+
+def _entry_without_picks(monkeypatch):
+    """Entry on olemassa, mutta picksit eivät ole julkisia (= esikausi)."""
+    def fake_fetch(path):
+        if path == "/bootstrap-static/":
+            return FAKE_BOOTSTRAP
+        if path == "/entry/424242/":
+            return {"id": 424242}
+        raise rt.RateTeamError(404, "Not found on the FPL API.")
+
+    monkeypatch.setattr(rt, "_fetch_fpl", fake_fetch)
+    rt._FPL_CACHE.clear()
+
+
+@pytest.mark.parametrize("url", [
+    "/api/fantasy/rate-team?entry=424242",
+    "/api/fantasy/plan?entry=424242&horizon=3",
+    "/api/fantasy/captain?entry=424242",
+    "/api/fantasy/plan-chains?entry=424242&horizon=3",
+])
+def test_preseason_404_carries_machine_readable_code(client, monkeypatch, url):
+    _entry_without_picks(monkeypatch)
+    r = client.get(url)
+    assert r.status_code == 404
+    # Koodi headerissa, EI bodyssa: `detail` pysyy merkkijonona, joten jo
+    # julkaistut klientit (mobiili 1.0.3, SPA) lukevat vastauksen ennallaan.
+    assert r.headers.get("X-GoalIQ-Error-Code") == "picks_not_published"
+    assert isinstance(r.json()["detail"], str)
+
+
+@pytest.mark.parametrize("url", [
+    "/api/fantasy/plan?horizon=3&players=",
+    "/api/fantasy/captain?players=",
+    "/api/fantasy/plan-chains?horizon=3&players=",
+])
+def test_draft_mode_works_without_entry(client, url):
+    r = client.get(url + ",".join(str(i) for i in SQUAD_IDS))
+    assert r.status_code == 200, r.text
+
+
+def test_plan_chains_requires_entry_or_players(client):
+    r = client.get("/api/fantasy/plan-chains?horizon=3")
+    assert r.status_code == 400

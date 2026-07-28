@@ -72,7 +72,27 @@ def _cache_put(key: tuple, value) -> None:
         _RESULT_CACHE[key] = (time.time(), value)
 
 
+def _parse_ids(raw: str) -> list[int]:
+    """Pilkkuerotellut element-ID:t. Sama sopimus kuin main.py:n _parse_id_csv
+    (PI-16b: plan-chains sai `players`-moodin, joten parseri tarvitaan tanne)."""
+    try:
+        return [int(x) for x in raw.split(",") if x.strip()]
+    except ValueError:
+        raise HTTPException(status_code=400,
+                            detail="players must be comma-separated integers")
+
+
 def _http(e: RateTeamError) -> HTTPException:
+    """PI-16b (28.7): koneluettava `code` mukaan headeriin, kuten rate-teamissa.
+
+    Ilman tata chip-EV, plan-chains, H2H ja edge naittavat esikauden 404:n
+    samannakoisena kuin vaaran entry-ID:n, eika UI voi haarautua toimivaan
+    draft-polkuun. `detail` sailyy merkkijonona -> julkaistut klientit
+    ennallaan.
+    """
+    if getattr(e, "code", None):
+        return HTTPException(status_code=e.status_code, detail=e.detail,
+                             headers={"X-GoalIQ-Error-Code": e.code})
     return HTTPException(status_code=e.status_code, detail=e.detail)
 
 
@@ -526,24 +546,37 @@ def _gw_score_with_captain(squad, g):
 @router.get("/api/fantasy/plan-chains")
 def fantasy_plan_chains(
     request: Request, response: Response,
-    entry: int = Query(..., description="Julkinen FPL entry-ID"),
+    entry: int | None = Query(default=None,
+                              description="Julkinen FPL entry-ID"),
+    players: str | None = Query(
+        default=None,
+        description="Esikausifallback: 15 FPL element-ID:ta pilkuilla"),
     horizon: int = Query(default=3, ge=2, le=6),
 ):
     """Solver-light: beam-search 0-2 siirtoa per GW olemassa olevalla xP:lla
     + hit-kustannus (sama HIT_COST -4 kuin transfer-suggestions). Palauttaa
     top-3 suunnitelmaa {moves per GW, net_ev vs hold, hits_taken, rationale}.
     Beam width 8, kandidaatit rajattu, aikabudjetti ~6 s (timeout-suoja:
-    degradaatio merkitaan metaan). ft-oletus 1 (FPL-API ei kerro FT-saldoa)."""
+    degradaatio merkitaan metaan). ft-oletus 1 (FPL-API ei kerro FT-saldoa).
+
+    PI-16b (28.7): `players` lisatty samalla kaavalla kuin rate-team/plan/
+    captain. Ilman sita tama endpoint palautti 404:n KAIKILLE koko esikauden,
+    koska FPL julkaisee kokoonpanot vasta GW1-deadlinen jalkeen."""
     response.headers["Cache-Control"] = "no-store"
     premium = is_premium_request(request)
+    player_ids = _parse_ids(players) if players else None
+    if not player_ids and entry is None:
+        raise HTTPException(status_code=400,
+                            detail="Provide either entry or players.")
     try:
         xp_data, bootstrap, pool, pool_by_id = build_context()
-        cache_key = ("plan_chains", entry, horizon,
+        cache_key = ("plan_chains", entry,
+                     tuple(player_ids) if player_ids else None, horizon,
                      xp_data["meta"].get("generated_at"))
         payload = _cache_get(cache_key)
         if payload is None:
             squad_ids, _cap, bank_tenths, picks_gw = resolve_squad(
-                bootstrap, entry, None, None, None, None)
+                bootstrap, entry, None, player_ids, None, None)
             start_gw = clamp_gw_to_projections(picks_gw, pool, xp_data)
             covered = _covered_gws(pool)
             gws = [g for g in covered if g >= start_gw][:horizon]

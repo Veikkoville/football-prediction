@@ -883,15 +883,9 @@
 	}
 	/* 28.7 (PI-16): neutraali ohjaus, EI virhetyyliä. Punainen laatikko kertoisi
 	   käyttäjälle että hän teki jotain väärin, vaikka syy on FPL:n kalenteri. */
-	.notice-preseason {
-		max-width: 640px;
-		border: 1px solid var(--border);
-		border-left: 3px solid var(--accent, var(--border));
-		border-radius: var(--radius);
-		padding: var(--s-3) var(--s-4);
-		margin: 0 0 var(--s-3);
-		font-size: var(--step--1);
-	}
+	/* PI-16b (28.7): .notice-preseason siirretty theme.css:ään — planner ja
+	   siirtoketjut näyttävät saman esikausiselitteen, ja kolme scoped-kopiota
+	   olisi ajautunut eroon. */
 	.draft-box {
 		max-width: 640px;
 		border: 1px solid var(--border);

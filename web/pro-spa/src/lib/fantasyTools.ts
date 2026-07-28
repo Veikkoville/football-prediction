@@ -343,6 +343,24 @@ export function fetchPlan(entry: number, horizon: number, ft: number): Promise<P
 	return getTool(`/api/fantasy/plan?entry=${entry}&horizon=${horizon}&ft=${ft}`, 'plan');
 }
 
+/** PI-16b (28.7): esikausi-draft plannerille — sama kaava kuin
+ * fetchRateTeamManual. Backend on tukenut players-moodia koko ajan. */
+export function fetchPlanDraft(
+	playerIds: number[],
+	horizon: number,
+	ft: number
+): Promise<PlanResponse> {
+	return getTool(
+		`/api/fantasy/plan?players=${playerIds.join(',')}&horizon=${horizon}&ft=${ft}`,
+		'plan'
+	);
+}
+
+/** HUOM (PI-16b-tarkistus 28.7): SPA EI kutsu tätä. Webin CaptainRanker
+ * johtaa top-10:n suoraan xP-taulukosta, joten se ei tarvitse joukkuetta
+ * eikä siis kärsi esikauden 404:sta. Jätetty datakerrokseen mobiilin
+ * pariteetin vuoksi; jos tämä otetaan käyttöön, käytä
+ * runWithSquadFallback-kaavaa kuten TransferPlanner. */
 export function fetchCaptain(entry: number): Promise<CaptainResponse> {
 	return getTool(`/api/fantasy/captain?entry=${entry}`, 'captain');
 }
@@ -583,6 +601,18 @@ export interface PlanChainsResponse {
 
 export function fetchPlanChains(entry: number, horizon: number): Promise<PlanChainsResponse> {
 	return getTool(`/api/fantasy/plan-chains?entry=${entry}&horizon=${horizon}`, 'plan_chains');
+}
+
+/** PI-16b (28.7): siirtoketjut tallennetulla draftilla, kun FPL ei ole vielä
+ * julkaissut kokoonpanoja. */
+export function fetchPlanChainsDraft(
+	playerIds: number[],
+	horizon: number
+): Promise<PlanChainsResponse> {
+	return getTool(
+		`/api/fantasy/plan-chains?players=${playerIds.join(',')}&horizon=${horizon}`,
+		'plan_chains'
+	);
 }
 
 /* ---------- Edge-sprint: mini-league + H2H ---------- */
