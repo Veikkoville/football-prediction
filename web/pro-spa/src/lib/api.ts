@@ -245,6 +245,149 @@ export async function fetchXp(): Promise<XpResponse> {
 	return xpP;
 }
 
+// ---------------------------------------------------------------------------
+// Ottelu-ennuste (28.7). Mitattu ennen tätä: /api/predict, /api/teams ja
+// /api/leagues olivat mobiilissa mutta EIVÄT lainkaan webissä, vaikka
+// goaliq.app:n 181 staattista ennustesivua ovat suurin indeksoitu pintamme
+// eikä niistä ollut mihinkään konvertoida. Backend oli valmis ja julkinen.
+// ---------------------------------------------------------------------------
+
+export interface LeaguesResponse {
+	top5_xg_leagues: string[];
+	other_leagues: string[];
+	uefa_tournaments: string[];
+	[key: string]: unknown;
+}
+
+export interface TeamsResponse {
+	leagues: string[];
+	teams: string[];
+	n_matches?: number;
+}
+
+export interface PredictScore {
+	score: string;
+	probability: number;
+}
+
+export interface PredictResponse {
+	home_team: string;
+	away_team: string;
+	expected_goals_home: number;
+	expected_goals_away: number;
+	p_home_win: number;
+	p_draw: number;
+	p_away_win: number;
+	fair_odds_home?: number;
+	fair_odds_draw?: number;
+	fair_odds_away?: number;
+	p_over_2_5?: number;
+	p_under_2_5?: number;
+	p_btts_yes?: number;
+	p_btts_no?: number;
+	top_scores: PredictScore[];
+	[key: string]: unknown;
+}
+
+let leaguesP: Promise<LeaguesResponse> | null = null;
+export function fetchLeagues(): Promise<LeaguesResponse> {
+	leaguesP ??= getJson<LeaguesResponse>('/api/leagues');
+	return leaguesP;
+}
+
+/** Joukkuelista per liiga. Cachetetaan liigakohtaisesti: valitsimen vaihto on
+ *  jatkuva ele eikä sen kuulu maksaa uutta hakua joka kerta. */
+const teamsCache = new Map<string, Promise<TeamsResponse>>();
+export function fetchTeams(league: string): Promise<TeamsResponse> {
+	const key = league;
+	if (!teamsCache.has(key)) {
+		teamsCache.set(
+			key,
+			getJson<TeamsResponse>(`/api/teams?leagues=${encodeURIComponent(league)}`)
+		);
+	}
+	return teamsCache.get(key)!;
+}
+
+/** Ottelu-ennuste. `top_n` seuraa premium-tilaa samalla tavalla kuin mobiilissa
+ *  (free 5, premium 10) — pariteetti on tässä sääntö, ei mieltymys. */
+export async function predictMatch(
+	league: string,
+	home: string,
+	away: string,
+	topN: number
+): Promise<PredictResponse> {
+	const headers = await authHeaders();
+	const r = await fetch(`${API_BASE}/api/predict`, {
+		method: 'POST',
+		headers: { ...headers, 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			home_team: home,
+			away_team: away,
+			leagues: [league],
+			top_n: topN
+		})
+	});
+	if (!r.ok) {
+		const detail = (await r.json().catch(() => null))?.detail;
+		throw new Error(
+			typeof detail === 'string' && detail
+				? detail
+				: `Prediction failed (${r.status}). Please try again shortly.`
+		);
+	}
+	return r.json() as Promise<PredictResponse>;
+}
+
+export interface StandingsRow {
+	position: number;
+	team_name: string;
+	team_short_name?: string | null;
+	team_crest?: string | null;
+	played_games: number;
+	won: number;
+	draw: number;
+	lost: number;
+	goals_for: number;
+	goals_against: number;
+	goal_difference: number;
+	points: number;
+}
+
+export interface StandingsResponse {
+	league: string;
+	season: string;
+	rows: StandingsRow[];
+}
+
+export interface FixtureRow {
+	date: string;
+	datetime: string;
+	home_team: string;
+	away_team: string;
+	home_team_short_name?: string | null;
+	away_team_short_name?: string | null;
+	matchday?: number | null;
+}
+
+export interface FixturesResponse {
+	league: string;
+	days: number;
+	fixtures: FixtureRow[];
+}
+
+export function fetchStandings(league: string, season: string): Promise<StandingsResponse> {
+	return getJson<StandingsResponse>(
+		`/api/standings?league=${encodeURIComponent(league)}&season=${encodeURIComponent(season)}`
+	);
+}
+
+export function fetchFixtures(league: string, days: number): Promise<FixturesResponse> {
+	return getJson<FixturesResponse>(
+		`/api/fixtures?league=${encodeURIComponent(league)}&days=${days}`
+	);
+}
+
 export function fetchAccuracy(): Promise<AccuracyResponse> {
 	accuracyP ??= getJson<AccuracyResponse>('/api/accuracy').catch(() => ({}));
 	return accuracyP;

@@ -18,8 +18,19 @@
 	import PlanChains from './PlanChains.svelte';
 	import PlayerCard from './PlayerCard.svelte';
 	import EdgeMode from './EdgeMode.svelte';
+	import Predict from './Predict.svelte';
+	import Fixtures from './Fixtures.svelte';
+	import Standings from './Standings.svelte';
 
 	let { xp }: { xp: XpResponse } = $props();
+
+	// 28.7: Fixtures-rivin "Predict" vie ennustenäkymään esitäytettynä (sama
+	// kaava kuin free-puolella). Ilman tätä otteluohjelma olisi kalenteri.
+	let predictPrefill = $state<{ league: string; home: string; away: string } | null>(null);
+	function goPredict(lg: string, h: string, a: string) {
+		predictPrefill = { league: lg, home: h, away: a };
+		segment = 'predict';
+	}
 
 	// Edge-sprint: Chips (chip-EV), Chains (plan-chains) ja Edge (protect/climb)
 	// ovat uusia premium-segmenttejä — renderöityvät VAIN tästä gatatusta
@@ -34,7 +45,13 @@
 		{ id: 'value', label: 'Value' },
 		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'differentials', label: 'Differentials' },
-		{ id: 'compare', label: 'Compare' }
+		{ id: 'compare', label: 'Compare' },
+		// 28.7 pariteetti: samat kolme kuin free-puolella, mutta premium-rajaus
+		// auki (xG, top 10 tulosta, over/under, BTTS, fair value, koko
+		// otteluohjelma). Renderoidaan VAIN tasta gatatusta haarasta.
+		{ id: 'predict', label: 'Predict a match' },
+		{ id: 'fixtures', label: 'Fixtures' },
+		{ id: 'standings', label: 'Table' }
 	];
 	let segment = $state('players');
 </script>
@@ -89,8 +106,24 @@
 	<div id="panel-differentials" role="tabpanel" aria-labelledby="seg-differentials">
 		<section class="tool-card"><Differentials /></section>
 	</div>
-{:else}
+{:else if segment === 'compare'}
 	<div id="panel-compare" role="tabpanel" aria-labelledby="seg-compare">
 		<section class="tool-card"><ComparePlayers {xp} /></section>
+	</div>
+{:else if segment === 'predict'}
+	<div id="panel-predict" role="tabpanel" aria-labelledby="seg-predict">
+		<section class="tool-card">
+			<Predict premium={true} prefill={predictPrefill} />
+		</section>
+	</div>
+{:else if segment === 'fixtures'}
+	<div id="panel-fixtures" role="tabpanel" aria-labelledby="seg-fixtures">
+		<section class="tool-card">
+			<Fixtures premium={true} onPredict={(l, h, a) => goPredict(l, h, a)} />
+		</section>
+	</div>
+{:else}
+	<div id="panel-standings" role="tabpanel" aria-labelledby="seg-standings">
+		<section class="tool-card"><Standings /></section>
 	</div>
 {/if}

@@ -10,6 +10,9 @@
 	import Leaders from './Leaders.svelte';
 	import Value from './Value.svelte';
 	import MiniLeague from './MiniLeague.svelte';
+	import Predict from './Predict.svelte';
+	import Fixtures from './Fixtures.svelte';
+	import Standings from './Standings.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
 
 	// #46: lukitun siirtosuositus-teaserin klikki nostaa tämän → +page vaihtaa
@@ -27,8 +30,23 @@
 		{ id: 'value', label: 'Value' },
 		{ id: 'leaders', label: 'Leaders' },
 		{ id: 'pricewatch', label: 'Price watch' },
-		{ id: 'league', label: 'Mini-league' }
+		{ id: 'league', label: 'Mini-league' },
+		// 28.7 TÄYSI PARITEETTI MOBIILIN KANSSA (Villen päätös). Nämä kolme
+		// olivat mobiilissa mutta EIVÄT lainkaan webissä, vaikka goaliq.app:n
+		// 181 staattista ennustesivua ovat suurin indeksoitu pintamme eikä
+		// niistä ollut mihinkään konvertoida.
+		{ id: 'predict', label: 'Predict a match' },
+		{ id: 'fixtures', label: 'Fixtures' },
+		{ id: 'standings', label: 'Table' }
 	];
+
+	// Fixtures-rivin "Predict" vie ennustenäkymään esitäytettynä. Ilman tätä
+	// otteluohjelma olisi kalenteri, ei työkalu.
+	let predictPrefill = $state<{ league: string; home: string; away: string } | null>(null);
+	function goPredict(lg: string, h: string, a: string) {
+		predictPrefill = { league: lg, home: h, away: a };
+		segment = 'predict';
+	}
 	let segment = $state('cleansheets');
 
 	let data = $state<FantasyResponse | null>(null);
@@ -382,6 +400,19 @@
 {:else if segment === 'pricewatch'}
 	<div class="tool-card" id="panel-pricewatch" role="tabpanel" aria-labelledby="seg-pricewatch">
 		<PriceWatch />
+	</div>
+{:else if segment === 'predict'}
+	<!-- 28.7: ottelu-ennuste. free = 1X2 + top 5 (sama raja kuin mobiilissa). -->
+	<div class="tool-card" id="panel-predict" role="tabpanel" aria-labelledby="seg-predict">
+		<Predict premium={false} {onUpgrade} prefill={predictPrefill} />
+	</div>
+{:else if segment === 'fixtures'}
+	<div class="tool-card" id="panel-fixtures" role="tabpanel" aria-labelledby="seg-fixtures">
+		<Fixtures premium={false} {onUpgrade} onPredict={(l, h, a) => goPredict(l, h, a)} />
+	</div>
+{:else if segment === 'standings'}
+	<div class="tool-card" id="panel-standings" role="tabpanel" aria-labelledby="seg-standings">
+		<Standings />
 	</div>
 {:else}
 	<!-- Edge-sprint kohta 9: mini-league standings + H2H (free MVP).
