@@ -97,6 +97,10 @@
 
 	let entryValid = $derived(/^\d{1,10}$/.test(fplEntry.entry.trim()));
 
+	/** 28.7 (PI-16): FPL ei ole vielä julkaissut kokoonpanoja. Erillään
+	 *  `error`:sta, koska tämä ei ole virhe vaan ohjaus toimivaan polkuun. */
+	let picksNotPublished = $state(false);
+
 	async function runRate() {
 		if (!entryValid || loading) return;
 		loading = true;
@@ -104,10 +108,24 @@
 		try {
 			const id = Number(fplEntry.entry.trim());
 			data = await fetchRateTeam(id);
+			picksNotPublished = false;
 			void persistEntry(id); // #66: talteen vasta onnistuneesta hausta
 		} catch (err) {
 			data = null;
-			error = err instanceof Error ? err.message : String(err);
+			// 28.7 (PI-16): esikaudella entry-ID-polku EI VOI onnistua, koska FPL
+			// julkaisee kokoonpanot vasta GW1-deadlinen jälkeen. Se ei ole
+			// käyttäjän virhe eikä sitä pidä näyttää punaisena virheenä: se on
+			// kalenterin tila, ja siihen on toimiva vaihtoehtoinen polku samaan
+			// työhön (draft rater). Avataan se automaattisesti.
+			const code = (err as { code?: string })?.code;
+			if (code === 'picks_not_published') {
+				picksNotPublished = true;
+				error = null;
+				draftOpen = true;
+			} else {
+				picksNotPublished = false;
+				error = err instanceof Error ? err.message : String(err);
+			}
 		}
 		loading = false;
 	}
@@ -402,9 +420,23 @@
 	squads only after each deadline, so before Gameweek 1 use the draft option below.
 </p>
 
-<!-- P1: esikausi-draft ilman entry-ID:tä (backendin players=-moodi) -->
+{#if picksNotPublished}
+	<!-- 28.7 (PI-16): tämä on koko esikauden normaalitila, ei virhe. Vanha
+	     toteutus näytti punaisen 404:n ja jätti käyttäjän umpikujaan juuri
+	     vuoden korkeimman ostoaikeen ikkunassa. -->
+	<p class="notice-preseason">
+		<strong>Your squad is not public yet.</strong> FPL publishes every team only after the
+		Gameweek 1 deadline, so nobody can import a squad before then. Rate the draft you are
+		planning instead: pick your 15 below and the model rates it exactly the same way, with the
+		same best XI, captain pick and projected points.
+	</p>
+{/if}
+
+<!-- P1: esikausi-draft ilman entry-ID:tä (backendin players=-moodi).
+     28.7: teksti korjattu. "No team ID yet?" oli väärä kysymys esikaudella,
+     jolloin 1,66 M managerilla ON team ID mutta ei julkaistua kokoonpanoa. -->
 <button type="button" class="linklike draft-toggle" onclick={() => (draftOpen = !draftOpen)}>
-	No team ID yet? Draft your 15
+	{draftOpen ? 'Hide the draft rater' : 'Rate a draft instead (works before Gameweek 1)'}
 </button>
 {#if draftOpen}
 	<div class="draft-box">
@@ -848,6 +880,17 @@
 	.draft-toggle {
 		display: block;
 		margin: 0 0 var(--s-3);
+	}
+	/* 28.7 (PI-16): neutraali ohjaus, EI virhetyyliä. Punainen laatikko kertoisi
+	   käyttäjälle että hän teki jotain väärin, vaikka syy on FPL:n kalenteri. */
+	.notice-preseason {
+		max-width: 640px;
+		border: 1px solid var(--border);
+		border-left: 3px solid var(--accent, var(--border));
+		border-radius: var(--radius);
+		padding: var(--s-3) var(--s-4);
+		margin: 0 0 var(--s-3);
+		font-size: var(--step--1);
 	}
 	.draft-box {
 		max-width: 640px;

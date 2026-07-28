@@ -2765,6 +2765,16 @@ def fantasy_rate_team(
         return rate_team(entry=entry, gw=gw, players=player_ids,
                          captain=captain, bank=bank, ft=ft)
     except RateTeamError as e:
+        # 28.7: `code` mukaan vastaukseen ADDITIIVISESTI. `detail` sailyy
+        # merkkijonona, joten jo julkaistut klientit (mobiili 1.0.3, SPA)
+        # lukevat sen ennallaan; uudet osaavat haarautua koodilla ilman
+        # virheviestin merkkijonovertailua.
+        if getattr(e, "code", None):
+            raise HTTPException(
+                status_code=e.status_code,
+                detail=e.detail,
+                headers={"X-GoalIQ-Error-Code": e.code},
+            )
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 

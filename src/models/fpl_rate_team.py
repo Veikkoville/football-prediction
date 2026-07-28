@@ -72,12 +72,20 @@ CAPTAIN_ALT_MARGIN_XP = 0.5
 
 
 class RateTeamError(Exception):
-    """Virhe jolle on selkeä HTTP-status + käyttäjäluettava viesti."""
+    """Virhe jolle on selkeä HTTP-status + käyttäjäluettava viesti.
 
-    def __init__(self, status_code: int, detail: str):
+    28.7: `code` on koneluettava syy. Ilman sitä klientti joutuu arvaamaan
+    virheen luonteen tekstistä, ja juuri se on tehnyt esikauden 404:sta
+    umpikujan: sama status tarkoittaa "ID on väärin" ja "FPL ei ole vielä
+    julkaissut kokoonpanoja", joista jälkimmäinen ei ole käyttäjän virhe
+    vaan kalenterin tila, ja siihen on toimiva vaihtoehtoinen polku.
+    """
+
+    def __init__(self, status_code: int, detail: str, code: str | None = None):
         super().__init__(detail)
         self.status_code = status_code
         self.detail = detail
+        self.code = code
 
 
 # ---------------------------------------------------------------------------
@@ -155,15 +163,28 @@ def get_entry_picks(entry_id: int, gw: int) -> dict:
         return _fetch_fpl(f"/entry/{entry_id}/event/{gw}/picks/")
     except RateTeamError as e:
         if e.status_code == 404:
-            # Rehellinen selitys: FPL julkaisee picksit vasta GW-deadlinen
-            # jälkeen. ÄLÄ lupaa manuaalisyöttöä — players=-moodi on olemassa
-            # vain API-tasolla, UI:ssa ei ole syöttöä (TASKS 23.7 P1).
+            # 28.7: ohjaus vaihdettu fit checkeristä DRAFT RATERIIN, ja lisätty
+            # koneluettava code.
+            #
+            # Vanha kommentti sanoi "ÄLÄ lupaa manuaalisyöttöä, UI:ssa ei ole
+            # syöttöä" — se piti paikkansa 23.7. mutta ei enää: draft rater
+            # (Rate my draft) rakennettiin sen jälkeen ja tekee TÄSMÄLLEEN
+            # saman työn kuin rate my team. Fit checker vastaa eri kysymykseen
+            # ("rakenna joukkue näiden pelaajien ympärille"), joten se ohjasi
+            # käyttäjän sivuun siitä mitä hän tuli tekemään.
+            #
+            # Miksi tämä on kiireellinen: FPL 26/27 avautui 23.7. ja GW1 on
+            # 21.8. Koko sitä väliä entry-ID-polku palauttaa 404:n, koska FPL
+            # julkaisee kokoonpanot vasta deadlinen jälkeen. Se on vuoden
+            # korkeimman ostoaikeen ikkuna, ja juuri silloin 1,66 M managerilla
+            # ON team ID mutta EI vielä julkaistua kokoonpanoa.
             raise RateTeamError(
-                404, f"No picks are available for entry {entry_id} yet. FPL "
-                     f"publishes each squad after the GW{gw} deadline passes, "
-                     "so team rating opens up once the gameweek locks. Until "
-                     "then, try the fit checker: lock your must-have players "
-                     "and the model builds the best legal squad around them.")
+                404, f"Your squad is not public yet. FPL publishes every team "
+                     f"only after the GW{gw} deadline passes, so this opens up "
+                     "when the gameweek locks. Until then, rate the draft you "
+                     "are planning: pick your 15 and the model rates that "
+                     "squad exactly the same way.",
+                code="picks_not_published")
         raise
 
 

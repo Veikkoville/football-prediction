@@ -305,11 +305,18 @@ async function getTool<T>(path: string, tool: FantasyTool): Promise<T> {
 	}
 	if (!r.ok) {
 		const detail = (await r.json().catch(() => null))?.detail;
-		throw new Error(
+		const err = new Error(
 			typeof detail === 'string' && detail
 				? detail
 				: `Request failed (${r.status}). Please try again shortly.`
-		);
+		) as Error & { code?: string; status?: number };
+		// 28.7: koneluettava syy talteen. Ilman tätä kutsuja joutuisi
+		// vertaamaan virheviestin merkkijonoa, joka rikkoutuu heti kun copya
+		// muutetaan. Backend lähettää koodin headerissa, jotta `detail` pysyy
+		// merkkijonona eivätkä jo julkaistut klientit riko.
+		err.code = r.headers.get('X-GoalIQ-Error-Code') ?? undefined;
+		err.status = r.status;
+		throw err;
 	}
 	const data = (await r.json()) as T;
 	// Onnistunut haku = työkalu käytetty (ei PII: entry-ID ei mene eventtiin)
