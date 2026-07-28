@@ -267,17 +267,19 @@
 			</div>
 		{/if}
 
-		<h4>
-			Most likely {data.top_scores.length === 1 ? 'scoreline' : 'scorelines'}
-		</h4>
-		<ul class="scores">
-			{#each data.top_scores as s (s.score)}
-				<li>
-					<span class="sc">{s.score}</span>
-					<span class="sp">{(s.probability * 100).toFixed(1)}%</span>
-				</li>
-			{/each}
-		</ul>
+		{#if premium}
+			<h4>
+				Most likely {data.top_scores.length === 1 ? 'scoreline' : 'scorelines'}
+			</h4>
+			<ul class="scores">
+				{#each data.top_scores as s (s.score)}
+					<li>
+						<span class="sc">{s.score}</span>
+						<span class="sp">{(s.probability * 100).toFixed(1)}%</span>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 
 		{#if premium}
 			<div class="grid2">
@@ -314,8 +316,9 @@
 			<!-- Paywall kertoo mitä puuttuu, ei piilota sitä että jotain puuttuu.
 			     Sama rajaus kuin mobiilissa. -->
 			<div class="locked">
-				<strong>Premium adds:</strong> expected goals for both teams, the top 10 scorelines,
-				over/under 2.5, both teams to score, and the model's fair value.
+				<strong>Free shows the win probabilities.</strong> Premium adds expected goals for
+				both teams, the most likely scorelines, over/under 2.5, both teams to score, and
+				the model's fair value.
 				<button type="button" class="linklike" onclick={showPaywall}>See Premium</button>
 			</div>
 		{/if}
