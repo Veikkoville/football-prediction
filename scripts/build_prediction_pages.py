@@ -84,12 +84,12 @@ LEAGUES: dict[str, dict] = {
 # 24.7 redesign: sama brändi-ilme kuin fpl.html — Space Grotesk display-fontti,
 # magenta-raita + tumma ink-header (gradient), cream-body, paper-kortit.
 CSS = """
-:root{--magenta:#FF2E7E;--magenta-deep:#C4005F;--teal:#00C2AD;--teal-ink:#007A6C;
---ink:#201F1D;--ink2:#140F1E;--cream:#F3F2F2;--paper:#EAE9E9;--card:#FFFFFF;
---muted:#5C574F;--hero-muted:#6E685E;--line:#DAD8D4;--radius:14px;}
+:root{--magenta:#FF2E7E;--magenta-deep:#2ED6C2;--teal:#2ED6C2;--teal-ink:#2ED6C2;
+--ink:#F3F2F2;--ink2:#141311;--cream:#0B0A09;--paper:#1F1D1A;--card:#141311;
+--muted:#A8A29A;--hero-muted:#A8A29A;--line:#434241;--radius:0;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--cream);color:var(--ink);font-family:"Lora",Georgia,"Times New Roman",serif;line-height:1.6;}
-h1,h2,h3,.brand{font-family:"Cormorant Garamond",Georgia,serif;}
+body{background:var(--cream);color:var(--ink);font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;line-height:1.6;}
+h1,h2,h3,.brand{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
 /* Peruslinkki: ilman tata .rec-laatikon "public track record" -linkki jai
    selaimen oletussiniseksi #0000EE:ksi. Elementtivalitsin haviaa kaikille
    luokkasaannoille, joten se osuu vain tyylittelemattomiin linkkeihin. */
@@ -102,8 +102,8 @@ font-size:14px;}
 nav a{text-decoration:none;color:var(--ink);font-weight:600;}
 .brand{font-size:21px;font-weight:700;letter-spacing:.5px;}
 .brand span{color:var(--magenta);}
-.nav-cta{background:transparent;color:var(--gold-deep,#8C6428);border:1px solid var(--gold,#B68235);padding:8px 16px;border-radius:999px;}
-.nav-cta:hover{background:rgba(182,130,53,0.08);}
+.nav-cta{background:transparent;color:var(--gold-deep,#F5C542);border:1px solid var(--gold,#F5C542);padding:8px 16px;border-radius:0;}
+.nav-cta:hover{background:rgba(245,197,66,0.14);}
 .hero{padding:8px 0 36px;}
 .hero h1{color:var(--ink);}
 .hero .lede{color:var(--hero-muted);margin-bottom:0;}
@@ -116,7 +116,7 @@ padding:18px 20px;margin-bottom:14px;}
 /* 26.7 CLASSIC: 12px:n täyttöpalkki -> 4px:n viiva. Ilme sallii värin
    viivana, ei täyttönä; prosentit ovat legendassa lukuina. */
 .probbar{display:flex;height:4px;overflow:hidden;margin:10px 0 6px;}
-.probbar .h{background:var(--magenta);} .probbar .d{background:rgba(32,31,29,0.18);}
+.probbar .h{background:var(--magenta);} .probbar .d{background:rgba(243,242,242,0.24);}
 .probbar .a{background:var(--teal);}
 .legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);}
 .big{font-size:15px;}
@@ -124,15 +124,15 @@ padding:18px 20px;margin-bottom:14px;}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
 padding:12px 16px;flex:1 1 140px;}
 .stat b{display:block;font-size:26px;color:var(--magenta-deep);
-font-family:"Cormorant Garamond",Georgia,serif;
+font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 font-variant-numeric:tabular-nums;}
 .stat span{color:var(--muted);font-size:12px;}
-.rec{border-left:4px solid var(--teal);background:var(--paper);border-radius:8px;
+.rec{border-left:4px solid var(--teal);background:var(--paper);border-radius:0;
 padding:10px 14px;font-size:13px;color:var(--muted);margin:16px 0;}
 .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0;}
-.btn{background:transparent;color:var(--gold-deep,#8C6428);border:1px solid var(--gold,#B68235);font-weight:700;padding:12px 22px;
-border-radius:999px;text-decoration:none;font-size:14px;}
-.btn:hover{background:rgba(182,130,53,0.08);}
+.btn{background:transparent;color:var(--gold-deep,#F5C542);border:1px solid var(--gold,#F5C542);font-weight:700;padding:12px 22px;
+border-radius:0;text-decoration:none;font-size:14px;}
+.btn:hover{background:rgba(245,197,66,0.14);}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
 .mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;
 padding:12px 0;border-bottom:1px solid var(--line);}
@@ -151,15 +151,15 @@ footer a{color:var(--muted);}
 # theme-color + Google Fonts (preconnect minimoi latauskustannuksen; sama
 # family-merkkijono kuin fpl.html:ssä → yksi fonttivälimuisti koko sivustolle)
 HEAD_BRAND = (
-    '<meta name="theme-color" content="#F3F2F2">\n'
+    '<meta name="theme-color" content="#0B0A09">\n'
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
     # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
     # odota kolmannen osapuolen CSS:ää. noscript = varmistus.
     '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family='
-    'Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
-    '<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:'
-    'wght@600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet"></noscript>\n'
+    'IBM+Plex+Mono:wght@400;500;600;700&display=swap" onload="this.rel=\'stylesheet\'">\n'
+    '<noscript><link href="https://fonts.googleapis.com/css2?family='
+    'IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>\n'
 )
 
 # Header avautuu tässä; _page sulkee </header>-tagin hero-lohkon jälkeen.
