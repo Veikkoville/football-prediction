@@ -393,7 +393,8 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
                 "ranker, transfer suggestions with one-tap apply to your "
                 "planned squad, player value (xP per million), full xG leaders "
                 "and DefCon (defensive contribution) leaderboards, goalkeeper "
-                "rotation pairs, differentials, player compare and predicted "
+                "rotation pairs, differentials, player compare for up to four "
+        "players and predicted "
                 "starting minutes. Available on the web, iOS and Android."
             ),
         ),
@@ -873,7 +874,8 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "and price watch free, plus an interactive team manager with a "
             "gameweek planner, player expected points (xP), the captain "
             "ranker, player value, xG leaders, a DefCon tracker, "
-            "differentials and transfer suggestions with apply on GoalIQ "
+            "differentials, player compare for up to four players and transfer "
+            "suggestions with apply on GoalIQ "
             "Premium - powered by a Dixon-Coles + machine-learning match model "
             "with a public, pre-match-logged prediction track record. Built by "
             "an independent developer in Finland. Analytics, not betting."
@@ -895,7 +897,8 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "team manager with a GW1 to GW6 gameweek planner, player expected "
             "points (xP), the captain ranker, player value (xP per million), "
             "xG leaders, a DefCon (defensive contribution) tracker, "
-            "differentials and transfer suggestions with apply. Also predicts "
+            "differentials and transfer suggestions with apply. On the web it "
+            "also shows upcoming fixtures and league tables. Also predicts "
             "any match - win probability, expected goals (xG) and the most "
             "likely score - using a Dixon-Coles model with an expected-goals "
             "ensemble. Analytics, not betting."
@@ -1241,7 +1244,8 @@ captaincy and a GW1 to GW6 gameweek planner showing each player's opponent
 per week), player expected points (xP), a captain ranker, transfer suggestions
 you can apply straight to your planned squad, a player value ranking (xP per
 million), full xG leaders and DefCon leaderboards, goalkeeper rotation pairs,
-differential picks, player compare and predicted starting minutes, from the
+differential picks, player compare for up to four players and predicted
+  starting minutes, from the
 same match model as this page. Rate my team, a captain pick, price watch and
 the top three of every leaderboard are free.</p>
 <div class="cta-row">

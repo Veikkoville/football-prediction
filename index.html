@@ -37,7 +37,7 @@
  "name": "GoalIQ",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "url": "https://goaliq.app/",
- "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, a player lookup with availability news, rate my team with a captain pick, a mini-league view and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, player value (xP per million), a DefCon tracker, differentials and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
+ "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, a player lookup with availability news, rate my team with a captain pick, a mini-league view and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, player value (xP per million), a DefCon tracker, differentials, player compare for up to four players and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
   "https://apps.apple.com/app/id6780047163",
@@ -106,7 +106,7 @@
    "name": "What FPL tools does GoalIQ have?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, and xG/xA/xGI leaders for every player with data. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, the full DefCon leaderboard, GK rotation pairs, differentials, player compare and predicted starting minutes. Available on the web, iOS and Android."
+    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, and xG/xA/xGI leaders for every player with data. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, the full DefCon leaderboard, GK rotation pairs, differentials, player compare for up to four players, and predicted starting minutes. The web app also predicts any match: win probability, expected goals, the most likely scorelines, upcoming fixtures and league tables. Available on the web, iOS and Android."
    }
   },
   {
@@ -506,6 +506,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           <li>Fit checker: lock 1&ndash;3 players, get the best legal 15 around them, save it as a draft</li>
           <li>Pre-season draft rater, no team ID needed, drafts auto-restore</li>
           <li>Price watch</li>
+        <!-- COPY-SYNC 28.7: ottelu-ennuste, otteluohjelma ja sarjataulukot
+             tulivat webiin tanaan. Ne olivat siihen asti vain sovelluksessa. -->
+        <li>Predict any match on the web: win probability, most likely scorelines,
+          fixtures and league tables</li>
         </ul>
         <p class="panel-cta"><a class="btn-primary btn-teal" href="fpl.html" data-cta="toolkit-free">Open the free tools</a></p>
       </div>
@@ -520,6 +524,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           <li>Transfer plans: the best 1&ndash;2 move chains, hits priced in, plus one-tap apply</li>
           <li>Edge mode: rank-aware picks to protect or climb in your mini-league</li>
           <li>Player value, DefCon tracker, differentials</li>
+        <li>Compare up to four players side by side on projected points</li>
+        <li>Match predictions with expected goals, the full scoreline table
+          and 30 days of fixtures</li>
         </ul>
         <p class="early-offer">First 200: <strong>30% off the season pass</strong> with code
           <code>EARLY30</code> at checkout. That is &euro;17.50 for the year.</p>
@@ -647,7 +654,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <dt>Is GoalIQ good for FPL?</dt>
       <dd>Yes. GoalIQ is built FPL-first: clean sheet probability, fixture difficulty, rate my team with a captain pick, price watch and the full xG/xA/xGI leaderboard are free, and GoalIQ Premium adds an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, player value (xP per million), a DefCon tracker, differentials and transfer suggestions with apply. Every number comes from a match model with a published, pre-match-logged track record.</dd>
       <dt>What FPL tools does GoalIQ have?</dt>
-      <dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, and xG/xA/xGI leaders for every player with data. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, the full DefCon leaderboard, GK rotation pairs, differentials, player compare and predicted starting minutes. Available on the web, iOS and Android.</dd>
+      <dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, and xG/xA/xGI leaders for every player with data. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, the full DefCon leaderboard, GK rotation pairs, differentials, player compare for up to four players, and predicted starting minutes. The web app also predicts any match: win probability, expected goals, the most likely scorelines, upcoming fixtures and league tables. Available on the web, iOS and Android.</dd>
       <dt>Is GoalIQ a betting app?</dt>
       <dd>No. GoalIQ is an analytics and FPL tool, not a gambling service. It has no odds, no bookmaker links and gives no betting advice. Predictions are statistical estimates for fun and planning.</dd>
       <dt>How accurate is GoalIQ?</dt>
