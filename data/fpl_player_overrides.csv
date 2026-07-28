@@ -1,0 +1,46 @@
+# FPL — PELAAJATASON minuuttiohitukset. Builderi lukee tämän ennen xP-laskentaa.
+#
+# MIKSI TÄMÄ ON OLEMASSA
+# Minuuttimalli käyttää priorina viime kauden minuutteja eikä osaa erottaa
+# kahta täysin eri asiaa:
+#     "ei pelannut koska ei ollut tarpeeksi hyvä"      -> matala p_start on OIKEIN
+#     "ei pelannut koska oli myynnissä / loukkaantunut" -> matala p_start on VÄÄRIN
+# Malli näkee vain minuuttiluvun, ei syytä.
+#
+# TÄMÄ ON VÄLIAIKAINEN. Oikea korjaus on hintapriori: FPL:n oma hinnoittelu on
+# riippumaton arvio odotetusta roolista, ja se korjaisi koko tämän luokan
+# automaattisesti ilman käsityötä. Kun se on livenä ja backtestattu, nämä rivit
+# POISTETAAN. Älä kasvata tätä tiedostoa kiertotienä mallin parantamiselle.
+#
+# REHELLISYYSSÄÄNTÖ (ei neuvoteltavissa)
+# Jokainen ohitettu pelaaja saa payloadiin minutes_source="override" ja
+# minutes_override_reason, ja UI näyttää sen. Käsin korotettu projektio joka ei
+# näy käyttäjälle on täsmälleen se asia joka syö "todennettava malli" -lupauksen.
+#
+# SÄÄNNÖT RIVIN LISÄÄMISELLE
+#   1. Pelaajan on oltava FPL-statukseltaan saatavilla (status "a").
+#   2. Perusteen on oltava TODENNETTAVISSA ulkopuolelta, ei mutua roolista.
+#   3. review_by on pakollinen: ohitus on väliaikainen oletus, ei totuus.
+#      Kun pelaajalle kertyy oikeaa dataa, rivi poistetaan.
+#
+# Sarakkeet:
+#   player_id   FPL element id (kanoninen tunniste; web_name voi muuttua)
+#   web_name    vain luettavuutta varten, EI käytetä täsmäytykseen
+#   p_start     aloitus-tn 0..1 (korvaa mallin arvion, minuutit johdetaan tästä)
+#   reason      näytetään käyttäjälle
+#   review_by   päivä johon mennessä rivi on tarkistettava tai poistettava
+player_id,web_name,p_start,reason,review_by
+379,Isak,0.85,"Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",2026-09-20
+#
+# HARKITTU JA HYLÄTTY — Havertz (ARS, 7.5M, p_start 0.25, xmins 15.5), 27.7:
+#   Sama juurisyy kuin Isakilla (rikkonainen 25/26), mutta EI ohiteta.
+#   Villen arvio roolista: "rotaatio hyökkäyksessä, ei varmaankaan 90 min
+#   pelaaja joka peliin."
+#
+#   Se ratkaisee asian mallin hyväksi. Rotaatiopelaajalle 25 % aloitus-tn on
+#   samassa SUURUUSLUOKASSA kuin todellisuus — matala mutta ei väärä. Isakin
+#   30 % oli väärässä suuruusluokassa ykköshyökkääjälle, ja siinä on koko ero.
+#
+#   Ohitus vaatisi keksityn luvun jolle ei ole mitattua perustetta, ja jokainen
+#   ohitus syö todennettavuuslupausta. Kapea ero ei ole sen arvoinen.
+#   Hintapriori korjaa tämän aikanaan oikeaa kautta.

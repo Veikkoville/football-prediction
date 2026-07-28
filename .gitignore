@@ -52,6 +52,12 @@ raw_data/
 !/data/fpl_prev_baselines_2526.json
 # FPL Phase 1b: manuaaliset konteksti-yliajot (versioitu input, builderit lukevat).
 !/data/fpl_manual_overrides.csv
+# 28.7: PELAAJATASON minuuttiohitukset. Tama poikkeus PUUTTUI kun tiedosto
+# luotiin 27.7 -> se jai vain kehityskoneelle, CI-runnerilla sita ei ollut, ja
+# load_player_overrides() palautti hiljaa tyhjan dictin. Seuraus: 27.7 korjattu
+# Isak (6.34 -> 18.93) oli tuotannossa yha 6.34. Sama refresh-konventio kuin
+# muilla versioiduilla inputeilla: builderi lukee taman gitista.
+!/data/fpl_player_overrides.csv
 # #142 OSA A: PL-seura->MM-2026-minuuttikartta (versioitu artefakti, OSA B:n
 # mitoitusevidenssi; uusinta-ajo ~15.8 ennen GW1:ta).
 !/data/wc2026_club_load.csv

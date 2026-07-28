@@ -307,6 +307,19 @@ def main(argv: list[str] | None = None) -> int:
     # loukkaantunut". Isak: 694 min / 8 avausta 25/26 -> p_start 0.30 -> xP
     # 1.06/GW 9.0M ykköshyökkääjälle. Väliaikainen; hintapriori korvaa.
     player_overrides = load_player_overrides()
+    # 28.7 SIGNAALI. Ohituslataus on tarkoituksella fail-safe (puuttuva tiedosto
+    # -> tyhjä dict, ei kaadu). Se on oikein, MUTTA ilman signaalia se on myös
+    # täysin hiljainen: 27.7. korjattu Isak (6.34 -> 18.93) palautui tuotannossa
+    # heti takaisin 6.34:ään, koska CSV oli gitignoressa eikä sitä ollut koskaan
+    # committoitu -> CI-runnerilla tiedostoa ei ollut olemassa. Mikään ei
+    # huutanut: gate meni PASS, ajo onnistui, luku oli vain väärä.
+    #
+    # Nyt lukumäärä tulostetaan AINA ja se viedään meta.overrides_applied-kenttään,
+    # jolloin sama vika näkyy suoraan tuotannon payloadista eikä vaadi että joku
+    # sattuu katsomaan yhtä pelaajaa.
+    if not player_overrides:
+        print("[Overrides] 0 riviä ladattu "
+              "(data/fpl_player_overrides.csv puuttuu tai on tyhjä)")
     override_applied: dict[int, dict] = {}
     for pid, ov in player_overrides.items():
         if pid not in mm_by_player:
@@ -681,6 +694,11 @@ def main(argv: list[str] | None = None) -> int:
             "phase": 1,
             "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
             "season": SEASON_LABEL,
+            # 28.7: ohitusten määrä payloadiin, jotta niiden katoaminen näkyy
+            # TUOTANNOSTA eikä vaadi että joku sattuu katsomaan yhtä pelaajaa.
+            # Vrt. Isak-regressio: CSV oli gitignoressa -> CI ajoi 0 ohituksella
+            # -> luku putosi 18.93 -> 6.34 eikä yksikään portti huutanut.
+            "overrides_applied": len(override_applied),
             "fixture_source": src["source_label"],
             "player_source": (
                 "FPL official API bootstrap (26/27) + jäädytetty 25/26-"

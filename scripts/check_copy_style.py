@@ -36,6 +36,11 @@ EM = "—"
 
 HTML_GLOBS = ["*.html", "fpl/*.html", "predictions/*.html", "predictions/**/*.html"]
 SPA_DIR = ROOT / "web" / "pro-spa" / "src"
+# 28.7: versioidut CSV-inputit joiden tekstikentat paatyvat API-payloadiin ja
+# sielta UI:hin (esim. fpl_player_overrides.csv:n `reason` nakyy pelaajakortilla).
+# Nama eivat ole koodia eivatka HTML:aa, joten ne jaivat portin ulkopuolelle ja
+# yksi em dash paasi lapi kayttajalle asti.
+COPY_CSV = ["data/fpl_player_overrides.csv", "data/fpl_manual_overrides.csv"]
 
 PLACEHOLDER = re.compile(r"(['\"`>])" + EM + r"(['\"`<])")
 
@@ -57,10 +62,15 @@ def scan(path: Path) -> list[tuple[int, str]]:
     raw = path.read_text(encoding="utf-8", errors="replace")
     if EM not in raw and "&mdash;" not in raw:
         return []
-    masked = _mask_non_copy(raw)
+    # CSV-inputeissa #-rivit ovat dokumentaatiota (suomeksi, taynna em dasheja),
+    # eivat copya. Vain datarivien tekstikentat paatyvat kayttajalle.
+    is_csv = path.suffix.lower() == ".csv"
+    masked = raw if is_csv else _mask_non_copy(raw)
     raw_lines = raw.split("\n")
     hits: list[tuple[int, str]] = []
     for i, line in enumerate(masked.split("\n")):
+        if is_csv and line.lstrip().startswith("#"):
+            continue
         probe = PLACEHOLDER.sub("  ", line)
         if EM in probe or "&mdash;" in probe:
             hits.append((i + 1, raw_lines[i].strip()[:200]))
@@ -73,6 +83,7 @@ def main() -> int:
         targets += sorted(ROOT.glob(g))
     if SPA_DIR.exists():
         targets += sorted(SPA_DIR.rglob("*.svelte"))
+    targets += [ROOT / c for c in COPY_CSV if (ROOT / c).exists()]
     targets = sorted(set(targets))
 
     all_hits = [(p, n, t) for p in targets for n, t in scan(p)]
