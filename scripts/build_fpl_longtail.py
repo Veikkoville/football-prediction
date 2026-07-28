@@ -557,6 +557,10 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
         if t is None or p.get("price") in (None, ""):
             continue
         pool.append({
+            # 28.7: id ja xmins pakollisia - penkkivalinta tarvitsee molemmat
+            # (duplikaattisuoja + pelattavuusvaatimus).
+            "id": p.get("id"),
+            "xmins": p.get("xmins"),
             "element_type": t,
             "price": int(round(float(p["price"]) * 10)),   # tenths
             "club": p.get("team_short") or p.get("team"),
@@ -587,15 +591,33 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
         )
         return f'<div class="xirow">{cells}</div>'
 
+    # 28.7 (Villen havainto): penkki nakyviin. Vertailukohta on KOKO 15, ja
+    # penkin pelattavuus on osa sen uskottavuutta - "halvimmat mahdolliset"
+    # -penkki ei ole joukkue jonka kukaan voisi oikeasti pelata kauden lapi.
+    from src.models.fpl_rate_team import bench_of_last_optimum
+    bench = bench_of_last_optimum()
+    bench_cost = sum(p["price"] for p in bench) / 10.0
+    bench_block = ""
+    if bench:
+        bench_block = (
+            '<h2 class="bench-h">Bench</h2>'
+            f'<p class="muted">The other four in the 15, {bench_cost:.1f}m. '
+            "Outfield bench players must project at least 45 expected minutes "
+            "a game, so the squad can cover a blank without a transfer. The "
+            "backup keeper is the cheapest available: he only plays if the "
+            "first choice does not.</p>"
+            + line(sorted(bench, key=lambda p: (p["element_type"],
+                                                -p["xp_horizon_total"]))))
+
     pitch = ('<div class="pitch">'
              + "".join(line(rows[t]) for t in (1, 2, 3, 4))
-             + "</div>")
+             + "</div>" + bench_block)
 
     url = f"{BASE}/fpl/model-xi"
     title = "The GoalIQ Model XI: best 100.0m FPL squad on xP | GoalIQ"
-    desc = (f"The best XI the model can build inside the 100.0m budget: "
-            f"{shape}, {total_xp:.1f} projected points over the horizon. "
-            f"Free, no sign-in, rebuilt daily.")
+    desc = (f"The highest-scoring XI inside the 100.0m budget: {shape}, "
+            f"{total_xp:.1f} projected points over the horizon, with a bench "
+            f"that actually plays. Free, no sign-in, rebuilt daily.")
     # 28.7: vaite optimaalisuudesta VAIN kun ratkaisija on sen todistanut.
     # Ennen tata paivaa sivu vaitti "strongest" ahneesta heuristiikasta joka
     # jai tuotantodatalla 15.2 xP optimista.
@@ -605,17 +627,25 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
              if optimal_xi_proven() else
              "The strongest XI the GoalIQ model found inside the standard "
              "100.0m budget")
+    # 28.7 (Villen havainto): budjetti kattaa 15 pelaajaa, ei 11. Aiempi
+    # vertailukohta varasi penkkiin halvimmat mahdolliset, mika on
+    # epärealistista: siirtoja on rajallisesti, joten penkkiläinen on joskus
+    # pakko pelauttaa. Sivun tekstin on kerrottava se, muuten luku nayttaa
+    # paremmalta kuin mika on pelattavissa.
     hero = ("<h1>The Model XI</h1>"
             f'<p class="lede">{claim}, ranked on projected points. '
+            "The budget has to cover a full 15, so the four on the bench are "
+            "the cheapest players who still project real minutes: the squad "
+            "can cover a blank without spending a transfer. "
             "This is the same squad logic the rate-my-team benchmark uses, so "
             "the page and the product cannot drift apart.</p>")
     body = (
         f'<div class="stat-row">'
         f'<div class="stat"><b>{shape}</b><span>Shape</span></div>'
         f'<div class="stat"><b>{total_xp:.1f}</b><span>Projected points, XI</span></div>'
-        f'<div class="stat"><b>{cost:.1f}m</b><span>XI cost of {BUDGET_TENTHS / 10:.1f}m</span></div>'
+        f'<div class="stat"><b>{cost:.1f}m</b><span>XI cost, {bench_cost:.1f}m on the bench</span></div>'
         f"</div>"
-        f"{_kit_defs(p['team_short'] for p in xi)}"
+        f"{_kit_defs(p['team_short'] for p in list(xi) + list(bench))}"
         f"{pitch}"
         '<p class="note">Shirts show club colours only. GoalIQ is not '
         "affiliated with the Premier League and uses no club badges or player "

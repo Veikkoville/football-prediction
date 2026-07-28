@@ -302,12 +302,95 @@ def _maxplus(a: list[float], b: list[float], budget: int) -> list[float]:
     return out
 
 
+BENCH_MIN_XMINS = 45.0
+_LAST_BENCH: dict[str, list[dict]] = {"v": []}
+
+
+def bench_of_last_optimum() -> list[dict]:
+    """Viimeisimmän benchmark-ajon PENKKI (4 pelaajaa)."""
+    return list(_LAST_BENCH["v"])
+
+
+def _playable(p: dict) -> bool:
+    """Kelpaako penkille oikeasti.
+
+    28.7 (Villen havainto): vanha benchmark varasi penkkiin vain *halvimmat*
+    pelaajat, mikä on epärealistinen vertailukohta. Siirtoja on rajallisesti,
+    joten joskus penkkiläinen ON pakko laittaa kentälle — ja jos hän ei pelaa
+    seurassaan lainkaan, joukkue on käytännössä 11 pelaajan varassa koko
+    kauden. Vaatimus ei ole "priimaa" vaan "pelaa": 45 odotettua minuuttia
+    ottelussa. Villen oma esimerkki (4.5m hyökkääjä) läpäisee tämän.
+
+    Varamaalivahti on tietoinen poikkeus: hän ei pelaa jos ykkönen on kunnossa,
+    joten siellä halvin on oikea valinta (Villen sanoin "halpa maalivahti").
+    """
+    return (p.get("xmins") or 0.0) >= BENCH_MIN_XMINS
+
+
+def _club_counts(players: list[dict]) -> dict:
+    out: dict = {}
+    for p in players:
+        out[p["club"]] = out.get(p["club"], 0) + 1
+    return out
+
+
+def _shape_of(xi: list[dict]) -> dict[int, int]:
+    """XI:n muoto positiolaskureina."""
+    out = {1: 0, 2: 0, 3: 0, 4: 0}
+    for p in xi:
+        out[p["element_type"]] += 1
+    return out
+
+
+def _bench_for_shape(pool: list[dict], shape: dict[int, int],
+                     exclude: set[int],
+                     club_counts: dict | None = None) -> tuple[list[dict], int]:
+    """Muodostelmaa täydentävä halvin PELATTAVA penkki (4 pelaajaa).
+
+    Penkin kokoonpano ei ole vapaa: 15 pelaajan kiintiö on 2/5/5/3, joten
+    XI:n muoto määrää mitä penkille jää. Vanha versio otti "3 halvinta
+    kenttäpelaajaa" positiosta riippumatta, mikä saattoi olla laiton.
+    """
+    need = {1: 1, 2: SQUAD_QUOTA[2] - shape[2],
+            3: SQUAD_QUOTA[3] - shape[3], 4: SQUAD_QUOTA[4] - shape[4]}
+    # 3/klubi koskee KOKO 15:tä, ei vain XI:tä. Ilman tätä penkki saattoi
+    # tehdä laillisesta XI:stä laittoman rungon (mock-poolilla 4 samasta
+    # seurasta); tuotannossa se meni läpi vain sattumalta.
+    clubs = dict(club_counts or {})
+    bench: list[dict] = []
+    cost = 0
+    for t, n in need.items():
+        if n <= 0:
+            continue
+        # GK-penkki: halvin kelpaa. Kenttäpelaajat: pelattavuusvaatimus.
+        cands = [p for p in pool
+                 if p["element_type"] == t and p["id"] not in exclude
+                 and (t == 1 or _playable(p))]
+        cands.sort(key=lambda p: (p["price"], -p["xp_horizon_total"]))
+        taken = 0
+        for p in cands:
+            if taken >= n:
+                break
+            if clubs.get(p["club"], 0) >= MAX_PER_CLUB:
+                continue
+            bench.append(p)
+            clubs[p["club"]] = clubs.get(p["club"], 0) + 1
+            cost += p["price"]
+            taken += 1
+        if taken < n:
+            return [], -1
+    return bench, cost
+
+
 def _unconstrained_optimum(pool: list[dict], xi_budget: int):
     """Eksakti paras XI ILMAN 3/klubi-rajaa → todistettu YLÄRAJA.
 
     Jos tuloksena oleva XI sattuu täyttämään klubikaton, se on samalla
     todistetusti paras LAILLINEN XI: rajoitteen poistaminen ei voi huonontaa
     optimia, joten kelvollinen ratkaisu ylärajan arvolla on optimi.
+
+    `xi_budget` on YLÄRAJA kaikille muodostelmille; kunkin muodostelman oma
+    budjetti lasketaan sen vaatimasta penkistä (28.7).
 
     Palauttaa (xi, total) tai (None, -inf).
     """
@@ -327,18 +410,26 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int):
             if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
                 continue
             shape = {1: 1, 2: n_def, 3: n_mid, 4: n_fwd}
+            # Muodostelmakohtainen budjetti: 100.0m miinus TÄMÄN muodon
+            # vaatima pelattava penkki.
+            _bench, bench_cost = _bench_for_shape(pool, shape, set())
+            if bench_cost < 0:
+                continue
+            b_shape = (BUDGET_TENTHS - bench_cost) // unit
+            if b_shape < 0:
+                continue
             rows = [tables[t][0][n] for t, n in shape.items()]
             acc = rows[0]
             for r in rows[1:]:
                 acc = _maxplus(acc, r, B)
-            top = max(acc)
+            top = max(acc[:b_shape + 1]) if b_shape <= B else max(acc)
             if top > best[0]:
-                best = (top, (shape, acc))
+                best = (top, (shape, acc, min(b_shape, B)))
     if best[1] is None:
         return None, _NEG
 
     # Rekonstruktio: etsi kustannusjako joka toteuttaa optimin, sitten pelaajat.
-    shape, _acc = best[1]
+    shape, _acc, shape_budget = best[1]
     order = [1, 2, 3, 4]
     rows = {t: tables[t][0][shape[t]] for t in order}
 
@@ -358,7 +449,7 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int):
                 return got
         return None
 
-    costs = _split(0, B, best[0], [])
+    costs = _split(0, shape_budget, best[0], [])
     if costs is None:
         return None, _NEG
     xi: list[dict] = []
@@ -437,10 +528,23 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
     if any(len(by_pos[t]) < n for t, n in SQUAD_QUOTA.items()):
         return []
 
-    cheapest_gk = min(p["price"] for p in by_pos[1])
-    outfield_prices = sorted(p["price"] for t in (2, 3, 4) for p in by_pos[t])
-    bench_reserve = cheapest_gk + sum(outfield_prices[:3])
-    xi_budget = BUDGET_TENTHS - bench_reserve
+    # 28.7 (Villen havainto): penkkireservi lasketaan PELATTAVASTA penkistä,
+    # ei kolmesta halvimmasta. Tässä lasketaan vain kaikkien muodostelmien
+    # HALVIN mahdollinen penkki, jotta DP:n kustannusakseli on tarpeeksi pitkä;
+    # kukin muodostelma käyttää sisällä omaa, tiukempaa budjettiaan.
+    cheapest_bench = None
+    for n_def in range(XI_MIN[2], XI_MAX[2] + 1):
+        for n_mid in range(XI_MIN[3], XI_MAX[3] + 1):
+            n_fwd = 10 - n_def - n_mid
+            if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
+                continue
+            _b, c = _bench_for_shape(pool, {1: 1, 2: n_def, 3: n_mid, 4: n_fwd},
+                                     set())
+            if c >= 0 and (cheapest_bench is None or c < cheapest_bench):
+                cheapest_bench = c
+    if cheapest_bench is None:
+        return []
+    xi_budget = BUDGET_TENTHS - cheapest_bench
     min_price = min(p["price"] for p in pool)
 
     ranked = sorted(pool, key=lambda p: p["xp_horizon_total"], reverse=True)
@@ -473,8 +577,18 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
     exact, exact_total = _unconstrained_optimum(pool, xi_budget)
     if exact and _squad_clubs_ok(exact):
         # Kelvollinen ratkaisu ylärajan arvolla ⇒ todistetusti optimi.
-        _LAST_OPTIMAL_PROVEN["v"] = True
-        return exact
+        bench, bench_cost = _bench_for_shape(
+            pool, _shape_of(exact), {p["id"] for p in exact},
+            _club_counts(exact))
+        xi_cost = sum(p["price"] for p in exact)
+        if bench and xi_cost + bench_cost <= BUDGET_TENTHS:
+            _LAST_OPTIMAL_PROVEN["v"] = True
+            _LAST_BENCH["v"] = bench
+            return exact
+        # Klubikatto teki oletetun penkin kalliimmaksi kuin varaus → tämä XI
+        # ei ole rahoitettavissa. Pudotaan varapolulle, joka tarkistaa
+        # rungon kokonaisuutena.
+        _LAST_OPTIMAL_PROVEN["v"] = False
 
     # --- 2. Varapolku: klubikatto sitoo → ahne + paikallishaku.
     _LAST_OPTIMAL_PROVEN["v"] = False
@@ -495,6 +609,10 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
     # Jos paikallishaku osuu ylärajaan, ratkaisu on silti todistetusti optimi.
     if best and exact_total != _NEG and abs(best_total - exact_total) < 1e-6:
         _LAST_OPTIMAL_PROVEN["v"] = True
+    _LAST_BENCH["v"] = (_bench_for_shape(pool, _shape_of(best),
+                                         {p["id"] for p in best},
+                                         _club_counts(best))[0]
+                        if best else [])
     return best
 
 

@@ -399,27 +399,46 @@ def _legal_xi(xi):
     return max(Counter(p["club"] for p in xi).values()) <= rt.MAX_PER_CLUB
 
 
-def test_optimal_xi_is_legal_and_locally_unimprovable():
-    """Yksikään yhden pelaajan vaihto ei saa parantaa tulosta."""
-    pool = rt._projection_pool(FAKE_XP, {e['id']: e for e in POOL_BOOT})
-    xi = rt.optimal_budget_xi(pool)
-    assert _legal_xi(xi)
-    cheapest_gk = min(p["price"] for p in pool if p["element_type"] == 1)
-    outfield = sorted(p["price"] for p in pool if p["element_type"] != 1)
-    xi_budget = rt.BUDGET_TENTHS - (cheapest_gk + sum(outfield[:3]))
-    assert sum(p["price"] for p in xi) <= xi_budget
+def test_optimal_squad_is_a_legal_fifteen_with_a_playable_bench():
+    """Benchmark on KOKO 15, ei vain XI.
 
-    ids = {p["id"] for p in xi}
+    28.7 (Villen havainto): vanha versio varasi penkkiin kolme halvinta
+    pelaajaa positiosta riippumatta. Se oli epärealistinen vertailukohta
+    (siirtoja on rajallisesti, joten penkkiläinen on joskus pakko pelauttaa)
+    ja saattoi olla myös laiton, koska 15:n kiintiö 2/5/5/3 ei salli mitä
+    tahansa penkkiä minkä tahansa muodostelman rinnalle.
+    """
+    from collections import Counter
+    pool = rt._projection_pool(FAKE_XP, {e["id"]: e for e in POOL_BOOT})
+    xi = rt.optimal_budget_xi(pool)
+    bench = rt.bench_of_last_optimum()
+    squad = xi + bench
+
+    assert len(squad) == 15
+    assert len({p["id"] for p in squad}) == 15, "sama pelaaja kahdesti"
+    assert Counter(p["element_type"] for p in squad) == Counter(
+        {t: n for t, n in rt.SQUAD_QUOTA.items()})
+    assert max(Counter(p["club"] for p in squad).values()) <= rt.MAX_PER_CLUB
+    assert sum(p["price"] for p in squad) <= rt.BUDGET_TENTHS
+    for p in bench:
+        if p["element_type"] != 1:  # varamaalivahti saa olla halvin
+            assert (p.get("xmins") or 0) >= rt.BENCH_MIN_XMINS, (
+                f'{p["web_name"]} ei pelaa, joten penkki ei kata mitään')
+
+    # XI on paikallisesti parantumaton oman budjettinsa sisällä.
+    xi_budget = rt.BUDGET_TENTHS - sum(p["price"] for p in bench)
+    ids = {p["id"] for p in squad}
     for i, out in enumerate(xi):
         for cand in pool:
             if (cand["element_type"] != out["element_type"] or cand["id"] in ids
                     or cand["xp_horizon_total"] <= out["xp_horizon_total"]):
                 continue
             swapped = xi[:i] + [cand] + xi[i + 1:]
-            assert not (sum(p["price"] for p in swapped) <= xi_budget
-                        and _legal_xi(swapped)), (
-                f'{cand["web_name"]} parantaisi {out["web_name"]}:n tilalla '
-                "- optimoija ei ole edes paikallisesti optimaalinen")
+            if sum(p["price"] for p in swapped) > xi_budget:
+                continue
+            clubs = Counter(p["club"] for p in swapped + bench)
+            assert max(clubs.values()) > rt.MAX_PER_CLUB, (
+                f'{cand["web_name"]} parantaisi {out["web_name"]}:n tilalla')
 
 
 def test_optimum_matches_independent_brute_force():
@@ -442,11 +461,21 @@ def test_optimum_matches_independent_brute_force():
             pid += 1
             pool.append({"id": pid, "web_name": f"p{pid}", "element_type": t,
                          "price": price, "xp_horizon_total": xp,
-                         "xp_per_gw": xp / 6, "club": 500 + pid})  # eri klubit
+                         "xp_per_gw": xp / 6, "club": 500 + pid,  # eri klubit
+                         "xmins": 90.0})  # kaikki pelaavat -> penkkikelpoisia
 
-    cheapest_gk = min(p["price"] for p in pool if p["element_type"] == 1)
-    outfield = sorted(p["price"] for p in pool if p["element_type"] != 1)
-    xi_budget = rt.BUDGET_TENTHS - (cheapest_gk + sum(outfield[:3]))
+    # Budjetti lasketaan MUODOSTELMAKOHTAISESTI: 15:n kiintio 2/5/5/3 maaraa
+    # mita penkille jaa, ja penkki maksaa. Sama saanto kuin toteutuksessa,
+    # mutta laskettuna tassa itsenaisesti.
+    cheapest = {}
+    for t in (1, 2, 3, 4):
+        cheapest[t] = min(p["price"] for p in pool if p["element_type"] == t)
+
+    def _budget(per_pos):
+        bench_cost = cheapest[1]  # varamaalivahti
+        for t in (2, 3, 4):
+            bench_cost += cheapest[t] * (rt.SQUAD_QUOTA[t] - per_pos[t])
+        return rt.BUDGET_TENTHS - bench_cost
 
     best = 0.0
     for counts in product(*[range(n + 1) for _, _, _, n in classes]):
@@ -457,11 +486,13 @@ def test_optimum_matches_independent_brute_force():
             per_pos[t] += k
             cost += k * price
             xp_sum += k * xp
-        if sum(per_pos.values()) != 11 or cost > xi_budget:
+        if sum(per_pos.values()) != 11:
             continue
         if per_pos[1] != 1 or not (3 <= per_pos[2] <= 5
                                    and 2 <= per_pos[3] <= 5
                                    and 1 <= per_pos[4] <= 3):
+            continue
+        if cost > _budget(per_pos):
             continue
         best = max(best, xp_sum)
 
@@ -469,7 +500,8 @@ def test_optimum_matches_independent_brute_force():
     # negatiivinen kontrolli (eksakti polku pois paalta) meni lapi, koska tama
     # pooli on niin pieni etta ahne+paikallishaku osuu samaan optimiin.
     # Erotteleva todiste on tuotantodata: 288.23 -> 303.43 xP (28.7).
-    exact, exact_total = rt._unconstrained_optimum(pool, xi_budget)
+    exact, exact_total = rt._unconstrained_optimum(
+        pool, rt.BUDGET_TENTHS - cheapest[1] - 3 * min(cheapest.values()))
     assert exact is not None
     assert abs(exact_total - best) < 1e-6, (
         f"eksakti {exact_total:.2f} vs raaka voima {best:.2f}")
@@ -478,6 +510,47 @@ def test_optimum_matches_independent_brute_force():
     xi = rt.optimal_budget_xi(pool)
     got = sum(p["xp_horizon_total"] for p in xi)
     assert _legal_xi(xi)
-    assert sum(p["price"] for p in xi) <= xi_budget
     assert abs(got - best) < 1e-6, f"solver {got:.2f} vs raaka voima {best:.2f}"
     assert rt.optimal_xi_proven() is True
+
+
+def test_bench_skips_cheap_non_players():
+    """Penkille ei kelpaa halvin jos hän ei pelaa.
+
+    Erillinen synteettinen pooli, koska jaettu mock-runko ei erottele tätä:
+    siinä KAIKILLA on xmins 85, joten säännön poistaminen ei muuta mitään
+    (negatiivinen kontrolli meni läpi). Tässä halvin vaihtoehto on
+    nimenomaan pelaamaton.
+    """
+    pool, pid = [], 0
+
+    def add(t, price, xp, club, xmins, name):
+        nonlocal pid
+        pid += 1
+        pool.append({"id": pid, "web_name": name, "element_type": t,
+                     "price": price, "xp_horizon_total": xp, "xp_per_gw": xp / 6,
+                     "club": club, "team_short": f"C{club:02d}",
+                     "xmins": xmins, "gameweeks": []})
+
+    add(1, 40, 5.0, 1, 0.0, "GK_CHEAP")          # varavahti: halvin kelpaa
+    add(1, 55, 24.0, 2, 90.0, "GK_START")
+    # DEF: halvin ei pelaa, seuraavaksi halvin pelaa
+    add(2, 40, 1.0, 3, 0.0, "DEF_NEVER_PLAYS")
+    add(2, 45, 14.0, 4, 60.0, "DEF_PLAYS")
+    for i in range(6):
+        add(2, 60, 25.0 - i, 10 + i, 90.0, f"DEF{i}")
+    for i in range(6):
+        add(3, 60, 30.0 - i, 20 + i, 90.0, f"MID{i}")
+    for i in range(5):
+        add(4, 60, 28.0 - i, 30 + i, 90.0, f"FWD{i}")
+
+    shape = {1: 1, 2: 5, 3: 4, 4: 1}  # penkille jää 1 GK + 0 DEF + 1 MID + 2 FWD
+    shape_def4 = {1: 1, 2: 4, 3: 4, 4: 2}  # penkille jää 1 DEF
+    bench, cost = rt._bench_for_shape(pool, shape_def4, set())
+    names = [p["web_name"] for p in bench]
+    assert "DEF_NEVER_PLAYS" not in names, (
+        f"penkille valittiin pelaamaton pelaaja: {names}")
+    assert "DEF_PLAYS" in names
+    # Varamaalivahti saa olla halvin vaikka ei pelaa (tietoinen poikkeus).
+    assert "GK_CHEAP" in names
+    assert cost > 0
