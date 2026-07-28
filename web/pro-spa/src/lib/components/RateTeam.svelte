@@ -558,14 +558,21 @@
 						Your XI <strong>beats</strong> the best team the model can build inside the
 						budget. The model would pick your squad over its own.
 					{:else}
-						<!-- 28.7: mobiilin sanamuoto voitti. "97/100" ei kerro lukijalle
-						     mista sata koostuu; "97 % of the best possible budget team"
-						     kertoo mita mitataan. -->
-						<strong>{Math.round(data.rating.percentile)}%</strong> of the best possible
-						budget team{#if typeof data.rating.gap_to_optimal_xp === 'number'}
+						<!-- 28.7 (Villen havainto): otsikkoluku takaisin /100-muotoon.
+						     26.7. backend lisasi `rating`-kokonaisluvun juuri siksi etta
+						     se on luettavampi, mutta saman paivan pariteettikorjaus vei
+						     molemmat pinnat prosenttiin. Prosentin ainoa aito etu oli
+						     etta se kertoi mita mitataan - se sanotaan nyt suoraan
+						     seuraavalla rivilla, joten kumpikaan ei haviaa. -->
+						Team rating
+						<strong>{data.rating.rating ?? Math.round(data.rating.percentile)}/100</strong
+						>{#if typeof data.rating.gap_to_optimal_xp === 'number'}
 							({data.rating.gap_to_optimal_xp > 0.05
 								? `-${data.rating.gap_to_optimal_xp.toFixed(1)} xP`
 								: 'level with it'}){/if}.
+						<span class="rating-basis"
+							>100 = the best squad the rules allow inside the 100.0m budget.</span
+						>
 					{/if}
 				</p>
 				<!-- 26.7: metodologia auki. Villen havainto: FFS antoi samasta
@@ -964,6 +971,11 @@
 		margin: 0;
 		color: var(--text-muted);
 		font-size: var(--step--1);
+	}
+	/* 28.7: mittaperusta omalle rivilleen, jotta /100-luku ei jaa selittamatta */
+	.rating-basis {
+		display: block;
+		font-size: var(--step--2);
 	}
 	/* 26.7: metodologia auki, oletuksena kiinni (ei vie tilaa herolta) */
 	.method {
