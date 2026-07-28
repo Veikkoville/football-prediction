@@ -592,12 +592,12 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
              + "</div>")
 
     url = f"{BASE}/fpl/model-xi"
-    title = "The GoalIQ Model XI: best legal FPL squad on xP | GoalIQ"
-    desc = (f"The best legal XI the model can build inside the 100.0m budget: "
+    title = "The GoalIQ Model XI: best 100.0m FPL squad on xP | GoalIQ"
+    desc = (f"The best XI the model can build inside the 100.0m budget: "
             f"{shape}, {total_xp:.1f} projected points over the horizon. "
             f"Free, no sign-in, rebuilt daily.")
     hero = ("<h1>The Model XI</h1>"
-            '<p class="lede">The strongest legal XI the GoalIQ model can build '
+            '<p class="lede">The strongest XI the GoalIQ model can build '
             "inside the standard 100.0m budget, ranked on projected points. "
             "This is the same squad logic the rate-my-team benchmark uses, so "
             "the page and the product cannot drift apart.</p>")
