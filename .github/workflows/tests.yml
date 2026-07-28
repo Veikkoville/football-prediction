@@ -25,3 +25,10 @@ jobs:
           pip install -r requirements.txt pytest httpx
       - name: Run fast test suite
         run: pytest -m "not slow" -q
+
+      # 28.7: em dash -portti julkaistuille sivuille + SPA-markupille. Sääntö
+      # oli olemassa vain ihmisen muistissa, ja 27.7. sen ohi meni useita.
+      # Ei riipu asennetuista paketeista (pelkkä stdlib), joten se ajaa myös
+      # jos requirements muuttuu.
+      - name: Copy style (em dash)
+        run: python scripts/check_copy_style.py

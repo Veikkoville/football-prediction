@@ -91,9 +91,14 @@ HORIZON_GW = 6
 # --------------------------------------------------------------------------
 NEAR_HORIZON_GW = 6
 
+# 28.7: em dash pois (projektin copy-saanto) JA loppupiste lisatty. Ilman
+# pistetta fpl.html liitti taman perään "Lower is easier." ilman valimerkkia
+# -> julkaistulla sivulla luki "...moves closer Lower is easier."
+# Tama merkkijono valuu YHDESTA lahteesta neljalle pinnalle (fpl.html, SPA,
+# mobiili, API-meta), joten se korjataan tasta eika pinnoilta.
 FAR_BASIS_LABEL = (
-    "Fixture difficulty only, based on today's ratings — "
-    "clean sheet % appears as each gameweek moves closer"
+    "Fixture difficulty only, based on today's ratings. "
+    "Clean sheet % appears as each gameweek moves closer."
 )
 
 # Lähdenimi (pulselive-pitkä TAI FPL-lyhyt) -> mallin (Understat) nimi.

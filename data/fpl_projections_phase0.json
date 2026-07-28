@@ -47,7 +47,7 @@
     "horizon_gw": 38,
     "horizon_max": 38,
     "near_horizon_gw": 6,
-    "far_basis_label": "Fixture difficulty only, based on today's ratings — clean sheet % appears as each gameweek moves closer",
+    "far_basis_label": "Fixture difficulty only, based on today's ratings. Clean sheet % appears as each gameweek moves closer.",
     "todo": []
   },
   "teams": [

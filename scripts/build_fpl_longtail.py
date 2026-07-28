@@ -168,7 +168,49 @@ font-variant-numeric:tabular-nums;}
 @media (max-width:520px){.xip{width:64px;}.xirow{gap:6px;}}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
+.toolnav{margin:34px 0 6px;padding-top:18px;border-top:1px solid var(--line);
+display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;}
+.toolnav b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+color:var(--muted);font-weight:600;margin-right:2px;}
+.toolnav a{font-size:15px;color:var(--ink);text-decoration:none;
+border-bottom:1px solid var(--line);padding-bottom:1px;}
+.toolnav a:hover{border-bottom-color:currentColor;}
 """
+
+
+# 28.7: SISAINEN LINKITYS. GSC:n URL-tarkastus paljasti etta naista sivuista
+# 5/6 oli Googlelle taysin tuntemattomia: "Viittaavia sivustokarttoja ei
+# havaittu" JA "Viittaava sivu: Ei havaittuja". Sitemap yksin on heikko
+# signaali - sivu jolle ei osoita yksikaan linkki on orpo, eika Google
+# priorisoi sen indeksointia. Mitattu ennen korjausta: fpl.html -> 0 kpl
+# /fpl/*-linkkeja, etusivu -> 1 (model-xi), /predictions -> 0.
+# Naiden sivujen koko olemassaolon syy on FPL-hakuliikenne ennen GW1:ta.
+_TOOL_LINKS = [
+    ("/fpl/best-captain", "Captain picks"),
+    ("/fpl/model-xi", "Model XI"),
+    ("/fpl/differentials", "Differentials"),
+    ("/fpl/price-changes", "Price changes"),
+    ("/fpl/xg-leaders", "xG leaders"),
+    ("/fpl/defcon", "DefCon leaders"),
+]
+
+
+def _tool_nav(canonical: str) -> str:
+    """Ristiinlinkitys muihin longtail-sivuihin, nykyinen sivu pois.
+
+    Renderoidaan <nav>-elementtina eika pelkkana linkkilistana, jotta
+    sivun oma navigointirakenne on koneluettava.
+    """
+    here = canonical.rstrip("/").replace(BASE, "")
+    items = "".join(
+        f'<a href="{href}">{escape(label)}</a>'
+        for href, label in _TOOL_LINKS
+        if href != here
+    )
+    return (
+        '<nav class="toolnav" aria-label="More free FPL tools">'
+        f'<b>More free FPL tools</b>{items}</nav>\n'
+    )
 
 
 def _page(title: str, desc: str, canonical: str, hero: str, body: str,
@@ -217,6 +259,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         f'<div class="wrap hero">\n{hero}\n</div>\n'
         "</header>\n"
         f'<main class="wrap content">\n{body}\n'
+        f"{_tool_nav(canonical)}"
         f'<footer>© 2026 GoalIQ · '
         f'<a href="/predictions">Football predictions</a> · '
         f'<a href="/fpl.html">Free FPL tools</a> · '
@@ -417,8 +460,9 @@ _TEAM_COLORS = {
     "ARS": ("#EF0107", "#FFFFFF"), "AVL": ("#670E36", "#FFFFFF"),
     "BOU": ("#DA291C", "#FFFFFF"), "BRE": ("#E30613", "#FFFFFF"),
     "BHA": ("#0057B8", "#FFFFFF"), "BUR": ("#6C1D45", "#FFFFFF"),
-    "CHE": ("#034694", "#FFFFFF"), "CRY": ("#1B458F", "#FFFFFF"),
-    "EVE": ("#003399", "#FFFFFF"), "FUL": ("#000000", "#FFFFFF"),
+    "CHE": ("#034694", "#FFFFFF"), "COV": ("#009CD8", "#FFFFFF"),
+    "CRY": ("#1B458F", "#FFFFFF"), "EVE": ("#003399", "#FFFFFF"),
+    "FUL": ("#000000", "#FFFFFF"), "HUL": ("#F0A800", "#000000"),
     "IPS": ("#4172B5", "#FFFFFF"), "LEE": ("#FFCD00", "#1D428A"),
     "LEI": ("#003090", "#FFFFFF"), "LIV": ("#C8102E", "#FFFFFF"),
     "MCI": ("#6CABDD", "#FFFFFF"), "MUN": ("#DA291C", "#FFFFFF"),

@@ -114,7 +114,7 @@
 					disabled={busy !== null}
 					onclick={() => void buy(key as PlanKey)}
 				>
-					{busy === key ? 'Opening checkout…' : `Get Premium — ${plan.label}`}
+					{busy === key ? 'Opening checkout…' : `Get Premium: ${plan.label}`}
 				</button>
 			</div>
 		{/each}

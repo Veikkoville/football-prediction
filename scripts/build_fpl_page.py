@@ -793,14 +793,14 @@ def far_grid_html(c: dict) -> str:
             f'<tr><th scope="row">{r["team"]}</th>{"".join(cells)}</tr>'
         )
     label = c.get("far_basis_label") or (
-        "Fixture difficulty only — based on today's ratings, and it will move "
+        "Fixture difficulty only, based on today's ratings, and it will move "
         "as the season plays."
     )
     return (
         '<h2 id="long-range">Long-range fixture difficulty</h2>\n'
         f'<p class="muted">{label} Lower is easier. Each column averages the '
         'model\'s difficulty over six gameweeks, so what you are reading here '
-        'is where the swings are — not a precise number for any single match.</p>\n'
+        'is where the swings are, not a precise number for any single match.</p>\n'
         '<div class="table-wrap"><table class="fdr-grid">\n'
         f'<thead><tr><th scope="col">Team</th>{head}</tr></thead>\n'
         f'<tbody>{"".join(rows)}</tbody></table></div>\n'
@@ -1059,6 +1059,9 @@ CSS = """
   .stat span{ color:var(--ink-muted); font-size:14px; }
   .faq dt{ font-weight:700; margin-top:20px; }
   .faq dd{ margin:6px 0 0; }
+  .toollist{ margin:14px 0 8px; padding-left:20px; }
+  .toollist li{ margin:10px 0; }
+  .toollist a{ font-weight:700; }
   .disclaimer{ border:1px solid var(--line); background:var(--paper); border-radius:12px; padding:12px 16px; color:var(--ink-muted); font-size:14px; margin:26px 0 60px; }
   .upsell{ border:1px solid var(--line); background:var(--paper); border-radius:16px; padding:24px 26px; margin:48px 0 6px; }
   .upsell h2{ margin:0 0 10px; }
@@ -1242,7 +1245,7 @@ differential picks, player compare and predicted starting minutes, from the
 same match model as this page. Rate my team, a captain pick, price watch and
 the top three of every leaderboard are free.</p>
 <div class="cta-row">
-  <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium &mdash; &euro;25/year</a>
+  <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium, &euro;25/year</a>
 </div>
 <p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
 One subscription covers web, iOS and Android.</p>
@@ -1267,6 +1270,24 @@ probabilities, ranked across every team fixture of the season and bucketed
 into five tiers. Fixture data comes from the official Premier League fantasy
 API, with premierleague.com as the fixture source until the FPL game opens
 for {c["season"]}.</p>
+
+<h2 id="tools">More free FPL tools</h2>
+<p>Every page below is built from the same model that powers this one, and each
+one refreshes on the same schedule. No login, no paywall.</p>
+<ul class="toollist">
+  <li><a href="/fpl/best-captain">Captain picks for the next deadline</a>:
+  every player ranked by expected points, not by last week's haul.</li>
+  <li><a href="/fpl/model-xi">The model's own XI</a>: the squad our numbers
+  would pick inside the budget, published before every deadline.</li>
+  <li><a href="/fpl/differentials">Differentials under 10% ownership</a>:
+  where the model disagrees with the crowd.</li>
+  <li><a href="/fpl/price-changes">Price change watch</a>: who is close to
+  rising or falling tonight.</li>
+  <li><a href="/fpl/xg-leaders">xG, xA and xGI leaders</a>: the underlying
+  numbers behind the point returns.</li>
+  <li><a href="/fpl/defcon">DefCon leaders</a>: defensive contribution ranked
+  under the current scoring rules.</li>
+</ul>
 
 <h2 id="about">About GoalIQ</h2>
 <p>GoalIQ is a free football prediction app built by an independent developer
@@ -1297,6 +1318,12 @@ predictions and analytics. Not betting advice.</p>
   <p><a href="./">GoalIQ home</a> &middot;
   <a href="{PRO_URL}">GoalIQ Premium (web)</a> &middot;
   <a href="/predictions">Match predictions</a> &middot;
+  <a href="/fpl/best-captain">Captain picks</a> &middot;
+  <a href="/fpl/model-xi">Model XI</a> &middot;
+  <a href="/fpl/differentials">Differentials</a> &middot;
+  <a href="/fpl/price-changes">Price changes</a> &middot;
+  <a href="/fpl/xg-leaders">xG leaders</a> &middot;
+  <a href="/fpl/defcon">DefCon leaders</a> &middot;
   <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
   <a href="faq.html">App FAQ</a> &middot;
   <a href="privacy.html">Privacy</a></p>

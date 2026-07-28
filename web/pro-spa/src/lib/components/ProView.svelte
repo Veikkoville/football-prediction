@@ -55,7 +55,7 @@
 {#if checkoutSuccess}
 	{#if guestCheckout && !auth.user}
 		<p class="banner success">
-			Payment received — Premium is yours! We just emailed you a sign-in link (check spam
+			Payment received. Premium is yours! We just emailed you a sign-in link (check spam
 			too). Click it to open Premium here on the web; once signed in, you can set a password
 			to use the same account in the GoalIQ app on iOS and Android.
 		</p>

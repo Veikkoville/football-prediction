@@ -30,7 +30,7 @@
 		busy = true;
 		error = null;
 		const err = await sendMagicLink(email);
-		linkNotice = err ? null : 'Sign-in link sent — check your email (and spam).';
+		linkNotice = err ? null : 'Sign-in link sent. Check your email (and spam).';
 		error = err;
 		busy = false;
 	}

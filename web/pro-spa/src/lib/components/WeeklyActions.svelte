@@ -74,7 +74,7 @@
 		} else {
 			note =
 				res.reason === 'locked'
-					? 'This gameweek is locked. Decisions can only be logged before the deadline — that is what makes the comparison mean anything.'
+					? 'This gameweek is locked. Decisions can only be logged before the deadline, and that is what makes the comparison mean anything.'
 					: res.reason === 'auth'
 						? 'Sign in to log your decisions.'
 						: "Couldn't save that. Try again in a moment.";
@@ -87,7 +87,7 @@
 		<h3>{actions.length} things to do this week</h3>
 		{#if !open}
 			<p class="muted locked">
-				This gameweek is locked. Decisions can only be logged before the deadline — that is what
+				This gameweek is locked. Decisions can only be logged before the deadline, and that is what
 				makes the comparison mean anything.
 			</p>
 		{/if}
@@ -101,7 +101,7 @@
 					{#if a.rationale}<p class="muted why">{a.rationale}</p>{/if}
 					{#if rec}
 						<p class="done">
-							{rec.followed ? 'Logged — following the model' : 'Logged — going your own way'}
+							{rec.followed ? 'Logged: following the model' : 'Logged: going your own way'}
 						</p>
 					{/if}
 				</div>
@@ -126,7 +126,7 @@
 		<!-- Ei koskaan piiloteta sitä mitä nappi EI tee. -->
 		<p class="muted foot">
 			Logging keeps a record of your call against the model's. It does not change your Fantasy
-			Premier League team — apply it there yourself.
+			Premier League team, so apply it there yourself.
 		</p>
 	</section>
 {/if}

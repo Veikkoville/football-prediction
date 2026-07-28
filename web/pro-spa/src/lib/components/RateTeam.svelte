@@ -70,7 +70,7 @@
 				// Lähellä oleva vaihtoehto on itsessään tieto: valinta ei ole
 				// selvä, ja mallin pitää myöntää se.
 				rationale: alt
-					? `${alt.web_name} is only ${(cap.gw_xp - alt.gw_xp).toFixed(2)} xP behind — this one is close.`
+					? `${alt.web_name} is only ${(cap.gw_xp - alt.gw_xp).toFixed(2)} xP behind, so this one is close.`
 					: undefined
 			});
 		}
@@ -516,12 +516,21 @@
 				     hiljaa 100 %:iin, jolloin tieto katosi ja luku luki ontolta
 				     imartelulta. -->
 				<p class="subline">
-					{#if data.rating.beats_benchmark}
+					{#if data.meta.rating_method == null && data.rating.optimal_team_xp == null}
+						<!-- 28.7: mobiilin GUARD webiin. Ilman tata sivu vaitti "best
+						     possible budget team" -mittaperustaa myos silloin kun payload
+						     ei kanna sita. -->
+						GoalIQ model rating:
+						<strong>{data.rating.rating ?? Math.round(data.rating.percentile)}/100</strong>
+					{:else if data.rating.beats_benchmark}
 						Your XI <strong>beats</strong> the best team the model can build inside the
 						budget. The model would pick your squad over its own.
 					{:else}
-						Team rating <strong>{data.rating.rating ?? Math.round(data.rating.percentile)}/100</strong>,
-						measured against the best possible budget team{#if typeof data.rating.gap_to_optimal_xp === 'number'}
+						<!-- 28.7: mobiilin sanamuoto voitti. "97/100" ei kerro lukijalle
+						     mista sata koostuu; "97 % of the best possible budget team"
+						     kertoo mita mitataan. -->
+						<strong>{Math.round(data.rating.percentile)}%</strong> of the best possible
+						budget team{#if typeof data.rating.gap_to_optimal_xp === 'number'}
 							({data.rating.gap_to_optimal_xp > 0.05
 								? `-${data.rating.gap_to_optimal_xp.toFixed(1)} xP`
 								: 'level with it'}){/if}.
@@ -721,7 +730,7 @@
 					</button>
 				</div>
 				<p class="muted plan-note">
-					{#if planSaved}<strong>Saved to your draft</strong> — it stays here and, when you
+					{#if planSaved}<strong>Saved to your draft.</strong> It stays here and, when you
 						are signed in, on your phone too.{/if} Nothing is sent to FPL: they have no public
 					write API, so make the final move in the official FPL app.
 				</p>

@@ -41,7 +41,7 @@
 		const err = await sendPasswordReset(email);
 		resetNotice = err
 			? `Could not send the link: ${err}`
-			: 'Password reset link sent — check your email (and spam).';
+			: 'Password reset link sent. Check your email (and spam).';
 		resetBusy = false;
 	}
 </script>
@@ -110,7 +110,7 @@
 					</div>
 					{#if auth.passwordRecovery}
 						<p class="banner success">
-							Password reset link accepted — set your new password below.
+							Password reset link accepted. Set your new password below.
 						</p>
 					{/if}
 					<SetPassword

@@ -188,7 +188,7 @@
 				<p class="muted">
 					Free · <strong>Avg CS%</strong> = the team's average chance of a clean sheet from the
 					match model across the gameweeks you select. It is shown only while the whole range
-					sits inside the modelled window — beyond that the calendar still tells you where the
+					sits inside the modelled window. Beyond that the calendar still tells you where the
 					swings are, but a precise percentage would not be honest.
 					<strong>Avg FDR</strong> = average fixture difficulty from the GoalIQ model (win% +
 					xG), not FPL's official FDR; 1 = easiest, 5 = hardest. Each GW cell shows opponent,
@@ -270,7 +270,7 @@
 					     malli ei voi luvata GW30:n tarkkuutta heinäkuussa. -->
 					<p class="banner">
 						{data.meta.far_basis_label ??
-							'Fixture difficulty only beyond the next few gameweeks — clean sheet % appears as each gameweek moves closer.'}
+							'Fixture difficulty only beyond the next few gameweeks. Clean sheet % appears as each gameweek moves closer.'}
 					</p>
 				{/if}
 
