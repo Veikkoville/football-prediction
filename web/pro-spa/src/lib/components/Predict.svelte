@@ -17,7 +17,6 @@
 	 *   premium : xG, top 10, over/under 2.5, BTTS, mallin fair value
 	 */
 	import {
-		fetchLeagues,
 		fetchTeams,
 		predictMatch,
 		type PredictResponse
@@ -35,7 +34,26 @@
 		prefill?: { league: string; home: string; away: string } | null;
 	} = $props();
 
-	let leagues = $state<string[]>([]);
+	/** 28.7: KURATOITU lista, sama kuin mobiilin lib/leagues.ts.
+	 *
+	 *  Aiemmin tama dumppasi /api/leagues:n sellaisenaan, 24 liigaa. Mitattu:
+	 *  kolme palautti NOLLA joukkuetta, 14 palautti 404 otteluohjelmaan, ja
+	 *  hitaimmat kestivat 6 - 9 s koska palvelin sovittaa mallin liigalle
+	 *  pyynnon yhteydessa. Mobiilin lista on juuri ne joilla toimii seka
+	 *  ennuste etta otteluohjelma, ja koodit ovat -FD-muodossa jotta
+	 *  /api/fixtures ja /api/standings osuvat. */
+	const LEAGUES: { code: string; label: string }[] = [
+		{ code: 'ENG-Premier League', label: 'Premier League' },
+		{ code: 'ESP-La Liga-FD', label: 'La Liga' },
+		{ code: 'GER-Bundesliga-FD', label: 'Bundesliga' },
+		{ code: 'ITA-Serie A-FD', label: 'Serie A' },
+		{ code: 'FRA-Ligue 1-FD', label: 'Ligue 1' },
+		{ code: 'ENG-Championship', label: 'Championship' },
+		{ code: 'NED-Eredivisie', label: 'Eredivisie' },
+		{ code: 'POR-Primeira Liga', label: 'Primeira Liga' },
+		{ code: 'BRA-Serie A', label: 'Brasileirao' },
+		{ code: 'INT-Champions League', label: 'Champions League' }
+	];
 	let league = $state('ENG-Premier League');
 	let teams = $state<string[]>([]);
 	let home = $state('');
@@ -45,18 +63,6 @@
 	let error = $state<string | null>(null);
 	let data = $state<PredictResponse | null>(null);
 
-	$effect(() => {
-		fetchLeagues().then(
-			(l) => {
-				leagues = [
-					...(l.top5_xg_leagues ?? []),
-					...(l.uefa_tournaments ?? []),
-					...(l.other_leagues ?? [])
-				];
-			},
-			() => (leagues = ['ENG-Premier League'])
-		);
-	});
 
 	// Fixtures-näkymästä tuleva esitäyttö. Käsitellään ENNEN liigaefektiä ja
 	// vasta joukkuelistan latauduttua: liigan vaihto tyhjentää valinnat, joten
@@ -70,13 +76,24 @@
 
 	// Liigan vaihto tyhjentää joukkuevalinnat: vanha valinta ei kuulu uuteen
 	// liigaan, ja sen jättäminen näkyviin tuottaisi varman 404:n.
+	// Juokseva pyyntonumero. TAVALLINEN muuttuja eika $state: tama on
+	// kilpa-ajon esto, ei UI-tilaa, eika sen kuulu laukaista renderointia.
+	let reqSeq = 0;
+	let teamsLoading = $state(false);
+
 	$effect(() => {
 		const lg = league;
+		const seq = ++reqSeq;
 		teams = [];
 		home = '';
 		away = '';
+		teamsLoading = true;
 		fetchTeams(lg).then(
 			(t) => {
+				// Villen havainto "valilla vaarat joukkueet vaarassa liigassa":
+				// hidas liiga ehtii vastata vasta kun kayttaja on jo vaihtanut.
+				if (seq !== reqSeq) return;
+				teamsLoading = false;
 				teams = t.teams ?? [];
 				if (pending) {
 					// Nimet tulevat otteluohjelmasta (football-data.org) ja
@@ -87,7 +104,11 @@
 					pending = null;
 				}
 			},
-			() => (teams = [])
+			() => {
+				if (seq !== reqSeq) return;
+				teamsLoading = false;
+				teams = [];
+			}
 		);
 	});
 
@@ -128,14 +149,14 @@
 	<div class="field">
 		<label for="pred-league">League</label>
 		<select id="pred-league" bind:value={league}>
-			{#each leagues as l (l)}
-				<option value={l}>{l}</option>
+			{#each LEAGUES as l (l.code)}
+				<option value={l.code}>{l.label}</option>
 			{/each}
 		</select>
 	</div>
 	<div class="field">
 		<label for="pred-home">Home team</label>
-		<select id="pred-home" bind:value={home} disabled={teams.length === 0}>
+		<select id="pred-home" bind:value={home} disabled={teamsLoading || teams.length === 0}>
 			<option value="">Select</option>
 			{#each teams as t (t)}
 				<option value={t}>{t}</option>
@@ -144,7 +165,7 @@
 	</div>
 	<div class="field">
 		<label for="pred-away">Away team</label>
-		<select id="pred-away" bind:value={away} disabled={teams.length === 0}>
+		<select id="pred-away" bind:value={away} disabled={teamsLoading || teams.length === 0}>
 			<option value="">Select</option>
 			{#each teams as t (t)}
 				<option value={t}>{t}</option>
@@ -155,6 +176,12 @@
 		{loading ? 'Predicting…' : 'Predict match'}
 	</button>
 </form>
+
+{#if teamsLoading}
+	<!-- Odotus oli aiemmin taysin hiljainen. Mitattu: liigan ensilataus vie
+	     jopa 6 - 9 s, koska palvelin sovittaa mallin pyynnon yhteydessa. -->
+	<p class="muted hint">Loading teams. The first time you open a league this can take a few seconds.</p>
+{/if}
 
 {#if home && away && home === away}
 	<p class="muted hint">Home and away cannot be the same team.</p>
