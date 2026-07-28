@@ -156,7 +156,7 @@ font-weight:600;}
    mobiilin #106-pitchilla (teal-tint, #108-paletti) - EI nurmivaria. Villen
    paatos: brandipaletti voittaa kirjaimellisen nurmen, ja kolmen pinnan
    pitaa nayttaa samalta. */
-.pitch{background:rgba(0,194,173,0.08);border:1px solid var(--line);
+.pitch{background:rgba(0,194,173,0.24);border:1px solid var(--line);
 border-radius:14px;padding:10px 6px;margin:18px 0;}
 .xirow{display:flex;justify-content:space-evenly;flex-wrap:wrap;gap:8px;
 margin:10px 0;}
