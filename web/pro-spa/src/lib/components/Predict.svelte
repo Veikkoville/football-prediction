@@ -64,9 +64,45 @@
 	let pending = $state<{ home: string; away: string } | null>(null);
 	$effect(() => {
 		if (!prefill) return;
+		const sameLeague = league === prefill.league;
 		league = prefill.league;
 		pending = { home: prefill.home, away: prefill.away };
+		// 28.7 BUGIKORJAUS: jos liiga on JO oikea, alla oleva liigaefekti ei aja
+		// uudelleen (riippuvuus ei muuttunut) eika `pending` kuluteta koskaan.
+		// Villen havainto: "fixturesista kun painaa predict ei ohjaa oikeaan
+		// otteluun". Yleisin tapaus on juuri tama, koska otteluohjelma ja
+		// ennuste ovat oletuksena samassa liigassa.
+		if (sameLeague && teams.length > 0) applyPending();
 	});
+
+	/** Tasmaytys mallin joukkuelistaan. Otteluohjelman nimet tulevat
+	 *  football-data.orgilta ("Coventry City") ja lista mallista ("Coventry"),
+	 *  joten tarvitaan normalisointi. EI arvata: jos vastinetta ei loydy,
+	 *  slotti jaa tyhjaksi ja kayttaja valitsee itse. */
+	function norm(s: string): string {
+		return s
+			.toLowerCase()
+			.replace(/\b(fc|afc|cf|sc|ac|as|ss|us)\b/g, '')
+			.replace(/[^a-z0-9]/g, '');
+	}
+	function matchTeam(name: string): string | null {
+		if (teams.includes(name)) return name;
+		const n = norm(name);
+		const exact = teams.find((t) => norm(t) === n);
+		if (exact) return exact;
+		// "Coventry City" -> "Coventry": salli etuliiteosuma molempiin suuntiin,
+		// mutta vain jos se on YKSIKASITTEINEN (Man City / Man United -ansa).
+		const partial = teams.filter((t) => n.startsWith(norm(t)) || norm(t).startsWith(n));
+		return partial.length === 1 ? partial[0] : null;
+	}
+	function applyPending() {
+		if (!pending) return;
+		const h = matchTeam(pending.home);
+		const a = matchTeam(pending.away);
+		if (h) home = h;
+		if (a) away = a;
+		pending = null;
+	}
 
 	// Liigan vaihto tyhjentää joukkuevalinnat: vanha valinta ei kuulu uuteen
 	// liigaan, ja sen jättäminen näkyviin tuottaisi varman 404:n.
@@ -78,14 +114,7 @@
 		fetchTeams(lg).then(
 			(t) => {
 				teams = t.teams ?? [];
-				if (pending) {
-					// Nimet tulevat otteluohjelmasta (football-data.org) ja
-					// joukkuelista mallista. Täsmäytetään vain jos nimi löytyy,
-					// muuten jätetään käyttäjän valittavaksi eikä arvata.
-					if (teams.includes(pending.home)) home = pending.home;
-					if (teams.includes(pending.away)) away = pending.away;
-					pending = null;
-				}
+				applyPending();
 			},
 			() => (teams = [])
 		);
@@ -159,6 +188,17 @@
 {#if home && away && home === away}
 	<p class="muted hint">Home and away cannot be the same team.</p>
 {/if}
+
+<!-- 28.7 REHELLISYYS (Villen havainto): lista on mallin treeni-ikkunan
+     joukkueet, ei kauden 26/27 sarjataulukko. Ennen ensimmäisiä otteluita ne
+     eroavat: pudonneet ovat vielä mukana ja nousseilla ei ole yhtään ottelua
+     joista mallintaa. Tämä SANOTAAN, koska vaihtoehto olisi näyttää joukkueita
+     ilman selitystä ja antaa lukijan päätellä että data on vanhentunut.
+     Mobiilissa on sama selite (predict.info_prefill_team_missing). -->
+<p class="muted hint roster">
+	The list shows the clubs the model has match data for. Before the season starts that is last
+	season's field: promoted clubs join once they have played their first league matches.
+</p>
 
 {#if error}
 	<p class="errorbox">{error}</p>
@@ -296,6 +336,10 @@
 	}
 	.hint {
 		font-size: var(--step--1);
+	}
+	.roster {
+		max-width: 62ch;
+		margin-top: 0;
 	}
 	.errorbox {
 		border: 1px solid var(--border);
