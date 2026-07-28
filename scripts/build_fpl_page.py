@@ -367,7 +367,7 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
             (
                 "Yes. GoalIQ is built FPL-first: clean sheet probability, fixture "
                 "difficulty, rate my team with a captain pick, a fit checker "
-                "that builds the best legal 15 around your must-have players, "
+                "that builds the best valid 15 around your must-have players, "
                 "a pre-season draft rater (no team ID needed), price watch and "
                 "the full xG/xA/xGI leaderboard for every player "
                 "are free, and GoalIQ Premium adds an interactive team manager "
@@ -384,7 +384,7 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
                 "Free: clean sheet probabilities, fixture difficulty ratings "
                 "(FDR), rate my team with a captain pick, a pre-season draft "
                 "rater (pick 15, no team ID needed), the fit checker (lock "
-                "must-have players, the model builds the best legal 15 around "
+                "must-have players, the model builds the best valid 15 around "
                 "them), price watch, and the "
                 "top three of the value, xG leaders and DefCon lists. GoalIQ "
                 "Premium: an interactive team manager (formations, bench swaps, "

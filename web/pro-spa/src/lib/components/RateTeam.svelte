@@ -575,8 +575,9 @@
 					<summary>How this rating is calculated</summary>
 					<p>
 						We compare your XI's projected points over the next {data.meta.horizon_gw ?? 6} gameweeks
-						to the best legal XI our model can build inside the same 100.0m budget. 100 means you
-						captured every projected point that budget allows.
+						to the best XI our model can build under the same squad rules: a 100.0m budget and
+						no more than three players from one club. 100 means you captured every projected
+						point those rules allow.
 					</p>
 					<p>
 						Other FPL sites run their own projections and their own scale, so their number and
