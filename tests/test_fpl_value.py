@@ -128,3 +128,41 @@ def test_value_endpoint_shape(client, monkeypatch):
     assert b["meta"]["available"] is True
     assert b["players"][0]["value"] > 0
     assert b["gk"]["pairs"][0]["avg_best_cs_pct"] == pytest.approx(60.0)
+
+
+def test_gk_meta_horizon_kertoo_cs_kattavuuden_ei_tiedoston_metaa(monkeypatch):
+    """29.7 (Villen havainto tuotannosta): payload vaitti horizon_gw=38 mutta
+    gw_split oli 6 kierrosta.
+
+    Juurisyy: meta luki phase0-TIEDOSTON horizon_gw:n, joka on koko
+    fixture-aineiston kattavuus. Pari lasketaan kuitenkin vain kierroksista
+    joilla MOLEMMILLA seuroilla on cs_pct, eli lahihorisontista.
+
+    Miksi vanhat testit eivat nahneet tata: niiden `_phase0`-fixture asettaa
+    horizon_gw=2 ja CS-data kattaa nimenomaan 2 kierrosta, joten vaara ja oikea
+    arvo ovat identtiset eika kontrolli erottele. Tassa ne on tarkoituksella
+    eriytetty: tiedosto vaittaa 38, CS-dataa on 2.
+    """
+    pool = [
+        _pool_player(11, "KeeperA", "ARS", 1, 55, 10.0, [5, 5]),
+        _pool_player(13, "KeeperB", "MCI", 1, 50, 9.0, [4, 5]),
+    ]
+    teams = [
+        {"short": "ARS", "fixtures": [{"gw": 1, "cs_pct": 60.0},
+                                      {"gw": 2, "cs_pct": 30.0}]},
+        {"short": "MCI", "fixtures": [{"gw": 1, "cs_pct": 20.0},
+                                      {"gw": 2, "cs_pct": 50.0}]},
+    ]
+    phase0 = {"meta": {"available": True, "next_gameweek": 1,
+                       "horizon_gw": 38, "horizon_max": 38},
+              "teams": teams}
+    monkeypatch.setattr(fv, "build_context", lambda: _ctx(pool))
+    monkeypatch.setattr(fv, "load_phase0", lambda: phase0)
+
+    out = fv.gk_rotation_pairs(top_n=3)
+    split = out["pairs"][0]["gw_split"]
+    assert len(split) == 2, "testin oletus: CS-dataa on kahdelta kierrokselta"
+    assert out["meta"]["horizon_gw"] == 2, (
+        "horizon_gw kertoo mita vastauksessa on, ei mita tiedoston metassa "
+        f"lukee (sai {out['meta']['horizon_gw']}, gw_split on {len(split)})"
+    )

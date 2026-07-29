@@ -169,11 +169,23 @@ def gk_rotation_pairs(top_n: int = 10) -> dict:
     # Paras rotaatio ensin; sama CS% → halvempi pari voittaa
     pairs.sort(key=lambda r: (-r["avg_best_cs_pct"], r["combined_price"]))
 
+    # 29.7 (Villen havainto): horizon_gw kertoo mitä TÄSSÄ vastauksessa on, ei
+    # mitä tiedoston metassa lukee. Aiemmin tämä luki p0_meta["horizon_gw"]:n,
+    # joka on koko fixture-tiedoston kattavuus (38) — mutta pari lasketaan vain
+    # kierroksista joilla MOLEMMILLA seuroilla on cs_pct, eli lähihorisontista.
+    # Payload väitti siis 38:aa ja näytti gw_splitissä 6:ta. Sama vikaluokka
+    # kuin muistin `honest-data-labels`: leima lupasi kattavuutta jota ei ole.
+    cs_gws = {gw for per_gw in cs_by_short.values() for gw in per_gw}
+    next_gw = p0_meta.get("next_gameweek")
+    horizon_actual = (
+        max(cs_gws) - next_gw + 1 if cs_gws and next_gw is not None else None
+    )
+
     return {
         "meta": {
             "available": True,
             "gw": p0_meta.get("next_gameweek"),
-            "horizon_gw": p0_meta.get("horizon_gw"),
+            "horizon_gw": horizon_actual,
             "note": ("Best rotating goalkeeper duo: each gameweek you field the "
                      "keeper with the higher model clean sheet probability."),
         },
