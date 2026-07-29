@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-07-29T08:29:13",
+    "generated_at": "2026-07-29T11:18:41",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -28,7 +28,7 @@
       ],
       "attack": -0.3018,
       "defence": 0.4813,
-      "home_gamma": -0.1552,
+      "home_gamma": -0.1553,
       "source": "measured",
       "provenance": null
     },
@@ -142,7 +142,7 @@
               "venue": "H"
             }
           ],
-          "xp": 7.46
+          "xp": 7.45
         },
         {
           "gw": 3,
@@ -689,7 +689,7 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.1,
+      "owned_pct": 16.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -809,7 +809,7 @@
       "predicted_starts": 87.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 12.4,
+      "owned_pct": 12.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1049,7 +1049,7 @@
       "predicted_starts": 80.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 13.5,
+      "owned_pct": 13.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1529,7 +1529,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 20.2,
+      "owned_pct": 20.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2609,7 +2609,7 @@
       "predicted_starts": 77.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 52.1,
+      "owned_pct": 52.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2729,7 +2729,7 @@
       "predicted_starts": 94.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 13.2,
+      "owned_pct": 13.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3209,7 +3209,7 @@
       "predicted_starts": 71.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 23.8,
+      "owned_pct": 23.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4049,7 +4049,7 @@
       "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 32.9,
+      "owned_pct": 32.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4169,7 +4169,7 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 9.7,
+      "owned_pct": 9.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5249,7 +5249,7 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 4.5,
+      "owned_pct": 4.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6209,7 +6209,7 @@
       "predicted_starts": 79.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 9.0,
+      "owned_pct": 8.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6809,7 +6809,7 @@
       "predicted_starts": 66.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.7,
+      "owned_pct": 10.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7409,7 +7409,7 @@
       "predicted_starts": 64.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.4,
+      "owned_pct": 6.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8249,7 +8249,7 @@
       "predicted_starts": 99.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 23.1,
+      "owned_pct": 23.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8849,7 +8849,7 @@
       "predicted_starts": 72.0,
       "minutes_confidence": "low",
       "data_basis": "no_history",
-      "owned_pct": 2.1,
+      "owned_pct": 2.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11281,7 +11281,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 9.7,
+      "owned_pct": 9.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11521,7 +11521,7 @@
       "predicted_starts": 77.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 0.3,
+      "owned_pct": 0.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11761,7 +11761,7 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 18.7,
+      "owned_pct": 18.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -12841,7 +12841,7 @@
       "predicted_starts": 81.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.0,
+      "owned_pct": 7.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13201,7 +13201,7 @@
       "predicted_starts": 68.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 4.4,
+      "owned_pct": 4.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13681,7 +13681,7 @@
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 13.7,
+      "owned_pct": 13.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14281,7 +14281,7 @@
       "predicted_starts": 56.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 12.8,
+      "owned_pct": 12.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -17371,7 +17371,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.5,
+      "owned_pct": 6.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19171,7 +19171,7 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.3,
+      "owned_pct": 6.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20341,7 +20341,7 @@
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 22.8,
+      "owned_pct": 22.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20566,7 +20566,7 @@
       "predicted_starts": 53.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.4,
+      "owned_pct": 0.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21816,126 +21816,6 @@
       "components_gw": 1
     },
     {
-      "id": 238,
-      "web_name": "Grealish",
-      "full_name": "Jack Grealish",
-      "team": "Manchester City",
-      "team_short": "MCI",
-      "pos": "MID",
-      "xmins": 46.9,
-      "predicted_starts": 52.7,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.3,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 3,
-      "price": 6.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1627,
-        "starts": 18,
-        "goals": 2,
-        "assists": 6,
-        "xg": 2.05,
-        "xa": 3.37,
-        "cs": 7,
-        "points": 79,
-        "per90": {
-          "goals": 0.11,
-          "assists": 0.33,
-          "xgi": 0.3
-        }
-      },
-      "p_start": 0.5268,
-      "p_cameo": 0.0473,
-      "p_bench": 0.4258,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.28,
-      "xp_per_gw": 2.11,
-      "xp_horizon_total": 12.63,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.09
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.89
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.72
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.83
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.23
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.86
-        }
-      ],
-      "components": {
-        "appearance": 1.05,
-        "goals": 0.34,
-        "assists": 0.29,
-        "clean_sheet": 0.17,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.04,
-        "yellows": -0.09,
-        "bonus": 0.3
-      },
-      "components_gw": 1
-    },
-    {
       "id": 303,
       "web_name": "Kipré",
       "full_name": "Cédric Kipré",
@@ -22381,7 +22261,7 @@
       "predicted_starts": 72.0,
       "minutes_confidence": "low",
       "data_basis": "no_history",
-      "owned_pct": 6.4,
+      "owned_pct": 6.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -24001,7 +23881,7 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.6,
+      "owned_pct": 2.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -24721,7 +24601,7 @@
       "predicted_starts": 45.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 7.4,
+      "owned_pct": 7.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29196,6 +29076,126 @@
       "components_gw": 1
     },
     {
+      "id": 238,
+      "web_name": "Grealish",
+      "full_name": "Jack Grealish",
+      "team": "Manchester City",
+      "team_short": "MCI",
+      "pos": "MID",
+      "xmins": 35.4,
+      "predicted_starts": 39.5,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "status": "d",
+      "news": "Foot injury - 75% chance of playing",
+      "chance_next": 75,
+      "yellows": 3,
+      "price": 6.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1627,
+        "starts": 18,
+        "goals": 2,
+        "assists": 6,
+        "xg": 2.05,
+        "xa": 3.37,
+        "cs": 7,
+        "points": 79,
+        "per90": {
+          "goals": 0.11,
+          "assists": 0.33,
+          "xgi": 0.3
+        }
+      },
+      "p_start": 0.3951,
+      "p_cameo": 0.0454,
+      "p_bench": 0.5595,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.21,
+      "xp_per_gw": 1.59,
+      "xp_horizon_total": 9.55,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.58
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.43
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.05
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.39
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.68
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.41
+        }
+      ],
+      "components": {
+        "appearance": 0.79,
+        "goals": 0.25,
+        "assists": 0.22,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.03,
+        "yellows": -0.07,
+        "bonus": 0.22
+      },
+      "components_gw": 1
+    },
+    {
       "id": 212,
       "web_name": "Hughes",
       "full_name": "Will Hughes",
@@ -31531,7 +31531,7 @@
       "predicted_starts": 40.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.4,
+      "owned_pct": 3.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -40111,7 +40111,7 @@
       "predicted_starts": 26.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 20.9,
+      "owned_pct": 20.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -42016,7 +42016,7 @@
       "predicted_starts": 25.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.2,
+      "owned_pct": 17.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -43663,7 +43663,7 @@
       "predicted_starts": 8.0,
       "minutes_confidence": "low",
       "data_basis": "no_history",
-      "owned_pct": 0.5,
+      "owned_pct": 0.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -44998,7 +44998,7 @@
       "predicted_starts": 19.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 1.4,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -47867,7 +47867,7 @@
       "predicted_starts": 15.6,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 2.1,
+      "owned_pct": 2.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -49862,7 +49862,7 @@
       "team_short": "COV",
       "pos": "FWD",
       "price": 4.5,
-      "owned_pct": 1.3,
+      "owned_pct": 1.2,
       "status": "u",
       "news": "Has joined KVC Westerlo on loan for the rest of the season",
       "chance_next": 0,
