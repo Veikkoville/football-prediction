@@ -32,6 +32,9 @@
 	// Hinnanmuutosennuste (sama data kuin Prices-työkalussa). Fail-safe:
 	// esikaudella listat ovat tyhjät eikä se ole vika.
 	let priceMap = $state<Map<number, string>>(new Map());
+	// Kun price watch on tyhjä (esikausi), paljas rivi ei kerro että signaali
+	// on tulossa. API kertoo syyn itse (meta.note) — näytetään se, ei arvata.
+	let priceNote = $state<string | null>(null);
 
 	// SAMA termistö kuin PriceWatch.svelte — pariteetti, ei kahta sanastoa.
 	const TREND: Record<string, { arrow: string; cls: string; label: string }> = {
@@ -52,6 +55,7 @@
 				for (const p of pw.risers ?? []) m.set(p.id, p.status);
 				for (const p of pw.fallers ?? []) m.set(p.id, p.status);
 				priceMap = m;
+				if (m.size === 0) priceNote = pw.meta?.note ?? null;
 			},
 			() => {}
 		);
@@ -111,6 +115,9 @@
 	{/each}
 	{#if rows.length === 0}
 		<p class="muted">No players tracked yet. Add the ones you are deciding on.</p>
+	{/if}
+	{#if rows.length > 0 && priceNote != null}
+		<p class="muted limit">{priceNote}</p>
 	{/if}
 
 	{#if !atLimit}
