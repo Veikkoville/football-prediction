@@ -205,6 +205,31 @@ def _fmt_kickoff(iso: str) -> str:
         return iso
 
 
+SOCIAL_IMAGE = f"{BASE}/assets/brand/goaliq-social-1200x630.png"
+
+
+def _social_meta(title: str, desc: str, canonical: str) -> str:
+    """OG + Twitter Card, sama muoto ja sama kuva-asset kuin fpl.html:ssä
+    (build_fpl_page.py). Ilman näitä sivu renderöityy jaettaessa paljaana
+    linkkinä ilman otsikkoa, kuvausta tai kuvaa."""
+    t, d = escape(title), escape(desc)
+    return (
+        '<meta property="og:type" content="article">\n'
+        f'<meta property="og:title" content="{t}">\n'
+        f'<meta property="og:description" content="{d}">\n'
+        f'<meta property="og:url" content="{canonical}">\n'
+        f'<meta property="og:image" content="{SOCIAL_IMAGE}">\n'
+        '<meta property="og:image:width" content="1200">\n'
+        '<meta property="og:image:height" content="630">\n'
+        '<meta property="og:site_name" content="GoalIQ">\n'
+        '<meta name="twitter:card" content="summary_large_image">\n'
+        '<meta name="twitter:site" content="@goaliqapp">\n'
+        f'<meta name="twitter:title" content="{t}">\n'
+        f'<meta name="twitter:description" content="{d}">\n'
+        f'<meta name="twitter:image" content="{SOCIAL_IMAGE}">\n'
+    )
+
+
 def _page(title: str, desc: str, canonical: str, hero: str, body: str,
           jsonld: list[dict]) -> str:
     ld = "".join(
@@ -220,6 +245,11 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         f"<title>{escape(title)}</title>\n"
         f'<meta name="description" content="{escape(desc)}" />\n'
         f'<link rel="canonical" href="{canonical}" />\n'
+        # 29.7 (#225-SEO): OG/Twitter myös ohjelmallisille sivuille. Konventio
+        # oli olemassa vain build_fpl_page.py:ssä, joten 180 ottelusivua +hub
+        # renderöityi jaettaessa paljaana linkkinä. Arvot johdetaan samoista
+        # _page()-parametreista, ei uutta dataa.
+        f"{_social_meta(title, desc, canonical)}"
         # 27.7: koko ikonisetti myös ohjelmallisille ottelusivuille (ks.
         # build_fpl_longtail.py, sama perustelu).
         '<link rel="icon" href="/favicon.ico" sizes="any">\n'
