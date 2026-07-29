@@ -9,6 +9,7 @@
 	 * leaders-listoissa: free näkee mekanismin, premium poistaa rajan.
 	 */
 	import { fetchXp, type XpPlayer } from '$lib/api';
+	import { fetchPriceWatch } from '$lib/fantasyTools';
 	import {
 		EMPTY_PREFS,
 		WATCHLIST_FREE_LIMIT,
@@ -28,10 +29,30 @@
 	let pool = $state<XpPlayer[]>([]);
 	let prefs = $state<FplPrefs>({ ...EMPTY_PREFS });
 	let query = $state('');
+	// Hinnanmuutosennuste (sama data kuin Prices-työkalussa). Fail-safe:
+	// esikaudella listat ovat tyhjät eikä se ole vika.
+	let priceMap = $state<Map<number, string>>(new Map());
+
+	// SAMA termistö kuin PriceWatch.svelte — pariteetti, ei kahta sanastoa.
+	const TREND: Record<string, { arrow: string; cls: string; label: string }> = {
+		rising_soon: { arrow: '▲', cls: 'up', label: 'Rising soon' },
+		rising_watch: { arrow: '▲', cls: 'up', label: 'On watch' },
+		falling_soon: { arrow: '▼', cls: 'down', label: 'Falling soon' },
+		falling_watch: { arrow: '▼', cls: 'down', label: 'On watch' }
+	};
 
 	$effect(() => {
 		fetchXp().then(
 			(d) => (pool = d.players ?? []),
+			() => {}
+		);
+		fetchPriceWatch().then(
+			(pw) => {
+				const m = new Map<number, string>();
+				for (const p of pw.risers ?? []) m.set(p.id, p.status);
+				for (const p of pw.fallers ?? []) m.set(p.id, p.status);
+				priceMap = m;
+			},
 			() => {}
 		);
 		prefs = loadPrefs();
@@ -64,6 +85,7 @@
 	{#each rows as p (p.id)}
 		{@const flagged = p.status != null && p.status !== 'a'}
 		{@const tc = teamColorByShort(p.team_short)}
+		{@const trend = TREND[priceMap.get(p.id) ?? '']}
 		<div class="row">
 			<TeamKit color={tc.color} textColor={tc.textColor} label={p.team_short} size={24} />
 			<div class="body">
@@ -71,6 +93,9 @@
 					>{p.web_name}
 					<span class="muted meta">{p.pos}{p.price != null ? ` · ${p.price.toFixed(1)}m` : ''}</span>
 				</span>
+				{#if trend}
+					<span class="trend {trend.cls}">{trend.arrow} {trend.label}</span>
+				{/if}
 				{#if flagged}
 					<span class="flag">{p.news || 'Flagged by FPL'}</span>
 				{/if}
@@ -139,6 +164,16 @@
 	.flag {
 		color: var(--negative);
 		font-size: var(--step--1);
+	}
+	.trend {
+		font-size: var(--step--1);
+		font-weight: 600;
+	}
+	.trend.up {
+		color: var(--positive);
+	}
+	.trend.down {
+		color: var(--negative);
 	}
 	.remove {
 		font: inherit;
