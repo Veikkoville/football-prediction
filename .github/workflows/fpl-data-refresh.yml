@@ -136,6 +136,30 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_player_leaders
 
+      # Beat the model V1: gradaa lukitut päätökset valmiilta kierroksilta.
+      # Idempotentti (gradatut ohitetaan, trigger estää uudelleengradauksen),
+      # joten päivittäinen kutsu on turvallinen myös GW:iden välissä.
+      # ADMIN_TOKEN = sama arvo kuin Renderin ADMIN_TOKEN-env. Jos secretiä ei
+      # ole asetettu, askel EI kaadu vaan kirjaa ohituksen näkyvästi — hiljaa
+      # kuoleva grader olisi sama vikaluokka kuin ajokelvoton ship-gate (28.7).
+      - name: Grade Beat-the-model decisions
+        if: steps.guard.outputs.proceed == 'true'
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          if [ -z "$ADMIN_TOKEN" ]; then
+            echo "::warning::ADMIN_TOKEN-secret puuttuu — grading OHITETTU. Lisää repo-secret (sama arvo kuin Renderin ADMIN_TOKEN)."
+            exit 0
+          fi
+          resp=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            https://api.goaliq.app/api/admin/grade-decisions)
+          body=$(echo "$resp" | head -n -1); code=$(echo "$resp" | tail -1)
+          echo "grade-decisions HTTP $code: $body"
+          if [ "$code" != "200" ]; then
+            echo "::warning::grading epäonnistui (HTTP $code) — päätökset jäävät gradaamatta tähän ajoon."
+          fi
+
       - name: Commit + push to main (Render serves fresh data)
         if: steps.guard.outputs.proceed == 'true'
         run: |

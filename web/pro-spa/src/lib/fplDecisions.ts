@@ -34,6 +34,49 @@ export interface StoredDecision {
 	followed: boolean;
 	deadline_utc: string;
 	locked_at: string;
+	/** Beat the model V1 (29.7): backend-graderin tulos. NULL = ei vielä
+	 *  gradattu. Optionaaliset: vanha skeema ei palauta kenttiä. */
+	graded_at?: string | null;
+	model_points?: number | null;
+	user_points?: number | null;
+	grade_note?: string | null;
+}
+
+/** Tuloskortin kausisumma gradatuista päätöksistä. delta > 0 = käyttäjä
+ *  edellä. Vain rivit joissa MOLEMMAT puolet gradattiin — gradaamattomia ei
+ *  arvata nollaksi vaan ne raportoidaan erikseen. SAMA logiikka kuin mobiilin
+ *  lib/fplDecisions.ts:ssä: silmukan lopputulos ei saa riippua pinnasta. */
+export interface SeasonScore {
+	gradedCount: number;
+	ungradableCount: number;
+	userTotal: number;
+	modelTotal: number;
+	delta: number;
+}
+
+export function seasonScore(rows: StoredDecision[]): SeasonScore {
+	let user = 0;
+	let model = 0;
+	let graded = 0;
+	let ungradable = 0;
+	for (const r of rows) {
+		if (r.graded_at == null || r.grade_note === 'kind_not_graded') continue;
+		if (typeof r.model_points !== 'number') continue;
+		if (typeof r.user_points !== 'number') {
+			ungradable += 1;
+			continue;
+		}
+		user += r.user_points;
+		model += r.model_points;
+		graded += 1;
+	}
+	return {
+		gradedCount: graded,
+		ungradableCount: ungradable,
+		userTotal: Math.round(user * 10) / 10,
+		modelTotal: Math.round(model * 10) / 10,
+		delta: Math.round((user - model) * 10) / 10
+	};
 }
 
 export function didFollowModel(
@@ -79,12 +122,15 @@ export async function loadDecisions(gw?: number): Promise<StoredDecision[]> {
 	try {
 		let q = supabase
 			.from('fpl_decisions')
-			.select('gw,kind,model_choice,user_choice,followed,deadline_utc,locked_at')
+			.select(
+				'gw,kind,model_choice,user_choice,followed,deadline_utc,locked_at,' +
+					'graded_at,model_points,user_points,grade_note'
+			)
 			.order('gw', { ascending: false });
 		if (gw != null) q = q.eq('gw', gw);
 		const { data, error } = await q;
 		if (error || !data) return [];
-		return data as StoredDecision[];
+		return data as unknown as StoredDecision[];
 	} catch {
 		return [];
 	}

@@ -1906,6 +1906,93 @@ def clear_cache(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# ENDPOINT: Beat the model — päätösten gradaus (admin-eräajo)
+# ---------------------------------------------------------------------------
+@app.post("/api/admin/grade-decisions")
+def grade_decisions(request: Request):
+    """Gradaa lukitut päätökset valmiilta kierroksilta (Beat the model V1).
+
+    Määrittely: goaliq-app/cos-reports/beat-the-model-maarittely-2026-07-29.md.
+    Kutsutaan fpl-data-refresh-workflowista päivittäin; idempotentti, koska
+    gradatut rivit ohitetaan (graded_at is null -haku) ja trigger estää
+    uudelleengradauksen. Klientti ei koskaan gradaa itseään — tämä ajaa
+    service-roolilla ja on ADMIN_TOKEN-portin takana kuten clear-cache.
+    """
+    require_admin(request)
+    from src.models.fpl_grade import (
+        NOTE_NO_ENTRY, fetch_live_points, finished_gws, grade_one,
+        make_picks_fetchers,
+    )
+
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        raise HTTPException(status_code=503, detail="Supabase env missing")
+    sb_headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal",
+    }
+
+    done = finished_gws()
+    if not done:
+        return {"graded": 0, "skipped": 0, "gws": []}
+
+    # Gradaamattomat päätökset valmiilta kierroksilta. PostgREST in-lista.
+    gw_list = ",".join(str(g) for g in sorted(done))
+    rows = requests.get(
+        f"{SUPABASE_URL}/rest/v1/fpl_decisions"
+        f"?graded_at=is.null&gw=in.({gw_list})"
+        f"&select=id,user_id,gw,kind,model_choice,user_choice,followed",
+        headers=sb_headers, timeout=30,
+    ).json()
+    if not isinstance(rows, list) or not rows:
+        return {"graded": 0, "skipped": 0, "gws": sorted(done)}
+
+    # entry-ID:t kerralla (poikkeamien gradaus tarvitsee ne).
+    user_ids = sorted({r["user_id"] for r in rows})
+    entry_by_user: dict[str, int] = {}
+    for i in range(0, len(user_ids), 100):
+        chunk = ",".join(user_ids[i:i + 100])
+        prof = requests.get(
+            f"{SUPABASE_URL}/rest/v1/profiles?id=in.({chunk})"
+            f"&select=id,fpl_entry_id",
+            headers=sb_headers, timeout=30,
+        ).json()
+        for p in prof if isinstance(prof, list) else []:
+            if isinstance(p.get("fpl_entry_id"), int):
+                entry_by_user[p["id"]] = p["fpl_entry_id"]
+
+    graded = skipped = 0
+    live_by_gw: dict[int, dict] = {}
+    fetchers_by_gw: dict[int, tuple] = {}
+    now_iso = datetime.now(timezone.utc).isoformat()
+    for r in rows:
+        gw = r["gw"]
+        if gw not in live_by_gw:
+            live_by_gw[gw] = fetch_live_points(gw)
+            fetchers_by_gw[gw] = make_picks_fetchers(gw)
+        fetch_captain, fetch_transfers = fetchers_by_gw[gw]
+        model_pts, user_pts, note = grade_one(
+            r["kind"], r.get("model_choice") or {}, r.get("user_choice") or {},
+            bool(r["followed"]), live_by_gw[gw],
+            entry_by_user.get(r["user_id"]), fetch_captain, fetch_transfers,
+        )
+        patch = requests.patch(
+            f"{SUPABASE_URL}/rest/v1/fpl_decisions?id=eq.{r['id']}",
+            headers=sb_headers, timeout=15,
+            json={"graded_at": now_iso, "model_points": model_pts,
+                  "user_points": user_pts, "grade_note": note},
+        )
+        if patch.status_code in (200, 204):
+            graded += 1
+        else:
+            skipped += 1
+            print(f"[grade] FAILED id={r['id']} status={patch.status_code} "
+                  f"body={patch.text[:150]}")
+    return {"graded": graded, "skipped": skipped, "gws": sorted(done)}
+
+
+# ---------------------------------------------------------------------------
 # STRIPE: Checkout-session ja webhook
 # ---------------------------------------------------------------------------
 class CheckoutRequest(BaseModel):

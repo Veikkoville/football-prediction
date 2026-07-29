@@ -19,6 +19,7 @@
 	import { loadDraftIds, saveDraftIds, syncDraft, pushRemoteDraftSoon } from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import WeeklyActions, { type WeeklyAction } from './WeeklyActions.svelte';
+	import BeatTheModel from './BeatTheModel.svelte';
 	import { fetchFantasy } from '$lib/api';
 	import ModelWorking from './ModelWorking.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -673,6 +674,9 @@
 			actions={weeklyActions}
 			onFollowTransfer={followTransferFromLoop}
 		/>
+		<!-- Silmukan askel 5: kauden "sinä vs malli" -tuloskortti (V1).
+		     Etuoven alle: tulos on kirjaamisen palkinto. -->
+		<BeatTheModel />
 
 		<p class="captain">
 			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
