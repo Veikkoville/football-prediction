@@ -32,8 +32,22 @@
 	let {
 		gw,
 		deadlineUtc,
-		actions
-	}: { gw: number | null; deadlineUtc: string | null; actions: WeeklyAction[] } = $props();
+		actions,
+		onFollowTransfer
+	}: {
+		gw: number | null;
+		deadlineUtc: string | null;
+		actions: WeeklyAction[];
+		/**
+		 * 29.7 (Villen havainto 28.7: "painaa do it, niin se ei muuta
+		 * kokoonpanossa sitä pelaajaa"). Kutsutaan kun siirtopäätös kirjattiin
+		 * followed-tilassa — parent soveltaa siirron suunniteltuun joukkueeseen
+		 * SAMALLA setPlan-polulla kuin Apply-nappi (#121), jolloin portit
+		 * (budjetti, duplikaatit) pysyvät yhdessä paikassa. true = sovellettu,
+		 * jolloin käyttäjä saa vahvistuksen.
+		 */
+		onFollowTransfer?: (choice: Record<string, unknown>) => boolean;
+	} = $props();
 
 	let logged = $state<Record<string, StoredDecision>>({});
 	let busy = $state<string | null>(null);
@@ -70,6 +84,14 @@
 		});
 		busy = null;
 		if (res.ok) {
+			// FM-silmukka: "I'll do this" siirrolle päivittää myös suunnitellun
+			// joukkueen — päätös joka ei muuta mitään ei ole päätös. Vain
+			// onnistuneen kirjauksen jälkeen: loki ja joukkue pysyvät synkassa.
+			if (followed && a.kind === 'transfer' && onFollowTransfer) {
+				if (onFollowTransfer(a.modelChoice)) {
+					note = 'Applied to your planned squad on GoalIQ. Remember to make the transfer in FPL too.';
+				}
+			}
 			await refresh();
 		} else {
 			note =
@@ -130,8 +152,9 @@
 
 		<!-- Ei koskaan piiloteta sitä mitä nappi EI tee. -->
 		<p class="muted foot">
-			Logging keeps a record of your call against the model's. It does not change your Fantasy
-			Premier League team, so apply it there yourself.
+			Logging keeps a record of your call against the model's. Following a transfer also updates
+			your planned squad here on GoalIQ. Nothing changes in your actual Fantasy Premier League
+			team, so make the move there yourself.
 		</p>
 	</section>
 {/if}

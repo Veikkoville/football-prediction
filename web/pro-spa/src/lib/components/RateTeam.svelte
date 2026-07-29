@@ -386,6 +386,19 @@
 		);
 	}
 
+	/** FM-silmukan "I'll do this" siirrolle (29.7) — sama setPlan-polku ja
+	 *  samat portit kuin Apply-napilla. Ei koskaan kahta soveltamislogiikkaa. */
+	function followTransferFromLoop(choice: Record<string, unknown>): boolean {
+		const sug = data?.transfers?.suggestions?.find(
+			(s) => s.out.id === choice.out_id && s.in.id === choice.in_id
+		);
+		if (!sug) return false;
+		if (appliedKeys.has(`${sug.out.id}-${sug.in.id}`)) return false;
+		if (!canApply(sug)) return false;
+		setPlan([...appliedTransfers, sug]);
+		return true;
+	}
+
 	$effect(() => {
 		// Paywall-pariteetti: teaser näkyvissä = paywall_shown (kerran per lataus)
 		if (!premium && data) {
@@ -654,7 +667,12 @@
 		     ainoa paikka jossa kapteeni JA siirtoehdotus ovat samassa datassa,
 		     ja silmukka alkaa siitä hetkestä kun käyttäjä on juuri nähnyt
 		     mitä malli suosittelee. -->
-		<WeeklyActions gw={data.meta.gw} {deadlineUtc} actions={weeklyActions} />
+		<WeeklyActions
+			gw={data.meta.gw}
+			{deadlineUtc}
+			actions={weeklyActions}
+			onFollowTransfer={followTransferFromLoop}
+		/>
 
 		<p class="captain">
 			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
