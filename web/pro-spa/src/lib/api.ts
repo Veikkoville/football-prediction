@@ -429,7 +429,14 @@ export interface FitResponse {
 	locked: FitPlayer[];
 	xi: FitPlayer[];
 	bench: FitPlayer[];
-	totals: { xi_xp_horizon: number; optimal_xp_horizon: number; delta_xp: number };
+	totals: {
+		xi_xp_horizon: number;
+		optimal_xp_horizon: number;
+		delta_xp: number;
+		/** 29.7: onko vertailukohta todistettu optimi. Vanha deployattu API ei
+		    palauta kenttaa -> undefined = "ei tietoa", portti reagoi vain falseen. */
+		optimal_proven?: boolean;
+	};
 	message: string;
 }
 

@@ -228,7 +228,7 @@ def _squad_clubs_ok(squad: list[dict]) -> bool:
     return all(c <= MAX_PER_CLUB for c in counts.values())
 
 
-_OPTIMAL_XP_CACHE: dict[str, float] = {}
+_OPTIMAL_XP_CACHE: dict[str, dict] = {}
 _NEG = float("-inf")
 # Viimeisimmän optimoinnin todistustila. Copy saa väittää "paras mahdollinen"
 # VAIN kun tämä on True (28.7: aiempi ahne heuristiikka jäi mitatusti 14.19 xP
@@ -382,7 +382,8 @@ def _bench_for_shape(pool: list[dict], shape: dict[int, int],
     return bench, cost
 
 
-def _unconstrained_optimum(pool: list[dict], xi_budget: int):
+def _unconstrained_optimum(pool: list[dict], xi_budget: int,
+                           locked: list[dict] | None = None):
     """Eksakti paras XI ILMAN 3/klubi-rajaa → todistettu YLÄRAJA.
 
     Jos tuloksena oleva XI sattuu täyttämään klubikaton, se on samalla
@@ -392,13 +393,25 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int):
     `xi_budget` on YLÄRAJA kaikille muodostelmille; kunkin muodostelman oma
     budjetti lasketaan sen vaatimasta penkistä (28.7).
 
+    `locked` (29.7, #155-yhtenäistys): pakotetut XI-pelaajat. Ne poistetaan
+    valinta-avaruudesta ja niiden hinta budjetista, jolloin DP ratkaisee tasan
+    jäljellä olevat paikat. Todistus säilyy: lukitut ovat kiinteä vakio, joten
+    rajoitteeton optimi jäännösongelmaan + vakio on yläraja koko tehtävälle.
+
     Palauttaa (xi, total) tai (None, -inf).
     """
+    locked = list(locked or [])
+    locked_ids = {p["id"] for p in locked}
+    locked_shape = _shape_of(locked)
+    locked_cost = sum(p["price"] for p in locked)
+    locked_xp = sum(p["xp_horizon_total"] for p in locked)
+
     unit = _price_unit(pool)
-    B = xi_budget // unit
+    B = max(0, xi_budget - locked_cost) // unit
     by_pos: dict[int, list[dict]] = {1: [], 2: [], 3: [], 4: []}
     for p in pool:
-        by_pos[p["element_type"]].append(p)
+        if p["id"] not in locked_ids:
+            by_pos[p["element_type"]].append(p)
 
     kmax = {1: 1, 2: XI_MAX[2], 3: XI_MAX[3], 4: XI_MAX[4]}
     tables = {t: _pos_dp(by_pos[t], kmax[t], B, unit) for t in (1, 2, 3, 4)}
@@ -410,28 +423,31 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int):
             if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
                 continue
             shape = {1: 1, 2: n_def, 3: n_mid, 4: n_fwd}
+            need = {t: shape[t] - locked_shape[t] for t in shape}
+            if any(v < 0 for v in need.values()):
+                continue  # lukitut eivät mahdu tähän muodostelmaan
             # Muodostelmakohtainen budjetti: 100.0m miinus TÄMÄN muodon
             # vaatima pelattava penkki.
-            _bench, bench_cost = _bench_for_shape(pool, shape, set())
+            _bench, bench_cost = _bench_for_shape(pool, shape, locked_ids)
             if bench_cost < 0:
                 continue
-            b_shape = (BUDGET_TENTHS - bench_cost) // unit
+            b_shape = (BUDGET_TENTHS - bench_cost - locked_cost) // unit
             if b_shape < 0:
                 continue
-            rows = [tables[t][0][n] for t, n in shape.items()]
+            rows = [tables[t][0][n] for t, n in need.items()]
             acc = rows[0]
             for r in rows[1:]:
                 acc = _maxplus(acc, r, B)
             top = max(acc[:b_shape + 1]) if b_shape <= B else max(acc)
             if top > best[0]:
-                best = (top, (shape, acc, min(b_shape, B)))
-    if best[1] is None:
+                best = (top, (shape, need, min(b_shape, B)))
+    if best[1] is None or best[0] == _NEG:
         return None, _NEG
 
     # Rekonstruktio: etsi kustannusjako joka toteuttaa optimin, sitten pelaajat.
-    shape, _acc, shape_budget = best[1]
+    shape, need, shape_budget = best[1]
     order = [1, 2, 3, 4]
-    rows = {t: tables[t][0][shape[t]] for t in order}
+    rows = {t: tables[t][0][need[t]] for t in order}
 
     def _split(idx: int, budget_left: int, target: float, chosen: list[int]):
         t = order[idx]
@@ -452,10 +468,10 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int):
     costs = _split(0, shape_budget, best[0], [])
     if costs is None:
         return None, _NEG
-    xi: list[dict] = []
+    xi: list[dict] = list(locked)
     for t, c in zip(order, costs):
         _dp, pick = tables[t]
-        k, cur = shape[t], c
+        k, cur = need[t], c
         while k > 0:
             entry = pick[k][cur]
             if entry is None:
@@ -463,20 +479,27 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int):
             p, prev = entry
             xi.append(p)
             k, cur = k - 1, prev
-    return (xi, best[0]) if len(xi) == 11 else (None, _NEG)
+    return ((xi, best[0] + locked_xp) if len(xi) == 11
+            else (None, _NEG))
 
 
-def _improve_legal(xi: list[dict], pool: list[dict], xi_budget: int) -> list[dict]:
+def _improve_legal(xi: list[dict], pool: list[dict], xi_budget: int,
+                   keep_ids: set[int] | None = None) -> list[dict]:
     """Paikallishaku: vaihda yksi pelaaja kerrallaan parempaan samassa
     positiossa niin kauan kuin budjetti ja klubikatto sallivat. Käytetään VAIN
     kun eksakti optimi rikkoo klubikaton — ahne lähtökohta jää muuten
-    todistettavasti kauas (mitattu 28.7: 288.23 vs 302.42)."""
+    todistettavasti kauas (mitattu 28.7: 288.23 vs 302.42).
+
+    `keep_ids` = lukitut pelaajat, joita ei saa vaihtaa pois (fit checker)."""
+    keep_ids = keep_ids or set()
     cur = list(xi)
     ids = {p["id"] for p in cur}
     improved = True
     while improved:
         improved = False
         for i, out in enumerate(cur):
+            if out["id"] in keep_ids:
+                continue
             for cand in pool:
                 if (cand["element_type"] != out["element_type"]
                         or cand["id"] in ids
@@ -495,9 +518,20 @@ def _improve_legal(xi: list[dict], pool: list[dict], xi_budget: int) -> list[dic
     return cur
 
 
-def optimal_budget_xi(pool: list[dict]) -> list[dict]:
-    """Sama heuristiikka kuin optimal_budget_team_xp, mutta palauttaa XI:n
-    PELAAJAT eikä pelkkää summaa.
+def build_optimal_squad(pool: list[dict],
+                        locked: list[dict] | None = None) -> dict:
+    """Paras laillinen 15 (XI + pelattava penkki), valinnaisilla lukituilla.
+
+    YKSI LÄHDE (29.7): tätä käyttävät sekä #50-benchmark (locked=[]) että
+    #155-fit-checker (locked=1-3 pelaajaa). Aiemmin fit checkerillä oli oma
+    vanhempi ahne optimoija ilman eksaktia hakua ja ilman pelattavaa penkkiä,
+    jolloin kaksi pintaa väitti eri lukua "mallin parhaaksi": fit 282.31 vs
+    benchmark 303.34 (mitattu tuotannosta 28.7). Sama koneisto molemmilla
+    poistaa ristiriidan rakenteellisesti, ei kirjanpidolla.
+
+    Palauttaa {"xi", "bench", "xi_xp", "proven"}; xi=[] jos runkoa ei saada.
+    "proven" = XI on todistetusti paras laillinen (eksakti DP osui laillisena),
+    ei pelkkä heuristiikan paras — copy saa sanoa "best" vain silloin.
 
     MIKSI ERIKSEEN (26.7): "Model XI" halutaan renderöidä kenttägrafiikkana
     julkiselle webille, ja siihen tarvitaan rivit eikä yhtä lukua. Logiikka on
@@ -522,11 +556,16 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
 
     Palauttaa [] jos laillista XI:tä ei saada kokoon.
     """
+    locked = list(locked or [])
+    locked_ids = {p["id"] for p in locked}
+    locked_shape = _shape_of(locked)
+    empty: dict = {"xi": [], "bench": [], "xi_xp": 0.0, "proven": False}
+
     by_pos: dict[int, list[dict]] = {1: [], 2: [], 3: [], 4: []}
     for p in pool:
         by_pos[p["element_type"]].append(p)
     if any(len(by_pos[t]) < n for t, n in SQUAD_QUOTA.items()):
-        return []
+        return empty
 
     # 28.7 (Villen havainto): penkkireservi lasketaan PELATTAVASTA penkistä,
     # ei kolmesta halvimmasta. Tässä lasketaan vain kaikkien muodostelmien
@@ -538,26 +577,35 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
             n_fwd = 10 - n_def - n_mid
             if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
                 continue
-            _b, c = _bench_for_shape(pool, {1: 1, 2: n_def, 3: n_mid, 4: n_fwd},
-                                     set())
+            shape = {1: 1, 2: n_def, 3: n_mid, 4: n_fwd}
+            if any(shape[t] < locked_shape[t] for t in shape):
+                continue
+            _b, c = _bench_for_shape(pool, shape, locked_ids)
             if c >= 0 and (cheapest_bench is None or c < cheapest_bench):
                 cheapest_bench = c
     if cheapest_bench is None:
-        return []
+        return empty
     xi_budget = BUDGET_TENTHS - cheapest_bench
     min_price = min(p["price"] for p in pool)
 
     ranked = sorted(pool, key=lambda p: p["xp_horizon_total"], reverse=True)
 
     def _fill(shape: dict[int, int]) -> list[dict]:
-        """Ahne täyttö KIINTEÄLLE muodostelmalle. Palauttaa [] jos ei onnistu."""
-        xi: list[dict] = []
-        counts = {1: 0, 2: 0, 3: 0, 4: 0}
-        clubs: dict = {}
-        cost = 0
+        """Ahne täyttö KIINTEÄLLE muodostelmalle, lukitut pohjalla.
+        Palauttaa [] jos ei onnistu."""
+        xi: list[dict] = list(locked)
+        counts = _shape_of(xi)
+        clubs: dict = _club_counts(xi)
+        cost = sum(p["price"] for p in xi)
+        if any(counts[t] > shape[t] for t in shape):
+            return []
+        if any(n > MAX_PER_CLUB for n in clubs.values()):
+            return []
         for p in ranked:
             if len(xi) == 11:
                 break
+            if p["id"] in locked_ids:
+                continue
             t = p["element_type"]
             if counts[t] >= shape[t]:
                 continue
@@ -573,8 +621,20 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
             cost += p["price"]
         return xi if len(xi) == 11 else []
 
+    def _result(xi: list[dict], proven: bool) -> dict:
+        if not xi:
+            return empty
+        bench = _bench_for_shape(pool, _shape_of(xi), {p["id"] for p in xi},
+                                 _club_counts(xi))[0]
+        return {
+            "xi": xi,
+            "bench": bench,
+            "xi_xp": sum(p["xp_horizon_total"] for p in xi),
+            "proven": proven,
+        }
+
     # --- 1. EKSAKTI polku (28.7): DP ilman klubikattoa = todistettu yläraja.
-    exact, exact_total = _unconstrained_optimum(pool, xi_budget)
+    exact, exact_total = _unconstrained_optimum(pool, xi_budget, locked)
     if exact and _squad_clubs_ok(exact):
         # Kelvollinen ratkaisu ylärajan arvolla ⇒ todistetusti optimi.
         bench, bench_cost = _bench_for_shape(
@@ -582,16 +642,14 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
             _club_counts(exact))
         xi_cost = sum(p["price"] for p in exact)
         if bench and xi_cost + bench_cost <= BUDGET_TENTHS:
-            _LAST_OPTIMAL_PROVEN["v"] = True
-            _LAST_BENCH["v"] = bench
-            return exact
+            return {"xi": exact, "bench": bench,
+                    "xi_xp": sum(p["xp_horizon_total"] for p in exact),
+                    "proven": True}
         # Klubikatto teki oletetun penkin kalliimmaksi kuin varaus → tämä XI
         # ei ole rahoitettavissa. Pudotaan varapolulle, joka tarkistaa
         # rungon kokonaisuutena.
-        _LAST_OPTIMAL_PROVEN["v"] = False
 
     # --- 2. Varapolku: klubikatto sitoo → ahne + paikallishaku.
-    _LAST_OPTIMAL_PROVEN["v"] = False
     best: list[dict] = []
     best_total = -1.0
     for n_def in range(XI_MIN[2], XI_MAX[2] + 1):
@@ -602,18 +660,44 @@ def optimal_budget_xi(pool: list[dict]) -> list[dict]:
             cand = _fill({1: 1, 2: n_def, 3: n_mid, 4: n_fwd})
             if not cand:
                 continue
-            cand = _improve_legal(cand, pool, xi_budget)
+            cand = _improve_legal(cand, pool, xi_budget, locked_ids)
             total = sum(p["xp_horizon_total"] for p in cand)
             if total > best_total:
                 best_total, best = total, cand
     # Jos paikallishaku osuu ylärajaan, ratkaisu on silti todistetusti optimi.
-    if best and exact_total != _NEG and abs(best_total - exact_total) < 1e-6:
-        _LAST_OPTIMAL_PROVEN["v"] = True
-    _LAST_BENCH["v"] = (_bench_for_shape(pool, _shape_of(best),
-                                         {p["id"] for p in best},
-                                         _club_counts(best))[0]
-                        if best else [])
-    return best
+    proven = bool(best and exact_total != _NEG
+                  and abs(best_total - exact_total) < 1e-6)
+    return _result(best, proven)
+
+
+def optimal_budget_xi(pool: list[dict]) -> list[dict]:
+    """#50-benchmarkin XI (ei lukittuja). Ohut kääre build_optimal_squadille,
+    joka pitää moduulitason todistus-/penkkitilan ennallaan vanhoille
+    kutsujille (rate_team-payload + model-xi-sivu)."""
+    res = build_optimal_squad(pool)
+    _LAST_OPTIMAL_PROVEN["v"] = res["proven"]
+    _LAST_BENCH["v"] = res["bench"]
+    return res["xi"]
+
+
+def free_optimum(pool: list[dict], cache_key: str) -> dict:
+    """Vapaa optimi (ei lukittuja) välimuistista — KOKO tulos, ei pelkkä luku.
+
+    29.7: välimuisti säilöi ennen vain xP:n, jolloin osumalla `optimal_xi_proven()`
+    palautti edellisen ajon lipun eikä välimuistiin osuneen. Sama arvo samalla
+    poolilla, joten oire ei näkynyt — mutta lippu on nimenomaan rehellisyysportti,
+    joten sen ei kuulu roikkua globaalissa tilassa. Nyt lippu ja penkki tulevat
+    aina samasta tuloksesta kuin luku.
+
+    Fit checker (#155) käyttää TÄTÄ vertailukohtanaan → sen "vapaa optimi" ei voi
+    poiketa rate-teamin benchmarkista.
+    """
+    hit = _OPTIMAL_XP_CACHE.get(cache_key)
+    if hit is None:
+        hit = build_optimal_squad(pool)
+        _OPTIMAL_XP_CACHE.clear()
+        _OPTIMAL_XP_CACHE[cache_key] = hit
+    return hit
 
 
 def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
@@ -621,14 +705,11 @@ def optimal_budget_team_xp(pool: list[dict], cache_key: str) -> float:
     horisontti-xP). Korvaa satunnaisotoksen: "300 random squads" antoi lähes
     kaikille oikeille joukkueille ~100 % = ontto imartelu (Hub 2,0★ -oppi 4).
 
-    Rakentaa XI:n optimal_budget_xi():lla → yksi heuristiikka, ei kahta."""
-    hit = _OPTIMAL_XP_CACHE.get(cache_key)
-    if hit is not None:
-        return hit
-    xi = optimal_budget_xi(pool)
-    total = sum(p["xp_horizon_total"] for p in xi) if xi else 0.0
-    _OPTIMAL_XP_CACHE[cache_key] = total
-    return total
+    Rakentaa XI:n build_optimal_squadilla → yksi optimoija, ei kahta."""
+    res = free_optimum(pool, cache_key)
+    _LAST_OPTIMAL_PROVEN["v"] = res["proven"]
+    _LAST_BENCH["v"] = res["bench"]
+    return res["xi_xp"]
 
 
 def _line_strength(xi: list[dict], pool: list[dict]) -> tuple[str, str]:

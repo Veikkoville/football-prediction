@@ -106,8 +106,9 @@
 <section class="tool-card">
 	<h2>Fit checker</h2>
 	<p class="muted">
-		Free · Lock 1-3 must-have players and the model builds the best valid 15-player squad
-		around them, then shows what forcing those picks costs against its best free squad.
+		Free · Lock 1-3 must-have players and the model builds the strongest valid 15-player
+		squad around them, then shows what forcing those picks costs against the same squad
+		built with no locks.
 		No FPL entry ID needed. Prices come straight from the official FPL API and update the
 		moment FPL opens the new season's game.
 	</p>
@@ -198,7 +199,14 @@
 					<dd>{result.totals.xi_xp_horizon.toFixed(1)}</dd>
 				</div>
 				<div>
-					<dt>vs the model's best free squad</dt>
+					<!-- 29.7: "best" vain kun backend on TODISTANUT sen. Sama portti kuin
+					     RateTeamissa; fit kayttaa nyt samaa optimoijaa, joten lippu on
+					     vertailukelpoinen molemmilla pinnoilla. -->
+					<dt>
+						{result.totals.optimal_proven === false
+							? 'vs the strongest free squad the model found'
+							: "vs the model's best free squad"}
+					</dt>
 					<dd class:cost={result.totals.delta_xp < -0.005}>
 						{result.totals.delta_xp >= -0.005 ? 'no cost' : result.totals.delta_xp.toFixed(2)}
 					</dd>
