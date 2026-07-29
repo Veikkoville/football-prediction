@@ -9,9 +9,12 @@
 			name="description"
 			content="Fantasy Premier League tools from the GoalIQ match model: clean sheet probability, fixture difficulty and player expected points (xP)."
 		/>
-		<!-- 27.7 classic-ilme. 32/48 lisättiin koska selaimet suosivat
-		     välilehtikokoa vastaavaa varianttia; pelkkä 192 skaalattiin alas ja
-		     antiikva-IQ sumeni. goaliq.app-puolella on sama setti. -->
+		<!-- 32/48 lisättiin koska selaimet suosivat välilehtikokoa vastaavaa
+		     varianttia; pelkkä 192 skaalattiin alas ja IQ sumeni.
+		     29.7 (Villen havainto): nämä olivat yhä MAGENTA-aikakaudelta, koska
+		     SPA:lla on omat kopiot static/-kansiossa eikä 28.7. teletext-passi
+		     koskenut niitä. goaliq.app näytti amber-merkkiä ja pro.goaliq.app
+		     magentaa. Nyt molemmat tulevat samasta gen_teletext_social.py:sta. -->
 		<link rel="icon" type="image/png" sizes="32x32" href="%sveltekit.assets%/goaliq-appicon-32.png" />
 		<link rel="icon" type="image/png" sizes="48x48" href="%sveltekit.assets%/goaliq-appicon-48.png" />
 		<link rel="icon" type="image/png" sizes="192x192" href="%sveltekit.assets%/goaliq-appicon-192.png" />
