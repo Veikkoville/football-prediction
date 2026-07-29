@@ -24,6 +24,39 @@ export const DRAFT_TS_KEY = 'goaliq.fplDraftPicks.updatedAt';
 export interface RemoteDraft {
 	ids: number[];
 	updated_at: string;
+	captain_id?: number | null;
+	vice_id?: number | null;
+}
+
+/** Kapteeni/vice (29.7, skeema 20260729233000). Oma avain jotta vanha
+ *  ids-muoto ei muutu; sama kaava kuin mobiilin lib/fplDraft.ts:ssä. */
+export const CAP_LS_KEY = 'goaliq.fplDraftCaptaincy';
+
+export interface Captaincy {
+	captain_id: number | null;
+	vice_id: number | null;
+}
+
+export function loadCaptaincy(): Captaincy {
+	try {
+		const raw = localStorage.getItem(CAP_LS_KEY);
+		if (!raw) return { captain_id: null, vice_id: null };
+		const p: unknown = JSON.parse(raw);
+		const num = (v: unknown) =>
+			typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : null;
+		const o = p as { captain_id?: unknown; vice_id?: unknown };
+		return { captain_id: num(o?.captain_id), vice_id: num(o?.vice_id) };
+	} catch {
+		return { captain_id: null, vice_id: null };
+	}
+}
+
+export function saveCaptaincy(c: Captaincy): void {
+	try {
+		localStorage.setItem(CAP_LS_KEY, JSON.stringify(c));
+	} catch {
+		/* fail-safe */
+	}
 }
 
 function isIdList(v: unknown): v is number[] {
@@ -79,9 +112,21 @@ export async function fetchRemoteDraft(): Promise<RemoteDraft | null> {
 		if (error || !data || data.length === 0) return null;
 		const raw = (data[0] as { fpl_draft?: unknown }).fpl_draft;
 		if (!raw || typeof raw !== 'object') return null;
-		const obj = raw as { ids?: unknown; updated_at?: unknown };
+		const obj = raw as {
+			ids?: unknown;
+			updated_at?: unknown;
+			captain_id?: unknown;
+			vice_id?: unknown;
+		};
 		if (!isIdList(obj.ids) || typeof obj.updated_at !== 'string') return null;
-		return { ids: obj.ids, updated_at: obj.updated_at };
+		const num = (v: unknown) =>
+			typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : null;
+		return {
+			ids: obj.ids,
+			updated_at: obj.updated_at,
+			captain_id: num(obj.captain_id),
+			vice_id: num(obj.vice_id)
+		};
 	} catch {
 		// Vanha skeema (sarake puuttuu) tai verkkovirhe → synkka on no-op,
 		// lokaali draft toimii ennallaan.
@@ -89,12 +134,21 @@ export async function fetchRemoteDraft(): Promise<RemoteDraft | null> {
 	}
 }
 
-/** Kirjoita draft tilille. Palauttaa false jos ei kirjautunut / virhe. */
-export async function pushRemoteDraft(ids: number[]): Promise<boolean> {
+/** Kirjoita draft tilille. Palauttaa false jos ei kirjautunut / virhe.
+ *
+ *  Kapteeni/vice lähetetään VAIN jos pelaaja on ids-listassa — kanta hylkäisi
+ *  muuten koko draftin (fpl_draft_is_valid), ja vanhentunut kapteeni ei saa
+ *  estää joukkueen tallennusta. */
+export async function pushRemoteDraft(ids: number[], captaincy?: Captaincy): Promise<boolean> {
 	try {
 		const { data: sess } = await supabase.auth.getSession();
 		if (!sess.session) return false;
-		const { error } = await supabase.rpc('set_fpl_draft', { draft: { ids } });
+		const draft: Record<string, unknown> = { ids };
+		const cap = captaincy?.captain_id;
+		const vice = captaincy?.vice_id;
+		if (cap != null && ids.includes(cap)) draft.captain_id = cap;
+		if (vice != null && ids.includes(vice) && vice !== cap) draft.vice_id = vice;
+		const { error } = await supabase.rpc('set_fpl_draft', { draft });
 		return !error;
 	} catch {
 		return false;
@@ -103,11 +157,11 @@ export async function pushRemoteDraft(ids: number[]): Promise<boolean> {
 
 let pushTimer: ReturnType<typeof setTimeout> | null = null;
 /** Debounced push — pick-muutoksia tulee useita peräkkäin (raahaus, apply). */
-export function pushRemoteDraftSoon(ids: number[], delayMs = 1500): void {
+export function pushRemoteDraftSoon(ids: number[], captaincy?: Captaincy, delayMs = 1500): void {
 	if (pushTimer) clearTimeout(pushTimer);
 	pushTimer = setTimeout(() => {
 		pushTimer = null;
-		void pushRemoteDraft(ids);
+		void pushRemoteDraft(ids, captaincy);
 	}, delayMs);
 }
 
@@ -122,24 +176,27 @@ export async function syncDraft(): Promise<number[] | null> {
 	const remote = await fetchRemoteDraft();
 	const localIds = loadDraftIds();
 	const localTs = loadDraftUpdatedAt();
+	const localCap = loadCaptaincy();
 
 	if (!remote) {
 		// Tilillä ei ole draftia → nosta lokaali sinne (jos sellainen on).
-		if (localIds && localIds.length > 0) void pushRemoteDraft(localIds);
+		if (localIds && localIds.length > 0) void pushRemoteDraft(localIds, localCap);
 		return null;
 	}
 	if (!localIds || localIds.length === 0) {
 		saveDraftIds(remote.ids, remote.updated_at);
+		saveCaptaincy({ captain_id: remote.captain_id ?? null, vice_id: remote.vice_id ?? null });
 		return remote.ids;
 	}
 	// Ilman lokaalia leimaa (ennen 26.7. tallennettu draft) tili voittaa vain
 	// jos listat eroavat — muuten turha uudelleenrenderöinti.
 	const remoteNewer = !localTs || Date.parse(remote.updated_at) > Date.parse(localTs);
 	if (remoteNewer) {
+		saveCaptaincy({ captain_id: remote.captain_id ?? null, vice_id: remote.vice_id ?? null });
 		if (remote.ids.join(',') === localIds.join(',')) return null;
 		saveDraftIds(remote.ids, remote.updated_at);
 		return remote.ids;
 	}
-	if (remote.ids.join(',') !== localIds.join(',')) void pushRemoteDraft(localIds);
+	if (remote.ids.join(',') !== localIds.join(',')) void pushRemoteDraft(localIds, localCap);
 	return null;
 }

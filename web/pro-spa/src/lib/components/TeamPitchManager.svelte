@@ -17,13 +17,21 @@
 		players,
 		premium = false,
 		defaultGw = null,
-		onUpgrade
+		onUpgrade,
+		initialCaptaincy,
+		onCaptaincyChange
 	}: {
 		players: RatedPlayer[];
 		premium?: boolean;
 		/** #123: aloitus-GW (rate-teamin meta.gw eli seuraava deadline). */
 		defaultGw?: number | null;
 		onUpgrade?: () => void;
+		/** 29.7 (kapteeni/vice-persistointi, skeema 20260729233000): tallennettu
+		 *  pari. Ylikirjoittaa players.is_captain-fallbackin — käyttäjän tuorein
+		 *  oma valinta voittaa FPL:n viimeksi julkaiseman. */
+		initialCaptaincy?: { captain_id: number | null; vice_id: number | null };
+		/** Kutsutaan kun kapteeni TAI vice vaihtuu — parent persistoi draftiin. */
+		onCaptaincyChange?: (captainId: number | null, viceId: number | null) => void;
 	} = $props();
 
 	/** Validit FPL-muodostelmat [DEF, MID, FWD] (GK aina 1, yht. 11). */
@@ -65,9 +73,29 @@
 			return;
 		}
 		xiIds = players.filter((p) => p.in_xi).map((p) => p.id);
-		captainId = players.find((p) => p.is_captain)?.id ?? null;
-		viceId = null;
+		// 29.7: reset palauttaa TALLENNETUN kapteeniparin kun se on rosterissa —
+		// muuten jokainen uusi rate-ajo pyyhkisi käyttäjän oman valinnan.
+		const savedCap = initialCaptaincy?.captain_id;
+		const savedVice = initialCaptaincy?.vice_id;
+		captainId =
+			savedCap != null && cur.has(savedCap)
+				? savedCap
+				: (players.find((p) => p.is_captain)?.id ?? null);
+		viceId = savedVice != null && cur.has(savedVice) && savedVice !== captainId ? savedVice : null;
 		selectedId = null;
+	});
+
+	// Persistointi: raportoi kapteeniparin muutokset parentille. Ensimmäinen
+	// ajo (mount/reset-alustus) ohitetaan — pelkkä lataus ei saa kirjoittaa.
+	let capInitialized = false;
+	$effect(() => {
+		void captainId;
+		void viceId;
+		if (!capInitialized) {
+			capInitialized = true;
+			return;
+		}
+		onCaptaincyChange?.(captainId, viceId);
 	});
 
 	// #123: GW-valitsin — GW:t datasta (vain kun backend lähettää gameweeks).

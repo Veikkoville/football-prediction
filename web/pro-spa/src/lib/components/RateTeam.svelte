@@ -16,7 +16,15 @@
 		persistEntry,
 		toggleRemember
 	} from '$lib/fplEntry.svelte';
-	import { loadDraftIds, saveDraftIds, syncDraft, pushRemoteDraftSoon } from '$lib/draft';
+	import {
+		loadDraftIds,
+		saveDraftIds,
+		syncDraft,
+		pushRemoteDraftSoon,
+		loadCaptaincy,
+		saveCaptaincy,
+		type Captaincy
+	} from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import WeeklyActions, { type WeeklyAction } from './WeeklyActions.svelte';
 	import BeatTheModel from './BeatTheModel.svelte';
@@ -360,12 +368,24 @@
 	}
 	/** Apply / Undo / Reset — kaikki kolme kirjoittavat draftiin, jotta
 	 *  tallennettu joukkue on aina se mikä ruudulla näkyy. */
+	// 29.7: kapteeni/vice kulkee draftin mukana (skeema 20260729233000).
+	// EI $state: arvo luetaan mountissa ja päivitetään callbackissa — reaktiivinen
+	// prop ajaisi managerin reset-effectin uudelleen (svelte-efektikehäopetus).
+	const captaincy: Captaincy = loadCaptaincy();
+	function handleCaptaincyChange(captainId: number | null, viceId: number | null) {
+		captaincy.captain_id = captainId;
+		captaincy.vice_id = viceId;
+		saveCaptaincy(captaincy);
+		const ids = planIdsAfter(appliedTransfers);
+		if (ids.length > 0) pushRemoteDraftSoon(ids, captaincy);
+	}
+
 	function setPlan(list: TransferSuggestion[]): void {
 		appliedTransfers = list;
 		const ids = planIdsAfter(list);
 		if (ids.length === 0) return;
 		saveDraftIds(ids);
-		pushRemoteDraftSoon(ids);
+		pushRemoteDraftSoon(ids, captaincy);
 		planSaved = true;
 		// Draft-valitsin seuraa perässä, jotta "Edit draft" näyttää saman
 		// joukkueen. Jos pooli ei ole vielä ladattu, storage riittää —
@@ -701,7 +721,14 @@
 	<!-- #113: pitch + kitit + what-if-manager (pariteetti mobiilin #106+#112:lle;
 	     free = staattinen pitch + lukko, premium = editointi). #121: manageri
 	     saa PLANNED-rosterin (sovelletut siirrot mukana); #123: default-GW. -->
-	<TeamPitchManager players={plannedPlayers} {premium} defaultGw={data.meta.gw} {onUpgrade} />
+	<TeamPitchManager
+		players={plannedPlayers}
+		{premium}
+		defaultGw={data.meta.gw}
+		{onUpgrade}
+		initialCaptaincy={captaincy}
+		onCaptaincyChange={handleCaptaincyChange}
+	/>
 
 	{#if premium}
 		<!-- #63: HOLD-verdikti HERO-kantana siirtolistan yläpuolella; backendin
