@@ -5,6 +5,7 @@
 	import LeagueBanner from './LeagueBanner.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import FitChecker from './FitChecker.svelte';
+	import Watchlist from './Watchlist.svelte';
 	import PlayerCard from './PlayerCard.svelte';
 	import PriceWatch from './PriceWatch.svelte';
 	import Leaders from './Leaders.svelte';
@@ -379,6 +380,9 @@
 	     Toimii myös ilman fixture-dataa. -->
 	<div class="tool-card" id="panel-rateteam" role="tabpanel" aria-labelledby="seg-rateteam">
 		<RateTeam {onUpgrade} />
+		<!-- V3 watchlist (FM: skoutauslista) — my team -kontekstissa, koska
+		     seurattavat ovat "minun pelaajiani". FREE 3, premium rajatta. -->
+		<Watchlist />
 	</div>
 {:else if segment === 'fitchecker'}
 	<!-- #155: lukitse 1-3 pakkopelaajaa → paras runko + lukituksen xP-hinta.

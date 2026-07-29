@@ -54,6 +54,42 @@ export interface SeasonScore {
 	delta: number;
 }
 
+/** V2 GW-debrief: viimeisin kierros jolta on molemmin puolin gradattuja
+ *  rivejä. delta > 0 = käyttäjä voitti kierroksen. SAMA logiikka kuin
+ *  mobiilissa — UI kääntää lauseen deltasta, logiikka ei keksi narratiivia. */
+export interface GwDebrief {
+	gw: number;
+	rows: StoredDecision[];
+	userTotal: number;
+	modelTotal: number;
+	delta: number;
+}
+
+export function latestDebrief(rows: StoredDecision[]): GwDebrief | null {
+	const graded = rows.filter(
+		(r) =>
+			r.graded_at != null &&
+			typeof r.model_points === 'number' &&
+			typeof r.user_points === 'number'
+	);
+	if (graded.length === 0) return null;
+	const gw = Math.max(...graded.map((r) => r.gw));
+	const gwRows = graded.filter((r) => r.gw === gw);
+	let user = 0;
+	let model = 0;
+	for (const r of gwRows) {
+		user += r.user_points as number;
+		model += r.model_points as number;
+	}
+	return {
+		gw,
+		rows: gwRows,
+		userTotal: Math.round(user * 10) / 10,
+		modelTotal: Math.round(model * 10) / 10,
+		delta: Math.round((user - model) * 10) / 10
+	};
+}
+
 export function seasonScore(rows: StoredDecision[]): SeasonScore {
 	let user = 0;
 	let model = 0;

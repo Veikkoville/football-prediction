@@ -10,6 +10,7 @@
 	import XpTable from './XpTable.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import TransferPlanner from './TransferPlanner.svelte';
+	import Watchlist from './Watchlist.svelte';
 	import Differentials from './Differentials.svelte';
 	import ComparePlayers from './ComparePlayers.svelte';
 	import Leaders from './Leaders.svelte';
@@ -72,6 +73,8 @@
 		<!-- #46: RateTeam premium={true} vain tilauksen takana → ei premium-vuotoa. -->
 		<section class="tool-card"><RateTeam premium={true} /></section>
 		<section class="tool-card"><TransferPlanner /></section>
+		<!-- V3 watchlist — premium ilman rajaa. -->
+		<section class="tool-card"><Watchlist premium={true} /></section>
 	</div>
 {:else if segment === 'lookup'}
 	<div id="panel-lookup" role="tabpanel" aria-labelledby="seg-lookup">

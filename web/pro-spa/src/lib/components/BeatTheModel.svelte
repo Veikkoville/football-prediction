@@ -12,9 +12,25 @@
 	 * tulevat. FREE: tuloskortti on silmukan palkinto, ei myyntimuuri.
 	 */
 	import { auth } from '$lib/auth.svelte';
-	import { loadDecisions, seasonScore, type StoredDecision } from '$lib/fplDecisions';
+	import {
+		latestDebrief,
+		loadDecisions,
+		seasonScore,
+		type StoredDecision
+	} from '$lib/fplDecisions';
+	import {
+		EMPTY_PREFS,
+		loadPrefs,
+		savePrefs,
+		pushRemotePrefsSoon,
+		type FplPrefs
+	} from '$lib/prefs';
 
 	let rows = $state<StoredDecision[] | null>(null);
+	// V4 kauden tavoite (FM: johtokunnan odotukset). Sama prefs-objekti kuin
+	// watchlistilla — eri lohko, sama tallennus- ja synkkapolku.
+	let prefs = $state<FplPrefs>({ ...EMPTY_PREFS });
+	let targetText = $state('');
 
 	$effect(() => {
 		void auth.user;
@@ -23,7 +39,17 @@
 			return;
 		}
 		loadDecisions().then((r) => (rows = r));
+		prefs = loadPrefs();
 	});
+
+	function saveObjective(value: number | null) {
+		prefs = {
+			...prefs,
+			objective: value != null ? { kind: 'overall_rank', value } : null
+		};
+		savePrefs(prefs);
+		pushRemotePrefsSoon(prefs);
+	}
 
 	let score = $derived(rows ? seasonScore(rows) : null);
 	let gradedRows = $derived(
@@ -34,13 +60,16 @@
 				typeof r.user_points === 'number'
 		)
 	);
+	let debrief = $derived(rows ? latestDebrief(rows) : null);
 </script>
 
-{#if auth.user && rows != null && rows.length > 0 && score != null}
+{#if auth.user && rows != null && score != null}
 	<section class="beat">
 		<h3>You vs the model</h3>
 
-		{#if score.gradedCount === 0}
+		{#if rows.length === 0}
+			<p class="muted">Log your first call above and the season scoreboard starts here.</p>
+		{:else if score.gradedCount === 0}
 			<p class="muted">
 				Your logged calls get graded once the gameweek finishes. First scores land after GW1.
 			</p>
@@ -61,8 +90,32 @@
 					Level with the model over {score.gradedCount} graded calls
 				{/if}
 			</p>
+			{#if debrief}
+				<!-- V2 GW-debrief: viimeisin ratkennut kierros. Lause johdetaan
+				     deltasta deterministisesti — UI ei keksi narratiivia. -->
+				<div class="debrief">
+					<span class="debrief-title">GW{debrief.gw} debrief</span>
+					<p class="debrief-sentence">
+						{#if debrief.delta > 0}
+							Your calls beat the model by {debrief.delta.toFixed(1)} points in GW{debrief.gw}.
+						{:else if debrief.delta < 0}
+							The model's calls would have scored {Math.abs(debrief.delta).toFixed(1)} more in GW{debrief.gw}.
+						{:else}
+							You and the model came out level in GW{debrief.gw}.
+						{/if}
+					</p>
+					<ul>
+						{#each debrief.rows as r (`${r.gw}-${r.kind}`)}
+							<li>
+								<span class="muted">{r.kind}</span>
+								<span>you {(r.user_points as number).toFixed(1)} · model {(r.model_points as number).toFixed(1)}</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 			<ul>
-				{#each gradedRows.slice(0, 5) as r (`${r.gw}-${r.kind}`)}
+				{#each gradedRows.filter((r) => r.gw !== debrief?.gw).slice(0, 5) as r (`${r.gw}-${r.kind}`)}
 					<li>
 						<span class="muted">GW{r.gw} · {r.kind}</span>
 						<span>you {(r.user_points as number).toFixed(1)} · model {(r.model_points as number).toFixed(1)}</span>
@@ -76,6 +129,39 @@
 				{score.ungradableCount} calls could not be graded without an FPL entry ID.
 			</p>
 		{/if}
+
+		<!-- V4 kauden tavoite. Rank-trendi tavoitetta vasten tulee kun kaudella
+		     on rank-dataa — siihen asti sanotaan se suoraan. -->
+		<div class="objective">
+			<span class="debrief-title">Season target</span>
+			{#if prefs.objective != null}
+				<div class="objective-row">
+					<span class="objective-value">Top {prefs.objective.value.toLocaleString('en-GB')} overall</span>
+					<button type="button" class="quiet" onclick={() => saveObjective(null)}>Clear</button>
+				</div>
+			{:else}
+				<div class="objective-row">
+					<input
+						type="text"
+						inputmode="numeric"
+						placeholder="Overall rank target, e.g. 1000000"
+						bind:value={targetText}
+					/>
+					<button
+						type="button"
+						class="set"
+						onclick={() => {
+							const v = parseInt(targetText.replace(/[^0-9]/g, ''), 10);
+							if (Number.isFinite(v) && v > 0) {
+								saveObjective(v);
+								targetText = '';
+							}
+						}}>Set</button
+					>
+				</div>
+			{/if}
+			<p class="muted small">Rank tracking against your target starts once the season is under way.</p>
+		</div>
 	</section>
 {/if}
 
@@ -142,5 +228,60 @@
 	.small {
 		font-size: var(--step--2);
 		margin: var(--s-2) 0 0;
+	}
+	.debrief {
+		border-top: 1px solid var(--border);
+		padding-top: var(--s-2);
+		margin-bottom: var(--s-2);
+	}
+	.debrief-title {
+		font-size: var(--step--2);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
+		font-weight: 700;
+	}
+	.debrief-sentence {
+		margin: 0.2rem 0 0.3rem;
+		font-size: var(--step--1);
+	}
+	.objective {
+		border-top: 1px solid var(--border);
+		padding-top: var(--s-2);
+		margin-top: var(--s-2);
+	}
+	.objective-row {
+		display: flex;
+		align-items: center;
+		gap: var(--s-3);
+		margin-top: 0.3rem;
+	}
+	.objective-value {
+		flex: 1;
+		font-weight: 700;
+	}
+	.objective input {
+		flex: 1;
+		font: inherit;
+		font-size: var(--step--1);
+		padding: 0.35em 0.6em;
+		border: 1px solid var(--border);
+		border-radius: var(--radius, 0);
+		background: var(--surface-alt, transparent);
+		color: var(--text);
+	}
+	.objective button {
+		font: inherit;
+		font-size: var(--step--1);
+		border: none;
+		background: transparent;
+		cursor: pointer;
+	}
+	.objective button.set {
+		color: var(--teal, #2ed6c2);
+		font-weight: 700;
+	}
+	.objective button.quiet {
+		color: var(--text-muted);
 	}
 </style>
