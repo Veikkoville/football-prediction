@@ -41,20 +41,28 @@
 	// #7 (30.7, Villen idea): DefConin basis. Esikaudella default = KOKO KAUSI:
 	// 38 pelin hit-rate on vakain basis, ja "viimeiset N 25/26-pelia" on
 	// mielivaltainen häntä ennen kuin uusi kausi tuottaa dataa.
+	// 30.7 tarkennus (Ville): xG:n ja DefConin valitsimet ovat ERILLISET —
+	// DefConin basis/ikkuna ei saa liikuttaa xG-listaa eikä toisinpäin.
+	// Siksi oma dcWindow + kaksi erillistä hakuefektiä.
 	let dcBasis = $state<'recent' | 'season'>('season');
+	let dcWindow = $state(5);
 
 	$effect(() => {
 		const w = gameWindow;
-		const b = dcBasis;
 		loading = true;
 		error = null;
-		Promise.all([fetchXgLeaders(w), fetchDefconLeaders(w, b)])
-			.then(([x, d]) => {
-				xg = x;
-				defcon = d;
-			})
+		fetchXgLeaders(w)
+			.then((x) => (xg = x))
 			.catch((e) => (error = e instanceof Error ? e.message : String(e)))
 			.finally(() => (loading = false));
+	});
+
+	$effect(() => {
+		const w = dcWindow;
+		const b = dcBasis;
+		fetchDefconLeaders(w, b)
+			.then((d) => (defcon = d))
+			.catch((e) => (error = e instanceof Error ? e.message : String(e)));
 	});
 
 	$effect(() => {
@@ -318,7 +326,11 @@
 	<p class="basis">{basisLabel}</p>
 {/if}
 
-{#if loading}
+{#if loading && !xg}
+	<!-- 30.7 fix (Villen "napit ei toimi"): skeleton VAIN ensilatauksessa.
+	     Basis/window-vaihdossa vanha lista pysyy paikallaan kunnes uusi data
+	     saapuu — koko paneelin romahdus skeletoniksi hyppäytti scrollin
+	     muualle ja klikki näytti tekevän ei-mitään. -->
 	<p class="muted">Loading leaderboards…</p>
 {:else if error}
 	<p class="banner error">{error}</p>
@@ -384,7 +396,7 @@
 				?.basis_season ?? 'previous'} season, every player.
 		{:else}
 			The most reliable defensive-contribution scorers over each player's last {defcon?.meta
-				?.window ?? gameWindow} games.
+				?.window ?? dcWindow} games.
 		{/if}
 		2 pts when a defender reaches 10 CBIT (clearances, blocks, interceptions, tackles) or a
 		midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match. Tap a player to open the
@@ -398,7 +410,7 @@
 		<button
 			type="button"
 			class="window-chip"
-			class:active={dcBasis === 'season'}
+			class:on={dcBasis === 'season'}
 			aria-pressed={dcBasis === 'season'}
 			onclick={() => (dcBasis = 'season')}>Full season</button
 		>
@@ -406,11 +418,11 @@
 			<button
 				type="button"
 				class="window-chip"
-				class:active={dcBasis === 'recent' && gameWindow === w}
-				aria-pressed={dcBasis === 'recent' && gameWindow === w}
+				class:on={dcBasis === 'recent' && dcWindow === w}
+				aria-pressed={dcBasis === 'recent' && dcWindow === w}
 				onclick={() => {
 					dcBasis = 'recent';
-					gameWindow = w;
+					dcWindow = w;
 				}}>Last {w}</button
 			>
 		{/each}

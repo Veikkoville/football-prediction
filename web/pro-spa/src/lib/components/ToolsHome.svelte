@@ -203,6 +203,12 @@
 		}
 	});
 
+	/** "On this page" -ankkurihyppy (Villen palaute 30.7: työkalut hukkuvat
+	 *  pitkään scrolliin — sisällys näkyviin ryhmän kärkeen). */
+	function jumpTo(id: string) {
+		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
+
 	function openToolCard(t: (typeof TOOL_CARDS)[number]) {
 		if (t.premium && !premium) {
 			capture('upgrade_tapped', { source: `fantasy_${t.key}` });
@@ -263,29 +269,46 @@
 		<!-- week + team jakavat SAMAN RateTeam-elementin (sama puupositio →
 		     Svelte ei tuhoa instanssia vaihdossa → data/entry-tila säilyy). -->
 		<div id="panel-{segment}" role="tabpanel" aria-labelledby="seg-{segment}">
-			<div class="tool-card">
+			{#if segment === 'team'}
+				<!-- 30.7 (Villen palaute: "fit checker yms hukkuu"): ryhmän
+				     sisällys ankkuririvinä heti nauhan alle — pitkä scroll ei
+				     saa piilottaa työkalun olemassaoloa. -->
+				<div class="onpage">
+					<span class="muted">On this page:</span>
+					{#each [['tc-rate', 'Rate my team'], ['tc-fit', 'Fit checker'], ...(premium ? [['tc-planner', 'Transfer planner']] : []), ['tc-watchlist', 'Watchlist']] as [id, label] (id)}
+						<button type="button" onclick={() => jumpTo(id)}>{label}</button>
+					{/each}
+				</div>
+			{/if}
+			<div class="tool-card" id="tc-rate">
 				<RateTeam
 					{premium}
 					onUpgrade={goUpgrade}
 					weekMode={segment === 'week'}
 					onGoToTeam={() => (segment = 'team')}
 				/>
-				{#if segment === 'team'}
-					<Watchlist {premium} />
-				{/if}
 			</div>
 			{#if segment === 'team'}
-				{#if premium}
-					<div class="tool-card"><TransferPlanner /></div>
-				{/if}
-				<div class="tool-card">
+				<!-- Järjestys 30.7: fit checker HETI raten alle (esikauden
+				     sankarityökalu), watchlist viimeiseksi (pisin lista). -->
+				<div class="tool-card" id="tc-fit">
 					<FitChecker onOpenRateTeam={() => (segment = 'team')} />
 				</div>
+				{#if premium}
+					<div class="tool-card" id="tc-planner"><TransferPlanner /></div>
+				{/if}
+				<div class="tool-card" id="tc-watchlist"><Watchlist {premium} /></div>
 			{/if}
 		</div>
 	{:else if segment === 'players'}
 		<div id="panel-players" role="tabpanel" aria-labelledby="seg-players">
-			<div class="tool-card"><PlayerCard {premium} /></div>
+			<div class="onpage">
+				<span class="muted">On this page:</span>
+				{#each [['pc-card', 'Player card'], ...(premium ? [['pc-captain', 'Captain ranker'], ['pc-swing', 'Fixture swing'], ['pc-xp', 'Player xP']] : []), ['pc-cs', 'Clean sheets'], ['pc-value', 'Value'], ['pc-leaders', 'Leaders'], ...(premium ? [['pc-diff', 'Differentials'], ['pc-compare', 'Compare']] : [])] as [id, label] (id)}
+					<button type="button" onclick={() => jumpTo(id)}>{label}</button>
+				{/each}
+			</div>
+			<div class="tool-card" id="pc-card"><PlayerCard {premium} /></div>
 			{#if premium}
 				{#if xpError}
 					<p class="banner error">
@@ -296,9 +319,9 @@
 				{:else if !xp.meta?.available}
 					<p class="banner success">xP projections go live before Gameweek 1.</p>
 				{:else}
-					<div class="tool-card"><CaptainRanker data={xp} /></div>
-					<div class="tool-card"><FixtureSwing data={xp} /></div>
-					<div class="tool-card"><XpTable data={xp} /></div>
+					<div class="tool-card" id="pc-captain"><CaptainRanker data={xp} /></div>
+					<div class="tool-card" id="pc-swing"><FixtureSwing data={xp} /></div>
+					<div class="tool-card" id="pc-xp"><XpTable data={xp} /></div>
 				{/if}
 			{:else}
 				<!-- Sama .locked-kaava kuin Predict/Fixtures-lohkoissa. -->
@@ -310,13 +333,13 @@
 					<button type="button" class="primary" onclick={goUpgrade}>See Premium</button>
 				</div>
 			{/if}
-			<CleanSheets />
-			<div class="tool-card"><Value {premium} onUpgrade={goUpgrade} /></div>
-			<div class="tool-card"><Leaders {premium} onUpgrade={goUpgrade} /></div>
+			<div id="pc-cs"><CleanSheets /></div>
+			<div class="tool-card" id="pc-value"><Value {premium} onUpgrade={goUpgrade} /></div>
+			<div class="tool-card" id="pc-leaders"><Leaders {premium} onUpgrade={goUpgrade} /></div>
 			{#if premium}
-				<div class="tool-card"><Differentials /></div>
+				<div class="tool-card" id="pc-diff"><Differentials /></div>
 				{#if xp}
-					<div class="tool-card"><ComparePlayers {xp} /></div>
+					<div class="tool-card" id="pc-compare"><ComparePlayers {xp} /></div>
 				{/if}
 			{/if}
 		</div>
@@ -472,5 +495,29 @@
 	}
 	.locked p {
 		margin: 0 0 var(--s-3);
+	}
+	/* 30.7: ryhmän sisällysrivi — kevyet tekstilinkit, ei kilpaile
+	   segmenttinauhan pillien kanssa */
+	.onpage {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: var(--s-1) var(--s-3);
+		font-size: var(--step--1);
+		margin: 0 0 var(--s-3);
+	}
+	.onpage button {
+		background: none;
+		border: none;
+		padding: 0;
+		font: inherit;
+		font-size: var(--step--1);
+		color: var(--accent-strong);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		cursor: pointer;
+	}
+	.onpage button:hover {
+		color: var(--text);
 	}
 </style>
