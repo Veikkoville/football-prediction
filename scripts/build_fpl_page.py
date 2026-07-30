@@ -1406,6 +1406,18 @@ def update_index(c: dict) -> bool:
     new = re.sub(
         r"(<!-- GEN:ACC-TRUST-START -->).*?(<!-- GEN:ACC-TRUST-END -->)",
         lambda m: m.group(1) + trust + m.group(2), new, flags=re.S)
+    # Teletext-ticker (2 ticker-set-kopiota) samasta lähteestä kuin chipit —
+    # kovakoodattuna se jäi jälkeen jokaisella bakella (P1 30.7).
+    ticker = (
+        f'<b>{c["acc_n"]} completed matches</b>\n      '
+        f'<b class="t-amber">&#9612; {fmt_pct(c["acc_pct_1x2"])} correct results</b>'
+    )
+    new, n_ticker = re.subn(
+        r"(<!-- GEN:ACC-TICKER-START -->).*?(<!-- GEN:ACC-TICKER-END -->)",
+        lambda m: m.group(1) + ticker + m.group(2), new, flags=re.S)
+    if n_ticker != 2:
+        raise RuntimeError(
+            f"index.html GEN:ACC-TICKER: odotettiin 2 markerilohkoa, löytyi {n_ticker}")
     # #85 GEO: track-record-Dataset-schema pysyy tuoreena samalla botilla
     # kuin chipit (luvut + dateModified accuracy-lähteestä, ei kovakoodausta).
     ds = accuracy_dataset_ld(c, BASE + "/")
