@@ -1,47 +1,47 @@
 {
-  "updated_at": "2026-07-30T02:27:12+00:00",
+  "updated_at": "2026-07-30T05:42:17+00:00",
   "logged_total": 304,
-  "pending": 178,
+  "pending": 176,
   "all_time": {
-    "n": 126,
-    "correct_1x2": 71,
-    "pct_1x2": 0.5635,
-    "decisive_n": 87,
-    "decisive_correct": 71,
-    "pct_decisive": 0.8161,
-    "exact_n": 78,
+    "n": 128,
+    "correct_1x2": 72,
+    "pct_1x2": 0.5625,
+    "decisive_n": 88,
+    "decisive_correct": 72,
+    "pct_decisive": 0.8182,
+    "exact_n": 80,
     "exact_correct": 15,
-    "pct_exact": 0.1923,
-    "brier": 0.55,
-    "brier_n": 78
+    "pct_exact": 0.1875,
+    "brier": 0.5524,
+    "brier_n": 80
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 59,
-    "pct_1x2": 0.59,
-    "decisive_n": 71,
-    "decisive_correct": 59,
-    "pct_decisive": 0.831,
-    "exact_n": 78,
+    "correct_1x2": 58,
+    "pct_1x2": 0.58,
+    "decisive_n": 70,
+    "decisive_correct": 58,
+    "pct_decisive": 0.8286,
+    "exact_n": 80,
     "exact_correct": 15,
-    "pct_exact": 0.1923,
-    "brier": 0.55,
-    "brier_n": 78,
+    "pct_exact": 0.1875,
+    "brier": 0.5524,
+    "brier_n": 80,
     "window": 100
   },
   "by_competition": {
     "BSA": {
-      "n": 22,
-      "correct_1x2": 8,
-      "pct_1x2": 0.3636,
-      "decisive_n": 12,
-      "decisive_correct": 8,
-      "pct_decisive": 0.6667,
-      "exact_n": 22,
+      "n": 24,
+      "correct_1x2": 9,
+      "pct_1x2": 0.375,
+      "decisive_n": 13,
+      "decisive_correct": 9,
+      "pct_decisive": 0.6923,
+      "exact_n": 24,
       "exact_correct": 4,
       "pct_exact": null,
       "brier": null,
-      "brier_n": 22
+      "brier_n": 24
     },
     "WC": {
       "n": 104,
@@ -71,10 +71,10 @@
       "n": 37
     },
     {
-      "bin_mid": 0.2548,
-      "predicted": 0.2548,
-      "actual": 0.236,
-      "n": 89
+      "bin_mid": 0.2538,
+      "predicted": 0.2538,
+      "actual": 0.2366,
+      "n": 93
     },
     {
       "bin_mid": 0.3391,
@@ -89,10 +89,10 @@
       "n": 27
     },
     {
-      "bin_mid": 0.5393,
-      "predicted": 0.5393,
-      "actual": 0.6667,
-      "n": 15
+      "bin_mid": 0.5394,
+      "predicted": 0.5394,
+      "actual": 0.6471,
+      "n": 17
     },
     {
       "bin_mid": 0.6461,
@@ -114,6 +114,34 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-07-30",
+      "home_team": "Vitoria",
+      "away_team": "Palmeiras",
+      "predicted_winner": "away",
+      "p_winner": 0.5192,
+      "most_likely_score": "0-1",
+      "actual_score": "0-4",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
+    {
+      "date": "2026-07-30",
+      "home_team": "Fluminense",
+      "away_team": "Bahia",
+      "predicted_winner": "home",
+      "p_winner": 0.5603,
+      "most_likely_score": "1-0",
+      "actual_score": "0-0",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-07-29",
       "home_team": "Mirassol",
@@ -365,34 +393,6 @@
       "exact_hit": false,
       "duration": null,
       "regular_score": null
-    },
-    {
-      "date": "2026-07-21",
-      "home_team": "Atletico-MG",
-      "away_team": "Bahia",
-      "predicted_winner": "home",
-      "p_winner": 0.512,
-      "most_likely_score": "1-1",
-      "actual_score": "1-1",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": true,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-19",
-      "home_team": "Spain",
-      "away_team": "Argentina",
-      "predicted_winner": "home",
-      "p_winner": 0.3582,
-      "most_likely_score": "1-1",
-      "actual_score": "1-0",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": false,
-      "duration": "EXTRA_TIME",
-      "regular_score": "0-0"
     }
   ]
 }
