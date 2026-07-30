@@ -1017,7 +1017,14 @@ def list_teams(
         n = len(dc.attack)
     except Exception:
         pass
-    teams = sorted(dc.teams_)
+    # Kausiflippi 1.8.2026: treeni-ikkunassa on edellisen kauden pudonneet
+    # (kokonainen kausi dataa), mutta valitsimen ei pidä tarjota niitä
+    # aktiivisella kaudella. Suodatus koskee VAIN tätä listaa — /api/predict
+    # hyväksyy pudonneet yhä (H2H, eksplisiittiset kausipyynnöt). Tuntematon
+    # kausi → tyhjä joukko → käytös ennallaan (esim. seasons=['2425','2526']).
+    from src.models.promoted_baseline import pudonneet_aktiiviselta_kaudelta
+    pois = pudonneet_aktiiviselta_kaudelta(tuple(leagues), tuple(seasons))
+    teams = sorted(t for t in dc.teams_ if t not in pois)
     return TeamsResponse(
         leagues=leagues,
         seasons=seasons,

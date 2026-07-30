@@ -63,6 +63,52 @@ PROMOTED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
     "2627": {"ENG-Premier League": ("Coventry", "Hull", "Ipswich")},
 }
 
+# ---------------------------------------------------------------------------
+# Pudonneet per kausi — nousijalistan peilikuva, sama ylläpitosykli.
+#
+# MIKSI TÄMÄ ON OLEMASSA (kausiflippi 1.8.2026): treeni-ikkuna on kaksi
+# kautta, joten 2526+2627-ikkunassa 25/26:n pudonneet OVAT mallissa (niillä
+# on kokonainen kausi dataa) mutta ne eivät pelaa aktiivista kautta.
+# /api/teams rakentaa ottelu-ennusteen joukkuevalitsimen mallin joukkueista
+# → ilman suodatusta valitsin tarjoaisi Burnleyta 26/27-kaudella. Malli
+# ITSE saa pitää joukkueet (H2H ja eksplisiittiset kausipyynnöt toimivat) —
+# vain aktiivisen kauden LISTA suodatetaan.
+#
+# Verifioitu datasta 30.7.2026 (ENG_Premier_League_2526.csv:n joukkuejoukko
+# miinus FPL 26/27 -feedin 20 joukkuetta): pudonneet = Burnley, West Ham,
+# Wolverhampton Wanderers. Leicester EI kuulu tähän — se putosi jo 24/25:n
+# jälkeen ja poistuu ikkunasta itsestään flipissä. Nimet ovat MALLINIMIÄ
+# (verifioitu tuotannon /api/teams-listasta 30.7).
+#
+# Muut liigat voi lisätä samalla kaavalla kun niiden valitsinta halutaan
+# siivota; puuttuva liiga = ei suodatusta = entinen käytös.
+# ---------------------------------------------------------------------------
+RELEGATED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
+    "2627": {
+        "ENG-Premier League": ("Burnley", "West Ham", "Wolverhampton Wanderers"),
+    },
+}
+
+
+def pudonneet_aktiiviselta_kaudelta(
+    liigat: tuple[str, ...] | list[str],
+    kaudet: tuple[str, ...] | list[str],
+) -> frozenset[str]:
+    """Joukkueet jotka ovat treeni-ikkunassa mutta eivät pelaa aktiivista
+    kautta annetuissa liigoissa. Aktiivinen kausi = viimeisin pyydetyistä
+    (sama sääntö kuin taydenna_nousijat). Tuntematon kausi/liiga → tyhjä
+    joukko eli ei suodatusta — käytös ei voi muuttua vahingossa vanhoille
+    kausipyynnöille."""
+    if not kaudet:
+        return frozenset()
+    per_liiga = RELEGATED_BY_SEASON.get(str(kaudet[-1]))
+    if not per_liiga:
+        return frozenset()
+    out: set[str] = set()
+    for liiga in liigat:
+        out.update(per_liiga.get(liiga, ()))
+    return frozenset(out)
+
 # Viimeisin trio jonka PL-voima on mitattu (nousi 24/25).
 REFERENCE_TRIO: tuple[str, ...] = ("Ipswich", "Leicester", "Southampton")
 
