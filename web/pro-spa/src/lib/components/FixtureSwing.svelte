@@ -62,6 +62,20 @@
 			capture('fixture_swing_viewed', { n: rows.length });
 		}
 	});
+
+	// 30.7 (Villen havainto: "näyttää vain low ja high, ei mitään"): rivin
+	// klikkaus avaa koko per-GW-stripin — sama data josta low/high lasketaan,
+	// joten käyttäjä näkee MISTÄ swing tulee (ei vain ääripäitä). Sama
+	// expand-kaava kuin DefCon-matriisissa.
+	let expandedId = $state<number | null>(null);
+	function toggleRow(id: number) {
+		if (expandedId === id) {
+			expandedId = null;
+			return;
+		}
+		expandedId = id;
+		capture('fixture_swing_expanded', { player_id: id });
+	}
 </script>
 
 <section class="swing">
@@ -86,10 +100,20 @@
 				</thead>
 				<tbody>
 					{#each rows as r (r.p.id)}
-						<tr>
+						<tr class:expanded={expandedId === r.p.id}>
 							<td>
-								<span class="name">{r.p.web_name}</span>
-								<span class="muted meta">{r.p.team_short} · {r.p.pos}</span>
+								<button
+									type="button"
+									class="row-toggle"
+									aria-expanded={expandedId === r.p.id}
+									onclick={() => toggleRow(r.p.id)}
+								>
+									<span class="name">{r.p.web_name}</span>
+									<span class="muted meta">{r.p.team_short} · {r.p.pos}</span>
+									<span class="chev" aria-hidden="true"
+										>{expandedId === r.p.id ? '▾' : '▸'}</span
+									>
+								</button>
 							</td>
 							<td class="num">
 								{r.min.xp.toFixed(1)}
@@ -103,6 +127,29 @@
 								{r.ratio === Infinity ? '∞' : `${r.ratio.toFixed(1)}x`}
 							</td>
 						</tr>
+						{#if expandedId === r.p.id}
+							<!-- Per-GW-strippi: paras korostettuna, pahin himmennettynä.
+							     Sama data josta low/high poimittiin — ei uutta hakua. -->
+							<tr class="gw-row">
+								<td colspan="4">
+									<div class="gw-strip" role="list">
+										{#each (r.p.gameweeks ?? []).filter((g) => g.opponents.length > 0) as g (g.gw)}
+											<span
+												role="listitem"
+												class="gw-chip"
+												class:best={g.xp === r.max.xp}
+												class:worst={g.xp === r.min.xp}
+												title="GW{g.gw} {gwLabel(g)}: {g.xp.toFixed(2)} xP"
+											>
+												<span class="gw-n">GW{g.gw}</span>
+												<span class="gw-opp">{gwLabel(g)}</span>
+												<span class="gw-xp">{g.xp.toFixed(1)}</span>
+											</span>
+										{/each}
+									</div>
+								</td>
+							</tr>
+						{/if}
 					{/each}
 				</tbody>
 			</table>
@@ -151,5 +198,63 @@
 	}
 	.foot {
 		font-size: var(--step--1);
+	}
+	/* 30.7 expand: sama kieli kuin DefCon-matriisin stripissä */
+	.row-toggle {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 4px 8px;
+		background: none;
+		border: none;
+		padding: 0;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+		text-align: left;
+	}
+	.chev {
+		color: var(--muted-fg, #8a847a);
+	}
+	.gw-row td {
+		background: rgba(243, 242, 242, 0.03);
+	}
+	.gw-strip {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		padding: 4px 0;
+	}
+	.gw-chip {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm, 6px);
+		padding: 3px 7px;
+		font-size: var(--step--1);
+		font-variant-numeric: tabular-nums;
+	}
+	.gw-chip .gw-n {
+		color: var(--muted-fg, #8a847a);
+		font-size: 0.85em;
+	}
+	.gw-chip .gw-opp {
+		color: var(--muted-fg, #8a847a);
+		font-size: 0.85em;
+		white-space: nowrap;
+	}
+	.gw-chip .gw-xp {
+		font-weight: 700;
+	}
+	.gw-chip.best {
+		border-color: var(--accent, #f5c542);
+	}
+	.gw-chip.best .gw-xp {
+		color: var(--accent-strong, #f5c542);
+	}
+	.gw-chip.worst {
+		opacity: 0.6;
 	}
 </style>

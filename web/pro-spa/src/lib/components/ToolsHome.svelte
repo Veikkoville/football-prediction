@@ -1,0 +1,476 @@
+<script lang="ts">
+	/**
+	 * ToolsHome — Web P1 (30.7, Villen GO "Web P1 go, matches omaan ryhmään").
+	 *
+	 * Korvaa FreeView + ProView + ProTools -kolmikon YHDELLÄ näkymällä:
+	 * 6 sisältöryhmää, yksi segmenttinauha, gate LOHKON sisällä (sama malli
+	 * kuin mobiilin Fantasy-tab). Vanha rakenne jakoi ylätabit ENTITLEMENTIN
+	 * mukaan → 24 välilehtipositiota, 7 työkalua duplikoituna ja 4 työkalua
+	 * jotka MAKSAVA käyttäjä menetti (clean sheets, fit checker, price watch,
+	 * mini-league olivat vain free-nauhassa). Maksu ei saa koskaan kaventaa
+	 * näkymää — nyt kaikki näkevät saman rakenteen ja premium avaa lohkoja.
+	 *
+	 * Upgrade-polku: teaserien onUpgrade avaa upgrade-näkymän (PremiumPreview
+	 * + LoginBox kirjautumattomalle, Paywall kirjautuneelle ilman tilausta) —
+	 * osto- ja checkout-paluulogiikka siirtyi ProView'sta tänne sellaisenaan.
+	 */
+	import { onMount } from 'svelte';
+	import { auth, refreshSubscription } from '$lib/auth.svelte';
+	import { fetchXp, type XpResponse } from '$lib/api';
+	import { capture } from '$lib/analytics';
+	import Provenance from './Provenance.svelte';
+	import LeagueBanner from './LeagueBanner.svelte';
+	import SegmentNav, { type Segment } from './SegmentNav.svelte';
+	import LoginBox from './LoginBox.svelte';
+	import Paywall from './Paywall.svelte';
+	import PremiumPreview from './PremiumPreview.svelte';
+	import SetPassword from './SetPassword.svelte';
+	import RateTeam from './RateTeam.svelte';
+	import FitChecker from './FitChecker.svelte';
+	import Watchlist from './Watchlist.svelte';
+	import TransferPlanner from './TransferPlanner.svelte';
+	import PlayerCard from './PlayerCard.svelte';
+	import CaptainRanker from './CaptainRanker.svelte';
+	import FixtureSwing from './FixtureSwing.svelte';
+	import XpTable from './XpTable.svelte';
+	import CleanSheets from './CleanSheets.svelte';
+	import Value from './Value.svelte';
+	import Leaders from './Leaders.svelte';
+	import Differentials from './Differentials.svelte';
+	import ComparePlayers from './ComparePlayers.svelte';
+	import ChipEv from './ChipEv.svelte';
+	import PlanChains from './PlanChains.svelte';
+	import EdgeMode from './EdgeMode.svelte';
+	import MiniLeague from './MiniLeague.svelte';
+	import PriceWatch from './PriceWatch.svelte';
+	import Predict from './Predict.svelte';
+	import Fixtures from './Fixtures.svelte';
+	import Standings from './Standings.svelte';
+
+	let {
+		forcePremium = false,
+		upgradeSignal = 0
+	}: {
+		/** DEV-esikatselu (/dev-premium): premium-lohkot auki ilman gatea. */
+		forcePremium?: boolean;
+		/** Heron Upgrade-badge nostaa tätä → upgrade-näkymä auki. */
+		upgradeSignal?: number;
+	} = $props();
+
+	const GROUPS: Segment[] = [
+		{ id: 'week', label: 'This week' },
+		{ id: 'team', label: 'My team' },
+		{ id: 'players', label: 'Players' },
+		{ id: 'tools', label: 'Tools' },
+		{ id: 'prices', label: 'Prices' },
+		{ id: 'matches', label: 'Matches' }
+	];
+
+	// Vanhat #tools=-deep-linkit (24 segmentti-id:tä) mappautuvat uusiin
+	// ryhmiin — linkki ei saa hajota IA-muutokseen.
+	const LEGACY_HASH: Record<string, string> = {
+		cleansheets: 'players',
+		playercard: 'players',
+		lookup: 'players',
+		rateteam: 'team',
+		myteam: 'team',
+		fitchecker: 'team',
+		value: 'players',
+		leaders: 'players',
+		differentials: 'players',
+		compare: 'players',
+		pricewatch: 'prices',
+		league: 'tools',
+		chips: 'tools',
+		chains: 'tools',
+		edge: 'tools',
+		predict: 'matches',
+		fixtures: 'matches',
+		standings: 'matches'
+	};
+
+	let segment = $state('week');
+	let upgradeOpen = $state(false);
+	let checkoutSuccess = $state(false);
+	let guestCheckout = $state(false);
+
+	// Tools-hakemiston avattu työkalu (sama grid-kaava kuin mobiilin P1).
+	type ToolKey = 'chips' | 'chains' | 'edge' | 'league';
+	const TOOL_CARDS: { key: ToolKey; title: string; desc: string; premium: boolean }[] = [
+		{
+			key: 'chips',
+			title: 'Chip timing',
+			desc: 'The best windows for Wildcard, Bench Boost, Triple Captain and Free Hit, scored by expected points.',
+			premium: true
+		},
+		{
+			key: 'chains',
+			title: 'Transfer chains',
+			desc: 'One and two-move transfer plans with hits priced in, chained over the coming gameweeks.',
+			premium: true
+		},
+		{
+			key: 'edge',
+			title: 'Edge mode',
+			desc: 'Rank-aware picks: ownership-weighted captains, differentials you do not own and template risks.',
+			premium: true
+		},
+		{
+			key: 'league',
+			title: 'Beat the Model league',
+			desc: 'Join the public mini-league and track the standings with head-to-head win odds.',
+			premium: false
+		}
+	];
+	let openTool = $state<ToolKey | null>(null);
+
+	// Matches-ryhmän sisäinen valinta (Villen valinta: oma ryhmä, ei gridiä).
+	let matchesView = $state<'predict' | 'fixtures' | 'standings'>('predict');
+	let predictPrefill = $state<{ league: string; home: string; away: string } | null>(null);
+	function goPredict(lg: string, h: string, a: string) {
+		predictPrefill = { league: lg, home: h, away: a };
+		matchesView = 'predict';
+	}
+
+	const premium = $derived(forcePremium || !!auth.sub);
+
+	function goUpgrade() {
+		upgradeOpen = true;
+		requestAnimationFrame(() => {
+			document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
+		});
+	}
+
+	// Hero-badge → upgrade-näkymä (signaali +page.sveltestä).
+	let lastSignal = 0;
+	$effect(() => {
+		if (upgradeSignal > lastSignal) {
+			lastSignal = upgradeSignal;
+			goUpgrade();
+		}
+	});
+
+	// Tilauksen aktivoituminen sulkee upgrade-näkymän itsestään.
+	$effect(() => {
+		if (premium && upgradeOpen) upgradeOpen = false;
+	});
+
+	onMount(() => {
+		// Checkout-paluu (?checkout=success): fulfillment tapahtuu webhookissa —
+		// täällä kuitataan + kysytään tilaustila uudelleen (webhook-viivettä
+		// vastaan). Siirretty ProView'sta sellaisenaan.
+		const params = new URLSearchParams(window.location.search);
+		if (params.get('checkout') === 'success') {
+			checkoutSuccess = true;
+			guestCheckout = params.get('guest') === '1';
+			const sid = params.get('session_id') ?? 'unknown';
+			capture('purchase_completed', { source: 'web', guest: guestCheckout }, `purchase_${sid}`);
+			history.replaceState(null, '', window.location.pathname);
+			upgradeOpen = true;
+			let tries = 0;
+			const poll = () => {
+				void refreshSubscription().then(() => {
+					if (!auth.sub && ++tries < 5) setTimeout(poll, 3000);
+				});
+			};
+			poll();
+		}
+		// #101: ?tab=premium avaa arvo-esikatselun + hinnat suoraan.
+		const tab = params.get('tab');
+		if (tab === 'premium' || tab === 'pro') upgradeOpen = true;
+		// Vanhat deep-linkit uusiin ryhmiin (SegmentNav hoitaa uudet id:t).
+		const m = window.location.hash.match(/^#tools=([\w-]+)$/);
+		if (m && LEGACY_HASH[m[1]]) {
+			segment = LEGACY_HASH[m[1]];
+			if (m[1] === 'fixtures') matchesView = 'fixtures';
+			if (m[1] === 'standings') matchesView = 'standings';
+			if (m[1] === 'chips' || m[1] === 'chains' || m[1] === 'edge' || m[1] === 'league')
+				openTool = m[1] as ToolKey;
+		}
+	});
+
+	// xP-pooli premium-työkaluille. Haku lähtee heti session ratkettua
+	// (rinnakkain tilaustarkistuksen kanssa, 26.7 PERF-oppi); free-käyttäjälle
+	// 555 kB:n haku ei lähde lainkaan.
+	let xp = $state<XpResponse | null>(null);
+	let xpError = $state<string | null>(null);
+	$effect(() => {
+		if ((auth.user || forcePremium) && !xp && !xpError) {
+			fetchXp().then(
+				(d) => (xp = d),
+				(e) => (xpError = String(e))
+			);
+		}
+	});
+
+	function openToolCard(t: (typeof TOOL_CARDS)[number]) {
+		if (t.premium && !premium) {
+			capture('upgrade_tapped', { source: `fantasy_${t.key}` });
+			goUpgrade();
+			return;
+		}
+		openTool = t.key;
+		capture('fantasy_tool_opened', { tool: t.key });
+	}
+</script>
+
+{#if checkoutSuccess}
+	{#if guestCheckout && !auth.user}
+		<p class="banner success">
+			Payment received. Premium is yours! We just emailed you a sign-in link (check spam
+			too). Click it to open Premium here on the web; once signed in, you can set a password
+			to use the same account in the GoalIQ app on iOS and Android.
+		</p>
+	{:else}
+		<p class="banner success">
+			Premium active, welcome aboard! Premium is now active on the web AND in the GoalIQ app
+			(iOS and Android). Just sign in with the same account on your phone.
+		</p>
+	{/if}
+{/if}
+
+{#if upgradeOpen && !premium}
+	<!-- Upgrade-näkymä: ei enää oma ylätabi vaan päällekkäinen tila, josta
+	     pääsee takaisin työkaluihin yhdellä klikillä. -->
+	<button type="button" class="back-link" onclick={() => (upgradeOpen = false)}>
+		‹ Back to the tools
+	</button>
+	{#if !auth.sessionResolved}
+		<p class="muted">Checking session…</p>
+	{:else if !auth.user}
+		<PremiumPreview />
+		<LoginBox />
+	{:else if auth.subLoading && auth.sub === undefined}
+		<p class="muted">Checking subscription…</p>
+	{:else}
+		<Paywall />
+	{/if}
+{:else}
+	{#if auth.sub}
+		{#if auth.sub.plan === 'app'}
+			<p class="banner success">Your GoalIQ app subscription is active here too. Welcome.</p>
+		{:else}
+			<p class="muted">GoalIQ Premium active ({auth.sub.plan}) · thank you for the support!</p>
+			<SetPassword />
+		{/if}
+	{/if}
+
+	<Provenance />
+	<LeagueBanner />
+	<SegmentNav segments={GROUPS} bind:active={segment} label="GoalIQ FPL tools" />
+
+	{#if segment === 'week' || segment === 'team'}
+		<!-- week + team jakavat SAMAN RateTeam-elementin (sama puupositio →
+		     Svelte ei tuhoa instanssia vaihdossa → data/entry-tila säilyy). -->
+		<div id="panel-{segment}" role="tabpanel" aria-labelledby="seg-{segment}">
+			<div class="tool-card">
+				<RateTeam
+					{premium}
+					onUpgrade={goUpgrade}
+					weekMode={segment === 'week'}
+					onGoToTeam={() => (segment = 'team')}
+				/>
+				{#if segment === 'team'}
+					<Watchlist {premium} />
+				{/if}
+			</div>
+			{#if segment === 'team'}
+				{#if premium}
+					<div class="tool-card"><TransferPlanner /></div>
+				{/if}
+				<div class="tool-card">
+					<FitChecker onOpenRateTeam={() => (segment = 'team')} />
+				</div>
+			{/if}
+		</div>
+	{:else if segment === 'players'}
+		<div id="panel-players" role="tabpanel" aria-labelledby="seg-players">
+			<div class="tool-card"><PlayerCard {premium} /></div>
+			{#if premium}
+				{#if xpError}
+					<p class="banner error">
+						Could not load xP projections right now. Please try again shortly.
+					</p>
+				{:else if !xp}
+					<p class="muted">Loading expected points…</p>
+				{:else if !xp.meta?.available}
+					<p class="banner success">xP projections go live before Gameweek 1.</p>
+				{:else}
+					<div class="tool-card"><CaptainRanker data={xp} /></div>
+					<div class="tool-card"><FixtureSwing data={xp} /></div>
+					<div class="tool-card"><XpTable data={xp} /></div>
+				{/if}
+			{:else}
+				<!-- Sama .locked-kaava kuin Predict/Fixtures-lohkoissa. -->
+				<div class="locked">
+					<p>
+						Player xP per gameweek, the captain ranker and fixture swing are part of GoalIQ
+						Premium.
+					</p>
+					<button type="button" class="primary" onclick={goUpgrade}>See Premium</button>
+				</div>
+			{/if}
+			<CleanSheets />
+			<div class="tool-card"><Value {premium} onUpgrade={goUpgrade} /></div>
+			<div class="tool-card"><Leaders {premium} onUpgrade={goUpgrade} /></div>
+			{#if premium}
+				<div class="tool-card"><Differentials /></div>
+				{#if xp}
+					<div class="tool-card"><ComparePlayers {xp} /></div>
+				{/if}
+			{/if}
+		</div>
+	{:else if segment === 'tools'}
+		<div id="panel-tools" role="tabpanel" aria-labelledby="seg-tools">
+			{#if openTool === null}
+				<!-- Hakemisto-grid: nimi + rivin kuvaus + premium-badge. Sama
+				     kaava kuin mobiilin P1 Tools-segmentissä. -->
+				<div class="tools-grid">
+					{#each TOOL_CARDS as t (t.key)}
+						<button type="button" class="tool-card-btn" onclick={() => openToolCard(t)}>
+							<span class="tool-card-head">
+								<span class="tool-card-title">{t.title}</span>
+								{#if t.premium && !premium}<span class="tool-lock">Premium</span>{/if}
+							</span>
+							<span class="tool-card-desc muted">{t.desc}</span>
+						</button>
+					{/each}
+				</div>
+			{:else}
+				<button type="button" class="back-link" onclick={() => (openTool = null)}>
+					‹ All tools
+				</button>
+				{#if openTool === 'chips'}
+					<div class="tool-card"><ChipEv /></div>
+				{:else if openTool === 'chains'}
+					<div class="tool-card"><PlanChains /></div>
+				{:else if openTool === 'edge'}
+					<div class="tool-card"><EdgeMode /></div>
+				{:else}
+					<div class="tool-card">
+						<MiniLeague onUseTeam={() => (segment = 'team')} />
+					</div>
+				{/if}
+			{/if}
+		</div>
+	{:else if segment === 'prices'}
+		<div id="panel-prices" role="tabpanel" aria-labelledby="seg-prices">
+			<div class="tool-card"><PriceWatch /></div>
+		</div>
+	{:else}
+		<div id="panel-matches" role="tabpanel" aria-labelledby="seg-matches">
+			<!-- Matches-alavalinta: kolme ottelutyökalua yhdessä ryhmässä
+			     (Villen valinta: oma ryhmä). -->
+			<div class="matches-nav" role="tablist" aria-label="Match tools">
+				{#each [['predict', 'Predict a match'], ['fixtures', 'Fixtures'], ['standings', 'Table']] as [id, label] (id)}
+					<button
+						type="button"
+						role="tab"
+						aria-selected={matchesView === id}
+						class:active={matchesView === id}
+						onclick={() => (matchesView = id as typeof matchesView)}
+					>
+						{label}
+					</button>
+				{/each}
+			</div>
+			{#if matchesView === 'predict'}
+				<div class="tool-card">
+					<Predict {premium} onUpgrade={goUpgrade} prefill={predictPrefill} />
+				</div>
+			{:else if matchesView === 'fixtures'}
+				<div class="tool-card">
+					<Fixtures {premium} onUpgrade={goUpgrade} onPredict={(l, h, a) => goPredict(l, h, a)} />
+				</div>
+			{:else}
+				<div class="tool-card"><Standings /></div>
+			{/if}
+		</div>
+	{/if}
+{/if}
+
+<style>
+	.back-link {
+		background: none;
+		border: none;
+		color: var(--text-muted);
+		font: inherit;
+		font-weight: 600;
+		padding: var(--s-2) 0;
+		cursor: pointer;
+	}
+	.back-link:hover {
+		color: var(--text);
+	}
+	.tools-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: var(--s-3);
+	}
+	.tool-card-btn {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--s-1);
+		text-align: left;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: var(--s-4);
+		font: inherit;
+		color: var(--text);
+		cursor: pointer;
+	}
+	.tool-card-btn:hover {
+		border-color: var(--accent);
+	}
+	.tool-card-head {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+	}
+	.tool-card-title {
+		font-weight: 700;
+	}
+	.tool-lock {
+		font-size: var(--step--1);
+		color: var(--text-muted);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		padding: 0 0.6em;
+	}
+	.tool-card-desc {
+		font-size: var(--step--1);
+	}
+	.matches-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--s-2);
+		margin: 0 0 var(--s-4);
+	}
+	.matches-nav button {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		color: var(--text-muted);
+		font-size: var(--step--1);
+		font-weight: 700;
+		padding: 0.4em 1em;
+		min-height: 40px;
+	}
+	.matches-nav button.active {
+		background: transparent;
+		border-color: var(--accent);
+		color: var(--accent-strong);
+	}
+	.locked {
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: var(--s-4);
+		margin: var(--s-4) 0;
+		background: var(--surface);
+	}
+	.locked p {
+		margin: 0 0 var(--s-3);
+	}
+</style>

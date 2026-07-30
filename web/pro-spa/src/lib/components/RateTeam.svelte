@@ -45,7 +45,22 @@
 	// FREE/PREMIUM-raja komponenttitasolla: siirtosuositukset renderöityvät
 	// VAIN premium={true} (ProView, tilauksen takana). Free näyttää lukitun
 	// teaser-rivin joka vie Paywalliin (onUpgrade → Pro-tab).
-	let { premium = false, onUpgrade }: { premium?: boolean; onUpgrade?: () => void } = $props();
+	let {
+		premium = false,
+		onUpgrade,
+		weekMode = false,
+		onGoToTeam
+	}: {
+		premium?: boolean;
+		onUpgrade?: () => void;
+		/** Web P1 (30.7): true = renderöi VAIN viikkosilmukan (WeeklyActions +
+		 *  Beat the model + kapteeni). Parent pitää tämän elementin samassa
+		 *  puupositiossa week↔team-vaihdossa → data/entry-tila säilyy. Sama
+		 *  kaava kuin mobiilin RateTeamSection weekMode. */
+		weekMode?: boolean;
+		/** week-tyhjätilan CTA — vie My team -ryhmään. */
+		onGoToTeam?: () => void;
+	} = $props();
 
 	// #66: entry-kenttä on jaettu (fplEntry.entry) RateTeamin + Plannerin kesken
 	let loading = $state(false);
@@ -474,6 +489,46 @@
 	});
 </script>
 
+{#if weekMode}
+	<!-- Web P1 "This week": suppea render — viikkosilmukka ilman rate-
+	     koneistoa. Sama komponentti-instanssi kuin My teamissa (parent pitää
+	     puuposition), joten data ja entry-tila ovat jaettuja. -->
+	<h2>This week</h2>
+	<p class="muted">
+		What to do before the deadline, and how your calls are going against the model.
+	</p>
+	{#if loading}
+		<p class="muted">Loading your squad…</p>
+	{:else if data == null}
+		<!-- Tyhjätila: viikkosilmukka tarvitsee joukkueen — ohjaa My teamiin,
+		     ei duplikoitua syöttölomaketta. -->
+		<div class="week-setup">
+			<p><strong>Set up your team first.</strong></p>
+			<p class="muted">
+				The weekly loop needs your squad. Add your FPL entry ID or build a draft in My team,
+				and this view fills in with your captain call and the decisions to log.
+			</p>
+			<button class="primary" type="button" onclick={() => onGoToTeam?.()}>Go to My team</button>
+		</div>
+	{:else}
+		<WeeklyActions
+			gw={data.meta.gw}
+			{deadlineUtc}
+			actions={weeklyActions}
+			onFollowTransfer={followTransferFromLoop}
+			refreshToken={decisionsVersion}
+		/>
+		<BeatTheModel />
+		<p class="captain">
+			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
+			<span class="muted">({data.captain.pick.team_short})</span>,
+			{data.captain.pick.gw_xp.toFixed(2)} xP in GW{data.meta.gw}{#if data.captain.alternative}.
+				Alternative: {data.captain.alternative.web_name}
+				<span class="muted">({data.captain.alternative.team_short})</span>,
+				{data.captain.alternative.gw_xp.toFixed(2)} xP{/if}.
+		</p>
+	{/if}
+{:else}
 <h2>Rate my FPL team</h2>
 <p class="muted">
 	Import your squad with your public FPL entry ID, no login or password needed.
@@ -900,8 +955,20 @@
 		</button>
 	{/if}
 {/if}
+{/if}
 
 <style>
+	/* Web P1: week-tyhjätilan kortti */
+	.week-setup {
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: var(--s-4);
+		margin: var(--s-3) 0;
+		background: var(--surface);
+	}
+	.week-setup p {
+		margin: 0 0 var(--s-2);
+	}
 	.entry-form {
 		display: flex;
 		flex-wrap: wrap;
