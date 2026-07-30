@@ -135,6 +135,11 @@ def build_payload(bootstrap: dict) -> dict:
         },
         "risers": risers,
         "fallers": fallers,
+        # 30.7 tarkkuusloki: koko hintataulun snapshot (id → kymmenykset).
+        # Seuraavan yön grade_price_watch diffaa tätä vasten → toteutuneet
+        # muutokset ilman arkistokaivuuta. ~700 int-paria, kompakti.
+        "prices": {str(e["id"]): int(e.get("now_cost") or 0)
+                   for e in bootstrap.get("elements") or []},
     }
 
 

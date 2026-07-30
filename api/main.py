@@ -2840,7 +2840,30 @@ def fantasy_price_watch(response: Response):
     """
     from src.models.fpl_price_watch import load_price_watch
     response.headers["Cache-Control"] = "no-store"
-    return load_price_watch()
+    payload = load_price_watch()
+    # 30.7 tarkkuusloki: julkinen gradaus payloadin kylkeen. Vain *_soon on
+    # väite; säännöt lokin metassa. Puuttuva/tyhjä loki → ei accuracy-kenttää
+    # (ei nollalla mainostamista).
+    try:
+        import json as _json
+        acc_path = config.PROJECT_ROOT / "data" / "fpl_price_accuracy.json"
+        if acc_path.exists():
+            acc = _json.loads(acc_path.read_text(encoding="utf-8"))
+            days = acc.get("days") or []
+            if days:
+                sp = sum(d["rise_soon_pred"] + d["fall_soon_pred"] for d in days)
+                sh = sum(d["rise_soon_hits"] + d["fall_soon_hits"] for d in days)
+                payload["accuracy"] = {
+                    "days_graded": len(days),
+                    "soon_predictions": sp,
+                    "soon_hits": sh,
+                    "soon_precision_pct": round(100.0 * sh / sp, 1) if sp else None,
+                    "last_graded_at": days[-1]["graded_at"],
+                    "rules": acc.get("meta", {}).get("rules"),
+                }
+    except Exception:
+        pass  # loki ei saa kaataa price watchia
+    return payload
 
 
 @app.get("/api/fantasy/rate-team")

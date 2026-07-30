@@ -71,6 +71,12 @@ raw_data/
 # HUOM: ilman tätä !-poikkeusta endpoint 503:aa tuotannossa vaikka kaikki
 # muu on pushattu — gitignoroitu-korjaus-vikaluokka.
 !/data/fpl_defcon_gw.json
+
+# 30.7: julkiset tarkkuuslokit + xP-deadline-freezet (append-only, CI kirjoittaa)
+!/data/fpl_price_accuracy.json
+!/data/fpl_xp_gw_accuracy.json
+!/data/fpl_xp_frozen/
+!/data/fpl_xp_frozen/*.json
 downloaded_files/
 ~/soccerdata/
 

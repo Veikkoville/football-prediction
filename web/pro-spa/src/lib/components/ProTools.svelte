@@ -7,6 +7,7 @@
 	import LeagueBanner from './LeagueBanner.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
 	import CaptainRanker from './CaptainRanker.svelte';
+	import FixtureSwing from './FixtureSwing.svelte';
 	import XpTable from './XpTable.svelte';
 	import RateTeam from './RateTeam.svelte';
 	import TransferPlanner from './TransferPlanner.svelte';
@@ -66,6 +67,8 @@
 {#if segment === 'players'}
 	<div id="panel-players" role="tabpanel" aria-labelledby="seg-players">
 		<section class="tool-card"><CaptainRanker data={xp} /></section>
+		<!-- 30.7: fixture swing — DefCon-rehellisyysnoten vastinpari -->
+		<section class="tool-card"><FixtureSwing data={xp} /></section>
 		<section class="tool-card"><XpTable data={xp} /></section>
 	</div>
 {:else if segment === 'myteam'}

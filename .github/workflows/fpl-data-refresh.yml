@@ -124,11 +124,28 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_xp
 
+      # 30.7 tarkkuusloki: gradaa EDELLISEN yön price-ennuste ENNEN kuin
+      # builderi ylikirjoittaa sen (järjestys on koko lokin pointti).
+      - name: Grade previous price watch predictions
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.grade_price_watch
+
       # #43: hinnanmuutosennuste samasta bootstrapista — hinnat liikkuvat öisin,
       # päivittäinen cron riittää (ei omaa workflowta).
       - name: Build price watch
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_price_watch
+
+      # 30.7 xP vs toteuma: gradaa ratkenneet jäädytetyt GW:t + jäädytä
+      # seuraava GW jos deadline on alle 30 h päässä (freeze TUOREESTA
+      # projektiosta → askel build_fpl_xp:n jälkeen).
+      - name: Grade finished frozen gameweeks (xP vs actual)
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.grade_fpl_xp_gw
+
+      - name: Freeze next gameweek xP at deadline window
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.freeze_fpl_xp_gw
 
       # #124/#125: xG- + DefCon-leaders samasta bootstrap+element-summary-
       # datasta (levyvälimuisti — valmiin kauden summaryt eivät uudelleenhae).
@@ -166,6 +183,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json
+          # 30.7 tarkkuuslokit: olemassa vain kun gradattavaa/jäädytettävää on ollut
+          for f in data/fpl_price_accuracy.json data/fpl_xp_gw_accuracy.json; do
+            [ -f "$f" ] && git add "$f"
+          done
+          [ -d data/fpl_xp_frozen ] && git add data/fpl_xp_frozen
+          true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (data ennallaan) — ohitetaan commit."
             exit 0
