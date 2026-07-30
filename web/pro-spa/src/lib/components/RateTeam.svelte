@@ -27,6 +27,7 @@
 	} from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
 	import WeeklyActions, { type WeeklyAction } from './WeeklyActions.svelte';
+	import { isOpenForLogging, loadDecisions, logDecision } from '$lib/fplDecisions';
 	import BeatTheModel from './BeatTheModel.svelte';
 	import { fetchFantasy } from '$lib/api';
 	import ModelWorking from './ModelWorking.svelte';
@@ -372,12 +373,57 @@
 	// EI $state: arvo luetaan mountissa ja päivitetään callbackissa — reaktiivinen
 	// prop ajaisi managerin reset-effectin uudelleen (svelte-efektikehäopetus).
 	const captaincy: Captaincy = loadCaptaincy();
+	// Silmukka-bugi #8 (30.7): WeeklyActions lataa kirjaukset uudelleen kun
+	// tämä bumppaa — managerin kapteeninvaihto päivittää kirjattua päätöstä
+	// kortin ohi, ja kortin on näytettävä tuore tila.
+	let decisionsVersion = $state(0);
+	/** Silmukka-bugi #8: managerin kapteeninvaihto virtaa kirjattuun
+	 *  captain-päätökseen. EI luo kirjausta — vain jo kirjattu päätös
+	 *  päivittyy (kanta upserttaa deadlineen asti), ja followed lasketaan
+	 *  uudelleen. Ilman tätä grader vertaisi vanhentunutta kirjausta.
+	 *  SAMA logiikka kuin mobiilin FantasyTools.syncCaptainDecision. */
+	async function syncCaptainDecision(captainId: number) {
+		const gw = data?.meta?.gw;
+		if (gw == null || !deadlineUtc || !isOpenForLogging(deadlineUtc)) return;
+		const rows = await loadDecisions(gw);
+		const rec = rows.find((r) => r.kind === 'captain');
+		if (!rec) return;
+		const modelId = (rec.model_choice as { id?: unknown }).id;
+		const name =
+			data?.team.players.find((p) => p.id === captainId)?.web_name ??
+			pool.find((p) => p.id === captainId)?.web_name;
+		// Mallin kapteeni takaisin → userChoice = täsmälleen model_choice,
+		// jolloin followed-vertailu (JSON-yhtäsuuruus) palaa todeksi.
+		const userChoice =
+			captainId === modelId
+				? rec.model_choice
+				: { id: captainId, name: name ?? String(captainId) };
+		if (JSON.stringify(userChoice) === JSON.stringify(rec.user_choice)) return;
+		const res = await logDecision({
+			gw,
+			kind: 'captain',
+			modelChoice: rec.model_choice,
+			userChoice,
+			deadlineUtc
+		});
+		if (res.ok) {
+			capture('fpl_decision_updated', {
+				kind: 'captain',
+				gw,
+				followed: captainId === modelId,
+				source: 'pitch'
+			});
+			decisionsVersion += 1;
+		}
+	}
 	function handleCaptaincyChange(captainId: number | null, viceId: number | null) {
+		const prevCaptainId = captaincy.captain_id;
 		captaincy.captain_id = captainId;
 		captaincy.vice_id = viceId;
 		saveCaptaincy(captaincy);
 		const ids = planIdsAfter(appliedTransfers);
 		if (ids.length > 0) pushRemoteDraftSoon(ids, captaincy);
+		if (captainId != null && captainId !== prevCaptainId) void syncCaptainDecision(captainId);
 	}
 
 	function setPlan(list: TransferSuggestion[]): void {
@@ -693,6 +739,7 @@
 			{deadlineUtc}
 			actions={weeklyActions}
 			onFollowTransfer={followTransferFromLoop}
+			refreshToken={decisionsVersion}
 		/>
 		<!-- Silmukan askel 5: kauden "sinä vs malli" -tuloskortti (V1).
 		     Etuoven alle: tulos on kirjaamisen palkinto. -->

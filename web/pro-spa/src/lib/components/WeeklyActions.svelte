@@ -33,7 +33,8 @@
 		gw,
 		deadlineUtc,
 		actions,
-		onFollowTransfer
+		onFollowTransfer,
+		refreshToken
 	}: {
 		gw: number | null;
 		deadlineUtc: string | null;
@@ -47,11 +48,21 @@
 		 * jolloin käyttäjä saa vahvistuksen.
 		 */
 		onFollowTransfer?: (choice: Record<string, unknown>) => boolean;
+		/**
+		 * Silmukka-bugi #8 (30.7): parent voi päivittää kirjattua päätöstä
+		 * kortin ohi (managerin kapteeninvaihto). Kun token muuttuu,
+		 * logged-tila ladataan uudelleen.
+		 */
+		refreshToken?: number;
 	} = $props();
 
 	let logged = $state<Record<string, StoredDecision>>({});
 	let busy = $state<string | null>(null);
 	let note = $state<string | null>(null);
+	// Silmukka-bugi #8 (30.7): kirjattu päätös EI lukitu ensimmäiseen
+	// klikkaukseen — kanta upserttaa deadlineen asti, ja lukitus kuuluu
+	// deadlinelle. editing[kind] avaa napit uudelleen "Change"-painalluksesta.
+	let editing = $state<Record<string, boolean>>({});
 
 	let open = $derived(isOpenForLogging(deadlineUtc));
 
@@ -66,6 +77,7 @@
 	$effect(() => {
 		void auth.user;
 		void gw;
+		void refreshToken;
 		refresh();
 	});
 
@@ -84,6 +96,7 @@
 		});
 		busy = null;
 		if (res.ok) {
+			editing = { ...editing, [a.kind]: false };
 			// FM-silmukka: "I'll do this" siirrolle päivittää myös suunnitellun
 			// joukkueen — päätös joka ei muuta mitään ei ole päätös. Vain
 			// onnistuneen kirjauksen jälkeen: loki ja joukkue pysyvät synkassa.
@@ -135,7 +148,7 @@
 
 				{#if !auth.user}
 					<span class="muted hint">Sign in to log</span>
-				{:else if open && !rec}
+				{:else if open && (!rec || editing[a.kind])}
 					<div class="btns">
 						<button type="button" class="primary" disabled={busy === a.kind}
 							onclick={() => record(a, true)}>I'll do this</button
@@ -143,7 +156,21 @@
 						<button type="button" disabled={busy === a.kind} onclick={() => record(a, false)}
 							>Doing something else</button
 						>
+						<!-- Muutoksen voi perua ilman kirjoitusta — vanha kirjaus jää. -->
+						{#if rec}
+							<button
+								type="button"
+								disabled={busy === a.kind}
+								onclick={() => (editing = { ...editing, [a.kind]: false })}
+								>Keep as logged</button
+							>
+						{/if}
 					</div>
+				{:else if open && rec}
+					<!-- #8: kirjattua päätöstä voi muuttaa deadlineen asti. -->
+					<button type="button" onclick={() => (editing = { ...editing, [a.kind]: true })}
+						>Change</button
+					>
 				{/if}
 			</div>
 		{/each}
