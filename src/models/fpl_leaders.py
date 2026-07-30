@@ -167,6 +167,62 @@ def rank_defcon_leaders(data: dict, window: int = WINDOW_DEFAULT,
     }
 
 
+def rank_defcon_season(data: dict, pos: str | None = None,
+                       top_n: int = 20) -> dict:
+    """Koko kausi -basis (#7, Villen idea 30.7): DefCon-leaderboard koko
+    basis-kauden yli. Lähde on per-GW-matriisi (load_defcon_gw) jonka
+    builderi on jo laskenut kausisummiksi (games/hits/hit_rate/dc_points) —
+    ei uutta laskentaa, ei rebuild-tarvetta. 38 pelin hit-rate on vakain
+    mahdollinen basis; esikaudella "viimeiset N 25/26-peliä" on
+    mielivaltainen häntä ja tämä korvaa sen oletuksena.
+
+    Sama rivimuoto ja sama järjestysavain kuin rank_defcon_leadersissa,
+    jotta klientit voivat vaihtaa basista ilman eri renderöintiä."""
+    rows = []
+    for p in data.get("players", []):
+        if p["pos"] == "GKP":
+            continue
+        if pos and p["pos"] != pos:
+            continue
+        games = int(p.get("games") or 0)
+        if games == 0:
+            continue
+        hits = int(p.get("hits") or 0)
+        actions = sum(int(g[4]) for g in (p.get("per_gw") or []))
+        row = _base_row(p, games)
+        row.update({
+            "threshold": p.get("threshold") or DEFCON_THRESHOLD.get(p["pos"]),
+            "dc_per_game": round(actions / games, 1),
+            "hit_rate_pct": round(100.0 * hits / games, 0),
+            "defcon_points_window": int(p.get("dc_points") or hits * DEFCON_POINTS),
+            "hits": hits,
+        })
+        rows.append(row)
+    rows.sort(key=lambda r: (r["hit_rate_pct"], r["dc_per_game"]), reverse=True)
+    m = data.get("meta", {})
+    return {
+        "meta": {
+            # window: koko kausi — klientti tunnistaa basiksen tästä, ei
+            # numerosta (38 ei päde DGW/blank-kausiin).
+            "window": "season",
+            "basis_season": m.get("basis_season"),
+            "is_prev_season_basis": m.get("is_prev_season_basis", True),
+            "basis_label": m.get("basis_label"),
+            "generated_at": m.get("generated_at"),
+            "thresholds": DEFCON_THRESHOLD,
+            "points_per_hit": DEFCON_POINTS,
+            "rule_note": ("2 pts when a defender reaches 10 CBIT "
+                          "(clearances, blocks, interceptions, tackles) "
+                          "or a midfielder/forward reaches 12 CBIRT "
+                          "(CBIT + recoveries) in a match. Capped at 2 "
+                          "pts per match."),
+            "note": ("GoalIQ analytics from official FPL match data. "
+                     "Not betting advice."),
+        },
+        "players": rows[:top_n],
+    }
+
+
 def _out_meta(data: dict, window: int) -> dict:
     m = data.get("meta", {})
     return {

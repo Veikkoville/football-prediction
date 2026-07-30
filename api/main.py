@@ -3102,15 +3102,26 @@ def fantasy_defcon_leaders(
     response: Response,
     window: int = Query(default=5, ge=3, le=10),
     pos: str | None = Query(default=None, pattern="^(DEF|MID|FWD)$"),
-    top_n: int = Query(default=20, ge=1, le=100),
+    top_n: int = Query(default=20, ge=1, le=400),
+    basis: str = Query(default="recent", pattern="^(recent|season)$"),
 ):
     """#125: DefCon-tracker (FPLWolfy-ehdotus): DefCon-actionit/game +
     hit-rate % + pisteet rolling-windowilla. Kynnykset DEF 10 CBIT /
-    MID+FWD 12 CBIRT (verifioitu virallisista säännöistä + datasta)."""
-    from src.models.fpl_leaders import load_leaders, rank_defcon_leaders
+    MID+FWD 12 CBIRT (verifioitu virallisista säännöistä + datasta).
+
+    basis=season (30.7, Villen idea): koko basis-kauden ranking per-GW-
+    matriisin kausisummista — window ohitetaan. Esikaudella tämä on
+    vakain basis (38 pelin hit-rate vs mielivaltainen viimeiset-N-häntä).
+    top_n-katto nostettu 400:aan samalla (lista oli kova 20 → "vain 20
+    pelaajaa" -havainto; matriisissa on 373 pelaajaa)."""
+    from src.models.fpl_leaders import (load_defcon_gw, load_leaders,
+                                        rank_defcon_leaders,
+                                        rank_defcon_season)
     from src.models.fpl_rate_team import RateTeamError
     response.headers["Cache-Control"] = "no-store"
     try:
+        if basis == "season":
+            return rank_defcon_season(load_defcon_gw(), pos=pos, top_n=top_n)
         return rank_defcon_leaders(load_leaders(), window=window, pos=pos,
                                    top_n=top_n)
     except RateTeamError as e:

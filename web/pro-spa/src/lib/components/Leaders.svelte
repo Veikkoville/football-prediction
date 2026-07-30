@@ -38,12 +38,17 @@
 	let loading = $state(true);
 	// #137: pelimäärävalitsin (Wolfy: "more expansive to pick for more games")
 	let gameWindow = $state(5);
+	// #7 (30.7, Villen idea): DefConin basis. Esikaudella default = KOKO KAUSI:
+	// 38 pelin hit-rate on vakain basis, ja "viimeiset N 25/26-pelia" on
+	// mielivaltainen häntä ennen kuin uusi kausi tuottaa dataa.
+	let dcBasis = $state<'recent' | 'season'>('season');
 
 	$effect(() => {
 		const w = gameWindow;
+		const b = dcBasis;
 		loading = true;
 		error = null;
-		Promise.all([fetchXgLeaders(w), fetchDefconLeaders(w)])
+		Promise.all([fetchXgLeaders(w), fetchDefconLeaders(w, b)])
 			.then(([x, d]) => {
 				xg = x;
 				defcon = d;
@@ -189,8 +194,17 @@
 		if (!was && v && minMins === 0) minMins = 180;
 		if (was && !v && minMins === 180) minMins = 0;
 	}
+	// #7: top_n nostettiin 20 → 400 ("vain 20 pelaajaa" -havainto) → sama
+	// RENDER_LIMIT + Show all -kaava kuin xG-listassa, ettei 373 rivin
+	// renderöinti lagaa. Suodatus/gate koskee silti koko aineistoa.
+	let showAllDc = $state(false);
+	const dcAll = $derived(defcon?.players ?? []);
 	const dcVisible = $derived(
-		premium ? (defcon?.players ?? []) : (defcon?.players ?? []).slice(0, FREE_ROWS)
+		premium
+			? showAllDc
+				? dcAll
+				: dcAll.slice(0, RENDER_LIMIT)
+			: dcAll.slice(0, FREE_ROWS)
 	);
 	const basisLabel = $derived(xg?.meta?.basis_label ?? defcon?.meta?.basis_label ?? null);
 
@@ -365,11 +379,42 @@
 
 	<h2 class="dc-title">DefCon leaders</h2>
 	<p class="muted">
-		The most reliable defensive-contribution scorers over each player's last {defcon?.meta?.window ??
-			gameWindow} games. 2 pts when a defender reaches 10 CBIT (clearances, blocks, interceptions,
-		tackles) or a midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match. Tap a player
-		to open the full gameweek-by-gameweek breakdown.
+		{#if dcBasis === 'season'}
+			The most reliable defensive-contribution scorers across the full {defcon?.meta
+				?.basis_season ?? 'previous'} season, every player.
+		{:else}
+			The most reliable defensive-contribution scorers over each player's last {defcon?.meta
+				?.window ?? gameWindow} games.
+		{/if}
+		2 pts when a defender reaches 10 CBIT (clearances, blocks, interceptions, tackles) or a
+		midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match. Tap a player to open the
+		full gameweek-by-gameweek breakdown.
 	</p>
+	<!-- #7 (30.7): DefConin oma basis-valitsin. Season = koko basis-kausi
+	     per-GW-matriisin summista (esikauden default); 3/5/10 = rolling-ikkuna
+	     kuten ennen. Erillään xG:n Games-valitsimesta — eri lista, eri basis. -->
+	<div class="window-row">
+		<span class="muted">Basis:</span>
+		<button
+			type="button"
+			class="window-chip"
+			class:active={dcBasis === 'season'}
+			aria-pressed={dcBasis === 'season'}
+			onclick={() => (dcBasis = 'season')}>Full season</button
+		>
+		{#each WINDOWS as w (w)}
+			<button
+				type="button"
+				class="window-chip"
+				class:active={dcBasis === 'recent' && gameWindow === w}
+				aria-pressed={dcBasis === 'recent' && gameWindow === w}
+				onclick={() => {
+					dcBasis = 'recent';
+					gameWindow = w;
+				}}>Last {w}</button
+			>
+		{/each}
+	</div>
 	<!-- 30.7: rehellisyysnote OMASTA mittauksesta. Emme myy vastustajakontekstia
 	     signaalina jota mittaus ei löydä (korrelaatio +0.026, 7 382 ottelua). -->
 	<p class="muted dc-honesty">
@@ -461,7 +506,14 @@
 		</div>
 	{/if}
 
-	{#if !premium && (defcon?.players?.length ?? 0) > FREE_ROWS}
+	{#if premium && !showAllDc && dcAll.length > RENDER_LIMIT}
+		<!-- #7: sama Show all -kaava kuin xG-listassa (perf, ei gate). -->
+		<button type="button" class="window-chip" onclick={() => (showAllDc = true)}>
+			Show all {dcAll.length} players
+		</button>
+	{/if}
+
+	{#if !premium && dcAll.length > FREE_ROWS}
 		<!-- 🔒 DefCon top-3 free → koko lista premium. xG-lista on ilmainen. -->
 		<button type="button" class="teaser-row" onclick={unlock}>
 			<span>

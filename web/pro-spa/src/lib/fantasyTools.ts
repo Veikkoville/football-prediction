@@ -430,7 +430,8 @@ export function fetchValue(): Promise<ValueResponse> {
 /** Jaettu meta: basis kertoo REHELLISESTI minkä kauden datasta rivit ovat
  * (esikausi = 25/26 + pakollinen basis_label; otoskoko per rivi). */
 export interface LeadersMeta {
-	window: number;
+	/** Pelien maara ikkunassa TAI 'season' (koko basis-kausi, 30.7 #7). */
+	window: number | 'season';
 	basis_season: string | null;
 	is_prev_season_basis?: boolean;
 	basis_label: string | null;
@@ -502,8 +503,16 @@ export function fetchXgLeaders(window = 5): Promise<XgLeadersResponse> {
 	return getTool(`/api/fantasy/xg-leaders?window=${window}&top_n=1000`, 'xg_leaders');
 }
 
-export function fetchDefconLeaders(window = 5): Promise<DefconLeadersResponse> {
-	return getTool(`/api/fantasy/defcon-leaders?window=${window}`, 'defcon_leaders');
+/** basis='season' (30.7, #7): koko basis-kauden ranking per-GW-matriisin
+ *  kausisummista — window ohitetaan. top_n nostettu 400:aan molemmissa
+ *  basiksissa (lista oli kovakoodattu top 20; matriisissa on 373 pelaajaa).
+ *  Naytto rajataan komponentissa kuten xG-listassa. */
+export function fetchDefconLeaders(
+	window = 5,
+	basis: 'recent' | 'season' = 'recent'
+): Promise<DefconLeadersResponse> {
+	const q = basis === 'season' ? 'basis=season&top_n=400' : `window=${window}&top_n=400`;
+	return getTool(`/api/fantasy/defcon-leaders?${q}`, 'defcon_leaders');
 }
 
 /* ---------- Per-GW DefCon -matriisi (30.7) ---------- */

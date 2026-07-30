@@ -81,3 +81,56 @@ def test_no_played_games_excluded():
     p = _player(1, "MID", 0)
     out = rank_xg_leaders(_data([p]), window=5)
     assert out["players"] == []  # "No data yet" — ei arvauksia
+
+# ---------------------------------------------------------------------------
+# Koko kausi -basis (#7, 30.7): ranking per-GW-matriisin kausisummista
+# ---------------------------------------------------------------------------
+def _gw_player(pid, pos, games, hits, dc_each=8, name=None):
+    return {
+        "id": pid, "code": 90000 + pid, "web_name": name or f"P{pid}",
+        "team_short": "TST", "pos": pos, "price": 5.0, "owned_pct": 3.0,
+        "threshold": DEFCON_THRESHOLD.get(pos), "games": games, "hits": hits,
+        "hit_rate": round(hits / games, 3) if games else 0.0,
+        "dc_points": hits * 2, "basis": "2025/26",
+        "per_gw": [[i + 1, "OPP", "H", 90, dc_each] for i in range(games)],
+    }
+
+
+def _gw_data(players):
+    return {
+        "meta": {"available": True, "basis_season": "2025/26",
+                 "basis_label": "Based on 2025/26",
+                 "generated_at": "2026-07-30T00:00:00", "n_players": len(players)},
+        "players": players,
+    }
+
+
+def test_defcon_season_ranks_by_hit_rate():
+    from src.models.fpl_leaders import rank_defcon_season
+    data = _gw_data([
+        _gw_player(1, "DEF", 38, 26),           # 68% hit rate
+        _gw_player(2, "MID", 38, 30),           # 79% -> karkeen
+        _gw_player(3, "DEF", 10, 2),            # 20%
+        _gw_player(4, "GKP", 38, 0),            # GKP pois aina
+    ])
+    out = rank_defcon_season(data, top_n=10)
+    ids = [p["id"] for p in out["players"]]
+    assert ids == [2, 1, 3] and 4 not in ids
+    top = out["players"][0]
+    assert top["games"] == 38 and top["hits"] == 30
+    assert top["hit_rate_pct"] == round(100.0 * 30 / 38, 0)
+    assert top["defcon_points_window"] == 60
+    assert out["meta"]["window"] == "season"
+    assert out["meta"]["basis_label"] == "Based on 2025/26"
+
+
+def test_defcon_season_negative_control_top_n_and_pos():
+    # Kontrolli joka kaatuu jos top_n tai pos-suodatin ei oikeasti toimi.
+    from src.models.fpl_leaders import rank_defcon_season
+    data = _gw_data([_gw_player(i, "DEF" if i % 2 else "MID", 20, i)
+                     for i in range(1, 8)])
+    out = rank_defcon_season(data, top_n=3)
+    assert len(out["players"]) == 3
+    only_def = rank_defcon_season(data, pos="DEF")
+    assert all(p["pos"] == "DEF" for p in only_def["players"])
+    assert len(only_def["players"]) > 0
