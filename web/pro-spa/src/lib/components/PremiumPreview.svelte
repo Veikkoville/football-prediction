@@ -15,6 +15,7 @@
 		'Multi-gameweek transfer planner and plan chains',
 		'Chip timing: best window for Wildcard, Bench Boost, Triple Captain and Free Hit',
 		'Edge mode: protect or climb your rank with ownership-weighted picks',
+		'Unlimited watchlist: track every player you are deciding on',
 		'Player compare: up to four players side by side',
 		'CSV export of the full projection set',
 		'Full match analysis: scorelines, goals & momentum'

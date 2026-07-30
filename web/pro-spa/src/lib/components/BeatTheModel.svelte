@@ -12,6 +12,7 @@
 	 * tulevat. FREE: tuloskortti on silmukan palkinto, ei myyntimuuri.
 	 */
 	import { auth } from '$lib/auth.svelte';
+	import { capture } from '$lib/analytics';
 	import {
 		latestDebrief,
 		loadDecisions,
@@ -32,13 +33,26 @@
 	let prefs = $state<FplPrefs>({ ...EMPTY_PREFS });
 	let targetText = $state('');
 
+	// 30.7 digest-instrumentointi: kortin näyttö kerran per mount kun data on
+	// ratkennut. SAMA eventtinimi + kentät kuin mobiilissa (pariteetti).
+	let viewedFired = false;
+
 	$effect(() => {
 		void auth.user;
 		if (!auth.user) {
 			rows = null;
 			return;
 		}
-		loadDecisions().then((r) => (rows = r));
+		loadDecisions().then((r) => {
+			rows = r;
+			if (!viewedFired) {
+				viewedFired = true;
+				capture('beat_scoreboard_viewed', {
+					decisions: r.length,
+					graded: r.filter((x) => x.graded_at != null).length
+				});
+			}
+		});
 		prefs = loadPrefs();
 	});
 

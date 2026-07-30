@@ -51,7 +51,7 @@
    "name": "What is GoalIQ?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "GoalIQ is a free FPL assistant and football prediction tool, in the app stores as GoalIQ: FPL Assistant. Free FPL tools: clean sheet probability and fixture difficulty with separate attack and defence views, a player lookup with official availability news, start chance, set-piece roles, price and ownership, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, and xG/xA/xGI leaders for every player with data. GoalIQ Premium adds an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker, chip timing, transfer plan chains, an edge mode for your mini-league, transfer suggestions, player value, xG leaders, a DefCon tracker, differentials, goalkeeper rotation pairs and player compare for up to four players. On the web it also shows upcoming fixtures and league tables. It also predicts any match with a Dixon-Coles + machine-learning model. Analytics, not betting."
+    "text": "GoalIQ is a free FPL assistant and football prediction tool, in the app stores as GoalIQ: FPL Assistant. Free FPL tools: clean sheet probability and fixture difficulty with separate attack and defence views, a player lookup with official availability news, start chance, set-piece roles, price and ownership, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, a watchlist for the players you are deciding on (three on the free plan), Beat the model (log your captain and transfer calls before the deadline and see them graded against the model's every gameweek), and xG/xA/xGI leaders for every player with data. GoalIQ Premium adds an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker, chip timing, transfer plan chains, an edge mode for your mini-league, transfer suggestions, player value, xG leaders, a DefCon tracker, differentials, an unlimited watchlist, goalkeeper rotation pairs and player compare for up to four players. On the web it also shows upcoming fixtures and league tables. It also predicts any match with a Dixon-Coles + machine-learning model. Analytics, not betting."
    }
   },
   {
@@ -67,7 +67,7 @@
    "name": "How much does GoalIQ Premium cost and what does it include?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Monthly through the App Store or Google Play at the price shown in the app, or on the web at pro.goaliq.app for 3.99 euros per month or 25 euros per year (season pass). One subscription covers web, iOS and Android. Premium unlocks an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value (xP per million), a DefCon tracker, differentials, player compare, predicted starting minutes, and in the app top-10 scorelines, total goals and BTTS probabilities, form and head-to-head."
+    "text": "Monthly through the App Store or Google Play at the price shown in the app, or on the web at pro.goaliq.app for 3.99 euros per month or 25 euros per year (season pass). One subscription covers web, iOS and Android. Premium unlocks an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook and CSV export, the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value (xP per million), a DefCon tracker, differentials, an unlimited watchlist (the free plan tracks up to three players), player compare, predicted starting minutes, and in the app top-10 scorelines, total goals and BTTS probabilities, form and head-to-head."
    }
   },
   {
@@ -254,13 +254,16 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           and defence views, a player lookup with official availability news,
           start chance, set-piece roles, price and ownership, rate my team with
           a captain pick, a mini-league view with head-to-head win odds, a fit
-          checker and pre-season draft rater with saved drafts, and price
-          watch. GoalIQ Premium adds an interactive team manager with a GW1 to
+          checker and pre-season draft rater with saved drafts, price
+          watch, a watchlist for the players you are deciding on (three on the
+          free plan), and Beat the model: log your captain and transfer calls
+          before the deadline and see them graded against the model's every
+          gameweek. GoalIQ Premium adds an interactive team manager with a GW1 to
           GW6 gameweek planner, player expected points (xP) with ownership,
           minutes outlook and CSV export, the captain ranker, chip timing,
           transfer plan chains, an edge mode for your mini-league, transfer
-          suggestions, player value, xG leaders, a DefCon tracker and
-          differentials. It can also predict any match: the app
+          suggestions, player value, xG leaders, a DefCon tracker, an unlimited
+          watchlist and differentials. It can also predict any match: the app
           uses machine learning models (Dixon-Coles + LightGBM ensemble) to
           estimate match outcomes, expected goals (xG), and likely
           scorelines.
@@ -307,6 +310,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           <li>Transfer plans that chain 1 to 2 moves over the coming gameweeks, hits priced in</li>
           <li>Edge mode: rank-aware picks to protect or climb in your mini-league</li>
           <li>Transfer suggestions with one-tap apply, player value (xP per million), the full DefCon leaderboard</li>
+          <li>Unlimited watchlist; the free plan tracks up to three players</li>
           <li>Differentials, player compare and predicted starting minutes</li>
           <li>In the app: top-10 most likely scorelines, total goals and BTTS probabilities, form &amp; momentum, head-to-head history</li>
         </ul>

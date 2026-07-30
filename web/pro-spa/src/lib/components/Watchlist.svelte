@@ -9,6 +9,7 @@
 	 * leaders-listoissa: free näkee mekanismin, premium poistaa rajan.
 	 */
 	import { fetchXp, type XpPlayer } from '$lib/api';
+	import { capture } from '$lib/analytics';
 	import { fetchPriceWatch } from '$lib/fantasyTools';
 	import {
 		EMPTY_PREFS,
@@ -127,6 +128,9 @@
 			bind:query
 			items={candidates}
 			onSelect={(p) => {
+				// 30.7 digest-instrumentointi: SAMA eventtinimi + n-kenttä kuin
+				// mobiilin WatchlistSectionissa (fpl_watchlist_added), pariteetti.
+				capture('fpl_watchlist_added', { n: prefs.watchlist.length + 1 });
 				update({ ...prefs, watchlist: [...prefs.watchlist, p.id] });
 				query = '';
 			}}
