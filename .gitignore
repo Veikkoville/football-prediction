@@ -66,6 +66,11 @@ raw_data/
 
 # #124/#125: xG- + DefCon-leaders-cache (committattu → Render servaa levyltä)
 !/data/fpl_player_leaders.json
+
+# 30.7: per-GW DefCon -matriisi (committattu → Render servaa levyltä).
+# HUOM: ilman tätä !-poikkeusta endpoint 503:aa tuotannossa vaikka kaikki
+# muu on pushattu — gitignoroitu-korjaus-vikaluokka.
+!/data/fpl_defcon_gw.json
 downloaded_files/
 ~/soccerdata/
 

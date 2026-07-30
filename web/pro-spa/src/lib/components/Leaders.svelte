@@ -19,8 +19,10 @@
 	// -parina (ks. PERF-huomio alempana), joten TeamKit-komponenttia ei tarvita.
 	import { teamColorByShort } from '$lib/teamColors';
 	import {
+		fetchDefconGw,
 		fetchDefconLeaders,
 		fetchXgLeaders,
+		type DefconGwResponse,
 		type DefconLeadersResponse,
 		type XgLeadersResponse
 	} from '$lib/fantasyTools';
@@ -57,6 +59,30 @@
 			capture('paywall_shown', { source: 'fantasy_leaders' }, 'paywall_shown_fantasy_leaders');
 		}
 	});
+
+	// 30.7 per-GW DefCon -matriisi (Vollo-vertailu): koko 25/26-kauden
+	// kierroskohtaiset rivit laajennettavana rivina. Haetaan kerran, vasta
+	// ensimmaisesta avauksesta (240 kB payload ei kuulu listan critical pathiin).
+	let gwData = $state<DefconGwResponse | null>(null);
+	let gwError = $state<string | null>(null);
+	let expandedId = $state<number | null>(null);
+
+	function toggleGw(id: number) {
+		if (expandedId === id) {
+			expandedId = null;
+			return;
+		}
+		expandedId = id;
+		capture('defcon_gw_expanded', { player_id: id });
+		if (!gwData && !gwError) {
+			fetchDefconGw().then(
+				(d) => (gwData = d),
+				(e) => (gwError = e instanceof Error ? e.message : String(e))
+			);
+		}
+	}
+
+	const gwById = $derived(new Map((gwData?.players ?? []).map((p) => [p.id, p])));
 
 	// 26.7: sama kontrollisetti kuin julkisella /fpl/xg-leaders-sivulla. Ilman
 	// naita SPA oli kapeampi kuin ilmainen SEO-sivu, mika on vaara suunta.
@@ -341,7 +367,15 @@
 	<p class="muted">
 		The most reliable defensive-contribution scorers over each player's last {defcon?.meta?.window ??
 			gameWindow} games. 2 pts when a defender reaches 10 CBIT (clearances, blocks, interceptions,
-		tackles) or a midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match.
+		tackles) or a midfielder/forward reaches 12 CBIRT (CBIT + recoveries) in a match. Tap a player
+		to open the full gameweek-by-gameweek breakdown.
+	</p>
+	<!-- 30.7: rehellisyysnote OMASTA mittauksesta. Emme myy vastustajakontekstia
+	     signaalina jota mittaus ei löydä (korrelaatio +0.026, 7 382 ottelua). -->
+	<p class="muted dc-honesty">
+		Worth knowing before you read fixtures into this: DefCon follows the player, not the
+		fixture. In 25/26 data the opponent shifted a player's DefCon count by about 2%. Bonus is
+		the stat that moves with fixtures.
 	</p>
 	{#if dcVisible.length === 0}
 		<p class="muted">No data yet.</p>
@@ -366,13 +400,21 @@
 				</thead>
 				<tbody>
 					{#each dcVisible as p, i (p.id)}
-						<tr>
+						<tr class:expanded={expandedId === p.id}>
 							<td class="muted">{i + 1}</td>
 							<td class="pl">
-								<svg class="kit" width="26" height="26" aria-hidden="true">
-									<use href="#lk{p.team_short}" />
-								</svg>
-								<span>{p.web_name} <span class="muted">({p.team_short})</span></span>
+								<button
+									type="button"
+									class="gw-toggle"
+									aria-expanded={expandedId === p.id}
+									onclick={() => toggleGw(p.id)}
+								>
+									<svg class="kit" width="26" height="26" aria-hidden="true">
+										<use href="#lk{p.team_short}" />
+									</svg>
+									<span>{p.web_name} <span class="muted">({p.team_short})</span></span>
+									<span class="chev" aria-hidden="true">{expandedId === p.id ? '▾' : '▸'}</span>
+								</button>
 							</td>
 							<td>{p.pos}</td>
 							<td class="num">{p.price.toFixed(1)}</td>
@@ -381,6 +423,38 @@
 							<td class="num">{p.defcon_points_window}</td>
 							<td class="num">{p.games}</td>
 						</tr>
+						{#if expandedId === p.id}
+							{@const g = gwById.get(p.id)}
+							<tr class="gw-row">
+								<td colspan="8">
+									{#if gwError}
+										<p class="muted">Could not load the gameweek data: {gwError}</p>
+									{:else if !gwData}
+										<p class="muted">Loading the 38-gameweek breakdown…</p>
+									{:else if !g}
+										<p class="muted">No gameweek data for this player yet.</p>
+									{:else}
+										<div class="gw-strip" role="list">
+											{#each g.per_gw as r (r[0])}
+												<span
+													role="listitem"
+													class="gw-chip"
+													class:hit={r[4] >= g.threshold}
+													title="GW{r[0]} {r[2] === 'H' ? 'vs' : 'at'} {r[1]}: {r[4]} defensive actions in {r[3]} min{r[4] >= g.threshold ? ', DefCon points earned' : ''}"
+												>
+													<span class="gw-n">{r[0]}</span>{r[4]}
+												</span>
+											{/each}
+										</div>
+										<p class="muted gw-note">
+											{g.games} played games in {g.basis ?? '2025/26'}: {g.hits} above the
+											threshold of {g.threshold} ({Math.round(g.hit_rate * 100)}%), worth
+											{g.dc_points} DefCon points. {gwData.meta.basis_label}
+										</p>
+									{/if}
+								</td>
+							</tr>
+						{/if}
 					{/each}
 				</tbody>
 			</table>
@@ -400,6 +474,60 @@
 {/if}
 
 <style>
+	/* 30.7 per-GW DefCon -matriisi */
+	.dc-honesty {
+		border-left: 3px solid var(--accent, #f5c542);
+		padding-left: var(--s-2);
+		font-size: var(--step--1);
+	}
+	.gw-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		background: none;
+		border: 0;
+		padding: 0;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		text-align: left;
+	}
+	.gw-toggle .chev {
+		color: var(--muted-fg, #8a847a);
+		font-size: var(--step--1);
+	}
+	.gw-row td {
+		background: var(--surface, transparent);
+	}
+	.gw-strip {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		padding: var(--s-2) 0 var(--s-1);
+	}
+	.gw-chip {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 3px;
+		border: 1px solid var(--border);
+		padding: 2px 6px;
+		font-size: var(--step--1);
+		font-variant-numeric: tabular-nums;
+		color: var(--muted-fg, inherit);
+	}
+	.gw-chip.hit {
+		border-color: var(--teal, #2ed6c2);
+		color: var(--teal, #2ed6c2);
+		font-weight: 700;
+	}
+	.gw-chip .gw-n {
+		font-size: 0.72em;
+		opacity: 0.7;
+	}
+	.gw-note {
+		font-size: var(--step--1);
+		margin: 0 0 var(--s-2);
+	}
 	/* 26.7: aktiivinen suodatin auki tekstina, ei hiljaista rajausta */
 	.count {
 		font-size: var(--step--1);

@@ -23,6 +23,7 @@ export type FantasyTool =
 	| 'value'
 	| 'xg_leaders'
 	| 'defcon_leaders'
+	| 'defcon_gw'
 	| 'chip_ev'
 	| 'plan_chains'
 	| 'league'
@@ -503,6 +504,45 @@ export function fetchXgLeaders(window = 5): Promise<XgLeadersResponse> {
 
 export function fetchDefconLeaders(window = 5): Promise<DefconLeadersResponse> {
 	return getTool(`/api/fantasy/defcon-leaders?window=${window}`, 'defcon_leaders');
+}
+
+/* ---------- Per-GW DefCon -matriisi (30.7) ---------- */
+
+/** Kompakti rivi: [gw, opp, venue, minutes, dc] (payload-kuri, ~240 kB). */
+export type DefconGwRow = [number, string, string, number, number];
+
+export interface DefconGwPlayer {
+	id: number;
+	code: number;
+	web_name: string;
+	team_short: string;
+	pos: 'DEF' | 'MID' | 'FWD';
+	price: number;
+	owned_pct: number | null;
+	threshold: number;
+	games: number;
+	hits: number;
+	hit_rate: number;
+	dc_points: number;
+	basis: string | null;
+	per_gw: DefconGwRow[];
+}
+
+export interface DefconGwResponse {
+	meta: {
+		basis_season: string;
+		basis_label: string;
+		thresholds: Record<string, number>;
+		/** Mitattu vastustajaefekti (28.7): nayta suoraan, ala myy kontekstia
+		 * signaalina jota oma mittaus ei loyda. */
+		opponent_effect?: { correlation: number; note: string };
+		n_players: number;
+	};
+	players: DefconGwPlayer[];
+}
+
+export function fetchDefconGw(): Promise<DefconGwResponse> {
+	return getTool('/api/fantasy/defcon-gw', 'defcon_gw');
 }
 
 /** Price watch- ja compare-luottamus samalle kolmiportaiselle asteikolle

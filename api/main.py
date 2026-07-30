@@ -3087,6 +3087,35 @@ def fantasy_defcon_leaders(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@app.get("/api/fantasy/defcon-gw")
+def fantasy_defcon_gw(request: Request, response: Response):
+    """Per-GW DefCon -matriisi (30.7): koko 25/26-kauden kierroskohtaiset
+    DefCon-rivit nykykauden pelaajille (code-mappaus arkistoon). Builderi
+    scripts/build_fpl_defcon_gw.py kirjoittaa tiedoston sanity-gaten takana —
+    tämä endpoint vain lukee sen (Render 0.5 vCPU -budjetti).
+
+    Meta kantaa mitatun vastustajaefektin (korrelaatio +0.026): frontend
+    näyttää sen suoraan eikä myy fixture-kontekstia signaalina jota oma
+    mittaus ei löydä. Payload ~240 kB → ETag + tunnin public-cache (data
+    muuttuu vain kun builderi ajetaan, ei auth-riippuvaa sisältöä)."""
+    from src.models.fpl_leaders import load_defcon_gw
+    from src.models.fpl_rate_team import RateTeamError
+    try:
+        payload = load_defcon_gw()
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    generated = str(payload.get("meta", {}).get("generated_at") or "0")
+    etag = 'W/"dcgw-{}"'.format(generated)
+    cache_control = "public, max-age=3600"
+    inm = request.headers.get("if-none-match", "")
+    if etag in [t.strip() for t in inm.split(",")]:
+        return Response(status_code=304, headers={
+            "ETag": etag, "Cache-Control": cache_control})
+    response.headers["Cache-Control"] = cache_control
+    response.headers["ETag"] = etag
+    return payload
+
+
 @app.get("/api/fantasy/compare")
 def fantasy_compare(
     response: Response,

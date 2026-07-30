@@ -35,6 +35,7 @@ import config
 from src.models.fpl_rate_team import RateTeamError
 
 LEADERS_PATH = config.DATA_DIR / "fpl_player_leaders.json"
+DEFCON_GW_PATH = config.DATA_DIR / "fpl_defcon_gw.json"
 
 DEFCON_POINTS = 2
 DEFCON_THRESHOLD = {"DEF": 10, "MID": 12, "FWD": 12}  # GKP: ei DefConia
@@ -49,6 +50,17 @@ def load_leaders() -> dict:
     data = json.loads(LEADERS_PATH.read_text(encoding="utf-8"))
     if not data.get("meta", {}).get("available", False):
         raise RateTeamError(503, "Player leaders data is not available.")
+    return data
+
+
+def load_defcon_gw() -> dict:
+    """Per-GW DefCon -matriisi (30.7): builderin committattu JSON, ei laskentaa
+    pyynnössä. Sama 503-konventio kuin load_leaders."""
+    if not DEFCON_GW_PATH.exists():
+        raise RateTeamError(503, "DefCon gameweek data is not built yet.")
+    data = json.loads(DEFCON_GW_PATH.read_text(encoding="utf-8"))
+    if not data.get("meta", {}).get("available", False):
+        raise RateTeamError(503, "DefCon gameweek data is not available.")
     return data
 
 

@@ -1270,7 +1270,8 @@ tooltip. Model-derived, not the official FPL difficulty.</p>
 captaincy and a GW1 to GW6 gameweek planner showing each player's opponent
 per week), player expected points (xP), a captain ranker, transfer suggestions
 you can apply straight to your planned squad, a player value ranking (xP per
-million), full xG leaders and DefCon leaderboards, goalkeeper rotation pairs,
+million), full xG leaders and DefCon leaderboards with a gameweek-by-gameweek
+DefCon breakdown, goalkeeper rotation pairs,
 differential picks, player compare for up to four players and predicted
   starting minutes, from the
 same match model as this page. Rate my team, a captain pick, price watch and
