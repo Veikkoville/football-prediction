@@ -47,7 +47,11 @@ export async function initAuth(): Promise<void> {
 function applySession(u: { id: string; email?: string | null } | null): void {
 	const prevId = auth.user?.id;
 	auth.user = u ? { id: u.id, email: u.email ?? '' } : null;
-	if (u?.id !== prevId) invalidateProfileRow(); // jaettu boot-rivi ei saa vuotaa käyttäjältä toiselle
+	// Uloskirjautuminen pudottaa jaetun profiilirivin heti (hygienia jaetulla
+	// koneella). Käyttäjävaihdos EI tarvitse invalidointia: cache on
+	// user-avaimellinen, ja boot-polulla (undefined → user) invalidointi
+	// aiheutti tuplahaun (draft ehti aloittaa ennen applySessionia).
+	if (!u && prevId) invalidateProfileRow();
 	if (u && u.id !== prevId) {
 		identifyUser(u.id, u.email);
 		auth.sub = undefined;
