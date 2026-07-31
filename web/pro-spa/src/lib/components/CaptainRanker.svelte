@@ -3,6 +3,7 @@
 	import type { XpResponse } from '$lib/api';
 	import { gwXp, gwOpponents } from '$lib/api';
 	import { capture } from '$lib/analytics';
+	import { shareCard } from '$lib/shareCard';
 	import SetPieceBadges from './SetPieceBadges.svelte';
 
 	let { data }: { data: XpResponse } = $props();
@@ -18,9 +19,47 @@
 	onMount(() => {
 		capture('captain_viewed', { source: 'pro_spa' }, 'captain_viewed_pro_spa');
 	});
+
+	// #9a Share as image (Wolfy-flow tuotteessa): sama teletext-kortti kuin
+	// viikkopostauksessa, suoraan tästä taulusta. Komponentti renderöityy vain
+	// premiumille (ToolsHome-gate), joten nappi on premium-gatettu implisiittisesti.
+	let sharing = $state(false);
+	async function shareImage() {
+		if (sharing) return;
+		sharing = true;
+		try {
+			const method = await shareCard({
+				title: `GAMEWEEK ${nextGw} TOP 10`,
+				subtitle: 'expected points, GoalIQ match model',
+				midLabel: 'FIXTURE',
+				valueLabel: 'xP',
+				fileName: `goaliq_xp_gw${nextGw}_top10.png`,
+				rows: top.map((p, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					badges: [
+						...(typeof p.set_pieces?.pens === 'number' && p.set_pieces.pens <= 2 ? ['P'] : []),
+						...(typeof p.set_pieces?.fk === 'number' && p.set_pieces.fk <= 2 ? ['FK'] : [])
+					],
+					mid: gwOpponents(p, nextGw),
+					value: gwXp(p, nextGw).toFixed(2)
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'captain', method });
+		} finally {
+			sharing = false;
+		}
+	}
 </script>
 
-<h2>Captain ranker: top xP for GW{nextGw}</h2>
+<div class="head-row">
+	<h2>Captain ranker: top xP for GW{nextGw}</h2>
+	<button type="button" class="share-chip" onclick={shareImage} disabled={sharing}>
+		{sharing ? 'Rendering…' : 'Share as image'}
+	</button>
+</div>
 <p class="muted">
 	The ten highest projected scores for the next gameweek only, a captaincy shortlist.
 	{#if hasEBonus}<abbr
@@ -77,6 +116,30 @@
 </div>
 
 <style>
+	.head-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--s-2);
+		flex-wrap: wrap;
+	}
+	.share-chip {
+		flex: 0 0 auto;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+		white-space: nowrap;
+		line-height: 1.4;
+	}
+	.share-chip:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
 	.pos-tag {
 		display: inline-block;
 		margin-left: 5px;

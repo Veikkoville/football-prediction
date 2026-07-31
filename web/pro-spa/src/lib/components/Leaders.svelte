@@ -18,6 +18,8 @@
 	// primary-vari, EI pelaajakuvia eika krestejä. Renderoidaan <symbol>+<use>
 	// -parina (ks. PERF-huomio alempana), joten TeamKit-komponenttia ei tarvita.
 	import { teamColorByShort } from '$lib/teamColors';
+	import { fetchXp } from '$lib/api';
+	import { shareCard } from '$lib/shareCard';
 	import {
 		fetchDefconGw,
 		fetchDefconLeaders,
@@ -105,11 +107,59 @@
 	let minMins = $state(0);
 	let posFilter = $state('');
 	let teamFilter = $state('');
-	let sortKey = $state<'xg' | 'xa' | 'xgi' | 'mins' | 'price' | 'games' | 'name'>('xg');
+	let sortKey = $state<'xg' | 'xa' | 'xgi' | 'mins' | 'price' | 'games' | 'name' | 'xp6'>('xg');
 	let sortDesc = $state(true);
 	let seasonView = $state(false);
 
 	const MIN_MINS = [0, 90, 180, 270];
+
+	// #9b (31.7, Villen idea): hintahaarukkafiltteri — "Tarkowski vs 6.0m midit"
+	// / "best budget defenders" yhdellä klikkauksella. Rajat jatkuvina väleinä,
+	// labelit rehellisiä 0.1-hintagranulariteetille (siksi 8.1+, ei 8.0+).
+	// xG-listassa VAPAA (koko lista on jo ilmainen, filtteri ei vuoda mitään);
+	// DefConissa vain premiumille — vapaa filtteri antaisi enumeroida
+	// premium-rivejä top-3:n ohi eri haarukoilla (sama logiikka kuin sorttigate).
+	const PRICE_BANDS = [
+		{ label: 'All', min: 0, max: Infinity },
+		{ label: '4.5-', min: 0, max: 4.5 },
+		{ label: '4.6-6.0', min: 4.6, max: 6.0 },
+		{ label: '6.1-8.0', min: 6.1, max: 8.0 },
+		{ label: '8.1+', min: 8.1, max: Infinity }
+	] as const;
+	type PriceBand = (typeof PRICE_BANDS)[number];
+	let xgBand = $state<PriceBand>(PRICE_BANDS[0]);
+	let dcBand = $state<PriceBand>(PRICE_BANDS[0]);
+	function setBand(list: 'xg' | 'defcon', b: PriceBand) {
+		if (list === 'xg') xgBand = b;
+		else dcBand = b;
+		capture('leaders_filtered', { list, band: b.label });
+	}
+
+	// #9b-c: 6 GW xP -sarake molempiin listoihin → poikkipositiovertailu
+	// pisteillä onnistuu suoraan (data on jo /api/fantasy/xp:ssä). xP on
+	// eteenpäin katsovaa mallidataa → sarake VAIN premiumille; ilmaisen
+	// xG-listan vapautus (26.7) koski taaksepäin katsovaa hyödykedataa.
+	let xpById = $state<Map<number, number> | null>(null);
+	let xpHorizon = $state<number | null>(null);
+	$effect(() => {
+		if (!premium || xpById) return;
+		fetchXp().then(
+			(x) => {
+				if (!x.meta?.available) return;
+				xpById = new Map(
+					x.players
+						.filter((p) => typeof p.xp_horizon_total === 'number')
+						.map((p) => [p.id, p.xp_horizon_total])
+				);
+				xpHorizon = x.meta.horizon_gw ?? null;
+			},
+			() => {
+				// xP-haun kaatuminen ei saa kaataa leaders-listoja — sarake vain jää pois.
+			}
+		);
+	});
+	const xpLabel = $derived(xpHorizon ? `${xpHorizon}GW xP` : 'xP');
+	const hasXpCol = $derived(premium && (xpById?.size ?? 0) > 0);
 
 	type Agg = {
 		row: (typeof xgRowsRaw)[number];
@@ -157,6 +207,8 @@
 		for (const r of xgRowsRaw) {
 			if (posFilter && r.pos !== posFilter) continue;
 			if (teamFilter && r.team_short !== teamFilter) continue;
+			// #9b: hintahaarukka (vapaa — koko xG-lista on jo ilmainen)
+			if (r.price < xgBand.min || r.price > xgBand.max) continue;
 			if (seasonView && !r.season) continue;
 			const a = agg(r);
 			if (per90 && a.mins < 1) continue;
@@ -170,6 +222,12 @@
 		out.sort((x, y) => {
 			if (sortKey === 'name') return dir * y.row.web_name.localeCompare(x.row.web_name);
 			if (sortKey === 'price') return dir * (y.row.price - x.row.price);
+			if (sortKey === 'xp6') {
+				// Puuttuva projektio (ei projektiossa / ei premium-dataa) aina hännille.
+				const xv = xpById?.get(x.row.id) ?? -Infinity;
+				const yv = xpById?.get(y.row.id) ?? -Infinity;
+				return dir * (yv - xv);
+			}
 			return dir * ((y[sortKey] as number) - (x[sortKey] as number));
 		});
 		return out;
@@ -212,7 +270,7 @@
 	// free näkee top-3 leadersit palvelinjärjestyksessä, ja vapaa sortti
 	// antaisi enumeroida premium-rivejä kolme kerrallaan eri avaimilla.
 	// Hinta aukeaa halvin ensin (budjettikulma), muut suurin ensin.
-	let dcSortKey = $state<'hit' | 'dc' | 'price' | 'pts' | 'games' | 'name' | 'pos'>('hit');
+	let dcSortKey = $state<'hit' | 'dc' | 'price' | 'pts' | 'games' | 'name' | 'pos' | 'xp6'>('hit');
 	let dcSortDesc = $state(true);
 	const DC_SORT_FIELDS = {
 		hit: 'hit_rate_pct',
@@ -224,10 +282,17 @@
 	const dcSorted = $derived.by(() => {
 		if (!premium) return dcAll;
 		const dir = dcSortDesc ? 1 : -1;
-		const rows = [...dcAll];
+		// #9b: hintahaarukka ENNEN sorttia — vain premium (free-polku ei koske tätä).
+		const rows = dcAll.filter((p) => p.price >= dcBand.min && p.price <= dcBand.max);
 		rows.sort((x, y) => {
 			if (dcSortKey === 'name') return dir * y.web_name.localeCompare(x.web_name);
 			if (dcSortKey === 'pos') return dir * y.pos.localeCompare(x.pos);
+			if (dcSortKey === 'xp6') {
+				const xv = xpById?.get(x.id) ?? -Infinity;
+				const yv = xpById?.get(y.id) ?? -Infinity;
+				const d = dir * (yv - xv);
+				return d !== 0 ? d : y.dc_per_game - x.dc_per_game;
+			}
 			const f = DC_SORT_FIELDS[dcSortKey];
 			const d = dir * ((y[f] as number) - (x[f] as number));
 			// Tiebreak aina dc/game desc — sama kuin palvelimen toissijainen avain.
@@ -256,6 +321,71 @@
 	function unlock() {
 		capture('upgrade_tapped', { source: 'fantasy_leaders' });
 		onUpgrade?.();
+	}
+
+	// #9a: Share as image molemmista listoista — jakaa NÄKYVÄN näkymän
+	// (aktiiviset suodattimet mukana, top 10). Vain premiumille: kortti on
+	// premium-datan johdannainen ja jakaja mainostaa meitä omilla luvuillamme.
+	let sharing = $state<'' | 'xg' | 'defcon'>('');
+	function bandPart(b: PriceBand): string[] {
+		return b.label === 'All' ? [] : [`${b.label}m`];
+	}
+	async function shareXg() {
+		if (sharing) return;
+		sharing = 'xg';
+		try {
+			const basisPart = seasonView
+				? 'season totals'
+				: `last ${xg?.meta?.window ?? gameWindow} games`;
+			const sub = [basisPart, ...(per90 ? ['per 90'] : []), ...bandPart(xgBand)].join(', ');
+			const method = await shareCard({
+				title: 'XG LEADERS TOP 10',
+				subtitle: `${sub}, official FPL data`,
+				midLabel: 'PRICE',
+				valueLabel: 'xG',
+				fileName: 'goaliq_xg_leaders.png',
+				rows: xgVisible.slice(0, 10).map((a, i) => ({
+					rank: i + 1,
+					name: a.row.web_name,
+					tag: a.row.pos,
+					team: a.row.team_short,
+					mid: a.row.price.toFixed(1),
+					value: a.xg.toFixed(2)
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'xg', method });
+		} finally {
+			sharing = '';
+		}
+	}
+	async function shareDc() {
+		if (sharing) return;
+		sharing = 'defcon';
+		try {
+			const basisPart =
+				dcBasis === 'season'
+					? `full ${defcon?.meta?.basis_season ?? 'previous'} season`
+					: `last ${dcWindow} games`;
+			const sub = [basisPart, ...bandPart(dcBand)].join(', ');
+			const method = await shareCard({
+				title: 'DEFCON LEADERS TOP 10',
+				subtitle: `${sub}, DefCon hit rate, GoalIQ`,
+				midLabel: 'PRICE',
+				valueLabel: 'HIT',
+				fileName: 'goaliq_defcon_leaders.png',
+				rows: dcSorted.slice(0, 10).map((p, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					mid: p.price.toFixed(1),
+					value: `${Math.round(p.hit_rate_pct)}%`
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'defcon', method });
+		} finally {
+			sharing = '';
+		}
 	}
 
 	// 26.7 PERF: TeamKit renderoi per rivi 4 polkua + tekstin = ~500 SVG-solmua
@@ -302,7 +432,15 @@
 	</defs>
 </svg>
 
-<h2>xG leaders</h2>
+<div class="head-row">
+	<h2>xG leaders</h2>
+	{#if premium}
+		<!-- #9a: jaettava kortti näkyvästä näkymästä (premium) -->
+		<button type="button" class="window-chip" onclick={shareXg} disabled={sharing !== ''}>
+			{sharing === 'xg' ? 'Rendering…' : 'Share as image'}
+		</button>
+	{/if}
+</div>
 <p class="muted">
 	Top expected-goals producers over each player's last {xg?.meta?.window ?? gameWindow} games, from
 	official FPL match data.
@@ -353,6 +491,16 @@
 			onclick={() => (posFilter = pp)}>{pp === '' ? 'All' : pp}</button
 		>
 	{/each}
+	<!-- #9b: hintahaarukka (vapaa xG-listassa — koko lista on jo ilmainen) -->
+	<span class="muted">Price:</span>
+	{#each PRICE_BANDS as b (b.label)}
+		<button
+			type="button"
+			class="window-chip"
+			class:on={xgBand === b}
+			onclick={() => setBand('xg', b)}>{b.label}</button
+		>
+	{/each}
 	<select bind:value={teamFilter} aria-label="Filter by team">
 		<option value="">All teams</option>
 		{#each teams as tt (tt)}<option value={tt}>{tt}</option>{/each}
@@ -388,6 +536,11 @@
 						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xgi')}>xGI</button></th>
 						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('mins')}>Mins</button></th>
 						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('games')}>{seasonView ? 'Starts' : 'Games'}</button></th>
+						{#if hasXpCol}
+							<!-- #9b-c: mallin projektio rinnalle (vain premium — xP on
+							     eteenpäin katsovaa mallidataa, ei ilmaista hyödykedataa) -->
+							<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xp6')}><abbr title="Projected FPL points over the model horizon (GoalIQ model)">{xpLabel}</abbr></button></th>
+						{/if}
 					</tr>
 				</thead>
 				<tbody>
@@ -407,6 +560,10 @@
 							<td class="num">{a.xgi.toFixed(2)}</td>
 							<td class="num">{a.mins}</td>
 							<td class="num">{a.games}</td>
+							{#if hasXpCol}
+								{@const xv = xpById?.get(a.row.id)}
+								<td class="num">{typeof xv === 'number' ? xv.toFixed(1) : ''}</td>
+							{/if}
 						</tr>
 					{/each}
 				</tbody>
@@ -422,11 +579,19 @@
 				? ', full season'
 				: `, last ${xg?.meta?.window ?? gameWindow} games each`}{minMins
 				? `, at least ${minMins} minutes played`
-				: ''}
+				: ''}{xgBand.label === 'All' ? '' : `, price ${xgBand.label}m`}
 		</p>
 	{/if}
 
-	<h2 class="dc-title">DefCon leaders</h2>
+	<div class="head-row dc-title">
+		<h2>DefCon leaders</h2>
+		{#if premium}
+			<!-- #9a: jaettava kortti näkyvästä näkymästä (premium) -->
+			<button type="button" class="window-chip" onclick={shareDc} disabled={sharing !== ''}>
+				{sharing === 'defcon' ? 'Rendering…' : 'Share as image'}
+			</button>
+		{/if}
+	</div>
 	<p class="muted">
 		{#if dcBasis === 'season'}
 			The most reliable defensive-contribution scorers across the full {defcon?.meta
@@ -463,6 +628,19 @@
 				}}>Last {w}</button
 			>
 		{/each}
+		{#if premium}
+			<!-- #9b: hintahaarukka vain premiumille (vapaa filtteri antaisi
+			     enumeroida premium-rivejä top-3:n ohi — sama logiikka kuin sortti) -->
+			<span class="muted">Price:</span>
+			{#each PRICE_BANDS as b (b.label)}
+				<button
+					type="button"
+					class="window-chip"
+					class:on={dcBand === b}
+					onclick={() => setBand('defcon', b)}>{b.label}</button
+				>
+			{/each}
+		{/if}
 	</div>
 	<!-- 30.7: rehellisyysnote OMASTA mittauksesta. Emme myy vastustajakontekstia
 	     signaalina jota mittaus ei löydä (korrelaatio +0.026, 7 382 ottelua). -->
@@ -521,6 +699,16 @@
 								>{:else}<abbr title="Games played in the window (real sample size)">Games</abbr
 								>{/if}
 						</th>
+						{#if hasXpCol}
+							<!-- #9b-c: sama premium-projektiosarake kuin xG-listassa -->
+							<th class="num">
+								<button type="button" class="sortbtn" onclick={() => dcSortBy('xp6')}
+									><abbr title="Projected FPL points over the model horizon (GoalIQ model)"
+										>{xpLabel}</abbr
+									></button
+								>
+							</th>
+						{/if}
 					</tr>
 				</thead>
 				<tbody>
@@ -547,11 +735,15 @@
 							<td class="num strong">{Math.round(p.hit_rate_pct)}%</td>
 							<td class="num">{p.defcon_points_window}</td>
 							<td class="num">{p.games}</td>
+							{#if hasXpCol}
+								{@const xv = xpById?.get(p.id)}
+								<td class="num">{typeof xv === 'number' ? xv.toFixed(1) : ''}</td>
+							{/if}
 						</tr>
 						{#if expandedId === p.id}
 							{@const g = gwById.get(p.id)}
 							<tr class="gw-row">
-								<td colspan="8">
+								<td colspan={hasXpCol ? 9 : 8}>
 									{#if gwError}
 										<p class="muted">Could not load the gameweek data: {gwError}</p>
 									{:else if !gwData}
@@ -606,6 +798,21 @@
 {/if}
 
 <style>
+	/* #9a: otsikko + Share as image samalle riville */
+	.head-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--s-2);
+		flex-wrap: wrap;
+	}
+	.head-row h2 {
+		margin: 0;
+	}
+	.window-chip:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
 	/* 30.7 per-GW DefCon -matriisi */
 	.dc-honesty {
 		border-left: 3px solid var(--accent, #f5c542);
