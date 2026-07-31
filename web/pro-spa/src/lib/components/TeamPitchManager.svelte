@@ -372,16 +372,18 @@
 			{/if}
 		</div>
 		<div class="pitch">
-			<!-- 31.7 (Villen palaute "saataisko kentästä parempi"): nurmiraidat +
-			     kenttäviivat samalla teal-tokenilla — ei uusia värejä (#108-kaanon).
+			<!-- 31.7 (Villen palaute "saataisko kentästä parempi" + tarkennus):
+			     PUOLIKAS kenttä kuten OfficialFPL/FFScout — maali+boksit ylhäällä,
+			     alareuna = keskiviiva keskiympyränkaarineen → FWD-rivi istuu
+			     keskiviivan tuntumaan. Teal-token, ei uusia värejä (#108-kaanon).
 			     preserveAspectRatio=none venyy pitchin mittoihin; non-scaling-stroke
 			     pitää viivat ohuina venytyksestä riippumatta. -->
 			<svg class="pitch-lines" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">
 				<rect x="2.5" y="2.5" width="95" height="135" vector-effect="non-scaling-stroke" />
-				<line x1="2.5" y1="70" x2="97.5" y2="70" vector-effect="non-scaling-stroke" />
-				<circle cx="50" cy="70" r="13" vector-effect="non-scaling-stroke" />
 				<rect x="27" y="2.5" width="46" height="15" vector-effect="non-scaling-stroke" />
-				<rect x="27" y="122.5" width="46" height="15" vector-effect="non-scaling-stroke" />
+				<rect x="38.5" y="2.5" width="23" height="7" vector-effect="non-scaling-stroke" />
+				<path d="M 42 17.5 A 9 9 0 0 1 58 17.5" vector-effect="non-scaling-stroke" />
+				<path d="M 37 137.5 A 13 13 0 0 0 63 137.5" vector-effect="non-scaling-stroke" />
 			</svg>
 			{#each rows as row, i (i)}
 				<div class="row">

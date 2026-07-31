@@ -348,19 +348,20 @@ export async function renderPitchCard(spec: PitchCardSpec): Promise<Blob> {
 	ctx.lineWidth = 2;
 	const inset = 14;
 	ctx.strokeRect(PX + inset, PY + inset, PW - 2 * inset, PH - 2 * inset);
-	// keskiviiva + keskiympyrä
-	ctx.beginPath();
-	ctx.moveTo(PX + inset, PY + PH / 2);
-	ctx.lineTo(PX + PW - inset, PY + PH / 2);
-	ctx.stroke();
-	ctx.beginPath();
-	ctx.arc(PX + PW / 2, PY + PH / 2, 74, 0, Math.PI * 2);
-	ctx.stroke();
-	// boksit ylä + ala
+	// PUOLIKAS kenttä (31.7, Villen tarkennus; OfficialFPL/FFScout-kaava):
+	// maali + boksit + D ylhäällä, alareuna = keskiviiva keskiympyränkaarineen
+	// → FWD-rivi istuu keskiviivan tuntumaan.
+	const cxm = PX + PW / 2;
 	const boxW = 400;
 	const boxH = 96;
-	ctx.strokeRect(PX + (PW - boxW) / 2, PY + inset, boxW, boxH);
-	ctx.strokeRect(PX + (PW - boxW) / 2, PY + PH - inset - boxH, boxW, boxH);
+	ctx.strokeRect(cxm - boxW / 2, PY + inset, boxW, boxH);
+	ctx.strokeRect(cxm - 110, PY + inset, 220, 40);
+	ctx.beginPath();
+	ctx.arc(cxm, PY + inset + boxH, 70, 0, Math.PI);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(cxm, PY + PH - inset, 88, Math.PI, 2 * Math.PI);
+	ctx.stroke();
 	ctx.restore();
 
 	// XI-rivit
