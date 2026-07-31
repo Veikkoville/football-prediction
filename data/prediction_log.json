@@ -3425,7 +3425,15 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-07-17T08:11:44+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 0,
+        "actual_score": "0-0",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-31T02:51:29+00:00"
+      }
     },
     {
       "match_id": "fd-554944",
@@ -3444,7 +3452,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-07-17T08:11:44+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 1,
+        "actual_score": "0-1",
+        "actual_outcome": "away",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-07-31T02:51:29+00:00"
+      }
     },
     {
       "match_id": "fd-554956",
