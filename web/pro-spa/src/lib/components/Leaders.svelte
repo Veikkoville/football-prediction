@@ -207,13 +207,50 @@
 	// renderöinti lagaa. Suodatus/gate koskee silti koko aineistoa.
 	let showAllDc = $state(false);
 	const dcAll = $derived(defcon?.players ?? []);
+	// 31.7 (Villen pyyntö; _fpltips-kulma "best budget defenders"): DefCon-
+	// taulun saraksorttaus, erityisesti hinnan mukaan. VAIN premiumille:
+	// free näkee top-3 leadersit palvelinjärjestyksessä, ja vapaa sortti
+	// antaisi enumeroida premium-rivejä kolme kerrallaan eri avaimilla.
+	// Hinta aukeaa halvin ensin (budjettikulma), muut suurin ensin.
+	let dcSortKey = $state<'hit' | 'dc' | 'price' | 'pts' | 'games' | 'name' | 'pos'>('hit');
+	let dcSortDesc = $state(true);
+	const DC_SORT_FIELDS = {
+		hit: 'hit_rate_pct',
+		dc: 'dc_per_game',
+		price: 'price',
+		pts: 'defcon_points_window',
+		games: 'games'
+	} as const;
+	const dcSorted = $derived.by(() => {
+		if (!premium) return dcAll;
+		const dir = dcSortDesc ? 1 : -1;
+		const rows = [...dcAll];
+		rows.sort((x, y) => {
+			if (dcSortKey === 'name') return dir * y.web_name.localeCompare(x.web_name);
+			if (dcSortKey === 'pos') return dir * y.pos.localeCompare(x.pos);
+			const f = DC_SORT_FIELDS[dcSortKey];
+			const d = dir * ((y[f] as number) - (x[f] as number));
+			// Tiebreak aina dc/game desc — sama kuin palvelimen toissijainen avain.
+			return d !== 0 ? d : y.dc_per_game - x.dc_per_game;
+		});
+		return rows;
+	});
 	const dcVisible = $derived(
 		premium
 			? showAllDc
-				? dcAll
-				: dcAll.slice(0, RENDER_LIMIT)
+				? dcSorted
+				: dcSorted.slice(0, RENDER_LIMIT)
 			: dcAll.slice(0, FREE_ROWS)
 	);
+	function dcSortBy(k: typeof dcSortKey) {
+		if (dcSortKey === k) {
+			dcSortDesc = !dcSortDesc;
+		} else {
+			dcSortKey = k;
+			dcSortDesc = k !== 'name' && k !== 'pos' && k !== 'price';
+		}
+		capture('leaders_sorted', { list: 'defcon', key: k, desc: dcSortDesc });
+	}
 	const basisLabel = $derived(xg?.meta?.basis_label ?? defcon?.meta?.basis_label ?? null);
 
 	function unlock() {
@@ -442,17 +479,48 @@
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Player</th>
-						<th>Pos</th>
-						<th class="num">Price</th>
-						<th class="num"><abbr title="Defensive-contribution actions per game">DC/game</abbr></th>
-						<th class="num"
-							><abbr title="Share of played games where the player reached the DefCon threshold"
-								>Hit rate</abbr
-							></th
-						>
-						<th class="num"><abbr title="DefCon points earned in the window">Pts</abbr></th>
-						<th class="num"><abbr title="Games played in the window (real sample size)">Games</abbr></th>
+						<!-- 31.7: sorttaus vain premiumille (ks. dcSorted-kommentti) -->
+						<th>
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('name')}
+									>Player</button
+								>{:else}Player{/if}
+						</th>
+						<th>
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('pos')}
+									>Pos</button
+								>{:else}Pos{/if}
+						</th>
+						<th class="num">
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('price')}
+									>Price</button
+								>{:else}Price{/if}
+						</th>
+						<th class="num">
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('dc')}
+									><abbr title="Defensive-contribution actions per game">DC/game</abbr></button
+								>{:else}<abbr title="Defensive-contribution actions per game">DC/game</abbr>{/if}
+						</th>
+						<th class="num">
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('hit')}
+									><abbr title="Share of played games where the player reached the DefCon threshold"
+										>Hit rate</abbr
+									></button
+								>{:else}<abbr
+									title="Share of played games where the player reached the DefCon threshold"
+									>Hit rate</abbr
+								>{/if}
+						</th>
+						<th class="num">
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('pts')}
+									><abbr title="DefCon points earned in the window">Pts</abbr></button
+								>{:else}<abbr title="DefCon points earned in the window">Pts</abbr>{/if}
+						</th>
+						<th class="num">
+							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('games')}
+									><abbr title="Games played in the window (real sample size)">Games</abbr></button
+								>{:else}<abbr title="Games played in the window (real sample size)">Games</abbr
+								>{/if}
+						</th>
 					</tr>
 				</thead>
 				<tbody>
