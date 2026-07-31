@@ -3,7 +3,7 @@
 	import type { XpResponse } from '$lib/api';
 	import { gwXp, gwOpponents } from '$lib/api';
 	import { capture } from '$lib/analytics';
-	import { shareCard } from '$lib/shareCard';
+	import { canShareToApps, shareCard } from '$lib/shareCard';
 	import SetPieceBadges from './SetPieceBadges.svelte';
 
 	let { data }: { data: XpResponse } = $props();
@@ -56,8 +56,9 @@
 
 <div class="head-row">
 	<h2>Captain ranker: top xP for GW{nextGw}</h2>
+	<!-- Desktopilla label lupaa latauksen, mobiilissa share-arkin (31.7) -->
 	<button type="button" class="share-chip" onclick={shareImage} disabled={sharing}>
-		{sharing ? 'Rendering…' : 'Share as image'}
+		{sharing ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
 	</button>
 </div>
 <p class="muted">

@@ -230,11 +230,23 @@ export async function renderCard(spec: CardSpec): Promise<Blob> {
 
 export type ShareOutcome = 'shared' | 'downloaded' | 'aborted';
 
-/** navigator.share tiedostolla + PNG-latausfallback. */
+/** Share-arkki vain mobiilissa (31.7, Villen havainto): Windowsin share-arkissa
+ * ei ole X-kohdetta eikä tallennusta — pöytäkoneella suora PNG-lataus on
+ * ainoa toimiva polku. Mobiilissa arkki taas on juuri se "suoraan X:ään" -flow.
+ * SSR-turvallinen (navigator-guard). */
+export function canShareToApps(): boolean {
+	return (
+		typeof navigator !== 'undefined' &&
+		typeof navigator.canShare === 'function' &&
+		/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+	);
+}
+
+/** Mobiili: navigator.share tiedostolla. Desktop + kaikki virhepolut: PNG-lataus. */
 export async function shareCard(spec: CardSpec): Promise<ShareOutcome> {
 	const blob = await renderCard(spec);
 	const file = new File([blob], spec.fileName, { type: 'image/png' });
-	if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+	if (canShareToApps() && navigator.canShare({ files: [file] })) {
 		try {
 			await navigator.share({ files: [file] });
 			return 'shared';
