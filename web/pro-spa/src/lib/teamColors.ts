@@ -34,7 +34,10 @@ const BY_SHORT: Record<string, [string, string]> = {
 	SHU: ['#EE2737', '#FFFFFF'],
 	SOU: ['#D71920', '#FFFFFF'],
 	SUN: ['#EB172B', '#FFFFFF'],
-	TOT: ['#132257', '#FFFFFF'],
+	// 31.7 (Villen havainto): Spursin identiteetti on VALKOINEN paita, navy on
+	// detaljiväri — navy-paita luki "sininen joukkue". Teksti navylla.
+	// HUOM mobiilipariteetti: sama fix tarvitaan teamMeta.ts:ään (build 23).
+	TOT: ['#FFFFFF', '#132257'],
 	WHU: ['#7A263A', '#FFFFFF'],
 	WOL: ['#FDB913', '#231F20'],
 	RMA: ['#00529F', '#FFFFFF'],

@@ -228,6 +228,225 @@ export async function renderCard(spec: CardSpec): Promise<Blob> {
 	});
 }
 
+/* ---------- #9a jatko (31.7): pitch-jakokortti (rate my team / draft) ---------- */
+
+export interface PitchCardPlayer {
+	name: string;
+	team: string;
+	color: string;
+	textColor: string;
+	xp: string;
+	badge?: 'C' | 'V';
+}
+
+export interface PitchCardSpec {
+	title: string;
+	subtitle: string;
+	/** XI positioriveinä (GKP → FWD), sama järjestys kuin pitchillä */
+	rows: PitchCardPlayer[][];
+	bench: PitchCardPlayer[];
+	fileName: string;
+}
+
+// Sama neutraali jersey-siluetti kuin TeamKit/Leaders (IP-turva: ei oikeita
+// kittikuvioita). Path2D syö SVG-polun sellaisenaan, viewBox 100x100.
+const JERSEY =
+	'M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 ' +
+	'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
+const SLEEVE_L = 'M 33 15 L 16 27 L 24 42 L 33 36 Z';
+const SLEEVE_R = 'M 67 15 L 84 27 L 76 42 L 67 36 Z';
+
+function darkenHex(hex: string, f = 0.7): string {
+	const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+	if (!m) return hex;
+	const n = parseInt(m[1], 16);
+	const p = [16, 8, 0].map((s) => Math.max(0, Math.round(((n >> s) & 0xff) * f)));
+	return `#${p.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function drawKit(
+	ctx: CanvasRenderingContext2D,
+	p: PitchCardPlayer,
+	x: number,
+	y: number,
+	size: number
+) {
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.scale(size / 100, size / 100);
+	ctx.fillStyle = p.color;
+	ctx.fill(new Path2D(JERSEY));
+	ctx.fillStyle = darkenHex(p.color);
+	ctx.fill(new Path2D(SLEEVE_L));
+	ctx.fill(new Path2D(SLEEVE_R));
+	ctx.strokeStyle = 'rgba(243,242,242,0.35)';
+	ctx.lineWidth = 3;
+	ctx.lineJoin = 'round';
+	ctx.stroke(new Path2D(JERSEY));
+	ctx.fillStyle = p.textColor;
+	ctx.font = `800 17px ${FONT}`;
+	ctx.textBaseline = 'alphabetic';
+	const tw = ctx.measureText(p.team).width;
+	ctx.fillText(p.team, 50 - tw / 2, 62);
+	ctx.restore();
+	ctx.textBaseline = 'top';
+}
+
+export async function renderPitchCard(spec: PitchCardSpec): Promise<Blob> {
+	await Promise.all([
+		document.fonts.load(bold(60)),
+		document.fonts.load(bold(22)),
+		document.fonts.load(med(18))
+	]).catch(() => undefined);
+	const wm = await loadWordmark();
+
+	const H = 1350;
+	const canvas = document.createElement('canvas');
+	canvas.width = W;
+	canvas.height = H;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('canvas 2d context unavailable');
+	ctx.textBaseline = 'top';
+
+	const g = ctx.createLinearGradient(0, 0, 0, H);
+	g.addColorStop(0, INK);
+	g.addColorStop(1, INK2);
+	ctx.fillStyle = g;
+	ctx.fillRect(0, 0, W, H);
+
+	if (wm) {
+		const wmH = 84;
+		const wmW = Math.round((wm.width * wmH) / wm.height);
+		ctx.drawImage(wm, (W - wmW) / 2, 64, wmW, wmH);
+	}
+	ctx.fillStyle = AMBER;
+	ctx.beginPath();
+	ctx.roundRect((W - 120) / 2, 176, 120, 6, 3);
+	ctx.fill();
+	ctx.font = bold(60);
+	ctx.fillStyle = CREAM;
+	ctx.fillText(spec.title, (W - ctx.measureText(spec.title).width) / 2, 226);
+	ctx.font = med(22);
+	ctx.fillStyle = MUTED;
+	ctx.fillText(spec.subtitle, (W - ctx.measureText(spec.subtitle).width) / 2, 306);
+
+	// Kenttä: tumma teal-nurmi raidoilla + viivat (sama teal-token kuin appissa)
+	const PX = MX;
+	const PY = 356;
+	const PW = W - 2 * MX;
+	const PH = 704;
+	ctx.save();
+	ctx.beginPath();
+	ctx.roundRect(PX, PY, PW, PH, 14);
+	ctx.clip();
+	const stripeH = PH / 8;
+	for (let i = 0; i < 8; i++) {
+		ctx.fillStyle = i % 2 === 0 ? 'rgba(46,214,194,0.10)' : 'rgba(46,214,194,0.16)';
+		ctx.fillRect(PX, PY + i * stripeH, PW, stripeH);
+	}
+	ctx.strokeStyle = 'rgba(46,214,194,0.45)';
+	ctx.lineWidth = 2;
+	const inset = 14;
+	ctx.strokeRect(PX + inset, PY + inset, PW - 2 * inset, PH - 2 * inset);
+	// keskiviiva + keskiympyrä
+	ctx.beginPath();
+	ctx.moveTo(PX + inset, PY + PH / 2);
+	ctx.lineTo(PX + PW - inset, PY + PH / 2);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(PX + PW / 2, PY + PH / 2, 74, 0, Math.PI * 2);
+	ctx.stroke();
+	// boksit ylä + ala
+	const boxW = 400;
+	const boxH = 96;
+	ctx.strokeRect(PX + (PW - boxW) / 2, PY + inset, boxW, boxH);
+	ctx.strokeRect(PX + (PW - boxW) / 2, PY + PH - inset - boxH, boxW, boxH);
+	ctx.restore();
+
+	// XI-rivit
+	const KIT = 84;
+	const nRows = spec.rows.length || 1;
+	const rowH = PH / nRows;
+	for (let r = 0; r < spec.rows.length; r++) {
+		const row = spec.rows[r];
+		const cy = PY + rowH * r + rowH / 2;
+		const cellW = PW / row.length;
+		for (let i = 0; i < row.length; i++) {
+			const p = row[i];
+			const cx = PX + cellW * i + cellW / 2;
+			const kx = cx - KIT / 2;
+			const ky = cy - 62;
+			drawKit(ctx, p, kx, ky, KIT);
+			if (p.badge) {
+				// C = amber-rengas, V = himmeä (korttipaletti: ei magentaa)
+				const bx = kx + KIT - 4;
+				const by = ky + 2;
+				ctx.beginPath();
+				ctx.arc(bx, by, 13, 0, Math.PI * 2);
+				ctx.fillStyle = INK;
+				ctx.fill();
+				ctx.strokeStyle = p.badge === 'C' ? AMBER : MUTED;
+				ctx.lineWidth = 2;
+				ctx.stroke();
+				ctx.font = bold(14);
+				ctx.fillStyle = p.badge === 'C' ? AMBER : CREAM;
+				ctx.fillText(p.badge, bx - ctx.measureText(p.badge).width / 2, by - 8);
+			}
+			const nPx = shrink(ctx, p.name, 22, cellW - 12, 14, bold);
+			ctx.font = bold(nPx);
+			ctx.fillStyle = CREAM;
+			ctx.fillText(p.name, cx - ctx.measureText(p.name).width / 2, cy + 28);
+			ctx.font = med(18);
+			ctx.fillStyle = MUTED;
+			ctx.fillText(p.xp, cx - ctx.measureText(p.xp).width / 2, cy + 56);
+		}
+	}
+
+	// Penkki
+	if (spec.bench.length > 0) {
+		ctx.font = med(19);
+		ctx.fillStyle = MUTED;
+		ctx.fillText('BENCH', MX, 1082);
+		const BK = 64;
+		const cellW = Math.min(200, (W - 2 * MX) / spec.bench.length);
+		const total = cellW * spec.bench.length;
+		const x0 = (W - total) / 2;
+		for (let i = 0; i < spec.bench.length; i++) {
+			const p = spec.bench[i];
+			const cx = x0 + cellW * i + cellW / 2;
+			drawKit(ctx, p, cx - BK / 2, 1112, BK);
+			const nPx = shrink(ctx, p.name, 18, cellW - 10, 12, bold);
+			ctx.font = bold(nPx);
+			ctx.fillStyle = CREAM;
+			ctx.fillText(p.name, cx - ctx.measureText(p.name).width / 2, 1184);
+			ctx.font = med(16);
+			ctx.fillStyle = MUTED;
+			ctx.fillText(p.xp, cx - ctx.measureText(p.xp).width / 2, 1208);
+		}
+	}
+
+	ctx.font = med(20);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.font = bold(20);
+	ctx.fillStyle = AMBER;
+	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
+	ctx.font = med(17);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('model projections, not betting advice', MX, H - 54);
+	ctx.fillStyle = AMBER;
+	ctx.fillRect(0, H - 8, W, 8);
+
+	return new Promise<Blob>((resolve, reject) => {
+		canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('canvas toBlob failed'))), 'image/png');
+	});
+}
+
+export async function sharePitchCard(spec: PitchCardSpec): Promise<ShareOutcome> {
+	const blob = await renderPitchCard(spec);
+	return deliver(blob, spec.fileName);
+}
+
 export type ShareOutcome = 'shared' | 'downloaded' | 'aborted';
 
 /** Share-arkki vain mobiilissa (31.7, Villen havainto): Windowsin share-arkissa
@@ -243,9 +462,8 @@ export function canShareToApps(): boolean {
 }
 
 /** Mobiili: navigator.share tiedostolla. Desktop + kaikki virhepolut: PNG-lataus. */
-export async function shareCard(spec: CardSpec): Promise<ShareOutcome> {
-	const blob = await renderCard(spec);
-	const file = new File([blob], spec.fileName, { type: 'image/png' });
+async function deliver(blob: Blob, fileName: string): Promise<ShareOutcome> {
+	const file = new File([blob], fileName, { type: 'image/png' });
 	if (canShareToApps() && navigator.canShare({ files: [file] })) {
 		try {
 			await navigator.share({ files: [file] });
@@ -258,8 +476,13 @@ export async function shareCard(spec: CardSpec): Promise<ShareOutcome> {
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');
 	a.href = url;
-	a.download = spec.fileName;
+	a.download = fileName;
 	a.click();
 	URL.revokeObjectURL(url);
 	return 'downloaded';
+}
+
+export async function shareCard(spec: CardSpec): Promise<ShareOutcome> {
+	const blob = await renderCard(spec);
+	return deliver(blob, spec.fileName);
 }

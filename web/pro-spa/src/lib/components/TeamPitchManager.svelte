@@ -11,6 +11,7 @@
 	import { capture } from '$lib/analytics';
 	import type { RatedPlayer } from '$lib/fantasyTools';
 	import { teamColorByShort } from '$lib/teamColors';
+	import { canShareToApps, sharePitchCard, type PitchCardPlayer } from '$lib/shareCard';
 	import TeamKit from './TeamKit.svelte';
 
 	let {
@@ -277,6 +278,39 @@
 		capture('upgrade_tapped', { source: 'fantasy_manager' });
 		onUpgrade?.();
 	}
+
+	// #9a jatko (31.7, Villen pyyntö): jaettava pitch-kortti — XI + penkki,
+	// sama teletext-kehys kuin listakorteissa. Kattaa SEKÄ draft-raten ETTÄ
+	// entry-ID-raten (molemmat renderöivät tämän komponentin). Premium-gate:
+	// kortin luvut ovat mallin xP:tä.
+	let sharing = $state(false);
+	function toCardPlayer(p: RatedPlayer): PitchCardPlayer {
+		const tc = teamColorByShort(p.team_short);
+		return {
+			name: p.web_name,
+			team: p.team_short,
+			color: tc.color,
+			textColor: tc.textColor,
+			xp: xpOf(p).toFixed(1),
+			badge: effCaptain === p.id ? 'C' : effVice === p.id ? 'V' : undefined
+		};
+	}
+	async function shareImage() {
+		if (sharing) return;
+		sharing = true;
+		try {
+			const method = await sharePitchCard({
+				title: selGw != null ? `GAMEWEEK ${selGw} XI` : 'MY FPL XI',
+				subtitle: `projected ${gwXp.toFixed(1)} points, captain doubled, GoalIQ model`,
+				fileName: selGw != null ? `goaliq_xi_gw${selGw}.png` : 'goaliq_xi.png',
+				rows: rows.map((row) => row.map(toCardPlayer)),
+				bench: bench.map(toCardPlayer)
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'pitch', method });
+		} finally {
+			sharing = false;
+		}
+	}
 </script>
 
 {#if players.length > 0}
@@ -328,8 +362,27 @@
 			</div>
 		{/if}
 
-		<p class="label">Starting XI</p>
+		<div class="xi-head">
+			<p class="label" style="margin:0">Starting XI</p>
+			{#if premium}
+				<!-- #9a: pitch-kortti (XI + penkki) — sama kortti draftille ja ID-ratelle -->
+				<button type="button" class="chip" onclick={shareImage} disabled={sharing}>
+					{sharing ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+				</button>
+			{/if}
+		</div>
 		<div class="pitch">
+			<!-- 31.7 (Villen palaute "saataisko kentästä parempi"): nurmiraidat +
+			     kenttäviivat samalla teal-tokenilla — ei uusia värejä (#108-kaanon).
+			     preserveAspectRatio=none venyy pitchin mittoihin; non-scaling-stroke
+			     pitää viivat ohuina venytyksestä riippumatta. -->
+			<svg class="pitch-lines" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">
+				<rect x="2.5" y="2.5" width="95" height="135" vector-effect="non-scaling-stroke" />
+				<line x1="2.5" y1="70" x2="97.5" y2="70" vector-effect="non-scaling-stroke" />
+				<circle cx="50" cy="70" r="13" vector-effect="non-scaling-stroke" />
+				<rect x="27" y="2.5" width="46" height="15" vector-effect="non-scaling-stroke" />
+				<rect x="27" y="122.5" width="46" height="15" vector-effect="non-scaling-stroke" />
+			</svg>
 			{#each rows as row, i (i)}
 				<div class="row">
 					{#each row as p (p.id)}
@@ -488,18 +541,48 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
+	/* #9a: Starting XI -otsikko + share-nappi samalle riville */
+	.xi-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-2);
+		margin: 0 0 var(--s-1);
+	}
+	.chip:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
 	/* Pitch-tausta = teal-tint (#108: kanoninen token, ei uutta nurmiväriä) */
 	.pitch {
 		/* 28.7 (Villen havainto): 0.08 = kontrasti 1.067:1 cream-taustaan eli
 		   kaytannossa nakymaton, ja kuvakaappauksessa/skaalauksessa se katoaa
 		   kokonaan - jaljelle jaa vain 1 px:n reuna. Mitattu 0.24 = 1.215:1.
-		   Sama arvo kaikilla kolmella pinnalla (SPA, mobiili, longtail). */
-		background: rgba(46, 214, 194, 0.24);
+		   Sama arvo kaikilla kolmella pinnalla (SPA, mobiili, longtail).
+		   31.7: + nurmiraidat (kaksi teal-alphaa) ja viivasto-SVG paalle. */
+		position: relative;
+		background: repeating-linear-gradient(
+			180deg,
+			rgba(46, 214, 194, 0.2) 0 44px,
+			rgba(46, 214, 194, 0.27) 44px 88px
+		);
 		border: 1px solid var(--border);
 		border-radius: 14px;
 		padding: var(--s-2) var(--s-1);
+		overflow: hidden;
+	}
+	.pitch-lines {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		fill: none;
+		stroke: rgba(46, 214, 194, 0.45);
+		stroke-width: 1.5;
+		pointer-events: none;
 	}
 	.row {
+		position: relative;
 		display: flex;
 		justify-content: space-evenly;
 		margin: var(--s-2) 0;

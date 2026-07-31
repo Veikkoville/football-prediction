@@ -107,6 +107,11 @@
 	] as const;
 	let priceBand = $state<(typeof PRICE_BANDS)[number]>(PRICE_BANDS[0]);
 	let ownBand = $state<(typeof OWN_BANDS)[number]>(OWN_BANDS[0]);
+	// 31.7 jatko (Ville): sama rajaus koskee myös Add a player -hakua, ja
+	// mukaan joukkuefiltteri — löytäminen helpottuu kun 700 kandidaattia
+	// kapenee esim. yhden joukkueen 4.6-6.0m-riveihin.
+	let teamFilter = $state('');
+	const teams = $derived([...new Set(pool.map((p) => p.team_short))].sort());
 	function setPriceBand(b: (typeof PRICE_BANDS)[number]) {
 		priceBand = b;
 		capture('watchlist_filtered', { kind: 'price', band: b.label });
@@ -115,20 +120,28 @@
 		ownBand = b;
 		capture('watchlist_filtered', { kind: 'own', band: b.label });
 	}
-	let visibleRows = $derived(
-		rows.filter((p) => {
-			if (priceBand.label !== 'All') {
-				// Hinnaton rivi ei voi osua haarukkaan — pois rajatusta näkymästä.
-				if (p.price == null || p.price < priceBand.min || p.price > priceBand.max) return false;
-			}
-			if (ownBand.label !== 'All') {
-				if (p.owned_pct == null || p.owned_pct < ownBand.min || p.owned_pct > ownBand.max)
-					return false;
-			}
-			return true;
-		})
+	function setTeam(t: string) {
+		teamFilter = t;
+		capture('watchlist_filtered', { kind: 'team', band: t || 'All' });
+	}
+	function inBands(p: XpPlayer): boolean {
+		if (teamFilter && p.team_short !== teamFilter) return false;
+		if (priceBand.label !== 'All') {
+			// Hinnaton rivi ei voi osua haarukkaan — pois rajatusta näkymästä.
+			if (p.price == null || p.price < priceBand.min || p.price > priceBand.max) return false;
+		}
+		if (ownBand.label !== 'All') {
+			if (p.owned_pct == null || p.owned_pct < ownBand.min || p.owned_pct > ownBand.max)
+				return false;
+		}
+		return true;
+	}
+	let visibleRows = $derived(rows.filter(inBands));
+	let filtered = $derived(
+		priceBand.label !== 'All' || ownBand.label !== 'All' || teamFilter !== ''
 	);
-	let filtered = $derived(priceBand.label !== 'All' || ownBand.label !== 'All');
+	// Sama rajaus hakukandidaatteihin — All-tilassa käyttäytyy kuten ennen.
+	let visibleCandidates = $derived(filtered ? candidates.filter(inBands) : candidates);
 </script>
 
 <section class="watchlist">
@@ -141,8 +154,8 @@
 		Track the players you are watching: price and availability at a glance.
 	</p>
 
-	{#if rows.length > 1}
-		<!-- Rajaimet vain kun rajattavaa on -->
+	{#if pool.length > 0}
+		<!-- Rajaimet koskevat sekä seurattuja että Add a player -hakua -->
 		<div class="band-row">
 			<span class="muted">Price:</span>
 			{#each PRICE_BANDS as b (b.label)}
@@ -162,6 +175,14 @@
 					onclick={() => setOwnBand(b)}>{b.label}</button
 				>
 			{/each}
+			<select
+				value={teamFilter}
+				onchange={(e) => setTeam(e.currentTarget.value)}
+				aria-label="Filter by team"
+			>
+				<option value="">All teams</option>
+				{#each teams as t (t)}<option value={t}>{t}</option>{/each}
+			</select>
 		</div>
 	{/if}
 
@@ -196,7 +217,7 @@
 		<p class="muted">No players tracked yet. Add the ones you are deciding on.</p>
 	{:else if visibleRows.length === 0}
 		<!-- Aktiivinen rajaus auki tekstinä, ei hiljaista tyhjää listaa -->
-		<p class="muted">No tracked players in this price or ownership range.</p>
+		<p class="muted">No tracked players match these filters.</p>
 	{:else if filtered}
 		<p class="muted limit">{visibleRows.length} of {rows.length} tracked players shown.</p>
 	{/if}
@@ -209,7 +230,7 @@
 			id="watchlist-add"
 			label="Add a player"
 			bind:query
-			items={candidates}
+			items={visibleCandidates}
 			onSelect={(p) => {
 				// 30.7 digest-instrumentointi: SAMA eventtinimi + n-kenttä kuin
 				// mobiilin WatchlistSectionissa (fpl_watchlist_added), pariteetti.
@@ -288,6 +309,17 @@
 		background: transparent;
 		border-color: var(--accent);
 		color: var(--accent-strong);
+	}
+	.band-row select {
+		flex: 0 0 auto;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text);
+		font-weight: 600;
+		font-size: var(--step--1);
+		padding: 4px 10px;
+		line-height: 1.4;
 	}
 	.row {
 		display: flex;
