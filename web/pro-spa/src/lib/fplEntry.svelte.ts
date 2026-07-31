@@ -18,6 +18,7 @@
  */
 import { supabase } from './supabase';
 import { auth } from './auth.svelte';
+import { fetchOwnProfileRow, invalidateProfileRow } from './profileRow';
 
 const VALID = /^\d{1,10}$/;
 
@@ -40,13 +41,10 @@ export async function loadProfileEntry(): Promise<void> {
 	if (!user || fplEntry.loadedForUser === user.id) return;
 	fplEntry.loadedForUser = user.id;
 	try {
-		const { data, error } = await supabase
-			.from('profiles')
-			.select('fpl_entry_id')
-			.eq('id', user.id)
-			.limit(1);
-		if (error) return; // fail-safe (esim. sarake puuttuu ennen migraatiota)
-		const v = data?.[0]?.fpl_entry_id;
+		// Perf 31.7: jaettu boot-select (profileRow) — puuttuva sarake näkyy
+		// undefined-kenttänä ja alla oleva validointi hoitaa sen kuten ennen.
+		const row = await fetchOwnProfileRow(user.id);
+		const v = row?.fpl_entry_id;
 		if (v != null && VALID.test(String(v))) {
 			fplEntry.savedEntry = String(v);
 			if (!fplEntry.entry) fplEntry.entry = String(v);
@@ -62,7 +60,10 @@ export async function persistEntry(id: number): Promise<void> {
 	if (!auth.user || !fplEntry.remember) return;
 	try {
 		const { error } = await supabase.rpc('set_fpl_entry_id', { entry: id });
-		if (!error) fplEntry.savedEntry = String(id);
+		if (!error) {
+			fplEntry.savedEntry = String(id);
+			invalidateProfileRow();
+		}
 	} catch {
 		// fail-safe
 	}
@@ -75,7 +76,10 @@ export async function toggleRemember(): Promise<void> {
 	try {
 		if (!fplEntry.remember) {
 			const { error } = await supabase.rpc('set_fpl_entry_id', { entry: null });
-			if (!error) fplEntry.savedEntry = null;
+			if (!error) {
+				fplEntry.savedEntry = null;
+				invalidateProfileRow();
+			}
 		} else if (VALID.test(fplEntry.entry.trim())) {
 			await persistEntry(Number(fplEntry.entry.trim()));
 		}
@@ -94,7 +98,10 @@ export async function forgetEntry(): Promise<void> {
 	}
 	try {
 		const { error } = await supabase.rpc('set_fpl_entry_id', { entry: null });
-		if (!error) fplEntry.savedEntry = null;
+		if (!error) {
+			fplEntry.savedEntry = null;
+			invalidateProfileRow();
+		}
 	} catch {
 		fplEntry.savedEntry = null; // UI-tila nollataan silti (fail-safe)
 	}

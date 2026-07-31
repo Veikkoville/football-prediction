@@ -3,6 +3,7 @@
  * totuus kirjautumattomalle, kirjautuneella uudempi aikaleima voittaa.
  * Palvelinpuoli: profiles.fpl_prefs + set_fpl_prefs() (20260730001500). */
 import { supabase } from './supabase';
+import { fetchOwnProfileRow, invalidateProfileRow } from './profileRow';
 
 const KEY = 'goaliq.fplPrefs';
 const TS_KEY = 'goaliq.fplPrefs.updatedAt';
@@ -71,13 +72,10 @@ async function fetchRemotePrefs(): Promise<RemotePrefs | null> {
 	try {
 		const { data: sess } = await supabase.auth.getSession();
 		if (!sess.session) return null;
-		const { data, error } = await supabase
-			.from('profiles')
-			.select('fpl_prefs')
-			.eq('id', sess.session.user.id)
-			.limit(1);
-		if (error || !data || data.length === 0) return null;
-		const raw = (data[0] as { fpl_prefs?: unknown }).fpl_prefs;
+		// Perf 31.7: jaettu boot-select (profileRow), sama parsinta alla.
+		const row = await fetchOwnProfileRow(sess.session.user.id);
+		if (!row) return null;
+		const raw = row.fpl_prefs;
 		if (!raw || typeof raw !== 'object') return null;
 		const updated = (raw as { updated_at?: unknown }).updated_at;
 		if (typeof updated !== 'string') return null;
@@ -94,6 +92,7 @@ export async function pushRemotePrefs(prefs: FplPrefs): Promise<boolean> {
 		const { error } = await supabase.rpc('set_fpl_prefs', {
 			prefs: { watchlist: prefs.watchlist, objective: prefs.objective }
 		});
+		if (!error) invalidateProfileRow(); // cache-rivissä on nyt vanha fpl_prefs
 		return !error;
 	} catch {
 		return false;

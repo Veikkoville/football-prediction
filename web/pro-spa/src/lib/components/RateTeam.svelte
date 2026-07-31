@@ -200,6 +200,13 @@
 	let savedDraftIds: number[] | null = loadDraftIds();
 	let draftCanSave = savedDraftIds == null;
 	if (savedDraftIds && savedDraftIds.length > 0) draftOpen = true; // triggaa pool-fetchin
+	// Web-perf-audit 31.7 kohta 2: persist-efekti laukesi myös pelkästä
+	// hydraatiosta → joka sivulataus uudelleenleimasi lokaalin aikaleiman JA
+	// työnsi muuttumattoman draftin tilille (set_fpl_draft joka bootissa).
+	// Vahti: tallenna/pushaa vain kun ID-lista oikeasti muuttuu viimeksi
+	// persistoidusta. syncDraftin jälkeen tili ≈ lokaali, joten alkuarvo on
+	// lokaali lista (ja tilin voittaessa .then päivittää sen tilin listaksi).
+	let lastPersistedSig = (savedDraftIds ?? []).join(',');
 
 	// 26.7 (Villen pyyntö): sama joukkue webissä ja apissa. Kirjautuneelle
 	// tilin draft on totuus, kirjautumattomalle localStorage kuten ennen.
@@ -213,6 +220,7 @@
 		if (!remoteIds || remoteIds.length === 0) return;
 		if (picks.length > 0) return; // käyttäjä ehti valita → ei ylikirjoiteta
 		savedDraftIds = remoteIds;
+		lastPersistedSig = remoteIds.join(','); // tili voitti → tämä on persistoitu tila
 		draftCanSave = false;
 		draftOpen = true;
 	});
@@ -266,8 +274,15 @@
 	$effect(() => {
 		const ids = picks.map((p) => p.id);
 		if (!draftCanSave) return;
-		saveDraftIds(ids);
 		if (ids.length > 0) draftEverHadPicks = true;
+		// Muuttumaton lista (hydraatio/boot) EI kirjoita: localStorage-leima ei
+		// liiku eikä tilille lähde turhaa set_fpl_draftia (perf-audit kohta 2).
+		// Poolista pudonneet pelaajat tuottavat eri sig:n → pruning-kirjoitus
+		// tapahtuu yhä kerran ja konvergoi.
+		const sig = ids.join(',');
+		if (sig === lastPersistedSig) return;
+		lastPersistedSig = sig;
+		saveDraftIds(ids);
 		if (draftSynced && (ids.length > 0 || draftEverHadPicks)) {
 			pushRemoteDraftSoon(ids);
 		}

@@ -16,6 +16,7 @@
  * saa pitää "no sign-in needed" -lupauksensa.
  */
 import { supabase } from './supabase';
+import { fetchOwnProfileRow, invalidateProfileRow } from './profileRow';
 
 export const DRAFT_LS_KEY = 'goaliq.fplDraftPicks';
 /** Lokaalin tallennuksen aikaleima — synkan konfliktinratkaisu vertaa tähän. */
@@ -104,13 +105,11 @@ export async function fetchRemoteDraft(): Promise<RemoteDraft | null> {
 	try {
 		const { data: sess } = await supabase.auth.getSession();
 		if (!sess.session) return null;
-		const { data, error } = await supabase
-			.from('profiles')
-			.select('fpl_draft')
-			.eq('id', sess.session.user.id)
-			.limit(1);
-		if (error || !data || data.length === 0) return null;
-		const raw = (data[0] as { fpl_draft?: unknown }).fpl_draft;
+		// Perf 31.7: jaettu boot-select (profileRow) korvasi oman
+		// yhden sarakkeen kyselyn — sama fail-safe-parsinta alla.
+		const row = await fetchOwnProfileRow(sess.session.user.id);
+		if (!row) return null;
+		const raw = row.fpl_draft;
 		if (!raw || typeof raw !== 'object') return null;
 		const obj = raw as {
 			ids?: unknown;
@@ -149,6 +148,7 @@ export async function pushRemoteDraft(ids: number[], captaincy?: Captaincy): Pro
 		if (cap != null && ids.includes(cap)) draft.captain_id = cap;
 		if (vice != null && ids.includes(vice) && vice !== cap) draft.vice_id = vice;
 		const { error } = await supabase.rpc('set_fpl_draft', { draft });
+		if (!error) invalidateProfileRow(); // cache-rivissä on nyt vanha fpl_draft
 		return !error;
 	} catch {
 		return false;

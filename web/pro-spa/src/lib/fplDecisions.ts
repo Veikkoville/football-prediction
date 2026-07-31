@@ -148,25 +148,53 @@ export async function logDecision(input: DecisionInput): Promise<LogResult> {
 				return { ok: false, reason: 'auth', message: msg };
 			return { ok: false, reason: 'network', message: msg };
 		}
+		invalidateDecisions(); // uusi rivi kannassa → cache ei saa tarjoilla vanhaa listaa
 		return { ok: true, lockedAt: String(data) };
 	} catch (e) {
 		return { ok: false, reason: 'network', message: (e as Error)?.message ?? 'unknown' };
 	}
 }
 
+/** Perf 31.7: boot haki saman taulun kahdesti (BeatTheModel ilman gw:tä +
+ *  WeeklyActions gw-suodattimella). Nyt yksi jaettu koko listan haku
+ *  (single-flight + lyhyt TTL) ja gw-suodatus klientissä — rivejä on max
+ *  muutama per GW, joten koko lista on aina pieni. Invalidointi:
+ *  logDecision-onnistuminen + käyttäjävaihdos (cache on user-avaimellinen). */
+const DECISIONS_TTL_MS = 60_000;
+let decCacheUser: string | null = null;
+let decCacheAt = 0;
+let decCachePromise: Promise<StoredDecision[]> | null = null;
+
+export function invalidateDecisions(): void {
+	decCacheUser = null;
+	decCachePromise = null;
+}
+
+async function fetchAllDecisions(): Promise<StoredDecision[]> {
+	const { data, error } = await supabase
+		.from('fpl_decisions')
+		.select(
+			'gw,kind,model_choice,user_choice,followed,deadline_utc,locked_at,' +
+				'graded_at,model_points,user_points,grade_note'
+		)
+		.order('gw', { ascending: false });
+	if (error || !data) return [];
+	return data as unknown as StoredDecision[];
+}
+
 export async function loadDecisions(gw?: number): Promise<StoredDecision[]> {
 	try {
-		let q = supabase
-			.from('fpl_decisions')
-			.select(
-				'gw,kind,model_choice,user_choice,followed,deadline_utc,locked_at,' +
-					'graded_at,model_points,user_points,grade_note'
-			)
-			.order('gw', { ascending: false });
-		if (gw != null) q = q.eq('gw', gw);
-		const { data, error } = await q;
-		if (error || !data) return [];
-		return data as unknown as StoredDecision[];
+		const { data: sess } = await supabase.auth.getSession();
+		const uid = sess.session?.user.id ?? null;
+		if (!uid) return []; // RLS palauttaisi tyhjän — säästetään roundtrip
+		const stale = Date.now() - decCacheAt > DECISIONS_TTL_MS;
+		if (!decCachePromise || decCacheUser !== uid || stale) {
+			decCacheUser = uid;
+			decCacheAt = Date.now();
+			decCachePromise = fetchAllDecisions();
+		}
+		const rows = await decCachePromise;
+		return gw != null ? rows.filter((r) => r.gw === gw) : rows;
 	} catch {
 		return [];
 	}
