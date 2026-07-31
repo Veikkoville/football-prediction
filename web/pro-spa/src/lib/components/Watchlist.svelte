@@ -79,15 +79,93 @@
 		prefs.watchlist.map((id) => byId.get(id)).filter((p): p is XpPlayer => p != null)
 	);
 	let candidates = $derived(pool.filter((p) => !prefs.watchlist.includes(p.id)));
+
+	// 31.7 (Villen palaute): lista oletuksena KIINNI — auki levitettynä se söi
+	// team-segmentin. Alasveto, sisältö säilyy täsmälleen samana avattuna.
+	let open = $state(false);
+	function toggle() {
+		open = !open;
+		capture('watchlist_toggled', { open });
+	}
+
+	// 31.7 (Villen palaute): samat rajaimet kuin leaders-listoissa — hinta ja
+	// omistus%. Oma lista = oma data, ei premium-gatea (ei enumerointivuotoa).
+	// Labelit rehellisiä 0.1-granulariteetille kuten Leadersissa (#9b).
+	const PRICE_BANDS = [
+		{ label: 'All', min: 0, max: Infinity },
+		{ label: '4.5-', min: 0, max: 4.5 },
+		{ label: '4.6-6.0', min: 4.6, max: 6.0 },
+		{ label: '6.1-8.0', min: 6.1, max: 8.0 },
+		{ label: '8.1+', min: 8.1, max: Infinity }
+	] as const;
+	const OWN_BANDS = [
+		{ label: 'All', min: 0, max: Infinity },
+		{ label: '<5%', min: 0, max: 4.99 },
+		{ label: '5-15%', min: 5, max: 15 },
+		{ label: '15-40%', min: 15.01, max: 40 },
+		{ label: '40%+', min: 40.01, max: Infinity }
+	] as const;
+	let priceBand = $state<(typeof PRICE_BANDS)[number]>(PRICE_BANDS[0]);
+	let ownBand = $state<(typeof OWN_BANDS)[number]>(OWN_BANDS[0]);
+	function setPriceBand(b: (typeof PRICE_BANDS)[number]) {
+		priceBand = b;
+		capture('watchlist_filtered', { kind: 'price', band: b.label });
+	}
+	function setOwnBand(b: (typeof OWN_BANDS)[number]) {
+		ownBand = b;
+		capture('watchlist_filtered', { kind: 'own', band: b.label });
+	}
+	let visibleRows = $derived(
+		rows.filter((p) => {
+			if (priceBand.label !== 'All') {
+				// Hinnaton rivi ei voi osua haarukkaan — pois rajatusta näkymästä.
+				if (p.price == null || p.price < priceBand.min || p.price > priceBand.max) return false;
+			}
+			if (ownBand.label !== 'All') {
+				if (p.owned_pct == null || p.owned_pct < ownBand.min || p.owned_pct > ownBand.max)
+					return false;
+			}
+			return true;
+		})
+	);
+	let filtered = $derived(priceBand.label !== 'All' || ownBand.label !== 'All');
 </script>
 
 <section class="watchlist">
-	<h3>Watchlist</h3>
+	<button type="button" class="head" aria-expanded={open} onclick={toggle}>
+		<h3>Watchlist {#if rows.length > 0}<span class="muted count">({rows.length})</span>{/if}</h3>
+		<span class="chev" aria-hidden="true">{open ? '▾' : '▸'}</span>
+	</button>
+	{#if open}
 	<p class="muted">
 		Track the players you are watching: price and availability at a glance.
 	</p>
 
-	{#each rows as p (p.id)}
+	{#if rows.length > 1}
+		<!-- Rajaimet vain kun rajattavaa on -->
+		<div class="band-row">
+			<span class="muted">Price:</span>
+			{#each PRICE_BANDS as b (b.label)}
+				<button
+					type="button"
+					class="band-chip"
+					class:on={priceBand === b}
+					onclick={() => setPriceBand(b)}>{b.label}</button
+				>
+			{/each}
+			<span class="muted">Owned:</span>
+			{#each OWN_BANDS as b (b.label)}
+				<button
+					type="button"
+					class="band-chip"
+					class:on={ownBand === b}
+					onclick={() => setOwnBand(b)}>{b.label}</button
+				>
+			{/each}
+		</div>
+	{/if}
+
+	{#each visibleRows as p (p.id)}
 		{@const flagged = p.status != null && p.status !== 'a'}
 		{@const tc = teamColorByShort(p.team_short)}
 		{@const trend = TREND[priceMap.get(p.id) ?? '']}
@@ -116,6 +194,11 @@
 	{/each}
 	{#if rows.length === 0}
 		<p class="muted">No players tracked yet. Add the ones you are deciding on.</p>
+	{:else if visibleRows.length === 0}
+		<!-- Aktiivinen rajaus auki tekstinä, ei hiljaista tyhjää listaa -->
+		<p class="muted">No tracked players in this price or ownership range.</p>
+	{:else if filtered}
+		<p class="muted limit">{visibleRows.length} of {rows.length} tracked players shown.</p>
 	{/if}
 	{#if rows.length > 0 && priceNote != null}
 		<p class="muted limit">{priceNote}</p>
@@ -138,6 +221,7 @@
 	{:else if !premium}
 		<p class="muted limit">Free tracks {WATCHLIST_FREE_LIMIT} players. Premium removes the limit.</p>
 	{/if}
+	{/if}
 </section>
 
 <style>
@@ -151,6 +235,59 @@
 	h3 {
 		margin: 0 0 var(--s-1);
 		font-size: var(--step-1);
+	}
+	/* 31.7: alasveto-otsikko — koko rivi klikattava, chevron oikealla */
+	.head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		background: none;
+		border: 0;
+		padding: 0;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		text-align: left;
+	}
+	.head h3 {
+		margin: 0;
+	}
+	.count {
+		font-weight: 400;
+		font-size: var(--step--1);
+	}
+	.chev {
+		color: var(--text-muted);
+		font-size: var(--step--1);
+	}
+	/* 31.7: rajainchipit — sama kieli kuin Leadersin window-chipit */
+	.band-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--s-2);
+		row-gap: var(--s-2);
+		margin: var(--s-2) 0;
+		font-size: var(--step--1);
+	}
+	.band-chip {
+		flex: 0 0 auto;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+		white-space: nowrap;
+		line-height: 1.4;
+	}
+	.band-chip.on {
+		background: transparent;
+		border-color: var(--accent);
+		color: var(--accent-strong);
 	}
 	.row {
 		display: flex;

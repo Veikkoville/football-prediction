@@ -11,6 +11,7 @@
 	const BULLETS = [
 		'Per-player xP projections for every gameweek',
 		'Captain ranker with top picks',
+		'Share as image: post-ready cards from the captain ranker and leaderboards',
 		'Differential finder: low ownership, high xP',
 		'Multi-gameweek transfer planner and plan chains',
 		'Chip timing: best window for Wildcard, Bench Boost, Triple Captain and Free Hit',
