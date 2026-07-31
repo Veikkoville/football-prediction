@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PLANS, startCheckout, type PlanKey } from '$lib/billing';
+	import { PLANS, planApprox, startCheckout, type PlanKey } from '$lib/billing';
 	import { capture } from '$lib/analytics';
 	import { fetchXp, gwXp, type XpResponse } from '$lib/api';
 
@@ -56,8 +56,11 @@
 
 <div class="plans">
 	{#each Object.entries(PLANS) as [key, plan] (key)}
+		{@const approx = planApprox(key as PlanKey)}
 		<div class="plan">
-			<span class="muted">{plan.hint}</span>
+			<!-- 31.7: UK/US-kävijälle valuuttalikiarvo (Adaptive Pricing hoitaa
+			     checkoutin tarkan summan kävijän valuutassa) -->
+			<span class="muted">{plan.hint}{approx ? ` · ${approx}` : ''}</span>
 			<button
 				class={key === 'season' ? 'primary' : 'secondary'}
 				disabled={busy !== null}

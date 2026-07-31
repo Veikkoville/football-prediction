@@ -20,6 +20,34 @@ export const PLANS = {
 
 export type PlanKey = keyof typeof PLANS;
 
+/** 31.7 (Villen GO): Stripe Adaptive Pricing on päällä → checkout näyttää ja
+ * veloittaa kävijän valuutassa. Nämä ovat NÄYTÖN likiarvoja UK/US-kävijöille
+ * ("about" pitää ne rehellisinä, checkout näyttää aina tarkan summan).
+ * Kurssit päivitetään käsin harvakseltaan — älä lisää FX-API-riippuvuutta. */
+const APPROX: Record<'GBP' | 'USD', Record<PlanKey, string>> = {
+	GBP: { season: 'about £21/year', monthly: 'about £3.40/mo' },
+	USD: { season: 'about $27/year', monthly: 'about $4.40/mo' }
+};
+
+function localCurrency(): 'GBP' | 'USD' | null {
+	if (typeof navigator === 'undefined') return null;
+	let region = '';
+	try {
+		region = new Intl.Locale(navigator.language).maximize().region ?? '';
+	} catch {
+		region = '';
+	}
+	if (region === 'GB') return 'GBP';
+	if (region === 'US') return 'USD';
+	return null;
+}
+
+/** Paikallinen likiarvo plan-riville, tai null (= pelkkä EUR riittää). */
+export function planApprox(plan: PlanKey): string | null {
+	const c = localCurrency();
+	return c ? APPROX[c][plan] : null;
+}
+
 /** Vie Stripe Checkoutiin. Kirjautunut → authed endpoint (osto linkittyy
  * tiliin heti); kirjautumaton → guest endpoint (tili syntyy maksun jälkeen).
  * Palauttaa virheviestin tai null (= redirect käynnissä). */

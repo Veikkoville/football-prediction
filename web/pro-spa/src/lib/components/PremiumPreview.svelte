@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fetchXp, gwXp, type XpResponse } from '$lib/api';
 	import { capture } from '$lib/analytics';
-	import { PLANS, startCheckout, type PlanKey } from '$lib/billing';
+	import { PLANS, planApprox, startCheckout, type PlanKey } from '$lib/billing';
 	import Provenance from './Provenance.svelte';
 
 	// #95: login-seinä myy ennen lomaketta — sama arvolupaus kuin mobiilin
@@ -110,8 +110,11 @@
 	     emailin ja maksun; tili + kirjautumislinkki tulevat maksun jälkeen. -->
 	<div class="plans">
 		{#each Object.entries(PLANS) as [key, plan] (key)}
+			{@const approx = planApprox(key as PlanKey)}
 			<div class="plan">
-				<span class="muted">{plan.hint}</span>
+				<!-- 31.7: UK/US-kävijälle valuuttalikiarvo (Adaptive Pricing hoitaa
+				     checkoutin tarkan summan kävijän valuutassa) -->
+				<span class="muted">{plan.hint}{approx ? ` · ${approx}` : ''}</span>
 				<button
 					class={key === 'season' ? 'primary' : 'secondary'}
 					disabled={busy !== null}

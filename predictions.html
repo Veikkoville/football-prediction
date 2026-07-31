@@ -589,5 +589,23 @@ document.addEventListener('click', function (e) {
 });
 </script>
 
+<script>
+/* 31.7: Stripe Adaptive Pricing veloittaa kavijan valuutassa checkoutissa;
+   tama lisaa NAYTON likiarvon UK/US-kavijoille. Kurssit paivitetaan kasin,
+   "about" pitaa ne rehellisina. */
+(function () {
+  var region = '';
+  try { region = new Intl.Locale(navigator.language).maximize().region || ''; } catch (e) {}
+  var fx = region === 'GB' ? { y: 'about £21', m: 'about £3.40', e: 'about £14.70' }
+         : region === 'US' ? { y: 'about $27', m: 'about $4.40', e: 'about $19' } : null;
+  if (!fx) return;
+  function add(sel, txt) {
+    var el = document.querySelector(sel);
+    if (el) el.insertAdjacentText('beforeend', ' (' + txt + ')');
+  }
+  add('.price', fx.y);
+  add('[data-cta="predictions-premium"]', fx.y);
+})();
+</script>
 </body>
 </html>
