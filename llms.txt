@@ -5,7 +5,7 @@
 
 ## Football match predictions (evergreen)
 - [Football match predictions](https://goaliq.app/predictions): GoalIQ predicts any football match - win probability for each side, expected goals (xG) and the most likely scorelines - from a Dixon-Coles + machine-learning model. Covers the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Brasileirao (plays through the European summer), the Championship, Eredivisie and Primeira Liga.
-- Every model prediction is logged before kick-off and graded after the match, hits and misses included. The current aggregate accuracy is published on the page and as machine-readable JSON at https://goaliq-api.onrender.com/api/accuracy.
+- Every model prediction is logged before kick-off and graded after the match, hits and misses included. The current aggregate accuracy is published on the page and as machine-readable JSON at https://api.goaliq.app/api/accuracy.
 - [Brasileirao Serie A predictions](https://goaliq.app/predictions/brasileirao/): a hub page plus a dedicated page per fixture at https://goaliq.app/predictions/brasileirao/<home-team>-vs-<away-team> (for example https://goaliq.app/predictions/brasileirao/cruzeiro-vs-palmeiras), each with the model's win, draw and loss probability, expected goals for both sides and the most likely scoreline. Brasileirao runs through the European summer; the European leagues return to this section in August 2026.
 
 ## World Cup 2026 (tournament finished, archive page)

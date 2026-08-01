@@ -19,7 +19,7 @@
 
 <!-- Open Graph / social preview -->
 <meta property="og:title" content="GoalIQ – Free FPL Tools &amp; Football Predictions" />
-<meta property="og:description" content="Free FPL tools - clean sheet probability &amp; FDR, xG/xA/xGI leaders for every player, rate my team with a captain pick, and price watch. Premium adds a team manager with gameweek planner, player xP, value ranking and a DefCon tracker. Proven match model, published track record. Football predictions too." />
+<meta property="og:description" content="Free FPL tools - clean sheet probability &amp; FDR, xG/xA/xGI leaders for every player, rate my team with a captain pick, and price watch. Premium adds a team manager with gameweek planner, player xP, value ranking and a DefCon tracker. Published, pre-match-logged track record. Football predictions too." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://goaliq.app/" />
 <meta property="og:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
@@ -624,7 +624,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           <li>Match predictions with expected goals, the full scoreline table
             and 30 days of fixtures</li>
           </ul>
-          <p class="early-offer">First 200: <strong>30% off the season pass</strong> with code
+          <!-- 1.8.2026: "First 200" oli niukkuusvaite jota mikaan koodissa ei
+               valvo (ei laskuria, ei nakyvaa Stripe-rajaa). Jos promokoodille
+               asetetaan max_redemptions=200 Stripessa, luvun voi palauttaa. -->
+          <p class="early-offer">Early adopters: <strong>30% off the season pass</strong> with code
             <code>EARLY30</code> at checkout. That is &euro;17.50 for the year.</p>
           <p class="panel-cta"><a class="btn btn-primary" href="https://pro.goaliq.app/checkout?plan=season" data-cta="pricing-season">Get the Season pass &#9656;</a>
             <a class="btn btn-quiet" href="https://pro.goaliq.app/checkout?plan=monthly" data-cta="pricing-monthly">Start Monthly</a></p>
@@ -644,7 +647,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <div class="bar bar-mag"><span>&#9612; The model plays FPL this season. Beat it.</span></div>
         <div class="panel-body">
           <p>GoalIQ's team picks itself from the model's numbers, squad public, every call
-            posted before the deadline. Season winner gets a year of Premium, free.</p>
+            posted before the deadline. Season winner gets a year of Premium, free: one prize,
+            decided by the mini-league table when the season ends.</p>
           <p class="link-row">
             <a class="mag" href="/fpl/model-xi" data-cta="index-model-xi">See the Model XI &#9656;</a>
             <a class="quiet" href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9" data-cta="league">Join the league · code jgi6j9</a>
@@ -656,9 +660,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         <div class="panel-body">
           <p>GoalIQ is made by one person. I have played Fantasy Premier League since 2012/13, and the
             record is public:
-            <a href="https://fantasy.premierleague.com/entry/1186244/history" rel="noopener" data-cta="founder-entry">12 seasons, anyone can check it</a>.
-            My best finish is top 6%. My worst is 6,138,376, the season I stopped updating my team in
-            October. One season I did not play at all.</p>
+            <!-- GEN:FOUNDER-START --><a href="https://fantasy.premierleague.com/entry/1186244/history" rel="noopener" data-cta="founder-entry">12 seasons, anyone can check it</a>.
+            My best finish is 450,207 (2020/21). My worst is 6,138,376 (2021/22), the season I stopped
+            updating my team in October.<!-- GEN:FOUNDER-END --> One season I did not play at all.</p>
           <p>That is the problem GoalIQ solves. Not beating the people who
             spend five hours a week on this. Just getting a defensible team in before the deadline,
             every week, without giving up your evening.</p>
@@ -878,16 +882,19 @@ document.addEventListener('click', function (e) {
 (function () {
   var region = '';
   try { region = new Intl.Locale(navigator.language).maximize().region || ''; } catch (e) {}
-  var fx = region === 'GB' ? { y: 'about £21', m: 'about £3.40', e: 'about £14.70' }
-         : region === 'US' ? { y: 'about $27', m: 'about $4.40', e: 'about $19' } : null;
-  if (!fx) return;
+  // 1.8.2026: kovakoodatut kurssit vanhenevat hiljaa eika mikaan porti nae sita.
+  // Stripe nayttaa tarkan paikallisen summan checkoutissa (Adaptive Pricing), joten
+  // sivulla riittaa valuutan nimeaminen ilman omaa lukua.
+  // Ei vaiteta veloitusmekanismista (Stripen Adaptive Pricing voi veloittaa
+  // paikallisessa valuutassa) — sanotaan vain se mika on varmasti totta.
+  var local = (region === 'GB' || region === 'US')
+    ? 'your local price is shown at checkout' : null;
+  if (!local) return;
   function add(sel, txt) {
     var el = document.querySelector(sel);
     if (el) el.insertAdjacentText('beforeend', ' (' + txt + ')');
   }
-  add('[data-cta="hero"]', fx.y);
-  add('.price-alt', fx.m);
-  add('.early-offer', fx.e);
+  add('[data-cta="hero"]', local);
 })();
 </script>
 </body>

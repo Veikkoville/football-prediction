@@ -1214,7 +1214,8 @@ def render_page(c: dict) -> str:
 <section class="hero dark">
 <div class="wrap">
 <h1>Free FPL Tools: Clean Sheet Probability, Fixture Difficulty and More</h1>
-<p class="lede">GoalIQ is a free FPL assistant built on a proven match model.
+<p class="lede">GoalIQ is a free FPL assistant built on a match model with a
+published, pre-match-logged track record.
 This page gives clean sheet probability and fixture difficulty for every
 Premier League team, free and updated every gameweek. Rate my team, a captain
 pick and price watch are free too; GoalIQ Premium adds an interactive team
@@ -1235,7 +1236,7 @@ Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
 Think you can outdraft it? Join the
 <a href="https://fantasy.premierleague.com/leagues/auto-join/jgi6j9" data-cta="league">Beat
 the Model mini-league</a> with code <strong>jgi6j9</strong>. Season winner gets a year of
-GoalIQ Premium, free.</p>
+GoalIQ Premium, free: one prize, decided by the mini-league table when the season ends.</p>
 </div>
 </section>
 
@@ -1387,6 +1388,9 @@ INDEX_PATH = ROOT / "index.html"
 # Etusivun projektiotaulukon lähde (sama tiedosto jonka fpl-data-refresh
 # rakentaa joka päivä) — taulukko oli aiemmin kovakoodattu, ks. xp_table_rows.
 XP_PATH = ROOT / "data" / "fpl_xp_projections.json"
+# Perustajan FPL-historia (scripts/build_founder_stats.py) — luvut samasta
+# julkisesta entrystä johon etusivun teksti linkkaa.
+FOUNDER_PATH = ROOT / "data" / "founder_entry.json"
 
 
 def _load_json(path) -> dict | None:
@@ -1492,6 +1496,24 @@ def update_index(c: dict, xp: dict | None = None) -> bool:
         if n_wc != 2:
             raise RuntimeError(
                 f"index.html GEN:ACC-WC: odotettiin 2 markerilohkoa, löytyi {n_wc}")
+    # Perustajalohko: luvut samasta julkisesta entrystä johon teksti linkkaa
+    # (scripts/build_founder_stats.py). "12 seasons" vanheni ennen joka kausi.
+    fe = _load_json(FOUNDER_PATH)
+    if fe and fe.get("seasons"):
+        founder = (
+            f'<a href="https://fantasy.premierleague.com/entry/{fe["entry_id"]}/history"'
+            f' rel="noopener" data-cta="founder-entry">{fe["seasons"]} seasons,'
+            f" anyone can check it</a>.\n"
+            f'            My best finish is {fe["best"]["rank"]:,} ({fe["best"]["season"]}).'
+            f' My worst is {fe["worst"]["rank"]:,} ({fe["worst"]["season"]}), the season I'
+            f" stopped\n            updating my team in October."
+        )
+        new, n_f = re.subn(
+            r"(<!-- GEN:FOUNDER-START -->).*?(<!-- GEN:FOUNDER-END -->)",
+            lambda m: m.group(1) + founder + m.group(2), new, flags=re.S)
+        if n_f != 1:
+            raise RuntimeError(
+                f"index.html GEN:FOUNDER: odotettiin 1 markerilohko, löytyi {n_f}")
     # "Live model projections" -taulukko: rivit tuoreesta xP-datasta, ei
     # kovakoodattuna. Ilman dataa markeri jätetään koskematta (ei tyhjennetä
     # taulukkoa sivulta jos builder ajetaan ilman xP-tiedostoa).

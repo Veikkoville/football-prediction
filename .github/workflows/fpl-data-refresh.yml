@@ -149,6 +149,14 @@ jobs:
 
       # #124/#125: xG- + DefCon-leaders samasta bootstrap+element-summary-
       # datasta (levyvälimuisti — valmiin kauden summaryt eivät uudelleenhae).
+      # 1.8: perustajalohkon luvut julkisesta entrysta (ei kovakoodausta
+      # etusivulle). Fail-safe: jos FPL-API on nurin, askel ei kaada ajoa ja
+      # build_fpl_page jattaa markerin koskematta.
+      - name: Build founder entry stats
+        if: steps.guard.outputs.proceed == 'true'
+        continue-on-error: true
+        run: python -m scripts.build_founder_stats
+
       - name: Build player leaders (xG + DefCon)
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_player_leaders
@@ -184,7 +192,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json
           # 30.7 tarkkuuslokit: olemassa vain kun gradattavaa/jäädytettävää on ollut
-          for f in data/fpl_price_accuracy.json data/fpl_xp_gw_accuracy.json; do
+          for f in data/fpl_price_accuracy.json data/fpl_xp_gw_accuracy.json data/founder_entry.json; do
             [ -f "$f" ] && git add "$f"
           done
           [ -d data/fpl_xp_frozen ] && git add data/fpl_xp_frozen
