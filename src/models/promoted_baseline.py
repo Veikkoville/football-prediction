@@ -109,6 +109,26 @@ def pudonneet_aktiiviselta_kaudelta(
         out.update(per_liiga.get(liiga, ()))
     return frozenset(out)
 
+def nousijat_aktiiviselta_kaudelta(
+    liigat: tuple[str, ...] | list[str],
+    kaudet: tuple[str, ...] | list[str],
+) -> frozenset[str]:
+    """Kauden nousijat annetuissa liigoissa — pudonneet-suodattimen peilikuva
+    /api/teams-valitsinta varten. Aktiivinen kausi = viimeisin pyydetyistä
+    (sama sääntö kuin taydenna_nousijat). Tuntematon kausi/liiga → tyhjä
+    joukko. HUOM: kutsuja vartioi listauksen dc.attack-jäsenyydellä, jotta
+    valitsin ei koskaan tarjoa joukkuetta jolle /api/predict palauttaisi 404."""
+    if not kaudet:
+        return frozenset()
+    per_liiga = PROMOTED_BY_SEASON.get(str(kaudet[-1]))
+    if not per_liiga:
+        return frozenset()
+    out: set[str] = set()
+    for liiga in liigat:
+        out.update(per_liiga.get(liiga, ()))
+    return frozenset(out)
+
+
 # Viimeisin trio jonka PL-voima on mitattu (nousi 24/25).
 REFERENCE_TRIO: tuple[str, ...] = ("Ipswich", "Leicester", "Southampton")
 

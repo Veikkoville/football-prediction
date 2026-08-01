@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from src.models.promoted_baseline import (
     RELEGATED_BY_SEASON,
+    nousijat_aktiiviselta_kaudelta,
     pudonneet_aktiiviselta_kaudelta,
 )
 
@@ -55,12 +56,28 @@ def test_negatiivinen_kontrolli_lista_luetaan_datasta(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
+# Nousijahelper (valitsimen peilikuva pudonneille)
+# ---------------------------------------------------------------------------
+def test_2627_ikkuna_listaa_nousijat():
+    lisaa = nousijat_aktiiviselta_kaudelta((PL,), ("2526", "2627"))
+    assert lisaa == {"Coventry", "Hull", "Ipswich"}
+
+
+def test_nousijahelper_vanha_ikkuna_tyhja():
+    assert nousijat_aktiiviselta_kaudelta((PL,), ("2425", "2526")) == frozenset()
+    assert nousijat_aktiiviselta_kaudelta((PL,), ()) == frozenset()
+    assert nousijat_aktiiviselta_kaudelta(("ESP-La Liga-FD",), ("2526", "2627")) == frozenset()
+
+
+# ---------------------------------------------------------------------------
 # /api/teams-endpoint stub-mallilla (ei fittiä)
 # ---------------------------------------------------------------------------
 class _StubDC:
-    def __init__(self, teams):
+    def __init__(self, teams, attack=None):
         self.teams_ = list(teams)
-        self.attack = {t: 0.0 for t in teams}
+        # attack voi kattaa teams_-listaa laajemman joukon: fitin jälkeinen
+        # nousijainjektio (taydenna_nousijat) lisää avaimia vain attackiin.
+        self.attack = {t: 0.0 for t in (attack if attack is not None else teams)}
 
 
 def test_list_teams_suodattaa_pudonneet_2627(monkeypatch):
@@ -70,7 +87,34 @@ def test_list_teams_suodattaa_pudonneet_2627(monkeypatch):
               "Wolverhampton Wanderers"]
     monkeypatch.setattr(m, "_saa_malli", lambda *a, **k: _StubDC(kaikki))
     resp = m.list_teams(leagues=[PL], seasons=["2526", "2627"])
+    # Ipswich tulee nousijaunionista vain jos se on attackissa — stubissa ei ole.
     assert resp.teams == ["Arsenal", "Coventry", "Hull"]
     # Kontrolli: sama stub vanhalla ikkunalla palauttaa kaikki.
     resp_vanha = m.list_teams(leagues=[PL], seasons=["2425", "2526"])
     assert resp_vanha.teams == sorted(kaikki)
+
+
+def test_list_teams_listaa_injektoidut_nousijat(monkeypatch):
+    # Tuotantotilanne 1.8: nousijat EIVÄT ole teams_-listassa (ei treenidataa)
+    # mutta OVAT attackissa injektion jäljiltä → valitsimen pitää listata ne.
+    import api.main as m
+
+    treenidata = ["Arsenal", "Burnley", "Chelsea"]
+    injektion_jalkeen = treenidata + ["Coventry", "Hull", "Ipswich"]
+    monkeypatch.setattr(
+        m, "_saa_malli",
+        lambda *a, **k: _StubDC(treenidata, attack=injektion_jalkeen))
+    resp = m.list_teams(leagues=[PL], seasons=["2526", "2627"])
+    assert resp.teams == ["Arsenal", "Chelsea", "Coventry", "Hull", "Ipswich"]
+
+
+def test_list_teams_ei_listaa_nousijaa_ilman_injektiota(monkeypatch):
+    # attack-vartio: jos injektio epäonnistui, valitsin ei saa tarjota
+    # joukkuetta jolle /api/predict palauttaisi 404.
+    import api.main as m
+
+    treenidata = ["Arsenal", "Chelsea"]
+    monkeypatch.setattr(
+        m, "_saa_malli", lambda *a, **k: _StubDC(treenidata))
+    resp = m.list_teams(leagues=[PL], seasons=["2526", "2627"])
+    assert resp.teams == ["Arsenal", "Chelsea"]

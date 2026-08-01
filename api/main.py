@@ -1022,9 +1022,20 @@ def list_teams(
     # aktiivisella kaudella. Suodatus koskee VAIN tätä listaa — /api/predict
     # hyväksyy pudonneet yhä (H2H, eksplisiittiset kausipyynnöt). Tuntematon
     # kausi → tyhjä joukko → käytös ennallaan (esim. seasons=['2425','2526']).
-    from src.models.promoted_baseline import pudonneet_aktiiviselta_kaudelta
+    from src.models.promoted_baseline import (
+        nousijat_aktiiviselta_kaudelta,
+        pudonneet_aktiiviselta_kaudelta,
+    )
     pois = pudonneet_aktiiviselta_kaudelta(tuple(leagues), tuple(seasons))
-    teams = sorted(t for t in dc.teams_ if t not in pois)
+    # Nousijat elävät fitin jälkeisessä injektiossa (taydenna_nousijat →
+    # dc.attack), eivät treenidatan teams_-listassa — ilman unionia valitsin
+    # näytti 17 joukkuetta 1.8. flipissä (havaittu tuotannosta). attack-vartio
+    # takaa ettei listata joukkuetta jolle /api/predict palauttaisi 404.
+    lisaa = nousijat_aktiiviselta_kaudelta(tuple(leagues), tuple(seasons))
+    teams = sorted(
+        {t for t in dc.teams_ if t not in pois}
+        | {t for t in lisaa if t in dc.attack}
+    )
     return TeamsResponse(
         leagues=leagues,
         seasons=seasons,
