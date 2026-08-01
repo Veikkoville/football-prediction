@@ -60,7 +60,23 @@ from src.models.dixon_coles import DixonColesModel
 # Nimet ovat MALLINIMIÄ (Understat/football-data), eivät FD:n täysnimiä.
 # ---------------------------------------------------------------------------
 PROMOTED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
-    "2627": {"ENG-Premier League": ("Coventry", "Hull", "Ipswich")},
+    "2627": {
+        "ENG-Premier League": ("Coventry", "Hull", "Ipswich"),
+        # 1.8 laajennus (TASKS 4d, Villen GO "samanlainen laajennus kuin
+        # PL:ssä"): ilman injektiota 378 ottelua ohittui track recordista
+        # (accuracy-ajon mittaus 1.8: PD 108, SA 108, FL1 66, BL1 96).
+        # FD-liigojen MALLINIMET = football-data.org:n täysnimet (loader
+        # käyttää homeTeam.name-kenttää sellaisenaan) — verifioitu
+        # PD/SA/FL1/BL1_2026.json-joukkuediffillä 1.8.
+        "ESP-La Liga-FD": (
+            "Málaga CF", "RC Deportivo La Coruña", "Real Racing Club de Santander",
+        ),
+        "ITA-Serie A-FD": ("AC Monza", "Frosinone Calcio", "Venezia FC"),
+        "FRA-Ligue 1-FD": ("ES Troyes AC", "Le Mans FC"),
+        "GER-Bundesliga-FD": (
+            "FC Schalke 04", "SC Paderborn 07", "SV 07 Elversberg",
+        ),
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -86,6 +102,14 @@ PROMOTED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
 RELEGATED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
     "2627": {
         "ENG-Premier League": ("Burnley", "West Ham", "Wolverhampton Wanderers"),
+        # 1.8: sama valitsinsiivous muille liigoille nousijalaajennuksen
+        # parina (kausidiff FD-datasta, sama ajo kuin PROMOTED-listat yllä).
+        "ESP-La Liga-FD": ("Girona FC", "RCD Mallorca", "Real Oviedo"),
+        "ITA-Serie A-FD": ("AC Pisa 1909", "Hellas Verona FC", "US Cremonese"),
+        "FRA-Ligue 1-FD": ("FC Metz", "FC Nantes"),
+        "GER-Bundesliga-FD": (
+            "1. FC Heidenheim 1846", "FC St. Pauli 1910", "VfL Wolfsburg",
+        ),
     },
 }
 
@@ -133,6 +157,25 @@ def nousijat_aktiiviselta_kaudelta(
 REFERENCE_TRIO: tuple[str, ...] = ("Ipswich", "Leicester", "Southampton")
 
 # ---------------------------------------------------------------------------
+# Per-liiga-viiteryhmät (1.8 laajennus): edellisen kauden nousijat, joilla on
+# TÄYSI 25/26-kausi treeni-ikkunassa → baseline mitataan AINA nykyisestä
+# fitistä (source='measured'). Toisin kuin PL:ssä, frozen-fallbackia EI ole:
+# PL:n jäädytetyt luvut ovat PL-skaalaa eikä niitä saa soveltaa muihin
+# liigoihin — jos viiteryhmä puuttuisi fitistä, injektio ohittuu näkyvästi
+# (needed jää tyhjäksi vasta resolvoinnissa, loki kertoo). Ryhmät laskettu
+# FD-kausidiffistä 1.8 (25/26-joukot miinus 24/25-joukot):
+#   FL1/BL1: vain 2 nimeä (nousu 2 suoraa + karsinta) — keskiarvo 2:sta
+#   on silti mitattu luku, ei arvaus.
+# ---------------------------------------------------------------------------
+REFERENCE_BY_LEAGUE: dict[str, tuple[str, ...]] = {
+    "ENG-Premier League": REFERENCE_TRIO,
+    "ESP-La Liga-FD": ("Elche CF", "Levante UD", "Real Oviedo"),
+    "ITA-Serie A-FD": ("AC Pisa 1909", "US Cremonese", "US Sassuolo Calcio"),
+    "FRA-Ligue 1-FD": ("FC Lorient", "FC Metz", "Paris FC"),
+    "GER-Bundesliga-FD": ("1. FC Köln", "Hamburger SV"),
+}
+
+# ---------------------------------------------------------------------------
 # JÄÄDYTETTY BASELINE — ja tämä on se kohta joka esti hiljaisen katoamisen.
 #
 # Viitetrio mitataan ENSISIJAISESTI nykyisestä fitistä (itsestään päivittyvä).
@@ -166,17 +209,31 @@ FROZEN_BASELINE: dict[str, float] = {
 FROZEN_PROVENANCE = "mitattu 27.7.2026, PL-ikkuna 2425+2526, trio Ipswich/Leicester/Southampton"
 
 
-def add_promoted_baseline(dc: DixonColesModel, needed: list[str]) -> dict:
-    """Anna `needed`-joukkueille viimeisimmän nousijatrion toteutunut PL-voima.
+def add_promoted_baseline(
+    dc: DixonColesModel,
+    needed: list[str],
+    reference: tuple[str, ...] = REFERENCE_TRIO,
+    allow_frozen: bool = True,
+) -> dict:
+    """Anna `needed`-joukkueille viimeisimmän nousijaryhmän toteutunut voima.
 
     Mutatoi `dc`:n paikan päällä. Palauttaa yhteenvedon telemetriaa/lokitusta
-    varten. Jos trio puuttuu fitistä tai `needed` on tyhjä, ei tee mitään —
-    baselinea ei arvata.
+    varten. Jos viiteryhmä puuttuu fitistä eikä frozen-varakeinoa saa käyttää,
+    tai `needed` on tyhjä, ei tee mitään — baselinea ei arvata.
+
+    `reference`/`allow_frozen` oletuksineen = entinen PL-käytös bittitarkasti
+    (FPL-builderit kutsuvat suoraan kahdella argumentilla). FROZEN_BASELINE on
+    PL-skaalaa: muille liigoille allow_frozen=False, jolloin puuttuva
+    viiteryhmä → näkyvä skip, ei väärän liigan lukuja.
     """
-    trio = [t for t in REFERENCE_TRIO if t in dc.attack]
+    trio = [t for t in reference if t in dc.attack]
     needed = [t for t in needed if t not in dc.attack]
     if not needed:
         return {"trio_used": trio, "applied_to": []}
+    if not trio and not allow_frozen:
+        return {"trio_used": [], "applied_to": [],
+                "skipped": list(needed),
+                "reason": "viiteryhmä ei fitissä eikä frozen sallittu"}
 
     if trio:
         # Ensisijainen: mittaa trio nykyisestä fitistä (itsestään päivittyvä).
@@ -230,11 +287,27 @@ def taydenna_nousijat(
     if not per_liiga:
         return {"applied_to": []}
 
-    needed: list[str] = []
+    # 1.8: injektio per liiga, koska viiteryhmä on liigakohtainen — PL:n
+    # baseline ei saa vuotaa esim. Bundesliigan nousijoille (eri skaala).
+    # Yhden liigan pyynnöillä (kaikki nykyklientit) käytös = ennen, mutta
+    # applied_to/trio_used aggregoituvat jos pyydetään useita liigoja.
+    yhdiste: dict = {"applied_to": []}
     for liiga in liigat:
-        for t in per_liiga.get(liiga, ()):
-            if t not in dc.attack and t not in needed:
-                needed.append(t)
-    if not needed:
-        return {"applied_to": []}
-    return add_promoted_baseline(dc, needed)
+        needed = [t for t in per_liiga.get(liiga, ()) if t not in dc.attack]
+        if not needed:
+            continue
+        info = add_promoted_baseline(
+            dc, needed,
+            reference=REFERENCE_BY_LEAGUE.get(liiga, ()),
+            allow_frozen=(liiga == "ENG-Premier League"),
+        )
+        if info.get("applied_to"):
+            yhdiste["applied_to"] = yhdiste["applied_to"] + info["applied_to"]
+            # Yksiliigapyynnössä (normaalitapaus) muut kentät suoraan lokiin.
+            for k in ("trio_used", "attack", "defence", "home_gamma",
+                      "source", "provenance"):
+                if k in info:
+                    yhdiste[k] = info[k]
+        if info.get("skipped"):
+            yhdiste.setdefault("skipped", []).extend(info["skipped"])
+    return yhdiste

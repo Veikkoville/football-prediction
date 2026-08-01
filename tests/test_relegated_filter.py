@@ -30,7 +30,9 @@ def test_vanha_ikkuna_ei_suodata_mitaan():
 
 
 def test_tuntematon_liiga_ei_suodata():
-    assert pudonneet_aktiiviselta_kaudelta(("ESP-La Liga-FD",), ("2526", "2627")) == frozenset()
+    # 1.8 laajennuksen jälkeen FD-top-5 ON listoissa → aidosti tuntematon
+    # liiga testaa yhä ettei suodatus laukea väärin.
+    assert pudonneet_aktiiviselta_kaudelta(("NED-Eredivisie-FD",), ("2526", "2627")) == frozenset()
 
 
 def test_tyhja_kausilista_ei_suodata():
@@ -66,7 +68,11 @@ def test_2627_ikkuna_listaa_nousijat():
 def test_nousijahelper_vanha_ikkuna_tyhja():
     assert nousijat_aktiiviselta_kaudelta((PL,), ("2425", "2526")) == frozenset()
     assert nousijat_aktiiviselta_kaudelta((PL,), ()) == frozenset()
-    assert nousijat_aktiiviselta_kaudelta(("ESP-La Liga-FD",), ("2526", "2627")) == frozenset()
+    # 1.8: ESP on nyt nousijalistoissa → tuntemattoman liigan kontrolli.
+    assert nousijat_aktiiviselta_kaudelta(("NED-Eredivisie-FD",), ("2526", "2627")) == frozenset()
+    assert nousijat_aktiiviselta_kaudelta(("ESP-La Liga-FD",), ("2526", "2627")) == {
+        "Málaga CF", "RC Deportivo La Coruña", "Real Racing Club de Santander",
+    }
 
 
 # ---------------------------------------------------------------------------
