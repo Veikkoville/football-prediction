@@ -752,7 +752,7 @@
 										<p class="muted">No gameweek data for this player yet.</p>
 									{:else}
 										<div class="gw-strip" role="list">
-											{#each g.per_gw as r (r[0])}
+											{#each g.per_gw as r, i (i)}
 												<span
 													role="listitem"
 													class="gw-chip"

@@ -461,8 +461,11 @@
 								<th class="num"><abbr title="Defensive contribution total">DC</abbr></th>
 							</tr>
 						</thead>
+						<!-- Each-avain indeksillä, EI kierroksella: tupla-GW:ssä (esim. Senesin
+						     DGW33 25/26) round toistuu ja each_key_duplicate kaatoi DefCon-osion
+						     pysyvään "Loading..."-tilaan (löydetty 1.8). -->
 						<tbody>
-							{#each defcon.games as g (g.round)}
+							{#each defcon.games as g, i (i)}
 								<tr class:dc-hit={g.hit}>
 									<td>GW{g.round}</td>
 									<td>{g.opp} ({g.venue})</td>
