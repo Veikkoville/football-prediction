@@ -272,6 +272,22 @@
 	// Hinta aukeaa halvin ensin (budjettikulma), muut suurin ensin.
 	let dcSortKey = $state<'hit' | 'dc' | 'price' | 'pts' | 'games' | 'name' | 'pos' | 'xp6'>('hit');
 	let dcSortDesc = $state(true);
+	// #226-DC (1.8): kausibasiksella hit rate lasketaan STARTEISTA, sama
+	// nimittäjä kuin Premier Leaguen omissa luvuissa. Otoskoko-sarake näyttää
+	// silloin startit, ei pelattuja otteluita, jotta luku ja sen nimittäjä
+	// ovat samalla rivillä (aiemmin: 47 % ja "26 games" = eri joukot).
+	const dcSeason = $derived(defcon?.meta?.window === 'season');
+	const hitRateHelp = $derived(
+		dcSeason
+			? 'Share of the player’s starts where he reached the DefCon threshold, the same basis the official FPL figures use'
+			: 'Share of played games in the window where the player reached the DefCon threshold'
+	);
+	const dcSampleLabel = $derived(dcSeason ? 'Starts' : 'Games');
+	const dcSampleHelp = $derived(
+		dcSeason
+			? 'Starts in the basis season (the denominator of the hit rate)'
+			: 'Games played in the window (real sample size)'
+	);
 	const DC_SORT_FIELDS = {
 		hit: 'hit_rate_pct',
 		dc: 'dc_per_game',
@@ -279,6 +295,10 @@
 		pts: 'defcon_points_window',
 		games: 'games'
 	} as const;
+	// Otoskoko-solu: kausibasiksella startit (hit raten nimittäjä), muuten
+	// pelatut. Defensiivinen fallback jos payload on vanhaa (ei starts-kenttää).
+	const dcSample = (p: { games: number; starts?: number }) =>
+		dcSeason && typeof p.starts === 'number' ? p.starts : p.games;
 	const dcSorted = $derived.by(() => {
 		if (!premium) return dcAll;
 		const dir = dcSortDesc ? 1 : -1;
@@ -369,7 +389,7 @@
 			const sub = [basisPart, ...bandPart(dcBand)].join(', ');
 			const method = await shareCard({
 				title: 'DEFCON LEADERS TOP 10',
-				subtitle: `${sub}, DefCon hit rate, GoalIQ`,
+				subtitle: `${sub}, DefCon hit rate per ${dcBasis === 'season' ? 'start' : 'game'}, GoalIQ`,
 				midLabel: 'PRICE',
 				valueLabel: 'HIT',
 				fileName: 'goaliq_defcon_leaders.png',
@@ -595,7 +615,9 @@
 	<p class="muted">
 		{#if dcBasis === 'season'}
 			The most reliable defensive-contribution scorers across the full {defcon?.meta
-				?.basis_season ?? 'previous'} season, every player.
+				?.basis_season ?? 'previous'} season, every player. Hit rate is the share of a player's
+			starts that reached the threshold, the same basis the official FPL figures use, and the
+			table needs at least {defcon?.meta?.pool_min_starts ?? 19} starts to rank.
 		{:else}
 			The most reliable defensive-contribution scorers over each player's last {defcon?.meta
 				?.window ?? dcWindow} games.
@@ -680,12 +702,8 @@
 						</th>
 						<th class="num">
 							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('hit')}
-									><abbr title="Share of played games where the player reached the DefCon threshold"
-										>Hit rate</abbr
-									></button
-								>{:else}<abbr
-									title="Share of played games where the player reached the DefCon threshold"
-									>Hit rate</abbr
+									><abbr title={hitRateHelp}>Hit rate</abbr></button
+								>{:else}<abbr title={hitRateHelp}>Hit rate</abbr
 								>{/if}
 						</th>
 						<th class="num">
@@ -695,8 +713,8 @@
 						</th>
 						<th class="num">
 							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('games')}
-									><abbr title="Games played in the window (real sample size)">Games</abbr></button
-								>{:else}<abbr title="Games played in the window (real sample size)">Games</abbr
+									><abbr title={dcSampleHelp}>{dcSampleLabel}</abbr></button
+								>{:else}<abbr title={dcSampleHelp}>{dcSampleLabel}</abbr
 								>{/if}
 						</th>
 						{#if hasXpCol}
@@ -732,9 +750,15 @@
 							<td>{p.pos}</td>
 							<td class="num">{p.price.toFixed(1)}</td>
 							<td class="num">{p.dc_per_game.toFixed(1)}</td>
-							<td class="num strong">{Math.round(p.hit_rate_pct)}%</td>
+							<td class="num strong"
+								>{Math.round(p.hit_rate_pct)}%{#if p.pos_changed}<abbr
+										class="reclass"
+										title="Played as a {p.basis_pos} in {defcon?.meta?.basis_season ??
+											'the basis season'} and is a {p.pos} now, so a different threshold applies. At the {p.basis_pos} threshold the same starts give {p.hit_rate_basis_pos_pct}%.">*</abbr
+									>{/if}</td
+							>
 							<td class="num">{p.defcon_points_window}</td>
-							<td class="num">{p.games}</td>
+							<td class="num">{dcSample(p)}</td>
 							{#if hasXpCol}
 								{@const xv = xpById?.get(p.id)}
 								<td class="num">{typeof xv === 'number' ? xv.toFixed(1) : ''}</td>
@@ -764,9 +788,11 @@
 											{/each}
 										</div>
 										<p class="muted gw-note">
-											{g.games} played games in {g.basis ?? '2025/26'}: {g.hits} above the
-											threshold of {g.threshold} ({Math.round(g.hit_rate * 100)}%), worth
-											{g.dc_points} DefCon points. {gwData.meta.basis_label}
+											{g.starts ?? g.games} starts in {g.basis ?? '2025/26'}: {g.start_hits ??
+												g.hits} above the threshold of {g.threshold} ({Math.round(
+												g.hit_rate * 100
+											)}%), worth {g.dc_points} DefCon points across all {g.games} appearances.
+											{gwData.meta.basis_label}
 										</p>
 									{/if}
 								</td>
@@ -866,6 +892,13 @@
 	.gw-note {
 		font-size: var(--step--1);
 		margin: 0 0 var(--s-2);
+	}
+	/* #226-DC: tahti = positio vaihtui kausien valilla -> kynnys eri kuin
+	   basis-kaudella. Selitys on abbr:n titlessa, ei piilotettuna. */
+	.reclass {
+		text-decoration: none;
+		cursor: help;
+		opacity: 0.75;
 	}
 	/* 26.7: aktiivinen suodatin auki tekstina, ei hiljaista rajausta */
 	.count {

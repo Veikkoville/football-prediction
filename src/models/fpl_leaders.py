@@ -168,7 +168,7 @@ def rank_defcon_leaders(data: dict, window: int = WINDOW_DEFAULT,
 
 
 def rank_defcon_season(data: dict, pos: str | None = None,
-                       top_n: int = 20) -> dict:
+                       top_n: int = 20, min_starts: int | None = None) -> dict:
     """Koko kausi -basis (#7, Villen idea 30.7): DefCon-leaderboard koko
     basis-kauden yli. Lähde on per-GW-matriisi (load_defcon_gw) jonka
     builderi on jo laskenut kausisummiksi (games/hits/hit_rate/dc_points) —
@@ -177,7 +177,19 @@ def rank_defcon_season(data: dict, pos: str | None = None,
     mielivaltainen häntä ja tämä korvaa sen oletuksena.
 
     Sama rivimuoto ja sama järjestysavain kuin rank_defcon_leadersissa,
-    jotta klientit voivat vaihtaa basista ilman eri renderöintiä."""
+    jotta klientit voivat vaihtaa basista ilman eri renderöintiä.
+
+    NIMITTÄJÄ = STARTIT (#226-DC, 1.8.2026). Premier Leaguen oma julkaisu
+    laskee DC success raten starteista; me laskimme pelatuista otteluista,
+    jolloin cameo-esiintymiset laimensivat luvun ja julkinen numeromme erosi
+    virallisesta (Wieffer 42 vs 48, Ballard 52 vs 58). Startti-pooliehto
+    (>= puolet kauden kierroksista) on samasta syystä: ilman sitä kolmen
+    ottelun otos nousee kärkeen ja lista lakkaa olemasta luotettavuusmittari.
+    Vanha data ilman `starts`-kenttää → fallback pelattuihin (rivi kantaa
+    `hit_rate_basis`-kentän, joka kertoo kummasta on kyse)."""
+    m = data.get("meta", {})
+    if min_starts is None:
+        min_starts = int(m.get("pool_min_starts") or 0)
     rows = []
     for p in data.get("players", []):
         if p["pos"] == "GKP":
@@ -187,19 +199,38 @@ def rank_defcon_season(data: dict, pos: str | None = None,
         games = int(p.get("games") or 0)
         if games == 0:
             continue
-        hits = int(p.get("hits") or 0)
+        starts = int(p.get("starts") or 0)
+        has_starts = "starts" in p and starts > 0
+        if has_starts and starts < min_starts:
+            continue
+        # Nimittäjä ja osumat samasta joukosta — ei koskaan sekoiteta
+        # starttiprosenttia ja pelattujen otteluiden osumia samaan lukuun.
+        denom = starts if has_starts else games
+        hits = int((p.get("start_hits") if has_starts else p.get("hits")) or 0)
         actions = sum(int(g[4]) for g in (p.get("per_gw") or []))
         row = _base_row(p, games)
         row.update({
             "threshold": p.get("threshold") or DEFCON_THRESHOLD.get(p["pos"]),
             "dc_per_game": round(actions / games, 1),
-            "hit_rate_pct": round(100.0 * hits / games, 0),
-            "defcon_points_window": int(p.get("dc_points") or hits * DEFCON_POINTS),
+            "hit_rate_pct": round(100.0 * hits / denom, 0),
+            "hit_rate_basis": "starts" if has_starts else "games",
+            "starts": starts,
+            "defcon_points_window": int(p.get("dc_points")
+                                        or int(p.get("hits") or 0) * DEFCON_POINTS),
             "hits": hits,
         })
+        # Positiomuutos näkyviin: kynnys tulee kuluvasta positiosta, joten
+        # luku eroaa virallisesta juuri näillä pelaajilla. Rivi kertoo miksi.
+        if p.get("pos_changed"):
+            row.update({
+                "pos_changed": True,
+                "basis_pos": p.get("basis_pos"),
+                "hit_rate_basis_pos_pct": (
+                    round(100.0 * float(p["hit_rate_basis_pos"]), 0)
+                    if p.get("hit_rate_basis_pos") is not None else None),
+            })
         rows.append(row)
     rows.sort(key=lambda r: (r["hit_rate_pct"], r["dc_per_game"]), reverse=True)
-    m = data.get("meta", {})
     return {
         "meta": {
             # window: koko kausi — klientti tunnistaa basiksen tästä, ei
@@ -216,6 +247,13 @@ def rank_defcon_season(data: dict, pos: str | None = None,
                           "or a midfielder/forward reaches 12 CBIRT "
                           "(CBIT + recoveries) in a match. Capped at 2 "
                           "pts per match."),
+            # #226-DC: nimittäjä kerrotaan payloadissa, jotta UI voi sanoa sen
+            # ääneen eikä lukua voi lukea väärästä joukosta laskettuna.
+            "hit_rate_denominator": m.get("hit_rate_denominator", "starts"),
+            "pool_min_starts": min_starts,
+            "hit_rate_note": ("Hit rate is the share of a player's starts "
+                              "that reached the threshold, the same basis "
+                              "the official FPL figures use."),
             "note": ("GoalIQ analytics from official FPL match data. "
                      "Not betting advice."),
         },

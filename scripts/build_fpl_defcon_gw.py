@@ -18,8 +18,24 @@ REHELLISYYS ENSILUOKKAISENA:
   - Vain pelatut ottelut (minutes > 0); pelaaja ilman yhtään riviä ei ole
     mukana (frontend: No data yet) — ei arvauksia.
 
-Rivit kompaktoitu listoiksi [gw, opp, venue, min, dc] — 700+ pelaajaa × ~38
-riviä objekteina olisi turhaan ~3x isompi payload.
+HIT RATE -NIMITTÄJÄ = AVAUSKOKOONPANOT (korjaus 1.8.2026, #226-DC):
+  Premier Leaguen oma Scout-artikkeli (1.8.2026, "Who's best at earning
+  defensive contribution points in Fantasy") julkaisee saman mittarin ja
+  laskee sen STARTEISTA, ei pelatuista otteluista ("hit the threshold in 25
+  of his 44 starts"). Me laskimme pelatuista → vaihtoon tulleet cameo-ottelut
+  laimensivat prosenttia ja meidän julkinen luku erosi virallisesta:
+  Wieffer 42,3 % (me) vs 47,8 % (FPL), Ballard 51,7 vs 58,3, Anderson 68,4
+  vs 70,3. Starteilla laskettuna 23/28 artikkelin PL-pelaajasta täsmää
+  desimaalilleen; loput 5 eroavat tasan yhden osuman verran (rajatapaus-
+  otteluiden tilastokorjaukset arkistosnapshotin jälkeen — ei metodiero,
+  verifioitu: dc-kenttä ja oma CBIT/CBIRT-laskenta täsmäävät 100 %).
+  → `hit_rate` on nyt startti-pohjainen. `hit_rate_games` säilyttää vanhan
+  luvun läpinäkyvyyden vuoksi, `dc_points` pysyy KAIKISTA otteluista
+  (DefCon-pisteet saa myös vaihtopelaajana — vain nimittäjä muuttui).
+
+Rivit kompaktoitu listoiksi [gw, opp, venue, min, dc, start] — 700+ pelaajaa
+× ~38 riviä objekteina olisi turhaan ~3x isompi payload. `start` (0/1) on
+kuudentena, jotta vanhat indeksit 0-4 pysyvät voimassa.
 
 Fail-safe: sanity gate FAIL → exit 2 → EI committia (sama konventio).
 """
@@ -48,8 +64,19 @@ SANITY_MAX_DC = 40        # kukaan ei tee >40 puolustustoimintoa ottelussa
 SANITY_MAX_ROWS = 38
 
 
+def _basis_pos_by_code() -> dict[int, str]:
+    """25/26-arkisto: element-code → positio JOSSA rivit on pelattu.
+
+    Kynnys riippuu positiosta, ja 10 pelaajaa vaihtoi sen kausien välillä
+    (#226-DC) → tämä tekee erosta näkyvän sen sijaan että se katoaisi lukuun.
+    """
+    boot = json.loads(ARCHIVE_BOOT.read_text(encoding="utf-8"))
+    return {e.get("code"): POS_NAME.get(e["element_type"])
+            for e in boot["elements"] if e.get("code")}
+
+
 def _rows_by_code() -> dict[int, list[list]]:
-    """25/26-arkisto: element-code → kompaktit per-GW-rivit [gw,opp,venue,min,dc]."""
+    """25/26-arkisto: code → kompaktit rivit [gw,opp,venue,min,dc,start]."""
     boot = json.loads(ARCHIVE_BOOT.read_text(encoding="utf-8"))
     if not boot["events"][0]["deadline_time"].startswith("2025-"):
         raise SystemExit("VIRHE: arkistobootstrap ei ole 25/26-kautta.")
@@ -79,6 +106,7 @@ def _rows_by_code() -> dict[int, list[list]]:
                 "H" if r.get("was_home") else "A",
                 int(r.get("minutes") or 0),
                 int(dc),
+                1 if (r.get("starts") or 0) > 0 else 0,
             ])
         code = id_to_code.get(e["id"])
         if rows and code:
@@ -87,11 +115,21 @@ def _rows_by_code() -> dict[int, list[list]]:
 
 
 def matrix_players(cur_elements: list[dict], cur_teams: dict[int, str],
-                   rows_by_code: dict[int, list[list]]) -> list[dict]:
+                   rows_by_code: dict[int, list[list]],
+                   basis_pos_by_code: dict[int, str] | None = None) -> list[dict]:
     """Puhdas ydin (pytest-testattava): nykykauden attribuutit + arkistorivit.
 
     Hinta/seura/pos/omistus tulevat KULUVAN kauden bootstrapista (26.7-oppi:
     historialliset statsit peritään, attribuutit eivät). GKP ei DefConia.
+
+    POSITIOMUUTOS (#226-DC, 1.8.2026): 10 pelaajaa vaihtoi positiota 25/26 →
+    26/27, ja positio määrää DefCon-kynnyksen (DEF 10 / MID+FWD 12). Kynnys
+    otetaan KULUVASTA positiosta, koska luku ennustaa 26/27-tuottoa — mutta
+    silloin luku ei enää vastaa FPL:n julkaisemaa (esim. Wieffer pelasi
+    keskikenttäpelaajana 25/26: virallinen 47,8 % kynnyksellä 12, meillä
+    56 % kynnyksellä 10). Siksi rivi kantaa `basis_pos` + `pos_changed` +
+    `hit_rate_basis_pos`, jotta pinta voi kertoa eron eikä lukua voi lukea
+    virallisen kanssa ristiriitaisena ilman selitystä.
     """
     players = []
     for e in cur_elements:
@@ -103,6 +141,15 @@ def matrix_players(cur_elements: list[dict], cur_teams: dict[int, str],
             continue
         thr = DEFCON_THRESHOLD[pos]
         hits = sum(1 for r in rows if r[4] >= thr)
+        # Startti-nimittäjä = FPL:n virallinen tapa (ks. moduulin docstring).
+        # Vanhemmat rivit voivat olla ilman start-lippua → .get-tyylinen
+        # pituustarkistus pitää builderin ajettavana myös vanhalla arkistolla.
+        starts_rows = [r for r in rows if len(r) > 5 and r[5]]
+        start_hits = sum(1 for r in starts_rows if r[4] >= thr)
+        n_starts = len(starts_rows)
+        basis_pos = (basis_pos_by_code or {}).get(e.get("code")) or pos
+        basis_thr = DEFCON_THRESHOLD.get(basis_pos, thr)
+        pos_changed = basis_pos != pos
         players.append({
             "id": e["id"],
             "code": e.get("code"),
@@ -112,9 +159,22 @@ def matrix_players(cur_elements: list[dict], cur_teams: dict[int, str],
             "price": (e.get("now_cost") or 0) / 10.0,
             "owned_pct": float(e.get("selected_by_percent") or 0.0),
             "threshold": thr,
-            "games": len(rows),
-            "hits": hits,
-            "hit_rate": round(hits / len(rows), 3),
+            "games": len(rows),          # pelatut ottelut (minutes > 0)
+            "starts": n_starts,          # avauskokoonpanot = hit_raten nimittäjä
+            "hits": hits,                # osumat kaikissa pelatuissa
+            "start_hits": start_hits,    # osumat avauksissa
+            # Julkinen hit rate: startit (FPL:n virallinen nimittäjä).
+            "hit_rate": round(start_hits / n_starts, 3) if n_starts else 0.0,
+            # Vanha luku säilytetty läpinäkyvyyden vuoksi, ei julkiseen copyyn.
+            "hit_rate_games": round(hits / len(rows), 3),
+            # Positio jossa rivit on pelattu + sama luku sen kynnyksellä
+            # (= FPL:n julkaisema luku). Vain kun positio on vaihtunut.
+            "basis_pos": basis_pos,
+            "pos_changed": pos_changed,
+            **({"hit_rate_basis_pos": round(
+                sum(1 for r in starts_rows if r[4] >= basis_thr) / n_starts, 3)}
+               if pos_changed and n_starts else {}),
+            # DefCon-pisteet kertyvät myös vaihdosta → kaikki pelatut ottelut.
             "dc_points": hits * 2,
             "basis": BASIS_SEASON,
             "per_gw": rows,
@@ -127,15 +187,26 @@ def matrix_players(cur_elements: list[dict], cur_teams: dict[int, str],
 def build() -> dict:
     boot = fetch_bootstrap()
     cur_teams = {t["id"]: t["short_name"] for t in boot["teams"]}
-    players = matrix_players(boot["elements"], cur_teams, _rows_by_code())
+    players = matrix_players(boot["elements"], cur_teams, _rows_by_code(),
+                             _basis_pos_by_code())
+    rounds = max((r[0] for p in players for r in p["per_gw"]), default=0)
     return {
         "meta": {
             "available": True,
             "generated_at": _dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
             "basis_season": BASIS_SEASON,
             "basis_label": f"Based on {BASIS_SEASON} · updates as the new season plays",
-            "row_format": ["gw", "opp", "venue", "minutes", "dc"],
+            "row_format": ["gw", "opp", "venue", "minutes", "dc", "start"],
             "thresholds": dict(DEFCON_THRESHOLD),
+            # #226-DC: nimittäjä + poolisääntö näkyviin, jotta klientti voi
+            # sanoa käyttäjälle mistä luku on laskettu (ja jotta ero
+            # viralliseen on jäljitettävissä ilman koodin lukemista).
+            "hit_rate_denominator": "starts",
+            "season_rounds": rounds,
+            "pool_min_starts": rounds // 2,
+            "pool_rule": (f"Hit rate is the share of a player's starts that "
+                          f"reached the threshold. Leaderboards require at "
+                          f"least {rounds // 2} starts in {BASIS_SEASON}."),
             # 28.7 mittaus (STATE: CC yö 5): within-player-korrelaatio ja
             # helpoin-vs-vaikein-vastustaja-ero. UI näyttää tämän suoraan.
             "opponent_effect": {
@@ -165,6 +236,17 @@ def sanity(data: dict) -> list[str]:
         fails.append(f"max dc {mx} > {SANITY_MAX_DC}")
     if not any(p["hits"] > 0 for p in ps):
         fails.append("kenellakaan ei yhtaan DefCon-hittia (data rikki?)")
+    # #226-DC: startti-nimittajan portit. Startteja ei voi olla enempaa kuin
+    # pelattuja otteluita eika osumia enempaa kuin startteja; jos start-lippu
+    # katoaisi lahteesta, koko lista putoaisi nollaan starttiin -> hit rate 0.
+    bad = next((p for p in ps if p["starts"] > p["games"]
+                or p["start_hits"] > p["starts"]), None)
+    if bad:
+        fails.append(f"{bad['web_name']}: startit/osumat epakoherentit "
+                     f"(games={bad['games']} starts={bad['starts']} "
+                     f"start_hits={bad['start_hits']})")
+    if not any(p["starts"] > 0 for p in ps):
+        fails.append("kenellakaan ei yhtaan starttia (starts-kentta rikki?)")
     return fails
 
 

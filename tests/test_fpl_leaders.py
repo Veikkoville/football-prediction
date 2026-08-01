@@ -134,3 +134,63 @@ def test_defcon_season_negative_control_top_n_and_pos():
     only_def = rank_defcon_season(data, pos="DEF")
     assert all(p["pos"] == "DEF" for p in only_def["players"])
     assert len(only_def["players"]) > 0
+
+
+# ---------------------------------------------------------------------------
+# #226-DC: season-basis rankkaa STARTEISTA + poolisaanto (>= puolet kierroksista)
+# ---------------------------------------------------------------------------
+def _gw_player_st(pid, pos, starts, start_hits, subs=0, name=None):
+    """Pelaaja jolla on erikseen startit ja vaihdosta tulot."""
+    p = _gw_player(pid, pos, starts + subs, start_hits, name=name)
+    p.update({"starts": starts, "start_hits": start_hits,
+              "hit_rate": round(start_hits / starts, 3) if starts else 0.0,
+              "hit_rate_games": round(start_hits / (starts + subs), 3)})
+    return p
+
+
+def test_defcon_season_uses_starts_denominator():
+    from src.models.fpl_leaders import rank_defcon_season
+    # 20 starttia / 10 osumaa = 50 %, plus 10 vaihtoa jotka EIVAT saa laimentaa.
+    data = _gw_data([_gw_player_st(1, "DEF", 20, 10, subs=10)])
+    data["meta"]["pool_min_starts"] = 19
+    out = rank_defcon_season(data)
+    row = out["players"][0]
+    assert row["hit_rate_pct"] == 50 and row["starts"] == 20
+    assert row["hit_rate_basis"] == "starts"
+    assert out["meta"]["hit_rate_denominator"] == "starts"
+    # Negatiivinen kontrolli: pelattujen otteluiden nimittaja antaisi 33 %.
+    assert row["hit_rate_pct"] != round(100.0 * 10 / 30, 0)
+
+
+def test_defcon_season_pool_rule_drops_thin_samples():
+    from src.models.fpl_leaders import rank_defcon_season
+    data = _gw_data([
+        _gw_player_st(1, "DEF", 3, 3, name="Cameo"),    # 100 % kolmesta
+        _gw_player_st(2, "DEF", 30, 15, name="Regular"),
+    ])
+    data["meta"]["pool_min_starts"] = 19
+    names = [p["web_name"] for p in rank_defcon_season(data)["players"]]
+    assert names == ["Regular"]
+    # Ilman poolisaantoa ohut otos nousisi karkeen -> sailyy saadettavana.
+    loose = [p["web_name"] for p in rank_defcon_season(data, min_starts=0)["players"]]
+    assert loose[0] == "Cameo"
+
+
+def test_defcon_season_falls_back_when_starts_missing():
+    """Vanha data levylla (ei starts-kenttaa) ei saa kaataa endpointtia eika
+    valehdella basiksesta — rivi kertoo kummasta luku on laskettu."""
+    from src.models.fpl_leaders import rank_defcon_season
+    data = _gw_data([_gw_player(1, "DEF", 38, 19)])
+    row = rank_defcon_season(data)["players"][0]
+    assert row["hit_rate_pct"] == 50 and row["hit_rate_basis"] == "games"
+
+
+def test_defcon_season_pos_change_carries_official_number():
+    from src.models.fpl_leaders import rank_defcon_season
+    p = _gw_player_st(1, "DEF", 20, 12)
+    p.update({"pos_changed": True, "basis_pos": "MID", "hit_rate_basis_pos": 0.25})
+    data = _gw_data([p])
+    data["meta"]["pool_min_starts"] = 19
+    row = rank_defcon_season(data)["players"][0]
+    assert row["hit_rate_pct"] == 60 and row["pos_changed"] is True
+    assert row["basis_pos"] == "MID" and row["hit_rate_basis_pos_pct"] == 25
