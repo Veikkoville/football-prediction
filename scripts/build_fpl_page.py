@@ -328,9 +328,15 @@ def track_record_sentences(c: dict) -> list[str]:
             f"Across the {c['acc_n']} completed matches, the model called the "
             f"result correctly in {fmt_pct(c['acc_pct_1x2'])} of matches."
         ),
+        # 1.8.2026 rehellisyyskorjaus: luku on laskettu TOTEUTUNEEN tuloksen
+        # mukaan (accuracy.py: actual_outcome != "draw"), ei sen mukaan mitä
+        # malli ennusti. Malli nimeää todennäköisemmän voittajan joka ottelussa,
+        # joten "kun malli nimesi voittajan" antoi ymmärtää valikoinnin jota ei
+        # ole. Sama sanamuoto kuin WC-sivulla, joka kuvasi tämän alusta oikein.
         (
-            f"When the model named a clear winner rather than a draw, it was right "
-            f"{fmt_pct(c['acc_pct_dec'])} of the time ({c['acc_dec_c']} of {c['acc_dec_n']})."
+            f"In the {c['acc_dec_n']} matches that did not end in a draw, the model "
+            f"called the result right {fmt_pct(c['acc_pct_dec'])} of the time "
+            f"({c['acc_dec_c']} of {c['acc_dec_n']})."
         ),
     ]
 
@@ -1148,7 +1154,8 @@ def render_page(c: dict) -> str:
         f'<div class="stat"><b>{fmt_pct(c["acc_pct_1x2"])}</b>'
         f'<span>correct results across {c["acc_n"]} completed predictions, all competitions</span></div>'
         f'<div class="stat"><b>{fmt_pct(c["acc_pct_dec"])}</b>'
-        f'<span>hit rate when the model called a winner ({c["acc_dec_c"]} of {c["acc_dec_n"]})</span></div>'
+        f'<span>correct in matches that did not end in a draw '
+        f'({c["acc_dec_c"]} of {c["acc_dec_n"]})</span></div>'
         f'<div class="stat"><b>{c["acc_logged"]}</b>'
         f'<span>predictions logged before kickoff, hits and misses</span></div>'
         "</div>"

@@ -9,9 +9,19 @@
 	 */
 	import { fetchLeagues, fetchStandings, type StandingsRow } from '$lib/api';
 
+	// 1.8.2026: kausi resolvoidaan kalenterista (elo-touko), ei kovakoodata.
+	// Valikosta puuttui 2026/27 kokonaan ja oletus oli jumissa 25/26:ssa, joten
+	// web ei pystynyt näyttämään kuluvaa kautta lainkaan. Sama sääntö kuin
+	// mobiilin lib/season.ts:ssä: kuukaudet 8-12 -> alkava kausi.
+	function currentSeasonCode(now = new Date()): string {
+		const y = now.getUTCFullYear() % 100;
+		const start = now.getUTCMonth() + 1 >= 8 ? y : y - 1;
+		return `${String(start).padStart(2, '0')}${String(start + 1).padStart(2, '0')}`;
+	}
+
 	let leagues = $state<string[]>([]);
 	let league = $state('ENG-Premier League');
-	let season = $state('2526');
+	let season = $state(currentSeasonCode());
 	let rows = $state<StandingsRow[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
@@ -66,6 +76,7 @@
 	<div class="field">
 		<label for="st-season">Season</label>
 		<select id="st-season" bind:value={season}>
+			<option value="2627">2026/27</option>
 			<option value="2526">2025/26</option>
 			<option value="2425">2024/25</option>
 			<option value="2324">2023/24</option>

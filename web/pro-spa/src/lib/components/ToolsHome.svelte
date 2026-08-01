@@ -118,7 +118,7 @@
 		{
 			key: 'league',
 			title: 'Beat the Model league',
-			desc: 'Join the public mini-league and track the standings with head-to-head win odds.',
+			desc: 'Join the public mini-league and track the standings with head-to-head win probabilities.',
 			premium: false
 		}
 	];
