@@ -15,6 +15,7 @@ import { authHeaders } from './api';
 export type FantasyTool =
 	| 'rate_team'
 	| 'rate_team_draft'
+	| 'model_squad'
 	| 'price_watch'
 	| 'plan'
 	| 'captain'
@@ -338,6 +339,24 @@ export function fetchRateTeam(entry: number): Promise<RateTeamResponse> {
  * (backendin players=-moodi; kapteenin valitsee malli, paras GW-xP). */
 export function fetchRateTeamManual(playerIds: number[]): Promise<RateTeamResponse> {
 	return getTool(`/api/fantasy/rate-team?players=${playerIds.join(',')}`, 'rate_team_draft');
+}
+
+/** 1.8: mallin vapaa optimirunko (sama free_optimum kuin rate-benchmark ja
+ * fit checker -> luvut eivät voi eriytyä). Joukkue 2 -vertailuslotin
+ * "beat the model" -esitäyttöön. */
+export interface ModelSquadResponse {
+	meta: {
+		generated_at?: string;
+		horizon_gw?: number;
+		next_gameweek?: number;
+		xi_xp_horizon: number;
+		optimal_proven: boolean;
+	};
+	players: { id: number; web_name: string; team_short: string; pos: string }[];
+}
+
+export function fetchModelSquad(): Promise<ModelSquadResponse> {
+	return getTool('/api/fantasy/model-squad', 'model_squad');
 }
 
 export function fetchPriceWatch(): Promise<PriceWatchResponse> {

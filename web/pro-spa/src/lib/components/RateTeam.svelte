@@ -2,6 +2,7 @@
 	import {
 		fetchRateTeam,
 		fetchRateTeamManual,
+		fetchModelSquad,
 		type RatedPlayer,
 		type RateTeamResponse,
 		type TransferSuggestion
@@ -595,6 +596,38 @@
 		}
 		loadingB = false;
 	}
+	/** 1.8: "beat the model" konkreettiseksi — täyttää Joukkue 2:n mallin
+	 *  vapaalla optimirungolla (sama free_optimum kuin benchmark) ja arvioi
+	 *  sen heti. Pickit jäävät muokattaviksi. Pooli haetaan tarvittaessa
+	 *  suoraan (ei odoteta draft-effectiä — käyttäjä voi painaa nappia ennen
+	 *  kuin valitsin on auennut kertaakaan). */
+	async function loadModelSquadB() {
+		if (loadingB) return;
+		loadingB = true;
+		errorB = null;
+		capture('fpl_model_squad_loaded', { slot: 'b' });
+		try {
+			const ms = await fetchModelSquad();
+			if (pool.length === 0) {
+				const d = await fetchXp();
+				pool = d.players ?? [];
+			}
+			const byId = new Map(pool.map((p) => [p.id, p]));
+			const resolved = ms.players
+				.map((p) => byId.get(p.id))
+				.filter((p): p is XpPlayer => p != null);
+			if (resolved.length !== 15) {
+				throw new Error('The model squad is not available right now. Please try again shortly.');
+			}
+			picksB = resolved;
+			draftOpenB = true;
+			dataB = await fetchRateTeamManual(resolved.map((p) => p.id));
+		} catch (err) {
+			dataB = null;
+			errorB = err instanceof Error ? err.message : String(err);
+		}
+		loadingB = false;
+	}
 	const compareDiff = $derived(
 		data && dataB ? data.rating.team_xp_horizon - dataB.rating.team_xp_horizon : null
 	);
@@ -1132,6 +1165,18 @@
 			{loadingB ? 'Rating…' : 'Rate my team'}
 		</button>
 	</form>
+	<!-- 1.8: mallin runko yhdellä napilla — beat the model näkyväksi -->
+	<button
+		type="button"
+		class="model-squad-btn"
+		disabled={loadingB}
+		onclick={() => void loadModelSquadB()}
+	>
+		Load the model's squad
+	</button>
+	<p class="muted hint">
+		Fills Team 2 with the model's own 15 and rates it. Edit the picks and try to beat it.
+	</p>
 	{#if picksNotPublishedB}
 		<p class="notice-preseason">
 			<strong>Squads are not public before the Gameweek 1 deadline.</strong> Build the comparison
@@ -1314,6 +1359,21 @@
 	.compare-verdict {
 		margin: 2px 0 0;
 		font-size: var(--step--1);
+	}
+	.model-squad-btn {
+		background: var(--surface);
+		border: 1px solid var(--giq-magenta);
+		border-radius: var(--radius);
+		color: var(--giq-magenta-deep);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 8px 16px;
+		margin: 0 0 var(--s-1);
+		cursor: pointer;
+	}
+	.model-squad-btn:disabled {
+		opacity: 0.5;
+		cursor: default;
 	}
 	/* Web P1: week-tyhjätilan kortti */
 	.week-setup {

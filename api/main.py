@@ -2977,6 +2977,40 @@ def fantasy_fit(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@app.get("/api/fantasy/model-squad")
+def fantasy_model_squad(response: Response):
+    """1.8: Joukkue 2 -vertailuslotin "mallin runko" -esitäyttö (mobiili+web).
+    Palauttaa SAMAN vapaan optimirungon jota rate-teamin benchmark, fit checker
+    ja /fpl/model-xi käyttävät (free_optimum → yksi optimoija, luvut eivät voi
+    eriytyä; ks. fpl_fit-docstring 29.7). Lukee committatun projektion, ei
+    laskentaa mallipolulla. Ei entry-ID:tä, ei kirjautumista."""
+    from src.models.fpl_rate_team import (
+        POS_NAME, RateTeamError, build_context, free_optimum)
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        xp_data, _bootstrap, pool, _pool_by_id = build_context()
+        free = free_optimum(pool, str(xp_data["meta"].get("generated_at")))
+        if not free["xi"] or len(free["bench"]) != 4:
+            raise HTTPException(status_code=503,
+                                detail="Model squad unavailable.")
+        def _out(p: dict) -> dict:
+            return {"id": p["id"], "web_name": p["web_name"],
+                    "team_short": p["team_short"],
+                    "pos": POS_NAME[p["element_type"]]}
+        return {
+            "meta": {
+                "generated_at": xp_data["meta"].get("generated_at"),
+                "horizon_gw": xp_data["meta"].get("horizon_gw"),
+                "next_gameweek": xp_data["meta"].get("next_gameweek"),
+                "xi_xp_horizon": round(free["xi_xp"], 2),
+                "optimal_proven": bool(free["proven"]),
+            },
+            "players": [_out(p) for p in list(free["xi"]) + list(free["bench"])],
+        }
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
 @app.get("/api/fantasy/plan")
 def fantasy_plan(
     request: Request,
