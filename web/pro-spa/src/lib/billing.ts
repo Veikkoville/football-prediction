@@ -11,7 +11,7 @@
  */
 import { API_BASE } from './config';
 import { accessToken } from './auth.svelte';
-import { capture } from './analytics';
+import { capture, captureBeforeUnload } from './analytics';
 
 export const PLANS = {
 	season: { label: 'Season pass: 25 €/year', price: 25.0, hint: 'Best value, under 2.10 €/month' },
@@ -70,6 +70,13 @@ export async function startCheckout(plan: PlanKey, source = 'pro_web'): Promise<
 		}
 		const { url } = await r.json();
 		if (!url) return 'Checkout failed: no redirect URL.';
+		// 1.8.2026: upgrade_tapped lahtee ENNEN tata kutsua, eli se mittaa
+		// aikomusta — myos silloin kun sessio ei synny ja kayttaja ei paady
+		// Stripeen koskaan. Tama lahtee vasta kun Stripe on palauttanut URLin,
+		// eli se on ensimmainen tapahtuma joka oikeasti vastaa kysymykseen
+		// "moniko avasi checkoutin". Lahetetaan ennen redirectia; PostHog
+		// kayttaa sendBeaconia, joten se selviaa sivun vaihdosta.
+		captureBeforeUnload('checkout_opened', { source, plan, price: PLANS[plan].price });
 		window.location.href = url;
 		return null;
 	} catch (e) {

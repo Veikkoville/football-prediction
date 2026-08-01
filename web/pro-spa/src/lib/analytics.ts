@@ -42,6 +42,20 @@ export function capture(
 	posthog.capture(event, props);
 }
 
+/** Tapahtuma joka lahtee juuri ennen sivun vaihtoa (esim. Stripe-redirect).
+ *
+ * 1.8.2026: tavallinen capture kayttaa XHR/fetchia, joka voidaan perua kun
+ * navigaatio alkaa — checkout_opened katoaisi juuri niilta kayttajilta jotka
+ * oikeasti paatyivat maksamaan, eli mittari valehtelisi alaspain juuri siina
+ * kohtaa mika halutaan tietaa. sendBeacon selviaa unloadista. */
+export function captureBeforeUnload(
+	event: string,
+	props?: Record<string, unknown>
+): void {
+	if (!ready) return;
+	posthog.capture(event, props, { transport: 'sendBeacon' });
+}
+
 export function identifyUser(userId: string, email?: string | null): void {
 	if (!ready) return;
 	posthog.identify(userId, email ? { email } : undefined);
