@@ -198,11 +198,22 @@ def _fmt_pct(x: float) -> str:
 
 
 def _fmt_kickoff(iso: str) -> str:
+    """Ottelun aika — ja rehellisyys silloin kun sita ei ole.
+
+    1.8.2026: 403/1926 tulevalla ottelulla (20 %) kickoff on tasan 00:00, mika
+    on fixture-feedin paikkamerkki kaudelle jonka aikatauluja ei ole viela
+    lyoty lukkoon. Sivu tulosti sen muodossa "Sat 19 Sep 2026, 00:00 UTC" eli
+    esitti paikkamerkin faktana. Keskiyon ottelu on teoriassa mahdollinen
+    (BSA pelaa myohaan), mutta "aika vahvistamatta" ei ole koskaan vaara
+    vaite, kun taas vaara kellonaika on.
+    """
     try:
         dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
-        return dt.strftime("%a %d %b %Y, %H:%M UTC")
     except Exception:
         return iso
+    if dt.hour == 0 and dt.minute == 0:
+        return dt.strftime("%a %d %b %Y") + ", kick-off time to be confirmed"
+    return dt.strftime("%a %d %b %Y, %H:%M UTC")
 
 
 SOCIAL_IMAGE = f"{BASE}/assets/brand/goaliq-social-1200x630.png"
@@ -318,8 +329,8 @@ def render_match_page(comp: str, e: dict) -> str:
         f"{home} vs {away} ({cfg['name']}, {e.get('date')}): the GoalIQ model "
         f"gives {fav} a {fav_pct} chance to win. Expected goals "
         f"{e['xg_home']:.2f}-{e['xg_away']:.2f}, most likely score "
-        f"{e.get('most_likely_score') or 'n/a'}. Logged pre-match in our public "
-        f"track record."
+        f"{e.get('most_likely_score') or 'n/a'}. Logged before kick-off in our "
+        f"public track record and graded after the match."
     )
     hero = (
         f"<h1>{escape(home)} vs {escape(away)} prediction</h1>"
