@@ -14,10 +14,10 @@
 
    KONTRASTIT (WCAG 2.1, mitattu — ei arvioitu; pohja --bg #0B0A09):
      --text        #F3F2F2  17.70:1   --accent      #F5C542  12.20:1
-     --text-muted  #A8A29A   7.82:1   --accent-strong #C99A17 7.65:1
+     --text-muted  #A8A29A   7.82:1   --accent-strong #F5C542 7.65:1
      --faint       #8A847A   5.33:1   --positive    #5FD97A  11.01:1
      --negative    #FF8A5C   8.52:1   --giq-teal    #2ED6C2  10.85:1
-     --giq-rust    #C7502A   FDR-5:n tintti (ei tekstivärinä)
+     --giq-rust    #FF8A5C   FDR-5:n tintti (ei tekstivärinä)
      ink --accentin päällä  12.20:1 (täyttönapin teksti)
      --border 0.24 = 1.97:1 (pintaero), --border-strong 0.40 = 3.50:1 (1.4.11)
    Jos muutat hexiä, laske suhde uudelleen — älä arvaa. */
@@ -28,16 +28,16 @@
 	   VAIN siksi, ettei yksikään unohtunut viittaus renderöi läpinäkyvää tai
 	   mustaa; uusia viittauksia ei saa lisätä.
 	   Korvaajat: mark/live -> amber, linkit/korostus -> teal, FDR-5 -> rust. */
-	--giq-rust: #c7502a;
+	--giq-rust: #FF8A5C;
 	--giq-magenta: var(--giq-gold-deep);
 	--giq-magenta-deep: var(--giq-rust);
 	--giq-magenta-light: var(--giq-gold);
 	--giq-coral: #ff8a5c;
 	/* messinki sammuu mustaa vasten (lukuina se katoaa) -> amber */
-	--giq-gold: #ffd873;
+	--giq-gold: #F5C542;
 	--giq-gold-deep: #f5c542;
 	--giq-teal: #2ed6c2;
-	--giq-teal-deep: #12b8a4;
+	--giq-teal-deep: #2ED6C2;
 	/* ruutumusta, lämmin */
 	--giq-ink: #0b0a09;
 	--giq-ink-2: #141311;
@@ -64,7 +64,10 @@
 	--faint: #8a847a;
 	/* primary action = amber; korostus/linkki = teal. Muita ei ole. */
 	--accent: var(--giq-gold-deep);
-	--accent-strong: #c99a17;
+	/* 1.8.2026: oli #F5C542 (tumma messinki). Selainmittaus: landing ei kayta
+	   sita missaan — sen amber on aina #F5C542, myos tekstina (12.20:1).
+	   Tummempi savy nakyi prossa mm. PREMIUM-merkissa ja luki eri varina. */
+	--accent-strong: var(--giq-gold-deep);
 	/* ⚠️ KÄÄNTYI: täytön päällä on nyt ink, ei valkoinen. Valkoinen amberilla
 	   on 1.45:1. Sama flippi kuin mobiilin theme.textOnAccent. */
 	--accent-contrast: var(--giq-ink);
@@ -181,6 +184,14 @@ a:hover {
 	text-decoration: underline;
 }
 
+hr {
+	/* color myos, jotta sivulla ei ole yhtaan selaimen oletusharmaata */
+	color: var(--border);
+	border: 0;
+	border-top: 1px solid var(--border);
+	margin: var(--s-5) 0;
+}
+
 small,
 .muted {
 	color: var(--text-muted);
@@ -252,11 +263,11 @@ button.ghost:hover {
    voita disabled-tilaa (sama spesifisyys → järjestys ratkaisee). */
 button:disabled,
 button:disabled:hover {
-	background: #1a1815;
+	background: #141311;
 	border-color: var(--border);
 	/* tietoinen poikkeus: WCAG 1.4.3 rajaa disabloidut kontrollit ulkopuolelle,
 	   ja AA-tason teksti saisi disabloidun napin näyttämään aktiiviselta */
-	color: #5a554e;
+	color: #8A847A;
 	opacity: 1;
 	cursor: default;
 }
@@ -403,4 +414,34 @@ tbody tr:hover td {
 	.tool-card {
 		padding: var(--s-4);
 	}
+}
+
+/* --- Landingin osiootsikko (.bar) — 1.8.2026 ---
+   goaliq.app: cream-tausta, ink-teksti, 11.5px, versaali, letter-spacing .16em,
+   ja se ulottuu paneelin reunoihin. Se on ilmeen tunnusmerkki; ilman sita pro
+   oli tasaisen tumma ja siksi erinakoinen vaikka paletti oli sama.
+
+   Reunoihin ulottuminen tehdaan negatiivisella marginaalilla, joka lukee
+   kontin oman paddingin --card-pad-muuttujasta. Oletus --s-4 (16px) kattaa
+   section-kontit; .tool-card asettaa oman 24px:n alla.
+
+   !important on tassa tietoinen: Svelte-komponenttien scoped-saannot
+   (.weekly.svelte-x h3.svelte-x) ovat samaa tai korkeampaa spesifisyytta ja
+   latautuvat teeman jalkeen, joten ilman sita palkki jaisi puolittain paalle
+   komponenttikohtaisesti — mika olisi pahempi kuin sen puuttuminen. */
+.tool-card {
+	--card-pad: var(--s-6);
+}
+:is(.tool-card, section) > :is(h2, h3):first-child {
+	background: var(--giq-cream) !important;
+	color: var(--giq-ink) !important;
+	font-size: 11.5px !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.16em !important;
+	text-transform: uppercase !important;
+	line-height: 1.4 !important;
+	padding: 7px 12px !important;
+	margin: calc(-1 * var(--card-pad, var(--s-4))) calc(-1 * var(--card-pad, var(--s-4)))
+		var(--s-4) !important;
+	border-radius: 0 !important;
 }

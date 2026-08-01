@@ -1032,7 +1032,7 @@ CSS = """
        --teal 10.85:1   --negative 8.52:1   --faint 5.33:1
      HUOM --magenta-deep on tummalla 3.31:1 eli AA:n ALLE: se ei ole
      enaa linkki- eika lukuvari, vain mark. Linkit = teal, luvut = amber. */
-  :root{ --coral:#FF8A5C; --gold:#FFD873; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#C99A17; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
+  :root{ --coral:#FF8A5C; --gold:#F5C542; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#F5C542; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
     /* jaetun record-lohkon tokenit (build_fpl_page.by_comp/record).
        predictions.html EI maarita naita -> se saa classic-fallbackit. */
     --rec-thead-bg:#1F1D1A; --rec-thead-fg:#A8A29A; --rec-hit:#5FD97A;
