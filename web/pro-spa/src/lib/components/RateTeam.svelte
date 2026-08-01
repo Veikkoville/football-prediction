@@ -231,7 +231,8 @@
 	let pickerCollapsed = $state(false);
 
 	$effect(() => {
-		if (draftOpen && pool.length === 0 && !poolError) {
+		// 1.8: myös Joukkue 2:n draft-valitsin tarvitsee poolin (jaettu haku).
+		if ((draftOpen || draftOpenB) && pool.length === 0 && !poolError) {
 			fetchXp().then(
 				(d) => (pool = d.players ?? []),
 				() => (poolError = true)
@@ -502,6 +503,101 @@
 			capture('paywall_shown', { source: 'fantasy_tools' }, 'paywall_shown_fantasy_tools');
 		}
 	});
+
+	// --- 1.8: Joukkue 2 (vertailuslotti) -----------------------------------
+	// Kevyt rinnakkaisslotti samoilla arviointiominaisuuksilla: oma entry/
+	// draft/tulos. TARKOITUKSELLA EI: tallennusta laitteelle/tilille, FM-
+	// kirjausta, siirtosuunnitelmaa — ne sitoutuvat käyttäjän omaan joukkueeseen
+	// (Team 1). Istuntokohtainen; UI sanoo sen ääneen. Sama toteutus mobiilissa
+	// (FantasyTools.tsx, sama päivä).
+	let slot = $state<'a' | 'b'>('a');
+	let entryBText = $state('');
+	const entryBValid = $derived(/^\d{1,10}$/.test(entryBText.trim()));
+	let loadingB = $state(false);
+	let errorB = $state<string | null>(null);
+	let dataB = $state<RateTeamResponse | null>(null);
+	let picksNotPublishedB = $state(false);
+	let draftOpenB = $state(false);
+	let picksB = $state<XpPlayer[]>([]);
+	let draftQueryB = $state('');
+	const posCountB = $derived.by(() => {
+		const c: Record<string, number> = { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
+		for (const p of picksB) c[p.pos] = (c[p.pos] ?? 0) + 1;
+		return c;
+	});
+	const draftReadyB = $derived(picksB.length === 15 && !loadingB);
+	const draftMatchesB = $derived.by(() => {
+		const q = normDraft(draftQueryB);
+		if (q.length < 2) return [];
+		const pickedIds = new Set(picksB.map((p) => p.id));
+		return pool
+			.filter(
+				(p) =>
+					!pickedIds.has(p.id) &&
+					(posCountB[p.pos] ?? 0) < (DRAFT_CAPS[p.pos] ?? 0) &&
+					(normDraft(p.web_name).includes(q) ||
+						(p.full_name ? normDraft(p.full_name).includes(q) : false) ||
+						normDraft(p.team_short).includes(q))
+			)
+			.slice(0, 6);
+	});
+	// EI $state — sama syy kuin captaincy yllä: reaktiivinen prop ajaisi
+	// pitch-managerin reset-effectin uudelleen (svelte-efektikehäopetus).
+	// Vain paikallinen: vertailujoukkueen kapteenia ei tallenneta mihinkään.
+	const captaincyB: Captaincy = { captain_id: null, vice_id: null };
+	function handleCaptaincyChangeB(captainId: number | null, viceId: number | null) {
+		captaincyB.captain_id = captainId;
+		captaincyB.vice_id = viceId;
+	}
+	function addPickB(p: XpPlayer) {
+		if (picksB.length >= 15 || (posCountB[p.pos] ?? 0) >= (DRAFT_CAPS[p.pos] ?? 0)) return;
+		picksB = [...picksB, p];
+		draftQueryB = '';
+	}
+	function removePickB(id: number) {
+		picksB = picksB.filter((p) => p.id !== id);
+	}
+	async function runRateB() {
+		if (!entryBValid || loadingB) return;
+		loadingB = true;
+		errorB = null;
+		try {
+			dataB = await fetchRateTeam(Number(entryBText.trim()));
+			picksNotPublishedB = false;
+		} catch (err) {
+			dataB = null;
+			const code = (err as { code?: string })?.code;
+			if (code === 'picks_not_published') {
+				picksNotPublishedB = true;
+				errorB = null;
+				draftOpenB = true;
+			} else {
+				picksNotPublishedB = false;
+				errorB = err instanceof Error ? err.message : String(err);
+			}
+		}
+		loadingB = false;
+	}
+	function rateB(e: SubmitEvent) {
+		e.preventDefault();
+		void runRateB();
+	}
+	async function submitDraftB() {
+		if (!draftReadyB) return;
+		loadingB = true;
+		errorB = null;
+		capture('rate_team_draft_submitted', { picked_n: picksB.length, slot: 'b' });
+		try {
+			dataB = await fetchRateTeamManual(picksB.map((p) => p.id));
+		} catch (err) {
+			dataB = null;
+			errorB = err instanceof Error ? err.message : String(err);
+		}
+		loadingB = false;
+	}
+	const compareDiff = $derived(
+		data && dataB ? data.rating.team_xp_horizon - dataB.rating.team_xp_horizon : null
+	);
 </script>
 
 {#if weekMode}
@@ -549,6 +645,49 @@
 	Import your squad with your public FPL entry ID, no login or password needed.
 </p>
 
+<!-- 1.8: vertailurivi — näkyy heti kun molemmilla joukkueilla on tulos,
+     valitusta slotista riippumatta (se on koko featuren pointti). -->
+{#if data && dataB}
+	<div class="compare-box">
+		<p class="compare-title">Team 1 vs Team 2</p>
+		<p class="compare-line">
+			Team 1 <strong>{Math.round(data.rating.team_xp_horizon)} xP</strong> · Team 2
+			<strong>{Math.round(dataB.rating.team_xp_horizon)} xP</strong>
+		</p>
+		<p class="muted compare-verdict">
+			{#if Math.abs(compareDiff ?? 0) < 0.5}
+				Dead level over the next {data.meta.horizon_gw ?? 6} GWs.
+			{:else if (compareDiff ?? 0) > 0}
+				Team 1 ahead by {Math.abs(compareDiff ?? 0).toFixed(1)} xP over the next
+				{data.meta.horizon_gw ?? 6} GWs.
+			{:else}
+				Team 2 ahead by {Math.abs(compareDiff ?? 0).toFixed(1)} xP over the next
+				{data.meta.horizon_gw ?? 6} GWs.
+			{/if}
+		</p>
+	</div>
+{/if}
+
+<!-- 1.8: joukkuevalitsin (Villen speksi: valinta nappien alle, ei sekavuutta —
+     sisältö vaihtuu chipeistä, oletusnäkymä ennallaan). -->
+<div class="slot-chips">
+	<button type="button" class="slot-chip" class:active={slot === 'a'} onclick={() => (slot = 'a')}>
+		Team 1
+	</button>
+	<button
+		type="button"
+		class="slot-chip"
+		class:active={slot === 'b'}
+		onclick={() => {
+			if (slot !== 'b') capture('fpl_rate_compare_opened');
+			slot = 'b';
+		}}
+	>
+		Team 2
+	</button>
+</div>
+
+{#if slot === 'a'}
 <form class="entry-form" onsubmit={rate}>
 	<div>
 		<label for="rate-entry">FPL entry ID</label>
@@ -972,7 +1111,210 @@
 {/if}
 {/if}
 
+{#if slot === 'b'}
+	<!-- 1.8: Joukkue 2 — sama arviointi, kevyt runko (ei tallennusta, ei
+	     FM-silmukkaa, ei siirtosuunnitelmaa; ne kuuluvat omalle joukkueelle). -->
+	<p class="muted hint">
+		Comparison team. Rated the same way, but not saved and not linked to your account.
+	</p>
+	<form class="entry-form" onsubmit={rateB}>
+		<div>
+			<label for="rate-entry-b">FPL entry ID</label>
+			<input
+				id="rate-entry-b"
+				inputmode="numeric"
+				autocomplete="off"
+				placeholder="e.g. 1234567"
+				bind:value={entryBText}
+			/>
+		</div>
+		<button class="primary" type="submit" disabled={!entryBValid || loadingB}>
+			{loadingB ? 'Rating…' : 'Rate my team'}
+		</button>
+	</form>
+	{#if picksNotPublishedB}
+		<p class="notice-preseason">
+			<strong>Squads are not public before the Gameweek 1 deadline.</strong> Build the comparison
+			draft below instead and the model rates it exactly the same way.
+		</p>
+	{/if}
+	<button
+		type="button"
+		class="linklike draft-toggle"
+		onclick={() => (draftOpenB = !draftOpenB)}
+	>
+		{draftOpenB ? 'Hide the draft rater' : 'Rate a draft instead (works before Gameweek 1)'}
+	</button>
+	{#if draftOpenB}
+		<div class="draft-box">
+			{#if poolError}
+				<p class="banner error">
+					Could not load the player pool right now. Please try again shortly.
+				</p>
+			{:else}
+				<div class="draft-chips">
+					{#each DRAFT_ORDER as pos (pos)}
+						{#each picksB.filter((p) => p.pos === pos) as p (p.id)}
+							<button type="button" class="draft-chip" onclick={() => removePickB(p.id)}>
+								{p.web_name}
+								<span class="muted">{p.team_short} · {p.pos}</span>
+								<span aria-hidden="true">×</span>
+							</button>
+						{/each}
+					{/each}
+				</div>
+				<p class="muted hint">
+					{picksB.length} / 15 picked · GK {posCountB.GKP}/2 · DEF {posCountB.DEF}/5 · MID
+					{posCountB.MID}/5 · FWD {posCountB.FWD}/3
+				</p>
+				{#if picksB.length < 15}
+					<PlayerSearch
+						id="draft-search-b"
+						label="Add a player"
+						bind:query={draftQueryB}
+						items={draftMatchesB}
+						onSelect={addPickB}
+					/>
+				{/if}
+				<button
+					type="button"
+					class="primary"
+					disabled={!draftReadyB}
+					onclick={() => void submitDraftB()}
+				>
+					{loadingB ? 'Rating…' : 'Rate my draft'}
+				</button>
+			{/if}
+		</div>
+	{/if}
+	{#if loadingB}
+		<ModelWorking steps={WORKING_STEPS} />
+	{/if}
+	{#if errorB}
+		<p class="banner error">{errorB}</p>
+	{:else if dataB}
+		<div class="rating card">
+			<div class="hero-top">
+				<p class="hero-xp" aria-hidden="true">
+					<span class="hero-num">{Math.round(dataB.rating.team_xp_horizon)}</span><span
+						class="hero-unit">xP</span
+					>
+				</p>
+				<div class="hero-copy">
+					<p class="headline">
+						Team xP, next {dataB.meta.horizon_gw ?? 6} GWs:
+						<strong>{dataB.rating.team_xp_horizon.toFixed(1)}</strong>
+						<span class="basis-note">captain doubled</span>
+					</p>
+					<p class="subline">
+						{#if dataB.meta.rating_method == null && dataB.rating.optimal_team_xp == null}
+							GoalIQ model rating:
+							<strong>{dataB.rating.rating ?? Math.round(dataB.rating.percentile)}/100</strong>
+						{:else if dataB.rating.beats_benchmark}
+							This XI <strong>beats</strong> the best team the model can build inside the
+							budget.
+						{:else}
+							Team rating
+							<strong>{dataB.rating.rating ?? Math.round(dataB.rating.percentile)}/100</strong>.
+							<span class="rating-basis"
+								>{dataB.rating.optimal_proven === false
+									? '100 = the strongest squad the model found inside the 100.0m budget.'
+									: '100 = the best squad the rules allow inside the 100.0m budget.'}</span
+							>
+						{/if}
+					</p>
+				</div>
+			</div>
+			<div class="facts">
+				<div class="fact">
+					<span class="muted">Team xP, GW{dataB.meta.gw}</span>
+					<span class="val">{dataB.rating.team_xp_gw.toFixed(1)}</span>
+				</div>
+				<div class="fact">
+					<span class="muted">Strongest line</span>
+					<span class="val line-strong">{dataB.rating.strongest_line}</span>
+				</div>
+				<div class="fact">
+					<span class="muted">Weakest line</span>
+					<span class="val line-weak">{dataB.rating.weakest_line}</span>
+				</div>
+			</div>
+			<p class="captain">
+				Captain suggestion: <strong>{dataB.captain.pick.web_name}</strong>
+				<span class="muted">({dataB.captain.pick.team_short})</span>,
+				{dataB.captain.pick.gw_xp.toFixed(2)} xP in GW{dataB.meta.gw}{#if dataB.captain.alternative}.
+					Alternative: {dataB.captain.alternative.web_name}
+					<span class="muted">({dataB.captain.alternative.team_short})</span>,
+					{dataB.captain.alternative.gw_xp.toFixed(2)} xP{/if}.
+			</p>
+			{#if dataB.team.missing_ids.length > 0}
+				<p class="muted">
+					{dataB.team.missing_ids.length}
+					{dataB.team.missing_ids.length === 1 ? 'player has' : 'players have'} no projection yet
+					and {dataB.team.missing_ids.length === 1 ? 'is' : 'are'} excluded from the rating.
+				</p>
+			{/if}
+			{#if typeof dataB.meta.note === 'string'}
+				<p class="muted">{dataB.meta.note}</p>
+			{/if}
+		</div>
+		<TeamPitchManager
+			players={dataB.team.players}
+			{premium}
+			defaultGw={dataB.meta.gw}
+			{onUpgrade}
+			initialCaptaincy={captaincyB}
+			onCaptaincyChange={handleCaptaincyChangeB}
+		/>
+	{/if}
+{/if}
+{/if}
+
 <style>
+	/* 1.8: kaksoisjoukkue — joukkuechipit + vertailurivi */
+	.slot-chips {
+		display: flex;
+		gap: var(--s-2);
+		margin: 0 0 var(--s-3);
+	}
+	.slot-chip {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 6px 16px;
+		cursor: pointer;
+	}
+	.slot-chip.active {
+		background: rgba(255, 46, 126, 0.1);
+		border-color: var(--giq-magenta);
+		color: var(--giq-magenta-deep);
+	}
+	.compare-box {
+		max-width: 640px;
+		border: 1px solid var(--border);
+		border-left: 4px solid var(--giq-magenta-deep);
+		border-radius: var(--radius);
+		background: var(--surface);
+		padding: var(--s-3) var(--s-4);
+		margin: 0 0 var(--s-3);
+	}
+	.compare-title {
+		margin: 0;
+		font-weight: 700;
+		font-size: var(--step--1);
+		color: var(--text-muted);
+	}
+	.compare-line {
+		margin: 2px 0 0;
+		font-variant-numeric: tabular-nums;
+	}
+	.compare-verdict {
+		margin: 2px 0 0;
+		font-size: var(--step--1);
+	}
 	/* Web P1: week-tyhjätilan kortti */
 	.week-setup {
 		border: 1px solid var(--border);
