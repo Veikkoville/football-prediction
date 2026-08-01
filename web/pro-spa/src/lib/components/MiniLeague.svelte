@@ -113,7 +113,7 @@
 	}
 </script>
 
-<h2>Mini-league: standings and head-to-head odds</h2>
+<h2>Mini-league: standings and head-to-head win probabilities</h2>
 <p class="muted">
 	Paste your classic league's ID (from the league page URL on the FPL site) to see the
 	table. Then pick any two managers to get the model's win probability for the next

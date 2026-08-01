@@ -1015,28 +1015,40 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
 
 def render_defcon(leaders: dict, now: datetime) -> str | None:
     """#128/#120: 'Best DefCon players' — FPL:n defensive contribution
-    -pistemekaniikan luotettavimmat lähteet. Top-3 luvuilla, loput niminä."""
-    from src.models.fpl_leaders import rank_defcon_leaders
+    -pistemekaniikan luotettavimmat lähteet. Top-3 luvuilla, loput niminä.
+
+    #226-DC (1.8.2026): basis vaihdettu viimeisistä 5 pelistä KOKO KAUTEEN ja
+    nimittäjä starteiksi. Kaksi syytä: (1) esikaudella "viimeiset 5" on
+    mielivaltainen häntä edelliskaudesta, (2) tämä on julkinen sivu jonka luvut
+    verrataan Premier Leaguen omaan DC-taulukkoon — eri nimittäjä tuotti eri
+    prosentin samasta datasta. Season-basis ei ole saatavilla ennen kuin
+    per-GW-matriisi on rakennettu → fallback vanhaan, ei tyhjää sivua."""
+    from src.models.fpl_leaders import (load_defcon_gw, rank_defcon_leaders,
+                                        rank_defcon_season)
     if not leaders.get("meta", {}).get("available"):
         return None
-    out = rank_defcon_leaders(leaders, window=5, top_n=10)
+    try:
+        out = rank_defcon_season(load_defcon_gw(), top_n=10)
+    except Exception:
+        out = rank_defcon_leaders(leaders, window=5, top_n=10)
     rows = out["players"]
     if not rows:
         return None
+    per = "starts" if out["meta"].get("hit_rate_denominator") == "starts" else "games"
     basis = out["meta"].get("basis_label") or ""
     url = f"{BASE}/fpl/defcon"
     title = "Best DefCon Players – FPL Defensive Contribution Leaders | GoalIQ"
     desc = (
         f"The most reliable FPL defensive contribution (DefCon) point scorers: "
         f"{rows[0]['web_name']} hits the threshold in "
-        f"{rows[0]['hit_rate_pct']:.0f}% of games. Defenders need 10 CBIT, "
+        f"{rows[0]['hit_rate_pct']:.0f}% of his {per}. Defenders need 10 CBIT, "
         f"midfielders and forwards 12 CBIRT, for 2 points."
     )
     top3 = "".join(
         '<div class="stat">'
         f'<b>{escape(r["web_name"])}</b>'
         f'<span>#{i + 1} · {escape(r["team_short"])} · '
-        f'{r["hit_rate_pct"]:.0f}% hit rate · {r["dc_per_game"]:.1f} DC/game</span></div>'
+        f'{r["hit_rate_pct"]:.0f}% of {per} · {r["dc_per_game"]:.1f} DC/game</span></div>'
         for i, r in enumerate(rows[:3])
     )
     rest = ", ".join(escape(r["web_name"]) for r in rows[3:10])
@@ -1047,9 +1059,17 @@ def render_defcon(leaders: dict, now: datetime) -> str | None:
         "and tackles (CBIT); midfielders and forwards need 12 including ball "
         "recoveries (CBIRT). These players hit the threshold most often.</p>"
     )
+    pool = out["meta"].get("pool_min_starts")
+    basis_note = (
+        f"Hit rate is the share of a player's {per} that reached the "
+        "threshold, the same basis the official FPL figures use."
+        + (f" Ranking needs at least {pool} starts." if per == "starts" and pool
+           else "")
+    )
     body = (
         f'<p class="note"><strong>{escape(basis)}</strong></p>'
         f'<div class="stat-row">{top3}</div>'
+        f'<p class="note">{escape(basis_note)}</p>'
         + (
             f'<p class="note">Also in the top 10: {rest}. Hit rates, DC per '
             f"game and position filters are on GoalIQ Premium.</p>"

@@ -500,9 +500,18 @@ export interface DefconLeaderRow {
 	basis: string | null;
 	threshold: number;
 	dc_per_game: number;
+	/** #226-DC: kausibasiksella nimittaja on startit (sama kuin FPL:n omissa
+	 * luvuissa), ei pelatut ottelut. `hit_rate_basis` kertoo kummasta. */
 	hit_rate_pct: number;
+	hit_rate_basis?: 'starts' | 'games';
+	starts?: number;
 	defcon_points_window: number;
 	hits: number;
+	/** Positio vaihtui kausien valilla -> kynnys eri kuin basis-kaudella.
+	 * `hit_rate_basis_pos_pct` on sama luku basis-position kynnyksella. */
+	pos_changed?: boolean;
+	basis_pos?: 'DEF' | 'MID' | 'FWD';
+	hit_rate_basis_pos_pct?: number | null;
 }
 
 export interface DefconLeadersResponse {
@@ -510,6 +519,9 @@ export interface DefconLeadersResponse {
 		thresholds?: Record<string, number>;
 		points_per_hit?: number;
 		rule_note?: string;
+		hit_rate_denominator?: 'starts' | 'games';
+		pool_min_starts?: number;
+		hit_rate_note?: string;
 	};
 	players: DefconLeaderRow[];
 }
@@ -537,7 +549,9 @@ export function fetchDefconLeaders(
 /* ---------- Per-GW DefCon -matriisi (30.7) ---------- */
 
 /** Kompakti rivi: [gw, opp, venue, minutes, dc] (payload-kuri, ~240 kB). */
-export type DefconGwRow = [number, string, string, number, number];
+/** [gw, opp, venue, minutes, dc, start] — start (0/1) lisattiin #226-DC:ssa
+ * kuudenneksi, jotta vanhat indeksit 0-4 pysyvat voimassa. */
+export type DefconGwRow = [number, string, string, number, number, number?];
 
 export interface DefconGwPlayer {
 	id: number;
@@ -549,8 +563,16 @@ export interface DefconGwPlayer {
 	owned_pct: number | null;
 	threshold: number;
 	games: number;
+	/** Startit = hit_raten nimittaja (#226-DC). Puuttuu vanhasta payloadista. */
+	starts?: number;
 	hits: number;
+	start_hits?: number;
 	hit_rate: number;
+	/** Vanha, pelattuihin otteluihin perustuva luku — lapinakyvyys, ei copyyn. */
+	hit_rate_games?: number;
+	pos_changed?: boolean;
+	basis_pos?: 'DEF' | 'MID' | 'FWD';
+	hit_rate_basis_pos?: number;
 	dc_points: number;
 	basis: string | null;
 	per_gw: DefconGwRow[];
@@ -564,6 +586,10 @@ export interface DefconGwResponse {
 		/** Mitattu vastustajaefekti (28.7): nayta suoraan, ala myy kontekstia
 		 * signaalina jota oma mittaus ei loyda. */
 		opponent_effect?: { correlation: number; note: string };
+		hit_rate_denominator?: 'starts' | 'games';
+		season_rounds?: number;
+		pool_min_starts?: number;
+		pool_rule?: string;
 		n_players: number;
 	};
 	players: DefconGwPlayer[];

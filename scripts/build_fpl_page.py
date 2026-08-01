@@ -328,9 +328,15 @@ def track_record_sentences(c: dict) -> list[str]:
             f"Across the {c['acc_n']} completed matches, the model called the "
             f"result correctly in {fmt_pct(c['acc_pct_1x2'])} of matches."
         ),
+        # 1.8.2026 rehellisyyskorjaus: luku on laskettu TOTEUTUNEEN tuloksen
+        # mukaan (accuracy.py: actual_outcome != "draw"), ei sen mukaan mitä
+        # malli ennusti. Malli nimeää todennäköisemmän voittajan joka ottelussa,
+        # joten "kun malli nimesi voittajan" antoi ymmärtää valikoinnin jota ei
+        # ole. Sama sanamuoto kuin WC-sivulla, joka kuvasi tämän alusta oikein.
         (
-            f"When the model named a clear winner rather than a draw, it was right "
-            f"{fmt_pct(c['acc_pct_dec'])} of the time ({c['acc_dec_c']} of {c['acc_dec_n']})."
+            f"In the {c['acc_dec_n']} matches that did not end in a draw, the model "
+            f"called the result right {fmt_pct(c['acc_pct_dec'])} of the time "
+            f"({c['acc_dec_c']} of {c['acc_dec_n']})."
         ),
     ]
 
@@ -1148,7 +1154,8 @@ def render_page(c: dict) -> str:
         f'<div class="stat"><b>{fmt_pct(c["acc_pct_1x2"])}</b>'
         f'<span>correct results across {c["acc_n"]} completed predictions, all competitions</span></div>'
         f'<div class="stat"><b>{fmt_pct(c["acc_pct_dec"])}</b>'
-        f'<span>hit rate when the model called a winner ({c["acc_dec_c"]} of {c["acc_dec_n"]})</span></div>'
+        f'<span>correct in matches that did not end in a draw '
+        f'({c["acc_dec_c"]} of {c["acc_dec_n"]})</span></div>'
         f'<div class="stat"><b>{c["acc_logged"]}</b>'
         f'<span>predictions logged before kickoff, hits and misses</span></div>'
         "</div>"
@@ -1377,9 +1384,64 @@ predictions and analytics. Not betting advice.</p>
 # 5. Etusivun track record -markerit (index.html, homepage-update 4.7)
 # ---------------------------------------------------------------------------
 INDEX_PATH = ROOT / "index.html"
+# Etusivun projektiotaulukon lähde (sama tiedosto jonka fpl-data-refresh
+# rakentaa joka päivä) — taulukko oli aiemmin kovakoodattu, ks. xp_table_rows.
+XP_PATH = ROOT / "data" / "fpl_xp_projections.json"
 
 
-def update_index(c: dict) -> bool:
+def _load_json(path) -> dict | None:
+    """Valinnainen datatiedosto: puuttuva tiedosto ei kaada sivubuildia."""
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def xp_table_rows(xp: dict, n: int = 4) -> str:
+    """Etusivun "Live model projections" -taulukon rivit LIVE-datasta (1.8.2026).
+
+    Tausta: taulukko oli kovakoodattu 24.7. value-ajosta samalla kun sen oma
+    alaviite lupasi "refreshed daily · live numbers, not a mock season".
+    Luvut olivat viikon vanhoja ja kärkirivillä oli James Garner, jonka FPL
+    on sittemmin liputtanut loukkaantuneeksi (status i, 0 % pelitodennäköisyys)
+    — eli etusivu suositteli pelaajaa jota ei voi pelauttaa.
+
+    Siksi tässä on kaksi porttia, ei vain tuoreus:
+      1. vain status 'a' (ei liputettuja) JA chance_next ei 0
+      2. vain pelaajat joilla on PL-historia (data_basis == 'pl_history'),
+         koska nousijoiden baseline-arviot eivät kuulu etusivun kärkeen
+    """
+    rows = [
+        p for p in (xp.get("players") or [])
+        if p.get("status") == "a"
+        and p.get("chance_next") in (None, 100)
+        and p.get("data_basis") == "pl_history"
+        and isinstance(p.get("xp_horizon_total"), (int, float))
+    ]
+    rows.sort(key=lambda p: p["xp_horizon_total"], reverse=True)
+    out = []
+    for p in rows[:n]:
+        out.append(
+            '        <div class="mock-row">'
+            f'<span class="mock-team">{escape(p["team_short"])}</span>'
+            f'<span><span class="mock-name">{escape(p["web_name"])}</span> '
+            f'<span class="mock-meta">&middot; {escape(p["pos"])}</span></span>'
+            f'<span>&pound;{p["price"]:.1f}</span>'
+            f'<span>{float(p.get("owned_pct") or 0):.1f}%</span>'
+            f'<span class="mock-xp">{p["xp_horizon_total"]:.1f}</span></div>'
+        )
+    horizon = (xp.get("meta") or {}).get("horizon_gw")
+    foot = (
+        '        <div class="mock-foot">Model projections'
+        + (f", next {horizon} gameweeks" if horizon else "")
+        + " &middot; <strong>live numbers, not a mock season</strong></div>"
+    )
+    return "\n" + "\n".join(out + [foot]) + "\n      "
+
+
+def update_index(c: dict, xp: dict | None = None) -> bool:
     """Täytä index.html:n GEN:ACC-markerit tuoreilla accuracy-luvuilla.
     Sama lähde ja refresh-tahti kuin fpl.html (ei staleja kovakoodauksia)."""
     if not INDEX_PATH.exists():
@@ -1419,6 +1481,27 @@ def update_index(c: dict) -> bool:
     if n_ticker != 2:
         raise RuntimeError(
             f"index.html GEN:ACC-TICKER: odotettiin 2 markerilohkoa, löytyi {n_ticker}")
+    # 1.8: WC-luku oli tickerissä ACC-TICKER-markerien ULKOPUOLELLA, eli se ei
+    # päivittynyt tästä botista lainkaan. Oma markeri per-kilpailu-luvulle.
+    wc = next((r for r in (c.get("by_comp") or []) if r["code"] == "WC"), None)
+    if wc:
+        wc_block = f'<b>World Cup 2026 &middot; {fmt_pct(wc["pct"])}</b>'
+        new, n_wc = re.subn(
+            r"(<!-- GEN:ACC-WC-START -->).*?(<!-- GEN:ACC-WC-END -->)",
+            lambda m: m.group(1) + wc_block + m.group(2), new, flags=re.S)
+        if n_wc != 2:
+            raise RuntimeError(
+                f"index.html GEN:ACC-WC: odotettiin 2 markerilohkoa, löytyi {n_wc}")
+    # "Live model projections" -taulukko: rivit tuoreesta xP-datasta, ei
+    # kovakoodattuna. Ilman dataa markeri jätetään koskematta (ei tyhjennetä
+    # taulukkoa sivulta jos builder ajetaan ilman xP-tiedostoa).
+    if xp and xp.get("players"):
+        new, n_xp = re.subn(
+            r"(<!-- GEN:XP-TABLE-START -->).*?(<!-- GEN:XP-TABLE-END -->)",
+            lambda m: m.group(1) + xp_table_rows(xp) + m.group(2), new, flags=re.S)
+        if n_xp != 1:
+            raise RuntimeError(
+                f"index.html GEN:XP-TABLE: odotettiin 1 markerilohko, löytyi {n_xp}")
     # #85 GEO: track-record-Dataset-schema pysyy tuoreena samalla botilla
     # kuin chipit (luvut + dateModified accuracy-lähteestä, ei kovakoodausta).
     ds = accuracy_dataset_ld(c, BASE + "/")
@@ -1612,7 +1695,7 @@ def main() -> None:
     html_out = render_page(c)
     OUT_PATH.write_text(html_out, encoding="utf-8")
     sitemap_changed = update_sitemap(c["iso_date"])
-    index_changed = update_index(c)
+    index_changed = update_index(c, _load_json(XP_PATH))
     predictions_changed = update_predictions(c, preds)
     wc_recap_changed = update_wc_recap(acc)
 

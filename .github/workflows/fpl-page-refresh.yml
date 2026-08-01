@@ -25,9 +25,12 @@ name: fpl-page-refresh
 
 on:
   schedule:
-    # Ma 09:30 UTC — Villen lokaalin FPL-refreshin (ma 09:00 EEST = 06:00 UTC)
-    # ja mahdollisen manuaalipushin jälkeen. Best-effort, voi driftata.
-    - cron: "30 9 * * 1"
+    # PÄIVITTÄIN 09:30 UTC (Villen päätös 1.8.2026). Oli ma-viikoittainen, mutta
+    # etusivun projektiotaulukko lupaa tuoretta dataa ja hinnat/omistus/xP
+    # liikkuvat joka päivä — viikkotahti teki lupauksesta valheellisen.
+    # Ajoitus: fpl-data-refresh rakentaa data/fpl_xp_projections.json 09:15 UTC,
+    # tämä lukee sen 15 min myöhemmin. Älä siirrä aikaisemmaksi.
+    - cron: "30 9 * * *"
   workflow_dispatch: {}
 
 concurrency:
