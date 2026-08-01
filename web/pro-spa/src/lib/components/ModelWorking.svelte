@@ -64,7 +64,7 @@
 		justify-content: center;
 		width: 18px;
 		height: 18px;
-		border-radius: 50%;
+		border-radius: var(--radius);
 		border: 2px solid currentColor;
 		font-size: 11px;
 		flex: none;

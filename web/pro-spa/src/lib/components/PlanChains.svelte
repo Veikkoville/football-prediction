@@ -260,7 +260,7 @@
 		background: rgba(46, 214, 194, 0.12);
 		border: 1px solid rgba(0, 148, 130, 0.4);
 		color: var(--giq-ink);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: 2px 12px;
 		font-size: var(--step--1);
 		font-weight: 700;
@@ -280,7 +280,7 @@
 	}
 	.gw-card {
 		border: 1px solid var(--border);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius);
 		background: var(--surface);
 		padding: var(--s-3);
 	}
@@ -304,7 +304,7 @@
 		gap: var(--s-1);
 	}
 	.arrow {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 	}
 	.gain {

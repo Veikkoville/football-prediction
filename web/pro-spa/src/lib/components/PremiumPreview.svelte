@@ -160,7 +160,7 @@
 		content: '◆';
 		position: absolute;
 		left: 0;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-size: 0.7em;
 		top: 0.35em;
 	}
@@ -170,7 +170,7 @@
 	.teaser {
 		position: relative;
 		border: 1px solid var(--border);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius);
 		overflow: hidden;
 		margin-bottom: var(--s-4);
 	}
@@ -181,7 +181,7 @@
 		opacity: 0.75;
 	}
 	.locked-val {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		letter-spacing: 2px;
 	}
@@ -195,7 +195,7 @@
 		gap: var(--s-1);
 		background: var(--giq-ink);
 		color: var(--giq-cream);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: var(--s-1) var(--s-3);
 		font-size: var(--step--1);
 		font-weight: 700;
@@ -204,7 +204,7 @@
 		pointer-events: none;
 	}
 	.lock-pill svg {
-		color: var(--giq-magenta);
+		color: var(--accent);
 	}
 	.plans {
 		display: flex;

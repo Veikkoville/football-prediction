@@ -514,13 +514,13 @@
 	   malliblokki magenta-aksentilla — sama data ei sekoitu. */
 	.pc-block {
 		border: 1px solid var(--border);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius);
 		background: var(--surface-2);
 		padding: var(--s-3) var(--s-4);
 	}
 	.pc-block.model {
 		background: var(--surface);
-		border-left: 4px solid var(--giq-magenta-deep);
+		border-left: 4px solid var(--giq-rust);
 	}
 	.pc-block h4 {
 		margin: 0 0 var(--s-2);
@@ -544,7 +544,7 @@
 	.chip {
 		display: inline-block;
 		padding: 2px 10px;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		font-size: var(--step--1);
 		font-weight: 700;
 		border: 1px solid transparent;
@@ -575,7 +575,7 @@
 	.start-line .big {
 		font-size: var(--step-2);
 		font-weight: 700;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-variant-numeric: tabular-nums;
 		margin-right: 4px;
 	}
@@ -620,7 +620,7 @@
 	.stat {
 		background: var(--surface-2);
 		border: 1px solid var(--border);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius);
 		padding: var(--s-2) var(--s-3);
 	}
 	.stat dt {

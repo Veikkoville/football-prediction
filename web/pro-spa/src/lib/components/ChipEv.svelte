@@ -204,8 +204,8 @@
 	.best-pill {
 		background: rgba(255, 46, 126, 0.1);
 		border: 1px solid rgba(255, 46, 126, 0.35);
-		color: var(--giq-magenta-deep);
-		border-radius: 999px;
+		color: var(--giq-rust);
+		border-radius: var(--radius);
 		padding: 1px 10px;
 		font-size: var(--step--1);
 		font-weight: 700;
@@ -213,7 +213,7 @@
 	}
 	.best-ev {
 		margin: var(--s-2) 0 var(--s-2);
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		line-height: 1;
 	}

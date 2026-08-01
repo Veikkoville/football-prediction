@@ -150,7 +150,7 @@
 <style>
 	.strong {
 		font-weight: 800;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 	}
 	.gk-title {
 		margin-top: var(--s-5);

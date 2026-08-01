@@ -101,8 +101,8 @@
 		margin-bottom: var(--s-3);
 	}
 	.modes .active {
-		color: var(--giq-magenta-deep);
-		border-color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
+		border-color: var(--giq-rust);
 	}
 	form {
 		max-width: 460px;
@@ -122,7 +122,7 @@
 		border: none;
 		padding: 0;
 		margin: 0;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-size: inherit;
 		font-weight: 700;
 		text-decoration: underline;

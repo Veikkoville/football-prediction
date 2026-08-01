@@ -495,7 +495,7 @@
 	}
 	.chip {
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text-muted);
 		font-weight: 700;
@@ -519,7 +519,7 @@
 		margin-bottom: var(--s-3);
 	}
 	.xp-val {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-size: var(--step-2);
 		font-weight: 800;
 		font-variant-numeric: tabular-nums;
@@ -569,7 +569,7 @@
 			rgba(46, 214, 194, 0.27) 44px 88px
 		);
 		border: 1px solid var(--border);
-		border-radius: 14px;
+		border-radius: var(--radius);
 		padding: var(--s-2) var(--s-1);
 		overflow: hidden;
 	}
@@ -596,7 +596,7 @@
 		width: 68px;
 		background: none;
 		border: 2px solid transparent;
-		border-radius: 10px;
+		border-radius: var(--radius);
 		padding: 2px;
 		cursor: pointer;
 		color: var(--text);
@@ -605,7 +605,7 @@
 		cursor: default;
 	}
 	.player.selected {
-		border-color: var(--giq-magenta);
+		border-color: var(--accent);
 	}
 	.kitwrap {
 		position: relative;
@@ -621,10 +621,10 @@
 		right: -5px;
 		width: 15px;
 		height: 15px;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
-		border: 1.5px solid var(--giq-magenta);
-		color: var(--giq-magenta-deep);
+		border: 1.5px solid var(--accent);
+		color: var(--giq-rust);
 		font-size: 9px;
 		font-weight: 800;
 		display: flex;
@@ -665,8 +665,8 @@
 	.action {
 		background: var(--surface);
 		border: 1px solid rgba(255, 46, 126, 0.35);
-		border-radius: 8px;
-		color: var(--giq-magenta);
+		border-radius: var(--radius);
+		color: var(--accent);
 		font-weight: 700;
 		font-size: var(--step--1);
 		padding: 8px 14px;

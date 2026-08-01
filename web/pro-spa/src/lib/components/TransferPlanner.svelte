@@ -238,7 +238,7 @@
 		gap: var(--s-1);
 	}
 	.arrow {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 	}
 	.gain {

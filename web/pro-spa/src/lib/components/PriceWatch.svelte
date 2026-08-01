@@ -108,7 +108,7 @@
 	}
 	.badge {
 		display: inline-block;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: 1px 10px;
 		font-size: var(--step--1);
 		font-weight: 700;

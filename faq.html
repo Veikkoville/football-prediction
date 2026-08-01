@@ -91,9 +91,7 @@
 </script>
   <title>GoalIQ – Frequently Asked Questions</title>
   <style>
-    :root {
-      --magenta: #FF2E7E;
-      --magenta-deep: #2ED6C2;
+    :root {/* 1.8.2026: magenta poistettiin paletista; nama korvaavat tokenit olivat viittauksina mutta puuttuivat :rootista. */--amber:#F5C542;--ember:#FF8A5C;
       --ink: #F3F2F2;
       --ink2: #141311;
       --cream: #0B0A09;
@@ -125,8 +123,8 @@
     }
     .brand { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
     .brand a { color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap:0; }
-    .brand-icon { margin-right:10px; width: 32px; height: 32px; border-radius: 9px; display: block; }
-    .brand span { color: var(--magenta); }
+    .brand-icon { margin-right:10px; width: 32px; height: 32px; border-radius: 0; display: block; }
+    .brand span { color: var(--amber); }
     .nav-cta {
       display: inline-block; background: transparent; color: var(--gold-deep,#F5C542); border: 1px solid var(--gold,#F5C542);
       text-decoration: none; padding: 11px 20px; border-radius: 0; font-weight: 800; font-size: 14px;
@@ -135,7 +133,7 @@
     .site-footer { border-top: 1px solid var(--line); padding: 30px 0 40px; font-size: 14px; }
     .site-footer .foot { max-width: 960px; margin: 0 auto; padding: 0 20px; color: var(--hero-muted); }
     .site-footer a { color: var(--hero-muted); }
-    .site-footer a:hover { color: var(--magenta-deep); }
+    .site-footer a:hover { color: var(--ember); }
 
     .wrap {
       max-width: 720px;
@@ -150,7 +148,7 @@
     }
     .updated { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
     p, li { color: var(--ink); font-size: 15px; }
-    a { color: var(--magenta-deep); text-decoration: none; font-weight: 600; }
+    a { color: var(--ember); text-decoration: none; font-weight: 600; }
     a:hover { text-decoration: underline; }
     details {
       background: var(--card);
@@ -179,9 +177,9 @@
       display: inline-block;
       width: 22px;
       height: 22px;
-      border-radius: 11px;
+      border-radius: 0;
       background: rgba(255,46,126,0.14);
-      color: var(--magenta-deep);
+      color: var(--ember);
       text-align: center;
       line-height: 22px;
       font-weight: 800;

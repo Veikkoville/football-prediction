@@ -189,7 +189,7 @@
 <style>
 	.weekly {
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius);
 		padding: var(--s-4);
 		margin: var(--s-4) 0;
 		background: var(--surface);
@@ -247,7 +247,7 @@
 		font: inherit;
 		font-size: var(--step--1);
 		padding: 0.35em 0.9em;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		border: 1px solid var(--border);
 		background: transparent;
 		color: var(--text-muted);

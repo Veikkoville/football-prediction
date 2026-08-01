@@ -42,7 +42,8 @@
 }
 </script>
 <style>
-:root{--magenta:#FF2E7E;--magenta-deep:#C4005F;--teal:#2ED6C2;
+.brand-icon{width:22px;height:22px;display:inline-block;vertical-align:-4px;margin-right:8px;flex:none;}
+:root{--teal:#2ED6C2;
 --teal-ink:#12B8A4;--amber:#F5C542;--amber-deep:#C99A17;
 --gold:#FFD873;--gold-deep:#F5C542;--coral:#FF8A5C;
 --ink:#0B0A09;--ink2:#141311;--cream:#F3F2F2;
@@ -62,7 +63,7 @@ nav{display:flex;align-items:center;justify-content:space-between;
 padding:18px 0;font-size:14px;}
 nav a{text-decoration:none;color:var(--cream);font-weight:600;}
 .brand{font-size:20px;font-weight:700;letter-spacing:.5px;}
-.brand span{color:var(--magenta);}
+.brand span{color:var(--amber);}
 .nav-cta{background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 16px;
 border-radius:var(--radius);font-weight:700;}
 .nav-cta:hover{background:var(--amber);color:var(--ink);}
@@ -156,7 +157,7 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
 <body>
 <header class="dark">
 <div class="bar"></div>
-<div class="wrap"><nav><a class="brand" href="/">Goal<span>IQ</span></a><span><a href="/predictions">All predictions</a> · <a class="nav-cta" href="https://pro.goaliq.app/">Try it live</a></span></nav></div>
+<div class="wrap"><nav><a class="brand" href="/"><svg class="brand-icon" width="22" height="22" viewBox="0 0 44 44" role="img" aria-label="GoalIQ" focusable="false"><rect x="0" y="0" width="44" height="44" fill="#F5C542"/><text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,ui-monospace,Consolas,monospace" font-size="20" font-weight="700" letter-spacing="-0.5" fill="#0B0A09">IQ</text></svg>Goal<span>IQ</span></a><span><a href="/predictions">All predictions</a> · <a class="nav-cta" href="https://pro.goaliq.app/">Try it live</a></span></nav></div>
 <div class="wrap hero">
 <h1>Best FPL differentials, this gameweek</h1><p class="lede">A differential is a low-owned player (under 10% ownership) the model rates far higher than the crowd does. Today's top model differential:</p>
 </div>

@@ -75,7 +75,7 @@
 	.seg-nav button {
 		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		color: var(--text-muted);
 		font-size: var(--step--1);
 		font-weight: 700;

@@ -37,7 +37,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </script>
 
 <style>
-  :root {
+  :root {/* 1.8.2026: magenta poistettiin paletista; nama korvaavat tokenit olivat viittauksina mutta puuttuivat :rootista. */--amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;
     --bg: #0B0A09;
     --bg-alt: #1F1D1A;
     --card: #141311;
@@ -47,8 +47,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     --text: #F3F2F2;
     --muted: #A8A29A;
     --hero-muted: #A8A29A;
-    --magenta: #FF2E7E;
-    --magenta-deep: #2ED6C2;
     --teal: #2ED6C2;
     --teal-ink: #2ED6C2;
     --radius: 2px;
@@ -80,8 +78,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .hero-shell + .wrap { padding-top: 12px; }
   nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
   .logo { display: flex; align-items: center; gap:0; font-weight: 700; font-size: 20px; text-decoration: none; color: inherit; }
-  .logo span { color: var(--magenta); }
-  .logo-mark-img { margin-right:10px; width: 32px; height: 32px; border-radius: 9px; display: block; }
+  .logo span { color: var(--amber); }
+  .logo-mark-img { margin-right:10px; width: 32px; height: 32px; border-radius: 0; display: block; }
   .nav-cta { background: transparent; color: var(--gold-deep,#F5C542); border: 1px solid var(--gold,#F5C542); font-weight: 700; padding: 10px 18px; border-radius: 0; text-decoration: none; font-size: 14px; }
   .nav-cta:hover { background: rgba(245,197,66,0.14); }
   h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; margin: 44px 0 14px; }
@@ -92,7 +90,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     flex: 1 1 220px; font: inherit; font-size: 17px; padding: 12px 16px;
     border: 1px solid var(--line); border-radius: 0; background: var(--card); color: var(--text);
   }
-  .entry-form input:focus { outline: 2px solid var(--magenta); border-color: transparent; }
+  .entry-form input:focus { outline: 2px solid var(--amber); border-color: transparent; }
   .btn {
     display: inline-block; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 16px;
     background: transparent; color: var(--gold-deep,#F5C542); border: 1px solid var(--gold,#F5C542); padding: 12px 24px; border-radius: 0; text-decoration: none;
@@ -103,7 +101,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .hint { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 62ch; margin-top: 2px; }
   .hint a { color: var(--teal-ink); }
   .status { margin: 18px 0; font-size: 15px; color: var(--muted); min-height: 1.4em; }
-  .status.error { color: var(--magenta-deep); font-weight: 500; }
+  .status.error { color: var(--ember); font-weight: 500; }
   .card-stage { display: none; margin-top: 8px; }
   .card-stage.visible { display: block; }
   #cardCanvas {
@@ -119,7 +117,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .store-links { display: flex; gap: 10px; flex-wrap: wrap; }
   footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; padding: 28px 20px; text-align: center; margin-top: 60px; }
   footer a { color: var(--muted); }
-  footer a:hover { color: var(--magenta-deep); }
+  footer a:hover { color: var(--ember); }
 </style>
 
 <!-- #85 GEO: sivukohtainen structured data (sivulla ei ollut yhtaan JSON-LD:ta).
@@ -223,7 +221,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   // joten CSS-token-ajot eivat nahneet niita. Fontit olivat jo Cormorantia.
   // Magenta jaa: se on tassa merkki (IQ), 14px:n ylapalkkiviiva ja
   // laatikon reunaviiva - ei tayttoa, eli ilmeen saannon mukainen.
-  var INK = '#F3F2F2', CREAM = '#0B0A09', MAGENTA = '#FF2E7E',
+  var INK = '#F3F2F2', CREAM = '#0B0A09', MAGENTA = '#F5C542',
       MUTED = '#A8A29A', WHITE = '#141311', LINE = 'rgba(243,242,242,0.24)';
 
   function setStatus(msg, isError) {

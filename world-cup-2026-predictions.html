@@ -103,7 +103,7 @@
   /* Redesign 24.7 (brand-tokens.md): Space Grotesk -display-fontti + tumma
      ink-hero (index-gradientti, 6px magenta-raita) + cream-body.
      GEN:WCRECAP-lohko sailyy: .statrow/.stat/.num/.lbl/.meta tyylit alla. */
-  :root{ --bg:#0B0A09; --bg2:#1F1D1A; --card:#141311; --line:rgba(243,242,242,0.24); --accent:#FF2E7E; --accent-deep:#2ED6C2; --teal:#2ED6C2; --teal-ink:#2ED6C2; --ink:#F3F2F2; --ink-2:#F3F2F2; --text:#F3F2F2; --muted:#A8A29A; --hero-muted:#A8A29A; --radius:2px; --font-display:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  :root{/* 1.8.2026: magenta poistettiin paletista; nama korvaavat tokenit olivat viittauksina mutta puuttuivat :rootista. */--cream:#F3F2F2; --bg:#0B0A09; --bg2:#1F1D1A; --card:#141311; --line:rgba(243,242,242,0.24); --accent:#F5C542; --accent-deep:#2ED6C2; --teal:#2ED6C2; --teal-ink:#2ED6C2; --ink:#F3F2F2; --ink-2:#F3F2F2; --text:#F3F2F2; --muted:#A8A29A; --hero-muted:#A8A29A; --radius:2px; --font-display:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px 80px; }

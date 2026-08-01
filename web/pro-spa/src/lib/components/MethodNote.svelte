@@ -46,7 +46,7 @@
 		flex: none;
 		width: 18px;
 		height: 18px;
-		border-radius: 50%;
+		border-radius: var(--radius);
 		border: 1.5px solid var(--positive);
 		color: var(--positive);
 		font-style: italic;

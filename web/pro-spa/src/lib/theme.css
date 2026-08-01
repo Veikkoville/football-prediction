@@ -17,17 +17,21 @@
      --text-muted  #A8A29A   7.82:1   --accent-strong #C99A17 7.65:1
      --faint       #8A847A   5.33:1   --positive    #5FD97A  11.01:1
      --negative    #FF8A5C   8.52:1   --giq-teal    #2ED6C2  10.85:1
-     --giq-magenta #FF2E7E   5.60:1 (vain mark/live)
+     --giq-rust    #C7502A   FDR-5:n tintti (ei tekstivärinä)
      ink --accentin päällä  12.20:1 (täyttönapin teksti)
      --border 0.24 = 1.97:1 (pintaero), --border-strong 0.40 = 3.50:1 (1.4.11)
    Jos muutat hexiä, laske suhde uudelleen — älä arvaa. */
 :root {
-	/* brändi — teletext-askelmat. magenta säilyy: mark on sama kaikkialla. */
-	--giq-magenta: #ff2e7e;
-	/* ⚠️ magenta-deep #C4005F on tummalla 3.31:1 eli AA:n ALLE. Se ei enää
-	   kelpaa tekstiksi/linkiksi; jätetty tokeniksi vain FDR-5-tintin pohjaksi. */
-	--giq-magenta-deep: #c4005f;
-	--giq-magenta-light: #ff4d90;
+	/* 1.8.2026 (Villen päätös): MAGENTA POISTETTU KOKONAAN — ei brändistä, ei
+	   markista, ei FDR-asteikosta. Se luki pinkkinä eikä istunut teletextiin,
+	   jonka koko ilme on amber + teal tummalla. Tokenit jätetään aliaksiksi
+	   VAIN siksi, ettei yksikään unohtunut viittaus renderöi läpinäkyvää tai
+	   mustaa; uusia viittauksia ei saa lisätä.
+	   Korvaajat: mark/live -> amber, linkit/korostus -> teal, FDR-5 -> rust. */
+	--giq-rust: #c7502a;
+	--giq-magenta: var(--giq-gold-deep);
+	--giq-magenta-deep: var(--giq-rust);
+	--giq-magenta-light: var(--giq-gold);
 	--giq-coral: #ff8a5c;
 	/* messinki sammuu mustaa vasten (lukuina se katoaa) -> amber */
 	--giq-gold: #ffd873;
@@ -58,7 +62,7 @@
 	--text-muted: var(--giq-muted);
 	/* tertiääri: #7A746B olisi 4.27:1 eli AA:n alle -> #8A847A (5.33:1) */
 	--faint: #8a847a;
-	/* primary action = amber (magenta on varattu kolmeen työhön) */
+	/* primary action = amber; korostus/linkki = teal. Muita ei ole. */
 	--accent: var(--giq-gold-deep);
 	--accent-strong: #c99a17;
 	/* ⚠️ KÄÄNTYI: täytön päällä on nyt ink, ei valkoinen. Valkoinen amberilla
@@ -74,7 +78,7 @@
 	--fdr-2: var(--giq-teal);
 	--fdr-3: var(--giq-gold-deep);
 	--fdr-4: var(--giq-coral);
-	--fdr-5: var(--giq-magenta-deep);
+	--fdr-5: var(--giq-rust);
 
 	/* typografia — 28.7 teletext: yksi monospace kantaa kaiken. Nimet
 	   --font-sans/--font-display säilyvät, jotta komponentteja ei tarvitse
@@ -136,8 +140,12 @@ h3 {
 	line-height: 1.1;
 	/* Cormorant on kapea ja korkea — negatiivinen välistys tekisi siitä
 	   tukkoisen, joten se nollataan ja paino jää kevyeksi (600, ei 700). */
-	letter-spacing: 0;
-	font-weight: 600;
+	/* 1.8.2026: landingin otsikkokieli — versaali + tiukka valistys.
+	   Aiempi kommentti puhui Cormorantista, jota ei ole kaytetty sitten
+	   teletext-siirtyman. */
+	letter-spacing: -0.02em;
+	text-transform: uppercase;
+	font-weight: 700;
 	margin: 0 0 var(--s-3);
 }
 
@@ -164,7 +172,9 @@ p {
 }
 
 a {
-	color: var(--accent-strong);
+	/* landing (goaliq.app) kayttaa tealia linkkivarina — sama tassa, jotta
+	   pinnat ovat samannakoiset. */
+	color: var(--giq-teal);
 	text-decoration: none;
 }
 a:hover {

@@ -37,7 +37,7 @@
 		   Sama kieli kuin muillakin korostuksilla: viiva kantaa painon. */
 		border: 1px solid var(--border);
 		border-left: 2px solid var(--accent);
-		border-radius: var(--radius, 2px);
+		border-radius: var(--radius);
 		padding: 0.75rem 0.9rem;
 		margin: 0 0 1rem;
 		text-decoration: none;

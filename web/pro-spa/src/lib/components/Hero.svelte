@@ -54,26 +54,12 @@
 		     pyöristetty neliö + IQ-aksentti, sama kaava kuin wordmarkissa.
 		     HUOM: app-ikonia/faviconia EI muuteta; ne tarvitsevat täytön
 		     erottuakseen kotinäytöllä ja kauppalistauksella. -->
-		<svg class="mark" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
-			<rect
-				x="1.2"
-				y="1.2"
-				width="41.6"
-				height="41.6"
-				rx="9"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="1.4"
-			/>
-			<text
-				x="22"
-				y="29"
-				text-anchor="middle"
-				font-family="var(--font-display)"
-				font-size="20"
-				font-weight="600"
-				fill="currentColor">I<tspan fill="var(--giq-magenta)">Q</tspan></text
-			>
+		<!-- 1.8.2026: kanoninen merkki = amber-laatikko + ink IQ, sama joka
+		     sivulla ja mobiilissa. Aiempi outline-merkki magentalla Q:lla oli
+		     kolmas eri versio samasta logosta. -->
+		<svg class="mark" width="44" height="44" viewBox="0 0 44 44" role="img" aria-label="GoalIQ">
+			<rect x="0" y="0" width="44" height="44" fill="#F5C542" />
+			<text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,ui-monospace,Consolas,monospace" font-size="20" font-weight="700" letter-spacing="-0.5" fill="#0B0A09">IQ</text>
 		</svg>
 		<div>
 			<div class="word">Goal<span>IQ</span> Premium</div>
@@ -140,7 +126,7 @@
 		background: transparent;
 		border: none;
 		border-bottom: 1px solid var(--border);
-		border-radius: 0;
+		border-radius: var(--radius);
 		box-shadow: none;
 		padding: var(--s-4) 0 var(--s-5);
 		display: flex;
@@ -165,7 +151,8 @@
 		line-height: 1.1;
 	}
 	.word span {
-		color: var(--giq-magenta);
+		/* sanamerkin IQ seuraa merkkia: amber, ei enaa magenta */
+		color: var(--accent);
 	}
 	.tag {
 		color: var(--text-muted);
@@ -173,8 +160,8 @@
 		margin-top: 2px;
 	}
 	.tag a {
-		/* kirkas magenta luettavana tummalla bändillä (deep jäisi heikoksi) */
-		color: var(--giq-magenta);
+		/* landingin linkkivari */
+		color: var(--giq-teal);
 	}
 	.session {
 		display: flex;
@@ -231,7 +218,7 @@
 		border: none;
 		padding: 0;
 		margin: 0;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-size: var(--step--1);
 		font-weight: 700;
 		text-decoration: underline;
@@ -252,7 +239,7 @@
 		text-transform: uppercase;
 		line-height: 1.6;
 		padding: 1px 10px;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		white-space: nowrap;
 	}
 	/* 26.7 classic: premium-merkki on outline, ei magentaläikkä */
@@ -270,6 +257,6 @@
 	}
 	.plan.free:hover {
 		color: var(--text);
-		border-color: var(--giq-magenta);
+		border-color: var(--accent);
 	}
 </style>

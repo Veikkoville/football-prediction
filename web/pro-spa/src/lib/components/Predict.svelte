@@ -406,7 +406,7 @@
 	.bar {
 		display: flex;
 		height: 10px;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		overflow: hidden;
 		background: var(--surface);
 		max-width: 620px;

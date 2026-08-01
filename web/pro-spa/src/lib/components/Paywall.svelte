@@ -89,7 +89,7 @@
 		justify-content: space-between;
 	}
 	.locked {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		letter-spacing: 2px;
 	}

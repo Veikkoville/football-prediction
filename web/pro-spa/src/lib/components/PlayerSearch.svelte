@@ -130,7 +130,7 @@
 		text-align: left;
 		background: var(--surface-2);
 		border: none;
-		border-radius: 6px;
+		border-radius: var(--radius);
 		padding: 8px 10px;
 		margin-top: 4px;
 		cursor: pointer;
@@ -144,7 +144,7 @@
 	.flag {
 		font-size: var(--step--1);
 		font-weight: 700;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: 0 8px;
 		white-space: nowrap;
 	}

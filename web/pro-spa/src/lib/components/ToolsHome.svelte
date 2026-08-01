@@ -438,7 +438,7 @@
 		text-align: left;
 		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius);
 		padding: var(--s-4);
 		font: inherit;
 		color: var(--text);
@@ -459,7 +459,7 @@
 		font-size: var(--step--1);
 		color: var(--text-muted);
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: 0 0.6em;
 	}
 	.tool-card-desc {
@@ -474,7 +474,7 @@
 	.matches-nav button {
 		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		color: var(--text-muted);
 		font-size: var(--step--1);
 		font-weight: 700;
@@ -488,7 +488,7 @@
 	}
 	.locked {
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius);
 		padding: var(--s-4);
 		margin: var(--s-4) 0;
 		background: var(--surface);

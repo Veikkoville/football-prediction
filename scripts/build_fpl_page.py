@@ -646,13 +646,13 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         f"<style>{BYCOMP_CSS}"
         ".rec-filters{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;}"
         ".rec-filter{border:1px solid rgba(128,128,128,.4);background:transparent;"
-        "color:inherit;border-radius:2px;padding:6px 14px;font-size:13px;"
+        "color:inherit;border-radius: 0;padding:6px 14px;font-size:13px;"
         "font-weight:600;cursor:pointer;}"
         ".rec-filter.on{background:var(--rec-on-bg,transparent);"
         "border-color:var(--rec-on-line,#B68235);color:var(--rec-on-fg,#8C6428);}"
         ".rec-scroll{overflow-x:auto;overflow-y:auto;max-height:560px;"
         "-webkit-overflow-scrolling:touch;border:1px solid rgba(128,128,128,.3);"
-        "border-radius:2px;}"
+        "border-radius: 0;}"
         ".rec-scroll table{width:100%;border-collapse:collapse;min-width:640px;}"
         ".rec-scroll th,.rec-scroll td{text-align:left;padding:8px 10px;"
         "border-bottom:1px solid rgba(128,128,128,.2);font-size:14px;}"
@@ -1032,7 +1032,7 @@ CSS = """
        --teal 10.85:1   --negative 8.52:1   --faint 5.33:1
      HUOM --magenta-deep on tummalla 3.31:1 eli AA:n ALLE: se ei ole
      enaa linkki- eika lukuvari, vain mark. Linkit = teal, luvut = amber. */
-  :root{ --magenta:#FF2E7E; --magenta-deep:#C4005F; --coral:#FF8A5C; --gold:#FFD873; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#C99A17; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
+  :root{ --coral:#FF8A5C; --gold:#FFD873; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#C99A17; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
     /* jaetun record-lohkon tokenit (build_fpl_page.by_comp/record).
        predictions.html EI maarita naita -> se saa classic-fallbackit. */
     --rec-thead-bg:#1F1D1A; --rec-thead-fg:#A8A29A; --rec-hit:#5FD97A;
@@ -1052,7 +1052,7 @@ CSS = """
   .nav{ max-width:960px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
   .brand{ font-size:24px; font-weight:800; letter-spacing:.5px; }
   .brand a{ color:var(--cream); text-decoration:none; display:inline-flex; align-items:center; gap:0; }
-  .brand span{ color:var(--magenta); }
+  .brand span{ color:var(--amber); }
   .brand-icon{ margin-right:8px; width:26px; height:26px; border-radius:var(--radius); display:block; }
   .cta{ display:inline-block; background:transparent; color:var(--amber); border:1px solid var(--amber); text-decoration:none; padding:14px 24px; border-radius:var(--radius); font-weight:800; min-height:48px; }
   .cta:hover{ background:var(--amber); color:var(--ink); }

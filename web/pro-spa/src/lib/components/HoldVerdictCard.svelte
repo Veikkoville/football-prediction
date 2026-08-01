@@ -64,7 +64,7 @@
 		background: linear-gradient(160deg, rgba(46, 214, 194, 0.08), transparent 60%), var(--surface);
 	}
 	.verdict-hero.go {
-		border-left: 4px solid var(--giq-magenta-deep);
+		border-left: 4px solid var(--giq-rust);
 	}
 	.title {
 		margin: 0 0 var(--s-1);

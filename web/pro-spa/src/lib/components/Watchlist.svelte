@@ -248,7 +248,7 @@
 <style>
 	.watchlist {
 		border: 1px solid var(--border);
-		border-radius: var(--radius, 0);
+		border-radius: var(--radius);
 		padding: var(--s-4);
 		margin: var(--s-4) 0;
 		background: var(--surface);
@@ -295,7 +295,7 @@
 	.band-chip {
 		flex: 0 0 auto;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text-muted);
 		font-weight: 700;
@@ -313,7 +313,7 @@
 	.band-row select {
 		flex: 0 0 auto;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text);
 		font-weight: 600;

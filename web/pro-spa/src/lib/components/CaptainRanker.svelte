@@ -127,7 +127,7 @@
 	.share-chip {
 		flex: 0 0 auto;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text-muted);
 		font-weight: 700;
@@ -145,7 +145,7 @@
 		display: inline-block;
 		margin-left: 5px;
 		padding: 0 5px;
-		border-radius: 4px;
+		border-radius: var(--radius);
 		border: 1px solid rgba(243, 242, 242, 0.28);
 		font-size: 0.68em;
 		font-weight: 700;

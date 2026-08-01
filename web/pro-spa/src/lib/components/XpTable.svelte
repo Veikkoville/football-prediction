@@ -420,7 +420,7 @@
 	.show-all {
 		margin-top: var(--s-3);
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text-muted);
 		font-weight: 700;
@@ -431,7 +431,7 @@
 	}
 	.show-all:hover {
 		color: var(--text);
-		border-color: var(--giq-magenta);
+		border-color: var(--accent);
 	}
 	.controls {
 		display: flex;
@@ -540,7 +540,7 @@
 		background: none;
 		border: 0;
 		padding: 0;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font: inherit;
 		font-weight: 700;
 		cursor: pointer;

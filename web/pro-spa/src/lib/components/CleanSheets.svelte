@@ -284,7 +284,7 @@
 		font: inherit;
 		padding: 0.2em 0.4em;
 		border: 1px solid var(--border);
-		border-radius: 6px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text);
 	}
@@ -293,7 +293,7 @@
 		font-size: var(--step--1);
 		padding: 0.2em 0.7em;
 		border: 1px solid var(--border);
-		border-radius: 6px;
+		border-radius: var(--radius);
 		background: transparent;
 		color: var(--text-muted);
 		cursor: pointer;
@@ -307,7 +307,7 @@
 	}
 	.skel-row {
 		height: 34px;
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius);
 		background: var(--surface);
 		border: 1px solid var(--border);
 		margin: var(--s-2) 0;

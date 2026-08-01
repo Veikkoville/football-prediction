@@ -253,7 +253,7 @@
 		gap: 6px;
 		background: rgba(255, 46, 126, 0.1);
 		border: 1px solid rgba(255, 46, 126, 0.35);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: 4px 12px;
 		font-weight: 700;
 		cursor: pointer;
@@ -263,7 +263,7 @@
 	}
 	.verdict {
 		background: rgba(255, 46, 126, 0.1);
-		border-radius: 8px;
+		border-radius: var(--radius);
 		padding: var(--s-3);
 		font-weight: 600;
 		margin-top: var(--s-4);
@@ -310,7 +310,7 @@
 		border: none;
 		padding: 0;
 		min-height: 0;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		font-size: inherit;
 		cursor: pointer;

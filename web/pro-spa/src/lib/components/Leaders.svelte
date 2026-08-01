@@ -915,12 +915,12 @@
 		cursor: pointer;
 	}
 	.sortbtn:hover {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 	}
 	.window-row select {
 		flex: 0 0 auto;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text);
 		font-weight: 600;
@@ -967,7 +967,7 @@
 		flex: 0 0 auto;
 		min-width: 36px;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text-muted);
 		font-weight: 700;
@@ -989,7 +989,7 @@
 	}
 	.strong {
 		font-weight: 800;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 	}
 	.teaser-row {
 		display: flex;

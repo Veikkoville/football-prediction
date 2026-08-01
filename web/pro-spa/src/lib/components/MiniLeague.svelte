@@ -262,10 +262,10 @@
 	}
 	/* Kohta 5: kompakti rivinappi (taulukkoon sopiva, ei globaali 44px) */
 	.use-btn {
-		border: 1px solid var(--giq-magenta);
-		border-radius: 999px;
+		border: 1px solid var(--accent);
+		border-radius: var(--radius);
 		background: var(--surface);
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		font-size: var(--step--1);
 		padding: 4px 12px;
@@ -306,7 +306,7 @@
 	}
 	.seg.a,
 	.dot.a {
-		background: var(--giq-magenta);
+		background: var(--accent);
 	}
 	.seg.draw,
 	.dot.draw {

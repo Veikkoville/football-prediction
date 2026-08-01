@@ -231,7 +231,7 @@
 		align-items: center;
 		gap: 1px;
 		border: 1px solid var(--border);
-		border-radius: var(--radius-sm, 6px);
+		border-radius: var(--radius);
 		padding: 3px 7px;
 		font-size: var(--step--1);
 		font-variant-numeric: tabular-nums;

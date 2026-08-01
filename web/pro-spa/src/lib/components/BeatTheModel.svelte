@@ -184,7 +184,7 @@
 		/* Sama kohtelu kuin track record -lohkolla: kauden vertailu on
 		   luottamusväite, ei yksi kortti muiden joukossa. */
 		border: 2px solid var(--teal, #2ed6c2);
-		border-radius: var(--radius, 0);
+		border-radius: var(--radius);
 		padding: var(--s-4);
 		margin: var(--s-4) 0;
 		background: var(--surface);
@@ -280,7 +280,7 @@
 		font-size: var(--step--1);
 		padding: 0.35em 0.6em;
 		border: 1px solid var(--border);
-		border-radius: var(--radius, 0);
+		border-radius: var(--radius);
 		background: var(--surface-alt, transparent);
 		color: var(--text);
 	}

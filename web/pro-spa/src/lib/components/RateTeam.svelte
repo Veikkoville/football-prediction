@@ -1325,7 +1325,7 @@
 	.slot-chip {
 		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		color: var(--text-muted);
 		font-weight: 700;
 		font-size: var(--step--1);
@@ -1334,13 +1334,13 @@
 	}
 	.slot-chip.active {
 		background: rgba(255, 46, 126, 0.1);
-		border-color: var(--giq-magenta);
-		color: var(--giq-magenta-deep);
+		border-color: var(--accent);
+		color: var(--giq-rust);
 	}
 	.compare-box {
 		max-width: 640px;
 		border: 1px solid var(--border);
-		border-left: 4px solid var(--giq-magenta-deep);
+		border-left: 4px solid var(--giq-rust);
 		border-radius: var(--radius);
 		background: var(--surface);
 		padding: var(--s-3) var(--s-4);
@@ -1362,9 +1362,9 @@
 	}
 	.model-squad-btn {
 		background: var(--surface);
-		border: 1px solid var(--giq-magenta);
+		border: 1px solid var(--accent);
 		border-radius: var(--radius);
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		font-size: var(--step--1);
 		padding: 8px 16px;
@@ -1378,7 +1378,7 @@
 	/* Web P1: week-tyhjätilan kortti */
 	.week-setup {
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius);
 		padding: var(--s-4);
 		margin: var(--s-3) 0;
 		background: var(--surface);
@@ -1416,14 +1416,14 @@
 		cursor: pointer;
 	}
 	.remember-toggle input {
-		accent-color: var(--giq-magenta);
+		accent-color: var(--accent);
 	}
 	/* #121: apply-to-planner */
 	.apply-btn {
-		border: 1px solid var(--giq-magenta);
-		border-radius: 999px;
+		border: 1px solid var(--accent);
+		border-radius: var(--radius);
 		background: var(--surface);
-		color: var(--giq-magenta);
+		color: var(--accent);
 		font-weight: 700;
 		font-size: var(--step--1);
 		padding: 4px 12px;
@@ -1459,7 +1459,7 @@
 	.plan-btn {
 		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 8px;
+		border-radius: var(--radius);
 		color: var(--text);
 		font-weight: 600;
 		font-size: var(--step--1);
@@ -1474,7 +1474,7 @@
 		background: none;
 		border: none;
 		padding: 0;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		font-size: var(--step--1);
 		cursor: pointer;
@@ -1508,7 +1508,7 @@
 		gap: 6px;
 		background: rgba(255, 46, 126, 0.1);
 		border: 1px solid rgba(255, 46, 126, 0.35);
-		border-radius: 999px;
+		border-radius: var(--radius);
 		padding: 4px 12px;
 		font-weight: 700;
 		cursor: pointer;
@@ -1543,7 +1543,7 @@
 		margin: 0;
 		line-height: 1;
 		white-space: nowrap;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 	}
 	.hero-num {
@@ -1587,7 +1587,7 @@
 	.method summary {
 		cursor: pointer;
 		font-weight: 600;
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 	}
 	.method p {
 		margin: var(--s-2) 0 0;
@@ -1603,7 +1603,7 @@
 	.verdict-line {
 		max-width: 640px;
 		border: 1px solid var(--border);
-		border-left: 4px solid var(--giq-magenta-deep);
+		border-left: 4px solid var(--giq-rust);
 		background: var(--surface);
 		border-radius: var(--radius);
 		padding: var(--s-3) var(--s-4);
@@ -1657,10 +1657,10 @@
 		font-size: var(--step--1);
 	}
 	.teaser-row:hover {
-		border-color: var(--giq-magenta);
+		border-color: var(--accent);
 	}
 	.locked {
-		color: var(--giq-magenta-deep);
+		color: var(--giq-rust);
 		font-weight: 700;
 		letter-spacing: 2px;
 		margin-left: auto;
