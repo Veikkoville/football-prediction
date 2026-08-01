@@ -98,7 +98,7 @@ h1,h2,h3,.brand{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Co
 /* Peruslinkki: ilman tata .rec-laatikon "public track record" -linkki jai
    selaimen oletussiniseksi #0000EE:ksi. Elementtivalitsin haviaa kaikille
    luokkasaannoille, joten se osuu vain tyylittelemattomiin linkkeihin. */
-a{color:var(--ember);}
+a{color:var(--teal);}
 .dark{background:var(--cream);color:var(--ink);}
 .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
 .bar{height:1px;background:var(--line);}
@@ -128,7 +128,7 @@ padding:18px 20px;margin-bottom:14px;}
 .stat-row{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0;}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
 padding:12px 16px;flex:1 1 140px;}
-.stat b{display:block;font-size:26px;color:var(--ember);
+.stat b{display:block;font-size:26px;color:var(--amber);
 font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 font-variant-numeric:tabular-nums;}
 .stat span{color:var(--muted);font-size:12px;}
@@ -142,7 +142,7 @@ border-radius:0;text-decoration:none;font-size:14px;}
 .mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;
 padding:12px 0;border-bottom:1px solid var(--line);}
 .mrow:last-child{border-bottom:none;}
-.mrow a{color:var(--ember);font-weight:700;text-decoration:none;}
+.mrow a{color:var(--teal);font-weight:700;text-decoration:none;}
 .mrow .meta{color:var(--muted);font-size:12px;}
 .pick{color:var(--teal-ink);font-weight:700;font-size:13px;white-space:nowrap;}
 footer{border-top:1px solid var(--line);margin-top:36px;padding:22px 0 34px;
