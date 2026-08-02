@@ -12,6 +12,11 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
+<!-- 2.8 PERF: pro.goaliq.app on SPA jonka kaynnistys maksaa; avataan
+     yhteys ja DNS valmiiksi jo landingilla, jolloin klikkauksen jalkeen
+     jaljelle jaa vain lataus eika kattely. Ei vaikuta tahan sivuun. -->
+<link rel="preconnect" href="https://pro.goaliq.app">
+<link rel="preconnect" href="https://api.goaliq.app" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">

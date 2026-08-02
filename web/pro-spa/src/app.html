@@ -48,6 +48,10 @@
 			content="Clean sheet probability, fixture difficulty and player expected points from the GoalIQ match model."
 		/>
 		<meta name="twitter:image" content="https://pro.goaliq.app/goaliq-social-1200x630.png" />
+		<!-- 2.8 PERF: API ja Supabase avataan valmiiksi, koska molempiin
+		     soitetaan heti kun sovellus on kaynnistynyt. Sailyttaa TLS-kattelyn
+		     ajan kriittiselta polulta. -->
+		<link rel="preconnect" href="https://api.goaliq.app" crossorigin />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<!-- 26.7 PERF: preload+onload, ei render-blocking stylesheetiä (sama
@@ -67,6 +71,47 @@
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
+		<!-- 2.8 PERF: kuori on 5,5 kB ja sovellus 736 kB JS:aa, joten ilman tata
+		     ruutu oli TYHJA koko latauksen ajan. Tama runko on osa HTML:aa eli
+		     maalautuu heti ensimmaisesta tavusta. +layout poistaa sen mountissa.
+		     Tarkoituksella pelkka kehys, EI valeskeleton datalle jota ei viela
+		     ole: tyhja rivi joka tayttyy on rehellinen, valeluku ei olisi. -->
+		<div id="boot" aria-hidden="true">
+			<div class="boot-bar">GoalIQ Premium</div>
+			<div class="boot-lines"><i></i><i></i><i></i></div>
+		</div>
+		<style>
+			#boot {
+				font-family: 'IBM Plex Mono', ui-monospace, monospace;
+				max-width: 960px;
+				margin: 0 auto;
+				padding: 16px;
+			}
+			#boot .boot-bar {
+				background: #f3f2f2;
+				color: #0b0a09;
+				font-size: 11.5px;
+				text-transform: uppercase;
+				letter-spacing: 0.16em;
+				padding: 6px 10px;
+			}
+			#boot .boot-lines {
+				display: grid;
+				gap: 8px;
+				margin-top: 12px;
+			}
+			#boot .boot-lines i {
+				display: block;
+				height: 14px;
+				background: #1f1d1a;
+			}
+			#boot .boot-lines i:nth-child(2) {
+				width: 72%;
+			}
+			#boot .boot-lines i:nth-child(3) {
+				width: 45%;
+			}
+		</style>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

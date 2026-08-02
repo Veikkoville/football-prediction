@@ -7,6 +7,8 @@
 	let { children } = $props();
 
 	onMount(() => {
+		// 2.8 PERF: app.html:n boot-runko pois heti kun oikea sisältö on DOM:issa.
+		document.getElementById('boot')?.remove();
 		initAnalytics();
 		// Web-funnel (#12-pariteetti): sivulataus kerran per lataus.
 		// 2.8.2026: src/srcp = landingin CTA-lahdetagi (ks. staattisten sivujen
