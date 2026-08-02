@@ -34,6 +34,9 @@ PL_TOURNAMENT = 17
 PL_SEASON_2627 = 96668
 # Kohteliaisuusviive: tama on epavirallinen rajapinta eika sita saa hakata.
 SLEEP_S = 0.6
+# Turnauksen jalkeinen loma + paluu treeneihin. Sen sisalla pelatut
+# harjoitusminuutit eivat kerro pelaajan roolista mitaan.
+WC_REST_DAYS = 28
 
 
 def _get(path: str) -> dict:
@@ -93,6 +96,7 @@ class PlayerMinutes:
     sofascore_id: int
     name: str
     team: str
+    country: str = ""
     matches: int = 0
     starts: int = 0
     minutes: int = 0
@@ -129,11 +133,81 @@ def event_minutes(event_id: int) -> list[dict]:
             rows.append({
                 "sofascore_id": pl["id"],
                 "name": pl.get("name") or pl.get("shortName") or "",
+                "country": ((pl.get("country") or {}).get("name") or ""),
                 "side": side,
                 "minutes": mins,
                 "started": not bool(p.get("substitute")),
             })
     return rows
+
+
+WC_TOURNAMENT = 16
+WC_SEASON_2026 = 58210
+
+
+def wc_players_by_last_appearance() -> dict[int, str]:
+    """Sofascore-pelaaja-id -> hanen VIIMEISEN MM-ottelunsa paivamaara.
+
+    Miksi pelaajatasolla eika kansalaisuudella: ensimmainen versio liputti
+    kansalaisuuden perusteella ja merkitsi 110/191 pelaajaa, joista 92
+    englantilaista. Valtaosa PL:n englantilaisista ei ollut turnauksessa
+    lainkaan, joten lippu olisi sulkenut pois yli puolet datasta ja tehnyt
+    signaalista hyodyttoman. Vain oikeasti pelanneet lasketaan.
+    """
+    out: dict[int, str] = {}
+    try:
+        rounds = _get(
+            f"unique-tournament/{WC_TOURNAMENT}/season/{WC_SEASON_2026}/events/last/0"
+        ).get("events", [])
+        for page in (1, 2, 3):
+            more = _get(
+                f"unique-tournament/{WC_TOURNAMENT}/season/{WC_SEASON_2026}"
+                f"/events/last/{page}"
+            ).get("events", [])
+            if not more:
+                break
+            rounds += more
+    except Exception:
+        return out
+
+    import datetime as _dt
+    for e in rounds:
+        ts = e.get("startTimestamp")
+        if not ts:
+            continue
+        day = _dt.date.fromtimestamp(ts).isoformat()
+        try:
+            rows = event_minutes(e["id"])
+        except Exception:
+            continue
+        for r in rows:
+            pid = r["sofascore_id"]
+            if day > out.get(pid, ""):
+                out[pid] = day
+    return out
+
+
+def wc_last_match_dates() -> dict[str, str]:
+    """Maa -> sen VIIMEISEN MM-ottelun paivamaara, omasta ennustelokista.
+
+    Miksi lokista eika kovakoodattuna: loki sisaltaa kaikki 64 gradattua
+    MM-ottelua tuloksineen, joten "kuinka pitkalle maa paasi" on siella
+    faktana. Kovakoodattu vaihetaulukko vanhenisi ja voisi olla vaarin.
+    """
+    import config
+    p = config.PROJECT_ROOT / "data" / "prediction_log.json"
+    if not p.exists():
+        return {}
+    rows = json.loads(p.read_text(encoding="utf-8")).get("predictions", [])
+    out: dict[str, str] = {}
+    for r in rows:
+        if r.get("competition") != "WC" or not r.get("result") or not r.get("date"):
+            continue
+        d = r["date"][:10]
+        for team in (r.get("home_team"), r.get("away_team")):
+            if team and d > out.get(team, ""):
+                out[team] = d
+    return out
 
 
 def build(days_back: int = 45, teams: list[dict] | None = None,
@@ -177,6 +251,7 @@ def build(days_back: int = 45, teams: list[dict] | None = None,
                         sofascore_id=r["sofascore_id"],
                         name=r["name"],
                         team=team_by_sofa[sofa_team],
+                        country=r.get("country", ""),
                     )
                     agg[r["sofascore_id"]] = pm
                 pm.matches += 1
@@ -184,13 +259,43 @@ def build(days_back: int = 45, teams: list[dict] | None = None,
                 pm.starts += 1 if r["started"] else 0
                 pm.per_match.append(r["minutes"])
 
+    # MM-LIPPU (Villen havainto 2.8): MM-kisoissa pitkalle paasseiden maiden
+    # pelaajat eivat pelaa esikautta normaalisti. Finaali oli 19.7.2026 eli
+    # kaksi viikkoa ennen tata ikkunaa. Naiden pelaajien matalat minuutit ovat
+    # TURNAUSLEPOA, eivat merkki paikan menetyksesta. Ilman tata lippua
+    # minuuttisignaali rankaisisi jarjestelmallisesti parhaita pelaajia
+    # parhaista maista, eli olisi aktiivisesti haitallinen.
+    wc_by_player = wc_players_by_last_appearance()
+    wc_by_nation = wc_last_match_dates()
+    import datetime as _dt
+    today = _dt.date.fromtimestamp(now_ts)
+
     players = []
     for pm in agg.values():
         d = asdict(pm)
         d["avg_minutes"] = pm.avg_minutes
         d["start_rate"] = pm.start_rate
+        # Ensisijaisesti pelaajataso (oikeasti pelasi MM-kisoissa). Jos
+        # MM-haku epaonnistui kokonaan, EI palata kansalaisuuteen: se
+        # yliliputtaisi. Silloin lippu jaa pois ja se nakyy metassa.
+        last = wc_by_player.get(pm.sofascore_id)
+        d["wc_played"] = last is not None
+        d["wc_nation_last_match"] = wc_by_nation.get(pm.country)
+        d["wc_last_match"] = last
+        if last:
+            d["wc_rest_days"] = (today - _dt.date.fromisoformat(last)).days
+        else:
+            d["wc_rest_days"] = None
+        # MITTAUS 2.8: kaikilla 15 MM-pelaajalla oli TASAN 1 harjoitusottelu
+        # (13-90 min), kun muilla oli 3-5 ottelua ja 190-226 min. Lepopaivat
+        # (26-38) EIVAT erotelleet heita lainkaan, joten kynnys olisi
+        # virheellisesti "puhdistanut" 14/15. Siksi lippu on osallistuminen,
+        # ei lepoaika: MM-pelaajan minuutteja ei voi verrata muihin talla
+        # esikaudella, piste.
+        d["minutes_confounded"] = d["wc_played"]
         players.append(d)
     players.sort(key=lambda p: (-p["minutes"], p["name"]))
+    flagged = sum(1 for p in players if p["minutes_confounded"])
 
     return {
         "meta": {
@@ -199,10 +304,25 @@ def build(days_back: int = 45, teams: list[dict] | None = None,
             "days_back": days_back,
             "events": len(events_used),
             "players": len(players),
+            "wc_confounded": flagged,
+            "wc_rest_days_threshold": WC_REST_DAYS,
+            "wc_players_seen": len(wc_by_player),
             "note": (
                 "Pre-season friendly minutes. Observation, not projection: "
                 "rotation is heavy, opposition is uneven and trialists play. "
                 "45 minutes in July does not mean 90 in August."
+            ),
+            "wc_note": (
+                "minutes_confounded marks players who actually appeared at the "
+                "2026 World Cup. Their friendly minutes are post-tournament "
+                "ramp-up, not a loss of role, and are not comparable with "
+                "players who had a normal summer. Any minutes signal must "
+                "exclude them."
+            ),
+            "wc_absence_warning": (
+                "The bigger confounder is absence, not low minutes. Players "
+                "from the deepest runs have not appeared in a friendly at all, "
+                "so a missing player is not a negative signal this pre-season."
             ),
         },
         "events": events_used,
