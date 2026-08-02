@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { fetchPriceWatch, confBand, type PriceWatchResponse, type PriceMove } from '$lib/fantasyTools';
+	import { canShareToApps, shareCard } from '$lib/shareCard';
+	import { capture } from '$lib/analytics';
 
 	let data = $state<PriceWatchResponse | null>(null);
 	let error = $state<string | null>(null);
@@ -23,6 +25,40 @@
 	let empty = $derived(
 		data != null && data.risers.length === 0 && data.fallers.length === 0
 	);
+	/* 2.8: jakokortti free-datalle. Price watch ei ole premiumia, ja juuri
+	 * free-datan jakaminen on jakelusilmukka: jakaja mainostaa meitä
+	 * maksamatta. Sama shareCard-moottori kuin leaders-listoilla. */
+	let sharing = $state('');
+
+	async function shareMoves(title: string, rows: PriceMove[]) {
+		if (sharing) return;
+		sharing = title;
+		try {
+			const method = await shareCard({
+				title: `PRICE ${title.toUpperCase()}`,
+				// Disclaimer kortin kylkeen: FPL:n kynnysarvot eivät ole julkisia,
+				// joten tämä on arvio eikä virallinen. Sama rehellisyysrivi kuin
+				// endpointin metassa.
+				subtitle: 'estimated from transfer activity, not official',
+				midLabel: 'PRICE',
+				valueLabel: 'PROGRESS',
+				fileName: `goaliq_price_${title.toLowerCase()}.png`,
+				rows: rows.slice(0, 10).map((r, i) => ({
+					rank: i + 1,
+					name: r.web_name,
+					tag: confBand(r.confidence).toUpperCase(),
+					team: '',
+					mid: typeof r.now_cost === 'number' ? (r.now_cost / 10).toFixed(1) : '',
+					value: `${Math.round(r.progress_pct)}%`
+				}))
+			});
+			if (method !== 'aborted') {
+				capture('xp_card_shared', { list: `price_${title.toLowerCase()}`, method });
+			}
+		} finally {
+			sharing = '';
+		}
+	}
 </script>
 
 {#snippet moveTable(title: string, rows: PriceMove[])}
@@ -31,6 +67,21 @@
 		{#if rows.length === 0}
 			<p class="muted">No candidates right now.</p>
 		{:else}
+			<!-- 2.8: jakokortti free-datalle, sama kaava kuin Clean Sheetsissä.
+			     Nappi ilmestyy itsestään kun listalla on 3+ riviä: esikaudella
+			     risers/fallers ovat tyhjät (n_with_transfer_activity 0), joten
+			     tämä on inertti 21.8. asti eikä lupaa korttia jota ei voi tehdä. -->
+			{#if rows.length >= 3}
+				<div class="share-row">
+					<button type="button" class="share-btn" onclick={() => shareMoves(title, rows)} disabled={sharing !== ''}>
+						{sharing === title
+							? 'Rendering…'
+							: canShareToApps()
+								? 'Share as image'
+								: 'Download image'}
+					</button>
+				</div>
+			{/if}
 			<div class="table-wrap">
 				<table>
 					<thead>
@@ -102,6 +153,28 @@
 		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 		gap: var(--s-6);
 		align-items: start;
+	}
+	.share-row {
+		display: flex;
+		justify-content: flex-end;
+		margin: 0 0 8px;
+	}
+	.share-btn {
+		background: transparent;
+		border: 1px solid var(--track);
+		color: var(--muted);
+		font: inherit;
+		font-size: 11px;
+		padding: 4px 8px;
+		cursor: pointer;
+	}
+	.share-btn:hover:not(:disabled) {
+		color: var(--cream);
+		border-color: var(--muted);
+	}
+	.share-btn:disabled {
+		opacity: 0.6;
+		cursor: default;
 	}
 	.watch-col h3 {
 		margin-top: 0;

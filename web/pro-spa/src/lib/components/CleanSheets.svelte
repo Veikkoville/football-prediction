@@ -7,6 +7,8 @@
 	 * -värisäännöt) — vain kuori vaihtui.
 	 */
 	import { fetchFantasy, type FantasyResponse, type FantasyTeam } from '$lib/api';
+	import { canShareToApps, shareCard } from '$lib/shareCard';
+	import { capture } from '$lib/analytics';
 	import MethodNote from './MethodNote.svelte';
 
 	let data = $state<FantasyResponse | null>(null);
@@ -90,6 +92,46 @@
 		});
 		return rows;
 	});
+
+	/* 2.8: jakokortti myös FREE-datalle. #9a shipattiin 31.7 vain premium-
+	 * listoille sillä perusteella että kortti on premium-datan johdannainen.
+	 * Clean sheet -ennuste EI ole premiumia (FAQ: "Free: clean sheet
+	 * probabilities, fixture difficulty ratings"), joten tässä ei ole mitään
+	 * porttia — ja juuri free-datan jakaminen on se jakelusilmukka jonka
+	 * haluamme: jakaja mainostaa meitä ilman että hän on maksanut. */
+	let sharing = $state(false);
+
+	/* Vain joukkueet joilla on mallinnettu CS% valitulla välillä. Kaukaisilla
+	 * kierroksilla avgCs on null (far_basis), eikä korttiin panna tyhjää
+	 * lukua eikä FDR:ää CS%:n paikalle. */
+	let shareRows = $derived(sortedTeams.filter((r) => r.a.avgCs != null).slice(0, 10));
+
+	async function shareCs() {
+		if (sharing || shareRows.length < 3) return;
+		sharing = true;
+		try {
+			const method = await shareCard({
+				title: 'CLEAN SHEET OUTLOOK',
+				subtitle: `GW${gwFrom} to GW${gwTo}, GoalIQ match model`,
+				midLabel: 'FDR',
+				valueLabel: 'CS%',
+				fileName: 'goaliq_clean_sheets.png',
+				rows: shareRows.map((r, i) => ({
+					rank: i + 1,
+					name: r.t.name,
+					// tyhjä GW = 0 ja tupla = 2: se on FPL-pelaajalle olennaisin
+					// konteksti keskiarvon vieressä.
+					tag: `${r.a.n}x`,
+					team: '',
+					mid: r.a.avgFdr != null ? r.a.avgFdr.toFixed(2) : '',
+					value: `${Math.round(r.a.avgCs as number)}%`
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'clean_sheets', method });
+		} finally {
+			sharing = false;
+		}
+	}
 
 	let rangeHasFar = $derived(gwTo > minGw + nearHorizon - 1);
 	let hasDuoAny = $derived(
@@ -200,6 +242,18 @@
 			</p>
 		{/if}
 
+		{#if shareRows.length >= 3}
+			<div class="share-row">
+				<button type="button" class="gw-reset" onclick={shareCs} disabled={sharing}>
+					{sharing
+						? 'Rendering…'
+						: canShareToApps()
+							? 'Share as image'
+							: 'Download image'}
+				</button>
+			</div>
+		{/if}
+
 		<div class="table-wrap">
 			<table>
 				<thead>
@@ -287,6 +341,11 @@
 		border-radius: var(--radius);
 		background: var(--surface);
 		color: var(--text);
+	}
+	.share-row {
+		display: flex;
+		justify-content: flex-end;
+		margin: 0 0 8px;
 	}
 	.gw-reset {
 		font: inherit;
