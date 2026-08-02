@@ -136,6 +136,10 @@
 			data = await fetchRateTeam(id);
 			picksNotPublished = false;
 			void persistEntry(id); // #66: talteen vasta onnistuneesta hausta
+			// 2.8 aktivaatiomittari (mobiilipariteetti): lahtee vasta onnistuneesta
+			// hausta. mode kattaa entryn JA draftin, koska entry-ID ei voi onnistua
+			// esikaudella (picks_not_published) — pelkka entry nayttaisi nollaa 21.8. asti.
+			capture('rate_team_succeeded', { mode: 'entry', slot: 'a' });
 		} catch (err) {
 			data = null;
 			// 28.7 (PI-16): esikaudella entry-ID-polku EI VOI onnistua, koska FPL
@@ -338,6 +342,7 @@
 			data = await fetchRateTeamManual(picks.map((p) => p.id));
 			// Kohta 4: tulos näkyy → valitsin collapse-tilaan (Edit draft avaa).
 			pickerCollapsed = true;
+			capture('rate_team_succeeded', { mode: 'draft', slot: 'a', auto });
 		} catch (err) {
 			data = null;
 			error = err instanceof Error ? err.message : String(err);
@@ -565,6 +570,7 @@
 		try {
 			dataB = await fetchRateTeam(Number(entryBText.trim()));
 			picksNotPublishedB = false;
+			capture('rate_team_succeeded', { mode: 'entry', slot: 'b' });
 		} catch (err) {
 			dataB = null;
 			const code = (err as { code?: string })?.code;
@@ -590,6 +596,7 @@
 		capture('rate_team_draft_submitted', { picked_n: picksB.length, slot: 'b' });
 		try {
 			dataB = await fetchRateTeamManual(picksB.map((p) => p.id));
+			capture('rate_team_succeeded', { mode: 'draft', slot: 'b' });
 		} catch (err) {
 			dataB = null;
 			errorB = err instanceof Error ? err.message : String(err);
