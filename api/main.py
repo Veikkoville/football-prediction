@@ -3202,6 +3202,48 @@ def fantasy_defcon_gw(request: Request, response: Response):
     return payload
 
 
+@app.get("/api/fantasy/defcon-live")
+def fantasy_defcon_live(
+    response: Response,
+    entry: int | None = Query(default=None, ge=1, le=99_999_999,
+                              description="FPL entry ID (oma joukkue)"),
+    ids: str | None = Query(default=None,
+                            description="Vaihtoehto entrylle: pilkkulista element-ID:ita"),
+):
+    """DefCon-live (2.8): oman joukkueen defensive contribution KESKEN kierroksen.
+
+    Ainoa live-pinta tuotteessa. FPL:n virallinen appi vei live-rankit 20.-21.7.
+    featurepudotuksessa, mutta DefCon-kertyma on yha aukko: uusi pistesaanto,
+    vaikea seurata ottelun aikana, ja meilla on jo koko DefCon-datamalli.
+
+    Toisin kuin muut fantasy-endpointit tama EI lue committattua JSONia vaan
+    hakee FPL:n live-feedin (60 s TTL prosessissa). Sama `defensive_contribution`
+    -kentta kuin historiallisessa putkessa -> nakymat eivat voi olla eri mielta.
+
+    Kierrosten valissa ja esikaudella: available=false + note, ei virhetta.
+    """
+    from src.models.fpl_defcon_live import load_defcon_live
+    from src.models.fpl_rate_team import RateTeamError
+
+    id_list: list[int] | None = None
+    if ids:
+        try:
+            id_list = [int(x) for x in ids.split(",") if x.strip()][:20]
+        except ValueError:
+            raise HTTPException(status_code=400, detail="ids must be integers")
+    if entry is None and not id_list:
+        raise HTTPException(status_code=400, detail="Give either entry or ids.")
+
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        return load_defcon_live(entry_id=entry, ids=id_list)
+    except RateTeamError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except requests.RequestException as e:
+        # Ylavirran katko ei saa nayttaa meidan bugilta.
+        raise HTTPException(status_code=502, detail=f"FPL feed unavailable: {e}")
+
+
 @app.get("/api/fantasy/compare")
 def fantasy_compare(
     response: Response,
