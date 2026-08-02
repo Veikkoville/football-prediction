@@ -8,8 +8,23 @@
 
 	onMount(() => {
 		initAnalytics();
-		// Web-funnel (#12-pariteetti): sivulataus kerran per lataus
-		capture('pro_page_viewed', undefined, 'page_viewed');
+		// Web-funnel (#12-pariteetti): sivulataus kerran per lataus.
+		// 2.8.2026: src/srcp = landingin CTA-lahdetagi (ks. staattisten sivujen
+		// CTA-snippet). goaliq.app on cookieless persistence:'memory' -tilassa,
+		// joten distinct_id ei jatku domainien yli eika landing->pro-siirtymaa
+		// voinut aiemmin laskea lainkaan. Nama propit antavat saapumisasteen
+		// per CTA-paikka ilman evastetta. Puuttuvat kun kayttaja tuli suoraan.
+		const q = new URLSearchParams(location.search);
+		const src = q.get('src');
+		const srcPage = q.get('srcp');
+		const props: Record<string, string> = {};
+		if (src) props.src = src;
+		if (srcPage) props.src_page = srcPage;
+		capture(
+			'pro_page_viewed',
+			Object.keys(props).length ? props : undefined,
+			'page_viewed'
+		);
 		void initAuth();
 	});
 </script>

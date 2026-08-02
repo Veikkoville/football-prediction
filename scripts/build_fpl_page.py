@@ -51,14 +51,35 @@ posthog.register({platform:'web',source_app:'goaliq-static'});
 posthog.capture('web_landing_viewed',{page:location.pathname});
 </script>"""
 
-# #56: Pro CTA -klikkimittaus (pro_cta_clicked, prop location) - delegoitu
+# #56: Pro CTA -klikkimittaus (pro_cta_clicked, propit location + page) - delegoitu
 # listener, ei blokkaa navigaatiota, ei PII:ta, cookieless-moodi ennallaan.
-CTA_TRACK_SNIPPET = """<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+# 2.8.2026: sama snippet liittaa pro.goaliq.app-linkkeihin lahdetagin (src/srcp),
+# jonka SPA lukee pro_page_viewed-eventtiin -> saapumisaste per CTA-paikka.
+# Raw-string, koska tagays sisaltaa regex-kenoviivoja.
+CTA_TRACK_SNIPPET = r"""<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
-  if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta')}); }
+  if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta'), page: location.pathname}); }
 });
+/* 2.8.2026 saapumisattribuutio: goaliq.app ajaa persistence:'memory' -tilassa ja
+   pro.goaliq.app localStorage+cookie -tilassa, joten distinct_id EI jatku domainien
+   yli. Liitetaan pro-linkkeihin ei-identifioiva lahdetagi, jonka SPA lukee
+   pro_page_viewed-eventtiin. Ei evastetta, ei PII:ta. */
+(function () {
+  var links = document.querySelectorAll('a[data-cta]');
+  for (var i = 0; i < links.length; i++) {
+    var a = links[i], href = a.getAttribute('href');
+    if (!href) continue;
+    try {
+      var u = new URL(href, location.href);
+      if (u.hostname !== 'pro.goaliq.app' || u.searchParams.has('src')) continue;
+      u.searchParams.set('src', a.getAttribute('data-cta'));
+      u.searchParams.set('srcp', location.pathname.replace(/^\/|\.html$/g, '') || 'index');
+      a.setAttribute('href', u.toString());
+    } catch (err) { /* virheellinen href - jata linkki ennalleen */ }
+  }
+})();
 </script>"""
 
 
