@@ -339,8 +339,7 @@ def render_match_page(comp: str, e: dict) -> str:
     # gradattu mittari eika sita siksi tarvita vaitteen tueksi.
     desc = (
         f"{home} vs {away} ({cfg['name']}, {e.get('date')}): the GoalIQ model "
-        f"gives {fav} a {fav_pct} chance to win. Most likely score "
-        f"{e.get('most_likely_score') or 'n/a'}. Logged before kick-off in our "
+        f"gives {fav} a {fav_pct} chance to win. Logged before kick-off in our "
         f"public track record and graded after the match."
     )
     hero = (
@@ -352,8 +351,7 @@ def render_match_page(comp: str, e: dict) -> str:
     body = (
         f'<div class="card big">{_prob_block(e)}</div>'
         f'<div class="stat-row">'
-        f'<div class="stat"><b>{escape(e.get("most_likely_score") or "–")}</b><span>most likely score</span></div>'
-        f'<div class="stat"><b>xG</b><span>expected goals on '
+        f'<div class="stat"><b>Premium</b><span>expected goals and the most likely score on '
         f'<a href="https://pro.goaliq.app/?tab=premium&amp;src=predict-page&amp;srcp=predictions">GoalIQ Premium</a></span></div>'
         f"</div>"
         f'<div class="rec">This prediction was logged before kickoff on '
@@ -392,11 +390,11 @@ def render_match_page(comp: str, e: dict) -> str:
 def render_league_hub(comp: str, rows: list[dict], now: datetime) -> str:
     cfg = LEAGUES[comp]
     url = f"{BASE}/predictions/{cfg['slug']}/"
-    title = f"{cfg['name']} Predictions This Week – Win % & Score | GoalIQ"
+    title = f"{cfg['name']} Predictions This Week – Win Probability | GoalIQ"
     desc = (
-        f"Model predictions for upcoming {cfg['name']} matches: win probability "
-        f"and the most likely score for every fixture. Every prediction is "
-        f"logged before kickoff in GoalIQ's public track record."
+        f"Model win probabilities for upcoming {cfg['name']} matches. Every "
+        f"prediction is logged before kickoff in GoalIQ's public track record "
+        f"and graded after the match, hits and misses included."
     )
     items = []
     for e in rows:
