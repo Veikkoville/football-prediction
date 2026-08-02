@@ -330,10 +330,16 @@ def render_match_page(comp: str, e: dict) -> str:
     fav_pct = _fmt_pct(ph if e["predicted_winner"] == "home" else pa)
     url = f"{BASE}/predictions/{cfg['slug']}/{_match_filename(e)[:-5]}"
     title = f"{home} vs {away} Prediction – {cfg['name']} | GoalIQ"
+    # 2.8.2026 PREMIUM-VUOTO KIINNI: raaka xG on premium-dataa (PredictScreen
+    # #92: "siita johtaa total goals + BTTS + scoreline", XgStat locked=
+    # !isPremium), mutta se julkaistiin 1 930 indeksoidulla sivulla ilmaiseksi.
+    # Julki jaavat 1X2 ja todennakoisin tulos: molemmat ovat osa JULKAISTUA
+    # track recordia (pct_1x2 + pct_exact gradataan), eli ilman niita koko
+    # "logged before kickoff" -vaite ei olisi todennettavissa. xG ei ole
+    # gradattu mittari eika sita siksi tarvita vaitteen tueksi.
     desc = (
         f"{home} vs {away} ({cfg['name']}, {e.get('date')}): the GoalIQ model "
-        f"gives {fav} a {fav_pct} chance to win. Expected goals "
-        f"{e['xg_home']:.2f}-{e['xg_away']:.2f}, most likely score "
+        f"gives {fav} a {fav_pct} chance to win. Most likely score "
         f"{e.get('most_likely_score') or 'n/a'}. Logged before kick-off in our "
         f"public track record and graded after the match."
     )
@@ -346,9 +352,9 @@ def render_match_page(comp: str, e: dict) -> str:
     body = (
         f'<div class="card big">{_prob_block(e)}</div>'
         f'<div class="stat-row">'
-        f'<div class="stat"><b>{e["xg_home"]:.2f}</b><span>expected goals, {escape(home)}</span></div>'
-        f'<div class="stat"><b>{e["xg_away"]:.2f}</b><span>expected goals, {escape(away)}</span></div>'
         f'<div class="stat"><b>{escape(e.get("most_likely_score") or "–")}</b><span>most likely score</span></div>'
+        f'<div class="stat"><b>xG</b><span>expected goals on '
+        f'<a href="https://pro.goaliq.app/?tab=premium&amp;src=predict-page&amp;srcp=predictions">GoalIQ Premium</a></span></div>'
         f"</div>"
         f'<div class="rec">This prediction was logged before kickoff on '
         f'{escape((e.get("logged_at") or "")[:10])} and will be graded in our '
@@ -386,11 +392,11 @@ def render_match_page(comp: str, e: dict) -> str:
 def render_league_hub(comp: str, rows: list[dict], now: datetime) -> str:
     cfg = LEAGUES[comp]
     url = f"{BASE}/predictions/{cfg['slug']}/"
-    title = f"{cfg['name']} Predictions This Week – Win % & xG | GoalIQ"
+    title = f"{cfg['name']} Predictions This Week – Win % & Score | GoalIQ"
     desc = (
-        f"Model predictions for upcoming {cfg['name']} matches: win probability, "
-        f"expected goals and the most likely score for every fixture. Every "
-        f"prediction is logged before kickoff in GoalIQ's public track record."
+        f"Model predictions for upcoming {cfg['name']} matches: win probability "
+        f"and the most likely score for every fixture. Every prediction is "
+        f"logged before kickoff in GoalIQ's public track record."
     )
     items = []
     for e in rows:
