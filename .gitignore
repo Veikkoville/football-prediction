@@ -77,6 +77,12 @@ raw_data/
 !/data/fpl_xp_gw_accuracy.json
 !/data/fpl_xp_frozen/
 !/data/fpl_xp_frozen/*.json
+
+# 1.8: perustajalohkon luvut julkisesta entrysta (build_founder_stats.py).
+# Tama !-poikkeus PUUTTUI shipatessa -> data-refreshin commit-step kaatui
+# "paths are ignored"-virheeseen 4 ajossa (1.-2.8) eika MITAAN dataa pushattu.
+# build_fpl_page lukee taman repon puolelta, joten tiedoston on oltava mukana.
+!/data/founder_entry.json
 downloaded_files/
 ~/soccerdata/
 

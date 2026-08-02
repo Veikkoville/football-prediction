@@ -192,8 +192,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json
           # 30.7 tarkkuuslokit: olemassa vain kun gradattavaa/jäädytettävää on ollut
+          # 2.8: yhden valinnaisen tiedoston add EI saa kaataa koko pushia.
+          # Tausta: founder_entry.json puuttui .gitignoren !-poikkeuksista →
+          # git add exit 1 → shell `-e` tappoi stepin → projektiot, price watch
+          # ja leaders jäivät pushaamatta 4 ajossa (~14 h vanhaa dataa).
           for f in data/fpl_price_accuracy.json data/fpl_xp_gw_accuracy.json data/founder_entry.json; do
-            [ -f "$f" ] && git add "$f"
+            [ -f "$f" ] || continue
+            git add "$f" || echo "::warning::git add $f epäonnistui (gitignore?) — muu data pushataan silti"
           done
           [ -d data/fpl_xp_frozen ] && git add data/fpl_xp_frozen
           true
