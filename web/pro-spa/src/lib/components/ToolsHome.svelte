@@ -18,6 +18,7 @@
 	import { auth, refreshSubscription } from '$lib/auth.svelte';
 	import { fetchXp, type XpResponse } from '$lib/api';
 	import { capture } from '$lib/analytics';
+	import DefConLive from './DefConLive.svelte';
 	import Provenance from './Provenance.svelte';
 	import LeagueBanner from './LeagueBanner.svelte';
 	import SegmentNav, { type Segment } from './SegmentNav.svelte';
@@ -263,6 +264,10 @@
 
 	<Provenance />
 	<LeagueBanner />
+	<!-- 2.8: DefCon-live ylimpänä ja segmenttien ULKOPUOLELLA — se on
+	     aikakriittinen eikä saa olla välilehden takana. Renderöi tyhjää aina
+	     kun kierros ei ole käynnissä, joten esikaudella tämä ei näy. -->
+	<DefConLive />
 	<SegmentNav segments={GROUPS} bind:active={segment} label="GoalIQ FPL tools" />
 
 	{#if segment === 'week' || segment === 'team'}

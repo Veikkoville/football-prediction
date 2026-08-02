@@ -503,3 +503,36 @@ export async function fetchPlayerDefcon(
 ): Promise<DefconPlayerResponse> {
 	return getJson<DefconPlayerResponse>(`/api/fantasy/defcon/${id}?window=${window}`);
 }
+
+/** DefCon-live (2.8): oman kokoonpanon kertymä kesken kierroksen. */
+export interface DefconLivePlayer {
+	id: number;
+	web_name: string;
+	team_short: string | null;
+	pos: string;
+	squad_position: number | null;
+	is_captain: boolean;
+	minutes: number;
+	defcon: number;
+	/** null = maalivahti, ei DefConia */
+	threshold: number | null;
+	hit: boolean;
+	remaining: number | null;
+	eligible: boolean;
+}
+
+export interface DefconLiveResponse {
+	meta: {
+		/** false = esikausi tai kierrosten väli. Silloin EI renderöidä mitään. */
+		available: boolean;
+		gw: number | null;
+		generated_at: string | null;
+		thresholds: Record<string, number>;
+		note: string;
+	};
+	players: DefconLivePlayer[];
+}
+
+export async function fetchDefconLive(entry: number): Promise<DefconLiveResponse> {
+	return getJson<DefconLiveResponse>(`/api/fantasy/defcon-live?entry=${entry}`);
+}
