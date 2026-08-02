@@ -464,7 +464,7 @@
 	}
 	tr.selected td {
 		/* magenta-tintti toimii myös vaalealla (10 % valkoisen päällä) */
-		background: rgba(255, 46, 126, 0.1);
+		background: rgba(255, 138, 92, 0.1);
 	}
 	tr.group-row td {
 		background: var(--surface-2);

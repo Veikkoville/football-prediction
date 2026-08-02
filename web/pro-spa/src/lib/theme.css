@@ -27,7 +27,14 @@
 	   jonka koko ilme on amber + teal tummalla. Tokenit jätetään aliaksiksi
 	   VAIN siksi, ettei yksikään unohtunut viittaus renderöi läpinäkyvää tai
 	   mustaa; uusia viittauksia ei saa lisätä.
-	   Korvaajat: mark/live -> amber, linkit/korostus -> teal, FDR-5 -> rust. */
+	   Korvaajat: mark/live -> amber, linkit/korostus -> teal, FDR-5 -> rust.
+
+	   2.8.2026: "poistettu kokonaan" EI pitänyt paikkaansa renderissä. 24 kovaa
+	   rgba(255,46,126,...)-literaalia yhdeksässä komponentissa ohitti koko tämän
+	   tokenikerroksen, joten pinkkiä näkyi yhä pilleissä ja korostuspinnoissa —
+	   1.8:n ajo korvasi hex-arvoja eikä nähnyt rgba-muotoa. Literaalit vaihdettu
+	   rustiin samoilla alfoilla. Jos magentaa etsii jatkossa: grep myös
+	   "255, 46, 126" -muodossa, ei pelkkää #FF2E7E:tä. */
 	--giq-rust: #FF8A5C;
 	--giq-magenta: var(--giq-gold-deep);
 	--giq-magenta-deep: var(--giq-rust);

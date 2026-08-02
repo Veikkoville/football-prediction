@@ -65,10 +65,20 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   h1, h2, .logo, .btn, .nav-cta {
     font-family: "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
+  /* 2.8: talta sivulta puuttui globaali linkkisaanto kokonaan -> leipatekstin
+     linkit renderoityivat selaimen oletussinisella keskella tummaa teletext-teemaa.
+     Alleviivaus jatetaan (leipatekstissa vari ei saa olla ainoa erottaja);
+     .hint a, footer a ja .nav-cta yliajavat taman omilla saannoillaan. */
+  a { color: var(--teal-ink); }
   .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
   /* Tumma ink-hero (redesign 24.7): sama gradientti + 6px magenta-raita kuin index.html */
+  /* 2.8: banneri oli VALKOINEN ja teksti hukkui siihen. Talla sivulla --cream JA
+     --ink ovat molemmat #F3F2F2, eli tausta ja teksti olivat sama vari. Ennen 1.8:aa
+     --cream puuttui :rootista -> var(--cream) oli invalidi -> tausta jai tummaksi ja
+     vika oli nakymaton; puuttuvan tokenin LISAAMINEN paljasti sen. Teema on tumma
+     teletext (index.html), joten hero kayttaa --bg:ta ja erottuu alaviivalla. */
   .hero-shell {
-    background: var(--cream);
+    background: var(--bg);
     color: var(--ink);
     border-bottom: 1px solid var(--line);
   }

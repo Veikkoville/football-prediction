@@ -251,8 +251,8 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		background: rgba(255, 46, 126, 0.1);
-		border: 1px solid rgba(255, 46, 126, 0.35);
+		background: rgba(255, 138, 92, 0.1);
+		border: 1px solid rgba(255, 138, 92, 0.35);
 		border-radius: var(--radius);
 		padding: 4px 12px;
 		font-weight: 700;
@@ -262,7 +262,7 @@
 		margin-top: var(--s-3);
 	}
 	.verdict {
-		background: rgba(255, 46, 126, 0.1);
+		background: rgba(255, 138, 92, 0.1);
 		border-radius: var(--radius);
 		padding: var(--s-3);
 		font-weight: 600;

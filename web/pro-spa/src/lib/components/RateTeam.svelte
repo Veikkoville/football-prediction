@@ -1333,7 +1333,7 @@
 		cursor: pointer;
 	}
 	.slot-chip.active {
-		background: rgba(255, 46, 126, 0.1);
+		background: rgba(255, 138, 92, 0.1);
 		border-color: var(--accent);
 		color: var(--giq-rust);
 	}
@@ -1434,8 +1434,8 @@
 		cursor: default;
 	}
 	.apply-btn.applied {
-		background: rgba(255, 46, 126, 0.1);
-		border-color: rgba(255, 46, 126, 0.35);
+		background: rgba(255, 138, 92, 0.1);
+		border-color: rgba(255, 138, 92, 0.35);
 		opacity: 1;
 	}
 	.plan-box {
@@ -1506,8 +1506,8 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		background: rgba(255, 46, 126, 0.1);
-		border: 1px solid rgba(255, 46, 126, 0.35);
+		background: rgba(255, 138, 92, 0.1);
+		border: 1px solid rgba(255, 138, 92, 0.35);
 		border-radius: var(--radius);
 		padding: 4px 12px;
 		font-weight: 700;
@@ -1527,9 +1527,9 @@
 	.rating {
 		max-width: 680px;
 		margin-bottom: var(--s-4);
-		border-color: rgba(255, 46, 126, 0.35);
+		border-color: rgba(255, 138, 92, 0.35);
 		background:
-			linear-gradient(160deg, rgba(255, 46, 126, 0.09), transparent 55%),
+			linear-gradient(160deg, rgba(255, 138, 92, 0.09), transparent 55%),
 			var(--surface);
 	}
 	.hero-top {

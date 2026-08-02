@@ -202,8 +202,8 @@
 		font-size: var(--step-0);
 	}
 	.best-pill {
-		background: rgba(255, 46, 126, 0.1);
-		border: 1px solid rgba(255, 46, 126, 0.35);
+		background: rgba(255, 138, 92, 0.1);
+		border: 1px solid rgba(255, 138, 92, 0.35);
 		color: var(--giq-rust);
 		border-radius: var(--radius);
 		padding: 1px 10px;

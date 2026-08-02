@@ -255,7 +255,7 @@
 		cursor: pointer;
 	}
 	tr.selected td {
-		background: rgba(255, 46, 126, 0.1);
+		background: rgba(255, 138, 92, 0.1);
 	}
 	td.total-col {
 		font-weight: 700;
@@ -274,7 +274,7 @@
 		white-space: nowrap;
 	}
 	.use-btn:hover {
-		background: rgba(255, 46, 126, 0.1);
+		background: rgba(255, 138, 92, 0.1);
 	}
 	.move {
 		font-size: 0.7em;

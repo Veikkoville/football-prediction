@@ -240,9 +240,9 @@
 		margin: 0 0 var(--s-4);
 	}
 	.hero-plan {
-		border-color: rgba(255, 46, 126, 0.35);
+		border-color: rgba(255, 138, 92, 0.35);
 		background:
-			linear-gradient(160deg, rgba(255, 46, 126, 0.07), transparent 55%),
+			linear-gradient(160deg, rgba(255, 138, 92, 0.07), transparent 55%),
 			var(--surface);
 		margin-bottom: var(--s-4);
 	}

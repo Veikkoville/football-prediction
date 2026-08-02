@@ -664,7 +664,7 @@
 	}
 	.action {
 		background: var(--surface);
-		border: 1px solid rgba(255, 46, 126, 0.35);
+		border: 1px solid rgba(255, 138, 92, 0.35);
 		border-radius: var(--radius);
 		color: var(--accent);
 		font-weight: 700;
@@ -679,8 +679,8 @@
 		gap: var(--s-2);
 		width: 100%;
 		margin-top: var(--s-3);
-		background: rgba(255, 46, 126, 0.1);
-		border: 1px solid rgba(255, 46, 126, 0.35);
+		background: rgba(255, 138, 92, 0.1);
+		border: 1px solid rgba(255, 138, 92, 0.35);
 		border-radius: var(--radius);
 		padding: var(--s-2) var(--s-3);
 		color: var(--text);
