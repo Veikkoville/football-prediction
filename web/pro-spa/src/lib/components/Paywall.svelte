@@ -34,7 +34,8 @@
 <h3>Unlock GoalIQ Premium</h3>
 <p class="muted">
 	Player expected points (xP), captain ranker, chip timing, transfer plan chains, edge mode,
-	shareable image cards and per-gameweek breakdowns. Season pass renews yearly, monthly renews monthly, cancel
+	a live DefCon panel for your own squad during a gameweek, shareable image cards and
+	per-gameweek breakdowns. Season pass renews yearly, monthly renews monthly, cancel
 	anytime. One subscription covers web, iOS and Android.
 </p>
 <p class="muted">
