@@ -4,8 +4,10 @@ Generoi data/prediction_log.json:sta (= #110-putken lokaamat PRE-MATCH-
 ennusteet, sama julkinen malli + track record):
 
   predictions/{league}/index.html            per-liiga-hub ("this week")
-  predictions/{league}/{home}-vs-{away}.html per-ottelu-sivu (win% / xG /
-                                             todennäköisin tulos + record-linkki)
+  predictions/{league}/{home}-vs-{away}.html per-ottelu-sivu (VAIN 1X2-% +
+                                             record-linkki; xG ja todennäköisin
+                                             tulos ovat premiumia, ks. 2.8.
+                                             vuotokorjaus rivillä ~333)
 
 MIKSI prediction_log eikä live-API: sivun luku = TÄSMÄLLEEN se ennuste joka
 on lukittu julkiseen track recordiin ("logged before kickoff") → sivu ja
@@ -17,7 +19,7 @@ vanhentuneet ottelusivut (ei staleja ennusteita indeksissä). Hub-sivut ovat
 pysyviä URL:eja (sitemap daily). predictions.html:n GEN:PRED-LEAGUES-markerit
 täytetään livenä olevilla hubeilla.
 
-Gambling-safe: predictions / win probability / xG / model — EI betting/odds/tips.
+Gambling-safe: predictions / win probability / model — EI betting/odds/tips.
 STDLIB-ONLY (kuten build_fpl_page.py) → ajettavissa CI:ssä ilman pipiä.
 Ajo: python -m scripts.build_prediction_pages   (accuracy-log.yml ajaa 3 h välein)
 """

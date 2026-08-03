@@ -2,11 +2,12 @@
 
 Kolme evergreen-URLia, per-GW päivittyvä sisältö:
 
-  fpl/best-captain.html    "Best FPL captain GW{n}" — top-pick xP:llä (free-
-                           pariteetti: captain suggestion on ilmainen appissa),
-                           sijat 2-3 NIMINÄ ilman lukuja → ranker = Premium.
-  fpl/differentials.html   "Best FPL differentials GW{n}" — top-1 teaser
-                           (nimi+EO+xP), loput lukittu → Premium.
+  fpl/best-captain.html    "Best FPL captain GW{n}" — top-pick NIMENÄ, sijat
+                           2-3 niminä, EI xP-lukuja (3.8. korjaus: alkuperäinen
+                           "captain suggestion on ilmainen appissa" oli VÄÄRÄ
+                           premissi, CaptainRanker on kokonaan premium).
+  fpl/differentials.html   "Best FPL differentials GW{n}" — top-1 nimi + EO
+                           (FPL:n omaa julkista dataa), EI xP:tä → Premium.
   fpl/price-changes.html   "FPL price changes" — koko risers/fallers-lista
                            (price watch on ilmainen appissa). Esikausi →
                            rehellinen tyhjätila meta.notesta.
@@ -348,23 +349,31 @@ def render_captain(xp: dict, now: datetime) -> str | None:
     top = ranked[0]
     alts = ranked[1:3]
     url = f"{BASE}/fpl/best-captain"
-    title = f"Best FPL Captain GW{gw} – Model Pick & xP | GoalIQ"
+    # 3.8.2026 PREMIUM-VUOTO KIINNI: xP-luku pois julkiselta sivulta.
+    # Taman sivun alkuperainen perustelu oli "free-pariteetti: captain
+    # suggestion on ilmainen appissa". Se EI pida paikkaansa: CaptainRanker
+    # on kokonaan premium (CAPTAIN_PAYWALL_SOURCE = 'fantasy_captain',
+    # FantasyEdge.tsx:71) ja captain_viewed emittoituu vain premium-listalta,
+    # eli free-kayttaja ei nae appissa yhtaan kapteenisuositusta. Julkinen
+    # sivu antoi siis nimen JA xP:n ilmaiseksi. NIMI jaa (se on sivun
+    # SEO-arvo ja teaser), LUKU menee lukon taakse — sama linja kuin
+    # 2.8. ottelusivujen xG-korjauksessa: paywall kertoo mita puuttuu.
+    title = f"Best FPL Captain GW{gw} – Model Pick | GoalIQ"
     desc = (
         f"The GoalIQ model's best FPL captain for Gameweek {gw}: "
-        f"{top['web_name']} ({top['team_short']}) at {float(top['xp_per_gw']):.1f} "
-        f"expected points. Updated every round from the match model behind our "
-        f"public track record."
+        f"{top['web_name']} ({top['team_short']}). Expected points and the "
+        f"full captain ranking are in GoalIQ Premium. Updated every round "
+        f"from the match model behind our public track record."
     )
     hero = (
         f"<h1>Best FPL captain, Gameweek {gw}</h1>"
         f'<p class="lede">The GoalIQ match model\'s top captain pick for GW{gw} is '
-        f"<strong>{escape(top['web_name'])} ({escape(top['team_short'])})</strong> at "
-        f"<strong>{float(top['xp_per_gw']):.1f} expected points</strong>.</p>"
+        f"<strong>{escape(top['web_name'])} ({escape(top['team_short'])})</strong>.</p>"
     )
     body = (
         f'<div class="stat-row">'
         f'<div class="stat"><b>{escape(top["web_name"])}</b>'
-        f'<span>#1 pick · {escape(top["team_short"])} · {float(top["xp_per_gw"]):.1f} xP</span></div>'
+        f'<span>#1 pick · {escape(top["team_short"])} · xP in Premium</span></div>'
         + "".join(
             f'<div class="stat"><b>{escape(p["web_name"])}</b>'
             f'<span>contender · {escape(p["team_short"])} · xP in Premium</span></div>'
@@ -392,11 +401,14 @@ def render_differentials(diff: dict, now: datetime) -> str | None:
     top = players[0]
     url = f"{BASE}/fpl/differentials"
     title = f"Best FPL Differentials {gw_txt} – Low-Owned Model Picks | GoalIQ"
+    # 3.8.2026 PREMIUM-VUOTO KIINNI (sama silmays kuin best-captain):
+    # DifferentialsSection on appissa premium (FantasyTools.tsx:3424) eika
+    # siina ole free-teaseria, joten xP-luku ei saa nakya julkisella sivulla.
+    # Omistus-% JAA: se on FPL:n omaa julkista dataa, ei mallin tuotos.
     desc = (
         f"GoalIQ's model differential for {gw_txt}: {top['web_name']} "
-        f"({top['team_short']}), owned by just {top['owned_pct']}% of managers "
-        f"with {top['xp_horizon_total']} expected points over the horizon. "
-        f"{len(players)} more low-owned picks in GoalIQ Premium."
+        f"({top['team_short']}), owned by just {top['owned_pct']}% of managers. "
+        f"Expected points and {len(players)} more low-owned picks in GoalIQ Premium."
     )
     hero = (
         f"<h1>Best FPL differentials, {escape(gw_txt)}</h1>"
@@ -408,7 +420,7 @@ def render_differentials(diff: dict, now: datetime) -> str | None:
         f'<div class="stat-row">'
         f'<div class="stat"><b>{escape(top["web_name"])}</b>'
         f'<span>{escape(top["team_short"])} · owned {top["owned_pct"]}% · '
-        f'{top["xp_horizon_total"]} xP over the horizon</span></div>'
+        f"xP in Premium</span></div>"
         f'<div class="stat"><b>+{len(players) - 1} more</b>'
         f"<span>full differential list in Premium</span></div>"
         f"</div>"
