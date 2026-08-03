@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-08-03T12:16:10",
+    "generated_at": "2026-08-03T17:06:19",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -42,8 +42,8 @@
       "promoted_prior_method": "Nousijaseurojen pelaajat ilman PL-minuutteja: minuutit = roolipriori FPL-hintajärjestyksestä (XI-paikat 1/4/4/2 per positio; kärki p_start 0.72, seuraavat 2 0.30, loput 0.08) x FPL:n saatavuusportti; vauhdit = positiopriori. data_basis=no_history, minutes_confidence=low, minutes_method=promoted_price_prior.",
       "player_basis_counts": {
         "pl_history": 295,
-        "limited_history": 45,
-        "no_history": 77
+        "limited_history": 44,
+        "no_history": 76
       },
       "basis_threshold_minutes": 450.0,
       "note": "data_basis per pelaaja: pl_history = oma PL-historia kantaa >= 50 % painon; limited_history = ohut otos, positiopriori dominoi; no_history = ei PL-minuutteja. transfers_known=false: pre-season-bootstrap on edellisen kauden -> kesäsiirrot eivät näy."
@@ -68,8 +68,8 @@
     "deadline_utc": "2026-08-21T17:30:00+00:00",
     "horizon_gw": 6,
     "min_xp_total": 1.0,
-    "n_players": 417,
-    "n_excluded": 147,
+    "n_players": 415,
+    "n_excluded": 152,
     "excluded_note": "excluded[] = FPL-listatut pelaajat jotka EIVAT ole projektiossa (saatavuuslippu i/s/u/n tai horisontin xP alle 1.0). Rivit ovat hakua/player cardia varten: in_projection=false, ei xP/xmins/p_start-kenttia. Vanhat klientit voivat jattaa listan huomiotta.",
     "todo": [
       "Nousijaseurojen pelaajista 83 on positiopriori-arviolla (ei PL-historiaa): ['Hull']. Roolit hintajärjestyksestä (MVP-heuristiikka) — tarkentuvat kun 26/27-kierroksia kertyy."
@@ -927,7 +927,7 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 21.8,
+      "owned_pct": 21.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1047,7 +1047,7 @@
       "predicted_starts": 80.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.2,
+      "owned_pct": 16.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1167,7 +1167,7 @@
       "predicted_starts": 82.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 24.1,
+      "owned_pct": 24.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1647,7 +1647,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.2,
+      "owned_pct": 17.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1887,7 +1887,7 @@
       "predicted_starts": 99.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.3,
+      "owned_pct": 16.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2127,7 +2127,7 @@
       "predicted_starts": 81.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.2,
+      "owned_pct": 2.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2487,7 +2487,7 @@
       "predicted_starts": 85.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 47.9,
+      "owned_pct": 47.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2833,126 +2833,6 @@
         "defensive_contribution": 0.26,
         "yellows": -0.17,
         "bonus": 0.34
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 165,
-      "web_name": "João Pedro",
-      "full_name": "João Pedro Junqueira de Jesus",
-      "team": "Chelsea",
-      "team_short": "CHE",
-      "pos": "FWD",
-      "xmins": 71.2,
-      "predicted_starts": 77.0,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "owned_pct": 54.7,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 5,
-      "price": 7.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2658,
-        "starts": 31,
-        "goals": 15,
-        "assists": 9,
-        "xg": 14.91,
-        "xa": 1.96,
-        "cs": 10,
-        "points": 177,
-        "per90": {
-          "goals": 0.51,
-          "assists": 0.3,
-          "xgi": 0.57
-        }
-      },
-      "p_start": 0.7701,
-      "p_cameo": 0.1314,
-      "p_bench": 0.0985,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.73,
-      "xp_per_gw": 3.87,
-      "xp_horizon_total": 23.23,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.72
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.56
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.08
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 4.9
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "A"
-            }
-          ],
-          "xp": 4.02
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.95
-        }
-      ],
-      "components": {
-        "appearance": 1.67,
-        "goals": 1.39,
-        "assists": 0.14,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.12,
-        "bonus": 0.65
       },
       "components_gw": 1
     },
@@ -3317,6 +3197,126 @@
       "components_gw": 1
     },
     {
+      "id": 165,
+      "web_name": "João Pedro",
+      "full_name": "João Pedro Junqueira de Jesus",
+      "team": "Chelsea",
+      "team_short": "CHE",
+      "pos": "FWD",
+      "xmins": 70.7,
+      "predicted_starts": 76.4,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "owned_pct": 54.7,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 5,
+      "price": 7.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 2658,
+        "starts": 31,
+        "goals": 15,
+        "assists": 9,
+        "xg": 14.91,
+        "xa": 1.96,
+        "cs": 10,
+        "points": 177,
+        "per90": {
+          "goals": 0.51,
+          "assists": 0.3,
+          "xgi": 0.57
+        }
+      },
+      "p_start": 0.7635,
+      "p_cameo": 0.1351,
+      "p_bench": 0.1013,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.72,
+      "xp_per_gw": 3.85,
+      "xp_horizon_total": 23.08,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.7
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.54
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.06
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 4.87
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.99
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.92
+        }
+      ],
+      "components": {
+        "appearance": 1.66,
+        "goals": 1.38,
+        "assists": 0.14,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.65
+      },
+      "components_gw": 1
+    },
+    {
       "id": 387,
       "web_name": "O'Reilly",
       "full_name": "Nico O'Reilly",
@@ -3327,7 +3327,7 @@
       "predicted_starts": 71.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 23.0,
+      "owned_pct": 22.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4647,7 +4647,7 @@
       "predicted_starts": 79.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 12.1,
+      "owned_pct": 12.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4767,7 +4767,7 @@
       "predicted_starts": 89.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 31.0,
+      "owned_pct": 30.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4887,7 +4887,7 @@
       "predicted_starts": 72.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 20.1,
+      "owned_pct": 20.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5367,7 +5367,7 @@
       "predicted_starts": 88.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 3.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7167,7 +7167,7 @@
       "predicted_starts": 66.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 11.6,
+      "owned_pct": 11.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8117,126 +8117,6 @@
       "components_gw": 1
     },
     {
-      "id": 136,
-      "web_name": "Welbeck",
-      "full_name": "Danny Welbeck",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "FWD",
-      "xmins": 59.4,
-      "predicted_starts": 65.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 2.8,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 5,
-      "price": 6.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2249,
-        "starts": 26,
-        "goals": 13,
-        "assists": 1,
-        "xg": 12.36,
-        "xa": 1.4,
-        "cs": 10,
-        "points": 126,
-        "per90": {
-          "goals": 0.52,
-          "assists": 0.04,
-          "xgi": 0.55
-        }
-      },
-      "p_start": 0.6507,
-      "p_cameo": 0.2911,
-      "p_bench": 0.0582,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.46,
-      "xp_per_gw": 3.26,
-      "xp_horizon_total": 19.56,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.54
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.12
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.6
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.62
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.73
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.96
-        }
-      ],
-      "components": {
-        "appearance": 1.61,
-        "goals": 1.43,
-        "assists": 0.12,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.12,
-        "bonus": 0.5
-      },
-      "components_gw": 1
-    },
-    {
       "id": 19,
       "web_name": "Zubimendi",
       "full_name": "Martín Zubimendi Ibáñez",
@@ -8833,6 +8713,126 @@
         "defensive_contribution": 0.75,
         "yellows": -0.24,
         "bonus": 0.15
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 136,
+      "web_name": "Welbeck",
+      "full_name": "Danny Welbeck",
+      "team": "Chelsea",
+      "team_short": "CHE",
+      "pos": "FWD",
+      "xmins": 59.8,
+      "predicted_starts": 65.7,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 2.8,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 5,
+      "price": 6.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 2249,
+        "starts": 26,
+        "goals": 13,
+        "assists": 1,
+        "xg": 12.36,
+        "xa": 1.4,
+        "cs": 10,
+        "points": 126,
+        "per90": {
+          "goals": 0.52,
+          "assists": 0.04,
+          "xgi": 0.55
+        }
+      },
+      "p_start": 0.6568,
+      "p_cameo": 0.286,
+      "p_bench": 0.0572,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.46,
+      "xp_per_gw": 3.21,
+      "xp_horizon_total": 19.29,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.1
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.97
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.61
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 4.01
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.33
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.28
+        }
+      ],
+      "components": {
+        "appearance": 1.55,
+        "goals": 1.15,
+        "assists": 0.1,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.12,
+        "bonus": 0.41
       },
       "components_gw": 1
     },
@@ -9659,7 +9659,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",
       "data_basis": "pl_history",
-      "owned_pct": 11.5,
+      "owned_pct": 11.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10019,7 +10019,7 @@
       "predicted_starts": 63.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.1,
+      "owned_pct": 10.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11999,7 +11999,7 @@
       "predicted_starts": 61.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 12.8,
+      "owned_pct": 12.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -12599,7 +12599,7 @@
       "predicted_starts": 71.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.9,
+      "owned_pct": 1.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13799,7 +13799,7 @@
       "predicted_starts": 61.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 15.0,
+      "owned_pct": 15.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19859,7 +19859,7 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.0,
+      "owned_pct": 5.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20564,7 +20564,7 @@
       "predicted_starts": 56.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 21.1,
+      "owned_pct": 21.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21149,7 +21149,7 @@
       "predicted_starts": 72.0,
       "minutes_confidence": "low",
       "data_basis": "no_history",
-      "owned_pct": 1.2,
+      "owned_pct": 1.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -22034,7 +22034,7 @@
       "predicted_starts": 72.0,
       "minutes_confidence": "low",
       "data_basis": "no_history",
-      "owned_pct": 8.6,
+      "owned_pct": 8.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -22814,7 +22814,7 @@
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.0,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -23054,7 +23054,7 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.0,
+      "owned_pct": 2.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -23170,8 +23170,8 @@
       "team": "Brighton",
       "team_short": "BHA",
       "pos": "FWD",
-      "xmins": 46.7,
-      "predicted_starts": 52.4,
+      "xmins": 46.9,
+      "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
       "owned_pct": 0.7,
@@ -23197,9 +23197,9 @@
           "xgi": 0.29
         }
       },
-      "p_start": 0.5237,
-      "p_cameo": 0.2911,
-      "p_bench": 0.1852,
+      "p_start": 0.5268,
+      "p_cameo": 0.2892,
+      "p_bench": 0.184,
       "set_pieces": {
         "pens": null,
         "corners": null,
@@ -23207,7 +23207,7 @@
       },
       "e_bonus": 0.15,
       "xp_per_gw": 2.02,
-      "xp_horizon_total": 12.1,
+      "xp_horizon_total": 12.15,
       "gameweeks": [
         {
           "gw": 1,
@@ -23237,7 +23237,7 @@
               "venue": "H"
             }
           ],
-          "xp": 2.16
+          "xp": 2.17
         },
         {
           "gw": 4,
@@ -23247,7 +23247,7 @@
               "venue": "A"
             }
           ],
-          "xp": 2.17
+          "xp": 2.18
         },
         {
           "gw": 5,
@@ -23257,7 +23257,7 @@
               "venue": "H"
             }
           ],
-          "xp": 1.79
+          "xp": 1.8
         },
         {
           "gw": 6,
@@ -23267,11 +23267,11 @@
               "venue": "A"
             }
           ],
-          "xp": 1.89
+          "xp": 1.9
         }
       ],
       "components": {
-        "appearance": 1.29,
+        "appearance": 1.3,
         "goals": 0.48,
         "assists": 0.22,
         "clean_sheet": 0.0,
@@ -23534,7 +23534,7 @@
       "predicted_starts": 58.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 9.7,
+      "owned_pct": 9.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -23654,7 +23654,7 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.6,
+      "owned_pct": 6.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -24374,7 +24374,7 @@
       "predicted_starts": 45.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.3,
+      "owned_pct": 10.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -26520,111 +26520,6 @@
         "defensive_contribution": 0.03,
         "yellows": -0.03,
         "bonus": 0.07
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 299,
-      "web_name": "Burstow",
-      "full_name": "Mason Burstow",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "FWD",
-      "xmins": 29.1,
-      "predicted_starts": 30.0,
-      "minutes_confidence": "low",
-      "data_basis": "no_history",
-      "owned_pct": 1.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 4.5,
-      "last_season": null,
-      "p_start": 0.3,
-      "p_cameo": 0.315,
-      "p_bench": 0.385,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.2,
-      "xp_per_gw": 1.76,
-      "xp_horizon_total": 10.56,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.87
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.94
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.69
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.67
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.7
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.69
-        }
-      ],
-      "minutes_method": "promoted_price_prior",
-      "components": {
-        "appearance": 0.87,
-        "goals": 0.73,
-        "assists": 0.07,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.05,
-        "bonus": 0.25
       },
       "components_gw": 1
     },
@@ -30604,126 +30499,6 @@
       "components_gw": 1
     },
     {
-      "id": 167,
-      "web_name": "Delap",
-      "full_name": "Liam Delap",
-      "team": "Chelsea",
-      "team_short": "CHE",
-      "pos": "FWD",
-      "xmins": 27.2,
-      "predicted_starts": 33.9,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.5,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 4,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1092,
-        "starts": 12,
-        "goals": 1,
-        "assists": 2,
-        "xg": 4.54,
-        "xa": 0.23,
-        "cs": 2,
-        "points": 45,
-        "per90": {
-          "goals": 0.08,
-          "assists": 0.16,
-          "xgi": 0.39
-        }
-      },
-      "p_start": 0.3393,
-      "p_cameo": 0.3915,
-      "p_bench": 0.2692,
-      "set_pieces": {
-        "pens": 4,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.1,
-      "xp_per_gw": 1.43,
-      "xp_horizon_total": 8.61,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.39
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.34
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.24
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.7
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BRE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.48
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.46
-        }
-      ],
-      "components": {
-        "appearance": 0.92,
-        "goals": 0.42,
-        "assists": 0.02,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.07,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
       "id": 184,
       "web_name": "Grimes",
       "full_name": "Matt Grimes",
@@ -30945,6 +30720,126 @@
         "defensive_contribution": 0.03,
         "yellows": -0.04,
         "bonus": 0.1
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 167,
+      "web_name": "Delap",
+      "full_name": "Liam Delap",
+      "team": "Chelsea",
+      "team_short": "CHE",
+      "pos": "FWD",
+      "xmins": 27.1,
+      "predicted_starts": 33.6,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.5,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 4,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1092,
+        "starts": 12,
+        "goals": 1,
+        "assists": 2,
+        "xg": 4.54,
+        "xa": 0.23,
+        "cs": 2,
+        "points": 45,
+        "per90": {
+          "goals": 0.08,
+          "assists": 0.16,
+          "xgi": 0.39
+        }
+      },
+      "p_start": 0.3364,
+      "p_cameo": 0.3933,
+      "p_bench": 0.2704,
+      "set_pieces": {
+        "pens": 4,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.1,
+      "xp_per_gw": 1.43,
+      "xp_horizon_total": 8.57,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.38
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.34
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.24
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.69
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BRE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.47
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.45
+        }
+      ],
+      "components": {
+        "appearance": 0.91,
+        "goals": 0.42,
+        "assists": 0.02,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.07,
+        "bonus": 0.09
       },
       "components_gw": 1
     },
@@ -32039,7 +31934,7 @@
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 16.9,
+      "owned_pct": 16.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -34151,7 +34046,7 @@
       "predicted_starts": 38.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 3.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -38363,7 +38258,7 @@
       "team_short": "BHA",
       "pos": "FWD",
       "xmins": 9.3,
-      "predicted_starts": 14.3,
+      "predicted_starts": 14.4,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "owned_pct": 0.3,
@@ -38389,9 +38284,9 @@
           "xgi": 0.68
         }
       },
-      "p_start": 0.1428,
-      "p_cameo": 0.4524,
-      "p_bench": 0.4048,
+      "p_start": 0.1437,
+      "p_cameo": 0.452,
+      "p_bench": 0.4044,
       "set_pieces": {
         "pens": null,
         "corners": null,
@@ -38439,7 +38334,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.92
+          "xp": 0.93
         },
         {
           "gw": 5,
@@ -40646,7 +40541,7 @@
       "predicted_starts": 14.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 0.4,
+      "owned_pct": 0.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -44015,7 +43910,7 @@
       "team_short": "CHE",
       "pos": "FWD",
       "xmins": 7.0,
-      "predicted_starts": 12.4,
+      "predicted_starts": 12.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "owned_pct": 0.4,
@@ -44041,9 +43936,9 @@
           "xgi": 0.62
         }
       },
-      "p_start": 0.1239,
-      "p_cameo": 0.2131,
-      "p_bench": 0.663,
+      "p_start": 0.1228,
+      "p_cameo": 0.2134,
+      "p_bench": 0.6638,
       "set_pieces": {
         "pens": null,
         "corners": null,
@@ -44051,7 +43946,7 @@
       },
       "e_bonus": 0.04,
       "xp_per_gw": 0.46,
-      "xp_horizon_total": 2.77,
+      "xp_horizon_total": 2.76,
       "gameweeks": [
         {
           "gw": 1,
@@ -44061,7 +43956,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.45
+          "xp": 0.44
         },
         {
           "gw": 2,
@@ -44101,7 +43996,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.48
+          "xp": 0.47
         },
         {
           "gw": 6,
@@ -47559,7 +47454,7 @@
       "team_short": "BHA",
       "pos": "FWD",
       "xmins": 2.6,
-      "predicted_starts": 9.1,
+      "predicted_starts": 9.2,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
       "owned_pct": 0.0,
@@ -47585,9 +47480,9 @@
           "xgi": 0.38
         }
       },
-      "p_start": 0.0913,
-      "p_cameo": 0.1474,
-      "p_bench": 0.7614,
+      "p_start": 0.0918,
+      "p_cameo": 0.1473,
+      "p_bench": 0.7609,
       "set_pieces": {
         "pens": null,
         "corners": null,
@@ -48624,122 +48519,6 @@
       "components_gw": 1
     },
     {
-      "id": 133,
-      "web_name": "Watson",
-      "full_name": "Tom Watson",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "MID",
-      "xmins": 1.5,
-      "predicted_starts": 11.0,
-      "minutes_confidence": "high",
-      "data_basis": "limited_history",
-      "owned_pct": 0.0,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 1,
-      "price": 5.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 57,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.04,
-        "xa": 0.03,
-        "cs": 0,
-        "points": 5,
-        "per90": null
-      },
-      "p_start": 0.11,
-      "p_cameo": 0.1405,
-      "p_bench": 0.7495,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.01,
-      "xp_per_gw": 0.18,
-      "xp_horizon_total": 1.05,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.18
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.17
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.18
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.18
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.17
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.17
-        }
-      ],
-      "components": {
-        "appearance": 0.16,
-        "goals": 0.01,
-        "assists": 0.01,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.0,
-        "bonus": 0.01
-      },
-      "components_gw": 1
-    },
-    {
       "id": 383,
       "web_name": "Elliott",
       "full_name": "Harvey Elliott",
@@ -48989,7 +48768,7 @@
       "team_short": "BOU",
       "pos": "MID",
       "price": 7.5,
-      "owned_pct": 6.6,
+      "owned_pct": 6.4,
       "status": "i",
       "news": "Foot injury - Unknown return date",
       "chance_next": 0,
@@ -49200,28 +48979,6 @@
       "excluded_reason": "below_min_xp"
     },
     {
-      "id": 278,
-      "web_name": "Hughes",
-      "full_name": "Charlie Hughes",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "DEF",
-      "price": 4.0,
-      "owned_pct": 1.7,
-      "status": "i",
-      "news": "Groin injury - Unknown return date",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 555,
       "web_name": "Matthews",
       "full_name": "Remi Matthews",
@@ -49310,6 +49067,28 @@
       "last_season": null,
       "in_projection": false,
       "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 278,
+      "web_name": "Hughes",
+      "full_name": "Charlie Hughes",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "DEF",
+      "price": 4.0,
+      "owned_pct": 1.6,
+      "status": "i",
+      "news": "Groin injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
     },
     {
       "id": 38,
@@ -49530,6 +49309,28 @@
       "excluded_reason": "below_min_xp"
     },
     {
+      "id": 299,
+      "web_name": "Burstow",
+      "full_name": "Mason Burstow",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "FWD",
+      "price": 4.5,
+      "owned_pct": 1.1,
+      "status": "u",
+      "news": "Has joined Sheffield Wednesday on loan for the rest of the season",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
       "id": 530,
       "web_name": "Patterson",
       "full_name": "Anthony Patterson",
@@ -49630,44 +49431,6 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
-    },
-    {
-      "id": 239,
-      "web_name": "Garner",
-      "full_name": "James Garner",
-      "team": "Everton",
-      "team_short": "EVE",
-      "pos": "MID",
-      "price": 6.0,
-      "owned_pct": 0.9,
-      "status": "i",
-      "news": "Groin injury - Expected back 22 Aug",
-      "chance_next": 0,
-      "yellows": 12,
-      "set_pieces": {
-        "pens": 3,
-        "corners": 4,
-        "fk": 1
-      },
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 3413,
-        "starts": 38,
-        "goals": 2,
-        "assists": 7,
-        "xg": 2.1,
-        "xa": 6.18,
-        "cs": 11,
-        "points": 159,
-        "per90": {
-          "goals": 0.05,
-          "assists": 0.18,
-          "xgi": 0.22
-        }
-      },
-      "in_projection": false,
-      "excluded_reason": "unavailable"
     },
     {
       "id": 524,
@@ -49774,6 +49537,44 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 239,
+      "web_name": "Garner",
+      "full_name": "James Garner",
+      "team": "Everton",
+      "team_short": "EVE",
+      "pos": "MID",
+      "price": 6.0,
+      "owned_pct": 0.8,
+      "status": "i",
+      "news": "Groin injury - Expected back 22 Aug",
+      "chance_next": 0,
+      "yellows": 12,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 4,
+        "fk": 1
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 3413,
+        "starts": 38,
+        "goals": 2,
+        "assists": 7,
+        "xg": 2.1,
+        "xa": 6.18,
+        "cs": 11,
+        "points": 159,
+        "per90": {
+          "goals": 0.05,
+          "assists": 0.18,
+          "xgi": 0.22
+        }
+      },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
     },
     {
       "id": 377,
@@ -51804,6 +51605,40 @@
       "excluded_reason": "below_min_xp"
     },
     {
+      "id": 375,
+      "web_name": "Nyoni",
+      "full_name": "Trey Nyoni",
+      "team": "Liverpool",
+      "team_short": "LIV",
+      "pos": "MID",
+      "price": 5.0,
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 21,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.37,
+        "xa": 0.02,
+        "cs": 0,
+        "points": 6,
+        "per90": null
+      },
+      "in_projection": false,
+      "excluded_reason": "below_min_xp"
+    },
+    {
       "id": 353,
       "web_name": "Pecsi",
       "full_name": "Armin Pecsi",
@@ -51811,6 +51646,40 @@
       "team_short": "LIV",
       "pos": "GKP",
       "price": 4.0,
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 0,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.0,
+        "cs": 0,
+        "points": 0,
+        "per90": null
+      },
+      "in_projection": false,
+      "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 560,
+      "web_name": "Penders",
+      "full_name": "Mike Penders",
+      "team": "Chelsea",
+      "team_short": "CHE",
+      "pos": "GKP",
+      "price": 4.5,
       "owned_pct": 0.1,
       "status": "a",
       "news": "",
@@ -51940,6 +51809,28 @@
         "points": 1,
         "per90": null
       },
+      "in_projection": false,
+      "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 565,
+      "web_name": "Sangaré",
+      "full_name": "Mamadou Sangaré",
+      "team": "Brentford",
+      "team_short": "BRE",
+      "pos": "MID",
+      "price": 5.5,
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
       "in_projection": false,
       "excluded_reason": "below_min_xp"
     },
@@ -52902,6 +52793,28 @@
       "excluded_reason": "unavailable"
     },
     {
+      "id": 567,
+      "web_name": "Horníček",
+      "full_name": "Lukás Hornícek",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "GKP",
+      "price": 5.0,
+      "owned_pct": 0.0,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "below_min_xp"
+    },
+    {
       "id": 49,
       "web_name": "Iling Jr",
       "full_name": "Samuel Iling-Junior",
@@ -53304,40 +53217,6 @@
       "excluded_reason": "below_min_xp"
     },
     {
-      "id": 375,
-      "web_name": "Nyoni",
-      "full_name": "Trey Nyoni",
-      "team": "Liverpool",
-      "team_short": "LIV",
-      "pos": "MID",
-      "price": 5.0,
-      "owned_pct": 0.0,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 21,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.37,
-        "xa": 0.02,
-        "cs": 0,
-        "points": 6,
-        "per90": null
-      },
-      "in_projection": false,
-      "excluded_reason": "below_min_xp"
-    },
-    {
       "id": 517,
       "web_name": "Odobert",
       "full_name": "Wilson Odobert",
@@ -53412,40 +53291,6 @@
       },
       "in_projection": false,
       "excluded_reason": "unavailable"
-    },
-    {
-      "id": 560,
-      "web_name": "Penders",
-      "full_name": "Mike Penders",
-      "team": "Chelsea",
-      "team_short": "CHE",
-      "pos": "GKP",
-      "price": 4.5,
-      "owned_pct": 0.0,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 0,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.0,
-        "cs": 0,
-        "points": 0,
-        "per90": null
-      },
-      "in_projection": false,
-      "excluded_reason": "below_min_xp"
     },
     {
       "id": 408,
@@ -53580,6 +53425,28 @@
       "excluded_reason": "below_min_xp"
     },
     {
+      "id": 566,
+      "web_name": "Silva",
+      "full_name": "António João Pereira de Albuquerque Tavares da Silva",
+      "team": "Bournemouth",
+      "team_short": "BOU",
+      "pos": "DEF",
+      "price": 5.0,
+      "owned_pct": 0.0,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "below_min_xp"
+    },
+    {
       "id": 225,
       "web_name": "Uche",
       "full_name": "Christantus Uche",
@@ -53688,6 +53555,40 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 133,
+      "web_name": "Watson",
+      "full_name": "Tom Watson",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "MID",
+      "price": 5.0,
+      "owned_pct": 0.0,
+      "status": "u",
+      "news": "Has joined Leicester City on loan for the rest of the season",
+      "chance_next": 0,
+      "yellows": 1,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 57,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.04,
+        "xa": 0.03,
+        "cs": 0,
+        "points": 5,
+        "per90": null
+      },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
     },
     {
       "id": 513,
