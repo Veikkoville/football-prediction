@@ -23,16 +23,9 @@
 			One account, premium on web, iOS and Android. · {DISCLAIMER} ·
 			<a href="https://goaliq.app/privacy.html">Privacy</a> ·
 			<a href="https://goaliq.app/faq.html">FAQ</a> ·
-			<!-- 3.8.2026: pro.goaliq.app on se pinta jolla Stripe-maksut tapahtuvat,
-			     eika siella ollut MITAAN tapaa tavoittaa myyjaa. Maksava
-			     kausipassiasiakas oli ainoa kayttajaryhma ilman reittia meihin.
-			     Kohde on Google Form eika hello@: se on jo tuotannossa mobiilissa
-			     (lib/links.ts) ja poistaa riippuvuuden DMARC-portista - jos
-			     quarantine kiristetaan ja tukivastaus lahtee linjautumattomasta
-			     lahteesta, se suodattuu hiljaa, ja maksavan asiakkaan tukiviesti
-			     on pahin paikka epaonnistua. Sailyy myos chargeback-tilanteessa:
-			     seka Stripe-kiistoissa etta Play-hyvityksissa ratkaisee, yrittiko
-			     asiakas tavoittaa myyjan ennen pankkiaan. -->
+			<!-- Kohde on Google Form eika hello@: poistaa riippuvuuden DMARC-portista
+			     (linjautumaton tukivastaus suodattuisi hiljaa). Perustelu kokonaan
+			     commitissa ae9545d6. -->
 			<a href="https://forms.gle/wTfsB3Kvuukodtd26" rel="noopener">Contact</a> · Built by an
 			independent developer in Finland.
 		</p>
