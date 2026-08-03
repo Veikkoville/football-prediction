@@ -19,6 +19,7 @@
 	import { capture } from '$lib/analytics';
 	import PlayerSearch from './PlayerSearch.svelte';
 	import SetPieceBadges from './SetPieceBadges.svelte';
+	import { canShareToApps, sharePlayerCard, type PlayerCardCell } from '$lib/shareCard';
 
 	let pool = $state<CardPlayer[]>([]);
 	let meta = $state<XpMeta | null>(null);
@@ -250,6 +251,129 @@
 		].filter((c): c is Cell => c != null);
 	});
 	const showLastSeason = $derived(lsTotals.length > 0 || lsPer90.length > 0);
+
+	// --- 4.8: jaettava pelaajakortti (Villen pyynto) ----------------------
+	// Kortti jakaa TASAN sen mita katsoja itse nakee: free saa julkiset faktat
+	// (FPL-status, hinta, omistus, aloitustodennakoisyys, viime kauden tuotanto),
+	// premium saa lisaksi xP-rivin. Sama raja kuin itse kortissa (:348), joten
+	// jakonappi ei voi vuotaa premium-lukua freelle.
+	//
+	// Nappi nakyy MYOS freelle, toisin kuin Leaders/Value/CaptainRanker. Peruste
+	// on 2.8. paatos: kortti gatetaan premiumille vain kun se on premium-datan
+	// johdannainen, ja juuri free-datan jakaminen ON jakelusilmukka - jakaja
+	// mainostaa meita maksamatta. Pelaajakortti on paaosin julkista dataa ja se
+	// on koko sivun oma lupaus ("Free ...").
+	let sharing = $state(false);
+
+	function startPct(p: CardPlayer): number | null {
+		if (typeof p.p_start === 'number') return Math.round(p.p_start * 100);
+		if (typeof p.predicted_starts === 'number') return Math.round(p.predicted_starts);
+		return null;
+	}
+
+	/** Poimi solut avainjarjestyksessa, pudota puuttuvat. Pelipaikka ratkaisee:
+	 *  maalivahdin maalit/syotot per 90 olisivat nollarivi eivatka kerro mitaan. */
+	function pick(cells: Cell[], keys: string[], max: number): PlayerCardCell[] {
+		const out: PlayerCardCell[] = [];
+		for (const k of keys) {
+			const c = cells.find((x) => x.key === k);
+			if (c) out.push({ label: c.label, value: c.value });
+			if (out.length >= max) break;
+		}
+		return out;
+	}
+
+	async function share() {
+		const p = player;
+		if (!p || sharing) return;
+		sharing = true;
+		try {
+			const sp = startPct(p);
+			const metaBits: string[] = [];
+			if (typeof p.price === 'number' && p.price > 0) metaBits.push(`${p.price.toFixed(1)}m`);
+			if (typeof p.owned_pct === 'number') metaBits.push(`${p.owned_pct.toFixed(1)}% owned`);
+
+			// Tuotantorivi kayttaa KAUDEN KERTYMIA, ei per 90 -vauhteja. 1. veto
+			// kaytti per 90:aa ja Zubimendin kortille tuli "0.15 goals / 0.03
+			// assists" - teknisesti oikein mutta laiha jakolupaus, ja per-90-rivi
+			// oli lisaksi harvemmin taytetty (vain 2/4 solua). Kertymat ovat se
+			// muoto jossa FPL-yleiso lukee kauden.
+			const keys =
+				p.pos === 'GKP'
+					? ['saves', 'cs', 'bonus', 'points']
+					: ['goals', 'assists', 'xg', 'xa', 'xgi', 'cs', 'bonus', 'points'];
+			const cells = pick(lsTotals, keys, 4);
+			// Sanamuodot kasin: c.label.toLowerCase() tuotti "133 fpl points".
+			const TOTALS_WORD: Record<string, string> = {
+				minutes: 'minutes',
+				starts: 'starts',
+				points: 'FPL points'
+			};
+			const totalsLine = ['minutes', 'starts', 'points']
+				.map((k) => {
+					const c = lsTotals.find((x) => x.key === k);
+					return c ? `${c.value} ${TOTALS_WORD[k]}` : null;
+				})
+				.filter((x): x is string => x != null)
+				.join(' · ');
+
+			// DefCon omalle riville: se on eri ikkuna kuin viime kausi, eika
+			// niita saa esittaa samana lukusarjana.
+			const dcLine =
+				defcon && defcon.totals.games > 0
+					? `DefCon ${Math.round(defcon.totals.hit_rate_pct)}% hit rate over ${defcon.totals.games} games`
+					: null;
+
+			const noteBits: string[] = [];
+			if (excluded) noteBits.push('not in the projections right now, official FPL data only');
+			else if (sp != null) noteBits.push('start chance is a model estimate, not team news');
+			if (dcLine) noteBits.push(dcLine);
+
+			const method = await sharePlayerCard({
+				name: p.web_name,
+				tag: p.pos,
+				team: p.team_short,
+				teamName: p.team ?? p.team_short,
+				meta: metaBits.join(' · '),
+				// "Available" olisi kohinaa - status vain kun on kerrottavaa.
+				statusLine:
+					st !== 'a'
+						? `FPL: ${STATUS_LABEL[st] ?? st.toUpperCase()}${
+								p.chance_next != null ? `, ${p.chance_next}% chance of playing` : ''
+							}`
+						: undefined,
+				// Karkiluku EI poissuljetulle: se olisi mallin luku tilanteesta jota
+				// malli ei projisoi (sama peruste kuin kortin oma "left out on purpose").
+				hero:
+					sp != null && !excluded
+						? { value: `${sp}%`, label: 'chance of starting the next gameweek' }
+						: undefined,
+				modelLine:
+					premium && !excluded && typeof p.xp_horizon_total === 'number'
+						? `${p.xp_horizon_total.toFixed(1)} xP projected over the next ${
+								(p.gameweeks ?? []).length
+							} gameweeks`
+						: undefined,
+				production:
+					cells.length > 0
+						? {
+								title: `Last season ${lastSeasonLabel}${
+									lastSeasonLeague ? `, ${lastSeasonLeague}` : ''
+								}`,
+								cells,
+								totals: totalsLine || undefined
+							}
+						: undefined,
+				note: noteBits.join(' · ') || undefined,
+				fileName: `goaliq_${p.web_name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.png`
+			});
+			if (method !== 'aborted') {
+				capture('xp_card_shared', { list: 'player_card', method, premium });
+			}
+		} finally {
+			sharing = false;
+		}
+	}
 </script>
 
 <h2>Player card</h2>
@@ -267,7 +391,13 @@
 	{#if player}
 		<article class="pc card">
 			<header class="pc-head">
-				<h3 class="pc-name">{player.web_name}</h3>
+				<div class="pc-name-row">
+					<h3 class="pc-name">{player.web_name}</h3>
+					<!-- 4.8: jaettava kortti. Nakyy myos freelle, ks. share()-kommentti. -->
+					<button type="button" class="share-btn" onclick={share} disabled={sharing}>
+						{sharing ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+					</button>
+				</div>
 				<p class="muted pc-sub">
 					{#if player.full_name && player.full_name !== player.web_name}{player.full_name}
 						·{/if}
@@ -497,9 +627,34 @@
 	.pc-head {
 		margin-bottom: var(--s-4);
 	}
+	.pc-name-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--s-2);
+		flex-wrap: wrap;
+	}
 	.pc-name {
 		margin: 0 0 var(--s-1);
 		font-size: var(--step-2);
+	}
+	/* Sama chip-kieli kuin Leadersin/Valuen jakonapissa */
+	.share-btn {
+		flex: 0 0 auto;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+		white-space: nowrap;
+		line-height: 1.4;
+	}
+	.share-btn:disabled {
+		opacity: 0.6;
+		cursor: default;
 	}
 	.pc-sub {
 		margin: 0;

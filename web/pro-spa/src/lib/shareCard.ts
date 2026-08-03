@@ -12,6 +12,8 @@
  * nappia ei renderöidä freelle.
  */
 
+import { teamColorByShort } from './teamColors';
+
 export interface CardRow {
 	rank: number;
 	name: string;
@@ -266,7 +268,9 @@ function darkenHex(hex: string, f = 0.7): string {
 
 function drawKit(
 	ctx: CanvasRenderingContext2D,
-	p: PitchCardPlayer,
+	// Rakenteellinen tyyppi (ei PitchCardPlayer): pelaajakortti kayttaa samaa
+	// paitaa mutta sille ei ole xp:ta eika badgea.
+	p: { color: string; textColor: string; team: string },
 	x: number,
 	y: number,
 	size: number
@@ -445,6 +449,246 @@ export async function renderPitchCard(spec: PitchCardSpec): Promise<Blob> {
 
 export async function sharePitchCard(spec: PitchCardSpec): Promise<ShareOutcome> {
 	const blob = await renderPitchCard(spec);
+	return deliver(blob, spec.fileName);
+}
+
+/* ---------- 4.8: yhden pelaajan kortti (player card) ---------- */
+
+export interface PlayerCardCell {
+	label: string;
+	value: string;
+}
+
+export interface PlayerCardSpec {
+	name: string;
+	/** pos-tagi (GKP/DEF/MID/FWD) */
+	tag: string;
+	/** lyhytkoodi paitaan ja klubivariin, esim. "ARS" */
+	team: string;
+	/** koko nimi klubinauhaan, esim. "Arsenal" */
+	teamName: string;
+	/** hinta + omistus yhdella rivilla nimen alla */
+	meta: string;
+	/** FPL:n VIRALLINEN saatavuustila. Jatetaan pois kun pelaaja on
+	 *  normaalisti kaytettavissa - "Available" olisi kohinaa. */
+	statusLine?: string;
+	/** Kortin karkiluku: iso amber-arvo + selittava teksti. */
+	hero?: { value: string; label: string };
+	/** Premium-rivi (xP). Kutsuja jattaa pois freelta. */
+	modelLine?: string;
+	/** Tuotantorivi. title kantaa katteen (kausi + sarja + per 90 vai totaali)
+	 *  - ilman sita luvut vaittaisivat olevansa jotain muuta kuin ovat. */
+	production?: { title: string; cells: PlayerCardCell[]; totals?: string };
+	note?: string;
+	fileName: string;
+}
+
+/** Yhden pelaajan kortti. Erillinen renderCardista, koska se on listakortti
+ *  (rank/name/mid/value) eivatka pelaajan faktat ole rivimuotoista dataa.
+ *
+ *  1. versio oli neljan ison laatikon ruudukko ja Ville hylkasi sen ("ei oo
+ *  hyva tollanen kortti") - se oli geneerinen dashboard ilman pelaajan
+ *  identiteettia, ja puolet kortista oli tyhjaa. Tama versio nojaa klubin
+ *  variin ja paitaan (sama lahde kuin pitch-kortissa) ja kertoo mallin
+ *  nakemyksen + oikeat tuotantoluvut.
+ *
+ *  PREMIUM-GATE ON KUTSUJAN VASTUULLA. Toisin kuin muut kortit tama EI ole
+ *  puhtaasti premium-datan johdannainen: pelaajakortin data on paaosin
+ *  julkista (FPL-status, hinta, omistus, aloitustodennakoisyys, DefCon,
+ *  viime kausi), ja 2.8. paatettiin etta juuri free-datan jakaminen ON
+ *  jakelusilmukka. Kutsuja jattaa modelLine-rivin pois freelta. */
+export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
+	await Promise.all([
+		document.fonts.load(bold(64)),
+		document.fonts.load(bold(30)),
+		document.fonts.load(med(20))
+	]).catch(() => undefined);
+	const wm = await loadWordmark();
+
+	const BAND_TOP = 128;
+	const BAND_H = 172;
+
+	// Korkeus lasketaan lohko kerrallaan, jotta puuttuva lohko ei jata aukkoa
+	// (1. version vika: kiintea ruudukko + iso tyhja alue alalaidassa).
+	let h = BAND_TOP + BAND_H + 26;
+	const yStatus = h;
+	if (spec.statusLine) h += 50;
+	const yHero = h;
+	if (spec.hero) h += 128;
+	const yModel = h;
+	if (spec.modelLine) h += 58;
+	const yProd = h;
+	if (spec.production) h += 40 + 92 + (spec.production.totals ? 40 : 0);
+	const yNote = h;
+	if (spec.note) h += 44;
+	const H = h + FOOT_H;
+
+	const canvas = document.createElement('canvas');
+	canvas.width = W;
+	canvas.height = H;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('canvas 2d context unavailable');
+	ctx.textBaseline = 'top';
+
+	const g = ctx.createLinearGradient(0, 0, 0, H);
+	g.addColorStop(0, INK);
+	g.addColorStop(1, INK2);
+	ctx.fillStyle = g;
+	ctx.fillRect(0, 0, W, H);
+
+	// Wordmark (pienempi kuin listakortissa: klubinauha kantaa ylaosan)
+	if (wm) {
+		const wmH = 56;
+		const wmW = Math.round((wm.width * wmH) / wm.height);
+		ctx.drawImage(wm, (W - wmW) / 2, 44, wmW, wmH);
+	} else {
+		ctx.font = bold(38);
+		const gw = ctx.measureText('GOAL').width;
+		const box = 52;
+		const x0 = (W - (gw + 12 + box)) / 2;
+		ctx.fillStyle = CREAM;
+		ctx.fillText('GOAL', x0, 50);
+		ctx.fillStyle = AMBER;
+		ctx.fillRect(x0 + gw + 12, 44, box, box);
+		ctx.fillStyle = INK;
+		ctx.font = bold(28);
+		ctx.fillText('IQ', x0 + gw + 12 + (box - ctx.measureText('IQ').width) / 2, 56);
+	}
+
+	// --- Klubinauha: pelaajan identiteetti ---
+	const kit = teamColorByShort(spec.team);
+	ctx.fillStyle = kit.color;
+	ctx.fillRect(0, BAND_TOP, W, BAND_H);
+	// Amber-viiva nauhan alle sitoo klubivarin brandiin
+	ctx.fillStyle = AMBER;
+	ctx.fillRect(0, BAND_TOP + BAND_H, W, 5);
+
+	const onBand = kit.textColor;
+	const onBandMuted =
+		onBand === '#000000' ? 'rgba(0,0,0,0.66)' : 'rgba(255,255,255,0.76)';
+
+	const KIT_S = 108;
+	drawKit(ctx, { color: kit.color, textColor: onBand, team: spec.team },
+		MX, BAND_TOP + (BAND_H - KIT_S) / 2, KIT_S);
+
+	const tx = MX + KIT_S + 34;
+	const availW = W - tx - MX;
+	const nPx = shrink(ctx, spec.name, 62, availW, 30, bold);
+	ctx.font = bold(nPx);
+	ctx.fillStyle = onBand;
+	ctx.fillText(spec.name, tx, BAND_TOP + 40);
+
+	// Meta-rivi: pos-tagi + hinta/omistus
+	const my = BAND_TOP + 40 + nPx + 16;
+	ctx.font = bold(19);
+	const tagW = ctx.measureText(spec.tag).width + 18;
+	ctx.strokeStyle = onBandMuted;
+	ctx.lineWidth = 1;
+	ctx.strokeRect(tx, my - 3, tagW, 30);
+	ctx.fillStyle = onBand;
+	ctx.fillText(spec.tag, tx + 9, my + 3);
+	ctx.font = med(21);
+	ctx.fillStyle = onBandMuted;
+	ctx.fillText(spec.meta, tx + tagW + 16, my + 4);
+
+	// Klubin nimi nauhan oikeaan laitaan haaleana (identiteetti, ei kohina)
+	ctx.font = bold(21);
+	const tnW = ctx.measureText(spec.teamName.toUpperCase()).width;
+	ctx.fillStyle = onBandMuted;
+	ctx.fillText(spec.teamName.toUpperCase(), W - MX - tnW, BAND_TOP + 22);
+
+	// --- Virallinen status (vain kun on kerrottavaa) ---
+	if (spec.statusLine) {
+		const sPx = shrink(ctx, spec.statusLine, 23, W - 2 * MX, 15, med);
+		ctx.font = med(sPx);
+		ctx.fillStyle = AMBER;
+		ctx.fillText(spec.statusLine, MX, yStatus + 10);
+	}
+
+	// --- Karkiluku ---
+	if (spec.hero) {
+		ctx.font = bold(76);
+		ctx.fillStyle = AMBER;
+		ctx.fillText(spec.hero.value, MX, yHero + 16);
+		const vw = ctx.measureText(spec.hero.value).width;
+		const lPx = shrink(ctx, spec.hero.label, 26, W - MX * 2 - vw - 26, 15, med);
+		ctx.font = med(lPx);
+		ctx.fillStyle = CREAM;
+		ctx.fillText(spec.hero.label, MX + vw + 26, yHero + 16 + 76 - lPx - 10);
+	}
+
+	// --- Malliluku (premium) ---
+	if (spec.modelLine) {
+		const mPx = shrink(ctx, spec.modelLine, 27, W - 2 * MX, 16, bold);
+		ctx.font = bold(mPx);
+		ctx.fillStyle = CREAM;
+		ctx.fillText(spec.modelLine, MX, yModel + 12);
+	}
+
+	// --- Tuotantorivi ---
+	if (spec.production) {
+		const pr = spec.production;
+		ctx.strokeStyle = LINE;
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.moveTo(MX, yProd + 8);
+		ctx.lineTo(W - MX, yProd + 8);
+		ctx.stroke();
+
+		ctx.font = med(19);
+		ctx.fillStyle = MUTED;
+		ctx.fillText(pr.title.toUpperCase(), MX, yProd + 24);
+
+		const cy = yProd + 40 + 16;
+		// KIINTEA slot-leveys, EI (leveys / solujen maara). Jalkimmainen levitti
+		// kaksi solua koko kortin leveydelle ja nakyi rikkinaisena ruudukkona
+		// (nakyi vasta kuvaa katsomalla). Nyt solut pakkautuvat vasemmalta.
+		const SLOT = 240;
+		pr.cells.forEach((c, i) => {
+			const cx = MX + i * SLOT;
+			ctx.font = bold(38);
+			ctx.fillStyle = CREAM;
+			ctx.fillText(c.value, cx, cy);
+			ctx.font = med(18);
+			ctx.fillStyle = MUTED;
+			ctx.fillText(c.label.toUpperCase(), cx, cy + 46);
+		});
+
+		if (pr.totals) {
+			const tPx = shrink(ctx, pr.totals, 20, W - 2 * MX, 13, med);
+			ctx.font = med(tPx);
+			ctx.fillStyle = MUTED;
+			ctx.fillText(pr.totals, MX, yProd + 40 + 92 - 8);
+		}
+	}
+
+	if (spec.note) {
+		const nfPx = shrink(ctx, spec.note, 18, W - 2 * MX, 12, med);
+		ctx.font = med(nfPx);
+		ctx.fillStyle = MUTED;
+		ctx.fillText(spec.note, MX, yNote + 12);
+	}
+
+	// Footer identtinen listakortin kanssa
+	ctx.font = med(20);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.font = bold(20);
+	ctx.fillStyle = AMBER;
+	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
+	ctx.font = med(17);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('model projections, not betting advice', MX, H - 54);
+	ctx.fillStyle = AMBER;
+	ctx.fillRect(0, H - 8, W, 8);
+
+	return new Promise<Blob>((resolve, reject) => {
+		canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('canvas toBlob failed'))), 'image/png');
+	});
+}
+
+export async function sharePlayerCard(spec: PlayerCardSpec): Promise<ShareOutcome> {
+	const blob = await renderPlayerCard(spec);
 	return deliver(blob, spec.fileName);
 }
 
