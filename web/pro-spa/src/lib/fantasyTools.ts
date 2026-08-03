@@ -440,8 +440,12 @@ export interface ValueResponse {
 	};
 }
 
+/** 4.8: top_n 20 -> 50. Backend on tukenut 1-100 alusta asti (api/main.py
+ *  `top_n: int = Query(default=20, ge=1, le=100)`); 20 oli klientin oletus
+ *  eika rajoite. 50 rivilla pelipaikkasuodatin antaa jokaiselle positiolle
+ *  mielekkaan listan (20 rivista GKP-suodatin tuotti 1-2 rivia). */
 export function fetchValue(): Promise<ValueResponse> {
-	return getTool('/api/fantasy/value', 'value');
+	return getTool('/api/fantasy/value?top_n=50', 'value');
 }
 
 /* ---------- #124/#125: xG leaders + DefCon tracker ---------- */

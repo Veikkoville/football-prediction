@@ -11,7 +11,7 @@
 	const BULLETS = [
 		'Per-player xP projections for every gameweek',
 		'Captain ranker with top picks',
-		'Share as image: post-ready cards from your XI, the captain ranker and leaderboards',
+		'Share as image: post-ready cards from your XI, the captain ranker, the value ranking and leaderboards',
 		'Differential finder: low ownership, high xP',
 		'Multi-gameweek transfer planner and plan chains',
 		'Chip timing: best window for Wildcard, Bench Boost, Triple Captain and Free Hit',
@@ -19,7 +19,10 @@
 		'Unlimited watchlist: track every player you are deciding on',
 		'Player compare: up to four players side by side',
 		'CSV export of the full projection set',
-		'Full match analysis: scorelines, goals & momentum'
+		// 4.8: synkattu paywall.bullet_match-avaimeen (goaliq-app/lib/i18n/en.ts).
+		// Kommentti ylla lupaa 1:1-vastaavuuden, ja 29.7 todettiin ettei yksikaan
+		// portti nae pintojen valista eroa -> se loytyy vain lukemalla molemmat.
+		'Full match analysis: top-10 scorelines, total goals, both teams to score, form & momentum and head-to-head'
 	];
 
 	let teaser = $state<XpResponse | null>(null);

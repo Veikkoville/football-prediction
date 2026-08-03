@@ -32,11 +32,29 @@
 </script>
 
 <h3>Unlock GoalIQ Premium</h3>
+<!--
+	4.8 (Villen paatos): molemmat pinnat olivat puolikkaita. Mobiilin
+	scoreline-lukko myi VAIN ottelusisaltoa ja tama sivu VAIN FPL:aa, vaikka
+	tilaus on yksi ja kattaa molemmat. Mobiilin laajin paywall-pinta (24
+	kayttajaa / 7 vrk) konvertoi NOLLAA, ja diagnoosi oli lupaus eika sijainti.
+	Molemmat tuotteet nakyvat nyt molemmilla pinnoilla, FPL karkena.
+	⚠️ Pinta-pariteetti: parikorjaus on goaliq-app/screens/PredictScreen.tsx +
+	lib/i18n/*.ts (vrt. em-dash-ja-pinta-pariteetti).
+-->
 <p class="muted">
-	Player expected points (xP), captain ranker, chip timing, transfer plan chains, edge mode,
-	a live DefCon panel for your own squad during a gameweek, shareable image cards and
-	per-gameweek breakdowns. Season pass renews yearly, monthly renews monthly, cancel
-	anytime. One subscription covers web, iOS and Android.
+	<strong>FPL:</strong> player expected points (xP), captain ranker, differential finder,
+	chip timing, transfer plan chains, edge mode, a live DefCon panel for your own squad
+	during a gameweek, shareable image cards and per-gameweek breakdowns.
+</p>
+<p class="muted">
+	<strong>Match model:</strong> full analysis for any fixture across the ten competitions we
+	cover, from the Premier League to the Champions League: top-10 most likely scorelines,
+	total goals, both teams to score, form and momentum trends, head-to-head record and fair
+	value estimates.
+</p>
+<p class="muted">
+	Season pass renews yearly, monthly renews monthly, cancel anytime. One subscription
+	covers web, iOS and Android.
 </p>
 <p class="muted">
 	Already subscribed in the GoalIQ app? Sign in with the same account and Premium is already

@@ -8,6 +8,7 @@
 	 */
 	import { capture } from '$lib/analytics';
 	import { fetchValue, type ValueResponse } from '$lib/fantasyTools';
+	import { canShareToApps, shareCard } from '$lib/shareCard';
 
 	let { premium = false, onUpgrade }: { premium?: boolean; onUpgrade?: () => void } = $props();
 
@@ -21,6 +22,16 @@
 	let data = $state<ValueResponse | null>(null);
 	let error = $state<string | null>(null);
 	let loading = $state(true);
+
+	// 4.8: suodattimet + sortaus. NAMA OVAT PREMIUM-ONLY EIVATKA KOSMETIIKKAA --
+	// free nakee top-3, ja jos free saisi pelipaikka-/joukkuesuodattimen, han
+	// kavisi listan lapi 3 rivia kerrallaan ja nakisi kaytannossa koko
+	// rankingin. Sama vikaluokka kuin 3.8. captain/differentials-vuoto.
+	type SortKey = 'value' | 'xp' | 'price';
+	let posFilter = $state('');
+	let teamFilter = $state('');
+	let sortKey = $state<SortKey>('value');
+	let sharing = $state(false);
 
 	$effect(() => {
 		loading = true;
@@ -36,18 +47,78 @@
 		}
 	});
 
-	const visible = $derived(
-		premium ? (data?.players ?? []) : (data?.players ?? []).slice(0, FREE_ROWS)
-	);
+	const players = $derived(data?.players ?? []);
+
+	/** Joukkuevaihtoehdot datasta, ei kovakoodattuna (nousijat seuraavat itse). */
+	const teamOptions = $derived([...new Set(players.map((p) => p.team_short))].sort());
+
+	/** Tiebreak aina value desc, jotta listan identiteetti sailyy sortista
+	 *  riippumatta (sama kaava kuin Leadersissa). */
+	const visible = $derived.by(() => {
+		if (!premium) return players.slice(0, FREE_ROWS);
+		const v = (p: (typeof players)[number]) =>
+			sortKey === 'price' ? p.price : sortKey === 'xp' ? p.xp_horizon_total : p.value;
+		return players
+			.filter((p) => (!posFilter || p.pos === posFilter) && (!teamFilter || p.team_short === teamFilter))
+			.sort((a, b) => v(b) - v(a) || b.value - a.value);
+	});
 	const pairs = $derived(data?.gk?.pairs ?? []);
 
 	function unlock() {
 		capture('upgrade_tapped', { source: 'fantasy_value' });
 		onUpgrade?.();
 	}
+
+	// 4.8: Value oli ainoa premium-lista ILMAN jakokorttia (CaptainRanker,
+	// Leaders, CleanSheets, PriceWatch ja pitch saivat sen 31.7-2.8). Jakaa
+	// NAKYVAN nakyman top 10 -- aktiiviset suodattimet mukana alaotsikossa,
+	// muuten kortti vaittaisi olevansa koko listan karki.
+	const SORT_LABEL: Record<SortKey, string> = {
+		value: 'xP per million',
+		xp: 'projected xP',
+		price: 'price'
+	};
+	async function share() {
+		if (sharing) return;
+		sharing = true;
+		try {
+			const sub = [
+				`next ${data?.meta?.horizon_gw ?? 6} gameweeks`,
+				`by ${SORT_LABEL[sortKey]}`,
+				...(posFilter ? [posFilter] : []),
+				...(teamFilter ? [teamFilter] : [])
+			].join(', ');
+			const method = await shareCard({
+				title: 'TOP VALUE PICKS',
+				subtitle: `${sub}, GoalIQ model`,
+				midLabel: 'PRICE',
+				valueLabel: 'xP/£m',
+				fileName: 'goaliq_value.png',
+				rows: visible.slice(0, 10).map((p, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					mid: p.price.toFixed(1),
+					value: p.value.toFixed(2)
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'value', method });
+		} finally {
+			sharing = false;
+		}
+	}
 </script>
 
-<h2>Player value: xP per million</h2>
+<div class="head-row">
+	<h2>Player value: xP per million</h2>
+	{#if premium && players.length > 0}
+		<!-- 4.8: jaettava kortti nakyvasta nakymasta (premium) -->
+		<button type="button" class="window-chip" onclick={share} disabled={sharing}>
+			{sharing ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+		</button>
+	{/if}
+</div>
 <p class="muted">
 	Projected points per million spent over the next {data?.meta?.horizon_gw ?? 6} gameweeks, with a
 	fixture-swing flag. Pre-season prices come from the 2025/26 game until GW1.
@@ -58,8 +129,34 @@
 {:else if error}
 	<p class="banner error">{error}</p>
 {:else}
-	{#if visible.length === 0}
+	{#if premium && players.length > 0}
+		<!-- Suodattimet ovat premium-only, ks. script-lohkon kommentti. -->
+		<div class="window-row">
+			<span class="muted">Sort:</span>
+			<button type="button" class="window-chip" class:on={sortKey === 'value'} onclick={() => (sortKey = 'value')}>Value</button>
+			<button type="button" class="window-chip" class:on={sortKey === 'xp'} onclick={() => (sortKey = 'xp')}>xP</button>
+			<button type="button" class="window-chip" class:on={sortKey === 'price'} onclick={() => (sortKey = 'price')}>Price</button>
+			<span class="muted">Pos:</span>
+			{#each ['', 'GKP', 'DEF', 'MID', 'FWD'] as pp (pp)}
+				<button type="button" class="window-chip" class:on={posFilter === pp} onclick={() => (posFilter = pp)}>
+					{pp === '' ? 'All' : pp}
+				</button>
+			{/each}
+			{#if teamOptions.length > 1}
+				<span class="muted">Team:</span>
+				<select bind:value={teamFilter} aria-label="Filter by team">
+					<option value="">All</option>
+					{#each teamOptions as ts (ts)}
+						<option value={ts}>{ts}</option>
+					{/each}
+				</select>
+			{/if}
+		</div>
+	{/if}
+	{#if players.length === 0}
 		<p class="muted">No data yet.</p>
+	{:else if visible.length === 0}
+		<p class="muted">No players match these filters.</p>
 	{:else}
 		<div class="table-wrap">
 			<table>
@@ -139,7 +236,8 @@
 		<!-- 🔒 sama gate kuin mobiili #114: top-3 free, loput + GK-parit premium -->
 		<button type="button" class="teaser-row" onclick={unlock}>
 			<span>
-				Full value ranking and GK rotation pairs <span class="muted">(top 3 shown free)</span>
+				Top 50 value ranking, position and team filters, and GK rotation pairs
+				<span class="muted">(top 3 shown free)</span>
 			</span>
 			<span class="locked" aria-label="Locked">•.••</span>
 			<span class="cta">Unlock with Premium</span>
@@ -148,6 +246,64 @@
 {/if}
 
 <style>
+	.head-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--s-2);
+		flex-wrap: wrap;
+	}
+	.head-row h2 {
+		margin: 0;
+	}
+	/* Sama kontrollikieli kuin Leadersissa (window-row/-chip) */
+	.window-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--s-2);
+		row-gap: var(--s-2);
+		margin: 0 0 var(--s-2);
+		font-size: var(--step--1);
+	}
+	.window-row > span {
+		flex: 0 0 auto;
+	}
+	.window-chip {
+		flex: 0 0 auto;
+		min-width: 36px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+		text-align: center;
+		white-space: nowrap;
+		line-height: 1.4;
+	}
+	.window-chip.on {
+		background: transparent;
+		border-color: var(--accent);
+		color: var(--accent-strong);
+	}
+	.window-chip:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+	.window-row select {
+		flex: 0 0 auto;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--text);
+		font-weight: 600;
+		font-size: var(--step--1);
+		padding: 4px 10px;
+		line-height: 1.4;
+	}
 	.strong {
 		font-weight: 800;
 		color: var(--giq-rust);
