@@ -33,6 +33,79 @@ type Queued = { event: string; props?: Record<string, unknown>; beacon?: boolean
 const queue: Queued[] = [];
 let pendingIdentity: { userId: string; email?: string | null } | null = null;
 
+/* 3.8.2026: POIKKEUSTEN VARHAISPUSKURI.
+ *
+ * Miksi tama on olemassa: yllaoleva `queue` kattaa vain NIMENOMAISET
+ * capture()-kutsut. Poikkeukset eivat kulje sen lapi — posthog-js asentaa
+ * omat virhekuuntelijansa vasta init():issa, joka ajetaan requestIdleCallbackin
+ * takana (3 s katto). Ikkuna sivun avauksesta initiin oli siis taysin
+ * kuuntelematta, ja juuri se on ikkuna jossa SPA:n chunkit ajetaan: kaikki
+ * 31 aiemmin kirjattua $exceptionia (27.7.-1.8.) olivat kasittelemattomia
+ * virheita immutable/chunks-paloissa. 2.8. lazy-load-shipin jalkeen
+ * niita ei ole kirjautunut yhtaan — mikaan ei todista etta virheet loppuivat,
+ * vain etta lakkasimme nakemasta ne.
+ *
+ * MITATTU ensin, ettei korjata vaaraa asiaa: $web_vitals per pro_page_viewed
+ * on 3.8. 0,83 vs 1,20-1,88 aiemmin, mutta sivulatauksia oli 6 (ed. 19-59)
+ * — eli VITALS-otoksen romahdus on liikennetta, ei sokeutta. posthog latautuu
+ * ja lahettaa normaalisti. Vain poikkeusten ikkuna oli aito aukko.
+ *
+ * Kuuntelijat IRROTETAAN heti kun posthog on valmis: se asentaa omansa, ja
+ * kaksi kuuntelijaa samalle virheelle tuottaisi tuplakirjaukset.
+ *
+ * EI resurssivirheita (addEventListener 'error' capture-vaiheessa): ne ovat
+ * eri luokka (adblock, kuvat) ja tuottaisivat kohinaa jonka seassa aidot
+ * koodivirheet katoaisivat. Dynaamisen importin epaonnistuminen nakyy
+ * unhandledrejectionina, joka on mukana. */
+const MAX_EARLY_ERRORS = 10;
+type EarlyError = { error: unknown; kind: 'error' | 'unhandledrejection' };
+const earlyErrors: EarlyError[] = [];
+let earlyCaptureAttached = false;
+
+function pushEarlyError(error: unknown, kind: EarlyError['kind']): void {
+	// Katto suojaa virhemyrskylta: silmukassa heittava koodi tayttaisi muistin
+	// ennen kuin posthog ehtii latautua.
+	if (earlyErrors.length >= MAX_EARLY_ERRORS) return;
+	earlyErrors.push({ error, kind });
+}
+
+function onEarlyError(ev: ErrorEvent): void {
+	// ev.error puuttuu mm. cross-origin-skripteilta ("Script error."); silloin
+	// rakennetaan Error viestista, jotta rivi ei katoa kokonaan.
+	pushEarlyError(ev.error ?? new Error(ev.message || 'Unknown error'), 'error');
+}
+
+function onEarlyRejection(ev: PromiseRejectionEvent): void {
+	pushEarlyError(ev.reason ?? new Error('Unhandled rejection'), 'unhandledrejection');
+}
+
+function attachEarlyErrorCapture(): void {
+	if (earlyCaptureAttached || typeof window === 'undefined') return;
+	earlyCaptureAttached = true;
+	window.addEventListener('error', onEarlyError);
+	window.addEventListener('unhandledrejection', onEarlyRejection);
+}
+
+function detachEarlyErrorCapture(): void {
+	if (!earlyCaptureAttached || typeof window === 'undefined') return;
+	earlyCaptureAttached = false;
+	window.removeEventListener('error', onEarlyError);
+	window.removeEventListener('unhandledrejection', onEarlyRejection);
+}
+
+function flushEarlyErrors(): void {
+	const buffered = earlyErrors.splice(0);
+	if (!posthog) return;
+	for (const e of buffered) {
+		// $exception_source erottaa nama posthogin omista kirjauksista, jotta
+		// datasta nakee onko korjaus oikeasti tuonut virheita takaisin.
+		posthog.captureException(e.error, {
+			$exception_source: 'early_buffer',
+			early_capture_kind: e.kind
+		});
+	}
+}
+
 function boot(): void {
 	void import('posthog-js')
 		.then((mod) => {
@@ -55,18 +128,28 @@ function boot(): void {
 				pendingIdentity = null;
 				posthog.identify(userId, email ? { email } : undefined);
 			}
+			// Irrota omat kuuntelijat ENNEN purkua: posthog on nyt asentanut
+			// omansa, eika purku saa palautua takaisin puskuriin.
+			detachEarlyErrorCapture();
+			flushEarlyErrors();
 			for (const q of queue.splice(0)) {
 				posthog.capture(q.event, q.props, q.beacon ? { transport: 'sendBeacon' } : undefined);
 			}
 		})
 		.catch(() => {
-			loading = false; // verkkovirhe: seuraava initAnalytics saa yrittaa uudelleen
+			// Kuuntelijat jaavat TAHALLAAN paalle: jos kirjasto ei latautunut,
+			// puskuri (katto 10) on ainoa paikka jossa virheet sailyvat siihen
+			// asti kun seuraava initAnalytics yrittaa uudelleen.
+			loading = false;
 		});
 }
 
 export function initAnalytics(): void {
 	if (ready || loading || !POSTHOG_KEY) return;
 	loading = true;
+	// HETI, ei idlen takana: tama on koko korjauksen pointti. Kuuntelijat ovat
+	// muutama tavu ja ne asennetaan ennen kuin 203 kB:n kirjastoa aletaan hakea.
+	attachEarlyErrorCapture();
 	const ric = (window as { requestIdleCallback?: (cb: () => void, o?: object) => void })
 		.requestIdleCallback;
 	if (typeof ric === 'function') ric(boot, { timeout: 3000 });
