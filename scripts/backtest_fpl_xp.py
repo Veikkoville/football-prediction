@@ -151,7 +151,8 @@ def _load_archive_2526():
 
 
 def run_backtest(force_refresh: bool = False, use_context: bool = True,
-                 bps_2627: bool = True, archive: bool = False) -> dict:
+                 bps_2627: bool = True, archive: bool = False,
+                 show_components: bool = False) -> dict:
     print("[1/4] FPL-data (bootstrap + fixtures + 841 element-historiaa)...")
     if archive:
         boot, fixtures, summaries, season_key = _load_archive_2526()
@@ -269,9 +270,17 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
             rates = xp.player_rates(acc_by_player[pid], pos, priors)
             trounds = [r for r in team_rounds[tid] if r < g]
             xmins, p60, p1_59 = xp.minutes_form(mins_by_round[pid], trounds)
-            pred = sum(
-                xp.xp_components(pos, rates, xmins, p60, p1_59, c)["total"]
-                for c in ctxs)
+            comps = [xp.xp_components(pos, rates, xmins, p60, p1_59, c)
+                     for c in ctxs]
+            pred = sum(c["total"] for c in comps)
+            # Komponenttitason validointi (4.8): maali- ja syottokomponentit
+            # ovat PISTEINA, joten yksikko puretaan takaisin kappaleiksi.
+            # Nain mitataan tasan se luku joka tuotteessa naytettaisiin.
+            eg = sum(c["goals"] for c in comps) / xp.GOAL_PTS[pos]
+            ea = sum(c["assists"] for c in comps) / xp.ASSIST_PTS
+            raw_rows = rows_by_round[pid][g]
+            ag = sum((x.get("goals_scored") or 0) for x in raw_rows)
+            aa = sum((x.get("assists") or 0) for x in raw_rows)
 
             form_rounds = trounds[-FORM_WINDOW:]
             base = (float(np.mean([pts_by_round[pid].get(r, 0.0) for r in form_rounds]))
@@ -287,6 +296,7 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
             gw_played.append(played)
             gw_pos.append(pos)
             obs_rows.append({"gw": g, "pid": pid, "pos": pos, "pred": pred,
+                             "eg": eg, "ea": ea, "ag": ag, "aa": aa,
                              "base": base, "actual": actual, "played": played,
                              "vs_promoted": any(o in promoted
                                                 for o in opps_by_tid.get(tid, ()))})
@@ -309,8 +319,11 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
                   f"base={entry.get('played_mae_base', float('nan')):.3f}")
 
     print("[4/4] Aggregointi + ship-gate...")
-    return aggregate_and_gate(per_gw, obs_rows, season_key,
-                              use_context=use_context, bps_2627=bps_2627)
+    res = aggregate_and_gate(per_gw, obs_rows, season_key,
+                             use_context=use_context, bps_2627=bps_2627)
+    if show_components:
+        report_components(obs_rows)
+    return res
 
 
 def _agg(per_gw: list[dict], tag: str, gw_from: int, gw_to: int) -> dict:
@@ -445,6 +458,69 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
     return report
 
 
+
+# ---------------------------------------------------------------------------
+# KOMPONENTTITASON VALIDOINTI (4.8.2026, Villen GO)
+#
+# Miksi erikseen: ship-gate validoi xP-SUMMAN. Maali- ja syottokomponentit ovat
+# summan osia, ja summa voi olla oikein vaikka osat olisivat vaarin vastakkaisiin
+# suuntiin. Jos nama luvut aiotaan NAYTTAA tuotteessa ("model expects 0.68
+# goals"), ne on validoitava omina lukuinaan.
+#
+# Kolme kysymysta, kolme mittaria:
+#   1. Kalibraatio: summautuuko odotus toteutuneeseen? (bias)
+#   2. Erottelu:    rankkaako se oikeat pelaajat karkeen? (Spearman)
+#   3. Kaytettavyys: onko P(>=1 maali) parempi kuin naiivi vertailukohta? (Brier)
+# ---------------------------------------------------------------------------
+def report_components(obs_rows: list[dict]) -> None:
+    played = [o for o in obs_rows if o["played"] and "eg" in o]
+    if len(played) < 100:
+        print("KOMPONENTIT: liian vahan havaintoja")
+        return
+    print()
+    print("=" * 66)
+    print(f"KOMPONENTTITASON VALIDOINTI  (n={len(played)} pelaaja-GW, pelanneet)")
+    print("=" * 66)
+
+    def block(label, rows):
+        if len(rows) < 30:
+            print(f"{label:>6}  otos liian pieni (n={len(rows)})")
+            return
+        for key, act, name in (("eg", "ag", "maalit"), ("ea", "aa", "syotot")):
+            pe = sum(r[key] for r in rows)
+            pa = sum(r[act] for r in rows)
+            bias = (pe / pa - 1) * 100 if pa else float("nan")
+            # Spearman ilman scipya: rank-korrelaatio
+            def rank(vals):
+                order = sorted(range(len(vals)), key=lambda i: vals[i])
+                rk = [0.0] * len(vals)
+                for pos_, i in enumerate(order):
+                    rk[i] = pos_
+                return rk
+            rx, ry = rank([r[key] for r in rows]), rank([r[act] for r in rows])
+            n = len(rows)
+            mx, my = sum(rx) / n, sum(ry) / n
+            num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+            den = (sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry)) ** 0.5
+            rho = num / den if den else 0.0
+            # Brier P(>=1) Poissonista vs naiivi (populaation osuus)
+            import math
+            base_rate = sum(1 for r in rows if r[act] >= 1) / n
+            b_model = sum((1 - math.exp(-r[key]) - (1 if r[act] >= 1 else 0)) ** 2
+                          for r in rows) / n
+            b_naive = sum((base_rate - (1 if r[act] >= 1 else 0)) ** 2 for r in rows) / n
+            print(f"{label:>6} {name:>7}  odotus {pe:7.1f}  toteutunut {pa:6.0f}  "
+                  f"bias {bias:+6.1f} %   rho {rho:+.3f}   "
+                  f"Brier {b_model:.4f} vs naiivi {b_naive:.4f} "
+                  f"({(b_naive - b_model) / b_naive * 100:+.1f} %)")
+
+    block("KAIKKI", played)
+    for pos, nimi in ((2, "DEF"), (3, "MID"), (4, "FWD")):
+        block(nimi, [o for o in played if o["pos"] == pos])
+    print("TULKINTA: luku on julkaisukelpoinen vain jos bias on pieni JA "
+          "Brier voittaa naiivin. Pelkka korkea rho ei riita: se kertoo "
+          "jarjestyksesta, ei siita etta luku 0.68 tarkoittaa 0.68:aa.")
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true",
@@ -453,12 +529,15 @@ def main() -> int:
                     help="aja ILMAN Phase 1b -kontekstikerrosta (vertailuajo)")
     ap.add_argument("--archive", action="store_true",
                     help="lue 25/26 levyarkistosta (pakollinen kausiflipin jalkeen)")
+    ap.add_argument("--components", action="store_true",
+                    help="lisaa maali- ja syottokomponenttien validointi")
     ap.add_argument("--legacy-bps", action="store_true",
                     help="OHITA 26/27 BPS-oikaisu (#151) — vain ennen/jälkeen-"
                          "vertailuajoihin")
     args = ap.parse_args()
 
-    report = run_backtest(force_refresh=args.refresh, use_context=not args.raw,
+    report = run_backtest(show_components=args.components,
+                          force_refresh=args.refresh, use_context=not args.raw,
                           bps_2627=not args.legacy_bps, archive=args.archive)
 
     out_dir = config.PROJECT_ROOT / "logs"
