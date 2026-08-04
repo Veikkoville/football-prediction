@@ -110,6 +110,12 @@ export interface XpPlayer {
 	minutes_confidence?: 'low' | 'med' | 'high';
 	/** #143: estimaatin datapohja — defensiivinen (vanha payload ei tuo). */
 	data_basis?: 'pl_history' | 'limited_history' | 'no_history';
+	/** 4.8: mistä aloitus-tn TULEE kun se ei ole puhtaasti mallin laskema.
+	 *  Payload on tuonut `override`-arvon 27.7. lähtien mutta UI ei näyttänyt
+	 *  sitä missään — käsin nostettu projektio jota ei merkitä on täsmälleen
+	 *  se asia joka syö "todennettava malli" -lupauksen. Defensiivinen. */
+	minutes_source?: 'override' | 'price_prior' | 'price_blend';
+	minutes_override_reason?: string;
 	/** #147: koko nimi VAIN hakua varten — defensiivinen (vanha payload ei tuo). */
 	full_name?: string;
 	/** Edge-sprint (contract-data 1): kaikki defensiivisiä (vanha payload ei tuo). */
