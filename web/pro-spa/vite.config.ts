@@ -20,10 +20,23 @@ export default defineConfig({
 			// headerilla → polku jäi pysyvästi rikki (musta sivu). appDir-
 			// vaihto uudelleennimeää KAIKKI asset-polut → jokainen myrkytetty
 			// edge-merkintä ohitetaan kerralla. Ei muuteta takaisin '_app':iin
-			// ilman zone-purgea. Juurisyyn jatkotoimi: deploy-verify VAIN
+			// ilman zone-purgea.
+			//
+			// 4.8.2026: KOLMAS kerta (_app2 → _app3). Oire oli taas sama:
+			// jokainen assetti servautui domainilta curlille oikeana JS:nä
+			// (chunks 8/8, nodes 5/5, entry 2/2), selaimen fetch() sai ne
+			// oikein, mutta import() kaatui — ja TÄSMÄLLEEN SAMA BUILD
+			// hydratoitui pages.dev-originista virheettä. Erotustesti siis
+			// osoittaa zone-tasolle, ei buildiin.
+			//
+			// 🔴 TÄMÄ ON KIERTOTIE EIKÄ KORJAUS. Kolme osumaa kolmessa
+			// viikossa tarkoittaa ettei juurisyytä ole löydetty; appDir-
+			// numeron kasvattaminen jokaisella kerralla ei skaalaa. Seuraava
+			// askel on zone-purge + syy selvitettävä CF-dashboardista
+			// (Villen pääsy — wrangler-tokenissa vain zone:read). Juurisyyn jatkotoimi: deploy-verify VAIN
 			// pages.dev-deployment-URL:sta kunnes propagaatio valmis (ks.
 			// muisti pro-spa-wrangler-deploy).
-			appDir: '_app2'
+			appDir: '_app3'
 		})
 	]
 });
