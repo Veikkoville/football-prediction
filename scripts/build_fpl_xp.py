@@ -429,9 +429,34 @@ def main(argv: list[str] | None = None) -> int:
     #   tier 1 (2 seuraavaa)   n=38   TOTEUTUNUT 0.21   tuotannossa oli 0.30
     #   tier 2 (loput)        n=107   TOTEUTUNUT 0.17   tuotannossa oli 0.08
     #
-    # Eli karkitaso oli 25 pp liian korkea. Tier 1 ja 2 eivat eroa toisistaan
-    # otoksen sisalla (0.21 vs 0.17, keskivirhe ~0.065) -> ne yhdistetaan.
-    # Kolmas taso vaittaisi erottelukykya jota mittaus ei nayta.
+    # Eli karkitaso oli 25 pp liian korkea.
+    #
+    # 🔴 4.8. ILTAPAIVA: YLLA OLEVA SOVITUS TEHTIIN VAARASSA POPULAATIOSSA.
+    # Se rajattiin pelaajiin joilla oli vahintaan 6 GW-rivia 25/26:ssa, eli
+    # niihin jotka olivat kauden ajan kirjoilla. TUOTANTO soveltaa tasoa
+    # JOKAISEEN bootstrapin historiattomaan (n=307, joista 224 ei pelannut
+    # minuuttiakaan), joten selviytymissuodatettu sovitus yliarvioi
+    # systemaattisesti - pahiten tier 2:ssa jossa on 200 pelaajaa.
+    #
+    # Mitattu OIKEASSA populaatiossa (pelaamattomat mukana nollana):
+    #     tier 0  n= 53   toteutunut 0.377
+    #     tier 1  n= 54   toteutunut 0.164
+    #     tier 2  n=200   toteutunut 0.096
+    #   Brier: vanhat 0.72/0.30/0.08      0.1037
+    #          valiversio 0.47/0.18/0.18  0.0861
+    #          NAMA 0.38/0.16/0.10        0.0800   (+7.1 % valiversiosta)
+    # Tier 1 ja 2 EROAVAT tassa populaatiossa (0.164 vs 0.096) -> kolme tasoa
+    # palautetaan; valiversion yhdistaminen oli seurausta samasta suodatuksesta.
+    #
+    # SEURATYYPIN KERROIN MITATTIIN JA HYLATTIIN. Nousijaseurojen historiattomat
+    # toimittavat 9.1 aloitusta/seura kun malli antaa 6.9 (kerroin 1.33),
+    # vakiintuneilla 1.22 vs 1.61 (0.75) -> summavaje on TODELLINEN. Mutta
+    # kerroin ei paranna ennustetta omassa alaryhmassaan: nousijoilla Brier
+    # 0.1210 (kerroin 1.00) -> 0.1206 (1.33), ja optimi on 1.15 eika summan
+    # korjaava 1.33. Skaalaus sovittaisi siis summan silmamaaraisesti ja tekisi
+    # pelaajakohtaisesta arviosta huonomman. Vaje jaa TUNNETUKSI RAJOITTEEKSI:
+    # sen syy on ettei tier-jako anna nousijaseurassa tarpeeksi monelle
+    # tier 0:aa, ei se etta yksittaiset tn:t olisivat liian matalia.
     #
     # LAAJENNUS: sama priori kaikkien seurojen historiattomille, ei vain
     # nousijoille. Perustelu on mittaus, ei symmetria: hinta ennustaa
@@ -449,7 +474,7 @@ def main(argv: list[str] | None = None) -> int:
     # syvyys-passin JALKEEN ja vain pelaajille joiden p_start ei ole mallin
     # laskema, joten yhdenkaan historiallisen pelaajan luku ei muutu.
     # apply_price_prior pysyy kytkematta kunnes sen kolme ehtoa on tehty.
-    PROMOTED_PRIOR_TIERS = ((0.47, 0.35), (0.18, 0.45), (0.18, 0.20))
+    PROMOTED_PRIOR_TIERS = ((0.38, 0.35), (0.16, 0.45), (0.096, 0.20))
     prior_team_ids = {t["id"] for t in boot["teams"]}
     prior_pids: set[int] = set()
     for team_id in sorted(prior_team_ids):
