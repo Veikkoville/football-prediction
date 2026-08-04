@@ -298,10 +298,24 @@
 			// assists" - teknisesti oikein mutta laiha jakolupaus, ja per-90-rivi
 			// oli lisaksi harvemmin taytetty (vain 2/4 solua). Kertymat ovat se
 			// muoto jossa FPL-yleiso lukee kauden.
+			//
+			// Pelipaikka ratkaisee jarjestyksen, ja se KORJATTIIN kuvasta: 1. veto
+			// antoi kaikille kentallisille goals/assists/xg/xa, jolloin Gabrielin
+			// kortti johti luvuilla 3 maalia ja 2.9 xG eika kertonut lainkaan
+			// 18:aa clean sheetia - puolustajan koko FPL-valuuttaa. Kortissa on
+			// nelja slottia, joten jarjestys on sisaltopaatos.
+			//
+			// minutes/starts/points EIVAT ole soluja: ne ovat jo totals-rivilla.
+			// Raya sai solun "FPL POINTS 162" ja heti sen alle rivin
+			// "... 162 FPL points" - sama luku kahdesti perakkain (nakyi vasta
+			// kuvasta; GKP:lla saves/bonus puuttuvat payloadista, joten points
+			// nousi listalta soluksi).
 			const keys =
 				p.pos === 'GKP'
-					? ['saves', 'cs', 'bonus', 'points']
-					: ['goals', 'assists', 'xg', 'xa', 'xgi', 'cs', 'bonus', 'points'];
+					? ['cs', 'saves', 'bonus']
+					: p.pos === 'DEF'
+						? ['cs', 'goals', 'assists', 'bonus']
+						: ['goals', 'assists', 'xg', 'xa', 'bonus'];
 			const cells = pick(lsTotals, keys, 4);
 			// Sanamuodot kasin: c.label.toLowerCase() tuotti "133 fpl points".
 			const TOTALS_WORD: Record<string, string> = {
@@ -319,15 +333,22 @@
 
 			// DefCon omalle riville: se on eri ikkuna kuin viime kausi, eika
 			// niita saa esittaa samana lukusarjana.
+			//
+			// VAIN DEF/MID. FPL:ssa myos hyokkaaja voi saada DC-pisteita, mutta
+			// kynnys (12 CBIRT) tayttyy karkipaikalla niin harvoin etta luku on
+			// kaytannossa aina 0 % - Haalandin kortilla luki "DefCon 0% hit rate
+			// over 10 games", mika ei kerro pelaajasta mitaan ja on
+			// jaettavalla kortilla pelkkaa kohinaa. Puolustajalla sama luku on
+			// kortin erottava sisalto.
+			const dcRelevant = p.pos === 'DEF' || p.pos === 'MID';
 			const dcLine =
-				defcon && defcon.totals.games > 0
-					? `DefCon ${Math.round(defcon.totals.hit_rate_pct)}% hit rate over ${defcon.totals.games} games`
-					: null;
+				dcRelevant && defcon && defcon.totals.games > 0
+					? `DefCon ${Math.round(defcon.totals.hit_rate_pct)}% hit rate over the last ${defcon.totals.games} games`
+					: undefined;
 
 			const noteBits: string[] = [];
 			if (excluded) noteBits.push('not in the projections right now, official FPL data only');
 			else if (sp != null) noteBits.push('start chance is a model estimate, not team news');
-			if (dcLine) noteBits.push(dcLine);
 
 			const method = await sharePlayerCard({
 				name: p.web_name,
@@ -364,6 +385,7 @@
 								totals: totalsLine || undefined
 							}
 						: undefined,
+				defconLine: dcLine,
 				note: noteBits.join(' · ') || undefined,
 				fileName: `goaliq_${p.web_name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.png`
 			});

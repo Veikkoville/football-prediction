@@ -266,6 +266,23 @@ function darkenHex(hex: string, f = 0.7): string {
 	return `#${p.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 }
 
+/** WCAG-suhteellinen luminanssi. */
+function relLum(hex: string): number {
+	const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+	if (!m) return 0;
+	const n = parseInt(m[1], 16);
+	const c = [16, 8, 0].map((s) => {
+		const v = ((n >> s) & 0xff) / 255;
+		return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+	});
+	return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+
+function contrast(a: string, b: string): number {
+	const [x, y] = [relLum(a), relLum(b)].sort((p, q) => q - p);
+	return (x + 0.05) / (y + 0.05);
+}
+
 function drawKit(
 	ctx: CanvasRenderingContext2D,
 	// Rakenteellinen tyyppi (ei PitchCardPlayer): pelaajakortti kayttaa samaa
@@ -479,6 +496,10 @@ export interface PlayerCardSpec {
 	/** Tuotantorivi. title kantaa katteen (kausi + sarja + per 90 vai totaali)
 	 *  - ilman sita luvut vaittaisivat olevansa jotain muuta kuin ovat. */
 	production?: { title: string; cells: PlayerCardCell[]; totals?: string };
+	/** DefCon-rivi omanaan. EI note-riville: se on eri ikkuna kuin "viime kausi"
+	 *  (viimeiset N ottelua) ja se on puolustajilla kortin erottava luku - eika
+	 *  erottavaa lukua panna disclaimerin peraan pikkutekstiin. */
+	defconLine?: string;
 	note?: string;
 	fileName: string;
 }
@@ -519,6 +540,8 @@ export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
 	if (spec.modelLine) h += 58;
 	const yProd = h;
 	if (spec.production) h += 40 + 92 + (spec.production.totals ? 40 : 0);
+	const yDefcon = h;
+	if (spec.defconLine) h += 50;
 	const yNote = h;
 	if (spec.note) h += 44;
 	const H = h + FOOT_H;
@@ -563,9 +586,16 @@ export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
 	ctx.fillStyle = AMBER;
 	ctx.fillRect(0, BAND_TOP + BAND_H, W, 5);
 
-	const onBand = kit.textColor;
+	// Nauhan tekstivari EI ole suoraan kit.textColor. Se on paidan oma variPari
+	// (esim. MCI = valkoinen taivaansinisella), joka toimii pienessa paidassa
+	// mutta antaa nauhalla kontrastin 2,5:1 - nimi on kortin isoin teksti eika
+	// se saa olla luettavuuden rajalla. Flippaus vain kun kontrasti alittaa
+	// WCAG:n ison tekstin rajan 3:1, jotta esim. ARS (valkoinen punaisella,
+	// 4,5:1) sailyy klubin omana ilmeena.
+	const INK_ON_BAND = '#111111';
+	const onBand = contrast(kit.textColor, kit.color) >= 3 ? kit.textColor : INK_ON_BAND;
 	const onBandMuted =
-		onBand === '#000000' ? 'rgba(0,0,0,0.66)' : 'rgba(255,255,255,0.76)';
+		relLum(onBand) < 0.5 ? 'rgba(0,0,0,0.66)' : 'rgba(255,255,255,0.76)';
 
 	const KIT_S = 108;
 	drawKit(ctx, { color: kit.color, textColor: onBand, team: spec.team },
@@ -660,6 +690,13 @@ export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
 			ctx.fillStyle = MUTED;
 			ctx.fillText(pr.totals, MX, yProd + 40 + 92 - 8);
 		}
+	}
+
+	if (spec.defconLine) {
+		const dPx = shrink(ctx, spec.defconLine, 24, W - 2 * MX, 15, med);
+		ctx.font = med(dPx);
+		ctx.fillStyle = CREAM;
+		ctx.fillText(spec.defconLine, MX, yDefcon + 14);
 	}
 
 	if (spec.note) {
