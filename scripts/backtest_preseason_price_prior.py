@@ -194,6 +194,52 @@ def main() -> None:
           "informaatiota.")
 
     report_newcomers(pos_by_id)
+    report_by_position(thin, thick, pct)
+
+
+# ---------------------------------------------------------------------------
+# EHTO 1/3 apply_price_priorin kytkennalle (27.7. peruutuksen jalkeen):
+# per-positio-validointi. Peruutusmuistiinpano epaili ettei hinta erottele
+# maalivahteja lainkaan (kaikki 4.0-5.5M), jolloin priori luottaisi
+# informaatioon jota siina ei ole. Tama mittaa sen sen sijaan etta uskoisi.
+# ---------------------------------------------------------------------------
+POS_NAME = {1: "GKP", 2: "DEF", 3: "MID", 4: "FWD"}
+
+
+def report_by_position(thin: list[dict], thick: list[dict],
+                       pct: dict[int, float]) -> None:
+    print("\n" + "=" * 62)
+    print("EHTO 1: PER-POSITIO-VALIDOINTI (ohut otos)")
+    print("=" * 62)
+    print(f"{'pos':>5} {'n':>5} {'w=0':>9} {'w=0.15':>9} {'w=0.25':>9} "
+          f"{'w=0.35':>9}  {'paras':>7}")
+    for p in (1, 2, 3, 4):
+        grp = [r for r in thin if r["pos"] == p]
+        if len(grp) < 15:
+            print(f"{POS_NAME[p]:>5} {len(grp):>5}   otos liian pieni")
+            continue
+        vals = [evaluate(grp, pct, w)[0] for w in (0.0, 0.15, 0.25, 0.35)]
+        best = min(range(4), key=lambda i: vals[i])
+        print(f"{POS_NAME[p]:>5} {len(grp):>5} " + " ".join(f"{v:9.4f}" for v in vals)
+              + f"  {(0.0, 0.15, 0.25, 0.35)[best]:>7.2f}")
+    print("\nSama paksulla otoksella (ei saa heiketa):")
+    for p in (1, 2, 3, 4):
+        grp = [r for r in thick if r["pos"] == p]
+        if len(grp) < 15:
+            print(f"{POS_NAME[p]:>5} {len(grp):>5}   otos liian pieni")
+            continue
+        vals = [evaluate(grp, pct, w)[0] for w in (0.0, 0.25)]
+        print(f"{POS_NAME[p]:>5} {len(grp):>5} {vals[0]:9.4f} {vals[1]:9.4f}"
+              f"   {'HEIKKENEE' if vals[1] > vals[0] else 'ok'}")
+    print("\nHintahajonta positioittain (jos hinta ei erottele, priori ei kanna "
+          "informaatiota):")
+    for p in (1, 2, 3, 4):
+        prices = sorted(r["price"] for r in thin + thick if r["pos"] == p)
+        if not prices:
+            continue
+        print(f"{POS_NAME[p]:>5}  min {prices[0]:.1f}  mediaani "
+              f"{prices[len(prices) // 2]:.1f}  max {prices[-1]:.1f}  "
+              f"vaihteluvali {prices[-1] - prices[0]:.1f}M")
 
 
 # ---------------------------------------------------------------------------

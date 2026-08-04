@@ -295,6 +295,66 @@ def main(argv: list[str] | None = None) -> int:
             for p in pids:
                 mm_by_player[p] = xp.scale_p_start(mm_by_player[p], f)
 
+    # -----------------------------------------------------------------
+    # HINTAPRIORI OHUELLE OTOKSELLE (4.8.2026). Kytketty vasta nyt: se
+    # peruutettiin 27.7 ja koodissa (src/models/fpl_xp.py) oli kolme ehtoa
+    # ennen uudelleenkytkentaa. Kaikki kolme on nyt mitattu.
+    #
+    # EHTO 1 — per-positio-validointi. Peruutusmuistiinpano epaili ettei hinta
+    # erottele maalivahteja (kaikki 4.0-5.5M). Mitattuna se erottelee: ohuen
+    # otoksen Brier w=0 -> paras painolla, GKP 0.0613 -> 0.0503, DEF 0.0474 ->
+    # 0.0409, MID 0.0533 -> 0.0452, FWD 0.0678 -> 0.0521. Kaikki paranevat.
+    #
+    # EHTO 2 — priorin JA syvyysnormalisoinnin yhteisvaikutus. Tama oli koko
+    # 27.7. vian syy, ja se on KYTKENTAJARJESTYS eika priori itse. Sama
+    # priori, kaksi paikkaa, mitattu paksussa otoksessa (p_start >= 70 %,
+    # n=102):
+    #     ENNEN syvyys-passia (27.7. tapa): xP-mediaani -3.6 %,
+    #        yli 5 % pudonneita 39/102, pahimmat Donnarumma -16.5 %,
+    #        Gyokeres -15.0 %, Raya -14.9 %   <- vika toistettu
+    #     JALKEEN syvyys-passin (tama):     xP-mediaani +0.00 %,
+    #        yli 5 % pudonneita 0/102
+    # Mekanismi: ennen passia nostettu varamiehen p_start meni depth_factorin
+    # syotteeksi, joka skaalasi koko ryhman alas ja ykkospelaaja absorboi sen.
+    # Passin jalkeen priori ei voi enaa siirtaa massaa toiselta pelaajalta.
+    #
+    # EHTO 3 — regressioportti korkean omistuksen pelaajille. Ensimmaisessa
+    # ajossa yksi rikkoi portin: Diop (IPS, 20 % omistus) -7.6 %. Han on
+    # hintapersentiililtaan 0.00 eli halvin mahdollinen, ja juuri sille
+    # alaryhmalle backtest sanoi ettei priori auta (HALPA + ohut: Brier
+    # -1.5 %, baseline oli jo oikeassa). Siksi priori rajataan sinne missa
+    # hyoty on MITATTU (persentiili >= 0.30: KESKI +13.8 %, KALLIS +35.0 %).
+    # Rajauksen jalkeen: yli 10 % omistettuja 45, yli 5 % pudonneita 0 —
+    # itse asiassa koko projektiossa EI YHTAAN yli 5 % pudonnutta.
+    #
+    # Hinta rajauksesta: uusia projektioon 29 -> 16. Se on tarkoituksellista;
+    # halvassa hannassa priori ei tuonut mitattua hyotya.
+    # -----------------------------------------------------------------
+    PRICE_BLEND_MIN_PCT = 0.30
+    price_pct_by_id: dict[int, float] = {}
+    for _et in (1, 2, 3, 4):
+        _grp = sorted([e for e in boot["elements"] if e["element_type"] == _et],
+                      key=lambda e: (e.get("now_cost") or 0, e["id"]))
+        for _i, _e in enumerate(_grp):
+            price_pct_by_id[_e["id"]] = _i / max(len(_grp) - 1, 1)
+    blended_pids: set[int] = set()
+    for e in boot["elements"]:
+        pid = e["id"]
+        mins = acc_by_player[pid].get("mins", 0.0) or 0.0
+        # mins == 0 kuuluu historiattomien prioriin (alempana), ei tanne.
+        if mins <= 0 or mins >= xp.PRICE_PRIOR_THIN_MINUTES:
+            continue
+        if price_pct_by_id[pid] < PRICE_BLEND_MIN_PCT:
+            continue
+        before = mm_by_player[pid]["p_start"]
+        mm_by_player[pid] = xp.apply_price_prior(
+            mm_by_player[pid], price_pct_by_id[pid], mins)
+        if abs(mm_by_player[pid]["p_start"] - before) > 1e-9:
+            blended_pids.add(pid)
+    print(f"      hintapriori (ohut otos): {len(blended_pids)} pelaajaa — "
+          f"paino {xp.PRICE_PRIOR_WEIGHT}, vain persentiili >= "
+          f"{PRICE_BLEND_MIN_PCT}, syvyys-passin JALKEEN")
+
     # Pelaajatason minuuttiohitukset — VIIMEISENÄ, syvyyskorjauksen JÄLKEEN.
     #
     # Järjestys on olennainen: depth_factor skaalaa koko klubi+positio-ryhmää
@@ -657,6 +717,17 @@ def main(argv: list[str] | None = None) -> int:
                         "from where the player is priced in his club's squad",
                 }
                 if pid in prior_pids
+                else {
+                    # Sama rehellisyyslippu ohuelle otokselle: neljasosa
+                    # aloitus-tn:sta tulee hinnasta eika pelaajan omista
+                    # minuuteista, joten "based on the player's own PL
+                    # minutes" ei enaa pida taysin paikkaansa.
+                    "minutes_source": "price_blend",
+                    "minutes_override_reason":
+                        "thin Premier League sample, the expected role is part "
+                        "model and part where the player is priced",
+                }
+                if pid in blended_pids
                 else {}
             ),
             # #143: rehellisyyslippu — paljonko pelaajan omaa PL-dataa

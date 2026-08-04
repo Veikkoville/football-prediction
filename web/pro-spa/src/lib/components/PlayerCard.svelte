@@ -128,6 +128,14 @@
 		no_history: 'no PL minutes yet, position average only'
 	};
 
+	// Etuliite aloitus-tn:n lähteelle. Sanamuoto kertoo KUKA luvun asetti:
+	// "Set by hand" ei saa lukea kuten mallin oma arvio, koska se ei ole sitä.
+	const MINUTES_SOURCE_LABEL: Record<string, string> = {
+		override: 'Set by hand',
+		price_prior: 'Role estimate',
+		price_blend: 'Part model, part price'
+	};
+
 	function fixtureLabel(opps: { opp: string; venue: string }[]): string {
 		if (opps.length === 0) return 'Blank';
 		return opps.map((o) => `${o.opp} (${o.venue})`).join(', ');
@@ -359,6 +367,12 @@
 			if (!excluded && sp != null && p.data_basis && p.data_basis !== 'pl_history') {
 				noteBits.push(DATA_BASIS_LABEL[p.data_basis] ?? p.data_basis);
 			}
+			// Lahde mukaan MYOS jaettavaan kuvaan. Kortti on se artefakti joka
+			// lahtee appista ulos, ja juuri siina luku on isoimmillaan: jos
+			// varaus jaa vain sivulle, luku matkustaa ilman sita.
+			if (!excluded && sp != null && p.minutes_source && p.minutes_override_reason) {
+				noteBits.push(p.minutes_override_reason);
+			}
 
 			const method = await sharePlayerCard({
 				name: p.web_name,
@@ -505,6 +519,18 @@
 							<p class="muted">
 								The model's view on starting, {DATA_BASIS_LABEL[player.data_basis] ??
 									player.data_basis}.
+							</p>
+						{/if}
+						<!-- 4.8: aloitus-tn:n LÄHDE kun se ei ole puhtaasti mallin laskema.
+						     Payload on tuonut `override`-arvon 27.7. lähtien, mutta mikään
+						     pinta ei näyttänyt sitä: Isakin käsin nostettu 0.30 -> 0.85 on
+						     ollut käyttäjälle näkymätön. Ohitustiedosto sanoo näyttämisen
+						     ei-neuvoteltavaksi, joten tämä ei ole uusi sääntö vaan
+						     toteuttamatta jäänyt. -->
+						{#if player.minutes_source && player.minutes_override_reason}
+							<p class="muted">
+								{MINUTES_SOURCE_LABEL[player.minutes_source] ?? 'Adjusted'}:
+								{player.minutes_override_reason}.
 							</p>
 						{/if}
 						{#if premium}
