@@ -79,11 +79,28 @@ function onEarlyRejection(ev: PromiseRejectionEvent): void {
 	pushEarlyError(ev.reason ?? new Error('Unhandled rejection'), 'unhandledrejection');
 }
 
+/* 4.8.2026: app.html:n kaynnistysvahti asentaa samat kuuntelijat ENNEN
+ * yhtakaan moduulia. Tama nostaa sen keraaman puskurin tanne ja ottaa
+ * vastuun — jarjestys on tahallinen: omat kuuntelijat kiinni ENSIN, vasta
+ * sitten rungon irrotus, jotta valiin ei jaa kuuntelematonta ikkunaa. */
+function adoptInlineBuffer(): void {
+	const w = window as unknown as {
+		__goaliqEarlyErrors?: EarlyError[];
+		__goaliqEarlyDetach?: () => void;
+	};
+	const inline = w.__goaliqEarlyErrors;
+	if (inline) {
+		for (const e of inline.splice(0)) pushEarlyError(e.error, e.kind);
+	}
+	w.__goaliqEarlyDetach?.();
+}
+
 function attachEarlyErrorCapture(): void {
 	if (earlyCaptureAttached || typeof window === 'undefined') return;
 	earlyCaptureAttached = true;
 	window.addEventListener('error', onEarlyError);
 	window.addEventListener('unhandledrejection', onEarlyRejection);
+	adoptInlineBuffer();
 }
 
 function detachEarlyErrorCapture(): void {
@@ -94,8 +111,10 @@ function detachEarlyErrorCapture(): void {
 }
 
 function flushEarlyErrors(): void {
-	const buffered = earlyErrors.splice(0);
+	// Tyhjennys VASTA kun vastaanottaja on olemassa: toisin painvastoin
+	// splice() tuhoaisi puskurin hiljaa jos posthog puuttuu.
 	if (!posthog) return;
+	const buffered = earlyErrors.splice(0);
 	for (const e of buffered) {
 		// $exception_source erottaa nama posthogin omista kirjauksista, jotta
 		// datasta nakee onko korjaus oikeasti tuonut virheita takaisin.
