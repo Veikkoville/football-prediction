@@ -417,11 +417,42 @@ def main(argv: list[str] | None = None) -> int:
     # -----------------------------------------------------------------
     PROMOTED_PRIOR_SLOTS = {1: 1, 2: 4, 3: 4, 4: 2}   # tyypillinen XI
     # (p_start, p_sub | ei-start) roolitasoittain, hintajarjestyksen mukaan.
-    PROMOTED_PRIOR_TIERS = ((0.72, 0.35), (0.30, 0.45), (0.08, 0.20))
-    promoted_fpl_team_ids = {t["id"] for t in boot["teams"]
-                             if map_name(t["name"]) in promoted}
+    #
+    # 4.8.2026 REKALIBROINTI + LAAJENNUS KAIKKIIN SEUROIHIN (Villen GO).
+    #
+    # Aiemmat tasot 0.72 / 0.30 / 0.08 olivat MVP-heuristiikka. Ne mitattiin
+    # 4.8. samalla valintasaannolla jolla ne jaetaan (klubi+positio,
+    # hintajarjestys) populaatiossa "ei 24/25 PL-kautta, pelasi 25/26" (n=178,
+    # backtest_preseason_price_prior.py -> report_production_tiers):
+    #
+    #   tier 0 (XI-slotit)     n=33   TOTEUTUNUT 0.47   tuotannossa oli 0.72
+    #   tier 1 (2 seuraavaa)   n=38   TOTEUTUNUT 0.21   tuotannossa oli 0.30
+    #   tier 2 (loput)        n=107   TOTEUTUNUT 0.17   tuotannossa oli 0.08
+    #
+    # Eli karkitaso oli 25 pp liian korkea. Tier 1 ja 2 eivat eroa toisistaan
+    # otoksen sisalla (0.21 vs 0.17, keskivirhe ~0.065) -> ne yhdistetaan.
+    # Kolmas taso vaittaisi erottelukykya jota mittaus ei nayta.
+    #
+    # LAAJENNUS: sama priori kaikkien seurojen historiattomille, ei vain
+    # nousijoille. Perustelu on mittaus, ei symmetria: hinta ennustaa
+    # aloituksia koko historiattomassa populaatiossa (aloitusosuus laskee
+    # monotonisesti 0.45 -> 0.24 -> 0.16 -> 0.09 hintaneljanneksittain,
+    # Brier +13.8 % vs sama luku kaikille). Ilman tata liigaan tullut pelaaja
+    # saa p_start ~0.10 ja putoaa koko projektiosta: 4.8. livedatassa
+    # Tzolis (ARS 6.5M), Munoz (LIV 6.5M) ja N.Jackson (CHE 6.5M) olivat
+    # FPL-statukseltaan TERVEITA mutta poissa jokaiselta listalta.
+    #
+    # 🔴 EI KOSKE OHUTTA OTOSTA (0 < min < 900). Se on eri muutos
+    # (apply_price_prior) ja se PERUUTETTIIN 27.7, koska sen vuorovaikutus
+    # syvyysnormalisoinnin kanssa pudotti vakiintuneita pelaajia (Raya
+    # -26.8 %). Talla laajennuksella ei ole sita mekanismia: priori annetaan
+    # syvyys-passin JALKEEN ja vain pelaajille joiden p_start ei ole mallin
+    # laskema, joten yhdenkaan historiallisen pelaajan luku ei muutu.
+    # apply_price_prior pysyy kytkematta kunnes sen kolme ehtoa on tehty.
+    PROMOTED_PRIOR_TIERS = ((0.47, 0.35), (0.18, 0.45), (0.18, 0.20))
+    prior_team_ids = {t["id"] for t in boot["teams"]}
     prior_pids: set[int] = set()
-    for team_id in sorted(promoted_fpl_team_ids):
+    for team_id in sorted(prior_team_ids):
         club = [e for e in boot["elements"] if e["team"] == team_id]
         for etype, slots in PROMOTED_PRIOR_SLOTS.items():
             # Hintajarjestys KOKO positioryhmasta (myos ex-PL-pelaajat
@@ -447,8 +478,8 @@ def main(argv: list[str] | None = None) -> int:
                 prior_pids.add(e["id"])
     prior_fids = {fplteam_to_fid[e["team"]] for e in boot["elements"]
                   if e["id"] in prior_pids and e["team"] in fplteam_to_fid}
-    print(f"      nousijapriori: {len(prior_pids)} pelaajaa "
-          f"({len(promoted_fpl_team_ids)} seuraa) — positiopriori x "
+    print(f"      hintapriori (historiattomat): {len(prior_pids)} pelaajaa "
+          f"({len(prior_team_ids)} seuraa) — positiopriori x "
           f"hintapohjainen rooliarvio, data_basis=no_history")
 
     covered_fids = history_fids | prior_fids
@@ -589,6 +620,18 @@ def main(argv: list[str] | None = None) -> int:
                     "minutes_override_reason": override_applied[pid]["reason"],
                 }
                 if pid in override_applied
+                else {
+                    # 4.8: sama rehellisyyslippu hintapriorille. Naiden
+                    # pelaajien aloitus-tn EI ole mallin laskema vaan
+                    # hintajarjestykseen perustuva rooliarvio, ja kortti
+                    # nayttaa luvun isolla. Ilman lippua UI ei voi erottaa
+                    # sita mallin omasta arviosta.
+                    "minutes_source": "price_prior",
+                    "minutes_override_reason":
+                        "no Premier League minutes yet, expected role estimated "
+                        "from where the player is priced in his club's squad",
+                }
+                if pid in prior_pids
                 else {}
             ),
             # #143: rehellisyyslippu — paljonko pelaajan omaa PL-dataa
