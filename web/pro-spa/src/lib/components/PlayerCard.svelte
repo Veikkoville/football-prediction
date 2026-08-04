@@ -349,6 +349,16 @@
 			const noteBits: string[] = [];
 			if (excluded) noteBits.push('not in the projections right now, official FPL data only');
 			else if (sp != null) noteBits.push('start chance is a model estimate, not team news');
+			// Datapohja MUKAAN kun se ei ole pelaajan oma PL-historia. Kortti nayttaa
+			// aloitus-tn:n isolla, ja juuri uusilla pelaajilla luku ei tule heidan
+			// omista minuuteistaan: nousijaseurojen historiattomat saavat hinnan
+			// mukaisen rooliprioorin (kaikki samaan 72 %:iin), ohuen otoksen
+			// pelaajilla positiokeskiarvo kantaa. Appi nayttaa taman labelin kortin
+			// vieressa - jos se putoaa jaettavasta kuvasta, luku matkustaa ilman
+			// sita varausta joka tekee siita rehellisen ([[honest-data-labels]]).
+			if (!excluded && sp != null && p.data_basis && p.data_basis !== 'pl_history') {
+				noteBits.push(DATA_BASIS_LABEL[p.data_basis] ?? p.data_basis);
+			}
 
 			const method = await sharePlayerCard({
 				name: p.web_name,
