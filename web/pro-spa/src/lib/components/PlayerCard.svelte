@@ -136,6 +136,37 @@
 		price_blend: 'Part model, part price'
 	};
 
+	// --- 4.8: odotetut maalit (VAIN MID/FWD) -----------------------------
+	// Malli on laskenut taman koko ajan; se on vain ollut PISTEINA
+	// (components.goals = xg90 * xmins/90 * goal_mult * GOAL_PTS[pos]).
+	// Yksikko puretaan takaisin kappaleiksi jakamalla pistekertoimella.
+	//
+	// MIKSI VAIN MID/FWD: komponenttitason backtest 4.8 (25/26 walk-forward,
+	// n=10 733 pelaaja-GW) mittasi jokaisen ryhman erikseen:
+	//   FWD  bias -5.2 %   Brier 0.1553 vs naiivi 0.1596  (+2.7 %)
+	//   MID  bias -10.7 %  Brier 0.0828 vs naiivi 0.0858  (+3.6 %)
+	//   DEF  bias +4.6 %   Brier 0.0326 vs naiivi 0.0322  (-1.3 %)  <- HAVIAA
+	// Puolustajilla luku ei siis voita naiivia vakiota, joten sita ei nayteta.
+	//
+	// SYOTTOJA EI NAYTETA LAINKAAN: sama backtest antoi biasiksi -40 %, ja syy
+	// on lahdedatassa - FPL:n oma expected_assists on -27.5 % toteutuneista
+	// syotoista (683 vs 942 kaudella 25/26), koska FPL palkitsee syotosta myos
+	// ansaitusta rangaistuspotkusta ja kimmokkeista joita xA ei laske. Se ei
+	// ole kalibrointivirhe vaan eri suure.
+	const GOAL_PTS: Record<string, number> = { GKP: 10, DEF: 6, MID: 5, FWD: 4 };
+	const goalOutlook = $derived.by(() => {
+		const p = player;
+		if (!p || excluded) return null;
+		if (p.pos !== 'MID' && p.pos !== 'FWD') return null;
+		const g = p.components?.goals;
+		if (typeof g !== 'number' || !Number.isFinite(g)) return null;
+		const eg = g / GOAL_PTS[p.pos];
+		if (eg <= 0) return null;
+		// P(vahintaan 1 maali) Poissonista. Tama on se muoto joka on
+		// tarkistettavissa jalkikateen; 0.68 maalia ei ole.
+		return { eg, pct: Math.round((1 - Math.exp(-eg)) * 100), gw: p.components_gw };
+	});
+
 	function fixtureLabel(opps: { opp: string; venue: string }[]): string {
 		if (opps.length === 0) return 'Blank';
 		return opps.map((o) => `${o.opp} (${o.venue})`).join(', ');
@@ -540,6 +571,12 @@
 								<p>
 									<strong>{tot.toFixed(1)} xP</strong> projected over the next
 									{(player.gameweeks ?? []).length} gameweeks ({per.toFixed(1)} per GW).
+								</p>
+							{/if}
+							{#if goalOutlook}
+								<p>
+									<strong>{goalOutlook.eg.toFixed(2)} goals</strong> expected in
+									GW{goalOutlook.gw}, a {goalOutlook.pct}% chance of scoring.
 								</p>
 							{/if}
 						{:else}
