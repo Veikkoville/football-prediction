@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-08-04T16:48:22",
+    "generated_at": "2026-08-04T19:22:40",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -43,7 +43,7 @@
       "player_basis_counts": {
         "pl_history": 297,
         "limited_history": 58,
-        "no_history": 150
+        "no_history": 148
       },
       "basis_threshold_minutes": 450.0,
       "note": "data_basis per pelaaja: pl_history = oma PL-historia kantaa >= 50 % painon; limited_history = ohut otos, positiopriori dominoi; no_history = ei PL-minuutteja. transfers_known=false: pre-season-bootstrap on edellisen kauden -> kesäsiirrot eivät näy."
@@ -68,8 +68,8 @@
     "deadline_utc": "2026-08-21T17:30:00+00:00",
     "horizon_gw": 6,
     "min_xp_total": 1.0,
-    "n_players": 505,
-    "n_excluded": 63,
+    "n_players": 503,
+    "n_excluded": 65,
     "excluded_note": "excluded[] = FPL-listatut pelaajat jotka EIVAT ole projektiossa (saatavuuslippu i/s/u/n tai horisontin xP alle 1.0). Rivit ovat hakua/player cardia varten: in_projection=false, ei xP/xmins/p_start-kenttia. Vanhat klientit voivat jattaa listan huomiotta.",
     "todo": [
       "Nousijaseurojen pelaajista 164 on positiopriori-arviolla (ei PL-historiaa): ['Hull']. Roolit hintajärjestyksestä (MVP-heuristiikka) — tarkentuvat kun 26/27-kierroksia kertyy."
@@ -927,7 +927,7 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 22.1,
+      "owned_pct": 22.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1167,7 +1167,7 @@
       "predicted_starts": 80.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.0,
+      "owned_pct": 17.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1287,7 +1287,7 @@
       "predicted_starts": 82.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 24.0,
+      "owned_pct": 23.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1767,7 +1767,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.9,
+      "owned_pct": 16.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2847,7 +2847,7 @@
       "predicted_starts": 73.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 8.3,
+      "owned_pct": 8.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3087,7 +3087,7 @@
       "predicted_starts": 76.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 54.7,
+      "owned_pct": 54.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3207,7 +3207,7 @@
       "predicted_starts": 71.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 22.9,
+      "owned_pct": 22.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4167,7 +4167,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 20.2,
+      "owned_pct": 20.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4887,7 +4887,7 @@
       "predicted_starts": 72.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 21.8,
+      "owned_pct": 21.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5727,7 +5727,7 @@
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.3,
+      "owned_pct": 5.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6087,7 +6087,7 @@
       "predicted_starts": 84.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.2,
+      "owned_pct": 8.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10889,7 +10889,7 @@
       "predicted_starts": 52.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 9.4,
+      "owned_pct": 9.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19891,7 +19891,7 @@
       "predicted_starts": 52.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.2,
+      "owned_pct": 1.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20731,7 +20731,7 @@
       "predicted_starts": 50.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 7.5,
+      "owned_pct": 7.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21665,7 +21665,7 @@
       "predicted_starts": 45.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.9,
+      "owned_pct": 11.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -25445,7 +25445,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 0.2,
+      "owned_pct": 0.3,
       "status": "a",
       "news": "",
       "chance_next": 100,
@@ -31722,7 +31722,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.6,
+      "owned_pct": 0.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -32559,7 +32559,7 @@
       "predicted_starts": 31.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 16.9,
+      "owned_pct": 16.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -33360,7 +33360,7 @@
       "predicted_starts": 34.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.9,
+      "owned_pct": 1.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -44379,7 +44379,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "limited_history",
-      "owned_pct": 0.2,
+      "owned_pct": 0.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -48446,232 +48446,6 @@
       "set_pieces": {
         "pens": null,
         "corners": 6,
-        "fk": null
-      },
-      "e_bonus": 0.04,
-      "xp_per_gw": 0.58,
-      "xp_horizon_total": 3.47,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.6
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.62
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.56
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.56
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.56
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.57
-        }
-      ],
-      "minutes_method": "promoted_price_prior",
-      "components": {
-        "appearance": 0.36,
-        "goals": 0.12,
-        "assists": 0.06,
-        "clean_sheet": 0.01,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.02,
-        "bonus": 0.05
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 294,
-      "web_name": "Zambrano",
-      "full_name": "Óscar Zambrano",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "MID",
-      "xmins": 10.7,
-      "predicted_starts": 9.6,
-      "minutes_confidence": "low",
-      "minutes_source": "price_prior",
-      "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
-      "data_basis": "no_history",
-      "owned_pct": 0.6,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 4.5,
-      "last_season": null,
-      "p_start": 0.096,
-      "p_cameo": 0.1808,
-      "p_bench": 0.7232,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.04,
-      "xp_per_gw": 0.58,
-      "xp_horizon_total": 3.47,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.6
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.62
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.56
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.56
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.56
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.57
-        }
-      ],
-      "minutes_method": "promoted_price_prior",
-      "components": {
-        "appearance": 0.36,
-        "goals": 0.12,
-        "assists": 0.06,
-        "clean_sheet": 0.01,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.02,
-        "bonus": 0.05
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 297,
-      "web_name": "Gyabi",
-      "full_name": "Darko Gyabi",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "MID",
-      "xmins": 10.7,
-      "predicted_starts": 9.6,
-      "minutes_confidence": "low",
-      "minutes_source": "price_prior",
-      "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
-      "data_basis": "no_history",
-      "owned_pct": 0.2,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 4.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 0,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.0,
-        "cs": 0,
-        "points": 0,
-        "per90": null
-      },
-      "p_start": 0.096,
-      "p_cameo": 0.1808,
-      "p_bench": 0.7232,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
         "fk": null
       },
       "e_bonus": 0.04,
@@ -59432,7 +59206,7 @@
       "team_short": "BOU",
       "pos": "MID",
       "price": 7.5,
-      "owned_pct": 5.9,
+      "owned_pct": 5.8,
       "status": "i",
       "news": "Foot injury - Unknown return date",
       "chance_next": 0,
@@ -59915,6 +59689,28 @@
       "excluded_reason": "below_min_xp"
     },
     {
+      "id": 294,
+      "web_name": "Zambrano",
+      "full_name": "Óscar Zambrano",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "MID",
+      "price": 4.5,
+      "owned_pct": 0.6,
+      "status": "i",
+      "news": "Thigh injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
       "id": 5,
       "web_name": "J.Timber",
       "full_name": "Jurriën Timber",
@@ -60326,6 +60122,40 @@
           "assists": 0.2,
           "xgi": 0.63
         }
+      },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
+      "id": 297,
+      "web_name": "Gyabi",
+      "full_name": "Darko Gyabi",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "MID",
+      "price": 4.5,
+      "owned_pct": 0.2,
+      "status": "i",
+      "news": "Thigh injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 0,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.0,
+        "cs": 0,
+        "points": 0,
+        "per90": null
       },
       "in_projection": false,
       "excluded_reason": "unavailable"
