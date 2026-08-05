@@ -44,6 +44,7 @@ if str(ROOT) not in sys.path:
 
 from src.models import accuracy as acc
 from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
+from scripts.slugs import slug
 
 # #119b: KAIKKI generoidut sivut (hubit + ottelusivut) omaan lapsi-sitemapiin,
 # jonka sitemap.xml-index listaa. Wholesale-kirjoitus joka ajolla → poistuneet
@@ -81,6 +82,101 @@ LEAGUES: dict[str, dict] = {
     "SA": {"slug": "serie-a", "name": "Serie A"},
     "FL1": {"slug": "ligue-1", "name": "Ligue 1"},
     "CL": {"slug": "champions-league", "name": "Champions League"},
+}
+
+# 5.8.2026 (#229-SEO, F1): feedin virallinen pitka nimi ei ole se muoto jolla
+# kukaan hakee. "FC Internazionale Milano vs Udinese Calcio Prediction" ei osu
+# kyselyyn "inter vs udinese prediction" — ja long-tail-ottelusivun koko
+# olemassaolon syy on osua siihen kyselyyn. PL ja BSA nayttavat oikeilta vain
+# koska feedin nimi sattuu olemaan lyhyt; konventiota ei ole.
+#
+# Kartta koskee VAIN naita neljaa liigaa (rakenteellinen takuu, ei sattuma):
+# PL:n ja BSA:n URLit ovat olleet indeksoitavissa pisimpaan, eika niita saa
+# liikuttaa. Puuttuva nimi -> feedin nimi sellaisenaan (ei kaadu), ja ajo
+# emitoi kattavuusluvun — hiljainen puolikas kattavuus on tunnettu vikaluokka.
+DISPLAY_NAME_COMPS = {"PD", "SA", "BL1", "FL1"}
+
+DISPLAY_NAMES: dict[str, str] = {
+    # La Liga (PD)
+    "Athletic Club": "Athletic Bilbao",
+    "CA Osasuna": "Osasuna",
+    "Club Atlético de Madrid": "Atletico Madrid",
+    "Deportivo Alavés": "Alaves",
+    "Elche CF": "Elche",
+    "FC Barcelona": "Barcelona",
+    "Getafe CF": "Getafe",
+    "Levante UD": "Levante",
+    "Málaga CF": "Malaga",
+    "RC Celta de Vigo": "Celta Vigo",
+    "RC Deportivo La Coruña": "Deportivo La Coruna",
+    "RCD Espanyol de Barcelona": "Espanyol",
+    "Rayo Vallecano de Madrid": "Rayo Vallecano",
+    "Real Betis Balompié": "Real Betis",
+    "Real Madrid CF": "Real Madrid",
+    "Real Racing Club de Santander": "Racing Santander",
+    "Real Sociedad de Fútbol": "Real Sociedad",
+    "Sevilla FC": "Sevilla",
+    "Valencia CF": "Valencia",
+    "Villarreal CF": "Villarreal",
+    # Serie A (SA)
+    "AC Milan": "AC Milan",
+    "AC Monza": "Monza",
+    "ACF Fiorentina": "Fiorentina",
+    "AS Roma": "Roma",
+    "Atalanta BC": "Atalanta",
+    "Bologna FC 1909": "Bologna",
+    "Cagliari Calcio": "Cagliari",
+    "Como 1907": "Como",
+    "FC Internazionale Milano": "Inter",
+    "Frosinone Calcio": "Frosinone",
+    "Genoa CFC": "Genoa",
+    "Juventus FC": "Juventus",
+    "Parma Calcio 1913": "Parma",
+    "SS Lazio": "Lazio",
+    "SSC Napoli": "Napoli",
+    "Torino FC": "Torino",
+    "US Lecce": "Lecce",
+    "US Sassuolo Calcio": "Sassuolo",
+    "Udinese Calcio": "Udinese",
+    "Venezia FC": "Venezia",
+    # Bundesliga (BL1)
+    "1. FC Köln": "FC Koln",
+    "1. FC Union Berlin": "Union Berlin",
+    "1. FSV Mainz 05": "Mainz",
+    "Bayer 04 Leverkusen": "Bayer Leverkusen",
+    "Borussia Dortmund": "Borussia Dortmund",
+    "Borussia Mönchengladbach": "Borussia Monchengladbach",
+    "Eintracht Frankfurt": "Eintracht Frankfurt",
+    "FC Augsburg": "Augsburg",
+    "FC Bayern München": "Bayern Munich",
+    "FC Schalke 04": "Schalke",
+    "Hamburger SV": "Hamburger SV",
+    "RB Leipzig": "RB Leipzig",
+    "SC Freiburg": "Freiburg",
+    "SC Paderborn 07": "Paderborn",
+    "SV 07 Elversberg": "Elversberg",
+    "SV Werder Bremen": "Werder Bremen",
+    "TSG 1899 Hoffenheim": "Hoffenheim",
+    "VfB Stuttgart": "Stuttgart",
+    # Ligue 1 (FL1)
+    "AJ Auxerre": "Auxerre",
+    "AS Monaco FC": "Monaco",
+    "Angers SCO": "Angers",
+    "ES Troyes AC": "Troyes",
+    "FC Lorient": "Lorient",
+    "Le Havre AC": "Le Havre",
+    "Le Mans FC": "Le Mans",
+    "Lille OSC": "Lille",
+    "OGC Nice": "Nice",
+    "Olympique Lyonnais": "Lyon",
+    "Olympique de Marseille": "Marseille",
+    "Paris FC": "Paris FC",
+    "Paris Saint-Germain FC": "Paris Saint-Germain",
+    "RC Strasbourg Alsace": "Strasbourg",
+    "Racing Club de Lens": "Lens",
+    "Stade Brestois 29": "Brest",
+    "Stade Rennais FC 1901": "Rennes",
+    "Toulouse FC": "Toulouse",
 }
 
 # 24.7 redesign: sama brändi-ilme kuin fpl.html — Space Grotesk display-fontti,
@@ -196,8 +292,10 @@ FOOTER = (
 )
 
 
-def _slug(s: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+# 5.8.2026 (#229-SEO, F2): slug-kaava asuu nyt scripts/slugs.py:ssa, koska
+# build_fpl_page linkittaa naille sivuille ja tarvitsee TASMALLEEN saman
+# kaavan. Nimi _slug sailytetaan, koska tests/ importtaa sen.
+_slug = slug
 
 
 def _fmt_pct(x: float) -> str:
@@ -305,6 +403,35 @@ def _upcoming_by_comp(log: dict, now: datetime) -> dict[str, list[dict]]:
     for rows in out.values():
         rows.sort(key=lambda e: e.get("kickoff") or "")
     return out
+
+
+def _apply_display_names(by_comp: dict[str, list[dict]]) -> tuple[set, set]:
+    """Kirjoita nayttonimet SISAANLUKUUN, ei renderoijiin.
+
+    Tama on tarkoituksella ainoa kohta jossa nimi vaihtuu: slug, title, H1,
+    description ja JSON-LD lukevat kaikki samasta home_team/away_team-kentasta,
+    joten ne eivat voi erota toisistaan. Jos kartta ajettaisiin renderoijissa,
+    yhden pinnan unohtaminen tuottaisi URLin ja otsikon jotka eivat vastaa.
+
+    Muokkaa kopiota (dict(e)) — prediction_log.json:n loki on julkisen track
+    recordin lahde eika sita saa kirjoittaa uusiksi nayttosyista.
+    """
+    mapped: set[str] = set()
+    unmapped: set[str] = set()
+    for comp, rows in by_comp.items():
+        if comp not in DISPLAY_NAME_COMPS:
+            continue
+        for i, e in enumerate(rows):
+            new = dict(e)
+            for key in ("home_team", "away_team"):
+                raw = e[key]
+                if raw in DISPLAY_NAMES:
+                    mapped.add(raw)
+                    new[key] = DISPLAY_NAMES[raw]
+                else:
+                    unmapped.add(raw)
+            rows[i] = new
+    return mapped, unmapped
 
 
 def _match_filename(e: dict) -> str:
@@ -486,6 +613,11 @@ def main() -> int:
     now = datetime.now(timezone.utc)
     log = acc.load_log()
     by_comp = _upcoming_by_comp(log, now)
+    mapped, unmapped = _apply_display_names(by_comp)
+    total_names = len(mapped) + len(unmapped)
+    print(f"DISPLAY_NAMES: {len(mapped)}/{total_names} osumaa, "
+          f"{len(unmapped)} ilman karttaa"
+          + (f" -> {sorted(unmapped)}" if unmapped else ""))
 
     sitemap_entries: list[tuple[str, str, str, str]] = []
     live_hubs: list[str] = []
@@ -503,8 +635,18 @@ def main() -> int:
             print(f"{comp}: 0 tulevaa ottelua — ohitetaan (template valmiina).")
             continue
         out_dir.mkdir(parents=True, exist_ok=True)
+        # Slug-tormays: kaksi eri ottelua samaan tiedostonimeen tarkoittaa etta
+        # nayttonimikartta on vienyt kaksi joukkuetta samaan sluginiin. Ilman
+        # tata tarkistusta jalkimmainen kirjoittaa edellisen yli ja sivumaara
+        # putoaa HILJAA — juuri se vikaluokka jota vastaan tama koko commit on.
+        names = [_match_filename(e) for e in rows]
+        if len(set(names)) != len(names):
+            dupes = sorted({n for n in names if names.count(n) > 1})
+            print(f"VIRHE {comp}: slug-tormays {len(names) - len(set(names))} "
+                  f"sivulla -> {dupes}", file=sys.stderr)
+            return 1
         # Siivoa vanhentuneet ottelusivut (kickoff mennyt / pariutus muuttui)
-        keep = {"index.html"} | {_match_filename(e) for e in rows}
+        keep = {"index.html"} | set(names)
         for f in out_dir.glob("*.html"):
             if f.name not in keep:
                 f.unlink()

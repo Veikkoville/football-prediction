@@ -32,6 +32,15 @@ import sys
 from html import escape
 from pathlib import Path
 
+# Tama moduuli ajetaan MOLEMMILLA tavoilla: `python -m scripts.build_fpl_page`
+# (accuracy-log.yml) ja `python scripts/build_fpl_page.py` (fpl-page-refresh.yml).
+# Jalkimmaisessa sys.path[0] on scripts/, jolloin `scripts.*` ei resolvoidu ilman
+# tata — sama bootstrap kuin build_prediction_pages.py:ssa.
+if str(Path(__file__).resolve().parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from scripts.slugs import slug as _slug  # noqa: E402
+
 # #38: PostHog cookieless site-analytiikka (persistence=memory -> ei evasteita,
 # ei consent-banneria; ei PII:ta). Sama projekti kuin appi + pro-web (427890);
 # client-avain on julkinen by design (sama avain SPA-bundlessa).
@@ -795,8 +804,13 @@ def fdr_cell_class(fdr: int) -> str:
 
 
 def _pred_slug(s: str) -> str:
-    """SAMA kaava kuin build_prediction_pages._slug (testi vartioi driftin)."""
-    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+    """Ottelusivujen slug — SAMA funktio kuin generaattorilla, ei kopio kaavasta.
+
+    5.8.2026: tama oli oma re.sub-rivinsa, ja kun ottelusivujen kaava korjattiin
+    translitteroivaksi (#229-SEO), naista soluista olisi tullut 404-linkkeja.
+    Kahdennus poistettiin — drift on nyt rakenteellisesti mahdoton.
+    """
+    return _slug(s)
 
 
 def predict_cell_href(team: str, opponent: str, venue: str,
