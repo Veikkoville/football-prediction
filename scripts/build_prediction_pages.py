@@ -44,7 +44,7 @@ if str(ROOT) not in sys.path:
 
 from src.models import accuracy as acc
 from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
-from scripts.slugs import slug
+from scripts.slugs import fold_ascii, slug
 
 # #119b: KAIKKI generoidut sivut (hubit + ottelusivut) omaan lapsi-sitemapiin,
 # jonka sitemap.xml-index listaa. Wholesale-kirjoitus joka ajolla → poistuneet
@@ -70,6 +70,7 @@ ORG_PUBLISHER = {
 }
 OUT_ROOT = ROOT / "predictions"
 PREDICTIONS_HTML = ROOT / "predictions.html"
+LLMS_TXT = ROOT / "llms.txt"
 
 # competition-koodi (prediction_log) → julkinen slug + näyttönimi.
 # Big-5 + CL ovat valmiina: hub generoituu automaattisesti kun #110-lippu
@@ -609,6 +610,58 @@ def update_predictions_hub_links(live: list[str]) -> bool:
     return False
 
 
+def update_llms_txt(counts: dict[str, int]) -> bool:
+    """#231-GEO: kasvumoottorin luvut llms.txt:hyn SAMASTA datasta kuin sitemap.
+
+    Ongelma ei ollut llms.txt:n sisalto vaan se etta se oli kasin yllapidetty:
+    kolme perakkaista viikkoauditointia loysi siita eri staleuden (17.7 faq,
+    29.7 termi + kuolleet WC-sivut, 5.8 koko 1752 sivun laajennus puuttui),
+    koska mikaan generaattori ei kirjoittanut sita eika mikaan portti lukenut.
+
+    Generoidaan VAIN markkeriparin sisus eli liigarivit ja sivumaarat. Loppu
+    tiedostosta (disambiguaatio, tuotekuvaukset, hinnat) pysyy kasin
+    kirjoitettuna tarkoituksella - se on arvostelukykya, ei dataa.
+
+    Markkerit puuttuvat -> False, ei kaatoa (sama sopimus kuin
+    update_predictions_hub_links).
+    """
+    if not LLMS_TXT.exists():
+        return False
+    s = LLMS_TXT.read_text(encoding="utf-8")
+    if "GEN:LLMS-START" not in s:
+        return False
+    order = ["PL", "PD", "SA", "BL1", "FL1", "BSA", "CL"]
+    live = [c for c in order if counts.get(c)] + [
+        c for c in counts if c not in order and counts.get(c)
+    ]
+    rows = [
+        f"- [{fold_ascii(LEAGUES[c]['name'])} predictions]"
+        f"(https://goaliq.app/predictions/{LEAGUES[c]['slug']}/): "
+        f"{counts[c]} fixture pages."
+        for c in live
+    ]
+    total = sum(counts[c] for c in live)
+    rows.append(
+        f"- Live now: {len(live)} league hubs and {total} fixture pages, "
+        "regenerated every three hours as fixtures are played and new ones "
+        "are logged."
+        if live else
+        "- No fixture pages are live right now; league pages return with the "
+        "new seasons."
+    )
+    block = "\n" + "\n".join(rows) + "\n"
+    new = re.sub(
+        r"(<!-- GEN:LLMS-START -->).*?(<!-- GEN:LLMS-END -->)",
+        lambda m: m.group(1) + block + m.group(2),
+        s,
+        flags=re.S,
+    )
+    if new != s:
+        LLMS_TXT.write_text(new, encoding="utf-8")
+        return True
+    return False
+
+
 def main() -> int:
     now = datetime.now(timezone.utc)
     log = acc.load_log()
@@ -621,6 +674,7 @@ def main() -> int:
 
     sitemap_entries: list[tuple[str, str, str, str]] = []
     live_hubs: list[str] = []
+    match_counts: dict[str, int] = {}
     total_pages = 0
     today = now.strftime("%Y-%m-%d")
 
@@ -658,6 +712,7 @@ def main() -> int:
                 render_match_page(comp, e), encoding="utf-8"
             )
         live_hubs.append(comp)
+        match_counts[comp] = len(rows)
         total_pages += 1 + len(rows)
         sitemap_entries.append(
             (f"{BASE}/predictions/{cfg['slug']}/", today, "daily", "0.8")
@@ -672,8 +727,11 @@ def main() -> int:
     write_urlset(SITEMAP_PRED_PATH, sitemap_entries)
     print(f"sitemap-predictions.xml: {len(sitemap_entries)} URL:ia")
     hub_updated = update_predictions_hub_links(live_hubs)
+    llms_updated = update_llms_txt(match_counts)
     print(f"Yhteensä {total_pages} sivua ({len(live_hubs)} liigaa). "
           f"predictions.html-hublinkit: {'päivitetty' if hub_updated else 'ei muutosta'}.")
+    print(f"llms.txt GEN:LLMS-lohko: "
+          f"{'päivitetty' if llms_updated else 'ei muutosta'}.")
     return 0
 
 

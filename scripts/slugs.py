@@ -26,10 +26,14 @@ _TRANSLIT = {
 }
 
 
-def slug(s: str) -> str:
-    s = s.lower()
+def fold_ascii(s: str) -> str:
+    """Aksentit pois, muu teksti ennallaan. Kayttokohde: llms.txt, joka on
+    ASCII-konventiolla kirjoitettu ("Brasileirao Serie A")."""
     for src, dst in _TRANSLIT.items():
-        s = s.replace(src, dst)
+        s = s.replace(src, dst).replace(src.upper(), dst.upper())
     s = unicodedata.normalize("NFKD", s)
-    s = "".join(c for c in s if not unicodedata.combining(c))
-    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return "".join(c for c in s if not unicodedata.combining(c))
+
+
+def slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", fold_ascii(s.lower())).strip("-")

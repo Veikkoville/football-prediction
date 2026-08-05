@@ -134,7 +134,10 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/prediction_log.json data/accuracy.json data/international_results.csv
-          git add predictions/ fpl/ sitemap.xml sitemap-core.xml sitemap-predictions.xml sitemap-fpl.xml predictions.html fpl.html index.html || true
+          # llms.txt (#231-GEO 5.8): build_prediction_pages kirjoittaa nyt sen
+          # GEN:LLMS-lohkon. Ilman tata riviä ajo kirjoittaisi tiedoston ja
+          # muutos katoaisi aanettomasti — sama vikaluokka kuin itse ongelma.
+          git add predictions/ fpl/ sitemap.xml sitemap-core.xml sitemap-predictions.xml sitemap-fpl.xml predictions.html fpl.html index.html llms.txt || true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (ei uusia pre-matcheja eikä tuloksia) — ohitetaan commit."
             exit 0
