@@ -638,7 +638,7 @@ def xp_components(pos: int, rates: dict, xmins: float, p60: float, p1_59: float,
 # ---------------------------------------------------------------------------
 # Tuotanto-JSON:n loader (/api/fantasy/xp) — peili: fpl_phase0.load_phase0
 # ---------------------------------------------------------------------------
-# Vauhti erillään minuuteista (5.8)
+# Vauhti erillään minuuteista (5.8, korjattu 5.8 illalla)
 # ---------------------------------------------------------------------------
 # `xp_per_gw` kertoo pistevauhdin ja minuuttiodotuksen YHTEEN. 4.8. mitattiin
 # että virhe on horisontin funktio (vakiopelaaja +37,9 % 33 GW:n päässä), ja se
@@ -646,25 +646,40 @@ def xp_components(pos: int, rates: dict, xmins: float, p60: float, p1_59: float,
 # pysyvyys. Kun vauhti ja minuutit näytetään erikseen, se oletus on lukijan
 # nähtävissä eikä piilossa yhdessä luvussa.
 #
-# Kynnys on mittausvalinta: jakaja on xmins/90, joten pienillä minuuteilla luku
-# räjähtää (xmins 3 tekisi 0,2 xP/GW:sta 6,0 xP/90:n). Alle kynnyksen palautetaan
-# None eikä 0.0 — nolla lukisi "ei tuota pisteitä", mikä on eri väite kuin
-# "emme tiedä". Kaava asuu TÄSSÄ eikä kutsujissa: 5.8. slug-kaava oli kirjoitettu
-# kahteen kertaan ja toinen kopio jäi korjaamatta, joten kahdennusta ei tehdä.
-PER90_MIN_XMINS = 15.0
+# 🔴 ALKUPERÄINEN KAAVA OLI VÄÄRÄ, ja tapa jolla se oli väärä on opetus.
+# Se oli `xp_per_gw * 90 / xmins`, mikä olettaa että xP on LINEAARINEN
+# minuuttien suhteen. `xp_components` sanoo toisin: kolme komponenttia on
+# porrasfunktioita jotka eivät skaalaudu minuuteilla lainkaan —
+#   appearance       = 2.0*p60 + 1.0*p1_59   (esiintymisestä, ei kestosta)
+#   clean_sheet      = CS_PTS * cs_prob * p60
+#   def_contribution = DC_PTS * dc_freq * p60
+# Vain maalit/syötöt/kortit/bonus/päästetyt/torjunnat skaalautuvat `share`lla.
+#
+# Seuraus mitattiin tuotannosta: 16,2 odotetun minuutin pelaajalla 72 % GW1-xP:stä
+# oli esiintymispiste, ja kun se jaettiin 16 minuutilla ja skaalattiin 90:een,
+# siitä tuli YKSINÄÄN 4,83 "pistettä per 90". Julkaistu sarake nosti hänet koko
+# projektion kärkeen (7,06) ohi pelaajan jonka todellinen vauhti on 2,4-kertainen.
+# Sarake ei ollut epätarkka vaan KÄÄNTEINEN hännässä.
+#
+# Korjattu määritelmä: per-90 = "mitä hän tekisi jos pelaisi täydet 90" eli
+# xp_components ajettuna arvoilla xmins=90, p60=1, p1_59=0. Se on se mitä lukija
+# joka tapauksessa luulee lukevansa, ja se on vertailukelpoinen kaikkien välillä.
+# Luku EI ole enää johdettavissa (xp_per_gw, xmins) -parista, koska p60 ei ole
+# rekonstruoitavissa tarjoillusta rivistä → laskenta kuuluu putkeen ja kenttä
+# tulee JSON:ista. Serve-time EI arvaa sitä: puuttuva kenttä = None.
+#
+# Miksi None eikä vanha kaava fallbackina: väärä luku on huonompi kuin puuttuva.
+# Nolla taas lukisi "ei tuota pisteitä", mikä on eri väite kuin "emme tiedä".
 
 
-def xp_per_90(xp_per_gw: float | None, xmins: float | None) -> float | None:
-    """Pistevauhti 90 pelattua minuuttia kohden, tai None jos odotettuja
-    minuutteja on liian vähän jotta luku tarkoittaisi mitään."""
-    try:
-        rate = float(xp_per_gw or 0.0)
-        mins = float(xmins or 0.0)
-    except (TypeError, ValueError):
-        return None
-    if mins < PER90_MIN_XMINS:
-        return None
-    return round(rate * 90.0 / mins, 2)
+def xp_full_90(pos: int, rates: dict, ctx: dict) -> float:
+    """xP yhdelle fixturelle jos pelaaja pelaisi TÄYDET 90 minuuttia.
+
+    Sama funktio josta totalit lasketaan (ei rinnakkaista kaavaa): erona vain
+    minuuttiparametrit. p60=1.0 ja p1_59=0.0 = pelaaja on kentällä koko ajan,
+    joten esiintyminen on täydet 2 pistettä eikä cameo-odotusarvo, ja CS/DefCon
+    ovat täydellä painolla."""
+    return xp_components(pos, rates, 90.0, 1.0, 0.0, ctx)["total"]
 
 
 def empty_xp() -> dict:
@@ -692,10 +707,12 @@ def load_xp(path: Path = XP_PATH) -> dict:
         return empty_xp()
     if not isinstance(data, dict) or "players" not in data or "meta" not in data:
         return empty_xp()
-    # Vauhti serve-timessa, ei dataputkessa: kenttä on johdettu (xp_per_gw /
-    # xmins), joten sen kirjoittaminen tiedostoon tekisi siitä toisen totuuden
-    # joka voi ajautua erilleen. Additiivinen — vanhat lukijat eivät huomaa.
+    # Vauhti tulee PUTKESTA, ei serve-timesta. Alkuperäinen 5.8. suunnittelu
+    # johti kentän tässä (xp_per_gw / xmins) jottei syntyisi toista totuutta —
+    # mutta se derivaatio oli väärä (ks. xp_full_90:n yllä oleva perustelu),
+    # eikä oikeaa voi laskea tästä: p60 ei ole rivillä. Vanha rivi ilman kenttää
+    # saa None:n, ei arvausta.
     for p in data.get("players") or []:
         if isinstance(p, dict):
-            p["xp_per_90"] = xp_per_90(p.get("xp_per_gw"), p.get("xmins"))
+            p.setdefault("xp_per_90", None)
     return data

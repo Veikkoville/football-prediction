@@ -172,56 +172,46 @@ def test_gk_meta_horizon_kertoo_cs_kattavuuden_ei_tiedoston_metaa(monkeypatch):
 # 5.8: vauhti ja minuutit erikseen (kausiprojektiomittauksen (b)-puolikas)
 # ---------------------------------------------------------------------------
 
-def test_xp_per_90_separates_rate_from_minutes(monkeypatch):
-    """Kaksi pelaajaa, SAMA xP/GW, eri minuutit → eri vauhti.
+def test_xp_per_90_comes_from_pipeline_not_derived_here(monkeypatch):
+    """Vauhti LUETAAN rivilta, ei lasketa value-listalla.
 
-    Tama on koko muutoksen syy: yhdistetty xP/GW ei erota pelaajaa joka on
-    hyva 45 minuuttia pelaajasta joka on keskinkertainen 90. Jos per-90 ei
-    erota naita, kentta ei kerro mitaan uutta ja muutos on turha.
+    Alkuperainen 5.8. toteutus laski taalla `xp_per_gw * 90 / xmins`, mika on
+    vaara (esiintymis-, CS- ja DefCon-pisteet eivat skaalaudu minuuteilla).
+    Tama testi lukitsee ETTEI kaavaa ole taalla lainkaan: rivin oma xp_per_90
+    menee lapi sellaisenaan, vaikka se olisi ristiriidassa xp_per_gw/xmins
+    -parin kanssa. Jos joku palauttaa derivaation, tama kaatuu.
     """
-    pool = [
-        # 12 xP / 6 GW = 2.0 xP/GW taysilla minuuteilla → 2.0 xP/90
-        _pool_player(1, "FullGame", "AAA", 3, 60, 12.0, [2] * 6, xmins=90.0),
-        # sama 2.0 xP/GW mutta puolikkailla minuuteilla → 4.0 xP/90
-        _pool_player(2, "HalfGame", "BBB", 3, 60, 12.0, [2] * 6, xmins=45.0),
-    ]
-    monkeypatch.setattr(fv, "build_context", lambda: _ctx(pool))
+    a = _pool_player(1, "FullGame", "AAA", 3, 60, 12.0, [2] * 6, xmins=90.0)
+    b = _pool_player(2, "Cameo", "BBB", 3, 60, 12.0, [2] * 6, xmins=16.0)
+    # Putken luvut: cameo-pelaaja on TAYSILLA 90 minuutilla huonompi, vaikka
+    # vanha kaava olisi antanut hanelle 11.25 (2.0 * 90 / 16).
+    a["xp_per_90"] = 6.58
+    b["xp_per_90"] = 3.89
+    monkeypatch.setattr(fv, "build_context", lambda: _ctx([a, b]))
     rows = {r["web_name"]: r for r in fv.value_list()["players"]}
 
-    assert rows["FullGame"]["xp_per_90"] == pytest.approx(2.0)
-    assert rows["HalfGame"]["xp_per_90"] == pytest.approx(4.0)
-    assert rows["FullGame"]["xmins"] == 90.0
-    assert rows["HalfGame"]["xmins"] == 45.0
-    # value ja xP-summa ovat identtiset — ero nakyy VAIN uusissa kentissa
-    assert rows["FullGame"]["value"] == rows["HalfGame"]["value"]
-    assert rows["FullGame"]["xp_per_90"] != rows["HalfGame"]["xp_per_90"], (
-        "jos nama ovat samat, per-90 on johdettu xp_horizon_totalista eika "
-        "minuuteista, ja koko kentta on kosmetiikkaa"
+    assert rows["FullGame"]["xp_per_90"] == pytest.approx(6.58)
+    assert rows["Cameo"]["xp_per_90"] == pytest.approx(3.89)
+    assert rows["Cameo"]["xp_per_90"] != pytest.approx(2.0 * 90 / 16), (
+        "value-lista laskee vauhdin itse vanhalla kaavalla — se kaava on vaara "
+        "ja lisaksi kahdennus, joka on tassa talossa oma vikaluokkansa"
     )
+    assert rows["Cameo"]["xmins"] == 16.0
 
 
-def test_xp_per_90_is_none_below_floor_not_zero(monkeypatch):
-    """Alle minuuttikynnyksen: None, EI 0.0 eika rajaton luku.
+def test_xp_per_90_missing_from_row_is_none_not_zero(monkeypatch):
+    """Rivi ilman putken kenttaa: None, EI 0.0 eika arvaus.
 
     0.0 lukisi "ei tuota pisteita", mika on eri vaite kuin "emme tieda".
-    Kohinan julkaiseminen tarkkana lukuna on juuri se vikaluokka jota tama
-    muutos korjaa.
     """
-    below = fv.PER90_MIN_XMINS - 0.1
-    pool = [
-        _pool_player(1, "Fringe", "AAA", 3, 45, 1.2, [0.2] * 6, xmins=below),
-        _pool_player(2, "AtFloor", "BBB", 3, 45, 6.0, [1.0] * 6,
-                     xmins=fv.PER90_MIN_XMINS),
-    ]
+    pool = [_pool_player(1, "NoRate", "AAA", 3, 45, 1.2, [0.2] * 6, xmins=14.0)]
     monkeypatch.setattr(fv, "build_context", lambda: _ctx(pool))
     rows = {r["web_name"]: r for r in fv.value_list()["players"]}
 
-    assert rows["Fringe"]["xp_per_90"] is None
-    assert rows["Fringe"]["xmins"] == round(below, 1), (
+    assert rows["NoRate"]["xp_per_90"] is None
+    assert rows["NoRate"]["xmins"] == 14.0, (
         "minuutit nakyvat silti — juuri ne kertovat miksi vauhtia ei ole"
     )
-    # kynnys on inklusiivinen: tasan kynnyksella luku annetaan
-    assert rows["AtFloor"]["xp_per_90"] == pytest.approx(6.0)
 
 
 def test_value_note_says_rate_and_minutes_are_separate():
@@ -232,3 +222,29 @@ def test_value_note_says_rate_and_minutes_are_separate():
     """
     assert "separately" in fv.VALUE_NOTE
     assert "bench risk" in fv.VALUE_NOTE
+
+
+def test_projection_pool_carries_xp_per_90():
+    """Vauhti EI saa kadota poolin muotoiluun.
+
+    `_projection_pool` rakentaa rivin uusiksi nimetysta kenttalistasta, joten
+    kentta jota ei ole siina listassa katoaa AANETTOMASTI. Nain kavi 5.8:
+    value-lista sai xp_per_90 = None kaikille vaikka loader taytti sen, ja
+    yksikkotestit eivat nahneet sita koska ne syottivat kentan suoraan pooliin.
+    Tama testi ajaa oikean poolinrakentajan.
+    """
+    from src.models.fpl_rate_team import _projection_pool
+
+    xp_data = {"players": [{
+        "id": 7, "web_name": "Rate", "team_short": "AAA", "pos": "MID",
+        "xp_per_gw": 4.0, "xp_horizon_total": 24.0, "xmins": 80.0,
+        "xp_per_90": 5.25, "gameweeks": [], "status": "a",
+    }]}
+    price_by_id = {7: {"element_type": 3, "team": 1, "now_cost": 75,
+                       "selected_by_percent": "12.0"}}
+    pool = _projection_pool(xp_data, price_by_id)
+
+    assert len(pool) == 1
+    assert pool[0]["xp_per_90"] == 5.25, (
+        "pool pudotti xp_per_90:n — sarake nayttaa tyhjaa kaikilla pinnoilla"
+    )

@@ -189,7 +189,7 @@
 <p class="muted">
 	<strong>Total xP</strong> = the sum of projected points across {horizonLabel}
 	({horizonN} gameweeks). <strong>xP/GW</strong> = the per-gameweek average over the same
-	horizon. <strong>xP/90</strong> is the same points as a rate per 90 minutes on the pitch, shown next to
+	horizon. <strong>xP/90</strong> is the rate over a full 90 minutes, shown next to
 	<strong>xMins</strong> so the minutes assumption is visible instead of multiplied into one number. Click a row to see how a player's xP is built.{#if hasSetPieces}
 		The <strong>P</strong>, <strong>C</strong> and <strong>FK</strong> badges mark players
 		first or second in line for penalties, corners and direct free kicks (FPL squad data,
@@ -307,7 +307,7 @@
 				{/if}
 				<th class="num"><abbr title="Average expected points per gameweek">xP/GW</abbr></th>
 				<th class="num"
-					><abbr title="Expected points per 90 minutes on the pitch. This is the rate: it does not assume the player starts, so read it next to xMins."
+					><abbr title="Expected points if the player completes a full 90 minutes. This is the rate, so read it next to xMins, which is what he is actually expected to play."
 						>xP/90</abbr
 					></th
 				>
