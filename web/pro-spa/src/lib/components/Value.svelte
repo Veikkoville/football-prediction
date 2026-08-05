@@ -169,7 +169,7 @@
 						<th class="num"><abbr title="Projected xP per million over the horizon">Value</abbr></th>
 						<th class="num"><abbr title="Total projected points over the horizon">xP</abbr></th>
 						<th class="num"
-							><abbr title="Projected points per 90 minutes on the pitch. This is the rate, not the return: it does not assume the player starts."
+							><abbr title="Projected points if the player completes a full 90 minutes. This is the rate, not the return: read it next to Mins, which is what the model actually expects him to play."
 								>xP/90</abbr
 							></th
 						>
@@ -216,7 +216,7 @@
 		</div>
 		<p class="muted note">
 			Fixture swing measures calendar difficulty variation over the horizon, not point variance.
-			xP/90 is the scoring rate while on the pitch and Mins is how much of a gameweek the model
+			xP/90 is the rate over a full 90 minutes and Mins is how much of a gameweek the model
 			expects the player to play. They are shown separately on purpose: xP already multiplies them
 			together, which hides the assumption most likely to break.
 		</p>

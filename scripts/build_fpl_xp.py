@@ -636,6 +636,13 @@ def main(argv: list[str] | None = None) -> int:
         # TÄSMÄLLEEN samoista xp_components-dicteistä joista totalit lasketaan
         # → pelkkä emittointi, ei laskennan muutosta (xp-arvot identtiset).
         headline_comps: dict[str, float] = {}
+        # Vauhti (xP/90) = mitä pelaaja tekisi TÄYSILLÄ 90 minuutilla, keskiarvo
+        # horisontin fixtureista. Lasketaan TÄSSÄ eikä serve-timessa, koska
+        # p60/p1_59 eivät ole tarjoillulla rivillä eikä lukua siksi voi johtaa
+        # (xp_per_gw, xmins) -parista — se yritys tuotti käänteisen sarakkeen
+        # matalan minuutin pelaajille. Keskiarvo per FIXTURE eikä per GW: per-90
+        # on ottelukohtainen luku, joten tupla-GW ei saa painaa tuplasti.
+        full90_sum, full90_n = 0.0, 0
         for g in horizon:
             ctxs = ctx_by_gw.get(g, {}).get(fid, [])
             opps = opp_by_gw.get(g, {}).get(fid, [])
@@ -649,6 +656,11 @@ def main(argv: list[str] | None = None) -> int:
             for c in ctxs:
                 comp = xp.xp_components(pos, rates, xm_g, p60_g, p1_g, c)
                 gw_xp += comp["total"]
+                # Sama ctx, samat rates, vain minuutit täysinä. Ei rotaatio-
+                # kerrointa (`mult`): se on minuuttiodotuksen korjaus, eikä
+                # kysymys "jos hän pelaa 90" sisällä sitä.
+                full90_sum += xp.xp_full_90(pos, rates, c)
+                full90_n += 1
                 if g == next_gw:
                     for k, v in comp.items():
                         if k != "total":
@@ -776,6 +788,9 @@ def main(argv: list[str] | None = None) -> int:
             # bonushistoria on 26/27-BPS-oikaistu (#151).
             "e_bonus": round(min(rates["bonus90"] * xmins / 90.0, 3.0), 2),
             "xp_per_gw": round(total / max(len(horizon), 1), 2),
+            # None kun horisontissa ei ole yhtään fixturea (blank) — ei 0.0,
+            # joka lukisi "ei tuota pisteitä".
+            "xp_per_90": (round(full90_sum / full90_n, 2) if full90_n else None),
             "xp_horizon_total": round(total, 2),
             "gameweeks": gws,
         }

@@ -23,8 +23,6 @@ from __future__ import annotations
 from statistics import pstdev
 
 from src.models.fpl_phase0 import load_phase0
-# Vauhtikaava asuu fpl_xp:ssa (yksi totuus) — ei kopiota tanne.
-from src.models.fpl_xp import PER90_MIN_XMINS, xp_per_90  # noqa: F401
 from src.models.fpl_rate_team import (
     AVAILABILITY_GATE_NOTE, POS_NAME, RateTeamError, apply_availability_gate,
     build_context,
@@ -87,10 +85,12 @@ def value_list(top_n: int = 20) -> dict:
             "swing_label": _swing_label(swing),
             # 5.8: vauhti ja minuutit erikseen. xp_per_gw kertoo nämä yhteen,
             # ja se on juuri se yhdistetty luku jossa pettävä oletus (minuutit)
-            # jää piiloon. None = alle PER90_MIN_XMINS, ei "0.0".
+            # jää piiloon. Vauhti LUETAAN putken kentästä eikä lasketa täällä:
+            # oma derivaatio oli väärä (ks. fpl_xp.xp_full_90) ja kahdennettu
+            # kaava on juuri se rakenne joka päästi virheen kahdelle pinnalle.
             "xmins": (round(float(p["xmins"]), 1)
                       if p.get("xmins") is not None else None),
-            "xp_per_90": xp_per_90(p.get("xp_per_gw"), p.get("xmins")),
+            "xp_per_90": p.get("xp_per_90"),
         })
     rows.sort(key=lambda r: r["value"], reverse=True)
 

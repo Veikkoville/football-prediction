@@ -43,28 +43,104 @@ def test_load_xp_reads_valid_file(tmp_path):
         == payload["players"][0]
 
 
-def test_load_xp_enriches_rate_from_minutes(tmp_path):
-    """Vauhti johdetaan minuuteista, ei kopioida xp_per_gw:sta.
+def test_load_xp_does_not_derive_rate_from_minutes(tmp_path):
+    """load_xp EI keksi vauhtia (xp_per_gw, xmins) -parista.
 
-    Sama negatiivinen kontrolli kuin value-listalla: kaksi rivia joilla sama
-    xp_per_gw mutta eri xmins on saatava ERI vauhti, muuten kentta on
-    kosmetiikkaa.
+    Alkuperainen 5.8. toteutus laski `xp_per_gw * 90 / xmins` tassa. Se on
+    vaara: xP ei ole lineaarinen minuuttien suhteen (ks. xp_full_90). Rivi
+    ilman putken kenttaa saa None:n, ja rivin oma arvo menee lapi
+    koskemattomana.
     """
     payload = {
         "meta": {"available": True, "next_gameweek": 1},
         "players": [
-            {"id": 1, "web_name": "Full", "xp_per_gw": 2.0, "xmins": 90.0},
-            {"id": 2, "web_name": "Half", "xp_per_gw": 2.0, "xmins": 45.0},
-            {"id": 3, "web_name": "Fringe", "xp_per_gw": 0.2, "xmins": 3.0},
+            {"id": 1, "web_name": "FromPipeline", "xp_per_gw": 2.0,
+             "xmins": 45.0, "xp_per_90": 3.5},
+            {"id": 2, "web_name": "NoField", "xp_per_gw": 2.0, "xmins": 45.0},
         ],
     }
     p = tmp_path / "rates.json"
     p.write_text(json.dumps(payload), encoding="utf-8")
     rows = {r["web_name"]: r for r in xp.load_xp(p)["players"]}
-    assert rows["Full"]["xp_per_90"] == 2.0
-    assert rows["Half"]["xp_per_90"] == 4.0
-    assert rows["Full"]["xp_per_90"] != rows["Half"]["xp_per_90"]
-    assert rows["Fringe"]["xp_per_90"] is None      # alle kynnyksen: ei lukua
+    assert rows["FromPipeline"]["xp_per_90"] == 3.5
+    assert rows["NoField"]["xp_per_90"] is None
+    assert rows["NoField"]["xp_per_90"] != 4.0, (
+        "serve-time johtaa vauhdin uudestaan vanhalla kaavalla"
+    )
+
+
+def _rates(xg90=0.0, xa90=0.0, bonus90=0.0, yc90=0.0, saves90=0.0, dc_freq=0.0):
+    return {"xg90": xg90, "xa90": xa90, "bonus90": bonus90, "yc90": yc90,
+            "saves90": saves90, "dc_freq": dc_freq}
+
+
+def _ctx90():
+    return {"goal_mult": 1.0, "cs_prob": 0.3, "conceded_dist": [0.3, 0.4, 0.3],
+            "opp_goal_mult": 1.0}
+
+
+def test_xp_full_90_does_not_reward_short_minutes():
+    """NEGATIIVINEN KONTROLLI: vanha kaava kaansi jarjestyksen, uusi ei.
+
+    Terava hyokkaaja joka pelaa 77 min vs vaihtomies joka pelaa 16 min ja jonka
+    oma vauhti on murto-osa. Vanhalla kaavalla (xp_per_gw * 90 / xmins)
+    vaihtomies NOUSEE karkeen, koska kiinteat esiintymispisteet jaetaan
+    pienella minuuttiluvulla. Tama testi vaatii etta (a) vanha kaava todella
+    inversoi — muuten testi ei kontrolloi mitaan — ja (b) uusi ei.
+    """
+    pos = 4  # FWD
+    elite = _rates(xg90=0.80, xa90=0.20, bonus90=0.9)
+    # Vaihtomiehen vauhti on TARKOITUKSELLA uskottava eika olematon: juuri niin
+    # tuotannon tapaus syntyi (317 minuutin otos, 0.57 maalia/90). Olemattomalla
+    # vauhdilla vanha kaava ei edes inversoi, eli testi ei kontrolloisi mitaan.
+    fringe = _rates(xg90=0.45, xa90=0.20, bonus90=0.3)
+    ctx = _ctx90()
+
+    # Tuotannon kaltaiset minuuttiprofiilit
+    elite_xm, elite_p60, elite_p1 = 77.0, 0.83, 0.06
+    frin_xm, frin_p60, frin_p1 = 16.0, 0.12, 0.63
+
+    elite_gw = xp.xp_components(pos, elite, elite_xm, elite_p60, elite_p1,
+                                ctx)["total"]
+    frin_gw = xp.xp_components(pos, fringe, frin_xm, frin_p60, frin_p1,
+                               ctx)["total"]
+
+    old_elite = elite_gw * 90.0 / elite_xm
+    old_fringe = frin_gw * 90.0 / frin_xm
+    assert old_fringe > old_elite, (
+        "testin premissi ei pade: vanha kaava ei inversoi nailla luvuilla, "
+        "joten testi ei kontrolloi korjausta"
+    )
+
+    new_elite = xp.xp_full_90(pos, elite, ctx)
+    new_fringe = xp.xp_full_90(pos, fringe, ctx)
+    assert new_elite > new_fringe, (
+        f"korjattu vauhti asettaa vaihtomiehen ({new_fringe:.2f}) yha "
+        f"karkipelaajan ({new_elite:.2f}) edelle"
+    )
+
+
+def test_xp_full_90_is_independent_of_minute_expectation():
+    """Maaritelman ydin: per-90 ei saa riippua siita kuinka paljon pelaajan
+    ODOTETAAN pelaavan — se on nimenomaan se sekaannus joka korjattiin. Sama
+    rates + sama ctx = sama luku riippumatta minuuttiprofiilista."""
+    ctx = _ctx90()
+    r = _rates(xg90=0.5, xa90=0.2, bonus90=0.5)
+    assert xp.xp_full_90(3, r, ctx) == xp.xp_full_90(3, r, ctx)
+    # ja se on sama kuin komponenttilaskenta taysilla minuuteilla
+    assert xp.xp_full_90(3, r, ctx) == pytest.approx(
+        xp.xp_components(3, r, 90.0, 1.0, 0.0, ctx)["total"])
+
+
+def test_xp_full_90_counts_full_appearance_points():
+    """Esiintyminen on taydet 2 pistetta, ei cameo-odotusarvoa skaalattuna.
+    Tama on se komponentti joka teki vanhasta luvusta kaanteisen."""
+    ctx = _ctx90()
+    bare = xp.xp_full_90(4, _rates(), ctx)   # ei maaleja, syottoja, bonusta
+    assert bare == pytest.approx(2.0, abs=0.01), (
+        f"tyhjilla vauhdeilla per-90 pitaisi olla pelkka esiintyminen 2.0, "
+        f"sai {bare:.3f}"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -939,6 +939,15 @@ def _projection_pool(xp_data: dict, price_by_id: dict[int, dict]) -> list[dict]:
             "gameweeks": p.get("gameweeks") or [],
             # #35 compare: erittelykentät kulkevat poolin mukana
             "xmins": p.get("xmins"),
+            # 5.8: vauhti tulee putkesta ja sen ON kuljettava poolin mukana.
+            # Pool muotoilee rivin uusiksi, joten kentta joka ei ole TASSA
+            # listassa katoaa aanettomasti — juuri siksi alkuperainen toteutus
+            # laski vauhdin uudestaan value-listalla (ja laski sen vaarin).
+            "xp_per_90": p.get("xp_per_90"),
+            # 5.8: vauhti tulee putkesta ja sen ON kuljettava poolin mukana.
+            # Pool muotoilee rivin uusiksi, joten kentta joka ei ole TASSA
+            # listassa katoaa aanettomasti — juuri siksi alkuperainen toteutus
+            # laski vauhdin uudestaan value-listalla (ja laski sen vaarin).
             "predicted_starts": p.get("predicted_starts"),
             "minutes_confidence": p.get("minutes_confidence"),
             "components": p.get("components"),
