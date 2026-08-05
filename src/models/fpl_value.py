@@ -23,6 +23,8 @@ from __future__ import annotations
 from statistics import pstdev
 
 from src.models.fpl_phase0 import load_phase0
+# Vauhtikaava asuu fpl_xp:ssa (yksi totuus) — ei kopiota tanne.
+from src.models.fpl_xp import PER90_MIN_XMINS, xp_per_90  # noqa: F401
 from src.models.fpl_rate_team import (
     AVAILABILITY_GATE_NOTE, POS_NAME, RateTeamError, apply_availability_gate,
     build_context,
@@ -43,29 +45,6 @@ VALUE_NOTE = (
     "bargain. "
     "Powered by the match model behind our published track record."
 )
-
-# xP/90 = pistevauhti kentällä, kun xp_per_gw sisältää jo minuuttiodotuksen.
-# Jakaja on xmins/90, joten pienillä minuuteilla luku räjähtää: xmins 3 tekisi
-# 0.2 xP/GW:sta 6.0 xP/90:n. Kynnys on mittausvalinta eikä kosmetiikkaa —
-# 4.8. mitattiin että virhe on horisontin funktio (vakiopelaaja +37,9 % 33 GW:n
-# päässä), ja sama epävarmuus koskee minuuttiodotusta. Alle kynnyksen luku on
-# kohinaa, ja kohinan julkaiseminen tarkkana lukuna on juuri se vikaluokka jota
-# tämä muutos korjaa → None, ei arvausta.
-PER90_MIN_XMINS = 15.0
-
-
-def _xp_per_90(xp_per_gw: float | None, xmins: float | None) -> float | None:
-    """Pistevauhti 90 pelattua minuuttia kohden, tai None jos minuutteja on
-    liian vähän jotta luku tarkoittaisi mitään."""
-    try:
-        rate = float(xp_per_gw or 0.0)
-        mins = float(xmins or 0.0)
-    except (TypeError, ValueError):
-        return None
-    if mins < PER90_MIN_XMINS:
-        return None
-    return round(rate * 90.0 / mins, 2)
-
 
 def _fixture_swing(gameweeks: list[dict]) -> float:
     xs = [float(g["xp"]) for g in (gameweeks or []) if g.get("xp") is not None]
@@ -111,7 +90,7 @@ def value_list(top_n: int = 20) -> dict:
             # jää piiloon. None = alle PER90_MIN_XMINS, ei "0.0".
             "xmins": (round(float(p["xmins"]), 1)
                       if p.get("xmins") is not None else None),
-            "xp_per_90": _xp_per_90(p.get("xp_per_gw"), p.get("xmins")),
+            "xp_per_90": xp_per_90(p.get("xp_per_gw"), p.get("xmins")),
         })
     rows.sort(key=lambda r: r["value"], reverse=True)
 

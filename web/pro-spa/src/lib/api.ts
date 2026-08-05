@@ -101,6 +101,10 @@ export interface XpPlayer {
 	pos: 'GKP' | 'DEF' | 'MID' | 'FWD';
 	xmins: number;
 	xp_per_gw: number;
+	/** 5.8: pistevauhti 90 pelattua minuuttia kohden. `null` kun odotettuja
+	 *  minuutteja on liian vahan jotta vauhti tarkoittaisi mitaan (ei 0).
+	 *  Serve-timessa johdettu, defensiivinen: vanha payload ei tuo. */
+	xp_per_90?: number | null;
 	xp_horizon_total: number;
 	gameweeks: XpGameweek[];
 	components?: XpComponents;

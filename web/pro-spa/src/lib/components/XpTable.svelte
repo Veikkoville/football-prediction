@@ -189,7 +189,8 @@
 <p class="muted">
 	<strong>Total xP</strong> = the sum of projected points across {horizonLabel}
 	({horizonN} gameweeks). <strong>xP/GW</strong> = the per-gameweek average over the same
-	horizon. Click a row to see how a player's xP is built.{#if hasSetPieces}
+	horizon. <strong>xP/90</strong> is the same points as a rate per 90 minutes on the pitch, shown next to
+	<strong>xMins</strong> so the minutes assumption is visible instead of multiplied into one number. Click a row to see how a player's xP is built.{#if hasSetPieces}
 		The <strong>P</strong>, <strong>C</strong> and <strong>FK</strong> badges mark players
 		first or second in line for penalties, corners and direct free kicks (FPL squad data,
 		updated through pre-season).{/if}
@@ -305,6 +306,11 @@
 					>
 				{/if}
 				<th class="num"><abbr title="Average expected points per gameweek">xP/GW</abbr></th>
+				<th class="num"
+					><abbr title="Expected points per 90 minutes on the pitch. This is the rate: it does not assume the player starts, so read it next to xMins."
+						>xP/90</abbr
+					></th
+				>
 				<th class="num"><abbr title="Sum of expected points, {horizonLabel}">Total xP</abbr></th>
 				{#each gwCols as gw (gw)}
 					<th class="num">GW{gw}</th>
@@ -356,6 +362,15 @@
 							</td>
 						{/if}
 						<td class="num">{p.xp_per_gw.toFixed(2)}</td>
+						<td class="num">
+							{#if p.xp_per_90 == null}
+								<span class="muted" title="Too few expected minutes for a rate to mean anything"
+									>&ndash;</span
+								>
+							{:else}
+								{p.xp_per_90.toFixed(2)}
+							{/if}
+						</td>
 						<td class="num total-col">{p.xp_horizon_total.toFixed(2)}</td>
 						{#each gwCols as gw (gw)}
 							<td class="num">{gwXp(p, gw).toFixed(2)}</td>

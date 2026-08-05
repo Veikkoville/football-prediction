@@ -2828,7 +2828,14 @@ def fantasy_xp(request: Request, response: Response):
     # ETag erottaa maskatun ja täyden vastauksen: ilman mask-bittiä free-
     # käyttäjän 304 voisi validoida premium-rivit selaimen välimuistista.
     generated = str(payload.get("meta", {}).get("generated_at") or "0")
-    etag = 'W/"xp-{}-{}"'.format(generated, "m" if masked else "f")
+    # 5.8: SKEEMAVERSIO ETagiin. `generated_at` muuttuu vain kun projektio
+    # ajetaan uusiksi, joten serve-timessa lisätty kenttä (xp_per_90) EI
+    # invalidoi mitään: ehdollinen pyyntö validoisi vanhan vastauksen 304:llä
+    # ja klientti näyttäisi uuden sarakkeen tyhjänä. Se luetaan rikkinäiseksi
+    # ominaisuudeksi, ei vanhaksi välimuistiksi. Löytyi kuvasta, ei portista.
+    # Nosta tätä aina kun rivin kenttäjoukko muuttuu ilman uutta projektiota.
+    schema = "s2"
+    etag = 'W/"xp-{}-{}-{}"'.format(generated, "m" if masked else "f", schema)
     cache_control = "private, max-age=300"
     inm = request.headers.get("if-none-match", "")
     if etag in [t.strip() for t in inm.split(",")]:

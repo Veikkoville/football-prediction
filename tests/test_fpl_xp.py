@@ -34,7 +34,37 @@ def test_load_xp_reads_valid_file(tmp_path):
     }
     p = tmp_path / "ok.json"
     p.write_text(json.dumps(payload), encoding="utf-8")
-    assert xp.load_xp(p) == payload
+    out = xp.load_xp(p)
+    assert out["meta"] == payload["meta"]
+    # 5.8: load_xp rikastaa rivit vauhtikentalla. Rivilla ei ole xp_per_gw:ta
+    # eika xmins:ia -> None, ei kaatumista ja EI arvausta.
+    assert out["players"][0]["xp_per_90"] is None
+    assert {k: v for k, v in out["players"][0].items() if k != "xp_per_90"} \
+        == payload["players"][0]
+
+
+def test_load_xp_enriches_rate_from_minutes(tmp_path):
+    """Vauhti johdetaan minuuteista, ei kopioida xp_per_gw:sta.
+
+    Sama negatiivinen kontrolli kuin value-listalla: kaksi rivia joilla sama
+    xp_per_gw mutta eri xmins on saatava ERI vauhti, muuten kentta on
+    kosmetiikkaa.
+    """
+    payload = {
+        "meta": {"available": True, "next_gameweek": 1},
+        "players": [
+            {"id": 1, "web_name": "Full", "xp_per_gw": 2.0, "xmins": 90.0},
+            {"id": 2, "web_name": "Half", "xp_per_gw": 2.0, "xmins": 45.0},
+            {"id": 3, "web_name": "Fringe", "xp_per_gw": 0.2, "xmins": 3.0},
+        ],
+    }
+    p = tmp_path / "rates.json"
+    p.write_text(json.dumps(payload), encoding="utf-8")
+    rows = {r["web_name"]: r for r in xp.load_xp(p)["players"]}
+    assert rows["Full"]["xp_per_90"] == 2.0
+    assert rows["Half"]["xp_per_90"] == 4.0
+    assert rows["Full"]["xp_per_90"] != rows["Half"]["xp_per_90"]
+    assert rows["Fringe"]["xp_per_90"] is None      # alle kynnyksen: ei lukua
 
 
 # ---------------------------------------------------------------------------

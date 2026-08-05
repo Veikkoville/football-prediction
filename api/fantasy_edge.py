@@ -278,7 +278,7 @@ _CSV_BASE_COLUMNS = [
     "owned_pct", "xmins", "predicted_starts", "minutes_confidence",
     "data_basis", "p_start", "p_cameo", "p_bench", "e_bonus",
     "set_pieces_pens", "set_pieces_corners", "set_pieces_fk",
-    "xp_per_gw", "xp_horizon_total",
+    "xp_per_gw", "xp_per_90", "xp_horizon_total",
 ]
 
 
@@ -349,7 +349,11 @@ def fantasy_xp_csv(
                 p.get("p_start", ""), p.get("p_cameo", ""),
                 p.get("p_bench", ""), p.get("e_bonus", ""),
                 sp.get("pens", ""), sp.get("corners", ""), sp.get("fk", ""),
-                p.get("xp_per_gw"), p.get("xp_horizon_total"),
+                # 5.8: vauhti sarakkeena minuuttien rinnalle. Tyhja solu
+                # (None) = alle minuuttikynnyksen; 0 olisi eri vaite.
+                p.get("xp_per_gw"),
+                ("" if p.get("xp_per_90") is None else p.get("xp_per_90")),
+                p.get("xp_horizon_total"),
             ] + [gw_xp.get(g, "") for g in gws])])
         # Excel-yhteensopivuus (Villen bugilöytö 25.7): UTF-8 BOM (aksentilliset
         # nimet, esim. Kadıoğlu) + "sep=,"-vihjerivi, jota ilman fi/eu-locale-

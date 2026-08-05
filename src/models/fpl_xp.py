@@ -638,6 +638,35 @@ def xp_components(pos: int, rates: dict, xmins: float, p60: float, p1_59: float,
 # ---------------------------------------------------------------------------
 # Tuotanto-JSON:n loader (/api/fantasy/xp) — peili: fpl_phase0.load_phase0
 # ---------------------------------------------------------------------------
+# Vauhti erillään minuuteista (5.8)
+# ---------------------------------------------------------------------------
+# `xp_per_gw` kertoo pistevauhdin ja minuuttiodotuksen YHTEEN. 4.8. mitattiin
+# että virhe on horisontin funktio (vakiopelaaja +37,9 % 33 GW:n päässä), ja se
+# on yhteensopiva sen kanssa että pettävä oletus on nimenomaan minuuttien
+# pysyvyys. Kun vauhti ja minuutit näytetään erikseen, se oletus on lukijan
+# nähtävissä eikä piilossa yhdessä luvussa.
+#
+# Kynnys on mittausvalinta: jakaja on xmins/90, joten pienillä minuuteilla luku
+# räjähtää (xmins 3 tekisi 0,2 xP/GW:sta 6,0 xP/90:n). Alle kynnyksen palautetaan
+# None eikä 0.0 — nolla lukisi "ei tuota pisteitä", mikä on eri väite kuin
+# "emme tiedä". Kaava asuu TÄSSÄ eikä kutsujissa: 5.8. slug-kaava oli kirjoitettu
+# kahteen kertaan ja toinen kopio jäi korjaamatta, joten kahdennusta ei tehdä.
+PER90_MIN_XMINS = 15.0
+
+
+def xp_per_90(xp_per_gw: float | None, xmins: float | None) -> float | None:
+    """Pistevauhti 90 pelattua minuuttia kohden, tai None jos odotettuja
+    minuutteja on liian vähän jotta luku tarkoittaisi mitään."""
+    try:
+        rate = float(xp_per_gw or 0.0)
+        mins = float(xmins or 0.0)
+    except (TypeError, ValueError):
+        return None
+    if mins < PER90_MIN_XMINS:
+        return None
+    return round(rate * 90.0 / mins, 2)
+
+
 def empty_xp() -> dict:
     """Runko kun projektiota ei ole committattu — appi näyttää tyhjän tilan."""
     return {
@@ -663,4 +692,10 @@ def load_xp(path: Path = XP_PATH) -> dict:
         return empty_xp()
     if not isinstance(data, dict) or "players" not in data or "meta" not in data:
         return empty_xp()
+    # Vauhti serve-timessa, ei dataputkessa: kenttä on johdettu (xp_per_gw /
+    # xmins), joten sen kirjoittaminen tiedostoon tekisi siitä toisen totuuden
+    # joka voi ajautua erilleen. Additiivinen — vanhat lukijat eivät huomaa.
+    for p in data.get("players") or []:
+        if isinstance(p, dict):
+            p["xp_per_90"] = xp_per_90(p.get("xp_per_gw"), p.get("xmins"))
     return data
