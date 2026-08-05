@@ -454,6 +454,52 @@ def depth_factor(group_p_starts: list[float], slots: float) -> float:
     return min(slots / total, DEPTH_BOOST_CAP)
 
 
+# Rakenteellinen joukkuerajoite (5.8.2026)
+# ---------------------------------------------------------------------------
+# `depth_factor`in `slots` lasketaan SAMOJEN pelaajien viime kauden starteista
+# (build_fpl_xp.py), eli se on itsekonsistentti — ja juuri siksi hampaaton:
+# kun klubille tulee kaksi entista ykkosvahtia, slots ~ 2 ja rajoite EI SIDO
+# KOSKAAN. Mitattu tuotannosta 5.8.2026: Tottenhamin maalivahtien Sigma p_start
+# oli 2,10 kun avauspaikkoja on tasan 1 (Dubravka 81,6 min JA Vicario 74,4 min
+# samassa ottelussa), 7/20 klubia yli 25 % rajasta, ja kenttapelaajien summa
+# vaihteli 4,71 (Hull) - 13,40 (Chelsea) kun sen pitaa olla 10.
+#
+# Nama kaksi lukua eivat ole malliparametreja vaan pelin saantoja: joukkue
+# aloittaa tasan 11 pelaajalla joista tasan 1 on maalivahti. Siksi ne saavat
+# olla kovakoodattuja - toisin kuin muodostelmajakauma (4-4-2 vs 3-5-2), jota
+# EI oleteta tassa lainkaan: kenttapelaajat normalisoidaan yhtena ryhmana,
+# joten viiden puolustajan joukkue pysyy viiden puolustajan joukkueena.
+TEAM_GK_SLOTS = 1.0
+TEAM_OUTFIELD_SLOTS = 10.0
+
+
+def structural_exponent(p_starts: list[float], slots: float,
+                        lo: float = 1.0, hi: float = 12.0) -> float:
+    """Eksponentti k jolla Sigma p_i**k == slots (ylibuukattu ryhma).
+
+    MIKSI EI TASAISTA KERROINTA: tasainen skaalaus panee varman avaajan
+    maksamaan ryhmansa syvyydesta. Mitattu 5.8: Chelsean kenttapelaajien summa
+    oli 13,40, ja tasainen x0,75 vei 15 min myos naulatuilta (Lacroix 86,7 ->
+    71,3). Ylibuukkaus EI synny naulatuista pelaajista vaan siita etta usea
+    epavarma pelaaja saa uskottavan aloitus-tn:n samaan paikkaan, joten leikkaus
+    kuuluu sinne.
+
+    p**k saastaa suuret arvot ja leikkaa pienet jyrkasti (0,9**3 = 0,73 mutta
+    0,3**3 = 0,03). Ratkaistaan puolitushaulla: Sigma on aidosti laskeva k:n
+    suhteen kun kaikki p < 1, joten juuri on yksikasitteinen.
+    """
+    tot = sum(p_starts)
+    if tot <= slots or slots <= 0:
+        return 1.0
+    for _ in range(60):
+        mid = (lo + hi) / 2.0
+        if sum(p ** mid for p in p_starts) > slots:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2.0
+
+
 def scale_p_start(mm: dict, factor: float) -> dict:
     """Skaalaa aloitus-tn (capattu [0,1]) ja johda minuutit uudelleen."""
     out = dict(mm)

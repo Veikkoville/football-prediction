@@ -355,6 +355,63 @@ def main(argv: list[str] | None = None) -> int:
           f"paino {xp.PRICE_PRIOR_WEIGHT}, vain persentiili >= "
           f"{PRICE_BLEND_MIN_PCT}, syvyys-passin JALKEEN")
 
+    # -----------------------------------------------------------------
+    # RAKENTEELLINEN JOUKKUERAJOITE (5.8.2026) — ks. fpl_xp.TEAM_*_SLOTS.
+    #
+    # Klubi+positio-passi yllä ei sido, koska sen `slots` tulee samojen
+    # pelaajien historiasta. Tämä passi sitoo pelin sääntöön: tasan 1
+    # maalivahti + 10 kenttäpelaajaa. Ylibuukattu ryhmä skaalataan alas
+    # RAJATTA (tila on mahdoton), alibuukattu vain DEPTH_BOOST_CAP:iin —
+    # nousijaklubien 4,71 ei ole sama vika vaan ohuen otoksen hintapriori,
+    # eikä sitä korjata kertomalla kaikki kahdella.
+    #
+    # SIJAINTI: hintapriorin JÄLKEEN (muuten priori siirtäisi massaa
+    # normalisoinnin läpi, sama mekanismi kuin 27.7. vika) mutta
+    # pelaajaohitusten EDELLÄ (ohitus on tietoinen ihmispäätös ja sen pitää
+    # tarkoittaa sitä mitä CSV:ssä lukee — ks. seuraava lohko).
+    etype_by_pid = {e["id"]: e["element_type"] for e in boot["elements"]}
+    team_pids: dict[int, list[int]] = defaultdict(list)
+    for e in boot["elements"]:
+        team_pids[e["team"]].append(e["id"])
+    struct_before, struct_after, n_scaled = [], [], 0
+    for _tid, pids in team_pids.items():
+        for slots, is_gk in ((xp.TEAM_GK_SLOTS, True),
+                             (xp.TEAM_OUTFIELD_SLOTS, False)):
+            grp = [p for p in pids
+                   if (etype_by_pid[p] == 1) == is_gk
+                   and mm_by_player[p]["p_start_raw"] > 0]
+            if not grp:
+                continue
+            ps = [mm_by_player[p]["p_start_raw"] for p in grp]
+            tot = sum(ps)
+            if is_gk:
+                struct_before.append(tot)
+            if tot > slots:
+                # Ylibuukattu: leikkaus painottuu epavarmoihin (p**k), ei
+                # tasaisesti — muuten naulattu avaaja maksaa ryhmansa syvyydesta.
+                k = xp.structural_exponent(ps, slots)
+                if k > 1.0:
+                    n_scaled += 1
+                    for p in grp:
+                        cur = mm_by_player[p]["p_start_raw"]
+                        f = (cur ** k) / cur if cur > 0 else 1.0
+                        mm_by_player[p] = xp.scale_p_start(mm_by_player[p], f)
+            else:
+                # Alibuukattu: sama capattu nosto kuin ennen (nousijaklubien
+                # ohut otos ei ole sama vika eika sita korjata tassa).
+                f = xp.depth_factor(ps, slots)
+                if f != 1.0:
+                    n_scaled += 1
+                    for p in grp:
+                        mm_by_player[p] = xp.scale_p_start(mm_by_player[p], f)
+            if is_gk:
+                struct_after.append(
+                    sum(mm_by_player[p]["p_start_raw"] for p in grp))
+    if struct_before:
+        print(f"      rakenteellinen joukkuerajoite: {n_scaled} ryhmää skaalattu; "
+              f"GKP-summa max {max(struct_before):.2f} -> {max(struct_after):.2f} "
+              f"(paikkoja {xp.TEAM_GK_SLOTS:.0f})")
+
     # Pelaajatason minuuttiohitukset — VIIMEISENÄ, syvyyskorjauksen JÄLKEEN.
     #
     # Järjestys on olennainen: depth_factor skaalaa koko klubi+positio-ryhmää

@@ -497,3 +497,73 @@ def test_bonus_multiplier_cannot_go_negative():
     from src.models import fpl_xp as m
     assert m._bonus_fixture_mult(-5.0) == 0.0
     assert m._bonus_fixture_mult(1.0) == 1.0
+
+
+# ---------------------------------------------------------------------------
+# 5.8.2026: rakenteellinen joukkuerajoite (1 GK + 10 kenttapelaajaa)
+# ---------------------------------------------------------------------------
+
+def test_depth_factor_scales_overbooked_group_without_limit():
+    """Kaksi entista ykkosvahtia samassa klubissa -> summan ON tultava 1.0.
+
+    Tama on se tila joka mitattiin tuotannosta 5.8: Tottenhamin maalivahtien
+    Sigma p_start oli 2,10 kun avauspaikkoja on tasan 1. Alaskaalauksella EI
+    ole cappia, koska tila on mahdoton eika vain epatodennakoinen.
+    """
+    keepers = [0.83, 0.76, 0.35, 0.16]           # Sigma 2.10
+    f = xp.depth_factor(keepers, xp.TEAM_GK_SLOTS)
+    assert f < 1.0
+    assert sum(k * f for k in keepers) == pytest.approx(xp.TEAM_GK_SLOTS)
+
+
+def test_depth_factor_boost_stays_capped_for_thin_group():
+    """Alibuukattu ryhma EI skaalaudu taydeksi.
+
+    Nousijaklubien kenttapelaajien summa oli 4,71 (Hull) kun paikkoja on 10.
+    Se ei ole sama vika: syy on ohuen otoksen hintapriori, eika sita korjata
+    kertomalla koko ryhma kahdella. Nosto pysyy DEPTH_BOOST_CAPissa.
+    """
+    thin = [0.72, 0.30, 0.30, 0.08, 0.08]        # Sigma 1.48, slots 10
+    f = xp.depth_factor(thin, xp.TEAM_OUTFIELD_SLOTS)
+    assert f == pytest.approx(xp.DEPTH_BOOST_CAP)
+    assert sum(t * f for t in thin) < xp.TEAM_OUTFIELD_SLOTS
+
+
+def test_scale_p_start_keeps_minutes_consistent():
+    """Skaalaus johtaa minuutit uudelleen — muuten p_start ja xmins eriytyvat
+    ja UI nayttaisi vahdin jolla on 0.5 aloitus-tn mutta 90 odotettua min."""
+    mm = xp.minutes_model({r: 90.0 for r in range(1, 11)},
+                          {r: 1 for r in range(1, 11)},
+                          list(range(1, 11)), n_last=None)
+    before_x, before_p = mm["xmins"], mm["p_start_raw"]
+    out = xp.scale_p_start(mm, 0.5)
+    assert out["p_start_raw"] == pytest.approx(before_p * 0.5)
+    assert out["xmins"] < before_x, "minuutit eivat seuranneet aloitus-tn:aa"
+
+
+def test_structural_exponent_protects_nailed_starter():
+    """Leikkaus kohdistuu epavarmoihin, ei naulattuun avaajaan.
+
+    Tasainen kerroin vei 5.8. mittauksessa 15 min myos Chelsean naulatuilta
+    (Lacroix 86,7 -> 71,3), koska ylibuukkaus jaettiin tasan. p**k leikkaa
+    pienet jyrkasti ja saastaa suuret.
+    """
+    grp = [0.95, 0.90, 0.60, 0.55, 0.50, 0.45, 0.40]      # Sigma 4.35, slots 3
+    k = xp.structural_exponent(grp, 3.0)
+    scaled = [p ** k for p in grp]
+    assert sum(scaled) == pytest.approx(3.0, abs=1e-6)
+    # naulattu menettaa selvasti vahemman suhteessa kuin epavarma
+    nailed_loss = (grp[0] - scaled[0]) / grp[0]
+    fringe_loss = (grp[-1] - scaled[-1]) / grp[-1]
+    assert nailed_loss < fringe_loss / 2, (
+        f"naulattu menetti {nailed_loss:.1%}, epavarma {fringe_loss:.1%} — "
+        "leikkaus ei kohdistu epavarmuuteen"
+    )
+    # ja tasainen kerroin EI olisi tehnyt tata (negatiivinen kontrolli)
+    flat = 3.0 / sum(grp)
+    assert (grp[0] - grp[0] * flat) / grp[0] > nailed_loss
+
+
+def test_structural_exponent_noop_when_within_slots():
+    assert xp.structural_exponent([0.4, 0.3], 1.0) == 1.0
+    assert xp.structural_exponent([0.5, 0.5], 1.0) == 1.0
