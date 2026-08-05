@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-08-05T18:55:55",
+    "generated_at": "2026-08-05T16:28:33",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -1781,7 +1781,7 @@
       "predicted_starts": 85.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.7,
+      "owned_pct": 16.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9041,7 +9041,7 @@
       "predicted_starts": 87.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 4.1,
+      "owned_pct": 4.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -23005,7 +23005,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.1,
+      "owned_pct": 0.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -45402,7 +45402,7 @@
               "venue": "A"
             }
           ],
-          "xp": 0.77
+          "xp": 0.76
         },
         {
           "gw": 4,
@@ -54041,7 +54041,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 5.8,
+      "owned_pct": 5.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -59925,7 +59925,7 @@
       "team_short": "BOU",
       "pos": "MID",
       "price": 7.5,
-      "owned_pct": 5.5,
+      "owned_pct": 5.4,
       "status": "i",
       "news": "Foot injury - Unknown return date",
       "chance_next": 0,
@@ -61250,28 +61250,6 @@
       "excluded_reason": "unavailable"
     },
     {
-      "id": 310,
-      "web_name": "Matusiwa",
-      "full_name": "Azor Matusiwa",
-      "team": "Ipswich",
-      "team_short": "IPS",
-      "pos": "MID",
-      "price": 5.0,
-      "owned_pct": 0.1,
-      "status": "i",
-      "news": "Muscular injury - Unknown return date",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 409,
       "web_name": "Mukasa",
       "full_name": "Divine Mukasa",
@@ -61846,6 +61824,28 @@
       "owned_pct": 0.0,
       "status": "i",
       "news": "Knee injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
+      "id": 310,
+      "web_name": "Matusiwa",
+      "full_name": "Azor Matusiwa",
+      "team": "Ipswich",
+      "team_short": "IPS",
+      "pos": "MID",
+      "price": 5.0,
+      "owned_pct": 0.0,
+      "status": "i",
+      "news": "Muscular injury - Unknown return date",
       "chance_next": 0,
       "yellows": 0,
       "set_pieces": {

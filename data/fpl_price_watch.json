@@ -2,9 +2,9 @@
  "meta": {
   "product": "GoalIQ Fantasy - price watch",
   "available": true,
-  "generated_at": "2026-08-05T13:51:48Z",
-  "total_players": 2975832,
-  "n_players_scanned": 568,
+  "generated_at": "2026-08-05T16:28:33Z",
+  "total_players": 2996272,
+  "n_players_scanned": 570,
   "n_with_transfer_activity": 0,
   "disclaimer": "Estimated from FPL net-transfer velocity - FPL's exact price thresholds are not public. Model estimate, not a guarantee.",
   "note": "Pre-season: no transfer activity yet - price watch goes live when the FPL game opens."
@@ -287,6 +287,8 @@
   "270": 45,
   "271": 55,
   "272": 45,
+  "569": 60,
+  "570": 55,
   "273": 40,
   "274": 45,
   "275": 40,
