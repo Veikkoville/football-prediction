@@ -1,7 +1,7 @@
 {
  "meta": {
-  "source": "fpl_xp_backtest_2026-07-28.json",
-  "generated_at": "2026-07-28T21:53:08",
+  "source": "fpl_xp_backtest_2026-08-05.json",
+  "generated_at": "2026-08-05T20:19:29",
   "season": "2526",
   "method": "walk-forward backtest on the completed season; the model only ever saw gameweeks before the one it predicted",
   "population": "pelanneet (minuutit > 0)",
@@ -10,25 +10,25 @@
  "played": {
   "gw_range": "2-38",
   "n_gws": 37,
-  "mae_xp": 2.11,
+  "mae_xp": 2.122,
   "mae_baseline": 2.293,
-  "rho_xp": 0.339,
+  "rho_xp": 0.335,
   "rho_baseline": 0.275
  },
  "by_position": {
   "GKP": {
    "n": 715,
-   "mae_xp": 2.325,
+   "mae_xp": 2.355,
    "mae_baseline": 2.422
   },
   "DEF": {
    "n": 3691,
-   "mae_xp": 2.319,
+   "mae_xp": 2.338,
    "mae_baseline": 2.508
   },
   "MID": {
    "n": 4998,
-   "mae_xp": 1.922,
+   "mae_xp": 1.929,
    "mae_baseline": 2.123
   },
   "FWD": {
@@ -38,7 +38,7 @@
   }
  },
  "known_bias": {
-  "signed_bias_xp": -0.411,
+  "signed_bias_xp": -0.371,
   "note": "negative = the model under-predicts points on average; ranking is unaffected, absolute values run low"
  }
 }
