@@ -471,6 +471,14 @@ def depth_factor(group_p_starts: list[float], slots: float) -> float:
 # joten viiden puolustajan joukkue pysyy viiden puolustajan joukkueena.
 TEAM_GK_SLOTS = 1.0
 TEAM_OUTFIELD_SLOTS = 10.0
+# Naulatun avaajan suoja (Villen korjaus 5.8. illalla): kenttapelaajat
+# normalisoidaan yhtena ryhmana jottei muodostelmaa oleteta - mutta silloin
+# keskikentan ylibuukkaus vuotaa ykkoshyokkaajan minuutteihin. Haaland on
+# selkea ykkoshyokkaaja eika keskikenttakilpailu koske hanta. Siksi leikkaus
+# EI kosketa pelaajia joiden raaka start-share on yli taman: ylibuukkaus ei
+# koskaan synny naulatuista (heita mahtuu XI:hin enintaan 10) vaan siita etta
+# usea epavarma jakaa samat kiistanalaiset paikat. 0.85 ~ 32/38 starttia.
+NAILED_PROTECT_P_START = 0.85
 
 
 def structural_exponent(p_starts: list[float], slots: float,

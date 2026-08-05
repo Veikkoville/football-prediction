@@ -387,12 +387,26 @@ def main(argv: list[str] | None = None) -> int:
             if is_gk:
                 struct_before.append(tot)
             if tot > slots:
-                # Ylibuukattu: leikkaus painottuu epavarmoihin (p**k), ei
-                # tasaisesti — muuten naulattu avaaja maksaa ryhmansa syvyydesta.
-                k = xp.structural_exponent(ps, slots)
+                # Ylibuukattu: naulatut avaajat (raw >= NAILED_PROTECT) ovat
+                # koskemattomia — Villen korjaus 5.8: selkea ykkoshyokkaaja ei
+                # maksa keskikentan ruuhkasta. Leikkaus kohdistuu p**k:lla vain
+                # kiistanalaisiin paikkoihin (jaljelle jaavat slotit).
+                prot = [p for p in grp
+                        if mm_by_player[p]["p_start_raw"]
+                        >= xp.NAILED_PROTECT_P_START]
+                rest = [p for p in grp if p not in prot]
+                prot_sum = sum(mm_by_player[p]["p_start_raw"] for p in prot)
+                if prot_sum >= slots or not rest:
+                    # Degeneraatti (naulattuja enemman kuin paikkoja) ->
+                    # p**k koko ryhmalle; kaytannossa ei tapahdu.
+                    target, cut = grp, slots
+                else:
+                    target, cut = rest, slots - prot_sum
+                cps = [mm_by_player[p]["p_start_raw"] for p in target]
+                k = xp.structural_exponent(cps, cut)
                 if k > 1.0:
                     n_scaled += 1
-                    for p in grp:
+                    for p in target:
                         cur = mm_by_player[p]["p_start_raw"]
                         f = (cur ** k) / cur if cur > 0 else 1.0
                         mm_by_player[p] = xp.scale_p_start(mm_by_player[p], f)

@@ -567,3 +567,19 @@ def test_structural_exponent_protects_nailed_starter():
 def test_structural_exponent_noop_when_within_slots():
     assert xp.structural_exponent([0.4, 0.3], 1.0) == 1.0
     assert xp.structural_exponent([0.5, 0.5], 1.0) == 1.0
+
+
+def test_structural_pass_never_touches_nailed_starter():
+    """Villen korjaus 5.8: keskikentan ruuhka ei saa lyhentaa selkean
+    ykkoshyokkaajan minuutteja. Naulattu (raw >= NAILED_PROTECT_P_START) on
+    koskematon kun ylibuukkaus tulee muista; leikkaus osuu kiistanalaisiin."""
+    nailed = 0.92
+    fringe = [0.60, 0.55, 0.50, 0.45]           # kiistanalaiset
+    slots = 2.0                                  # naulattu + 1.08 muille
+    assert nailed >= xp.NAILED_PROTECT_P_START
+    cut = slots - nailed
+    k = xp.structural_exponent(fringe, cut)
+    scaled = [f ** k for f in fringe]
+    assert sum(scaled) == pytest.approx(cut, abs=1e-6)
+    # naulattu ei ole mukana leikkauksessa lainkaan -> summa = slots tasan
+    assert nailed + sum(scaled) == pytest.approx(slots, abs=1e-6)
