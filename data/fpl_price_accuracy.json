@@ -447,6 +447,78 @@
    "actual_fallers": 0,
    "risers_caught_any_tier": 0,
    "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-04T19:22:40Z",
+   "pred_at": "2026-08-04T16:48:23Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-04T22:07:10Z",
+   "pred_at": "2026-08-04T19:22:41Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-05T01:54:52Z",
+   "pred_at": "2026-08-04T22:07:10Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-05T05:40:46Z",
+   "pred_at": "2026-08-05T01:54:52Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-05T08:25:38Z",
+   "pred_at": "2026-08-05T05:40:46Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-05T11:14:52Z",
+   "pred_at": "2026-08-05T08:25:38Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
   }
  ]
 }
