@@ -414,6 +414,12 @@ export interface ValuePlayer {
 	value: number;
 	fixture_swing: number;
 	swing_label: 'steady' | 'moderate' | 'swingy';
+	/** 5.8: vauhti ja minuutit erikseen. `xp_per_90` on null kun odotettuja
+	 *  minuutteja on liian vähän jotta vauhti tarkoittaisi mitään — null ei ole
+	 *  sama asia kuin 0, ja UI:n on näytettävä ne eri tavalla. Defensiiviset:
+	 *  vanha payload ei tuo kumpaakaan. */
+	xmins?: number | null;
+	xp_per_90?: number | null;
 }
 
 export interface GkPair {

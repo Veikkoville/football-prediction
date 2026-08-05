@@ -37,8 +37,34 @@ SWING_HIGH_MIN = 1.2
 VALUE_NOTE = (
     "Value = model expected points over the horizon per million. Fixture swing "
     "= spread of per-gameweek xP (schedule volatility, not scoring variance). "
+    "Rate and minutes are shown separately: xP/90 is the scoring rate while on "
+    "the pitch, expected minutes is how much of a gameweek the model expects "
+    "the player to be on it. A high rate on low minutes is a bench risk, not a "
+    "bargain. "
     "Powered by the match model behind our published track record."
 )
+
+# xP/90 = pistevauhti kentällä, kun xp_per_gw sisältää jo minuuttiodotuksen.
+# Jakaja on xmins/90, joten pienillä minuuteilla luku räjähtää: xmins 3 tekisi
+# 0.2 xP/GW:sta 6.0 xP/90:n. Kynnys on mittausvalinta eikä kosmetiikkaa —
+# 4.8. mitattiin että virhe on horisontin funktio (vakiopelaaja +37,9 % 33 GW:n
+# päässä), ja sama epävarmuus koskee minuuttiodotusta. Alle kynnyksen luku on
+# kohinaa, ja kohinan julkaiseminen tarkkana lukuna on juuri se vikaluokka jota
+# tämä muutos korjaa → None, ei arvausta.
+PER90_MIN_XMINS = 15.0
+
+
+def _xp_per_90(xp_per_gw: float | None, xmins: float | None) -> float | None:
+    """Pistevauhti 90 pelattua minuuttia kohden, tai None jos minuutteja on
+    liian vähän jotta luku tarkoittaisi mitään."""
+    try:
+        rate = float(xp_per_gw or 0.0)
+        mins = float(xmins or 0.0)
+    except (TypeError, ValueError):
+        return None
+    if mins < PER90_MIN_XMINS:
+        return None
+    return round(rate * 90.0 / mins, 2)
 
 
 def _fixture_swing(gameweeks: list[dict]) -> float:
@@ -80,6 +106,12 @@ def value_list(top_n: int = 20) -> dict:
             "value": round(p["xp_horizon_total"] / price_m, 3),
             "fixture_swing": swing,
             "swing_label": _swing_label(swing),
+            # 5.8: vauhti ja minuutit erikseen. xp_per_gw kertoo nämä yhteen,
+            # ja se on juuri se yhdistetty luku jossa pettävä oletus (minuutit)
+            # jää piiloon. None = alle PER90_MIN_XMINS, ei "0.0".
+            "xmins": (round(float(p["xmins"]), 1)
+                      if p.get("xmins") is not None else None),
+            "xp_per_90": _xp_per_90(p.get("xp_per_gw"), p.get("xmins")),
         })
     rows.sort(key=lambda r: r["value"], reverse=True)
 

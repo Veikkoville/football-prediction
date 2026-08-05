@@ -166,3 +166,69 @@ def test_gk_meta_horizon_kertoo_cs_kattavuuden_ei_tiedoston_metaa(monkeypatch):
         "horizon_gw kertoo mita vastauksessa on, ei mita tiedoston metassa "
         f"lukee (sai {out['meta']['horizon_gw']}, gw_split on {len(split)})"
     )
+
+
+# ---------------------------------------------------------------------------
+# 5.8: vauhti ja minuutit erikseen (kausiprojektiomittauksen (b)-puolikas)
+# ---------------------------------------------------------------------------
+
+def test_xp_per_90_separates_rate_from_minutes(monkeypatch):
+    """Kaksi pelaajaa, SAMA xP/GW, eri minuutit → eri vauhti.
+
+    Tama on koko muutoksen syy: yhdistetty xP/GW ei erota pelaajaa joka on
+    hyva 45 minuuttia pelaajasta joka on keskinkertainen 90. Jos per-90 ei
+    erota naita, kentta ei kerro mitaan uutta ja muutos on turha.
+    """
+    pool = [
+        # 12 xP / 6 GW = 2.0 xP/GW taysilla minuuteilla → 2.0 xP/90
+        _pool_player(1, "FullGame", "AAA", 3, 60, 12.0, [2] * 6, xmins=90.0),
+        # sama 2.0 xP/GW mutta puolikkailla minuuteilla → 4.0 xP/90
+        _pool_player(2, "HalfGame", "BBB", 3, 60, 12.0, [2] * 6, xmins=45.0),
+    ]
+    monkeypatch.setattr(fv, "build_context", lambda: _ctx(pool))
+    rows = {r["web_name"]: r for r in fv.value_list()["players"]}
+
+    assert rows["FullGame"]["xp_per_90"] == pytest.approx(2.0)
+    assert rows["HalfGame"]["xp_per_90"] == pytest.approx(4.0)
+    assert rows["FullGame"]["xmins"] == 90.0
+    assert rows["HalfGame"]["xmins"] == 45.0
+    # value ja xP-summa ovat identtiset — ero nakyy VAIN uusissa kentissa
+    assert rows["FullGame"]["value"] == rows["HalfGame"]["value"]
+    assert rows["FullGame"]["xp_per_90"] != rows["HalfGame"]["xp_per_90"], (
+        "jos nama ovat samat, per-90 on johdettu xp_horizon_totalista eika "
+        "minuuteista, ja koko kentta on kosmetiikkaa"
+    )
+
+
+def test_xp_per_90_is_none_below_floor_not_zero(monkeypatch):
+    """Alle minuuttikynnyksen: None, EI 0.0 eika rajaton luku.
+
+    0.0 lukisi "ei tuota pisteita", mika on eri vaite kuin "emme tieda".
+    Kohinan julkaiseminen tarkkana lukuna on juuri se vikaluokka jota tama
+    muutos korjaa.
+    """
+    below = fv.PER90_MIN_XMINS - 0.1
+    pool = [
+        _pool_player(1, "Fringe", "AAA", 3, 45, 1.2, [0.2] * 6, xmins=below),
+        _pool_player(2, "AtFloor", "BBB", 3, 45, 6.0, [1.0] * 6,
+                     xmins=fv.PER90_MIN_XMINS),
+    ]
+    monkeypatch.setattr(fv, "build_context", lambda: _ctx(pool))
+    rows = {r["web_name"]: r for r in fv.value_list()["players"]}
+
+    assert rows["Fringe"]["xp_per_90"] is None
+    assert rows["Fringe"]["xmins"] == round(below, 1), (
+        "minuutit nakyvat silti — juuri ne kertovat miksi vauhtia ei ole"
+    )
+    # kynnys on inklusiivinen: tasan kynnyksella luku annetaan
+    assert rows["AtFloor"]["xp_per_90"] == pytest.approx(6.0)
+
+
+def test_value_note_says_rate_and_minutes_are_separate():
+    """Rehellisyyscaption kulkee payloadissa (sama kaava kuin swing-note).
+
+    Ilman tata kentta on kaksi lukua ilman lukuohjetta, ja "korkea vauhti
+    pienilla minuuteilla" luetaan loydoksi eika riskiksi.
+    """
+    assert "separately" in fv.VALUE_NOTE
+    assert "bench risk" in fv.VALUE_NOTE

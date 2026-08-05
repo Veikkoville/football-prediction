@@ -168,6 +168,16 @@
 						<th class="num">Price</th>
 						<th class="num"><abbr title="Projected xP per million over the horizon">Value</abbr></th>
 						<th class="num"><abbr title="Total projected points over the horizon">xP</abbr></th>
+						<th class="num"
+							><abbr title="Projected points per 90 minutes on the pitch. This is the rate, not the return: it does not assume the player starts."
+								>xP/90</abbr
+							></th
+						>
+						<th class="num"
+							><abbr title="Expected minutes per gameweek. A high rate on low minutes is a bench risk, not a bargain."
+								>Mins</abbr
+							></th
+						>
 						<th>Fixtures</th>
 						<th class="num">Owned</th>
 					</tr>
@@ -181,6 +191,22 @@
 							<td class="num">{p.price.toFixed(1)}</td>
 							<td class="num strong">{p.value.toFixed(2)}</td>
 							<td class="num">{p.xp_horizon_total.toFixed(1)}</td>
+							<td class="num">
+								{#if p.xp_per_90 == null}
+									<span class="muted" title="Too few expected minutes for a rate to mean anything"
+										>&ndash;</span
+									>
+								{:else}
+									{p.xp_per_90.toFixed(2)}
+								{/if}
+							</td>
+							<td class="num">
+								{#if p.xmins == null}
+									<span class="muted">&ndash;</span>
+								{:else}
+									{Math.round(p.xmins)}
+								{/if}
+							</td>
 							<td>{SWING_LABEL[p.swing_label] ?? p.swing_label}</td>
 							<td class="num">{p.owned_pct.toFixed(1)}%</td>
 						</tr>
@@ -190,6 +216,9 @@
 		</div>
 		<p class="muted note">
 			Fixture swing measures calendar difficulty variation over the horizon, not point variance.
+			xP/90 is the scoring rate while on the pitch and Mins is how much of a gameweek the model
+			expects the player to play. They are shown separately on purpose: xP already multiplies them
+			together, which hides the assumption most likely to break.
 		</p>
 	{/if}
 
