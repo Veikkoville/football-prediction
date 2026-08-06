@@ -314,7 +314,7 @@
 		</div>
 	{:else if segment === 'players'}
 		<div id="panel-players" role="tabpanel" aria-labelledby="seg-players">
-			<div class="onpage">
+			<div class="onpage" style="top: {segNavH}px">
 				<span class="muted">On this page:</span>
 				{#each [['pc-card', 'Player card'], ...(premium ? [['pc-captain', 'Captain ranker'], ['pc-swing', 'Fixture swing'], ['pc-xp', 'Player xP']] : []), ['pc-cs', 'Clean sheets'], ['pc-value', 'Value'], ['pc-leaders', 'Leaders'], ...(premium ? [['pc-diff', 'Differentials'], ['pc-compare', 'Compare']] : [])] as [id, label] (id)}
 					<button type="button" onclick={() => jumpTo(id)}>{label}</button>
