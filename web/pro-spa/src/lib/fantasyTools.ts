@@ -285,6 +285,13 @@ export interface ComparePlayer {
 	xp_horizon_total: number;
 	components: Record<string, number> | null;
 	components_gw: number | null;
+	/* 6.8 compare-V2: pelipaikkarelevantit raakastatit. Optionaaliset —
+	 * vanha deployattu backend ei lähetä → rivit jäävät pois, ei kaadu. */
+	xg90_prev?: number;
+	xa90_prev?: number;
+	prev_season?: string | null;
+	defcon_hit_rate_pct?: number | null;
+	defcon_dc_per_game?: number | null;
 }
 
 export interface CompareResponse {

@@ -952,6 +952,10 @@ def _projection_pool(xp_data: dict, price_by_id: dict[int, dict]) -> list[dict]:
             "minutes_confidence": p.get("minutes_confidence"),
             "components": p.get("components"),
             "components_gw": p.get("components_gw"),
+            # 6.8 compare-V2: xG/xA-raakastatit tulevat last_season-lohkosta ja
+            # sen ON kuljettava poolin mukana — pool muotoilee rivin uusiksi,
+            # joten kenttä joka ei ole tässä listassa katoaa äänettömästi.
+            "last_season": p.get("last_season"),
             # Addendum 2: projektiohetken FPL-status (serve-time-portin
             # vertailukohta). Vanha projektio ilman kenttaa -> None -> portti
             # kohtelee sita "a":na (sama kayttaytyminen kuin ennen).

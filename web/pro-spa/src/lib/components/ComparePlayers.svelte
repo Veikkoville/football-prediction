@@ -120,7 +120,71 @@
 							p.predicted_starts != null ? `${Math.round(p.predicted_starts)}%` : '-'
 						),
 						bestIndex: best(rows.map((p) => p.predicted_starts))
-					}
+					},
+					/* 6.8 V1 (Villen idea): pelipaikkakohtaiset rivit kun KAIKKI samaa
+					 * paikkaa. Luvut = xP-komponentit YHDELLE GW:lle (components_gw) —
+					 * EI per-GW-keskiarvo, siksi GW-numero labelissa (komponenttisumma
+					 * täsmää gameweeks[0].xp:hen, ei xp_per_gw:hen). Sama mobiilissa. */
+					...(new Set(rows.map((p) => p.pos)).size === 1 &&
+					rows.every((p) => p.components != null && p.components_gw != null)
+						? (
+								({
+									GKP: [
+										['saves', 'SAVES xP'],
+										['clean_sheet', 'CS xP']
+									],
+									DEF: [
+										['clean_sheet', 'CS xP'],
+										['defensive_contribution', 'DEFCON xP']
+									],
+									MID: [
+										['goals', 'GOALS xP'],
+										['assists', 'ASSISTS xP'],
+										['bonus', 'BONUS xP']
+									],
+									FWD: [
+										['goals', 'GOALS xP'],
+										['assists', 'ASSISTS xP'],
+										['bonus', 'BONUS xP']
+									]
+								}[rows[0].pos] ?? []) as [string, string][]
+							).map(([key, label]) => {
+								const vals = rows.map((p) => p.components?.[key] ?? 0);
+								return {
+									label: `${label} GW${rows[0].components_gw}`,
+									values: vals.map((v) => v.toFixed(2)),
+									bestIndex: best(vals)
+								};
+							})
+						: []),
+					/* V2: raakastatit backendista kun kaikilla on ne — DEF saa saman
+					 * DefCon hit-raten kuin leaders-lista, hyökkääjät xG/xA per 90
+					 * edelliskaudelta (kausi labelissa, ei myydä nykykautena). */
+					...(rows.every((p) => p.pos === 'DEF') &&
+					rows.every((p) => p.defcon_hit_rate_pct != null)
+						? [
+								{
+									label: 'DEFCON HIT',
+									values: rows.map((p) => `${Math.round(p.defcon_hit_rate_pct as number)}%`),
+									bestIndex: best(rows.map((p) => p.defcon_hit_rate_pct))
+								}
+							]
+						: []),
+					...(rows.every((p) => p.pos === 'MID' || p.pos === 'FWD') &&
+					rows.every((p) => p.xg90_prev != null)
+						? [
+								{
+									label: `xG/90 ${rows[0].prev_season ?? 'prev'}`,
+									values: rows.map((p) => (p.xg90_prev as number).toFixed(2)),
+									bestIndex: best(rows.map((p) => p.xg90_prev))
+								},
+								{
+									label: `xA/90 ${rows[0].prev_season ?? 'prev'}`,
+									values: rows.map((p) => (p.xa90_prev as number).toFixed(2)),
+									bestIndex: best(rows.map((p) => p.xa90_prev))
+								}
+							]
+						: [])
 				],
 				verdict: data.verdict.text
 			});
@@ -193,6 +257,14 @@
 							{/if}
 						</dd>
 					</div>
+					<!-- 6.8 V2: pelipaikkarelevantit raakastatit kun backend lähettää ne -->
+					{#if p.defcon_hit_rate_pct != null}
+						<div><dt>DefCon hit rate</dt><dd>{Math.round(p.defcon_hit_rate_pct)}%</dd></div>
+					{/if}
+					{#if p.xg90_prev != null}
+						<div><dt>xG per 90 ({p.prev_season ?? 'prev season'})</dt><dd>{p.xg90_prev.toFixed(2)}</dd></div>
+						<div><dt>xA per 90</dt><dd>{(p.xa90_prev ?? 0).toFixed(2)}</dd></div>
+					{/if}
 				</dl>
 				{#if p.components}
 					<h4 class="muted">GW{p.components_gw ?? ''} xP components</h4>

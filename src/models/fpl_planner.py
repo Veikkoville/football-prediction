@@ -411,12 +411,28 @@ def compare_players(player_ids: list[int]) -> dict:
     if len(set(player_ids)) != len(player_ids):
         raise RateTeamError(400, "compare IDs must be distinct.")
     xp_data, _bootstrap, _pool, pool_by_id = build_context()
+
+    # 6.8 compare-V2 (Villen idea): pelipaikkarelevantit RAAKAstatit xP-osuuksien
+    # rinnalle — DEF saa SAMAN DefCon hit-raten jota leaders-lista käyttää
+    # (rank_defcon_season, nimittäjä = startit), hyökkääjät xG/xA per 90
+    # edelliskaudelta. Defensiivinen: artefaktin puute ei kaada vertailua,
+    # mutta puute näkyy metassa (ei hiljaista katoamista).
+    dc_by_id: dict[int, dict] = {}
+    dc_basis_season = None
+    try:
+        from src.models.fpl_leaders import load_defcon_gw, rank_defcon_season
+        _dc = rank_defcon_season(load_defcon_gw(), pos=None, top_n=400)
+        dc_by_id = {r["id"]: r for r in _dc.get("players", [])}
+        dc_basis_season = _dc.get("meta", {}).get("basis_season")
+    except Exception:
+        pass
+
     rows = []
     for pid in player_ids:
         p = pool_by_id.get(pid)
         if p is None:
             raise RateTeamError(404, f"Player {pid} has no xP projection.")
-        rows.append({
+        row = {
             "id": p["id"], "web_name": p["web_name"],
             "team_short": p["team_short"], "pos": POS_NAME[p["element_type"]],
             "price": p["price"] / 10.0, "owned_pct": p["owned_pct"],
@@ -427,7 +443,20 @@ def compare_players(player_ids: list[int]) -> dict:
             "xp_horizon_total": round(p["xp_horizon_total"], 2),
             "components": p.get("components"),
             "components_gw": p.get("components_gw"),
-        })
+        }
+        ls = p.get("last_season") or {}
+        mins = ls.get("minutes") or 0
+        # 450 min alaraja: alle viiden pelin per-90 on kohinaa eikä sitä
+        # esitetä vertailulukuna (sama henki kuin leaders-poolisäännöissä).
+        if mins >= 450 and ls.get("xg") is not None:
+            row["xg90_prev"] = round(float(ls["xg"]) * 90.0 / mins, 2)
+            row["xa90_prev"] = round(float(ls.get("xa") or 0.0) * 90.0 / mins, 2)
+            row["prev_season"] = ls.get("season")
+        d = dc_by_id.get(p["id"])
+        if d is not None:
+            row["defcon_hit_rate_pct"] = d.get("hit_rate_pct")
+            row["defcon_dc_per_game"] = d.get("dc_per_game")
+        rows.append(row)
     ranked = sorted(rows, key=lambda r: r["xp_horizon_total"], reverse=True)
     margin = round(ranked[0]["xp_horizon_total"] - ranked[1]["xp_horizon_total"], 2)
     verdict = {
@@ -441,7 +470,11 @@ def compare_players(player_ids: list[int]) -> dict:
     }
     return {
         "meta": {"generated_at": xp_data["meta"].get("generated_at"),
-                 "horizon_gw": xp_data["meta"].get("horizon_gw")},
+                 "horizon_gw": xp_data["meta"].get("horizon_gw"),
+                 # V2: mistä raakastatit tulevat — frontend näyttää katteen
+                 # eikä myy edelliskauden lukua nykykauden mittauksena.
+                 "defcon_basis_season": dc_basis_season,
+                 "defcon_available": bool(dc_by_id)},
         "players": rows,
         "verdict": verdict,
     }
