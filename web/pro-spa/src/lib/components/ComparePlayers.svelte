@@ -160,14 +160,18 @@
 										['clean_sheet', 'CS xP'],
 										['defensive_contribution', 'DEFCON xP']
 									],
+									/* 6.8b (Ville): DefCon myös MID/FWD:lle — 12 CBIRT-kynnys
+									 * sisältää recoveryt ja leaders-listan kärkikin on MID. */
 									MID: [
 										['goals', 'GOALS xP'],
 										['assists', 'ASSISTS xP'],
+										['defensive_contribution', 'DEFCON xP'],
 										['bonus', 'BONUS xP']
 									],
 									FWD: [
 										['goals', 'GOALS xP'],
 										['assists', 'ASSISTS xP'],
+										['defensive_contribution', 'DEFCON xP'],
 										['bonus', 'BONUS xP']
 									]
 								}[rows[0].pos] ?? []) as [string, string][]
@@ -180,11 +184,10 @@
 								};
 							})
 						: []),
-					/* V2: raakastatit backendista kun kaikilla on ne — DEF saa saman
-					 * DefCon hit-raten kuin leaders-lista, hyökkääjät xG/xA per 90
-					 * edelliskaudelta (kausi labelissa, ei myydä nykykautena). */
-					...(rows.every((p) => p.pos === 'DEF') &&
-					rows.every((p) => p.defcon_hit_rate_pct != null)
+					/* V2: raakastatit backendista kun kaikilla on ne — DEFCON HIT näkyy
+					 * AINA kun jokaisella on hit rate (myös MID/FWD: 12 CBIRT sisältää
+					 * recoveryt; leaders-lista rankkaa samat positiot yhdessä). */
+					...(rows.every((p) => p.defcon_hit_rate_pct != null)
 						? [
 								{
 									label: 'DEFCON HIT',
