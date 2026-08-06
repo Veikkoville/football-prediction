@@ -20,6 +20,44 @@ export interface GiqSub {
 	current_period_end: string | null;
 }
 
+// P1-UX 6.8: viimeisin tunnettu sub-tila localStorageen ja optimistinen
+// render heti bootissa — sub-rivihaku Supabasesta on kylmällä yhteydellä
+// sekuntien RTT, ja tulos on lähes aina sama kuin edellisellä käynnillä.
+// Taustahaku (refreshSubscription) korjaa jos tila muuttui. Stale-premium
+// ei vuoda mitään: palvelin gateaa premium-datan access-tokenilla joka
+// tapauksessa, UI-lukot ovat vain esitystapa.
+const SUB_CACHE_KEY = 'giq:sub:v1';
+
+function readSubCache(userId: string): GiqSub | null | undefined {
+	try {
+		const raw = localStorage.getItem(SUB_CACHE_KEY);
+		if (!raw) return undefined;
+		const parsed = JSON.parse(raw) as { userId?: string; sub?: GiqSub | null };
+		// Cache on user-avaimellinen: toisen käyttäjän tila ei saa vuotaa
+		// jaetulla koneella käyttäjävaihdoksessa.
+		if (parsed.userId !== userId) return undefined;
+		return parsed.sub === undefined ? undefined : parsed.sub;
+	} catch {
+		return undefined;
+	}
+}
+
+function writeSubCache(userId: string, sub: GiqSub | null): void {
+	try {
+		localStorage.setItem(SUB_CACHE_KEY, JSON.stringify({ userId, sub }));
+	} catch {
+		/* private mode / quota: cache on vain optimointi */
+	}
+}
+
+function clearSubCache(): void {
+	try {
+		localStorage.removeItem(SUB_CACHE_KEY);
+	} catch {
+		/* noop */
+	}
+}
+
 // 'unknown' = alkutila ennen kuin getSession on ratkennut (ei väläytetä
 // login-formia kirjautuneelle); sub 'loading' vastaavasti.
 export const auth = $state({
@@ -51,10 +89,16 @@ function applySession(u: { id: string; email?: string | null } | null): void {
 	// koneella). Käyttäjävaihdos EI tarvitse invalidointia: cache on
 	// user-avaimellinen, ja boot-polulla (undefined → user) invalidointi
 	// aiheutti tuplahaun (draft ehti aloittaa ennen applySessionia).
-	if (!u && prevId) invalidateProfileRow();
+	if (!u && prevId) {
+		invalidateProfileRow();
+		clearSubCache();
+	}
 	if (u && u.id !== prevId) {
 		identifyUser(u.id, u.email);
-		auth.sub = undefined;
+		// P1-UX 6.8: cache-osuma renderöi entitlementin heti (premium-lohkot
+		// auki / paywall ilman "Checking subscription…" -odotusta); verkkohaku
+		// ajaa silti aina ja korjaa taustalla jos tila muuttui.
+		auth.sub = readSubCache(u.id);
 		void refreshSubscription();
 	}
 	if (!u) {
@@ -106,6 +150,9 @@ export async function setPassword(password: string): Promise<string | null> {
 export async function signOut(): Promise<void> {
 	await supabase.auth.signOut();
 	resetAnalytics();
+	// Eksplisiittinen clear: SIGNED_OUT-eventin applySession voi ajaa ennen
+	// kuin auth.user on nollattu tässä → prevId-ehto ei ole luotettava polku.
+	clearSubCache();
 	auth.user = null;
 	auth.sub = undefined;
 }
@@ -132,12 +179,15 @@ export async function refreshSubscription(): Promise<void> {
 		]);
 		if (rows && rows.length > 0) {
 			auth.sub = rows[0] as GiqSub;
-			return;
+		} else {
+			auth.sub =
+				prof && prof.length > 0 && prof[0].is_premium
+					? { status: 'active', plan: 'app', current_period_end: null }
+					: null;
 		}
-		auth.sub =
-			prof && prof.length > 0 && prof[0].is_premium
-				? { status: 'active', plan: 'app', current_period_end: null }
-				: null;
+		// Vain onnistunut haku päivittää cachen — virhepolku ei saa jäädyttää
+		// väärää tilaa levylle (#51-F2-periaate ulottuu cacheen).
+		writeSubCache(user.id, auth.sub ?? null);
 	} catch {
 		// #51-F2: transientti verkko/Supabase-virhe EI saa nollata premium-tilaa
 		// (maksaja näkisi hetkellisen väärän paywallin, Hub 2,0 -tähden
