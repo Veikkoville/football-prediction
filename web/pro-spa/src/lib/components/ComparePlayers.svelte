@@ -5,6 +5,9 @@
 		type CompareResponse,
 		type ComparePlayer
 	} from '$lib/fantasyTools';
+	import { capture } from '$lib/analytics';
+	import { teamColorByShort } from '$lib/teamColors';
+	import { canShareToApps, shareCompareCard } from '$lib/shareCard';
 
 	// Valinnat populoituvat jo ladatusta xP-datasta (sama prop kuin XpTable) -
 	// ei erillistä pelaajahakua eikä käsin syötettäviä ID:itä.
@@ -61,6 +64,71 @@
 			.filter(([, v]) => typeof v === 'number' && Math.abs(v) >= 0.005)
 			.sort(([, a], [, b]) => b - a);
 	}
+
+	/* 6.8 (Rowanin palaute): vertailun jakokortti — rivin paras xP/start-%
+	 * amberilla, hinta/omistus neutraaleina, mallin verdikti mukana. Sama
+	 * kortti shipattiin mobiiliin samana päivänä. */
+	let sharing = $state(false);
+	async function shareImage() {
+		if (sharing || !data) return;
+		sharing = true;
+		try {
+			const rows = data.players;
+			const best = (vals: (number | null | undefined)[]): number | null => {
+				const max = Math.max(...vals.map((v) => (v == null ? -Infinity : v)));
+				if (!Number.isFinite(max)) return null;
+				return vals.findIndex((v) => v === max);
+			};
+			const method = await shareCompareCard({
+				title: 'PLAYER COMPARISON',
+				subtitle: `next ${data.meta.horizon_gw ?? 6} gameweeks, GoalIQ match model`,
+				fileName: 'goaliq_player_comparison.png',
+				players: rows.map((p) => {
+					const tc = teamColorByShort(p.team_short);
+					return {
+						name: p.web_name,
+						team: p.team_short,
+						color: tc.color,
+						textColor: tc.textColor,
+						pos: p.pos
+					};
+				}),
+				stats: [
+					{
+						label: 'xP / GW',
+						values: rows.map((p) => p.xp_per_gw.toFixed(2)),
+						bestIndex: best(rows.map((p) => p.xp_per_gw))
+					},
+					{
+						label: `xP ${data.meta.horizon_gw ?? 6} GWS`,
+						values: rows.map((p) => p.xp_horizon_total.toFixed(1)),
+						bestIndex: best(rows.map((p) => p.xp_horizon_total))
+					},
+					{
+						label: 'PRICE',
+						values: rows.map((p) => p.price.toFixed(1)),
+						bestIndex: null
+					},
+					{
+						label: 'OWNED',
+						values: rows.map((p) => (p.owned_pct != null ? `${p.owned_pct.toFixed(1)}%` : '-')),
+						bestIndex: null
+					},
+					{
+						label: 'START %',
+						values: rows.map((p) =>
+							p.predicted_starts != null ? `${Math.round(p.predicted_starts)}%` : '-'
+						),
+						bestIndex: best(rows.map((p) => p.predicted_starts))
+					}
+				],
+				verdict: data.verdict.text
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'compare', method });
+		} finally {
+			sharing = false;
+		}
+	}
 </script>
 
 <h2>Compare players</h2>
@@ -94,7 +162,12 @@
 {#if error}
 	<p class="banner error">{error}</p>
 {:else if data}
-	<p class="verdict">{data.verdict.text}</p>
+	<div class="verdict-row">
+		<p class="verdict">{data.verdict.text}</p>
+		<button type="button" class="share-chip" onclick={shareImage} disabled={sharing}>
+			{sharing ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+		</button>
+	</div>
 	<div class="cmp-grid">
 		{#each data.players as p (p.id)}
 			<div class="card cmp-card" class:winner={p.id === data.verdict.pick.id}>
@@ -148,11 +221,36 @@
 		align-items: end;
 		margin-bottom: var(--s-4);
 	}
+	.verdict-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-3);
+		flex-wrap: wrap;
+	}
 	.verdict {
 		font-size: var(--step-1);
 		font-weight: 700;
 		color: var(--positive);
 		margin-bottom: var(--s-4);
+	}
+	/* sama chip kuin CaptainRankerissa (komponenttiscope → kopio) */
+	.share-chip {
+		flex: 0 0 auto;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: var(--step--1);
+		padding: 4px 12px;
+		cursor: pointer;
+		white-space: nowrap;
+		line-height: 1.4;
+	}
+	.share-chip:disabled {
+		opacity: 0.6;
+		cursor: default;
 	}
 	.cmp-grid {
 		display: grid;

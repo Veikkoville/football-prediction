@@ -103,8 +103,16 @@
 
 	/* Vain joukkueet joilla on mallinnettu CS% valitulla välillä. Kaukaisilla
 	 * kierroksilla avgCs on null (far_basis), eikä korttiin panna tyhjää
-	 * lukua eikä FDR:ää CS%:n paikalle. */
-	let shareRows = $derived(sortedTeams.filter((r) => r.a.avgCs != null).slice(0, 10));
+	 * lukua eikä FDR:ää CS%:n paikalle.
+	 * 6.8 laiteverify-pariteetti: kortin rivit AINA CS%-järjestyksessä UI-
+	 * sortista riippumatta — FDR-sortilla rank-numerot näyttivät CS-rankingilta
+	 * jossa 31 % oli sijalla 10 ja 35 % sijalla 4 = julkisena kuvana bugilta. */
+	let shareRows = $derived(
+		sortedTeams
+			.filter((r) => r.a.avgCs != null)
+			.toSorted((x, y) => (y.a.avgCs as number) - (x.a.avgCs as number))
+			.slice(0, 10)
+	);
 
 	async function shareCs() {
 		if (sharing || shareRows.length < 3) return;
@@ -113,6 +121,7 @@
 			const method = await shareCard({
 				title: 'CLEAN SHEET OUTLOOK',
 				subtitle: `GW${gwFrom} to GW${gwTo}, GoalIQ match model`,
+				nameLabel: 'TEAM',
 				midLabel: 'FDR',
 				valueLabel: 'CS%',
 				fileName: 'goaliq_clean_sheets.png',

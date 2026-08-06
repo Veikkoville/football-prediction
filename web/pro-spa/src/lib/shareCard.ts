@@ -31,6 +31,10 @@ export interface CardRow {
 export interface CardSpec {
 	title: string;
 	subtitle: string;
+	/** Nimisarakkeen otsikko — oletus PLAYER; joukkuetason lista (CS) antaa
+	 *  TEAM (6.8 laiteverify-pariteetti: PLAYER joukkuelistan päällä näytti
+	 *  virheeltä; sama korjaus mobiilissa). */
+	nameLabel?: string;
 	midLabel?: string;
 	valueLabel: string;
 	rows: CardRow[];
@@ -144,7 +148,7 @@ export async function renderCard(spec: CardSpec): Promise<Blob> {
 	// Sarakeotsikot
 	const fxRight = W - MX - 180;
 	ctx.font = med(19);
-	ctx.fillText('PLAYER', MX + 76, ROW_TOP - 34);
+	ctx.fillText(spec.nameLabel ?? 'PLAYER', MX + 76, ROW_TOP - 34);
 	if (spec.midLabel) {
 		ctx.fillText(spec.midLabel, fxRight - ctx.measureText(spec.midLabel).width, ROW_TOP - 34);
 	}
@@ -466,6 +470,188 @@ export async function renderPitchCard(spec: PitchCardSpec): Promise<Blob> {
 
 export async function sharePitchCard(spec: PitchCardSpec): Promise<ShareOutcome> {
 	const blob = await renderPitchCard(spec);
+	return deliver(blob, spec.fileName);
+}
+
+/* ---------- 6.8: vertailukortti (Rowanin palaute: "share a clean
+ * comparison card" — creator leikkasi vertailuja Snipping Toolilla).
+ * Sama kortti mobiilissa (FantasyCompareShareCard). Ei pelaajakuvia
+ * (Getty/PL-kuvaoikeudet) — kitit joukkueväreissä kuten pitch-kortissa. */
+
+export interface CompareCardPlayer {
+	name: string;
+	/** lyhytkoodi paitaan, esim. "ARS" */
+	team: string;
+	color: string;
+	textColor: string;
+	pos: string;
+}
+
+export interface CompareCardStat {
+	label: string;
+	values: string[];
+	/** rivin "paras" sarake amberilla; null = neutraali rivi (esim. hinta) */
+	bestIndex?: number | null;
+}
+
+export interface CompareCardSpec {
+	title: string;
+	subtitle: string;
+	players: CompareCardPlayer[];
+	stats: CompareCardStat[];
+	/** mallin suora kanta (backend-generoitu EN-verdikti) */
+	verdict?: string;
+	fileName: string;
+}
+
+function wrapLines(
+	ctx: CanvasRenderingContext2D,
+	text: string,
+	font: string,
+	maxW: number
+): string[] {
+	ctx.font = font;
+	const words = text.split(/\s+/);
+	const lines: string[] = [];
+	let cur = '';
+	for (const w of words) {
+		const cand = cur ? `${cur} ${w}` : w;
+		if (ctx.measureText(cand).width <= maxW || !cur) cur = cand;
+		else {
+			lines.push(cur);
+			cur = w;
+		}
+	}
+	if (cur) lines.push(cur);
+	return lines;
+}
+
+export async function renderCompareCard(spec: CompareCardSpec): Promise<Blob> {
+	await Promise.all([
+		document.fonts.load(bold(60)),
+		document.fonts.load(bold(30)),
+		document.fonts.load(med(20))
+	]).catch(() => undefined);
+	const wm = await loadWordmark();
+
+	const n = Math.max(1, spec.players.length);
+	const HEAD_TOP = 356;
+	const HEAD_H = 190;
+	const ROW_H2 = 64;
+	const statsTop = HEAD_TOP + HEAD_H;
+	const verdictTop = statsTop + spec.stats.length * ROW_H2 + 28;
+
+	// Verdiktin korkeus lasketaan rivityksestä ennen canvasin mitoitusta.
+	const probe = document.createElement('canvas').getContext('2d');
+	const verdictLines = spec.verdict && probe
+		? wrapLines(probe, spec.verdict, med(22), W - 2 * MX - 48)
+		: [];
+	const verdictH = verdictLines.length > 0 ? 62 + verdictLines.length * 30 : 0;
+	const H = verdictTop + verdictH + FOOT_H;
+
+	const canvas = document.createElement('canvas');
+	canvas.width = W;
+	canvas.height = H;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('canvas 2d context unavailable');
+	ctx.textBaseline = 'top';
+
+	const g = ctx.createLinearGradient(0, 0, 0, H);
+	g.addColorStop(0, INK);
+	g.addColorStop(1, INK2);
+	ctx.fillStyle = g;
+	ctx.fillRect(0, 0, W, H);
+
+	if (wm) {
+		const wmH = 84;
+		const wmW = Math.round((wm.width * wmH) / wm.height);
+		ctx.drawImage(wm, (W - wmW) / 2, 64, wmW, wmH);
+	}
+	ctx.fillStyle = AMBER;
+	ctx.beginPath();
+	ctx.roundRect((W - 120) / 2, 176, 120, 6, 3);
+	ctx.fill();
+	ctx.font = bold(60);
+	ctx.fillStyle = CREAM;
+	ctx.fillText(spec.title, (W - ctx.measureText(spec.title).width) / 2, 226);
+	ctx.font = med(22);
+	ctx.fillStyle = MUTED;
+	ctx.fillText(spec.subtitle, (W - ctx.measureText(spec.subtitle).width) / 2, 306);
+
+	// Pelaajasarakkeet: label-kaista vasemmalla, loput jaetaan tasan
+	const LABEL_W = 250;
+	const colW = (W - 2 * MX - LABEL_W) / n;
+	const colX = (i: number) => MX + LABEL_W + colW * i + colW / 2;
+	const KIT = 84;
+	for (let i = 0; i < n; i++) {
+		const p = spec.players[i];
+		const cx = colX(i);
+		drawKit(ctx, p, cx - KIT / 2, HEAD_TOP, KIT);
+		const nPx = shrink(ctx, p.name, 26, colW - 16, 16, bold);
+		ctx.font = bold(nPx);
+		ctx.fillStyle = CREAM;
+		ctx.fillText(p.name, cx - ctx.measureText(p.name).width / 2, HEAD_TOP + KIT + 16);
+		ctx.font = med(18);
+		ctx.fillStyle = MUTED;
+		ctx.fillText(p.pos, cx - ctx.measureText(p.pos).width / 2, HEAD_TOP + KIT + 52);
+	}
+
+	// Statirivit: hiusviiva ylle, label vasemmalle, arvot sarakkeisiin
+	for (let r = 0; r < spec.stats.length; r++) {
+		const s = spec.stats[r];
+		const y = statsTop + r * ROW_H2;
+		ctx.strokeStyle = LINE;
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.moveTo(MX, y);
+		ctx.lineTo(W - MX, y);
+		ctx.stroke();
+		ctx.font = med(19);
+		ctx.fillStyle = MUTED;
+		ctx.fillText(s.label, MX, y + ROW_H2 / 2 - 10);
+		for (let i = 0; i < n; i++) {
+			const v = s.values[i] ?? '';
+			ctx.font = bold(30);
+			ctx.fillStyle = s.bestIndex === i ? AMBER : CREAM;
+			ctx.fillText(v, colX(i) - ctx.measureText(v).width / 2, y + ROW_H2 / 2 - 16);
+		}
+	}
+
+	// Verdikti: amber-kehys + "THE MODEL SAYS" — kortti on kannanotto,
+	// ei pelkkä taulukko.
+	if (verdictLines.length > 0) {
+		ctx.strokeStyle = AMBER;
+		ctx.lineWidth = 2;
+		ctx.strokeRect(MX, verdictTop, W - 2 * MX, verdictH - 14);
+		ctx.font = bold(18);
+		ctx.fillStyle = AMBER;
+		ctx.fillText('THE MODEL SAYS', MX + 24, verdictTop + 18);
+		ctx.font = med(22);
+		ctx.fillStyle = CREAM;
+		for (let i = 0; i < verdictLines.length; i++) {
+			ctx.fillText(verdictLines[i], MX + 24, verdictTop + 50 + i * 30);
+		}
+	}
+
+	ctx.font = med(20);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.font = bold(20);
+	ctx.fillStyle = AMBER;
+	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
+	ctx.font = med(17);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('model projections, not betting advice', MX, H - 54);
+	ctx.fillStyle = AMBER;
+	ctx.fillRect(0, H - 8, W, 8);
+
+	return new Promise<Blob>((resolve, reject) => {
+		canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('canvas toBlob failed'))), 'image/png');
+	});
+}
+
+export async function shareCompareCard(spec: CompareCardSpec): Promise<ShareOutcome> {
+	const blob = await renderCompareCard(spec);
 	return deliver(blob, spec.fileName);
 }
 
