@@ -510,6 +510,15 @@
 		gap: var(--s-1) var(--s-3);
 		font-size: var(--step--1);
 		margin: 0 0 var(--s-3);
+		/* 6.8 (Villen palaute, sama kuin mobiilissa): rivi pysyy näkyvissä
+		   scrollatessa — työkalusta toiseen ilman paluuta ylös. Tausta
+		   peittää alle jäävän sisällön, hiusviiva erottaa. */
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: var(--bg);
+		padding: var(--s-2) 0;
+		border-bottom: 1px solid var(--border);
 	}
 	.onpage button {
 		background: none;
