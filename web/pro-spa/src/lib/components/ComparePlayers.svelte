@@ -40,6 +40,18 @@
 			(a, b) => a.web_name.localeCompare(b.web_name) || a.team_short.localeCompare(b.team_short)
 		)
 	);
+	/* 6.8 (Villen palaute): select → hakukenttä. 500+ pelaajan alasvetovalikko
+	 * on kivulias; datalist antaa selaimen oman haun ilman riippuvuuksia.
+	 * Label → id -kartta; törmäys (sama nimi+klubi+pos) on käytännössä
+	 * mahdoton, ja jos tulee, viimeinen voittaa (ei kaadu). */
+	const optionLabel = (p: (typeof options)[number]) =>
+		`${p.web_name} (${p.team_short}, ${p.pos})`;
+	let byLabel = $derived(new Map(options.map((p) => [optionLabel(p), p.id])));
+	let texts = $state<string[]>(['', '', '', '']);
+	function onPickInput(i: number, value: string) {
+		texts[i] = value;
+		ids[i] = byLabel.get(value) ?? null;
+	}
 	/** Valitut, jarjestys sailyttaen ja tyhjat pois. */
 	let picked = $derived(ids.filter((v): v is number => v != null));
 	let hasDupes = $derived(new Set(picked).size !== picked.length);
@@ -108,6 +120,17 @@
 						label: 'PRICE',
 						values: rows.map((p) => p.price.toFixed(1)),
 						bestIndex: null
+					},
+					/* 6.8 (Ville): VALUE tekee hinnasta kannanoton — xP koko
+					 * horisontilta per miljoona. Tälle amber kuuluu. */
+					{
+						label: 'xP / £m',
+						values: rows.map((p) =>
+							p.price > 0 ? (p.xp_horizon_total / p.price).toFixed(2) : '-'
+						),
+						bestIndex: best(
+							rows.map((p) => (p.price > 0 ? p.xp_horizon_total / p.price : null))
+						)
 					},
 					{
 						label: 'OWNED',
@@ -202,17 +225,25 @@
 </p>
 
 <form class="cmp-form" onsubmit={compare}>
+	<datalist id="cmp-player-options">
+		{#each options as p (p.id)}
+			<option value={optionLabel(p)}></option>
+		{/each}
+	</datalist>
 	{#each [0, 1, 2, 3] as i (i)}
 		<div>
 			<label for="cmp-{i}">
 				Player {i + 1}{i > 1 ? ' (optional)' : ''}
 			</label>
-			<select id="cmp-{i}" bind:value={ids[i]}>
-				<option value={null}>{i > 1 ? 'None' : 'Select a player'}</option>
-				{#each options as p (p.id)}
-					<option value={p.id}>{p.web_name} ({p.team_short}, {p.pos})</option>
-				{/each}
-			</select>
+			<input
+				id="cmp-{i}"
+				list="cmp-player-options"
+				type="text"
+				autocomplete="off"
+				placeholder={i > 1 ? 'Type to search (optional)' : 'Type to search'}
+				value={texts[i]}
+				oninput={(e) => onPickInput(i, e.currentTarget.value)}
+			/>
 		</div>
 	{/each}
 	<button class="primary" type="submit" disabled={!ready || loading}>
