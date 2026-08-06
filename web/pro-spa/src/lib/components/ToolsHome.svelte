@@ -91,6 +91,8 @@
 	};
 
 	let segment = $state('week');
+	/** 6.8: sticky-segmenttirivin mitattu korkeus → onpage-rivin top-offset. */
+	let segNavH = $state(0);
 	let upgradeOpen = $state(false);
 	let checkoutSuccess = $state(false);
 	let guestCheckout = $state(false);
@@ -268,7 +270,12 @@
 	     aikakriittinen eikä saa olla välilehden takana. Renderöi tyhjää aina
 	     kun kierros ei ole käynnissä, joten esikaudella tämä ei näy. -->
 	<DefConLive />
-	<SegmentNav segments={GROUPS} bind:active={segment} label="GoalIQ FPL tools" />
+	<!-- 6.8 (Villen palaute): segmenttirivi kulkee scrollissa mukana —
+	     Players → My team ilman paluuta ylös. Korkeus mitataan, jotta
+	     onpage-rivi osaa asettua sen ALLE myös kun pillit rivittyvät. -->
+	<div class="segnav-sticky" bind:clientHeight={segNavH}>
+		<SegmentNav segments={GROUPS} bind:active={segment} label="GoalIQ FPL tools" />
+	</div>
 
 	{#if segment === 'week' || segment === 'team'}
 		<!-- week + team jakavat SAMAN RateTeam-elementin (sama puupositio →
@@ -278,7 +285,7 @@
 				<!-- 30.7 (Villen palaute: "fit checker yms hukkuu"): ryhmän
 				     sisällys ankkuririvinä heti nauhan alle — pitkä scroll ei
 				     saa piilottaa työkalun olemassaoloa. -->
-				<div class="onpage">
+				<div class="onpage" style="top: {segNavH}px">
 					<span class="muted">On this page:</span>
 					{#each [['tc-rate', 'Rate my team'], ['tc-fit', 'Fit checker'], ...(premium ? [['tc-planner', 'Transfer planner']] : []), ['tc-watchlist', 'Watchlist']] as [id, label] (id)}
 						<button type="button" onclick={() => jumpTo(id)}>{label}</button>
@@ -511,14 +518,20 @@
 		font-size: var(--step--1);
 		margin: 0 0 var(--s-3);
 		/* 6.8 (Villen palaute, sama kuin mobiilissa): rivi pysyy näkyvissä
-		   scrollatessa — työkalusta toiseen ilman paluuta ylös. Tausta
-		   peittää alle jäävän sisällön, hiusviiva erottaa. */
+		   scrollatessa — työkalusta toiseen ilman paluuta ylös. top tulee
+		   inline-tyylistä (mitattu segnav-korkeus → asettuu sen alle). */
 		position: sticky;
-		top: 0;
 		z-index: 10;
 		background: var(--bg);
 		padding: var(--s-2) 0;
 		border-bottom: 1px solid var(--border);
+	}
+	/* 6.8: ylätabit mukaan scrolliin — Players → My team ilman paluuta ylös */
+	.segnav-sticky {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		background: var(--bg);
 	}
 	.onpage button {
 		background: none;
