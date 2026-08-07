@@ -38,6 +38,12 @@ raw_data/
 !/data/accuracy.json
 # FPL Phase 0 -projektio: ajastettu refresh ylläpitää, Render lukee gitistä (/api/fantasy).
 !/data/fpl_projections_phase0.json
+# SPL-fantasy Phase 0 (7.8): vendoroitu tuloshistoria (ESPN, DC-priorifitti)
+# + baked output. Sama !-kuvio kuin FPL:ssä — ilman näitä builderi toimisi
+# vain kehityskoneella ja endpoint 503:aisi tuotannossa.
+!/data/spl_results.csv
+!/data/spl_results.README.md
+!/data/spl_projections_phase0.json
 # xP-backtestin tiiviste (26.7): rate-team-selite kertoo projektioiden
 # osuvuuden, ja taysi raportti on logs/-alla gitignorattuna -> Render lukee taman.
 !/data/fpl_xp_accuracy.json
