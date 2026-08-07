@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saudi Pro League Fantasy Tools: Free xP, Clean Sheets and FDR | GoalIQ</title>
+<meta name="description" content="Free model-based tools for RSL Fantasy, the official Saudi Pro League fantasy game: expected points per player, clean sheet odds and fixture difficulty from an independent match model. No login, no paywall." />
+<link rel="canonical" href="https://goaliq.app/spl" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
+
+<!-- Open Graph / social preview -->
+<meta property="og:title" content="Saudi Pro League Fantasy Tools, free | GoalIQ" />
+<meta property="og:description" content="The first model-based xP for RSL Fantasy: expected points, clean sheet odds and fixture difficulty. Completely free." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://goaliq.app/spl" />
+<meta property="og:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@goaliqapp" />
+<meta name="twitter:image" content="https://goaliq.app/assets/brand/goaliq-social-1200x630.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<meta name="theme-color" content="#0B0A09">
+<link rel="preconnect" href="https://pro.goaliq.app">
+
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only',capture_pageview:true});
+posthog.register({platform:'web',source_app:'goaliq-static'});
+posthog.capture('web_landing_viewed',{page:location.pathname});
+</script>
+
+<!-- 2.8-konventio: pro.goaliq.app-linkkeihin src/srcp-lahdetagit (sama snippet
+     kuin muilla staattisilla sivuilla) -->
+<script>
+addEventListener('DOMContentLoaded',function(){
+  for (const a of document.querySelectorAll('a[href^="https://pro.goaliq.app"]')) {
+    try {
+      const u = new URL(a.href);
+      if (u.hostname !== 'pro.goaliq.app' || u.searchParams.has('src')) continue;
+      u.searchParams.set('src', a.dataset.cta || 'spl-page');
+      u.searchParams.set('srcp', 'spl');
+      a.href = u.toString();
+    } catch {}
+  }
+});
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "GoalIQ Saudi Pro League Fantasy Tools",
+  "url": "https://pro.goaliq.app/spl",
+  "applicationCategory": "SportsApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "description": "Free model-based tools for RSL Fantasy (Saudi Pro League): expected points per player per gameweek, clean sheet probability and fixture difficulty from an independent Dixon-Coles match model.",
+  "publisher": { "@type": "Organization", "name": "GoalIQ", "url": "https://goaliq.app" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is GoalIQ's Saudi Pro League fantasy tool free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, completely free. No account, no login, no paywall. Expected points, clean sheet odds and fixture difficulty for RSL Fantasy are open to everyone at pro.goaliq.app/spl." }
+    },
+    {
+      "@type": "Question",
+      "name": "What data does the SPL model use?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Team strengths come from a goals-based Dixon-Coles model fitted on two seasons of Saudi Pro League results. Player projections use realized goal and assist rates with RSL Fantasy's own scoring rules, and minutes are estimated from last season's aggregate playing time. No public per-match xG feed exists for the SPL, and the tool labels say so." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is GoalIQ affiliated with the Saudi Pro League?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. GoalIQ is an independent data tool and is not affiliated with, endorsed by, or paid by the Saudi Pro League, the RSL Fantasy game, or any club." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does GoalIQ also cover Fantasy Premier League?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The same match model runs a full FPL toolkit with free tools and a Premium tier, including expected points with a public accuracy log, a transfer planner and a captain ranker." }
+    }
+  ]
+}
+</script>
+
+<style>
+  :root {
+    --amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;
+    --bg: #0B0A09; --bg-alt: #1F1D1A; --card: #141311;
+    --ink: #F3F2F2; --line: rgba(243,242,242,0.24);
+    --text: #F3F2F2; --muted: #A8A29A;
+    --teal: #2ED6C2; --teal-ink: #2ED6C2; --radius: 2px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: clip; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .btn { font-family: "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  a { color: var(--teal-ink); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
+  header.hero { border-bottom: 6px solid var(--amber); padding: 48px 0 32px; }
+  h1 { font-size: clamp(24px, 4vw, 40px); line-height: 1.2; }
+  h1 .accent { color: var(--amber); }
+  .lede { margin-top: 14px; color: var(--muted); max-width: 60ch; }
+  .free-tag { display:inline-block; border:1px solid var(--teal); color: var(--teal);
+    padding: 2px 10px; font-size: 13px; margin-top: 14px; }
+  .btn { display: inline-block; background: var(--amber); color: #0B0A09;
+    padding: 12px 22px; text-decoration: none; font-weight: 700; border-radius: var(--radius);
+    margin-top: 22px; }
+  .btn:hover { filter: brightness(1.08); }
+  section { margin-top: 44px; }
+  h2 { font-size: clamp(18px, 2.6vw, 26px); margin-bottom: 12px; }
+  ul { padding-left: 20px; color: var(--muted); }
+  li { margin: 6px 0; }
+  li strong { color: var(--text); }
+  .card { background: var(--card); border: 1px solid var(--line); padding: 20px; margin-top: 14px; }
+  .disclaimer { border-left: 3px solid var(--amber); }
+  .disclaimer p { color: var(--muted); font-size: 14px; }
+  .disclaimer p + p { margin-top: 10px; }
+  footer { border-top: 1px solid var(--line); margin-top: 60px; padding-top: 18px;
+    font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Saudi Pro League <span class="accent">fantasy tools</span></h1>
+  <p class="lede">Expected points, clean sheet odds and fixture difficulty for
+  <strong>RSL Fantasy</strong>, the official Saudi Pro League fantasy game.
+  Built on an independent match model, using the game's own scoring rules.
+  As far as we know, the first model-based xP for this game anywhere.</p>
+  <span class="free-tag">Completely free · no login</span>
+  <div>
+    <a class="btn" href="https://pro.goaliq.app/spl" data-cta="spl-hero">Open the SPL tools &#9656;</a>
+  </div>
+</header>
+
+<section>
+  <h2>What you get</h2>
+  <ul>
+    <li><strong>Expected points (xP)</strong> per player per gameweek, next six gameweeks, scored with RSL Fantasy's actual rules: goals worth 5 or 6 by position, clean sheets 5/4/1, saves, tackles, defensive actions, shots on target, big chances and passes.</li>
+    <li><strong>Clean sheet probability</strong> for every team and fixture, from the match model's score matrix.</li>
+    <li><strong>Model fixture difficulty (FDR)</strong>, 1 to 5, derived from win odds and expected goals conceded, independent of any official difficulty rating.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="card disclaimer">
+    <p><strong>Independent, and stated plainly:</strong> GoalIQ is not affiliated
+    with, endorsed by, or paid by the Saudi Pro League, the RSL Fantasy game, or
+    any club. These tools are free, so nobody is paying us to cover this league,
+    including you.</p>
+    <p><strong>Data basis:</strong> team strengths come from a goals-based
+    Dixon-Coles model fitted on two seasons of SPL results. No public per-match
+    xG feed exists for this league, so player attack projections use realized
+    goal and assist rates, and minutes are estimated from season-aggregate
+    playing time. This is coarser than our FPL pipeline and the confidence
+    labels on the tool say exactly that.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Play FPL too?</h2>
+  <p style="color:var(--muted)">The same match model runs our full
+  <a href="/fpl.html">FPL toolkit</a>: free clean sheet and FDR tools, plus
+  Premium with expected points backed by a
+  <a href="/predictions">public accuracy log</a>, a transfer planner and a
+  captain ranker.</p>
+</section>
+
+<footer>
+  <p>GoalIQ · independent football data tools ·
+  <a href="/">Home</a> · <a href="/fpl.html">FPL tools</a> ·
+  <a href="/privacy.html">Privacy</a></p>
+</footer>
+
+</div>
+</body>
+</html>

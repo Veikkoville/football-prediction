@@ -13,6 +13,13 @@
 <div class="shell">
 	<Hero onUpgrade={() => upgradeSignal++} />
 
+	<!-- SPL-nosto (7.8): footer-linkki ei riitä löydettävyyteen (sama oppi
+	     kuin career-kortissa: haudattu linkki = ei käyttäjiä). Yksi hillitty
+	     rivi heron alla — SPL-sisältö itse pysyy omalla reitillään. -->
+	<p class="spl-note">
+		New: <a href="/spl">Saudi Pro League fantasy tools</a>, completely free.
+	</p>
+
 	<main>
 		<ToolsHome {upgradeSignal} />
 	</main>
@@ -43,6 +50,13 @@
 	}
 	footer {
 		margin-top: var(--s-12);
+	}
+	.spl-note {
+		border: 1px solid var(--border);
+		border-left: 3px solid var(--accent);
+		padding: var(--s-2) var(--s-3);
+		margin: var(--s-3) 0 0;
+		font-size: 0.9em;
 	}
 	hr {
 		border: none;
