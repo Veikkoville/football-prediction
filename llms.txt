@@ -40,8 +40,8 @@
 ## FPL Career Card (free tool)
 - [FPL Career Card](https://goaliq.app/career): turn any public FPL entry ID into a shareable career card - best season, all-time points and rank history, plus a GoalIQ model read on the squad in season. Free, no login.
 
-## Saudi Pro League fantasy tools (free, web)
-- [SPL fantasy tools](https://pro.goaliq.app/spl): model-based tools for RSL Fantasy, the official Saudi Pro League fantasy game - clean sheet odds, model fixture difficulty, expected points per gameweek using RSL Fantasy's own scoring rules, captain picks, an optimized model squad (100.0m budget, RSL squad rules), value per million and differential rankings, last season's leaders and a player comparison tool. Completely free, no login. Overview page: https://goaliq.app/spl
+## Saudi Pro League fantasy tools (free, web + app)
+- [SPL fantasy tools](https://pro.goaliq.app/spl): model-based tools for RSL Fantasy, the official Saudi Pro League fantasy game - clean sheet odds, model fixture difficulty, expected points per gameweek using RSL Fantasy's own scoring rules, captain picks, an optimized model squad (100.0m budget, RSL squad rules), value per million and differential rankings, last season's leaders and a player comparison tool. Completely free, no login. Also available in the GoalIQ app on iOS and Android. Overview page: https://goaliq.app/spl
 - Data basis, stated plainly: team strengths come from a goals-based Dixon-Coles model fitted on two seasons of SPL results (no per-match xG feed exists for this league), and player minutes are estimated from season-aggregate playing time, so projections are coarser than GoalIQ's FPL pipeline and are labeled accordingly.
 - GoalIQ is an independent data tool and is not affiliated with, endorsed by, or paid by the Saudi Pro League, the RSL Fantasy game, or any club.
 

@@ -493,6 +493,12 @@
 
 	<footer>
 		<hr />
+		<!-- Copy-sync 7.8 (OTA #3): SPL on nyt myös mobiilissa. -->
+		<p class="muted">
+			Also in the GoalIQ app:
+			<a href="https://apps.apple.com/app/id6780047163">iOS</a> ·
+			<a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Android</a>
+		</p>
 		<p class="muted">{DISCLAIMER} · <a href="https://goaliq.app/privacy.html">Privacy</a></p>
 	</footer>
 </div>
