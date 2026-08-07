@@ -34,6 +34,12 @@ import config
 
 XP_PATH = config.DATA_DIR / "fpl_xp_projections.json"
 
+# SPL-fantasy (7.8): sama serving-polku, eri projektio — /api/fantasy/xp?league=spl.
+# Builderi: scripts/build_spl_xp.py (RSL-pisteytys, src/models/spl_xp.py).
+# Sama ei-fallback-periaate kuin fpl_phase0.PHASE0_PATHS: tuntematon avain = 404.
+SPL_XP_PATH = config.DATA_DIR / "spl_xp_projections.json"
+XP_PATHS = {"fpl": XP_PATH, "spl": SPL_XP_PATH}
+
 # ---------------------------------------------------------------------------
 # FPL 25/26 -pistesäännöt
 # ---------------------------------------------------------------------------

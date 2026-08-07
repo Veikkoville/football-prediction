@@ -14,6 +14,13 @@ import config
 
 PHASE0_PATH = config.DATA_DIR / "fpl_projections_phase0.json"
 
+# SPL-fantasy (7.8): sama skeema, eri liiga — /api/fantasy?league=spl.
+# Builderi: scripts/build_spl_phase0.py. Tuntematon liiga-avain EI osu tähän
+# mappiin ja endpoint palauttaa 404:n (ei hiljaista fallbackia FPL-dataan —
+# väärän liigan data näyttäisi oikealta ja menisi portteista läpi).
+SPL_PHASE0_PATH = config.DATA_DIR / "spl_projections_phase0.json"
+PHASE0_PATHS = {"fpl": PHASE0_PATH, "spl": SPL_PHASE0_PATH}
+
 
 def empty_phase0() -> dict:
     """Runko kun projektiota ei ole vielä committattu — appi näyttää

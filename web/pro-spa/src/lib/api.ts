@@ -256,6 +256,33 @@ export async function fetchXp(): Promise<XpResponse> {
 }
 
 // ---------------------------------------------------------------------------
+// SPL (RSL Fantasy, 7.8): sama payload-skeema kuin FPL, league=spl-avaimella.
+// Oma /spl-reitti hakee nämä — FPL-polut ja -cachet eivät muutu.
+// data_basis on SPL:ssä 'spl_history' | 'no_history' (tyyppiunioni alla ei
+// kata sitä; SPL-sivu lukee kentän löyhästi eikä FPL-koodi näe SPL-rivejä).
+// ---------------------------------------------------------------------------
+let splFantasyP: Promise<FantasyResponse> | null = null;
+let splXpP: Promise<XpResponse> | null = null;
+let splXpAuthed = false;
+
+export function fetchSplFantasy(): Promise<FantasyResponse> {
+	splFantasyP ??= getJson<FantasyResponse>('/api/fantasy?league=spl&horizon=all');
+	return splFantasyP;
+}
+
+export async function fetchSplXp(): Promise<XpResponse> {
+	const headers = await authHeaders();
+	const hasToken = 'Authorization' in headers;
+	if (splXpP && (splXpAuthed || !hasToken)) return splXpP;
+	splXpAuthed = hasToken;
+	splXpP = fetch(`${API_BASE}/api/fantasy/xp?league=spl`, { headers }).then((r) => {
+		if (!r.ok) throw new Error(`/api/fantasy/xp?league=spl -> HTTP ${r.status}`);
+		return r.json() as Promise<XpResponse>;
+	});
+	return splXpP;
+}
+
+// ---------------------------------------------------------------------------
 // Ottelu-ennuste (28.7). Mitattu ennen tätä: /api/predict, /api/teams ja
 // /api/leagues olivat mobiilissa mutta EIVÄT lainkaan webissä, vaikka
 // goaliq.app:n 181 staattista ennustesivua ovat suurin indeksoitu pintamme
