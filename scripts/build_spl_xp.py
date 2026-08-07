@@ -111,6 +111,96 @@ def price_tier_factor(rank_in_group: int, pos: int) -> float:
     return PRIOR_TIERS[2]
 
 
+def build_model_squad(players_out: list[dict]) -> dict | None:
+    """RSL Model Squad: vahvin löydetty 15 (2/5/5/3, budjetti 100.0, max 3/seura),
+    maksimoiden parhaan laillisen XI:n xP-horisonttia + penkin halpuutta.
+
+    Greedy + paikalliset vaihdot — EI todistetusti optimaalinen, ja se sanotaan
+    payloadissa (optimal_proven: false, sama rehellisyyskonventio kuin FPL:n
+    rate-teamissä 28.7: "best" vain kun todistettu).
+    """
+    QUOTA = {"GKP": 2, "DEF": 5, "MID": 5, "FWD": 3}
+    XI_MIN = {"GKP": 1, "DEF": 3, "MID": 2, "FWD": 1}
+    BUDGET = 100.0
+    pool = [p for p in players_out if p.get("price", 0) > 0]
+
+    def squad_cost(sq):
+        return sum(p["price"] for p in sq)
+
+    def club_ok(sq):
+        cnt: dict[str, int] = {}
+        for p in sq:
+            cnt[p["team_short"]] = cnt.get(p["team_short"], 0) + 1
+            if cnt[p["team_short"]] > 3:
+                return False
+        return True
+
+    def best_xi_value(sq):
+        """Paras laillinen XI (muodostelmarajat) — ahne positioittain."""
+        by = {k: sorted([p for p in sq if p["pos"] == k],
+                        key=lambda p: -p["xp_horizon_total"]) for k in QUOTA}
+        xi = [by["GKP"][0]] + by["DEF"][:3] + by["MID"][:2] + by["FWD"][:1]
+        rest = sorted(
+            (p for k in ("DEF", "MID", "FWD") for p in by[k][XI_MIN[k]:]),
+            key=lambda p: -p["xp_horizon_total"],
+        )
+        # täytä 11:een kunnioittaen max-rajoja (DEF<=5, MID<=5, FWD<=3)
+        maxes = {"DEF": 5, "MID": 5, "FWD": 3}
+        counts = {"GKP": 1, "DEF": 3, "MID": 2, "FWD": 1}
+        for p in rest:
+            if len(xi) == 11:
+                break
+            if counts[p["pos"]] < maxes.get(p["pos"], 0):
+                xi.append(p)
+                counts[p["pos"]] += 1
+        return sum(p["xp_horizon_total"] for p in xi), xi
+
+    # Lähtöratkaisu: halvin mahdollinen runko + paras arvo -täyttö
+    squad: list[dict] = []
+    for pos, n in QUOTA.items():
+        cheap = sorted([p for p in pool if p["pos"] == pos], key=lambda p: p["price"])
+        squad.extend(cheap[:n])
+    if len(squad) < 15 or squad_cost(squad) > BUDGET:
+        return None
+    # Paikalliset parannusvaihdot kunnes ei parane
+    improved = True
+    rounds = 0
+    while improved and rounds < 60:
+        improved = False
+        rounds += 1
+        base_val, _ = best_xi_value(squad)
+        for i, out_p in enumerate(list(squad)):
+            cands = [p for p in pool if p["pos"] == out_p["pos"]
+                     and p["id"] not in {q["id"] for q in squad}]
+            cands.sort(key=lambda p: -p["xp_horizon_total"])
+            for in_p in cands[:40]:
+                trial = squad[:i] + [in_p] + squad[i + 1:]
+                if squad_cost(trial) > BUDGET or not club_ok(trial):
+                    continue
+                val, _ = best_xi_value(trial)
+                if val > base_val + 1e-9:
+                    squad = trial
+                    base_val = val
+                    improved = True
+                    break
+    total_val, xi = best_xi_value(squad)
+    xi_ids = {p["id"] for p in xi}
+    return {
+        "budget": BUDGET,
+        "cost": round(squad_cost(squad), 1),
+        "xi_xp_horizon": round(total_val, 1),
+        "optimal_proven": False,
+        "note": ("Strongest squad the model found (greedy search with local swaps), "
+                 "not a proven optimum. RSL rules: 100.0 budget, 2 GK / 5 DEF / "
+                 "5 MID / 3 FWD, max 3 per club."),
+        "players": [{
+            "id": p["id"], "web_name": p["web_name"], "team_short": p["team_short"],
+            "pos": p["pos"], "price": p["price"], "xp_per_gw": p["xp_per_gw"],
+            "xp_horizon_total": p["xp_horizon_total"], "in_xi": p["id"] in xi_ids,
+        } for p in sorted(squad, key=lambda p: ({"GKP": 0, "DEF": 1, "MID": 2, "FWD": 3}[p["pos"]], -p["xp_horizon_total"]))],
+    }
+
+
 def main() -> int:
     src = fetch_source()
 
@@ -279,6 +369,11 @@ def main() -> int:
     players_out.sort(key=lambda p: -p["xp_horizon_total"])
     print(f"      pooliin {len(players_out)} pelaajaa (xP >= {MIN_XP_TOTAL})")
 
+    model_squad = build_model_squad(players_out)
+    if model_squad:
+        print(f"      model squad: cost {model_squad['cost']}m, "
+              f"XI xP {model_squad['xi_xp_horizon']}")
+
     # Sanity-gate ---------------------------------------------------------
     print("\n" + "=" * 64)
     print("SANITY-GATE (SPL-xP)")
@@ -345,6 +440,7 @@ def main() -> int:
             "deadline_utc": src["deadline_utc"],
             "horizon_gw": HORIZON_GW,
         },
+        "model_squad": model_squad,
         "players": players_out,
     }
     OUT_PATH.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
