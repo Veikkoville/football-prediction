@@ -168,6 +168,14 @@
 		name="description"
 		content="Free model-based tools for RSL Fantasy (Saudi Pro League): clean sheet odds, fixture difficulty and expected points from the GoalIQ match model."
 	/>
+	<!-- /spl-prerender (7.8): canonical tälle työkalusivulle itselleen —
+	     goaliq.app/spl (staattinen landing) on erillinen sisältösivu joka
+	     linkittää tänne, ei duplikaatti. -->
+	<link rel="canonical" href="https://pro.goaliq.app/spl" />
+	<!-- Prerenderoidulla reitillä boot-runko näkyisi sisällön YLLÄ kunnes
+	     hydraatio poistaa sen — tällä reitillä sisältö on jo HTML:ssä,
+	     joten runko piilotetaan heti. -->
+	{@html '<style>#boot{display:none}</style>'}
 </svelte:head>
 
 <div class="shell">
