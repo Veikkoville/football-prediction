@@ -8,6 +8,7 @@
 		type TransferSuggestion
 	} from '$lib/fantasyTools';
 	import { fetchXp, type XpPlayer } from '$lib/api';
+	import { buildRoast } from '$lib/roast';
 	import { capture } from '$lib/analytics';
 	import { auth } from '$lib/auth.svelte';
 	import {
@@ -66,6 +67,9 @@
 	// #66: entry-kenttä on jaettu (fplEntry.entry) RateTeamin + Plannerin kesken
 	let loading = $state(false);
 	let error = $state<string | null>(null);
+	// Roast my team (7.8): toggle + kopiointikuittaus.
+	let roastOpen = $state(false);
+	let roastCopied = $state(false);
 	let data = $state<RateTeamResponse | null>(null);
 
 	// --- FM-silmukka: mallin suositukset kirjattaviksi päätöksiksi ----------
@@ -979,6 +983,39 @@
 				<span class="val line-weak">{data.rating.weakest_line}</span>
 			</div>
 		</div>
+		<!-- Roast my team (7.8, kasvutemppu 2): sama data, piikikäs sävy —
+		     UGC-jakoyksikkö. Logiikka lib/roast.ts (deterministinen, numerot
+		     payloadista). Copy-nappi X-liittämistä varten; kuvakortti =
+		     jatkotyö. -->
+		<div class="roast-row">
+			<button
+				class="roast-toggle"
+				onclick={() => {
+					roastOpen = !roastOpen;
+					if (roastOpen) capture('roast_viewed');
+				}}>{roastOpen ? 'Hide the roast' : 'Roast my team 🔥'}</button
+			>
+		</div>
+		{#if roastOpen}
+			{@const roastLines = buildRoast(data)}
+			<div class="roast card">
+				{#each roastLines as line, i (i)}
+					<p>{line}</p>
+				{/each}
+				<button
+					class="roast-copy"
+					onclick={() => {
+						navigator.clipboard?.writeText(
+							roastLines.join('\n\n') + '\n\nGet roasted: goaliq.app/fpl'
+						);
+						roastCopied = true;
+						capture('roast_copied');
+						setTimeout(() => (roastCopied = false), 2000);
+					}}>{roastCopied ? 'Copied' : 'Copy roast for sharing'}</button
+				>
+			</div>
+		{/if}
+
 		<!-- FM-silmukan etuovi. Sama sijoitus kuin mobiilissa: rate-team on
 		     ainoa paikka jossa kapteeni JA siirtoehdotus ovat samassa datassa,
 		     ja silmukka alkaa siitä hetkestä kun käyttäjä on juuri nähnyt
@@ -1675,5 +1712,31 @@
 	.cta {
 		color: var(--positive);
 		font-weight: 700;
+	}
+	/* Roast my team (7.8) */
+	.roast-row {
+		margin-top: var(--s-2);
+	}
+	.roast-toggle,
+	.roast-copy {
+		background: none;
+		border: 1px solid var(--border);
+		border-radius: 3px;
+		padding: var(--s-1) var(--s-2);
+		cursor: pointer;
+		color: inherit;
+		font: inherit;
+	}
+	.roast-toggle:hover,
+	.roast-copy:hover {
+		border-color: var(--accent);
+	}
+	.roast {
+		margin-top: var(--s-2);
+		padding: var(--s-3);
+		border-left: 3px solid var(--accent);
+	}
+	.roast p {
+		margin: 0 0 var(--s-2);
 	}
 </style>
