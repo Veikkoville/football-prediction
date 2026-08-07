@@ -36,7 +36,13 @@ export default defineConfig({
 			// (Villen pääsy — wrangler-tokenissa vain zone:read). Juurisyyn jatkotoimi: deploy-verify VAIN
 			// pages.dev-deployment-URL:sta kunnes propagaatio valmis (ks.
 			// muisti pro-spa-wrangler-deploy).
-			appDir: '_app3'
+			//
+			// 6.8.2026: NELJÄS kerta (_app3 → _app4). Kaksi deployta ~40 min
+			// välein Villen selatessa sivua aktiivisesti → sama oire (index ei
+			// toimi, eri selaimellakaan; headless tältä koneelta hydratoituu →
+			// POP-kohtainen myrkky). Lisäoppi: EI deployta kun käyttäjä on
+			// sivulla, ja zone-purge-juurisyyselvitys nousee taas jonoon.
+			appDir: '_app4'
 		})
 	]
 });
