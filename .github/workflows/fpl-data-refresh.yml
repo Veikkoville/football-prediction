@@ -124,6 +124,20 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_xp
 
+      # SPL (7.8): samat refresh-hyödyt (saatavuusliput, hinnat) RSL-projektioille.
+      # continue-on-error: SPL EI saa koskaan kaataa FPL-refreshiä (Villen ehto:
+      # FPL-GW1-prep SPL:n edellä). SPL-gate-FAIL → vanha SPL-data jää voimaan
+      # ja warning näkyy; FPL-data pushautuu normaalisti.
+      - name: Build SPL Phase 0 projections (CS% + FDR)
+        if: steps.guard.outputs.proceed == 'true'
+        continue-on-error: true
+        run: python -m scripts.build_spl_phase0
+
+      - name: Build SPL xP projections
+        if: steps.guard.outputs.proceed == 'true'
+        continue-on-error: true
+        run: python -m scripts.build_spl_xp
+
       # 30.7 tarkkuusloki: gradaa EDELLISEN yön price-ennuste ENNEN kuin
       # builderi ylikirjoittaa sen (järjestys on koko lokin pointti).
       - name: Grade previous price watch predictions
@@ -196,7 +210,7 @@ jobs:
           # Tausta: founder_entry.json puuttui .gitignoren !-poikkeuksista →
           # git add exit 1 → shell `-e` tappoi stepin → projektiot, price watch
           # ja leaders jäivät pushaamatta 4 ajossa (~14 h vanhaa dataa).
-          for f in data/fpl_price_accuracy.json data/fpl_xp_gw_accuracy.json data/founder_entry.json; do
+          for f in data/fpl_price_accuracy.json data/fpl_xp_gw_accuracy.json data/founder_entry.json data/spl_projections_phase0.json data/spl_xp_projections.json; do
             [ -f "$f" ] || continue
             git add "$f" || echo "::warning::git add $f epäonnistui (gitignore?) — muu data pushataan silti"
           done

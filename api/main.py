@@ -2722,6 +2722,10 @@ def fantasy_phase0(
         default="6",
         description="Montako GW:tä teams[].fixtures sisältää: 1-38 tai 'all'.",
     ),
+    league: str = Query(
+        default="fpl",
+        description="Fantasy-liiga: 'fpl' (oletus) tai 'spl' (Saudi Pro League).",
+    ),
 ):
     """FPL Phase 0 — clean sheet -% + mallipohjainen FDR per PL-joukkue/GW (free-tier).
 
@@ -2746,9 +2750,15 @@ def fantasy_phase0(
     tarvitse sitä kaukoviikoille. Ilman tätä rajausta `horizon=all` olisi
     ~800 kB; nyt se on murto-osa siitä.
     """
-    from src.models.fpl_phase0 import load_phase0
+    from src.models.fpl_phase0 import PHASE0_PATHS, load_phase0
     response.headers["Cache-Control"] = "no-store"
-    data = load_phase0()
+    # SPL-laajennos (7.8): league-avain valitsee committatun projektion.
+    # Oletus 'fpl' = täsmälleen entinen vastaus; tuntematon avain = 404
+    # (EI hiljaista FPL-fallbackia — väärä liiga näyttäisi oikealta datalta).
+    lg = (league or "fpl").strip().lower()
+    if lg not in PHASE0_PATHS:
+        raise HTTPException(status_code=404, detail=f"Unknown fantasy league '{league}'.")
+    data = load_phase0(PHASE0_PATHS[lg])
 
     teams = data.get("teams")
     meta = data.get("meta")
@@ -2790,7 +2800,14 @@ def fantasy_phase0(
 
 
 @app.get("/api/fantasy/xp")
-def fantasy_xp(request: Request, response: Response):
+def fantasy_xp(
+    request: Request,
+    response: Response,
+    league: str = Query(
+        default="fpl",
+        description="Fantasy-liiga: 'fpl' (oletus) tai 'spl' (Saudi Pro League).",
+    ),
+):
     """FPL Phase 1 — xP (expected points) per pelaaja per GW (premium-ydin).
 
     Palauttaa committatun projektion (data/fpl_xp_projections.json).
@@ -2816,13 +2833,22 @@ def fantasy_xp(request: Request, response: Response):
         vastaa 304:llä eikä 60 kB:tä siirretä uudelleen.
     Mobiili (fetchXp) ja SPA hyötyvät molemmat ilman klienttimuutosta.
     """
-    from src.models.fpl_xp import load_xp
-    payload = load_xp()
+    from src.models.fpl_xp import XP_PATHS, load_xp
+    # SPL-laajennos (7.8): sama sopimus kuin /api/fantasy — oletus 'fpl' =
+    # entinen vastaus, tuntematon avain = 404, ei hiljaista fallbackia.
+    lg = (league or "fpl").strip().lower()
+    if lg not in XP_PATHS:
+        raise HTTPException(status_code=404, detail=f"Unknown fantasy league '{league}'.")
+    payload = load_xp(XP_PATHS[lg])
     # Edge-sprint P0c: PREMIUM_ENFORCE=on + ei-premium -> typistetty teaser
     # (top-10 taysia riveja, meta.masked=true). Flagi off (default) -> tama
     # haara ei koskaan aja ja vastaus on bittitarkasti ennallaan.
     masked = False
-    if payload.get("players") and not is_premium_request(request):
+    # SPL = TÄYSIN ILMAINEN (Villen linjaus 7.8): hankintakiila FPL-premiumiin
+    # — RSL-analytiikkakenttä on tyhjä ja maksupotentiaali pieni, arvo on
+    # huomiossa; "free, not paid to promote" on myös etiikkakehyksen puhtain
+    # muoto. Premium-flippi = poista lg-ehto tästä (yksi rivi).
+    if lg != "spl" and payload.get("players") and not is_premium_request(request):
         payload = mask_xp_payload(payload)
         masked = True
     # ETag erottaa maskatun ja täyden vastauksen: ilman mask-bittiä free-
@@ -2835,7 +2861,10 @@ def fantasy_xp(request: Request, response: Response):
     # ominaisuudeksi, ei vanhaksi välimuistiksi. Löytyi kuvasta, ei portista.
     # Nosta tätä aina kun rivin kenttäjoukko muuttuu ilman uutta projektiota.
     schema = "s2"
-    etag = 'W/"xp-{}-{}-{}"'.format(generated, "m" if masked else "f", schema)
+    # Liiga-avain ETagiin: ilman sitä fpl- ja spl-vastaukset voisivat
+    # 304-validoitua ristiin samasta selainvälimuistista (sama URL-polku,
+    # eri query) — sama vikaluokka kuin mask-bitin puuttuminen olisi.
+    etag = 'W/"xp-{}-{}-{}-{}"'.format(lg, generated, "m" if masked else "f", schema)
     cache_control = "private, max-age=300"
     inm = request.headers.get("if-none-match", "")
     if etag in [t.strip() for t in inm.split(",")]:
