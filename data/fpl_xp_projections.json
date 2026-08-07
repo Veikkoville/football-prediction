@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
     "phase": 1,
-    "generated_at": "2026-08-07T18:45:13",
+    "generated_at": "2026-08-07T21:33:01",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -208,7 +208,7 @@
       "predicted_starts": 81.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 74.7,
+      "owned_pct": 74.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -450,7 +450,7 @@
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 9.9,
+      "owned_pct": 10.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1055,7 +1055,7 @@
       "predicted_starts": 92.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 22.8,
+      "owned_pct": 22.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1539,7 +1539,7 @@
       "predicted_starts": 80.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 18.6,
+      "owned_pct": 18.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1660,7 +1660,7 @@
       "predicted_starts": 82.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 23.7,
+      "owned_pct": 23.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1781,7 +1781,7 @@
       "predicted_starts": 94.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 46.9,
+      "owned_pct": 46.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2023,7 +2023,7 @@
       "predicted_starts": 86.5,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 10.8,
+      "owned_pct": 10.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4685,7 +4685,7 @@
       "predicted_starts": 96.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 29.6,
+      "owned_pct": 29.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5048,7 +5048,7 @@
       "predicted_starts": 78.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.2,
+      "owned_pct": 2.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5290,7 +5290,7 @@
       "predicted_starts": 71.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 23.3,
+      "owned_pct": 23.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5411,7 +5411,7 @@
       "predicted_starts": 68.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 54.1,
+      "owned_pct": 54.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7700,127 +7700,6 @@
       "components_gw": 1
     },
     {
-      "id": 208,
-      "web_name": "Sarr",
-      "full_name": "Ismaïla Sarr",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 63.7,
-      "predicted_starts": 69.6,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 9.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 2,
-      "price": 6.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2173,
-        "starts": 24,
-        "goals": 9,
-        "assists": 2,
-        "xg": 10.93,
-        "xa": 1.17,
-        "cs": 9,
-        "points": 117,
-        "per90": {
-          "goals": 0.37,
-          "assists": 0.08,
-          "xgi": 0.5
-        }
-      },
-      "p_start": 0.6959,
-      "p_cameo": 0.0652,
-      "p_bench": 0.2389,
-      "set_pieces": {
-        "pens": 2,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.28,
-      "xp_per_gw": 3.38,
-      "xp_per_90": 4.74,
-      "xp_horizon_total": 20.27,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.32
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.88
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.21
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 4.23
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 3.35
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.29
-        }
-      ],
-      "components": {
-        "appearance": 1.45,
-        "goals": 1.36,
-        "assists": 0.13,
-        "clean_sheet": 0.15,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.04,
-        "yellows": -0.08,
-        "bonus": 0.27
-      },
-      "components_gw": 1
-    },
-    {
       "id": 497,
       "web_name": "Dubravka",
       "full_name": "Martin Dubravka",
@@ -8059,6 +7938,127 @@
         "defensive_contribution": 0.38,
         "yellows": -0.14,
         "bonus": 0.41
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 210,
+      "web_name": "Wharton",
+      "full_name": "Adam Wharton",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 71.6,
+      "predicted_starts": 78.1,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "status": "a",
+      "news": "",
+      "chance_next": 100,
+      "yellows": 4,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 2552,
+        "starts": 29,
+        "goals": 1,
+        "assists": 6,
+        "xg": 1.52,
+        "xa": 7.47,
+        "cs": 8,
+        "points": 112,
+        "per90": {
+          "goals": 0.04,
+          "assists": 0.21,
+          "xgi": 0.32
+        }
+      },
+      "p_start": 0.7806,
+      "p_cameo": 0.0975,
+      "p_bench": 0.1219,
+      "set_pieces": {
+        "pens": null,
+        "corners": 6,
+        "fk": null
+      },
+      "e_bonus": 0.23,
+      "xp_per_gw": 3.36,
+      "xp_per_90": 4.04,
+      "xp_horizon_total": 20.13,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.31
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.04
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.25
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.92
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.32
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.29
+        }
+      ],
+      "components": {
+        "appearance": 1.72,
+        "goals": 0.26,
+        "assists": 0.56,
+        "clean_sheet": 0.19,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.48,
+        "yellows": -0.12,
+        "bonus": 0.23
       },
       "components_gw": 1
     },
@@ -8906,6 +8906,127 @@
         "defensive_contribution": 0.04,
         "yellows": -0.06,
         "bonus": 0.33
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 208,
+      "web_name": "Sarr",
+      "full_name": "Ismaïla Sarr",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 61.2,
+      "predicted_starts": 66.5,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 9.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 2,
+      "price": 6.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 2173,
+        "starts": 24,
+        "goals": 9,
+        "assists": 2,
+        "xg": 10.93,
+        "xa": 1.17,
+        "cs": 9,
+        "points": 117,
+        "per90": {
+          "goals": 0.37,
+          "assists": 0.08,
+          "xgi": 0.5
+        }
+      },
+      "p_start": 0.6649,
+      "p_cameo": 0.0718,
+      "p_bench": 0.2633,
+      "set_pieces": {
+        "pens": 2,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.26,
+      "xp_per_gw": 3.25,
+      "xp_per_90": 4.74,
+      "xp_horizon_total": 19.48,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.19
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.76
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.08
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 4.06
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.22
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.16
+        }
+      ],
+      "components": {
+        "appearance": 1.4,
+        "goals": 1.31,
+        "assists": 0.12,
+        "clean_sheet": 0.15,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.08,
+        "bonus": 0.25
       },
       "components_gw": 1
     },
@@ -10011,7 +10132,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",
       "data_basis": "pl_history",
-      "owned_pct": 11.3,
+      "owned_pct": 11.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13389,127 +13510,6 @@
       "components_gw": 1
     },
     {
-      "id": 211,
-      "web_name": "Yeremy",
-      "full_name": "Yéremy Pino Santos",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 60.5,
-      "predicted_starts": 74.4,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.2,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 4,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2074,
-        "starts": 26,
-        "goals": 2,
-        "assists": 2,
-        "xg": 4.53,
-        "xa": 6.12,
-        "cs": 7,
-        "points": 77,
-        "per90": {
-          "goals": 0.09,
-          "assists": 0.09,
-          "xgi": 0.46
-        }
-      },
-      "p_start": 0.7443,
-      "p_cameo": 0.1705,
-      "p_bench": 0.0852,
-      "set_pieces": {
-        "pens": null,
-        "corners": 7,
-        "fk": 1
-      },
-      "e_bonus": 0.13,
-      "xp_per_gw": 2.85,
-      "xp_per_90": 4.06,
-      "xp_horizon_total": 17.08,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.81
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.49
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.73
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.45
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.82
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.78
-        }
-      ],
-      "components": {
-        "appearance": 1.5,
-        "goals": 0.61,
-        "assists": 0.47,
-        "clean_sheet": 0.13,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.09,
-        "yellows": -0.12,
-        "bonus": 0.12
-      },
-      "components_gw": 1
-    },
-    {
       "id": 45,
       "web_name": "McGinn",
       "full_name": "John McGinn",
@@ -14357,6 +14357,127 @@
       "components_gw": 1
     },
     {
+      "id": 211,
+      "web_name": "Yeremy",
+      "full_name": "Yéremy Pino Santos",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 58.5,
+      "predicted_starts": 71.1,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 4,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 2074,
+        "starts": 26,
+        "goals": 2,
+        "assists": 2,
+        "xg": 4.53,
+        "xa": 6.12,
+        "cs": 7,
+        "points": 77,
+        "per90": {
+          "goals": 0.09,
+          "assists": 0.09,
+          "xgi": 0.46
+        }
+      },
+      "p_start": 0.7112,
+      "p_cameo": 0.1925,
+      "p_bench": 0.0963,
+      "set_pieces": {
+        "pens": null,
+        "corners": 7,
+        "fk": 1
+      },
+      "e_bonus": 0.12,
+      "xp_per_gw": 2.76,
+      "xp_per_90": 4.06,
+      "xp_horizon_total": 16.57,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.72
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.42
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.65
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.35
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.74
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.7
+        }
+      ],
+      "components": {
+        "appearance": 1.47,
+        "goals": 0.59,
+        "assists": 0.45,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.09,
+        "yellows": -0.12,
+        "bonus": 0.12
+      },
+      "components_gw": 1
+    },
+    {
       "id": 448,
       "web_name": "Burn",
       "full_name": "Dan Burn",
@@ -14716,127 +14837,6 @@
         "defensive_contribution": 0.74,
         "yellows": -0.14,
         "bonus": 0.08
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 210,
-      "web_name": "Wharton",
-      "full_name": "Adam Wharton",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 57.9,
-      "predicted_starts": 61.3,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.2,
-      "status": "d",
-      "news": "Ankle injury - 75% chance of playing",
-      "chance_next": 75,
-      "yellows": 4,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2552,
-        "starts": 29,
-        "goals": 1,
-        "assists": 6,
-        "xg": 1.52,
-        "xa": 7.47,
-        "cs": 8,
-        "points": 112,
-        "per90": {
-          "goals": 0.04,
-          "assists": 0.21,
-          "xgi": 0.32
-        }
-      },
-      "p_start": 0.6127,
-      "p_cameo": 0.1291,
-      "p_bench": 0.2582,
-      "set_pieces": {
-        "pens": null,
-        "corners": 6,
-        "fk": null
-      },
-      "e_bonus": 0.19,
-      "xp_per_gw": 2.71,
-      "xp_per_90": 4.04,
-      "xp_horizon_total": 16.28,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.68
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.46
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.63
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 3.17
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.69
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.66
-        }
-      ],
-      "components": {
-        "appearance": 1.41,
-        "goals": 0.21,
-        "assists": 0.45,
-        "clean_sheet": 0.15,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.38,
-        "yellows": -0.1,
-        "bonus": 0.18
       },
       "components_gw": 1
     },
@@ -17382,127 +17382,6 @@
       "components_gw": 1
     },
     {
-      "id": 214,
-      "web_name": "Kamada",
-      "full_name": "Daichi Kamada",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 55.9,
-      "predicted_starts": 64.7,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.3,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 3,
-      "price": 5.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1899,
-        "starts": 22,
-        "goals": 0,
-        "assists": 2,
-        "xg": 1.64,
-        "xa": 3.24,
-        "cs": 6,
-        "points": 67,
-        "per90": {
-          "goals": 0.0,
-          "assists": 0.09,
-          "xgi": 0.23
-        }
-      },
-      "p_start": 0.6475,
-      "p_cameo": 0.1102,
-      "p_bench": 0.2424,
-      "set_pieces": {
-        "pens": null,
-        "corners": 9,
-        "fk": null
-      },
-      "e_bonus": 0.07,
-      "xp_per_gw": 2.33,
-      "xp_per_90": 3.56,
-      "xp_horizon_total": 14.0,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.31
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.14
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.27
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.69
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.31
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.29
-        }
-      ],
-      "components": {
-        "appearance": 1.38,
-        "goals": 0.28,
-        "assists": 0.27,
-        "clean_sheet": 0.14,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.28,
-        "yellows": -0.1,
-        "bonus": 0.06
-      },
-      "components_gw": 1
-    },
-    {
       "id": 465,
       "web_name": "Osula",
       "full_name": "William Osula",
@@ -17864,6 +17743,127 @@
         "defensive_contribution": 0.03,
         "yellows": -0.05,
         "bonus": 0.19
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 214,
+      "web_name": "Kamada",
+      "full_name": "Daichi Kamada",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 53.8,
+      "predicted_starts": 61.9,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.3,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 3,
+      "price": 5.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1899,
+        "starts": 22,
+        "goals": 0,
+        "assists": 2,
+        "xg": 1.64,
+        "xa": 3.24,
+        "cs": 6,
+        "points": 67,
+        "per90": {
+          "goals": 0.0,
+          "assists": 0.09,
+          "xgi": 0.23
+        }
+      },
+      "p_start": 0.6187,
+      "p_cameo": 0.1192,
+      "p_bench": 0.2622,
+      "set_pieces": {
+        "pens": null,
+        "corners": 9,
+        "fk": null
+      },
+      "e_bonus": 0.06,
+      "xp_per_gw": 2.25,
+      "xp_per_90": 3.56,
+      "xp_horizon_total": 13.48,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.22
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.06
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.18
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.59
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.22
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.21
+        }
+      ],
+      "components": {
+        "appearance": 1.33,
+        "goals": 0.26,
+        "assists": 0.26,
+        "clean_sheet": 0.13,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.27,
+        "yellows": -0.09,
+        "bonus": 0.06
       },
       "components_gw": 1
     },
@@ -19209,7 +19209,7 @@
       "predicted_starts": 55.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 8.8,
+      "owned_pct": 8.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20409,127 +20409,6 @@
       "components_gw": 1
     },
     {
-      "id": 213,
-      "web_name": "Lerma",
-      "full_name": "Jefferson Lerma Solís",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 50.2,
-      "predicted_starts": 55.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 7,
-      "price": 5.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1722,
-        "starts": 18,
-        "goals": 0,
-        "assists": 5,
-        "xg": 1.84,
-        "xa": 1.48,
-        "cs": 7,
-        "points": 69,
-        "per90": {
-          "goals": 0.0,
-          "assists": 0.26,
-          "xgi": 0.17
-        }
-      },
-      "p_start": 0.5507,
-      "p_cameo": 0.2696,
-      "p_bench": 0.1797,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.12,
-      "xp_per_gw": 2.04,
-      "xp_per_90": 3.42,
-      "xp_horizon_total": 12.23,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.02
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.87
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.98
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.35
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.02
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.0
-        }
-      ],
-      "components": {
-        "appearance": 1.3,
-        "goals": 0.29,
-        "assists": 0.14,
-        "clean_sheet": 0.11,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.22,
-        "yellows": -0.17,
-        "bonus": 0.12
-      },
-      "components_gw": 1
-    },
-    {
       "id": 240,
       "web_name": "Iroegbunam",
       "full_name": "Tim Iroegbunam",
@@ -21135,6 +21014,127 @@
       "components_gw": 1
     },
     {
+      "id": 213,
+      "web_name": "Lerma",
+      "full_name": "Jefferson Lerma Solís",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 48.4,
+      "predicted_starts": 52.6,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 7,
+      "price": 5.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1722,
+        "starts": 18,
+        "goals": 0,
+        "assists": 5,
+        "xg": 1.84,
+        "xa": 1.48,
+        "cs": 7,
+        "points": 69,
+        "per90": {
+          "goals": 0.0,
+          "assists": 0.26,
+          "xgi": 0.17
+        }
+      },
+      "p_start": 0.5262,
+      "p_cameo": 0.2843,
+      "p_bench": 0.1895,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.12,
+      "xp_per_gw": 1.98,
+      "xp_per_90": 3.42,
+      "xp_horizon_total": 11.87,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.96
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.82
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.92
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.27
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.96
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.94
+        }
+      ],
+      "components": {
+        "appearance": 1.27,
+        "goals": 0.28,
+        "assists": 0.14,
+        "clean_sheet": 0.11,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.21,
+        "yellows": -0.16,
+        "bonus": 0.11
+      },
+      "components_gw": 1
+    },
+    {
       "id": 458,
       "web_name": "Joelinton",
       "full_name": "Joelinton Cássio Apolinário de Lira",
@@ -21593,127 +21593,6 @@
       "components_gw": 1
     },
     {
-      "id": 209,
-      "web_name": "Johnson",
-      "full_name": "Brennan Johnson",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 47.9,
-      "predicted_starts": 55.1,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 0.2,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 6,
-      "price": 6.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1710,
-        "starts": 19,
-        "goals": 2,
-        "assists": 1,
-        "xg": 2.45,
-        "xa": 1.31,
-        "cs": 6,
-        "points": 65,
-        "per90": {
-          "goals": 0.11,
-          "assists": 0.05,
-          "xgi": 0.2
-        }
-      },
-      "p_start": 0.5507,
-      "p_cameo": 0.337,
-      "p_bench": 0.1123,
-      "set_pieces": {
-        "pens": null,
-        "corners": 4,
-        "fk": 2
-      },
-      "e_bonus": 0.1,
-      "xp_per_gw": 1.92,
-      "xp_per_90": 3.14,
-      "xp_horizon_total": 11.53,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.9
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.75
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.86
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.23
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.9
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.89
-        }
-      ],
-      "components": {
-        "appearance": 1.34,
-        "goals": 0.34,
-        "assists": 0.12,
-        "clean_sheet": 0.1,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.04,
-        "yellows": -0.14,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
       "id": 108,
       "web_name": "Wilson",
       "full_name": "Callum Wilson",
@@ -21966,7 +21845,7 @@
       "predicted_starts": 43.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.8,
+      "owned_pct": 1.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -22436,6 +22315,127 @@
         "defensive_contribution": 0.03,
         "yellows": -0.03,
         "bonus": 0.15
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 209,
+      "web_name": "Johnson",
+      "full_name": "Brennan Johnson",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 46.4,
+      "predicted_starts": 52.6,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 6,
+      "price": 6.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1710,
+        "starts": 19,
+        "goals": 2,
+        "assists": 1,
+        "xg": 2.45,
+        "xa": 1.31,
+        "cs": 6,
+        "points": 65,
+        "per90": {
+          "goals": 0.11,
+          "assists": 0.05,
+          "xgi": 0.2
+        }
+      },
+      "p_start": 0.5262,
+      "p_cameo": 0.3554,
+      "p_bench": 0.1185,
+      "set_pieces": {
+        "pens": null,
+        "corners": 4,
+        "fk": 2
+      },
+      "e_bonus": 0.09,
+      "xp_per_gw": 1.88,
+      "xp_per_90": 3.14,
+      "xp_horizon_total": 11.25,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.85
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.71
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.82
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.17
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.86
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.84
+        }
+      ],
+      "components": {
+        "appearance": 1.31,
+        "goals": 0.33,
+        "assists": 0.12,
+        "clean_sheet": 0.1,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.14,
+        "bonus": 0.09
       },
       "components_gw": 1
     },
@@ -23152,7 +23152,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 1.8,
+      "owned_pct": 1.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -25634,127 +25634,6 @@
       "components_gw": 1
     },
     {
-      "id": 212,
-      "web_name": "Hughes",
-      "full_name": "Will Hughes",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 45.8,
-      "predicted_starts": 57.5,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 11.1,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 7,
-      "price": 4.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1560,
-        "starts": 19,
-        "goals": 0,
-        "assists": 1,
-        "xg": 1.11,
-        "xa": 1.94,
-        "cs": 5,
-        "points": 45,
-        "per90": {
-          "goals": 0.0,
-          "assists": 0.06,
-          "xgi": 0.18
-        }
-      },
-      "p_start": 0.5749,
-      "p_cameo": 0.2685,
-      "p_bench": 0.1566,
-      "set_pieces": {
-        "pens": null,
-        "corners": 8,
-        "fk": null
-      },
-      "e_bonus": 0.06,
-      "xp_per_gw": 1.65,
-      "xp_per_90": 2.9,
-      "xp_horizon_total": 9.92,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.64
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.52
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.61
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.9
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.64
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.62
-        }
-      ],
-      "components": {
-        "appearance": 1.24,
-        "goals": 0.21,
-        "assists": 0.17,
-        "clean_sheet": 0.09,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.04,
-        "yellows": -0.16,
-        "bonus": 0.06
-      },
-      "components_gw": 1
-    },
-    {
       "id": 369,
       "web_name": "Ngumoha",
       "full_name": "Rio Ngumoha",
@@ -27140,6 +27019,127 @@
         "defensive_contribution": 0.02,
         "yellows": -0.07,
         "bonus": 0.13
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 212,
+      "web_name": "Hughes",
+      "full_name": "Will Hughes",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 44.2,
+      "predicted_starts": 54.9,
+      "minutes_confidence": "med",
+      "data_basis": "pl_history",
+      "owned_pct": 11.1,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 7,
+      "price": 4.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1560,
+        "starts": 19,
+        "goals": 0,
+        "assists": 1,
+        "xg": 1.11,
+        "xa": 1.94,
+        "cs": 5,
+        "points": 45,
+        "per90": {
+          "goals": 0.0,
+          "assists": 0.06,
+          "xgi": 0.18
+        }
+      },
+      "p_start": 0.5493,
+      "p_cameo": 0.2847,
+      "p_bench": 0.1661,
+      "set_pieces": {
+        "pens": null,
+        "corners": 8,
+        "fk": null
+      },
+      "e_bonus": 0.06,
+      "xp_per_gw": 1.61,
+      "xp_per_90": 2.9,
+      "xp_horizon_total": 9.66,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.59
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.48
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.57
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.85
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.59
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.58
+        }
+      ],
+      "components": {
+        "appearance": 1.21,
+        "goals": 0.2,
+        "assists": 0.16,
+        "clean_sheet": 0.09,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.04,
+        "yellows": -0.16,
+        "bonus": 0.06
       },
       "components_gw": 1
     },
@@ -30068,7 +30068,7 @@
       "predicted_starts": 33.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 12.1,
+      "owned_pct": 12.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -33141,7 +33141,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 1.0,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -34492,127 +34492,6 @@
       "components_gw": 1
     },
     {
-      "id": 215,
-      "web_name": "Devenny",
-      "full_name": "Justin Devenny",
-      "team": "Crystal Palace",
-      "team_short": "CRY",
-      "pos": "MID",
-      "xmins": 22.8,
-      "predicted_starts": 28.4,
-      "minutes_confidence": "high",
-      "data_basis": "pl_history",
-      "owned_pct": 0.0,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 5.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 785,
-        "starts": 7,
-        "goals": 1,
-        "assists": 0,
-        "xg": 2.38,
-        "xa": 0.39,
-        "cs": 1,
-        "points": 36,
-        "per90": {
-          "goals": 0.11,
-          "assists": 0.0,
-          "xgi": 0.32
-        }
-      },
-      "p_start": 0.2844,
-      "p_cameo": 0.3232,
-      "p_bench": 0.3924,
-      "set_pieces": {
-        "pens": 3,
-        "corners": null,
-        "fk": 3
-      },
-      "e_bonus": 0.04,
-      "xp_per_gw": 1.26,
-      "xp_per_90": 3.99,
-      "xp_horizon_total": 7.56,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.25
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.15
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.22
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.45
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.25
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.24
-        }
-      ],
-      "components": {
-        "appearance": 0.78,
-        "goals": 0.28,
-        "assists": 0.06,
-        "clean_sheet": 0.05,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.07,
-        "yellows": -0.03,
-        "bonus": 0.04
-      },
-      "components_gw": 1
-    },
-    {
       "id": 64,
       "web_name": "Smith",
       "full_name": "Adam Smith",
@@ -34853,6 +34732,127 @@
         "defensive_contribution": 0.0,
         "yellows": -0.06,
         "bonus": 0.16
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 215,
+      "web_name": "Devenny",
+      "full_name": "Justin Devenny",
+      "team": "Crystal Palace",
+      "team_short": "CRY",
+      "pos": "MID",
+      "xmins": 22.1,
+      "predicted_starts": 27.2,
+      "minutes_confidence": "high",
+      "data_basis": "pl_history",
+      "owned_pct": 0.0,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 5.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 785,
+        "starts": 7,
+        "goals": 1,
+        "assists": 0,
+        "xg": 2.38,
+        "xa": 0.39,
+        "cs": 1,
+        "points": 36,
+        "per90": {
+          "goals": 0.11,
+          "assists": 0.0,
+          "xgi": 0.32
+        }
+      },
+      "p_start": 0.2718,
+      "p_cameo": 0.3289,
+      "p_bench": 0.3994,
+      "set_pieces": {
+        "pens": 3,
+        "corners": null,
+        "fk": 3
+      },
+      "e_bonus": 0.04,
+      "xp_per_gw": 1.23,
+      "xp_per_90": 3.99,
+      "xp_horizon_total": 7.37,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.22
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.12
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.19
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.42
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "A"
+            }
+          ],
+          "xp": 1.22
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 1.21
+        }
+      ],
+      "components": {
+        "appearance": 0.76,
+        "goals": 0.27,
+        "assists": 0.05,
+        "clean_sheet": 0.05,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.06,
+        "yellows": -0.02,
+        "bonus": 0.04
       },
       "components_gw": 1
     },
@@ -42533,7 +42533,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.1,
+      "owned_pct": 0.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -58809,7 +58809,7 @@
       "predicted_starts": 10.0,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 8.0,
+      "owned_pct": 7.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -59935,28 +59935,6 @@
       "excluded_reason": "below_min_xp"
     },
     {
-      "id": 299,
-      "web_name": "Burstow",
-      "full_name": "Mason Burstow",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "FWD",
-      "price": 4.5,
-      "owned_pct": 0.7,
-      "status": "u",
-      "news": "Has joined Sheffield Wednesday on loan for the rest of the season",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 466,
       "web_name": "Neave",
       "full_name": "Sean Neave",
@@ -59989,6 +59967,28 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 299,
+      "web_name": "Burstow",
+      "full_name": "Mason Burstow",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "FWD",
+      "price": 4.5,
+      "owned_pct": 0.6,
+      "status": "u",
+      "news": "Has joined Sheffield Wednesday on loan for the rest of the season",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
     },
     {
       "id": 239,
