@@ -1559,6 +1559,14 @@ def render_stats(stats: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+
+def _join_names(names: list[str]) -> str:
+    """["A", "B", "C"] -> "A, B and C" (luettelo copyyn, ei koodilistana)."""
+    safe = [escape(n) for n in names]
+    if len(safe) == 1:
+        return safe[0]
+    return ", ".join(safe[:-1]) + " and " + safe[-1]
+
 def render_defence(defence: dict, now: datetime) -> str | None:
     """Joukkuetason puolustusprofiili: MILLAISIA paikkoja puolustus paastaa.
 
@@ -1630,12 +1638,30 @@ def render_defence(defence: dict, now: datetime) -> str | None:
         "long range, plus headers faced and set-piece expected goals. Two "
         "defences can face the same number of shots and be nothing alike.</p>"
     )
+    promoted = meta.get("promoted_no_data") or []
+    relegated = meta.get("relegated_excluded") or []
+    scope = (
+        f"<strong>{escape(season)} season, per match.</strong> This covers the "
+        f"{len(rows)} clubs that played in the Premier League last season and "
+        "are still in it."
+    )
+    if promoted:
+        scope += (
+            " " + _join_names(promoted) + " came up from the Championship, so "
+            "there is no Premier League shot data for them yet and they are "
+            "not in the table."
+        )
+    if relegated:
+        scope += (
+            " " + _join_names(relegated) + " are in last season's data but "
+            "went down, so they are left out."
+        )
     body = (
-        f'<p class="note"><strong>{escape(season)} season, per match. '
-        "Penalties are counted separately and left out of the zone columns, "
-        "because they say nothing about defensive shape.</strong></p>"
+        f'<p class="note">{scope}</p>'
+        '<p class="note">Penalties are counted separately and left out of the '
+        "zone columns, because they say nothing about defensive shape.</p>"
         f'<div class="stat-row">{stat_row}</div>'
-        "<h2>Every defence, sorted by expected goals conceded</h2>"
+        f"<h2>These {len(rows)} defences, sorted by expected goals conceded</h2>"
         '<p class="note">Why this matters for FPL: a defence that faces a lot '
         "of headers is a set-piece risk, so its clean sheet is fragile even "
         "against weak opponents. A defence that concedes mostly from long "

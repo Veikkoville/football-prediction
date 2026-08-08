@@ -36,15 +36,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config
+from scripts.build_fpl_phase0 import map_name
 from scripts.build_understat_shots import (HIGH_VALUE_XG, LEAGUE_ID,
                                            load_season_match_ids)
+from src.data.fpl_api import fetch_bootstrap
 
 BOX_X = 0.843
 SIX_X = 0.945
 CENTRAL_HALF_WIDTH = 0.132   # 18 m leveydesta puolet 68 m kentalla
 EDGE_X = 0.75
 
-SANITY_MIN_TEAMS = 18
+SANITY_MIN_TEAMS = 15   # 20 miinus nousijat joilla ei ole PL-dataa
 SANITY_MIN_MATCHES = 30
 
 
@@ -111,8 +113,19 @@ def build(season: str) -> dict:
             acc[h[0]["h_team"]]["matches"] += 1
             acc[h[0]["a_team"]]["matches"] += 1
 
+    # KENTTA JOKA PUUTTUI (Villen havainto 8.8): basis on 25/26, mutta sivu
+    # otsikoi itsensa Premier League -taulukoksi. Ilman tata suodatusta se
+    # listasi kolme PUDONNUTTA joukkuetta (Burnley, West Ham, Wolves) ja
+    # jatti kolme NOUSSUTTA pois (Coventry, Hull, Ipswich) — ja markkinointi-
+    # kulmaksi oli valikoitumassa Championship-joukkueen luku.
+    # Auktoriteetti sille kuka on liigassa on FPL:n oma joukkuelista.
+    current = {map_name(t["name"]) for t in fetch_bootstrap()["teams"]}
+    with_data = set(acc)
+
     rows = []
     for team, a in acc.items():
+        if team not in current:
+            continue
         m = max(a["matches"], 1)
         rows.append({
             "team": team,
@@ -133,10 +146,15 @@ def build(season: str) -> dict:
                 / max(a["shots"] - a["pens"], 1), 1),
         })
     rows.sort(key=lambda r: r["xg_pm"])
+    promoted = sorted(current - with_data)
+    relegated = sorted(with_data - current)
     return {
         "meta": {
             "available": True,
             "season": f"20{season[:2]}/{season[2:]}",
+            "promoted_no_data": promoted,
+            "relegated_excluded": relegated,
+            "n_current_teams": len(current),
             "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
             "source": "Understat shot-level data (own xG model, NOT Opta)",
             "matches_read": read,
@@ -162,6 +180,15 @@ def build(season: str) -> dict:
 def sanity(data: dict) -> list[str]:
     fails = []
     meta, rows = data["meta"], data["teams"]
+    covered = len(rows) + len(meta.get("promoted_no_data") or [])
+    if covered != meta.get("n_current_teams"):
+        fails.append(
+            f"katettu {covered} != liigan {meta.get('n_current_teams')} "
+            "joukkuetta (rivit + nousijat ei tasmaa)")
+    for r in rows:
+        if r["team"] in (meta.get("relegated_excluded") or []):
+            fails.append(f"{r['team']} on pudonnut mutta on yha taulukossa")
+            break
     if len(rows) < SANITY_MIN_TEAMS:
         fails.append(f"vain {len(rows)} joukkuetta")
     if meta["matches_missing"]:
