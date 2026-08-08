@@ -134,6 +134,13 @@ footer a{color:var(--teal);}
 .note{color:var(--muted);font-size:12px;margin:18px 0;}
 /* 26.7: vapautettu xG-leaderboard, koko taulukko ilmaiseksi */
 .lb-wrap{overflow-x:auto;margin:14px 0;}
+/* 8.8 (Villen havainto): sivun palsta on 820px, joten leveakaan naytto ei
+   nayttanyt kaikkia sarakkeita — piti vierittaa vaakaan. .lb-full paastaa
+   VAIN taulukon ulos palstasta ja kasvaa ikkunan mukana 1560 pikseliin asti;
+   header, teksti ja footer pysyvat 820:ssa (luettavuus). Kapealla naytolla
+   kaytos on ennallaan: min() palauttaa 96vw ja vaakavieritys jaa jaljelle.
+   96vw eika 100vw, jotta pystyvierityspalkki ei tyonna sivua vaakaan. */
+.lb-full{width:min(96vw,1560px);margin-left:50%;transform:translateX(-50%);}
 .lb{width:100%;border-collapse:collapse;font-size:14px;}
 .lb th,.lb td{padding:8px 10px;text-align:left;
 border-bottom:1px solid var(--line);white-space:nowrap;}
@@ -1416,7 +1423,7 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         "Click a column to sort.</p>"
     )
     table = (
-        '<div class="lb-wrap"><table class="lb">'
+        '<div class="lb-wrap lb-full"><table class="lb">'
         f'<thead id="sth">{thead}</thead>'
         f'<tbody id="stb">{trows}</tbody></table></div>'
         '<button type="button" class="chip" id="stmore" '
@@ -1456,12 +1463,57 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )
-    jsonld = [{
-        "@context": "https://schema.org", "@type": "WebPage",
-        "name": title, "url": url, "description": desc,
-        "isPartOf": {"@id": f"{BASE}/#organization"},
-        "dateModified": now.strftime("%Y-%m-%d"),
-    }]
+    # GEO/SEO: Dataset kertoo koneluettavasti MITA sarakkeita sivulla on ja
+    # etta ne ovat ilmaisia. WebPage yksin ei kerro kumpaakaan, ja juuri nama
+    # kaksi ovat ne joita hakukone tai kielimalli tarvitsee vastatakseen
+    # kysymykseen "mista saa ilmaiseksi FPL:n laukausdataa".
+    measured = [STATS_LABELS[k] for _, _, cols in STATS_GROUPS for k in cols]
+    measured = list(dict.fromkeys(measured))
+    jsonld = [
+        {
+            "@context": "https://schema.org", "@type": "WebPage",
+            "name": title, "url": url, "description": desc,
+            "isPartOf": {"@id": f"{BASE}/#organization"},
+            "dateModified": now.strftime("%Y-%m-%d"),
+        },
+        {
+            "@context": "https://schema.org", "@type": "Dataset",
+            "name": "GoalIQ free FPL player stats",
+            "url": url,
+            "description": (
+                "Season statistics for every Premier League player with "
+                "minutes, covering shots, shots on target, shots in the box, "
+                "headed attempts, non-penalty expected goals, set-piece "
+                "expected goals, key passes, xGChain, xGBuildup, goals, "
+                "assists, expected goals, expected assists, expected goal "
+                "involvement, expected goals conceded, tackles, clearances "
+                "blocks and interceptions, recoveries, defensive "
+                "contribution, clean sheets, saves, penalty, corner and "
+                "free-kick order, points, bonus, BPS and ICT."
+            ),
+            "isAccessibleForFree": True,
+            "creator": {"@id": f"{BASE}/#organization"},
+            "temporalCoverage": (meta.get("basis_season") or "").replace(
+                "/", "-"),
+            "variableMeasured": measured,
+            "distribution": [{
+                "@type": "DataDownload",
+                "encodingFormat": "text/csv",
+                "name": "CSV export of the current view",
+            }],
+        },
+        {
+            "@context": "https://schema.org", "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "GoalIQ",
+                 "item": BASE},
+                {"@type": "ListItem", "position": 2, "name": "Free FPL tools",
+                 "item": f"{BASE}/fpl.html"},
+                {"@type": "ListItem", "position": 3, "name": "Player stats",
+                 "item": url},
+            ],
+        },
+    ]
     return _page(title, desc, url, hero, body, jsonld)
 
 
