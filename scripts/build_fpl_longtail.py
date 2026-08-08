@@ -1143,8 +1143,14 @@ STATS_GROUPS = [
     # jarjestetty pisteilla, ja lajitteluperusteen pitaa olla nakyvissa.
     # Ilman sita "#"-sarakkeen jarjestys naytti selittamattomalta.
     ("key", "Key", ["pts", "g", "a", "xg", "xa", "xgi"]),
+    # HUOM: xG (FPL/Opta) EI ole tassa ryhmassa vaikka se sinne kuuluisi
+    # aiheen puolesta. Syy: npxG tulee laukausdatan omasta mallista, ja
+    # vierekkain ne nayttavat rikkinaisilta — Haaland xG 25.50 (Opta) ja
+    # npxG 25.75 (laukausmalli) = rangaistuspotkuton luku on suurempi kuin
+    # kokonaisluku, mika on mahdotonta jos oletat yhden mallin. FPL:n xG
+    # asuu Key-ryhmassa, laukausmallin luvut taalla. Ei sekoiteta rivilla.
     ("threat", "Goal threat", ["sh", "sot", "box", "head", "hvc", "npxg",
-                               "g", "xg"]),
+                               "g"]),
     ("create", "Creativity", ["kp", "a", "xa", "xgi", "xgchain", "xgbuildup",
                               "creativity"]),
     ("defend", "Defending", ["tkl", "cbi", "rec", "dc", "cs", "gc", "xgc",
@@ -1167,6 +1173,15 @@ STATS_LABELS = {
     "hvc": "xG 0.3+", "npxg": "npxG", "spxg": "Set-piece xG",
     "kp": "Key passes", "xgchain": "xGChain", "xgbuildup": "xGBuildup",
 }
+# Sarakekohtainen lahdemerkinta (title-tooltip). Ilman tata kayttaja ei nae
+# rivilta kumpi luku on FPL:n virallinen ja kumpi laukausdatan oma malli.
+STATS_SOURCE = {
+    k: ("Shot-level data, own expected-goals model (not Opta)"
+        if k in {"sh", "sot", "box", "head", "hvc", "npxg", "spxg", "kp",
+                 "xgchain", "xgbuildup"}
+        else "Official FPL API (Opta-sourced)")
+    for k in STATS_LABELS
+}
 # Sarakkeet joita per 90 / per start skaalaa. ppg on jo suhdeluku ja
 # erikoistilannejarjestykset ovat sijalukuja -> ei skaalata kumpaakaan.
 STATS_RATEABLE = {
@@ -1184,7 +1199,7 @@ STATS_JS = """
 (function(){
  var D=window.__ST__||{c:[],r:[]},C={},i;
  for(i=0;i<D.c.length;i++){C[D.c[i]]=i;}
- var GROUPS=__GROUPS__,LAB=__LAB__,RATE=__RATE__,INT=__INT__,
+ var GROUPS=__GROUPS__,LAB=__LAB__,RATE=__RATE__,INT=__INT__,SRC=__SRC__,
      ORDCOLS=['pen','cor','fk'];
  var grp='key',mode='total',pos='',team='',minm=0,maxp=99,q='',
      sortKey='pts',desc=true,all=false;
@@ -1246,7 +1261,8 @@ STATS_JS = """
    +'<th class="n" data-k="mins">Mins</th>',j;
   if(mode==='pstart')h+='<th class="n" data-k="starts">Starts</th>';
   for(j=0;j<ks.length;j++){
-   h+='<th class="n" data-k="'+ks[j]+'">'+LAB[ks[j]]
+   h+='<th class="n" data-k="'+ks[j]+'" title="'+(SRC[ks[j]]||'')+'">'
+     +LAB[ks[j]]
      +(sortKey===ks[j]?(desc?' \\u25be':' \\u25b4'):'')+'</th>';
   }
   head.innerHTML=h+'</tr>';
@@ -1359,6 +1375,7 @@ def _stats_js() -> str:
     js = js.replace("__LAB__", json.dumps(STATS_LABELS))
     js = js.replace("__RATE__", json.dumps(sorted(STATS_RATEABLE)))
     js = js.replace("__INT__", json.dumps(sorted(STATS_INT)))
+    js = js.replace("__SRC__", json.dumps(STATS_SOURCE))
     # GROUPNAMES on erillinen, jotta ryhmien jarjestys sailyy chipeissa
     return js.replace(
         "(function(){",
@@ -1404,8 +1421,9 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         '<th data-k="team">Team</th><th data-k="pos">Pos</th>'
         '<th class="n" data-k="price">Price</th>'
         '<th class="n" data-k="mins">Mins</th>'
-        + "".join(f'<th class="n" data-k="{k}">{STATS_LABELS[k]}</th>'
-                  for k in keys)
+        + "".join(
+            f'<th class="n" data-k="{k}" title="{STATS_SOURCE[k]}">'
+            f'{STATS_LABELS[k]}</th>' for k in keys)
         + "</tr>"
     )
     controls = (
