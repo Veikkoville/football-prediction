@@ -238,17 +238,19 @@ def _tool_nav(canonical: str) -> str:
 SOCIAL_IMAGE = f"{BASE}/assets/brand/goaliq-social-1200x630.png"
 
 
-def _social_meta(title: str, desc: str, canonical: str) -> str:
+def _social_meta(title: str, desc: str, canonical: str,
+                 image: str | None = None) -> str:
     """OG + Twitter Card, sama muoto ja sama kuva-asset kuin fpl.html:ssä
     (build_fpl_page.py). Ilman näitä sivu renderöityy jaettaessa paljaana
     linkkinä ilman otsikkoa, kuvausta tai kuvaa."""
     t, d = escape(title), escape(desc)
+    img = image or SOCIAL_IMAGE
     return (
         '<meta property="og:type" content="article">\n'
         f'<meta property="og:title" content="{t}">\n'
         f'<meta property="og:description" content="{d}">\n'
         f'<meta property="og:url" content="{canonical}">\n'
-        f'<meta property="og:image" content="{SOCIAL_IMAGE}">\n'
+        f'<meta property="og:image" content="{img}">\n'
         '<meta property="og:image:width" content="1200">\n'
         '<meta property="og:image:height" content="630">\n'
         '<meta property="og:site_name" content="GoalIQ">\n'
@@ -256,9 +258,23 @@ def _social_meta(title: str, desc: str, canonical: str) -> str:
         '<meta name="twitter:site" content="@goaliqapp">\n'
         f'<meta name="twitter:title" content="{t}">\n'
         f'<meta name="twitter:description" content="{d}">\n'
-        f'<meta name="twitter:image" content="{SOCIAL_IMAGE}">\n'
+        f'<meta name="twitter:image" content="{img}">\n'
     )
 
+
+
+def _og_image(canonical: str) -> str:
+    """Sivukohtainen og:image jos sellainen on generoitu, muuten yhteinen.
+
+    Kortit: assets/brand/gen_og_cards.py (goaliq-app). Polku johdetaan
+    canonicalin slugista, joten uusi sivu saa oman korttinsa automaattisesti
+    heti kun tiedosto on olemassa — eika yksikaan render-funktio tarvitse
+    muutosta. Puuttuva tiedosto putoaa yhteiseen korttiin, ei rikkinaiseen
+    URLiin (jaettu linkki ilman kuvaa on parempi kuin 404-kuva).
+    """
+    slug = canonical.rstrip("/").rsplit("/", 1)[-1]
+    rel = f"assets/brand/og/{slug}-1200x630.png"
+    return f"{BASE}/{rel}" if (_FP_ROOT / rel).exists() else SOCIAL_IMAGE
 
 def _page(title: str, desc: str, canonical: str, hero: str, body: str,
           jsonld: list[dict]) -> str:
@@ -280,7 +296,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         # 29.7 (#225-SEO): OG/Twitter myös longtail-sivuille — kuusi
         # fpl-alasivua jaettiin paljaana linkkinä vaikka fpl.html emittoi
         # nämä. Sama kuva-asset, arvot _page()-parametreista.
-        f"{_social_meta(title, desc, canonical)}"
+        f"{_social_meta(title, desc, canonical, _og_image(canonical))}"
         # 27.7: koko ikonisetti myös alasivuille. Pelkkä .ico jätti selaimet
         # käyttämään matalaresoluutioista varianttia ja iOS:n kotinäytön ilman
         # ikonia — 187 alasivua näytti eri merkkiä kuin neljä pääsivua.
@@ -1631,12 +1647,49 @@ def render_defence(defence: dict, now: datetime) -> str | None:
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )
-    jsonld = [{
-        "@context": "https://schema.org", "@type": "WebPage",
-        "name": title, "url": url, "description": desc,
-        "isPartOf": {"@id": f"{BASE}/#organization"},
-        "dateModified": now.strftime("%Y-%m-%d"),
-    }]
+    jsonld = [
+        {
+            "@context": "https://schema.org", "@type": "WebPage",
+            "name": title, "url": url, "description": desc,
+            "isPartOf": {"@id": f"{BASE}/#organization"},
+            "dateModified": now.strftime("%Y-%m-%d"),
+        },
+        {
+            "@context": "https://schema.org", "@type": "Dataset",
+            "name": "GoalIQ Premier League defence profiles",
+            "url": url,
+            "description": (
+                "Per match, for every Premier League team: shots faced split "
+                "by pitch zone (six-yard box, central penalty area, wide in "
+                "the box, edge of the box, long range), headed attempts "
+                "faced, set-piece expected goals conceded, expected goals "
+                "conceded and the share of shots faced from inside the box. "
+                "Penalties are counted separately and excluded from the zone "
+                "columns."
+            ),
+            "isAccessibleForFree": True,
+            "creator": {"@id": f"{BASE}/#organization"},
+            "temporalCoverage": season.replace("/", "-"),
+            "variableMeasured": [
+                "Expected goals conceded per match", "Shots faced per match",
+                "Six-yard box shots faced", "Central penalty area shots faced",
+                "Wide penalty area shots faced", "Edge of box shots faced",
+                "Long range shots faced", "Headed attempts faced",
+                "Set-piece expected goals conceded", "Share of shots in box",
+            ],
+        },
+        {
+            "@context": "https://schema.org", "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "GoalIQ",
+                 "item": BASE},
+                {"@type": "ListItem", "position": 2, "name": "Free FPL tools",
+                 "item": f"{BASE}/fpl.html"},
+                {"@type": "ListItem", "position": 3,
+                 "name": "Defence profiles", "item": url},
+            ],
+        },
+    ]
     return _page(title, desc, url, hero, body, jsonld)
 
 
