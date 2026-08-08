@@ -49,14 +49,36 @@
 			label: 'Ownership % (high to low)',
 			cmp: (a: XpPlayer, b: XpPlayer) =>
 				(b.owned_pct ?? -1) - (a.owned_pct ?? -1) || b.xp_horizon_total - a.xp_horizon_total
+		},
+		// Hinta nousevaan: budjettikulma ("halvin ensin"), toisin kuin muut
+		// numeeriset sortit. Sama valinta kuin mobiilin Leadersissa.
+		price: {
+			label: 'Price (low to high)',
+			cmp: (a: XpPlayer, b: XpPlayer) =>
+				(a.price ?? Infinity) - (b.price ?? Infinity) ||
+				b.xp_horizon_total - a.xp_horizon_total
+		},
+		value: {
+			label: 'Value (xP per million, high to low)',
+			cmp: (a: XpPlayer, b: XpPlayer) => xpPerMillion(b) - xpPerMillion(a)
 		}
 	} as const;
+
+	// xP per miljoona. Ilman hintaa arvo on -1, jolloin rivi valuu listan
+	// hantaan sen sijaan etta jakolasku tuottaisi Infinityn ja nostaisi sen karkeen.
+	function xpPerMillion(p: XpPlayer): number {
+		return p.price && p.price > 0 ? p.xp_horizon_total / p.price : -1;
+	}
 
 	// #33f: confidence-selite (mobiilipariteetti: sama merkitys, sama copy-henki).
 	const CONF_LABEL = { low: 'low', med: 'medium', high: 'high' } as const;
 
 	let pos = $state<(typeof POSITIONS)[number]>('All');
 	let sortBy = $state<keyof typeof SORTS>('total');
+	// Hintakatto, ei kaistoja: kayttajan kysymys on "parhaat 5,5 miljoonan
+	// keskarit", ja kaista 4.6-6.0 vastaisi siihen vaarin. Katto = "talla
+	// budjetilla tai halvemmalla", joka on se mita joukkuetta rakentaessa kysytaan.
+	let maxPrice = $state<number | null>(null);
 	let groupByTeam = $state(false);
 	let selectedId = $state<number | null>(null);
 
@@ -100,6 +122,7 @@
 		const q = normSearch(search);
 		return data.players
 			.filter((p) => pos === 'All' || p.pos === pos)
+			.filter((p) => maxPrice == null || (typeof p.price === 'number' && p.price <= maxPrice))
 			.filter(
 				(p) =>
 					!q ||
@@ -144,6 +167,15 @@
 	let hasStarts = $derived(data.players.some((p) => typeof p.predicted_starts === 'number'));
 	// Edge-sprint: Own%-sarake vain jos backend tuo kentän (defensiivinen).
 	let hasOwned = $derived(data.players.some((p) => typeof p.owned_pct === 'number'));
+	// Hinta-sarake ja hintasortit vain jos backend tuo kentän (defensiivinen,
+	// sama kaava kuin hasStarts/hasOwned). SPL-syöte kantaa priceä myös.
+	let hasPrice = $derived(data.players.some((p) => typeof p.price === 'number'));
+	// Hintaportaat aineistosta, ei kovakoodattuna: FPL:n 0,1 M granulariteetti
+	// muuttuu kauden aikana, ja kovakoodattu tikapuu vanhenisi hiljaa.
+	let priceLadder = $derived(
+		[...new Set(data.players.map((p) => p.price).filter((v): v is number => typeof v === 'number'))]
+			.sort((a, b) => a - b)
+	);
 	// Edge-sprint: badge-selite vain jos joku pelaaja saa badgen (order<=2).
 	let hasSetPieces = $derived(
 		data.players.some(
@@ -234,10 +266,21 @@
 			{/each}
 		</select>
 	</div>
+	{#if hasPrice}
+		<div>
+			<label for="maxprice">Max price</label>
+			<select id="maxprice" bind:value={maxPrice}>
+				<option value={null}>Any</option>
+				{#each priceLadder as v (v)}
+					<option value={v}>&pound;{v.toFixed(1)}m or less</option>
+				{/each}
+			</select>
+		</div>
+	{/if}
 	<div>
 		<label for="sort">Sort by</label>
 		<select id="sort" bind:value={sortBy}>
-			{#each Object.entries(SORTS).filter(([k]) => k !== 'starts' || hasStarts) as [key, s] (key)}
+			{#each Object.entries(SORTS).filter(([k]) => (k !== 'starts' || hasStarts) && (!['price', 'value'].includes(k) || hasPrice)) as [key, s] (key)}
 				<option value={key}>{s.label}</option>
 			{/each}
 		</select>
@@ -290,6 +333,9 @@
 				<th>Player</th>
 				<th>Team</th>
 				<th>Pos</th>
+				{#if hasPrice}
+					<th class="num"><abbr title="Current FPL price in millions">Price</abbr></th>
+				{/if}
 				<th class="num"><abbr title="Expected minutes per gameweek">xMins</abbr></th>
 				{#if hasStarts}
 					<th class="num"
@@ -321,7 +367,7 @@
 			{#each groups as g (g.team ?? '_all')}
 				{#if g.team}
 					<tr class="group-row">
-						<td colspan={7 + (hasStarts ? 1 : 0) + (hasOwned ? 1 : 0) + gwCols.length}
+						<td colspan={7 + (hasPrice ? 1 : 0) + (hasStarts ? 1 : 0) + (hasOwned ? 1 : 0) + gwCols.length}
 							>{g.team}</td
 						>
 					</tr>
@@ -347,6 +393,11 @@
 						>
 						<td>{p.team_short}</td>
 						<td>{p.pos}</td>
+						{#if hasPrice}
+							<td class="num">
+								{#if typeof p.price === 'number'}{p.price.toFixed(1)}{/if}
+							</td>
+						{/if}
 						<td class="num">{p.xmins.toFixed(1)}</td>
 						{#if hasStarts}
 							<td class="num" title={minutesTitle(p)}>
