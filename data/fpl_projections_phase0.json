@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-08-07T21:32:58",
+    "generated_at": "2026-08-08T01:06:43",
     "season": "2026/27",
     "source": "fpl-api",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -674,8 +674,8 @@
           "opponent_short": "NEW",
           "venue": "A",
           "kickoff_ms": 1798297200000,
-          "fdr": 2,
-          "def_fdr": 2,
+          "fdr": 3,
+          "def_fdr": 3,
           "att_fdr": 2,
           "tier": "far"
         },
@@ -3585,7 +3585,7 @@
           "kickoff_ms": 1791640800000,
           "fdr": 2,
           "def_fdr": 2,
-          "att_fdr": 2,
+          "att_fdr": 3,
           "tier": "near",
           "cs_pct": 36.3
         },
@@ -3685,7 +3685,7 @@
           "kickoff_ms": 1797087600000,
           "fdr": 2,
           "def_fdr": 2,
-          "att_fdr": 3,
+          "att_fdr": 2,
           "tier": "far"
         },
         {
@@ -6479,8 +6479,8 @@
           "opponent_short": "MCI",
           "venue": "H",
           "kickoff_ms": 1808575200000,
-          "fdr": 4,
-          "def_fdr": 4,
+          "fdr": 5,
+          "def_fdr": 5,
           "att_fdr": 4,
           "tier": "far"
         },
@@ -7268,8 +7268,8 @@
           "opponent_short": "BHA",
           "venue": "A",
           "kickoff_ms": 1803135600000,
-          "fdr": 5,
-          "def_fdr": 5,
+          "fdr": 4,
+          "def_fdr": 4,
           "att_fdr": 4,
           "tier": "far"
         },
@@ -9322,7 +9322,7 @@
       "xg_away": 1.071,
       "p_home_win": 0.3994,
       "p_draw": 0.3166,
-      "p_away_win": 0.284,
+      "p_away_win": 0.2841,
       "cs_home_pct": 34.3,
       "cs_away_pct": 27.0,
       "fdr_home": 2,
@@ -9951,7 +9951,7 @@
       "att_fdr_home": 4,
       "fdr_away": 2,
       "def_fdr_away": 2,
-      "att_fdr_away": 2
+      "att_fdr_away": 3
     },
     {
       "gameweek": 6,
