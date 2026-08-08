@@ -175,6 +175,12 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_player_leaders
 
+      # 8.8 STATS-ZONE: /fpl/stats -sivun raakataulukko. Sanity-gate FAIL →
+      # exit 2 → askel punaisena eikä JSONia kirjoiteta (vanha jää voimaan).
+      - name: Build player stats (free stats zone)
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.build_fpl_stats
+
       # Beat the model V1: gradaa lukitut päätökset valmiilta kierroksilta.
       # Idempotentti (gradatut ohitetaan, trigger estää uudelleengradauksen),
       # joten päivittäinen kutsu on turvallinen myös GW:iden välissä.
@@ -204,7 +210,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json
+          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json data/fpl_player_stats.json
           # 30.7 tarkkuuslokit: olemassa vain kun gradattavaa/jäädytettävää on ollut
           # 2.8: yhden valinnaisen tiedoston add EI saa kaataa koko pushia.
           # Tausta: founder_entry.json puuttui .gitignoren !-poikkeuksista →

@@ -53,6 +53,8 @@ XP_PATH = ROOT / "data" / "fpl_xp_projections.json"
 PW_PATH = ROOT / "data" / "fpl_price_watch.json"
 # #128/#120: xG- + DefCon-leaders-sivut samasta nightly-cachesta kuin API
 LEADERS_PATH = ROOT / "data" / "fpl_player_leaders.json"
+# 8.8 STATS-ZONE: ilmainen suodatettava raakataulukko (scripts/build_fpl_stats.py)
+STATS_PATH = ROOT / "data" / "fpl_player_stats.json"
 API = "https://api.goaliq.app"  # 27.7: pois estetysta onrender.com-vyohykkeesta
 
 UPSELL = (
@@ -196,6 +198,7 @@ _TOOL_LINKS = [
     ("/fpl/price-changes", "Price changes"),
     ("/fpl/xg-leaders", "xG leaders"),
     ("/fpl/defcon", "DefCon leaders"),
+    ("/fpl/stats", "Player stats"),
 ]
 
 
@@ -1112,6 +1115,330 @@ def render_defcon(leaders: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+# ---------------------------------------------------------------------------
+# STATS ZONE (8.8) — ilmainen suodatettava raakataulukko
+#
+# Kysyntasignaali: FFH:n Opta-osio katosi maksavalta kayttajalta ja han kysyi
+# julkisesti mista muualta saa "filter tables". Iso osa noista luvuista on
+# FPL:n omassa APIssa, joka on Opta-lahtoinen -> jaettavissa ilmaiseksi.
+#
+# RAJA (Villen paatos 8.8): raakaluvut ilmaiseksi, johdettu DefCon-tracker
+# (hit rate, kynnysosumat, projisoidut pisteet) pysyy premiumina. Tama sivu
+# nayttaa dc-kertyman lukuna, EI trackeria.
+# ---------------------------------------------------------------------------
+STATS_GROUPS = [
+    # pts on mukana Key-ryhmassa tarkoituksella: taulukko on oletuksena
+    # jarjestetty pisteilla, ja lajitteluperusteen pitaa olla nakyvissa.
+    # Ilman sita "#"-sarakkeen jarjestys naytti selittamattomalta.
+    ("key", "Key", ["pts", "g", "a", "xg", "xa", "xgi"]),
+    ("threat", "Goal threat", ["g", "xg", "xgi", "threat"]),
+    ("create", "Creativity", ["a", "xa", "xgi", "creativity"]),
+    ("defend", "Defending", ["tkl", "cbi", "rec", "dc", "cs", "gc", "xgc",
+                             "saves"]),
+    ("setp", "Set pieces", ["pen", "cor", "fk"]),
+    ("fpl", "FPL", ["pts", "ppg", "bps", "bonus", "ict", "yc", "rc"]),
+]
+STATS_LABELS = {
+    "g": "G", "a": "A", "xg": "xG", "xa": "xA", "xgi": "xGI",
+    "threat": "Threat", "creativity": "Creativity",
+    "tkl": "Tackles", "cbi": "CBI", "rec": "Recov", "dc": "DefCon",
+    "cs": "CS", "gc": "GC", "xgc": "xGC", "saves": "Saves",
+    "pen": "Pens", "cor": "Corners", "fk": "FK",
+    "pts": "Pts", "ppg": "PPG", "bps": "BPS", "bonus": "Bonus",
+    "ict": "ICT", "yc": "YC", "rc": "RC",
+}
+# Sarakkeet joita per 90 / per start skaalaa. ppg on jo suhdeluku ja
+# erikoistilannejarjestykset ovat sijalukuja -> ei skaalata kumpaakaan.
+STATS_RATEABLE = {
+    "g", "a", "xg", "xa", "xgi", "threat", "creativity", "tkl", "cbi", "rec",
+    "dc", "cs", "gc", "xgc", "saves", "pts", "bps", "bonus", "ict", "yc", "rc",
+}
+STATS_INT = {"g", "a", "tkl", "cbi", "rec", "dc", "cs", "gc", "saves", "pts",
+             "bps", "bonus", "yc", "rc"}
+
+STATS_JS = """
+<script>
+(function(){
+ var D=window.__ST__||{c:[],r:[]},C={},i;
+ for(i=0;i<D.c.length;i++){C[D.c[i]]=i;}
+ var GROUPS=__GROUPS__,LAB=__LAB__,RATE=__RATE__,INT=__INT__,
+     ORDCOLS=['pen','cor','fk'];
+ var grp='key',mode='total',pos='',team='',minm=0,maxp=99,q='',
+     sortKey='pts',desc=true,all=false;
+ var tb=document.getElementById('stb'),cnt=document.getElementById('stc'),
+     head=document.getElementById('sth'),more=document.getElementById('stmore');
+ function cols(){return GROUPS[grp];}
+ function raw(row,k){return row[C[k]];}
+ function val(row,k){
+  var v=raw(row,k);
+  if(typeof v!=='number')return v;
+  if(mode==='total'||RATE.indexOf(k)<0)return v;
+  var d=mode==='p90'?row[C.mins]/90:row[C.starts];
+  return d>0?v/d:0;
+ }
+ function fmt(row,k){
+  var v=val(row,k);
+  if(k==='pen'||k==='cor'||k==='fk')return v?String(v):'\\u2013';
+  if(typeof v!=='number')return v;
+  if(mode==='total'&&INT.indexOf(k)>=0)return String(v);
+  return v.toFixed(2);
+ }
+ function rows(){
+  var out=[],j;
+  for(j=0;j<D.r.length;j++){
+   var r=D.r[j];
+   if(pos&&r[C.pos]!==pos)continue;
+   if(team&&r[C.team]!==team)continue;
+   if(r[C.mins]<minm)continue;
+   if(r[C.price]>maxp)continue;
+   if(q&&(r[C.name]+' '+r[C.team]).toLowerCase().indexOf(q)<0)continue;
+   if(mode==='pstart'&&r[C.starts]<1)continue;
+   out.push(r);
+  }
+  // Erikoistilannejarjestykset ovat sijalukuja: 1 = ensimmainen potkaisija.
+  // Suurin-ensin olisi vaarinpain (5. pilkkuvuorossa oleva karkeen), ja
+  // 0 = "ei listalla" pitaa aina valua loppuun kumpaankin suuntaan.
+  var ORD=ORDCOLS.indexOf(sortKey)>=0;
+  out.sort(function(a,b){
+   var x=val(a,sortKey),y=val(b,sortKey);
+   if(ORD){
+    x=x?x:9999;y=y?y:9999;
+    return desc?x-y:y-x;
+   }
+   if(typeof x==='string')return desc?(y>x?1:-1):(x>y?1:-1);
+   return desc?y-x:x-y;
+  });
+  return out;
+ }
+ function draw(){
+  var ks=cols(),h='<tr><th class="n">#</th><th data-k="name">Player</th>'
+   +'<th data-k="team">Team</th><th data-k="pos">Pos</th>'
+   +'<th class="n" data-k="price">Price</th>'
+   +'<th class="n" data-k="mins">Mins</th>',j;
+  if(mode==='pstart')h+='<th class="n" data-k="starts">Starts</th>';
+  for(j=0;j<ks.length;j++){
+   h+='<th class="n" data-k="'+ks[j]+'">'+LAB[ks[j]]
+     +(sortKey===ks[j]?(desc?' \\u25be':' \\u25b4'):'')+'</th>';
+  }
+  head.innerHTML=h+'</tr>';
+  var rs=rows(),n=all?rs.length:Math.min(100,rs.length),s='';
+  for(j=0;j<n;j++){
+   var r=rs[j];
+   s+='<tr><td class="n">'+(j+1)+'</td><td>'+r[C.name]+'</td>'
+    +'<td>'+r[C.team]+'</td><td>'+r[C.pos]+'</td>'
+    +'<td class="n">'+r[C.price].toFixed(1)+'</td>'
+    +'<td class="n">'+r[C.mins]+'</td>';
+   if(mode==='pstart')s+='<td class="n">'+r[C.starts]+'</td>';
+   for(var m=0;m<ks.length;m++){
+    s+='<td class="n'+(ks[m]===sortKey?' hi':'')+'">'+fmt(r,ks[m])+'</td>';
+   }
+   s+='</tr>';
+  }
+  tb.innerHTML=s;
+  var lbl=mode==='total'?'season totals':(mode==='p90'?'per 90 minutes'
+    :'per start');
+  cnt.textContent=rs.length+' players, '+lbl
+   +(minm?', '+minm+'+ minutes':'')+'. Showing '+n
+   +'. Click a column to sort.';
+  more.style.display=(!all&&rs.length>100)?'':'none';
+  window.__STROWS__=rs;
+ }
+ function chips(id,items,cur,cb){
+  var e=document.getElementById(id),s='',j;
+  for(j=0;j<items.length;j++){
+   s+='<button type="button" class="chip'+(items[j][0]===cur?' on':'')
+    +'" data-v="'+items[j][0]+'">'+items[j][1]+'</button>';
+  }
+  e.innerHTML=s;
+  e.onclick=function(ev){
+   var b=ev.target.closest('button');if(!b)return;cb(b.getAttribute('data-v'));
+  };
+ }
+ function paint(){
+  chips('stg',GROUPKEYS,grp,function(v){grp=v;
+   if(cols().indexOf(sortKey)<0){sortKey=cols()[0];desc=true;}paint();});
+  chips('stm',[['total','Total'],['p90','Per 90'],['pstart','Per start']],
+   mode,function(v){
+    // Otoskokovahti: 7 pelattua minuuttia tuottaa 12.86 tacklea/90 ja
+    // valtaa koko listan karjen. Suhdeluku ilman otoskokoa on harhaanjohtava,
+    // joten rate-tilaan siirtyminen nostaa minimin 450 minuuttiin. Kayttaja
+    // voi laskea sen takaisin nollaan yhdella klikilla - sita ei estetä,
+    // se vain lakkaa olemasta oletus.
+    if(v!=='total'&&mode==='total'&&minm===0){minm=450;}
+    mode=v;paint();});
+  chips('stp',[['','All'],['GKP','GKP'],['DEF','DEF'],['MID','MID'],
+   ['FWD','FWD']],pos,function(v){pos=v;paint();});
+  chips('stmin',[[0,'0'],[450,'450'],[900,'900'],[1500,'1500']],minm,
+   function(v){minm=+v;paint();});
+  draw();
+ }
+ var GROUPKEYS=[];
+ for(var gk in GROUPS){if(GROUPS.hasOwnProperty(gk)){
+  GROUPKEYS.push([gk,GROUPNAMES[gk]]);}}
+ head.onclick=function(ev){
+  var th=ev.target.closest('th');if(!th)return;
+  var k=th.getAttribute('data-k');if(!k)return;
+  if(k===sortKey){desc=!desc;}else{sortKey=k;desc=true;}
+  draw();
+ };
+ more.onclick=function(){all=true;draw();};
+ var ts={},j2;
+ for(j2=0;j2<D.r.length;j2++){ts[D.r[j2][C.team]]=1;}
+ var tsel=document.getElementById('stteam'),o='<option value="">All teams</option>',
+     tk=Object.keys(ts).sort();
+ for(j2=0;j2<tk.length;j2++){o+='<option value="'+tk[j2]+'">'+tk[j2]+'</option>';}
+ tsel.innerHTML=o;
+ tsel.onchange=function(){team=this.value;draw();};
+ var psel=document.getElementById('stprice'),po='<option value="99">Any price</option>';
+ for(var p=40;p<=155;p+=5){po+='<option value="'+(p/10)+'">Max '+(p/10).toFixed(1)+'</option>';}
+ psel.innerHTML=po;
+ psel.onchange=function(){maxp=+this.value;draw();};
+ var qi=document.getElementById('stq');
+ qi.oninput=function(){q=this.value.toLowerCase();all=false;draw();};
+ document.getElementById('stcsv').onclick=function(){
+  var ks=cols(),hdr=['Player','Team','Pos','Price','Mins'];
+  if(mode==='pstart')hdr.push('Starts');
+  for(var j=0;j<ks.length;j++){hdr.push(LAB[ks[j]]);}
+  var lines=[hdr.join(',')],rs=window.__STROWS__||[];
+  for(var m=0;m<rs.length;m++){
+   var r=rs[m],line=['"'+String(r[C.name]).replace(/"/g,'""')+'"',r[C.team],
+    r[C.pos],r[C.price].toFixed(1),r[C.mins]];
+   if(mode==='pstart')line.push(r[C.starts]);
+   for(var n2=0;n2<ks.length;n2++){
+    var v=val(r,ks[n2]);
+    line.push(typeof v==='number'?v.toFixed(2):v);
+   }
+   lines.push(line.join(','));
+  }
+  var b=new Blob([lines.join('\\n')],{type:'text/csv'}),
+      a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download='goaliq-fpl-stats-'+grp+'-'+mode+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+ };
+ paint();
+})();
+</script>
+"""
+
+
+def _stats_js() -> str:
+    groups = {k: c for k, _, c in STATS_GROUPS}
+    names = {k: n for k, n, _ in STATS_GROUPS}
+    js = STATS_JS.replace("__GROUPS__", json.dumps(groups))
+    js = js.replace("__LAB__", json.dumps(STATS_LABELS))
+    js = js.replace("__RATE__", json.dumps(sorted(STATS_RATEABLE)))
+    js = js.replace("__INT__", json.dumps(sorted(STATS_INT)))
+    # GROUPNAMES on erillinen, jotta ryhmien jarjestys sailyy chipeissa
+    return js.replace(
+        "(function(){",
+        "(function(){\n var GROUPNAMES=" + json.dumps(names) + ";", 1)
+
+
+def render_stats(stats: dict, now: datetime) -> str | None:
+    """Ilmainen Stats zone: koko pelaajajoukko, suodattimet, per 90 / per start.
+
+    Palvelin renderoi 100 rivia default-ryhmalla (SEO + ei-JS), loput ja
+    ryhmavaihdot klientissa. Sama 100-rivin DOM-katto kuin xg-leaders: 26.7
+    todettiin etta 373 rivia x taysrender teki sivusta laggaavan."""
+    meta = stats.get("meta") or {}
+    rows = stats.get("players") or []
+    if not meta.get("available") or not rows:
+        return None
+    cols = meta.get("cols") or []
+    idx = {c: i for i, c in enumerate(cols)}
+    basis = meta.get("basis_label") or ""
+    url = f"{BASE}/fpl/stats"
+    title = "Free FPL Player Stats – Filterable Raw Numbers | GoalIQ"
+    desc = (
+        f"Every Premier League player's FPL numbers in one filterable table: "
+        f"xG, xA, xGI, tackles, CBI, recoveries, clean sheets, set-piece "
+        f"order and more. {len(rows)} players, free, no sign-in."
+    )
+    keys = STATS_GROUPS[0][2]
+    trows = "".join(
+        "<tr>"
+        f'<td class="n">{i + 1}</td>'
+        f'<td>{escape(str(r[idx["name"]]))}</td>'
+        f'<td>{escape(str(r[idx["team"]]))}</td>'
+        f'<td>{escape(str(r[idx["pos"]]))}</td>'
+        f'<td class="n">{r[idx["price"]]:.1f}</td>'
+        f'<td class="n">{r[idx["mins"]]}</td>'
+        + "".join(f'<td class="n">{r[idx[k]]}</td>' for k in keys)
+        + "</tr>"
+        for i, r in enumerate(rows[:100])
+    )
+    thead = (
+        '<tr><th class="n">#</th><th data-k="name">Player</th>'
+        '<th data-k="team">Team</th><th data-k="pos">Pos</th>'
+        '<th class="n" data-k="price">Price</th>'
+        '<th class="n" data-k="mins">Mins</th>'
+        + "".join(f'<th class="n" data-k="{k}">{STATS_LABELS[k]}</th>'
+                  for k in keys)
+        + "</tr>"
+    )
+    controls = (
+        '<div class="lbctl">'
+        '<span class="lbl">Stats</span><span id="stg" class="chips"></span>'
+        '<span class="lbl">Show</span><span id="stm" class="chips"></span>'
+        "</div>"
+        '<div class="lbctl">'
+        '<span class="lbl">Position</span><span id="stp" class="chips"></span>'
+        '<span class="lbl">Min mins</span><span id="stmin" class="chips"></span>'
+        '<select id="stteam" aria-label="Filter by team"></select>'
+        '<select id="stprice" aria-label="Maximum price"></select>'
+        '<input id="stq" type="search" placeholder="Search player" '
+        'aria-label="Search player" style="border:1px solid '
+        'var(--line-strong);background:var(--paper);color:var(--cream);'
+        'padding:7px 10px;font:inherit;font-size:13px;">'
+        '<button type="button" class="chip" id="stcsv">Download CSV</button>'
+        "</div>"
+        f'<p class="note" id="stc">{len(rows)} players, season totals. '
+        "Click a column to sort.</p>"
+    )
+    table = (
+        '<div class="lb-wrap"><table class="lb">'
+        f'<thead id="sth">{thead}</thead>'
+        f'<tbody id="stb">{trows}</tbody></table></div>'
+        '<button type="button" class="chip" id="stmore" '
+        'style="margin:4px 0 8px;">Show all players</button>'
+    )
+    payload = ('<script id="stdata">window.__ST__='
+               + json.dumps({"c": cols, "r": rows}, ensure_ascii=False)
+               + ";</script>")
+    hero = (
+        "<h1>Free FPL player stats</h1>"
+        '<p class="lede">The raw numbers, in one filterable table. Expected '
+        "goals and assists, tackles, clearances, recoveries, clean sheets, "
+        "set-piece order and FPL scoring history for every player. Filter by "
+        "position, team, price and minutes, switch to per 90 or per start, "
+        "sort any column, export CSV. Free, no sign-in.</p>"
+    )
+    body = (
+        f'<p class="note"><strong>{escape(basis)}</strong></p>'
+        f"<h2>Every player with minutes ({len(rows)})</h2>"
+        '<p class="note">These are FPL\'s own published numbers. The expected '
+        "goals, expected assists and expected goals conceded columns come from "
+        "the official FPL API, which is Opta-sourced, so there is no reason to "
+        "put them behind a subscription and we do not. What is not here: shot "
+        "counts and shot locations are not in the FPL API, and our DefCon "
+        "tracker (hit rate, thresholds, projected points) is a model output "
+        "rather than a raw stat, so it lives in the app. The DefCon column "
+        "below is the raw defensive contribution count.</p>"
+        f"{controls}{table}{payload}{_stats_js()}"
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def main() -> int:
     now = datetime.now(timezone.utc)
     OUT_DIR.mkdir(exist_ok=True)
@@ -1155,6 +1482,15 @@ def main() -> int:
         if page:
             (OUT_DIR / "defcon.html").write_text(page, encoding="utf-8")
             built.append("defcon")
+
+    # 8.8 STATS-ZONE: oma nightly-JSON (build_fpl_stats.py). Puuttuva data →
+    # sivu ohitetaan ja vanha jää voimaan, sama konventio kuin muut.
+    stats = _load(STATS_PATH)
+    if stats:
+        page = render_stats(stats, now)
+        if page:
+            (OUT_DIR / "stats.html").write_text(page, encoding="utf-8")
+            built.append("stats")
 
     today = now.strftime("%Y-%m-%d")
     write_urlset(SITEMAP_FPL_PATH, [

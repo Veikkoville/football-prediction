@@ -74,6 +74,11 @@ raw_data/
 # #124/#125: xG- + DefCon-leaders-cache (committattu → Render servaa levyltä)
 !/data/fpl_player_leaders.json
 
+# 8.8 STATS-ZONE: /fpl/stats -sivun lähdedata (scripts/build_fpl_stats.py).
+# Ilman tätä !-poikkeusta tiedosto jää kehityskoneelle ja CI:n regenerointi
+# tuottaisi sivun tyhjästä datasta — sama vikaluokka kuin fpl_defcon_gw.
+!/data/fpl_player_stats.json
+
 # 30.7: per-GW DefCon -matriisi (committattu → Render servaa levyltä).
 # HUOM: ilman tätä !-poikkeusta endpoint 503:aa tuotannossa vaikka kaikki
 # muu on pushattu — gitignoroitu-korjaus-vikaluokka.
