@@ -1127,6 +1127,14 @@ CSS = """
   .content a.cta{ color:var(--amber); }
   .content a.cta.secondary{ color:var(--cream); }
   .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:4px 12px 10px; }
+  /* 8.8 (Villen havainto): palsta on 960px, joten leveakaan naytto ei nayttanyt
+     kaikkia sarakkeita. Taulukot paasevat ulos palstasta ja kasvavat ikkunan
+     mukana; leipateksti pysyy 960:ssa. Taulukko itse ei veny taytteeksi. */
+  .scroll,.table-wrap,.rec-scroll{ width:min(96vw,1560px); margin-left:50%; transform:translateX(-50%); }
+  .scroll>table,.table-wrap>table,.rec-scroll>table{ width:auto; min-width:min(100%,560px); margin:0 auto; }
+  /* .table-wrap oli tyylittelematon: FDR-ruudukko vuoti ulos kapealla
+     naytolla ilman vieritysta. Sama kaare kuin muillakin. */
+  .table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   table{ width:100%; border-collapse:collapse; min-width:560px; }
   caption{ caption-side:bottom; color:var(--ink-muted); font-size:13px; text-align:left; padding:10px 2px 4px; }
   th,td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); font-size:15px; }

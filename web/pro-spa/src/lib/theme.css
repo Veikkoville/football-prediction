@@ -125,6 +125,18 @@
 	--shell: 1180px;
 }
 
+/* 8.8 (Villen havainto): leveilla naytoilla taulukoiden sarakkeet jaivat
+   vaakavierityksen taakse, koska palsta oli lukittu 1180 pikseliin. Kasvatetaan
+   KOKO palstaa isoilla naytoilla sen sijaan etta yksittaiset taulukot
+   karkaisivat kehyksestaan: silloin kortit, otsikot ja taulukot pysyvat
+   linjassa keskenaan eika mikaan komponentti voi vuotaa kortin ulkopuolelle.
+   Alle 1400 px:n naytoilla mikaan ei muutu. */
+@media (min-width: 1400px) {
+	:root {
+		--shell: min(94vw, 1560px);
+	}
+}
+
 * {
 	box-sizing: border-box;
 }
