@@ -23,6 +23,13 @@
 	} from '$lib/api';
 	import { capture } from '$lib/analytics';
 	import { DISCLAIMER } from '$lib/config';
+	import {
+		canShareToApps,
+		shareCard,
+		sharePitchCard,
+		type PitchCardPlayer
+	} from '$lib/shareCard';
+	import { teamColorByShort } from '$lib/teamColors';
 
 	let cs = $state<FantasyResponse | null>(null);
 	let xp = $state<XpResponse | null>(null);
@@ -151,6 +158,73 @@
 		}[];
 	} | null;
 	let modelSquad = $derived(((xp as unknown as { model_squad?: ModelSquad })?.model_squad) ?? null);
+
+	/* 8.8 SPL-jakokortit (M59-sarja ruokkii näistä; 13.8 postaus = squad-kortti).
+	   SPL on ilmainen → kortti on jakelusilmukka, sama perustelu kuin
+	   PriceWatchin free-kortissa. Sävy ja rakenne 1:1 FPL-korttien kanssa. */
+	let sharingCaptain = $state(false);
+	async function shareCaptainCard() {
+		if (sharingCaptain || captainPicks.length < 3) return;
+		sharingCaptain = true;
+		try {
+			const method = await shareCard({
+				title: 'RSL CAPTAIN PICKS',
+				subtitle: `Gameweek ${nextGw}, RSL Fantasy scoring, GoalIQ model`,
+				midLabel: 'FIXTURE',
+				valueLabel: 'xP',
+				fileName: `goaliq_spl_captains_gw${nextGw}.png`,
+				rows: captainPicks.map(({ p, gw1 }, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					mid:
+						(p.gameweeks?.[0]?.opponents ?? [])
+							.map((o) => `${o.opp} (${o.venue})`)
+							.join(', ') || '',
+					value: gw1.toFixed(2)
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'spl_captain', method });
+		} finally {
+			sharingCaptain = false;
+		}
+	}
+
+	const POS_ROWS = ['GKP', 'DEF', 'MID', 'FWD'] as const;
+	function toCardPlayer(p: NonNullable<ModelSquad>['players'][number]): PitchCardPlayer {
+		const { color, textColor } = teamColorByShort(p.team_short);
+		return {
+			name: p.web_name,
+			team: p.team_short,
+			color,
+			textColor,
+			xp: p.xp_per_gw.toFixed(1)
+		};
+	}
+	let sharingSquad = $state(false);
+	async function shareSquadCard() {
+		if (!modelSquad || sharingSquad) return;
+		sharingSquad = true;
+		try {
+			const squad = modelSquad;
+			const xi = squad.players.filter((p) => p.in_xi);
+			const method = await sharePitchCard({
+				title: 'RSL MODEL SQUAD',
+				subtitle:
+					`${squad.cost.toFixed(1)}m of 100.0m, XI ${squad.xi_xp_horizon.toFixed(1)} xP ` +
+					`next ${(xp?.meta?.horizon_gw as number) ?? 6} GWs, GoalIQ model`,
+				fileName: 'goaliq_spl_model_squad.png',
+				rows: POS_ROWS.map((pos) =>
+					xi.filter((p) => p.pos === pos).map(toCardPlayer)
+				).filter((row) => row.length > 0),
+				bench: squad.players.filter((p) => !p.in_xi).map(toCardPlayer)
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'spl_squad', method });
+		} finally {
+			sharingSquad = false;
+		}
+	}
 
 	/* Compare-lite: kaksi valintaa rinnakkain. */
 	let cmpA = $state<number | null>(null);
@@ -309,7 +383,14 @@
 
 	{#if xp?.meta?.available}
 		<section>
-			<h2>Captain picks <span class="muted">(GW{nextGw})</span></h2>
+			<div class="head-row">
+				<h2>Captain picks <span class="muted">(GW{nextGw})</span></h2>
+				{#if captainPicks.length >= 3}
+					<button type="button" class="share-btn" onclick={shareCaptainCard} disabled={sharingCaptain}>
+						{sharingCaptain ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+					</button>
+				{/if}
+			</div>
 			<div class="table-wrap">
 				<table>
 					<thead>
@@ -344,7 +425,12 @@
 
 		{#if modelSquad}
 			<section>
-				<h2>The model squad <span class="muted">({modelSquad.cost.toFixed(1)}m of 100.0m)</span></h2>
+				<div class="head-row">
+					<h2>The model squad <span class="muted">({modelSquad.cost.toFixed(1)}m of 100.0m)</span></h2>
+					<button type="button" class="share-btn" onclick={shareSquadCard} disabled={sharingSquad}>
+						{sharingSquad ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+					</button>
+				</div>
 				<p class="muted small">
 					{modelSquad.note} Starting XI in bold, projected XI total {modelSquad.xi_xp_horizon.toFixed(1)}
 					xP over the next {(xp?.meta?.horizon_gw as number) ?? 6} GWs.
@@ -508,6 +594,29 @@
 		max-width: var(--shell);
 		margin: 0 auto;
 		padding: var(--s-4);
+	}
+	/* 8.8 jakokortit: sama chip-henki kuin FPL-työkalujen share-napeissa */
+	.head-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-2);
+		flex-wrap: wrap;
+	}
+	.share-btn {
+		background: none;
+		border: 1px solid var(--border);
+		color: var(--text);
+		font: inherit;
+		font-size: 0.8rem;
+		padding: 4px 10px;
+		cursor: pointer;
+	}
+	.share-btn:hover:not(:disabled) {
+		border-color: var(--accent);
+	}
+	.share-btn:disabled {
+		opacity: 0.6;
 	}
 	.crumb {
 		margin-bottom: var(--s-2);
