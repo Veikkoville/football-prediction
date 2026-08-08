@@ -344,8 +344,19 @@ def render_captain(xp: dict, now: datetime) -> str | None:
     if not meta.get("available") or not players:
         return None
     gw = meta.get("next_gameweek") or "?"
-    ranked = sorted(players, key=lambda p: float(p.get("xp_per_gw") or 0.0),
-                    reverse=True)
+
+    # 8.8.2026 (Villen havainto): sivu lupaa otsikossa "Best FPL Captain GW{n}"
+    # mutta sorttasi xp_per_gw:lla (koko horisontin keskiarvo) -> sivu ja appin
+    # CaptainRanker antoivat ERI ykkosen (B.Fernandes vs Gabriel) samasta
+    # datasta. Kapteeni valitaan YHDEKSI kierrokseksi, joten avain on seuraavan
+    # GW:n xp. Fallback xp_per_gw:hen jos gameweeks puuttuu (vanha payload).
+    def _next_gw_xp(p: dict) -> float:
+        gws = p.get("gameweeks") or []
+        if gws and gws[0].get("xp") is not None:
+            return float(gws[0]["xp"])
+        return float(p.get("xp_per_gw") or 0.0)
+
+    ranked = sorted(players, key=_next_gw_xp, reverse=True)
     top = ranked[0]
     alts = ranked[1:3]
     url = f"{BASE}/fpl/best-captain"
