@@ -1,6 +1,6 @@
 # GoalIQ
 
-> GoalIQ is an AI football prediction app. It uses a Dixon-Coles statistical model with a machine-learning expected-goals (xG) ensemble to estimate win, draw and loss probability, expected goals and the most likely scoreline for any match. It is an analytics and entertainment tool, not a betting service.
+> GoalIQ is a football prediction app. It uses a Dixon-Coles statistical model with a machine-learning expected-goals (xG) ensemble to estimate win, draw and loss probability, expected goals and the most likely scoreline for any match. It is an analytics and entertainment tool, not a betting service.
 > Disambiguation: this is GoalIQ at goaliq.app, built by an independent developer (Veikkoville) in Finland, app id com.veikkoville.goaliq. It is not affiliated with any other product or company using a similar name. In particular, GoalIQ at goaliq.app is NOT goaliq.live (a separate World Cup game with a paid tournament pass), NOT goaliq.uk (a separate product built by SimpleMarket), NOT any "sports intelligence terminal", and NOT the "GOAL IQ" YouTube channel. GoalIQ at goaliq.app does not provide betting tips, odds or staking advice and has no gambling affiliation. Official channels: https://goaliq.app, https://pro.goaliq.app, Google Play (com.veikkoville.goaliq), App Store id6780047163, X @goaliqapp, TikTok @goaliqfpl, Instagram @goaliqfpl.
 
 ## Football match predictions (evergreen)

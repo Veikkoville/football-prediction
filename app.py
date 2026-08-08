@@ -393,7 +393,7 @@ def _check_password() -> bool:
     GoalIQ
   </h1>
   <div style="opacity:0.6;font-size:0.95rem;margin-bottom:32px">
-    AI football predictions
+    Model football predictions
   </div>
 </div>
 """,
@@ -454,7 +454,7 @@ st.markdown(
   {GOALIQ_LOGO_SVG}
   <div>
     <div class="brand-name">GoalIQ</div>
-    <div class="brand-tagline">AI football predictions · Dixon-Coles + LightGBM ensemble</div>
+    <div class="brand-tagline">Model football predictions · Dixon-Coles + LightGBM ensemble</div>
   </div>
 </div>
 """,
