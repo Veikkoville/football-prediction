@@ -21,6 +21,7 @@
 		predictMatch,
 		type PredictResponse
 	} from '$lib/api';
+	import { LEAGUES as SPA_LEAGUES } from '$lib/leagues';
 	import { capture } from '$lib/analytics';
 
 	let {
@@ -34,26 +35,11 @@
 		prefill?: { league: string; home: string; away: string } | null;
 	} = $props();
 
-	/** 28.7: KURATOITU lista, sama kuin mobiilin lib/leagues.ts.
-	 *
-	 *  Aiemmin tama dumppasi /api/leagues:n sellaisenaan, 24 liigaa. Mitattu:
-	 *  kolme palautti NOLLA joukkuetta, 14 palautti 404 otteluohjelmaan, ja
-	 *  hitaimmat kestivat 6 - 9 s koska palvelin sovittaa mallin liigalle
-	 *  pyynnon yhteydessa. Mobiilin lista on juuri ne joilla toimii seka
-	 *  ennuste etta otteluohjelma, ja koodit ovat -FD-muodossa jotta
-	 *  /api/fixtures ja /api/standings osuvat. */
-	const LEAGUES: { code: string; label: string }[] = [
-		{ code: 'ENG-Premier League', label: 'Premier League' },
-		{ code: 'ESP-La Liga-FD', label: 'La Liga' },
-		{ code: 'GER-Bundesliga-FD', label: 'Bundesliga' },
-		{ code: 'ITA-Serie A-FD', label: 'Serie A' },
-		{ code: 'FRA-Ligue 1-FD', label: 'Ligue 1' },
-		{ code: 'ENG-Championship', label: 'Championship' },
-		{ code: 'NED-Eredivisie', label: 'Eredivisie' },
-		{ code: 'POR-Primeira Liga', label: 'Primeira Liga' },
-		{ code: 'BRA-Serie A', label: 'Brasileirao' },
-		{ code: 'INT-Champions League', label: 'Champions League' }
-	];
+	/** 28.7: KURATOITU lista. 8.8: siirretty $lib/leagues.ts:aan, koska
+	 *  Fixtures ja Standings jaivat tata korjatessa /api/leagues:n varaan ja
+	 *  tarjosivat liigoja joille otteluohjelmaa ei ole (Veikkausliiga) samalla
+	 *  kun Brasileirao puuttui niista kokonaan. */
+	const LEAGUES = SPA_LEAGUES;
 	let league = $state('ENG-Premier League');
 	let teams = $state<string[]>([]);
 	let home = $state('');

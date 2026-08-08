@@ -8,12 +8,8 @@
 	 * Jokainen rivi vie ottelu-ennusteeseen. Se on tämän näkymän koko pointti:
 	 * otteluohjelma ilman "entä miten tässä käy" on kalenteri, ei työkalu.
 	 */
-	import {
-		fetchLeagues,
-		fetchFixtures,
-		LeagueUnsupportedError,
-		type FixtureRow
-	} from '$lib/api';
+	import { fetchFixtures, LeagueUnsupportedError, type FixtureRow } from '$lib/api';
+	import { FIXTURE_LEAGUES } from '$lib/leagues';
 	import { capture } from '$lib/analytics';
 
 	let {
@@ -28,24 +24,10 @@
 
 	const DAYS = 30;
 
-	let leagues = $state<string[]>([]);
 	let league = $state('ENG-Premier League');
 	let all = $state<FixtureRow[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-
-	$effect(() => {
-		fetchLeagues().then(
-			(l) => {
-				leagues = [
-					...(l.top5_xg_leagues ?? []),
-					...(l.uefa_tournaments ?? []),
-					...(l.other_leagues ?? [])
-				];
-			},
-			() => (leagues = ['ENG-Premier League'])
-		);
-	});
 
 	$effect(() => {
 		const lg = league;
@@ -130,8 +112,8 @@
 <div class="field">
 	<label for="fx-league">League</label>
 	<select id="fx-league" bind:value={league}>
-		{#each leagues as l (l)}
-			<option value={l}>{l}</option>
+		{#each FIXTURE_LEAGUES as l (l.code)}
+			<option value={l.code}>{l.label}</option>
 		{/each}
 	</select>
 </div>

@@ -7,37 +7,31 @@
 	 * hyödyttömän datan edessä on juuri se kitka joka ajaa kävijän pois
 	 * hakutulossivulta. Ero on tietoinen, ei vahinko.
 	 */
-	import { fetchLeagues, fetchStandings, type StandingsRow } from '$lib/api';
-
+	import { fetchStandings, type StandingsRow } from '$lib/api';
 	// 1.8.2026: kausi resolvoidaan kalenterista (elo-touko), ei kovakoodata.
 	// Valikosta puuttui 2026/27 kokonaan ja oletus oli jumissa 25/26:ssa, joten
-	// web ei pystynyt näyttämään kuluvaa kautta lainkaan. Sama sääntö kuin
-	// mobiilin lib/season.ts:ssä: kuukaudet 8-12 -> alkava kausi.
-	function currentSeasonCode(now = new Date()): string {
-		const y = now.getUTCFullYear() % 100;
-		const start = now.getUTCMonth() + 1 >= 8 ? y : y - 1;
-		return `${String(start).padStart(2, '0')}${String(start + 1).padStart(2, '0')}`;
-	}
+	// web ei pystynyt näyttämään kuluvaa kautta lainkaan. Logiikka asuu nyt
+	// $lib/leagues.ts:ssä, koska oikea kausikoodi riippuu liigasta (BSA =
+	// kalenterivuosi, '26' eikä '2627').
+	import { STANDINGS_LEAGUES, seasonChoices, defaultSeason } from '$lib/leagues';
 
-	let leagues = $state<string[]>([]);
 	let league = $state('ENG-Premier League');
-	let season = $state(currentSeasonCode());
+	let season = $state(defaultSeason('ENG-Premier League'));
 	let rows = $state<StandingsRow[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
-	$effect(() => {
-		fetchLeagues().then(
-			(l) => {
-				leagues = [
-					...(l.top5_xg_leagues ?? []),
-					...(l.uefa_tournaments ?? []),
-					...(l.other_leagues ?? [])
-				];
-			},
-			() => (leagues = ['ENG-Premier League'])
-		);
-	});
+	let seasons = $derived(seasonChoices(league));
+
+	/** Liigan vaihto siirtää kauden uuden liigan koodiavaruuteen. Tavallinen
+	 *  funktio tarkoituksella: kaksi $effectiä jotka lukevat ja kirjoittavat
+	 *  samaa statea tappaisi sidonnan hiljaa (todettu 3.8). */
+	function selectLeague(code: string) {
+		league = code;
+		if (!seasonChoices(code).some((s) => s.value === season)) {
+			season = defaultSeason(code);
+		}
+	}
 
 	$effect(() => {
 		const lg = league;
@@ -67,19 +61,22 @@
 <div class="controls">
 	<div class="field">
 		<label for="st-league">League</label>
-		<select id="st-league" bind:value={league}>
-			{#each leagues as l (l)}
-				<option value={l}>{l}</option>
+		<select
+			id="st-league"
+			value={league}
+			onchange={(e) => selectLeague(e.currentTarget.value)}
+		>
+			{#each STANDINGS_LEAGUES as l (l.code)}
+				<option value={l.code}>{l.label}</option>
 			{/each}
 		</select>
 	</div>
 	<div class="field">
 		<label for="st-season">Season</label>
 		<select id="st-season" bind:value={season}>
-			<option value="2627">2026/27</option>
-			<option value="2526">2025/26</option>
-			<option value="2425">2024/25</option>
-			<option value="2324">2023/24</option>
+			{#each seasons as s (s.value)}
+				<option value={s.value}>{s.label}</option>
+			{/each}
 		</select>
 	</div>
 </div>
