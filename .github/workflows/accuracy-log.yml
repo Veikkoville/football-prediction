@@ -90,6 +90,28 @@ jobs:
           ACC_PREDICT_API_BASE: ${{ vars.ACC_PREDICT_API_BASE }}
         run: python -m scripts.accuracy_pipeline run
 
+      # CF-eston vahti (8.8): ACC_PREDICT_API_BASE-kierto on ollut voimassa 1.8
+      # alkaen, mutta itse CF-saantoa ei ole koskaan tunnistettu, eika mikaan
+      # kertoisi meille jos esto poistuu. Ilman tata kierto jaa ikuisiksi ajoiksi
+      # paikalleen ja api.goaliq.app-polku jaa testaamatta.
+      # Read-only probe, continue-on-error: EI saa koskaan kaataa accuracy-lokia.
+      - name: CF-eston vahti (api.goaliq.app vs Render-origin)
+        continue-on-error: true
+        run: |
+          cf=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://api.goaliq.app/api/accuracy || echo 000)
+          origin=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://goaliq-api.onrender.com/api/accuracy || echo 000)
+          echo "api.goaliq.app=$cf  onrender-origin=$origin"
+          if [ "$cf" = "403" ]; then
+            echo "::notice::CF-esto YHA voimassa GH-runnerilta (403). ACC_PREDICT_API_BASE-kierto tarvitaan edelleen."
+          elif [ "$cf" = "200" ]; then
+            echo "::warning::CF-esto POISTUNUT: api.goaliq.app palautti 200 GH-runnerilta. ACC_PREDICT_API_BASE-kierto voidaan purkaa (poista repo-muuttuja)."
+          else
+            echo "::notice::api.goaliq.app palautti $cf (ei 403 eika 200) - tarkista erikseen."
+          fi
+          if [ "$origin" != "200" ]; then
+            echo "::error::Render-origin palautti $origin - ACC_PREDICT_API_BASE-kierto on rikki, accuracy-data voi olla vanhentunutta."
+          fi
+
       # Recent-form-sync (4.7.→, Villen GO): täytä pelattujen knockouttien
       # FT-tulokset international_results.csv:n NA-fixtureihin (sama FD-lähde
       # ja tahti kuin reconcile yllä) → /api/team last_5/form pysyy tuoreena
