@@ -16,7 +16,7 @@
 		'Multi-gameweek transfer planner and plan chains',
 		'Chip timing: best window for Wildcard, Bench Boost, Triple Captain and Free Hit',
 		'Edge mode: protect or climb your rank with ownership-weighted picks',
-		'Unlimited watchlist: track every player you are deciding on',
+		'Watchlist for up to 50 players: track everyone you are deciding on',
 		'Player compare: up to four players side by side',
 		'CSV export of the full projection set',
 		// 4.8: synkattu paywall.bullet_match-avaimeen (goaliq-app/lib/i18n/en.ts).

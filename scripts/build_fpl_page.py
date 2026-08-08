@@ -436,7 +436,8 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
                 "(log your calls before the deadline and they get graded "
                 "against the model's every gameweek), a watchlist for the "
                 "players you are deciding on, the "
-                "top three of the value, xG leaders and DefCon lists, and "
+                "full xG/xA/xGI leaderboard for every player with data, the "
+                "top three of the value and DefCon lists, and "
                 "shareable image cards of the clean sheet outlook and price "
                 "watch tables on the web. GoalIQ "
                 "Premium: an interactive team manager (formations, bench swaps, "
@@ -445,8 +446,8 @@ def build_faq(c: dict) -> list[tuple[str, str]]:
                 "ranker, transfer suggestions with one-tap apply to your "
                 "planned squad, player value (xP per million) for the top 50 with position and team filters, showing the scoring rate per 90 minutes and expected minutes separately so a high rate on low minutes reads as a bench risk and not a bargain, a live DefCon "
                 "panel that tracks your own squad against the threshold while "
-                "a gameweek is being played (web), full xG leaders "
-                "and DefCon (defensive contribution) leaderboards, goalkeeper "
+                "a gameweek is being played (web), the full DefCon "
+                "(defensive contribution) leaderboard, goalkeeper "
                 "rotation pairs, differentials, player compare for up to four "
         "players and predicted "
                 "starting minutes. Available on the web, iOS and Android."
@@ -939,7 +940,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "a fit checker, a pre-season draft rater "
             "and price watch free, plus an interactive team manager with a "
             "gameweek planner, player expected points (xP), the captain "
-            "ranker, player value, xG leaders, a DefCon tracker, "
+            "ranker, player value, a DefCon tracker, "
             "differentials, player compare for up to four players and transfer "
             "suggestions with apply on GoalIQ "
             "Premium - powered by a Dixon-Coles + machine-learning match model "
@@ -1277,7 +1278,7 @@ This page gives clean sheet probability and fixture difficulty for every
 Premier League team, free and updated every gameweek. Rate my team, a captain
 pick and price watch are free too; GoalIQ Premium adds an interactive team
 manager with a gameweek planner, player expected points (xP), the captain
-ranker, player value, xG leaders, a DefCon tracker and transfer suggestions
+ranker, player value, a DefCon tracker and transfer suggestions
 you can apply to your planned squad.</p>
 <p class="meta">Season {c["season"]}. Data updated {c["data_date"]}.
 Gameweek {c["next_gw"]} starts {c["gw_label"]}.</p>
@@ -1335,8 +1336,8 @@ tooltip. Model-derived, not the official FPL difficulty.</p>
 captaincy and a GW1 to GW6 gameweek planner showing each player's opponent
 per week), player expected points (xP), a captain ranker, transfer suggestions
 you can apply straight to your planned squad, a player value ranking (xP per
-million), full xG leaders and DefCon leaderboards with a gameweek-by-gameweek
-DefCon breakdown, goalkeeper rotation pairs,
+million), the full DefCon leaderboard with a gameweek-by-gameweek
+breakdown, goalkeeper rotation pairs,
 differential picks, player compare for up to four players and predicted
   starting minutes, from the
 same match model as this page. Rate my team, a captain pick, price watch and

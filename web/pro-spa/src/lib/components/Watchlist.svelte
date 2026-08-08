@@ -240,7 +240,7 @@
 			}}
 		/>
 	{:else if !premium}
-		<p class="muted limit">Free tracks {WATCHLIST_FREE_LIMIT} players. Premium removes the limit.</p>
+		<p class="muted limit">Free tracks {WATCHLIST_FREE_LIMIT} players. Premium tracks up to 50.</p>
 	{/if}
 	{/if}
 </section>
