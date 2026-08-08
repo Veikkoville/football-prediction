@@ -1346,6 +1346,7 @@ the top three of every leaderboard are free.</p>
   <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium, &euro;25/year</a>
 </div>
 <p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
+Early adopters: 30% off the season pass with code EARLY30 at checkout, so €17.50 for the year.
 One subscription covers web, iOS and Android.</p>
 </aside>
 

@@ -14,7 +14,7 @@ import { accessToken } from './auth.svelte';
 import { capture, captureBeforeUnload } from './analytics';
 
 export const PLANS = {
-	season: { label: 'Season pass: 25 €/year', price: 25.0, hint: 'Best value, under 2.10 €/month' },
+	season: { label: 'Season pass: 25 €/year', price: 25.0, hint: 'Best value, under 2.10 €/month. 30% off with code EARLY30 at checkout' },
 	monthly: { label: 'Monthly: 3.99 €/mo', price: 3.99, hint: 'Flexible, try it for a month' }
 } as const;
 
