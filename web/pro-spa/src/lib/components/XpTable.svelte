@@ -2,6 +2,8 @@
 	import type { XpResponse, XpPlayer } from '$lib/api';
 	import { gwXp } from '$lib/api';
 	import { downloadXpCsv } from '$lib/fantasyTools';
+	import { capture } from '$lib/analytics';
+	import { canShareToApps, shareCard } from '$lib/shareCard';
 	import ComponentSplit from './ComponentSplit.svelte';
 	import MethodNote from './MethodNote.svelte';
 	import SetPieceBadges from './SetPieceBadges.svelte';
@@ -205,6 +207,49 @@
 		);
 	}
 
+	// 8.8 (Villen pyyntö): jakokortti myös tähän listaan, samaan paikkaan
+	// mistä CSV:n saa. Jakaa NÄKYVÄN näkymän top 10 — aktiiviset suodattimet
+	// (pos/hintakatto/sortti/haku) alaotsikossa, muuten kortti väittäisi
+	// olevansa koko listan kärki (sama linjaus kuin Value.sveltessä 4.8).
+	let sharing = $state(false);
+	async function share() {
+		if (sharing) return;
+		sharing = true;
+		try {
+			// Vain ensimmäinen kirjain pieneksi — .toLowerCase() rikkoisi
+			// xP-kirjoitusasun ("by total xp").
+			const sortLabel = SORTS[sortBy].label.replace(/\s*\(.*\)$/, '');
+			const sub = [
+				horizonLabel,
+				`by ${sortLabel.charAt(0).toLowerCase()}${sortLabel.slice(1)}`,
+				...(pos !== 'All' ? [pos] : []),
+				...(maxPrice != null ? [`max £${maxPrice.toFixed(1)}m`] : []),
+				...(search.trim() ? [`"${search.trim()}"`] : [])
+			].join(', ');
+			const method = await shareCard({
+				title: 'EXPECTED POINTS',
+				subtitle: `${sub}, GoalIQ model`,
+				...(hasPrice ? { midLabel: 'PRICE' } : {}),
+				valueLabel: sortBy === 'value' ? 'xP/£m' : 'xP',
+				fileName: 'goaliq_xp_list.png',
+				rows: pool.slice(0, 10).map((p, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					...(hasPrice && typeof p.price === 'number' ? { mid: p.price.toFixed(1) } : {}),
+					value:
+						sortBy === 'value'
+							? xpPerMillion(p).toFixed(2)
+							: p.xp_horizon_total.toFixed(1)
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'xp', method });
+		} finally {
+			sharing = false;
+		}
+	}
+
 	// Edge-sprint kohta 5: CSV-lataus (premium-pinta; Bearer-header kulkee
 	// downloadXpCsv-helperissä). Virhe inline-banneriin, ei heitetä.
 	let csvBusy = $state(false);
@@ -306,6 +351,10 @@
 	<!-- Edge-sprint kohta 5: koko projektio CSV:nä (premium-pinta) -->
 	<button type="button" class="ghost csv-btn" disabled={csvBusy} onclick={() => void onCsv(false)}>
 		{csvBusy ? 'Preparing CSV…' : 'Download CSV'}
+	</button>
+	<!-- 8.8: jakokortti näkyvästä näkymästä, CSV:n vierestä -->
+	<button type="button" class="ghost" disabled={sharing} onclick={share}>
+		{sharing ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
 	</button>
 </div>
 <!-- fi/eu-Excel lukee pisteellisen desimaalin paivamaaraksi ja nayttaa '####'.
