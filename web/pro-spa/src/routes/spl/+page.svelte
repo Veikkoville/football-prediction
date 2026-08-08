@@ -191,6 +191,120 @@
 		}
 	}
 
+	let sharingXp = $state(false);
+	async function shareXpCard() {
+		if (sharingXp || players.length < 3) return;
+		sharingXp = true;
+		try {
+			const method = await shareCard({
+				title: 'RSL EXPECTED POINTS',
+				subtitle: [
+					`next ${(xp?.meta?.horizon_gw as number) ?? 6} GWs`,
+					...(posFilter !== 'ALL' ? [posFilter] : []),
+					'RSL Fantasy scoring, GoalIQ model'
+				].join(', '),
+				midLabel: 'PRICE',
+				valueLabel: 'xP',
+				fileName: 'goaliq_spl_xp.png',
+				rows: players.slice(0, 10).map((p, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					mid: typeof p.price === 'number' ? p.price.toFixed(1) : '',
+					value: p.xp_horizon_total.toFixed(1)
+				}))
+			});
+			if (method !== 'aborted') capture('xp_card_shared', { list: 'spl_xp', method });
+		} finally {
+			sharingXp = false;
+		}
+	}
+
+	/* Yleinen jakaja lopuille listoille (Villen "kaikkiin listoihin"):
+	   yksi tila, avain kertoo mikä nappi pyörii. */
+	let sharingList = $state<string | null>(null);
+	async function shareList(key: string, spec: Parameters<typeof shareCard>[0]) {
+		if (sharingList) return;
+		sharingList = key;
+		try {
+			const method = await shareCard(spec);
+			if (method !== 'aborted') capture('xp_card_shared', { list: key, method });
+		} finally {
+			sharingList = null;
+		}
+	}
+	const shareLabel = (key: string) =>
+		sharingList === key ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image';
+
+	const shareCsCard = () =>
+		shareList('spl_cs', {
+			title: 'RSL CLEAN SHEET OUTLOOK',
+			subtitle: `next ${nearHorizon} GWs, GoalIQ match model`,
+			nameLabel: 'TEAM',
+			midLabel: 'FDR',
+			valueLabel: 'CS%',
+			fileName: 'goaliq_spl_clean_sheets.png',
+			rows: teams.slice(0, 10).map((r, i) => ({
+				rank: i + 1,
+				name: r.t.name,
+				tag: `${r.n}x`,
+				team: '',
+				mid: r.avgFdr < 99 ? r.avgFdr.toFixed(2) : '',
+				value: r.avgCs != null ? `${Math.round(r.avgCs)}%` : ''
+			}))
+		});
+	const shareValueCard = () =>
+		shareList('spl_value', {
+			title: 'RSL VALUE PICKS',
+			subtitle: `xP per million, next ${(xp?.meta?.horizon_gw as number) ?? 6} GWs, GoalIQ model`,
+			midLabel: 'PRICE',
+			valueLabel: 'xP/m',
+			fileName: 'goaliq_spl_value.png',
+			rows: valuePicks.slice(0, 10).map(({ p, vpm }, i) => ({
+				rank: i + 1,
+				name: p.web_name,
+				tag: p.pos,
+				team: p.team_short,
+				mid: p.price?.toFixed(1) ?? '',
+				value: vpm.toFixed(2)
+			}))
+		});
+	const shareDiffCard = () =>
+		shareList('spl_diff', {
+			title: 'RSL DIFFERENTIALS',
+			subtitle: 'under 10% ownership, by xP per GW, GoalIQ model',
+			midLabel: 'OWNED',
+			valueLabel: 'xP/GW',
+			fileName: 'goaliq_spl_differentials.png',
+			rows: differentials.slice(0, 10).map((p, i) => ({
+				rank: i + 1,
+				name: p.web_name,
+				tag: p.pos,
+				team: p.team_short,
+				mid: `${(p.owned_pct ?? 0).toFixed(1)}%`,
+				value: p.xp_per_gw.toFixed(2)
+			}))
+		});
+	const shareLeadersCard = () =>
+		shareList('spl_leaders', {
+			title: 'RSL FANTASY LEADERS',
+			subtitle: '2025/26 season points, RSL Fantasy data',
+			midLabel: 'GOALS',
+			valueLabel: 'PTS',
+			fileName: 'goaliq_spl_leaders.png',
+			rows: leaders('points')
+				.slice(0, 10)
+				.map((p, i) => ({
+					rank: i + 1,
+					name: p.web_name,
+					tag: p.pos,
+					team: p.team_short,
+					mid: String(p.last_season?.goals ?? 0),
+					value: String(p.last_season?.points ?? 0)
+				}))
+		});
+
 	const POS_ROWS = ['GKP', 'DEF', 'MID', 'FWD'] as const;
 	function toCardPlayer(p: NonNullable<ModelSquad>['players'][number]): PitchCardPlayer {
 		const { color, textColor } = teamColorByShort(p.team_short);
@@ -283,7 +397,14 @@
 	</header>
 
 	<section>
-		<h2>Clean sheet % + fixture difficulty <span class="muted">(next {nearHorizon} GWs)</span></h2>
+		<div class="head-row">
+			<h2>Clean sheet % + fixture difficulty <span class="muted">(next {nearHorizon} GWs)</span></h2>
+			{#if cs?.meta?.available && teams.length >= 3}
+				<button type="button" class="share-btn" onclick={shareCsCard} disabled={sharingList !== null}>
+					{shareLabel('spl_cs')}
+				</button>
+			{/if}
+		</div>
 		{#if csError}
 			<p class="error">Could not reach the API. {csError}</p>
 		{:else if !cs}
@@ -329,7 +450,14 @@
 	</section>
 
 	<section>
-		<h2>Expected points <span class="muted">(next {(xp?.meta?.horizon_gw as number) ?? 6} GWs, top 50)</span></h2>
+		<div class="head-row">
+			<h2>Expected points <span class="muted">(next {(xp?.meta?.horizon_gw as number) ?? 6} GWs, top 50)</span></h2>
+			{#if xp?.meta?.available && players.length >= 3}
+				<button type="button" class="share-btn" onclick={shareXpCard} disabled={sharingXp}>
+					{sharingXp ? 'Rendering…' : canShareToApps() ? 'Share as image' : 'Download image'}
+				</button>
+			{/if}
+		</div>
 		{#if xpError}
 			<p class="error">Could not reach the API. {xpError}</p>
 		{:else if !xp}
@@ -457,11 +585,18 @@
 		{/if}
 
 		<section>
-			<h2>Best value <span class="muted">(xP per million, next {(xp?.meta?.horizon_gw as number) ?? 6} GWs)</span></h2>
+			<div class="head-row">
+				<h2>Best value <span class="muted">(xP per million, next {(xp?.meta?.horizon_gw as number) ?? 6} GWs)</span></h2>
+				{#if valuePicks.length >= 3}
+					<button type="button" class="share-btn" onclick={shareValueCard} disabled={sharingList !== null}>
+						{shareLabel('spl_value')}
+					</button>
+				{/if}
+			</div>
 			<div class="table-wrap">
 				<table>
 					<thead>
-						<tr><th>Player</th><th>Team</th><th>Pos</th><th class="num">Price</th><th class="num">xP / GW</th><th class="num">xP / £m</th></tr>
+						<tr><th>Player</th><th>Team</th><th>Pos</th><th class="num">Price</th><th class="num">xP / GW</th><th class="num">xP / m</th></tr>
 					</thead>
 					<tbody>
 						{#each valuePicks as { p, vpm } (p.id)}
@@ -484,7 +619,14 @@
 		</section>
 
 		<section>
-			<h2>Differentials <span class="muted">(under 10% ownership)</span></h2>
+			<div class="head-row">
+				<h2>Differentials <span class="muted">(under 10% ownership)</span></h2>
+				{#if differentials.length >= 3}
+					<button type="button" class="share-btn" onclick={shareDiffCard} disabled={sharingList !== null}>
+						{shareLabel('spl_diff')}
+					</button>
+				{/if}
+			</div>
 			<div class="table-wrap">
 				<table>
 					<thead>
@@ -507,7 +649,14 @@
 		</section>
 
 		<section>
-			<h2>Last season's leaders <span class="muted">(2025/26, RSL Fantasy data)</span></h2>
+			<div class="head-row">
+				<h2>Last season's leaders <span class="muted">(2025/26, RSL Fantasy data)</span></h2>
+				{#if leaders('points').length >= 3}
+					<button type="button" class="share-btn" onclick={shareLeadersCard} disabled={sharingList !== null}>
+						{shareLabel('spl_leaders')}
+					</button>
+				{/if}
+			</div>
 			<div class="leaders-grid">
 				{#each [['goals', 'Goals'], ['assists', 'Assists'], ['points', 'Fantasy points']] as [key, label] (key)}
 					<div>
