@@ -55,6 +55,8 @@ PW_PATH = ROOT / "data" / "fpl_price_watch.json"
 LEADERS_PATH = ROOT / "data" / "fpl_player_leaders.json"
 # 8.8 STATS-ZONE: ilmainen suodatettava raakataulukko (scripts/build_fpl_stats.py)
 STATS_PATH = ROOT / "data" / "fpl_player_stats.json"
+# 8.8: joukkuetason puolustusprofiili (scripts/build_understat_team_defence.py)
+DEFENCE_PATH = ROOT / "data" / "understat_team_defence_2526.json"
 API = "https://api.goaliq.app"  # 27.7: pois estetysta onrender.com-vyohykkeesta
 
 UPSELL = (
@@ -211,6 +213,7 @@ _TOOL_LINKS = [
     ("/fpl/xg-leaders", "xG leaders"),
     ("/fpl/defcon", "DefCon leaders"),
     ("/fpl/stats", "Player stats"),
+    ("/fpl/defence", "Defence profiles"),
 ]
 
 
@@ -1540,6 +1543,103 @@ def render_stats(stats: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+def render_defence(defence: dict, now: datetime) -> str | None:
+    """Joukkuetason puolustusprofiili: MILLAISIA paikkoja puolustus paastaa.
+
+    Taydentaa CS-% ja FDR -sivua, joka kertoo KUINKA PALJON muttei mista.
+    FPL-hyoty: paalaukausmaara kertoo erikoistilanneriskin, keskiboksin
+    paikat avoimen pelin heikkoudesta."""
+    meta = defence.get("meta") or {}
+    rows = defence.get("teams") or []
+    if not meta.get("available") or not rows:
+        return None
+    season = meta.get("season", "")
+    url = f"{BASE}/fpl/defence"
+    title = "Premier League Defence Profiles – What Each Defence Concedes | GoalIQ"
+    desc = (
+        f"Not how many chances each Premier League defence concedes but what "
+        f"kind: shots in the six-yard box, central box, wide box, edge of box "
+        f"and long range, plus headers and set-piece xG. {season} data, free."
+    )
+    best = rows[0]
+    most_headers = max(rows, key=lambda r: r["head_pm"])
+    most_central = max(rows, key=lambda r: r["central_pm"])
+    stat_row = "".join([
+        '<div class="stat"><b>' + escape(best["team"]) + "</b>"
+        f'<span>Fewest expected goals conceded: {best["xg_pm"]:.2f} per match</span></div>',
+        '<div class="stat"><b>' + escape(most_headers["team"]) + "</b>"
+        f'<span>Most headers faced: {most_headers["head_pm"]:.2f} per match</span></div>',
+        '<div class="stat"><b>' + escape(most_central["team"]) + "</b>"
+        f'<span>Most central-box shots faced: {most_central["central_pm"]:.2f} per match</span></div>',
+    ])
+    trows = "".join(
+        "<tr>"
+        f'<td class="n">{i + 1}</td>'
+        f'<td>{escape(r["team"])}</td>'
+        f'<td class="n hi">{r["xg_pm"]:.2f}</td>'
+        f'<td class="n">{r["shots_pm"]:.1f}</td>'
+        f'<td class="n">{r["six_pm"]:.2f}</td>'
+        f'<td class="n">{r["central_pm"]:.2f}</td>'
+        f'<td class="n">{r["wide_pm"]:.2f}</td>'
+        f'<td class="n">{r["edge_pm"]:.2f}</td>'
+        f'<td class="n">{r["far_pm"]:.2f}</td>'
+        f'<td class="n">{r["head_pm"]:.2f}</td>'
+        f'<td class="n">{r["sp_xg_pm"]:.2f}</td>'
+        f'<td class="n">{r["box_share"]:.0f}%</td>'
+        "</tr>"
+        for i, r in enumerate(rows)
+    )
+    table = (
+        '<div class="lb-wrap"><table class="lb">'
+        "<thead><tr>"
+        '<th class="n">#</th><th>Team</th>'
+        '<th class="n" title="Expected goals conceded per match">xGC</th>'
+        '<th class="n" title="Shots faced per match">Shots</th>'
+        '<th class="n" title="Six-yard box, central">6yd</th>'
+        '<th class="n" title="Penalty area, central band">Central</th>'
+        '<th class="n" title="Penalty area, wide of the central band">Wide</th>'
+        '<th class="n" title="Between 18 yards and the penalty area">Edge</th>'
+        '<th class="n" title="Long range">Far</th>'
+        '<th class="n" title="Headed attempts faced per match">Headers</th>'
+        '<th class="n" title="Set-piece expected goals conceded per match">SP xG</th>'
+        '<th class="n" title="Share of shots faced that came from inside the box">In box</th>'
+        "</tr></thead>"
+        f"<tbody>{trows}</tbody></table></div>"
+    )
+    hero = (
+        "<h1>What each Premier League defence concedes</h1>"
+        '<p class="lede">Clean sheet odds tell you how likely a shutout is. '
+        "This tells you what a defence actually gives up: shots from the "
+        "six-yard box, the central penalty area, wide in the box, the edge and "
+        "long range, plus headers faced and set-piece expected goals. Two "
+        "defences can face the same number of shots and be nothing alike.</p>"
+    )
+    body = (
+        f'<p class="note"><strong>{escape(season)} season, per match. '
+        "Penalties are counted separately and left out of the zone columns, "
+        "because they say nothing about defensive shape.</strong></p>"
+        f'<div class="stat-row">{stat_row}</div>'
+        "<h2>Every defence, sorted by expected goals conceded</h2>"
+        '<p class="note">Why this matters for FPL: a defence that faces a lot '
+        "of headers is a set-piece risk, so its clean sheet is fragile even "
+        "against weak opponents. A defence that concedes mostly from long "
+        "range is giving up volume without quality, and its goalkeeper is a "
+        "save-points candidate. These come from shot-level data with its own "
+        "expected-goals model, so the numbers are not Opta's and we do not "
+        "call them that.</p>"
+        f"{table}"
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def main() -> int:
     now = datetime.now(timezone.utc)
     OUT_DIR.mkdir(exist_ok=True)
@@ -1592,6 +1692,13 @@ def main() -> int:
         if page:
             (OUT_DIR / "stats.html").write_text(page, encoding="utf-8")
             built.append("stats")
+
+    defence = _load(DEFENCE_PATH)
+    if defence:
+        page = render_defence(defence, now)
+        if page:
+            (OUT_DIR / "defence.html").write_text(page, encoding="utf-8")
+            built.append("defence")
 
     today = now.strftime("%Y-%m-%d")
     write_urlset(SITEMAP_FPL_PATH, [

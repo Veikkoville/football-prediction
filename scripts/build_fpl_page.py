@@ -1416,6 +1416,8 @@ one refreshes on the same schedule. No login, no paywall.</p>
   <li><a href="/fpl/stats">Player stats</a>: shots, shots in the box, key
   passes, tackles and the rest of the raw numbers in one filterable table,
   per 90 or per start, with CSV export.</li>
+  <li><a href="/fpl/defence">Defence profiles</a>: what each defence actually
+  concedes, by pitch zone, plus headers faced and set-piece xG.</li>
 </ul>
 
 <h2 id="about">About GoalIQ</h2>
@@ -1454,6 +1456,7 @@ predictions and analytics. Not betting advice.</p>
   <a href="/fpl/xg-leaders">xG leaders</a> &middot;
   <a href="/fpl/defcon">DefCon leaders</a> &middot;
   <a href="/fpl/stats">Player stats</a> &middot;
+  <a href="/fpl/defence">Defence profiles</a> &middot;
   <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
   <a href="faq.html">App FAQ</a> &middot;
   <a href="privacy.html">Privacy</a></p>
