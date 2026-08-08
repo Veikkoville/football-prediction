@@ -10,6 +10,11 @@ MITA SKANNATAAN JA MIKSI JUURI TATA
    Naista <script>- ja <style>-lohkot ja <!-- --> -kommentit leikataan pois:
    ne eivat ole copya.
 2. pro-SPA:n Svelte-markup (script- ja style-lohkojen ULKOPUOLINEN teksti).
+3. pro-SPA:n .ts-tiedostojen MERKKIJONOLITERAALIT (8.8: roast.ts, shareCard.ts
+   ja fantasyTools.ts sisaltavat kayttajalle nakyvaa tekstia .ts-puolella,
+   joka oli portin katvealueessa). Kommentit ohitetaan tokenisoimalla, ei
+   regexilla: '//' merkkijonon sisalla (esim. https://...) ei ole kommentti,
+   eika kommentin heittomerkki (don't) aloita merkkijonoa.
 
 GENERAATTOREITA (build_*.py) EI skannata suoraan, ja se on tietoinen valinta.
 Ensimmainen versio skannasi ne ja tuotti 30 vaaraa osumaa: Python-docstringit
@@ -58,6 +63,45 @@ def _mask_non_copy(text: str) -> str:
     return text
 
 
+def _ts_string_literals_only(text: str) -> str:
+    """Sailyta vain .ts-tiedoston merkkijonoliteraalit; blankkaa koodi ja
+    kommentit rivinumerot sailyttaen. Copy elaa string-literaleissa;
+    koodikommentit (taynna em dasheja) eivat ole copya."""
+    out: list[str] = []
+    i, n = 0, len(text)
+    while i < n:
+        c = text[i]
+        if c == "/" and i + 1 < n and text[i + 1] == "/":
+            j = text.find("\n", i)
+            j = n if j == -1 else j
+            out.append(" " * (j - i))
+            i = j
+        elif c == "/" and i + 1 < n and text[i + 1] == "*":
+            j = text.find("*/", i + 2)
+            j = n if j == -1 else j + 2
+            out.append(re.sub(r"[^\n]", " ", text[i:j]))
+            i = j
+        elif c in "\"'`":
+            quote = c
+            j = i + 1
+            while j < n:
+                if text[j] == "\\":
+                    j += 2
+                    continue
+                if text[j] == quote:
+                    j += 1
+                    break
+                if quote != "`" and text[j] == "\n":
+                    break
+                j += 1
+            out.append(text[i:j])
+            i = j
+        else:
+            out.append(c if c == "\n" else " ")
+            i += 1
+    return "".join(out)
+
+
 def scan(path: Path) -> list[tuple[int, str]]:
     raw = path.read_text(encoding="utf-8", errors="replace")
     if EM not in raw and "&mdash;" not in raw:
@@ -65,7 +109,12 @@ def scan(path: Path) -> list[tuple[int, str]]:
     # CSV-inputeissa #-rivit ovat dokumentaatiota (suomeksi, taynna em dasheja),
     # eivat copya. Vain datarivien tekstikentat paatyvat kayttajalle.
     is_csv = path.suffix.lower() == ".csv"
-    masked = raw if is_csv else _mask_non_copy(raw)
+    if is_csv:
+        masked = raw
+    elif path.suffix.lower() == ".ts":
+        masked = _ts_string_literals_only(raw)
+    else:
+        masked = _mask_non_copy(raw)
     raw_lines = raw.split("\n")
     hits: list[tuple[int, str]] = []
     for i, line in enumerate(masked.split("\n")):
@@ -83,6 +132,7 @@ def main() -> int:
         targets += sorted(ROOT.glob(g))
     if SPA_DIR.exists():
         targets += sorted(SPA_DIR.rglob("*.svelte"))
+        targets += sorted(SPA_DIR.rglob("*.ts"))
     targets += [ROOT / c for c in COPY_CSV if (ROOT / c).exists()]
     targets = sorted(set(targets))
 
