@@ -1131,11 +1131,13 @@ STATS_GROUPS = [
     # jarjestetty pisteilla, ja lajitteluperusteen pitaa olla nakyvissa.
     # Ilman sita "#"-sarakkeen jarjestys naytti selittamattomalta.
     ("key", "Key", ["pts", "g", "a", "xg", "xa", "xgi"]),
-    ("threat", "Goal threat", ["g", "xg", "xgi", "threat"]),
-    ("create", "Creativity", ["a", "xa", "xgi", "creativity"]),
+    ("threat", "Goal threat", ["sh", "sot", "box", "head", "hvc", "npxg",
+                               "g", "xg"]),
+    ("create", "Creativity", ["kp", "a", "xa", "xgi", "xgchain", "xgbuildup",
+                              "creativity"]),
     ("defend", "Defending", ["tkl", "cbi", "rec", "dc", "cs", "gc", "xgc",
                              "saves"]),
-    ("setp", "Set pieces", ["pen", "cor", "fk"]),
+    ("setp", "Set pieces", ["pen", "cor", "fk", "spxg"]),
     ("fpl", "FPL", ["pts", "ppg", "bps", "bonus", "ict", "yc", "rc"]),
 ]
 STATS_LABELS = {
@@ -1146,15 +1148,24 @@ STATS_LABELS = {
     "pen": "Pens", "cor": "Corners", "fk": "FK",
     "pts": "Pts", "ppg": "PPG", "bps": "BPS", "bonus": "Bonus",
     "ict": "ICT", "yc": "YC", "rc": "RC",
+    # Vaihe 2, Understat. "hvc" ei ole Optan big chance vaan oma xG-kynnys,
+    # ja otsikko kertoo kynnyksen itse — vaara termi vuoti aiemmin neljalle
+    # pinnalle, joten talla kertaa nimi on laskusaanto.
+    "sh": "Shots", "sot": "On target", "box": "In box", "head": "Headers",
+    "hvc": "xG 0.3+", "npxg": "npxG", "spxg": "Set-piece xG",
+    "kp": "Key passes", "xgchain": "xGChain", "xgbuildup": "xGBuildup",
 }
 # Sarakkeet joita per 90 / per start skaalaa. ppg on jo suhdeluku ja
 # erikoistilannejarjestykset ovat sijalukuja -> ei skaalata kumpaakaan.
 STATS_RATEABLE = {
     "g", "a", "xg", "xa", "xgi", "threat", "creativity", "tkl", "cbi", "rec",
     "dc", "cs", "gc", "xgc", "saves", "pts", "bps", "bonus", "ict", "yc", "rc",
+    "sh", "sot", "box", "head", "hvc", "npxg", "spxg", "kp", "xgchain",
+    "xgbuildup",
 }
 STATS_INT = {"g", "a", "tkl", "cbi", "rec", "dc", "cs", "gc", "saves", "pts",
-             "bps", "bonus", "yc", "rc"}
+             "bps", "bonus", "yc", "rc", "sh", "sot", "box", "head", "hvc",
+             "kp"}
 
 STATS_JS = """
 <script>
@@ -1178,6 +1189,9 @@ STATS_JS = """
  }
  function fmt(row,k){
   var v=val(row,k);
+  // null = pelaajaa ei matsattu laukausdataan. Tyhja viiva on totuus,
+  // nolla olisi vaite ettei han laukonut kertaakaan.
+  if(v===null||v===undefined)return '\\u2013';
   if(k==='pen'||k==='cor'||k==='fk')return v?String(v):'\\u2013';
   if(typeof v!=='number')return v;
   if(mode==='total'&&INT.indexOf(k)>=0)return String(v);
@@ -1201,6 +1215,9 @@ STATS_JS = """
   var ORD=ORDCOLS.indexOf(sortKey)>=0;
   out.sort(function(a,b){
    var x=val(a,sortKey),y=val(b,sortKey);
+   // Tuntematon arvo ei kilpaile jarjestyksesta kumpaankaan suuntaan.
+   var xn=(x===null||x===undefined),yn=(y===null||y===undefined);
+   if(xn||yn)return xn&&yn?0:(xn?1:-1);
    if(ORD){
     x=x?x:9999;y=y?y:9999;
     return desc?x-y:y-x;
@@ -1350,11 +1367,12 @@ def render_stats(stats: dict, now: datetime) -> str | None:
     idx = {c: i for i, c in enumerate(cols)}
     basis = meta.get("basis_label") or ""
     url = f"{BASE}/fpl/stats"
-    title = "Free FPL Player Stats – Filterable Raw Numbers | GoalIQ"
+    title = "Free FPL Player Stats – Shots, xG and Filterable Raw Numbers | GoalIQ"
     desc = (
-        f"Every Premier League player's FPL numbers in one filterable table: "
-        f"xG, xA, xGI, tackles, CBI, recoveries, clean sheets, set-piece "
-        f"order and more. {len(rows)} players, free, no sign-in."
+        f"Every Premier League player's numbers in one filterable table: "
+        f"shots, shots in the box, key passes, xG, xA, xGI, tackles, "
+        f"recoveries and set-piece order. {len(rows)} players, per 90 or per "
+        f"start, CSV export. Free, no sign-in."
     )
     keys = STATS_GROUPS[0][2]
     trows = "".join(
@@ -1409,23 +1427,31 @@ def render_stats(stats: dict, now: datetime) -> str | None:
                + ";</script>")
     hero = (
         "<h1>Free FPL player stats</h1>"
-        '<p class="lede">The raw numbers, in one filterable table. Expected '
-        "goals and assists, tackles, clearances, recoveries, clean sheets, "
-        "set-piece order and FPL scoring history for every player. Filter by "
-        "position, team, price and minutes, switch to per 90 or per start, "
-        "sort any column, export CSV. Free, no sign-in.</p>"
+        '<p class="lede">The raw numbers, in one filterable table. Shots, '
+        "shots in the box, key passes, expected goals and assists, tackles, "
+        "recoveries, clean sheets, set-piece order and FPL scoring history "
+        "for every player. Filter by position, team, price and minutes, "
+        "switch to per 90 or per start, sort any column, export CSV. Free, "
+        "no sign-in.</p>"
     )
     body = (
         f'<p class="note"><strong>{escape(basis)}</strong></p>'
         f"<h2>Every player with minutes ({len(rows)})</h2>"
-        '<p class="note">These are FPL\'s own published numbers. The expected '
-        "goals, expected assists and expected goals conceded columns come from "
-        "the official FPL API, which is Opta-sourced, so there is no reason to "
-        "put them behind a subscription and we do not. What is not here: shot "
-        "counts and shot locations are not in the FPL API, and our DefCon "
-        "tracker (hit rate, thresholds, projected points) is a model output "
-        "rather than a raw stat, so it lives in the app. The DefCon column "
-        "below is the raw defensive contribution count.</p>"
+        '<p class="note">Two sources, both stated plainly. Goals, assists, '
+        "expected goals, expected assists, expected goals conceded, tackles, "
+        "clearances, recoveries, clean sheets, saves and set-piece order come "
+        "from the official FPL API, which is Opta-sourced, so there is no "
+        "reason to put them behind a subscription and we do not. Shots, shots "
+        "on target, shots in the box, headers, non-penalty xG, set-piece xG, "
+        "key passes, xGChain and xGBuildup come from shot-level data with its "
+        "own expected-goals model, so those numbers will not match Opta's and "
+        "we do not call them Opta. In box means the shot was taken inside the "
+        "penalty area. The xG 0.3+ column counts chances worth at least 0.3 "
+        "expected goals, which is our own threshold and not anyone else's "
+        "definition of a big chance. Our DefCon tracker (hit rate, thresholds, "
+        "projected points) is a model output rather than a raw stat, so it "
+        "lives in the app and the DefCon column here is the raw count. A dash "
+        "means we have no data for that player, not zero.</p>"
         f"{controls}{table}{payload}{_stats_js()}"
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'

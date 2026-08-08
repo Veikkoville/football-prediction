@@ -74,6 +74,11 @@ raw_data/
 # #124/#125: xG- + DefCon-leaders-cache (committattu → Render servaa levyltä)
 !/data/fpl_player_leaders.json
 
+# 8.8 STATS-ZONE vaihe 2: Understatin laukausaggregaatti. Päättynyt kausi on
+# staattinen, joten artefakti rakennetaan kerran lokaalisti ja committataan —
+# CI ei hae 380 ottelusivua eikä altista GH-runnerin IP:tä estoille.
+!/data/understat_player_shots_2526.json
+
 # 8.8 STATS-ZONE: /fpl/stats -sivun lähdedata (scripts/build_fpl_stats.py).
 # Ilman tätä !-poikkeusta tiedosto jää kehityskoneelle ja CI:n regenerointi
 # tuottaisi sivun tyhjästä datasta — sama vikaluokka kuin fpl_defcon_gw.

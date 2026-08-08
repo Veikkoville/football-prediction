@@ -33,6 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config
 from src.data.fpl_api import fetch_bootstrap, season_key_from_bootstrap
+from src.models.fpl_understat_match import match_all
 
 STATS_PATH = config.DATA_DIR / "fpl_player_stats.json"
 
@@ -49,7 +50,15 @@ COLS = [
     "cs", "gc", "xgc", "saves",
     "pts", "ppg", "bps", "bonus", "ict", "yc", "rc",
     "pen", "cor", "fk",
+    # Vaihe 2 (8.8): Understatin laukaustasolta. EI Optaa — oma xG-malli, ks.
+    # meta.shots_source. Matsaamaton pelaaja saa None:n eika nollaa: nolla
+    # olisi vaite ("ei laukauksia"), tyhja on totuus ("ei tietoa").
+    "sh", "sot", "box", "head", "hvc", "npxg", "spxg",
+    "kp", "xgchain", "xgbuildup",
 ]
+SHOT_COLS = ["sh", "sot", "box", "head", "hvc", "npxg", "spxg",
+             "kp", "xgchain", "xgbuildup"]
+MIN_SHOT_COVERAGE = 0.97   # promptin hyvaksymiskynnys vaiheelle 2
 
 # Sanity-rajat. Nämä ovat tarkoituksella väljiä: portin tehtävä on estää
 # rikkinäisen datan julkaisu, ei toistaa mallin validointia.
@@ -79,8 +88,22 @@ def season_label(key: str) -> str:
     return f"20{key[:2]}/{key[2:]}"
 
 
-def build_rows(boot: dict) -> list[list]:
+def load_shots() -> tuple[list[dict], dict]:
+    """Understat-laukausaggregaatti (scripts/build_understat_shots.py).
+
+    Puuttuva tiedosto EI kaada buildia: sivu rakentuu ilman laukaussarakkeita
+    ja meta kertoo sen. Sama fail-safe-linja kuin muut lahteet."""
+    path = config.DATA_DIR / "understat_player_shots_2526.json"
+    if not path.exists():
+        return [], {"available": False, "reason": "artefakti puuttuu"}
+    blob = json.loads(path.read_text(encoding="utf-8"))
+    return blob.get("players") or [], blob.get("meta") or {}
+
+
+def build_rows(boot: dict, shots: list[dict]) -> tuple[list[list], dict]:
     teams = {t["id"]: t["short_name"] for t in boot["teams"]}
+    report = match_all(boot["elements"], shots) if shots else None
+    smap = report["map"] if report else {}
     rows: list[list] = []
     for e in boot["elements"]:
         pos = POS_NAME.get(e.get("element_type"))
@@ -127,8 +150,21 @@ def build_rows(boot: dict) -> list[list]:
             _i(e.get("corners_and_indirect_freekicks_order"), 0),
             _i(e.get("direct_freekicks_order"), 0),
         ])
+        u = smap.get(str(e.get("id")))
+        rows[-1].extend([
+            u["sh"] if u else None,
+            u["sot"] if u else None,
+            u["box"] if u else None,
+            u["head"] if u else None,
+            u["hvc"] if u else None,
+            u["npxg"] if u else None,
+            u["spxg"] if u else None,
+            u["kp"] if u else None,
+            u["xgchain"] if u else None,
+            u["xgbuildup"] if u else None,
+        ])
     rows.sort(key=lambda r: -r[COLS.index("pts")])
-    return rows
+    return rows, (report or {})
 
 
 def build() -> dict:
@@ -144,9 +180,21 @@ def build() -> dict:
     basis = season_label(prev_key) if is_prev else target
     label = (f"Based on {basis} · updates as the new season plays"
              if is_prev else f"{basis} season to date")
-    rows = build_rows(boot)
+    shots, shots_meta = load_shots()
+    rows, report = build_rows(boot, shots)
     return {
         "meta": {
+            "shots_available": bool(shots) and bool(report),
+            "shots_source": shots_meta.get(
+                "source", "Understat shot-level data (own xG model, NOT Opta)"),
+            "shots_season": shots_meta.get("season"),
+            "shots_box_definition": shots_meta.get("box_definition"),
+            "shots_high_value_threshold": shots_meta.get(
+                "high_value_threshold"),
+            "shots_match_coverage": round(report.get("coverage", 0.0), 4)
+            if report else 0.0,
+            "shots_match_methods": report.get("how") if report else {},
+            "shots_unmatched": report.get("misses") if report else [],
             "available": True,
             "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
             "basis_season": basis,
@@ -211,6 +259,21 @@ def sanity(data: dict) -> list[str]:
                 f"{name}: xGI {r[idx['xgi']]} != xG {r[idx['xg']]} + "
                 f"xA {r[idx['xa']]}")
             break
+        sh = r[idx["sh"]]
+        if sh is not None:
+            for col in ("sot", "box", "head"):
+                if (r[idx[col]] or 0) > sh:
+                    fails.append(f"{name}: {col} {r[idx[col]]} > laukaukset {sh}")
+                    break
+            if fails:
+                break
+    meta = data.get("meta", {})
+    if meta.get("shots_available"):
+        cov = meta.get("shots_match_coverage", 0.0)
+        if cov < MIN_SHOT_COVERAGE:
+            fails.append(
+                f"FPL↔Understat-kattavuus {cov:.1%} < {MIN_SHOT_COVERAGE:.0%} "
+                "— laukaussarakkeet eivät shippaa vajaalla matsayksella")
     return fails
 
 

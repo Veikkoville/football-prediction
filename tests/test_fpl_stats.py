@@ -28,6 +28,9 @@ def _row(**over) -> list:
         "cs": 5, "gc": 20, "xgc": 18.5, "saves": 0,
         "pts": 120, "ppg": 4.0, "bps": 400, "bonus": 8, "ict": 150.0,
         "yc": 3, "rc": 0, "pen": 0, "cor": 0, "fk": 0,
+        # vaihe 2: Understat-sarakkeet (None = pelaajaa ei matsattu)
+        "sh": 40, "sot": 15, "box": 25, "head": 5, "hvc": 6,
+        "npxg": 4.2, "spxg": 0.8, "kp": 30, "xgchain": 8.0, "xgbuildup": 3.0,
     }
     base.update(over)
     return [base[c] for c in COLS]
@@ -117,6 +120,32 @@ def test_every_group_column_has_a_label():
 def test_rateable_and_int_columns_exist():
     assert not (STATS_RATEABLE - set(COLS))
     assert not (STATS_INT - set(COLS))
+
+
+def test_shot_columns_cannot_exceed_shots():
+    """SoT, boksilaukaukset ja paalaukaukset ovat laukausten osajoukkoja."""
+    for col in ("sot", "box", "head"):
+        d = _healthy()
+        d["players"][0][IDX[col]] = d["players"][0][IDX["sh"]] + 1
+        assert sanity(d), f"{col} > sh olisi pitanyt kiinnittaa"
+
+
+def test_missing_shot_data_is_allowed_as_none():
+    """Matsaamaton pelaaja saa tyhjan solun, ei nollaa — eika se kaada porttia."""
+    d = _healthy()
+    for col in ("sh", "sot", "box", "head", "hvc", "npxg", "spxg", "kp",
+                "xgchain", "xgbuildup"):
+        d["players"][0][IDX[col]] = None
+    assert sanity(d) == []
+
+
+def test_low_match_coverage_blocks_shot_columns():
+    d = _healthy()
+    d["meta"]["shots_available"] = True
+    d["meta"]["shots_match_coverage"] = 0.90
+    assert sanity(d), "alle 97 %:n matsayksen olisi pitanyt kaataa portti"
+    d["meta"]["shots_match_coverage"] = 0.99
+    assert sanity(d) == []
 
 
 def test_orders_and_ratios_are_not_scaled():
