@@ -381,34 +381,34 @@
 				<th class="num"><abbr title="Overall rank by total xP">#</abbr></th>
 				<th>Player</th>
 				<th>Team</th>
-				<th>Pos</th>
+				<th class="m-hide">Pos</th>
 				{#if hasPrice}
-					<th class="num"><abbr title="Current FPL price in millions">Price</abbr></th>
+					<th class="num m-hide"><abbr title="Current FPL price in millions">Price</abbr></th>
 				{/if}
-				<th class="num"><abbr title="Expected minutes per gameweek">xMins</abbr></th>
+				<th class="num m-hide"><abbr title="Expected minutes per gameweek">xMins</abbr></th>
 				{#if hasStarts}
-					<th class="num"
+					<th class="num m-hide"
 						><abbr title="Start probability from the GoalIQ minutes model; the mark shows confidence. Hover a value for the full minutes split (start / sub / unused)"
 							>Start %</abbr
 						></th
 					>
 				{/if}
 				{#if hasOwned}
-					<th class="num"
+					<th class="num m-hide"
 						><abbr title="Ownership: share of FPL managers who own the player (FPL data)"
 							>Own %</abbr
 						></th
 					>
 				{/if}
 				<th class="num"><abbr title="Average expected points per gameweek">xP/GW</abbr></th>
-				<th class="num"
+				<th class="num m-hide"
 					><abbr title="Expected points if the player completes a full 90 minutes. This is the rate, so read it next to xMins, which is what he is actually expected to play."
 						>xP/90</abbr
 					></th
 				>
 				<th class="num"><abbr title="Sum of expected points, {horizonLabel}">Total xP</abbr></th>
 				{#each gwCols as gw (gw)}
-					<th class="num">GW{gw}</th>
+					<th class="num m-hide">GW{gw}</th>
 				{/each}
 			</tr>
 		</thead>
@@ -441,15 +441,15 @@
 								>{/if}<SetPieceBadges sp={p.set_pieces} /></td
 						>
 						<td>{p.team_short}</td>
-						<td>{p.pos}</td>
+						<td class="m-hide">{p.pos}</td>
 						{#if hasPrice}
-							<td class="num">
+							<td class="num m-hide">
 								{#if typeof p.price === 'number'}{p.price.toFixed(1)}{/if}
 							</td>
 						{/if}
-						<td class="num">{p.xmins.toFixed(1)}</td>
+						<td class="num m-hide">{p.xmins.toFixed(1)}</td>
 						{#if hasStarts}
-							<td class="num" title={minutesTitle(p)}>
+							<td class="num m-hide" title={minutesTitle(p)}>
 								{#if typeof p.predicted_starts === 'number'}
 									<span class="conf conf-{p.minutes_confidence ?? 'low'}">&#9679;</span
 									>{Math.round(p.predicted_starts)}
@@ -457,12 +457,12 @@
 							</td>
 						{/if}
 						{#if hasOwned}
-							<td class="num">
+							<td class="num m-hide">
 								{#if typeof p.owned_pct === 'number'}{p.owned_pct.toFixed(1)}{/if}
 							</td>
 						{/if}
 						<td class="num">{p.xp_per_gw.toFixed(2)}</td>
-						<td class="num">
+						<td class="num m-hide">
 							{#if p.xp_per_90 == null}
 								<span class="muted" title="Too few expected minutes for a rate to mean anything"
 									>&ndash;</span
@@ -473,7 +473,7 @@
 						</td>
 						<td class="num total-col">{p.xp_horizon_total.toFixed(2)}</td>
 						{#each gwCols as gw (gw)}
-							<td class="num">{gwXp(p, gw).toFixed(2)}</td>
+							<td class="num m-hide">{gwXp(p, gw).toFixed(2)}</td>
 						{/each}
 					</tr>
 				{/each}

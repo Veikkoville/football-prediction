@@ -136,6 +136,74 @@
 				}, 10000);
 			})();
 		</script>
+		<!-- 9.8.2026: "Show all columns" -kytkin. Kapealla naytolla osa
+		     sarakkeista on .m-hide:lla piilossa, mutta piilotettu ei saa
+		     tarkoittaa saavuttamatonta (Villen huomio) — tama on ulospaasy,
+		     ja sama sopimus kuin goaliq.app-sivuilla.
+
+		     MIKSI HTML-SKRIPTI JA MutationObserver EIKA SVELTE-KOMPONENTTI:
+		     SPA:n taulukot syntyvat ja katoavat valilehtia vaihdettaessa, joten
+		     kertaluontoinen kiinnitys jattaisi myohemmin ilmestyvat taulukot
+		     ilman kytkinta. Komponenttiin kirjoitettuna se pitaisi lisata
+		     16 taulukkokomponenttiin erikseen — sama nelinkertainen kopio josta
+		     koko tama urakka alkoi. Observer hoitaa kaikki, myos tulevat. -->
+		<script>
+			(function () {
+				var WRAP = '.table-wrap';
+				var btns = [];
+				function label(on) {
+					return on ? 'Show key columns' : 'Show all columns';
+				}
+				function sync(on) {
+					for (var i = 0; i < btns.length; i++) {
+						btns[i].textContent = label(on);
+						btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+					}
+				}
+				function toggle() {
+					sync(document.body.classList.toggle('cols-all'));
+				}
+				function attach() {
+					var on = document.body.classList.contains('cols-all');
+					var wraps = document.querySelectorAll(WRAP);
+					for (var i = 0; i < wraps.length; i++) {
+						var w = wraps[i];
+						if (w.dataset.colsToggle) continue;
+						if (!w.querySelector('.m-hide')) continue;
+						w.dataset.colsToggle = '1';
+						var host = document.createElement('p');
+						host.className = 'm-only';
+						host.style.margin = '0';
+						var b = document.createElement('button');
+						b.type = 'button';
+						b.className = 'colstoggle';
+						b.textContent = label(on);
+						b.setAttribute('aria-pressed', on ? 'true' : 'false');
+						b.addEventListener('click', toggle);
+						host.appendChild(b);
+						w.parentNode.insertBefore(host, w);
+						btns.push(b);
+					}
+					/* Poistuneet napit pois listalta, ettei sync() kaada
+					   irronneita solmuja eika lista kasva rajatta. */
+					btns = btns.filter(function (b) {
+						return b.isConnected;
+					});
+				}
+				function start() {
+					attach();
+					new MutationObserver(attach).observe(document.body, {
+						childList: true,
+						subtree: true
+					});
+				}
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', start);
+				} else {
+					start();
+				}
+			})();
+		</script>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<!-- 26.7 PERF: preload+onload, ei render-blocking stylesheetiä (sama

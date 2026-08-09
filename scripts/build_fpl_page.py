@@ -41,6 +41,7 @@ if str(Path(__file__).resolve().parent.parent) not in sys.path:
 
 from scripts.mobile_css import (  # noqa: E402
     MOBILE_BLOCK_COLS,
+    MOBILE_COLS_JS,
     MOBILE_CSS,
     MOBILE_GW_COLS,
 )
@@ -1503,7 +1504,7 @@ predictions and analytics. Not betting advice.</p>
 </footer>
 
 {CTA_TRACK_SNIPPET}
-
+{MOBILE_COLS_JS}
 </body>
 </html>
 """

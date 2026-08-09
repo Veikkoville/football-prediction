@@ -69,6 +69,21 @@ _RULES = """
      leveammilla naytoilla muuttumattomana. */
   th.m-hide,td.m-hide{display:none;}
 
+  /* ...MUTTA piilotettu ei saa tarkoittaa saavuttamatonta (Villen huomio
+     9.8). Karsinta on OLETUS, ei lopputila: "Show all columns" palauttaa
+     jokaisen sarakkeen jokaisessa taulukossa kerralla, ja taulukko
+     vierittaa vaakaan kuten leveallakin naytolla. Korkeampi spesifisyys
+     samassa media queryssa -> voittaa jarjestyksesta riippumatta. */
+  body.cols-all th.m-hide,body.cols-all td.m-hide{display:table-cell;}
+  body.cols-all .m-only{display:none;}
+
+  .colstoggle{display:inline-block;margin:10px 0 4px;padding:9px 14px;
+    min-height:40px;border:1px solid var(--line-strong,rgba(128,128,128,.5));
+    background:transparent;color:inherit;font:inherit;font-size:13px;
+    font-weight:600;cursor:pointer;border-radius:0;}
+  .colstoggle[aria-pressed="true"]{border-color:var(--amber,#F5C542);
+    color:var(--amber,#F5C542);}
+
   /* Pitkat tekstisolut saavat rivittya; luvut eivat (tabular-nums hajoaa
      ja "1,25" katkeaisi kahdelle riville). */
   .lb th,.lb td,.scroll table th,.scroll table td{white-space:normal;}
@@ -166,3 +181,76 @@ _RULES = """
 """
 
 MOBILE_CSS = BEGIN_MARKER + _RULES + END_MARKER + "\n"
+
+
+# ---------------------------------------------------------------------------
+# "Show all columns" -kytkin (Villen huomio 9.8: piilotettu ei saa tarkoittaa
+# saavuttamatonta). Karsinta on oletus, tama on ulospaasy.
+#
+# MIKSI JS EIKA MARKUP: nappi lisataan JOKAISEN sellaisen taulukon eteen jossa
+# on .m-hide-sarakkeita, eika yhtakaan builderia tarvitse muuttaa. Jos nappi
+# kirjoitettaisiin markupiin, se pitaisi lisata neljaan builderiin ja kymmeneen
+# kasin yllapidettyyn sivuun erikseen -- eli sama nelinkertainen kopio josta
+# koko tama urakka alkoi.
+#
+# Napit pidetaan synkassa: ne kaikki kaantavat samaa body-luokkaa, joten sivun
+# alalaidan nappi ei voi vaittaa eri tilaa kuin ylalaidan.
+# ---------------------------------------------------------------------------
+COLS_JS_BEGIN = "<!-- GEN:MOBILE-COLS -->"
+COLS_JS_END = "<!-- /GEN:MOBILE-COLS -->"
+
+MOBILE_COLS_JS = COLS_JS_BEGIN + """
+<script>
+(function(){
+ function init(){
+  if(!document.querySelector('.m-hide'))return;
+  var WRAPS='.lb-wrap,.scroll,.table-wrap,.rec-scroll',
+      seen=[],btns=[],i;
+  var wraps=document.querySelectorAll(WRAPS);
+  for(i=0;i<wraps.length;i++){
+   if(!wraps[i].querySelector('.m-hide'))continue;
+   seen.push(wraps[i]);
+  }
+  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
+  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
+  // ilman ulospaasya.
+  var tables=document.querySelectorAll('table');
+  for(i=0;i<tables.length;i++){
+   if(!tables[i].querySelector('.m-hide'))continue;
+   var w=tables[i].closest(WRAPS);
+   if(!w&&seen.indexOf(tables[i])<0)seen.push(tables[i]);
+  }
+  if(!seen.length)return;
+
+  function label(on){return on?'Show key columns':'Show all columns';}
+  function sync(on){
+   for(var j=0;j<btns.length;j++){
+    btns[j].textContent=label(on);
+    btns[j].setAttribute('aria-pressed',on?'true':'false');
+   }
+  }
+  function toggle(){
+   var on=document.body.classList.toggle('cols-all');
+   sync(on);
+  }
+  for(i=0;i<seen.length;i++){
+   var host=document.createElement('p');
+   host.className='m-only';
+   host.style.margin='0';
+   var b=document.createElement('button');
+   b.type='button';
+   b.className='colstoggle';
+   b.setAttribute('aria-pressed','false');
+   b.textContent=label(false);
+   b.addEventListener('click',toggle);
+   host.appendChild(b);
+   seen[i].parentNode.insertBefore(host,seen[i]);
+   btns.push(b);
+  }
+ }
+ if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+ }else{init();}
+})();
+</script>
+""" + COLS_JS_END + "\n"

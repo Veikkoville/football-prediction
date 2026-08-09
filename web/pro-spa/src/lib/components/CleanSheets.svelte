@@ -269,10 +269,10 @@
 					<tr>
 						<th>Team</th>
 						<th class="num"><abbr title="Chance of a clean sheet from the match model, averaged over the selected gameweeks. Blank when the range reaches beyond the modelled window.">Avg CS%</abbr></th>
-						<th class="num"><abbr title="Fixture difficulty from the GoalIQ model (win% + xG), not FPL's official FDR; 1 easiest to 5 hardest">Avg FDR</abbr></th>
-						<th class="num"><abbr title="Fixtures in the selected range: 0 = blank gameweek, 2+ = double gameweek">Games</abbr></th>
+						<th class="num m-hide"><abbr title="Fixture difficulty from the GoalIQ model (win% + xG), not FPL's official FDR; 1 easiest to 5 hardest">Avg FDR</abbr></th>
+						<th class="num m-hide"><abbr title="Fixtures in the selected range: 0 = blank gameweek, 2+ = double gameweek">Games</abbr></th>
 						{#each gwCols as gw (gw)}
-							<th class:is-far={gw > minGw + nearHorizon - 1}>GW{gw}</th>
+							<th class:is-far={gw > minGw + nearHorizon - 1} class:m-hide={gw > minGw + 1}>GW{gw}</th>
 						{/each}
 					</tr>
 				</thead>
@@ -281,8 +281,8 @@
 						<tr class:is-blank={a.n === 0}>
 							<td>{t.name}</td>
 							<td class="num">{a.avgCs != null ? a.avgCs.toFixed(1) : '—'}</td>
-							<td class="num">{a.avgFdr != null ? a.avgFdr.toFixed(2) : '—'}</td>
-							<td class="num">{a.n}</td>
+							<td class="num m-hide">{a.avgFdr != null ? a.avgFdr.toFixed(2) : '—'}</td>
+							<td class="num m-hide">{a.n}</td>
 							{#each gwCols as gw (gw)}
 								{@const f = t.fixtures.find((x) => x.gw === gw)}
 								{#if f}
@@ -294,6 +294,7 @@
 									{#if typeof f.cs_pct === 'number'}
 										<td
 											class="cs-link-cell {csCellClass(f.cs_pct)}"
+											class:m-hide={gw > minGw + 1}
 											title="{f.opponent ?? f.opponent_short} ({f.venue}) · {fdrTitle} · view model prediction"
 										>
 											<a
@@ -309,6 +310,7 @@
 									{:else}
 										<td
 											class={fdrCellClass(f.fdr)}
+											class:m-hide={gw > minGw + 1}
 											title={hasDuo ? fdrTitle : undefined}
 										>
 											{f.opponent_short} ({f.venue})
@@ -318,7 +320,7 @@
 										</td>
 									{/if}
 								{:else}
-									<td class="muted">Blank</td>
+									<td class="muted" class:m-hide={gw > minGw + 1}>Blank</td>
 								{/if}
 							{/each}
 						</tr>

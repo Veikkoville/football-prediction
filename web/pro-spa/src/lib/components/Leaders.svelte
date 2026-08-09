@@ -549,13 +549,13 @@
 					<tr>
 						<th>#</th>
 						<th><button type="button" class="sortbtn" onclick={() => sortBy('name')}>Player</button></th>
-						<th>Pos</th>
-						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('price')}>Price</button></th>
+						<th class="m-hide">Pos</th>
+						<th class="num m-hide"><button type="button" class="sortbtn" onclick={() => sortBy('price')}>Price</button></th>
 						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xg')}>xG</button></th>
 						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xa')}>xA</button></th>
 						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('xgi')}>xGI</button></th>
-						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('mins')}>Mins</button></th>
-						<th class="num"><button type="button" class="sortbtn" onclick={() => sortBy('games')}>{seasonView ? 'Starts' : 'Games'}</button></th>
+						<th class="num m-hide"><button type="button" class="sortbtn" onclick={() => sortBy('mins')}>Mins</button></th>
+						<th class="num m-hide"><button type="button" class="sortbtn" onclick={() => sortBy('games')}>{seasonView ? 'Starts' : 'Games'}</button></th>
 						{#if hasXpCol}
 							<!-- #9b-c: mallin projektio rinnalle (vain premium — xP on
 							     eteenpäin katsovaa mallidataa, ei ilmaista hyödykedataa) -->
@@ -573,13 +573,13 @@
 								</svg>
 								<span>{a.row.web_name} <span class="muted">({a.row.team_short})</span></span>
 							</td>
-							<td>{a.row.pos}</td>
-							<td class="num">{a.row.price.toFixed(1)}</td>
+							<td class="m-hide">{a.row.pos}</td>
+							<td class="num m-hide">{a.row.price.toFixed(1)}</td>
 							<td class="num strong">{a.xg.toFixed(2)}</td>
 							<td class="num">{a.xa.toFixed(2)}</td>
 							<td class="num">{a.xgi.toFixed(2)}</td>
-							<td class="num">{a.mins}</td>
-							<td class="num">{a.games}</td>
+							<td class="num m-hide">{a.mins}</td>
+							<td class="num m-hide">{a.games}</td>
 							{#if hasXpCol}
 								{@const xv = xpById?.get(a.row.id)}
 								<td class="num">{typeof xv === 'number' ? xv.toFixed(1) : ''}</td>
@@ -685,12 +685,12 @@
 									>Player</button
 								>{:else}Player{/if}
 						</th>
-						<th>
+						<th class="m-hide">
 							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('pos')}
 									>Pos</button
 								>{:else}Pos{/if}
 						</th>
-						<th class="num">
+						<th class="num m-hide">
 							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('price')}
 									>Price</button
 								>{:else}Price{/if}
@@ -706,12 +706,12 @@
 								>{:else}<abbr title={hitRateHelp}>Hit rate</abbr
 								>{/if}
 						</th>
-						<th class="num">
+						<th class="num m-hide">
 							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('pts')}
 									><abbr title="DefCon points earned in the window">Pts</abbr></button
 								>{:else}<abbr title="DefCon points earned in the window">Pts</abbr>{/if}
 						</th>
-						<th class="num">
+						<th class="num m-hide">
 							{#if premium}<button type="button" class="sortbtn" onclick={() => dcSortBy('games')}
 									><abbr title={dcSampleHelp}>{dcSampleLabel}</abbr></button
 								>{:else}<abbr title={dcSampleHelp}>{dcSampleLabel}</abbr
@@ -719,7 +719,7 @@
 						</th>
 						{#if hasXpCol}
 							<!-- #9b-c: sama premium-projektiosarake kuin xG-listassa -->
-							<th class="num">
+							<th class="num m-hide">
 								<button type="button" class="sortbtn" onclick={() => dcSortBy('xp6')}
 									><abbr title="Projected FPL points over the model horizon (GoalIQ model)"
 										>{xpLabel}</abbr
@@ -747,8 +747,8 @@
 									<span class="chev" aria-hidden="true">{expandedId === p.id ? '▾' : '▸'}</span>
 								</button>
 							</td>
-							<td>{p.pos}</td>
-							<td class="num">{p.price.toFixed(1)}</td>
+							<td class="m-hide">{p.pos}</td>
+							<td class="num m-hide">{p.price.toFixed(1)}</td>
 							<td class="num">{p.dc_per_game.toFixed(1)}</td>
 							<td class="num strong"
 								>{Math.round(p.hit_rate_pct)}%{#if p.pos_changed}<abbr
@@ -757,11 +757,11 @@
 											'the basis season'} and is a {p.pos} now, so a different threshold applies. At the {p.basis_pos} threshold the same starts give {p.hit_rate_basis_pos_pct}%.">*</abbr
 									>{/if}</td
 							>
-							<td class="num">{p.defcon_points_window}</td>
-							<td class="num">{dcSample(p)}</td>
+							<td class="num m-hide">{p.defcon_points_window}</td>
+							<td class="num m-hide">{dcSample(p)}</td>
 							{#if hasXpCol}
 								{@const xv = xpById?.get(p.id)}
-								<td class="num">{typeof xv === 'number' ? xv.toFixed(1) : ''}</td>
+								<td class="num m-hide">{typeof xv === 'number' ? xv.toFixed(1) : ''}</td>
 							{/if}
 						</tr>
 						{#if expandedId === p.id}

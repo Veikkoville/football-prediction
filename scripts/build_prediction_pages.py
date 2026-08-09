@@ -44,7 +44,7 @@ if str(ROOT) not in sys.path:
 
 from src.models import accuracy as acc
 from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
-from scripts.mobile_css import MOBILE_CSS
+from scripts.mobile_css import MOBILE_COLS_JS, MOBILE_CSS
 from scripts.slugs import fold_ascii, slug
 
 # #119b: KAIKKI generoidut sivut (hubit + ottelusivut) omaan lapsi-sitemapiin,
@@ -382,7 +382,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         f'<div class="wrap hero">\n{hero}\n</div>\n</header>\n'
         f'<div class="wrap content">\n{body}\n'
         f"{FOOTER}"
-        "</div>\n</body>\n</html>\n"
+        "</div>\n" + MOBILE_COLS_JS + "</body>\n</html>\n"
     )
 
 

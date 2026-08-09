@@ -40,7 +40,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
-from scripts.mobile_css import MOBILE_CSS
+from scripts.mobile_css import MOBILE_COLS_JS, MOBILE_CSS
 from scripts.share_card_js import SHARE_CARD_JS
 
 # #119b: long-tail-sivut omaan lapsi-sitemapiin (sitemap.xml-index listaa).
@@ -333,7 +333,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         f'<a href="/predictions">Football predictions</a> · '
         f'<a href="/fpl.html">Free FPL tools</a> · '
         f'<a href="/privacy.html">Privacy</a><br>{DISCLAIMER}</footer>\n'
-        "</main>\n</body>\n</html>\n"
+        "</main>\n" + MOBILE_COLS_JS + "</body>\n</html>\n"
     )
 
 

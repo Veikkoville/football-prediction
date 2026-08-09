@@ -164,22 +164,22 @@
 					<tr>
 						<th>#</th>
 						<th>Player</th>
-						<th>Pos</th>
-						<th class="num">Price</th>
+						<th class="m-hide">Pos</th>
+						<th class="num m-hide">Price</th>
 						<th class="num"><abbr title="Projected xP per million over the horizon">Value</abbr></th>
 						<th class="num"><abbr title="Total projected points over the horizon">xP</abbr></th>
-						<th class="num"
+						<th class="num m-hide"
 							><abbr title="Projected points if the player completes a full 90 minutes. This is the rate, not the return: read it next to Mins, which is what the model actually expects him to play."
 								>xP/90</abbr
 							></th
 						>
-						<th class="num"
+						<th class="num m-hide"
 							><abbr title="Expected minutes per gameweek. A high rate on low minutes is a bench risk, not a bargain."
 								>Mins</abbr
 							></th
 						>
-						<th>Fixtures</th>
-						<th class="num">Owned</th>
+						<th class="m-hide">Fixtures</th>
+						<th class="num m-hide">Owned</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -187,11 +187,11 @@
 						<tr>
 							<td class="muted">{i + 1}</td>
 							<td>{p.web_name} <span class="muted">({p.team_short})</span></td>
-							<td>{p.pos}</td>
-							<td class="num">{p.price.toFixed(1)}</td>
+							<td class="m-hide">{p.pos}</td>
+							<td class="num m-hide">{p.price.toFixed(1)}</td>
 							<td class="num strong">{p.value.toFixed(2)}</td>
 							<td class="num">{p.xp_horizon_total.toFixed(1)}</td>
-							<td class="num">
+							<td class="num m-hide">
 								{#if p.xp_per_90 == null}
 									<span class="muted" title="Too few expected minutes for a rate to mean anything"
 										>&ndash;</span
@@ -200,15 +200,15 @@
 									{p.xp_per_90.toFixed(2)}
 								{/if}
 							</td>
-							<td class="num">
+							<td class="num m-hide">
 								{#if p.xmins == null}
 									<span class="muted">&ndash;</span>
 								{:else}
 									{Math.round(p.xmins)}
 								{/if}
 							</td>
-							<td>{SWING_LABEL[p.swing_label] ?? p.swing_label}</td>
-							<td class="num">{p.owned_pct.toFixed(1)}%</td>
+							<td class="m-hide">{SWING_LABEL[p.swing_label] ?? p.swing_label}</td>
+							<td class="num m-hide">{p.owned_pct.toFixed(1)}%</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -240,7 +240,7 @@
 									>Avg best CS%</abbr
 								></th
 							>
-							<th>Start plan</th>
+							<th class="m-hide">Start plan</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -252,7 +252,7 @@
 								</td>
 								<td class="num">{pair.combined_price.toFixed(1)}</td>
 								<td class="num strong">{pair.avg_best_cs_pct.toFixed(1)}%</td>
-								<td class="muted plan-cells">
+								<td class="muted plan-cells m-hide">
 									{pair.gw_split.map((s) => `GW${s.gw} ${s.team_short}`).join(' · ')}
 								</td>
 							</tr>

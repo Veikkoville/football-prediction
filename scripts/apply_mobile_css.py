@@ -29,7 +29,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.mobile_css import BEGIN_MARKER, END_MARKER, MOBILE_CSS  # noqa: E402
+from scripts.mobile_css import (  # noqa: E402
+    BEGIN_MARKER,
+    COLS_JS_BEGIN,
+    COLS_JS_END,
+    END_MARKER,
+    MOBILE_COLS_JS,
+    MOBILE_CSS,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -55,6 +62,31 @@ def hand_written_pages() -> list[Path]:
             continue
         out.append(p)
     return out
+
+
+def _strip_block(html: str, begin: str, end: str) -> str:
+    """Poistaa markkeroidun lohkon (myos jos se on vaarassa paikassa)."""
+    while begin in html and end in html:
+        a = html.index(begin)
+        b = html.index(end, a) + len(end)
+        if html[b:b + 1] == "\n":
+            b += 1
+        html = html[:a] + html[b:]
+    return html
+
+
+def _apply_cols_js(html: str) -> str:
+    """Liittaa "Show all columns" -kytkimen </body>:n eteen.
+
+    Kytkin on osa samaa sopimusta kuin CSS-lohko: piilotettu sarake ei saa
+    olla saavuttamaton. Jos sivulla ei ole </body>:ta, palautetaan
+    muuttamattomana -- kutsuja raportoi sen.
+    """
+    html = _strip_block(html, COLS_JS_BEGIN, COLS_JS_END)
+    if "</body>" not in html:
+        return html
+    cut = html.rindex("</body>")
+    return html[:cut] + MOBILE_COLS_JS + html[cut:]
 
 
 def _strip_existing(html: str) -> str:
@@ -87,6 +119,7 @@ def apply_to(path: Path) -> str:
     stripped = _strip_existing(original)
     cut = stripped.rindex("</style>")
     new = stripped[:cut] + MOBILE_CSS + stripped[cut:]
+    new = _apply_cols_js(new)
     if new == original:
         return "ok"
     path.write_text(new, encoding="utf-8")
@@ -102,7 +135,8 @@ def check(path: Path) -> bool:
         return False
     stripped = _strip_existing(original)
     cut = stripped.rindex("</style>")
-    return (stripped[:cut] + MOBILE_CSS + stripped[cut:]) == original
+    built = stripped[:cut] + MOBILE_CSS + stripped[cut:]
+    return _apply_cols_js(built) == original
 
 
 def main() -> int:

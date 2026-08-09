@@ -180,6 +180,21 @@ footer a{color:var(--muted);}
      leveammilla naytoilla muuttumattomana. */
   th.m-hide,td.m-hide{display:none;}
 
+  /* ...MUTTA piilotettu ei saa tarkoittaa saavuttamatonta (Villen huomio
+     9.8). Karsinta on OLETUS, ei lopputila: "Show all columns" palauttaa
+     jokaisen sarakkeen jokaisessa taulukossa kerralla, ja taulukko
+     vierittaa vaakaan kuten leveallakin naytolla. Korkeampi spesifisyys
+     samassa media queryssa -> voittaa jarjestyksesta riippumatta. */
+  body.cols-all th.m-hide,body.cols-all td.m-hide{display:table-cell;}
+  body.cols-all .m-only{display:none;}
+
+  .colstoggle{display:inline-block;margin:10px 0 4px;padding:9px 14px;
+    min-height:40px;border:1px solid var(--line-strong,rgba(128,128,128,.5));
+    background:transparent;color:inherit;font:inherit;font-size:13px;
+    font-weight:600;cursor:pointer;border-radius:0;}
+  .colstoggle[aria-pressed="true"]{border-color:var(--amber,#F5C542);
+    color:var(--amber,#F5C542);}
+
   /* Pitkat tekstisolut saavat rivittya; luvut eivat (tabular-nums hajoaa
      ja "1,25" katkeaisi kahdelle riville). */
   .lb th,.lb td,.scroll table th,.scroll table td{white-space:normal;}
@@ -287,5 +302,60 @@ footer a{color:var(--muted);}
 <div class="card big"><div class="probbar" aria-hidden="true"><span class="h" style="width:49.0%"></span><span class="d" style="width:25.3%"></span><span class="a" style="width:25.7%"></span></div><div class="legend"><span>Bahia 49%</span><span>Draw 25%</span><span>Mirassol 26%</span></div></div><div class="stat-row"><div class="stat"><b>Premium</b><span>expected goals and the most likely score on <a href="https://pro.goaliq.app/?tab=premium&amp;src=predict-page&amp;srcp=predictions">GoalIQ Premium</a></span></div></div><div class="rec">This prediction was logged before kickoff on 2026-07-17 and will be graded in our <a href="/predictions">public track record</a>, hits and misses included.</div><div class="cta-row"><a class="btn" href="https://pro.goaliq.app/">Run your own prediction</a><a class="btn ghost" href="/predictions/brasileirao/">More Brasileirão Série A predictions</a></div><p class="note">GoalIQ model predictions are statistical estimates for fun and analysis, not betting advice, and not a gambling service.</p>
 <footer>© 2026 GoalIQ · <a href="/predictions">Football predictions</a> · <a href="/fpl.html">Free FPL tools</a> · <a href="/privacy.html">Privacy</a><br>GoalIQ: FPL Assistant is free on <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google Play</a> and the <a href="https://apps.apple.com/app/id6780047163">App Store</a>. Premium is 3.99 €/month or 25 €/year, one subscription on web, iOS and Android.<br>GoalIQ model predictions are statistical estimates for fun and analysis, not betting advice, and not a gambling service.</footer>
 </div>
+<!-- GEN:MOBILE-COLS -->
+<script>
+(function(){
+ function init(){
+  if(!document.querySelector('.m-hide'))return;
+  var WRAPS='.lb-wrap,.scroll,.table-wrap,.rec-scroll',
+      seen=[],btns=[],i;
+  var wraps=document.querySelectorAll(WRAPS);
+  for(i=0;i<wraps.length;i++){
+   if(!wraps[i].querySelector('.m-hide'))continue;
+   seen.push(wraps[i]);
+  }
+  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
+  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
+  // ilman ulospaasya.
+  var tables=document.querySelectorAll('table');
+  for(i=0;i<tables.length;i++){
+   if(!tables[i].querySelector('.m-hide'))continue;
+   var w=tables[i].closest(WRAPS);
+   if(!w&&seen.indexOf(tables[i])<0)seen.push(tables[i]);
+  }
+  if(!seen.length)return;
+
+  function label(on){return on?'Show key columns':'Show all columns';}
+  function sync(on){
+   for(var j=0;j<btns.length;j++){
+    btns[j].textContent=label(on);
+    btns[j].setAttribute('aria-pressed',on?'true':'false');
+   }
+  }
+  function toggle(){
+   var on=document.body.classList.toggle('cols-all');
+   sync(on);
+  }
+  for(i=0;i<seen.length;i++){
+   var host=document.createElement('p');
+   host.className='m-only';
+   host.style.margin='0';
+   var b=document.createElement('button');
+   b.type='button';
+   b.className='colstoggle';
+   b.setAttribute('aria-pressed','false');
+   b.textContent=label(false);
+   b.addEventListener('click',toggle);
+   host.appendChild(b);
+   seen[i].parentNode.insertBefore(host,seen[i]);
+   btns.push(b);
+  }
+ }
+ if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+ }else{init();}
+})();
+</script>
+<!-- /GEN:MOBILE-COLS -->
 </body>
 </html>

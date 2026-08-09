@@ -84,11 +84,11 @@
 					<th class="num">#</th>
 					<th>Player</th>
 					<th>Team</th>
-					<th>Pos</th>
-					<th class="num">Price</th>
+					<th class="m-hide">Pos</th>
+					<th class="num m-hide">Price</th>
 					<th class="num"><abbr title="Effective ownership in the FPL game">Owned %</abbr></th>
-					<th class="num"><abbr title="Average expected points per gameweek">xP/GW</abbr></th>
-					<th class="num"
+					<th class="num m-hide"><abbr title="Average expected points per gameweek">xP/GW</abbr></th>
+					<th class="num m-hide"
 						><abbr title="Sum of expected points, next {data.meta.horizon_gw ?? 6} gameweeks"
 							>Total xP</abbr
 						></th
@@ -109,11 +109,11 @@
 						<td class="num muted">{i + 1}</td>
 						<td>{p.web_name}</td>
 						<td>{p.team_short}</td>
-						<td>{p.pos}</td>
-						<td class="num">{p.price.toFixed(1)}</td>
+						<td class="m-hide">{p.pos}</td>
+						<td class="num m-hide">{p.price.toFixed(1)}</td>
 						<td class="num">{p.owned_pct.toFixed(1)}</td>
-						<td class="num">{p.xp_per_gw.toFixed(2)}</td>
-						<td class="num total-col">{p.xp_horizon_total.toFixed(2)}</td>
+						<td class="num m-hide">{p.xp_per_gw.toFixed(2)}</td>
+						<td class="num total-col m-hide">{p.xp_horizon_total.toFixed(2)}</td>
 						{#if hasDelta}
 							<td class="num" class:delta-pos={(p.model_vs_crowd_delta ?? 0) > 0}>
 								{p.model_vs_crowd_delta != null
