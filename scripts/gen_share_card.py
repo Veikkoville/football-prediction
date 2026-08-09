@@ -150,6 +150,15 @@ def render(spec: dict, out_path: Path) -> Path:
             d.text((x, cy - 10), r["team"], font=f_team, fill=MUTED)
             x += d.textlength(r["team"], font=f_team) + 12
 
+        # Erikoistilannemerkinnat (P = pilkut, FK = vapaapotkut). Selainkortti
+        # piirtaa nama jo; ilman niita PIL-versio ei ollut sama kortti, mika
+        # nakyi pikselidiffina viikkopostauksen korttia vastaan (9.8).
+        for b in (r.get("badges") or []):
+            bw = d.textlength(b, font=f_tag) + 14
+            d.rectangle([x, cy - 14, x + bw, cy + 14], outline=AMBER, width=1)
+            d.text((x + 7, cy - 9), b, font=f_tag, fill=AMBER)
+            x += bw + 8
+
         if r.get("mid"):
             f_mid = _shrink(d, r["mid"], 24, 190, 14, FONT_MED)
             d.text((fx_right - d.textlength(r["mid"], font=f_mid),
@@ -336,7 +345,59 @@ def card_stats(args) -> dict:
     }
 
 
-BUILDERS = {"cs": card_cs, "defence": card_defence, "stats": card_stats}
+def card_xp(args) -> dict:
+    """Seuraavan gameweekin xP-top: viikkopostauksen kortti.
+
+    Siirretty tanne goaliq-appin outputs/gen_fpl_xp_list.py:sta 9.8, jotta
+    samalle layoutille ei jaa kolmatta erillista renderoijaa. Data on sama
+    live-endpoint kuin ennen, joten kortti ja webin Captain ranker nayttavat
+    samat luvut.
+    """
+    import urllib.request
+
+    req = urllib.request.Request(
+        "https://api.goaliq.app/api/fantasy/xp",
+        headers={"User-Agent": "Mozilla/5.0 goaliq-card-gen"})
+    with urllib.request.urlopen(req, timeout=90) as r:
+        data = json.loads(r.read().decode("utf-8"))
+    gw = data["meta"]["next_gameweek"]
+    rows = []
+    for p in data.get("players", []):
+        g = next((g for g in (p.get("gameweeks") or []) if g.get("gw") == gw),
+                 None)
+        if not g:
+            continue
+        opps = g.get("opponents") or []
+        fx = ", ".join(f"{o['opp']} ({o['venue']})" for o in opps) if opps             else "Blank"
+        sp = p.get("set_pieces") or {}
+        badges = []
+        if isinstance(sp.get("pens"), (int, float)) and sp["pens"] <= 2:
+            badges.append("P")
+        if isinstance(sp.get("fk"), (int, float)) and sp["fk"] <= 2:
+            badges.append("FK")
+        rows.append({"name": p["web_name"], "tag": p["pos"],
+                     "team": p["team_short"], "mid": fx,
+                     "_xp": float(g.get("xp") or 0.0), "badges": badges})
+    if not rows:
+        raise SystemExit(f"Ei xP-rivejä GW{gw}:lle.")
+    rows.sort(key=lambda r: r["_xp"], reverse=True)
+    rows = rows[:args.top]
+    return {
+        "title": f"GAMEWEEK {gw} TOP {len(rows)}",
+        "subtitle": "expected points, GoalIQ match model",
+        "nameLabel": "PLAYER",
+        "midLabel": "FIXTURE",
+        "valueLabel": "xP",
+        "footNote": "logged before kickoff, graded in public",
+        "footNote2": "model projections, not betting advice",
+        "rows": [dict(r, rank=i + 1, value=f"{r['_xp']:.2f}")
+                 for i, r in enumerate(rows)],
+        "file": f"goaliq_xp_gw{gw}_top{len(rows)}.png",
+    }
+
+
+BUILDERS = {"cs": card_cs, "defence": card_defence, "stats": card_stats,
+            "xp": card_xp}
 GW_CAPABLE = {"cs"}
 
 

@@ -145,6 +145,18 @@ jobs:
         continue-on-error: true
         run: python -m scripts.build_prediction_pages
 
+      # 9.8: kierroskohtaiset pelaajarivit /fpl/stats -sivun gameweek-ikkunaa
+      # varten. AJETTAVA ENNEN longtailia: longtail lukee taman metasta
+      # max_gw:n valikkoon, ja ilman tiedostoa koko suodatin jatetaan
+      # renderoimatta (rikkinainen suodatin olisi huonompi kuin puuttuva).
+      # Sijainti tassa workflowssa eika fpl-data-refreshissa on tietoinen:
+      # sen git add -lista on eksplisiittinen data/-lista, joten fpl/-polku
+      # ei olisi paatynyt committiin lainkaan. Tama workflow tekee git add fpl/.
+      - name: Build per-gameweek player rows (stats GW window)
+        id: bake_player_gw
+        continue-on-error: true
+        run: python -m scripts.build_fpl_player_gw
+
       # #120: FPL-long-tail-sivut (best captain / differentials / price changes)
       - name: Build FPL long-tail pages (#120)
         id: bake_longtail
@@ -195,5 +207,6 @@ jobs:
           fail=0
           [ "${{ steps.bake_fpl.outcome }}" = "failure" ] && { echo "::error::build_fpl_page FAILAA — sivut eivät päivity (katso stepin loki)"; fail=1; }
           [ "${{ steps.bake_predictions.outcome }}" = "failure" ] && { echo "::error::build_prediction_pages FAILAA"; fail=1; }
+          [ "${{ steps.bake_player_gw.outcome }}" = "failure" ] && { echo "::error::build_fpl_player_gw FAILAA (stats-sivun GW-ikkuna jaa vanhaksi)"; fail=1; }
           [ "${{ steps.bake_longtail.outcome }}" = "failure" ] && { echo "::error::build_fpl_longtail FAILAA"; fail=1; }
           exit $fail

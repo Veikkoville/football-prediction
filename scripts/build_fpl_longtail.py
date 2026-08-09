@@ -1238,15 +1238,53 @@ STATS_JS = """
      ORDCOLS=['pen','cor','fk'];
  var grp='key',mode='total',pos='',team='',minm=0,maxp=99,q='',
      sortKey='pts',desc=true,all=false;
+ // --- Gameweek-ikkuna (Villen pyynto 9.8) --------------------------------
+ // Kausisummista ei voi laskea "GW1-6" jalkikateen, joten kierroskohtaiset
+ // rivit haetaan ERILLISESTA tiedostosta ja VASTA kun kayttaja koskee
+ // suodattimeen: se on 551 KB (122 KB gzip) eika sita makseta niiden
+ // puolesta jotka eivat sita kayta.
+ var GW=null,gwFrom=0,gwTo=0,gwLoading=false,gwCache={},GWI=null;
+ // Vain FPL:n virallisen APIn sarakkeet ovat ikkunoitavissa. Laukaustason
+ // luvut tulevat Understatista ilman kierroserittelya, joten niiden
+ // ikkunointi olisi vale: sivu estaa sen sen sijaan etta nayttaisi nollia.
+ var WINCOLS=['pts','g','a','tkl','cbi','rec','dc','cs','gc','saves','bps',
+              'bonus','yc','rc','starts','mins','xg','xa','xgi','xgc','ict',
+              'ppg'];
+ var WINGROUPS=['key','defend','fpl'];
+ function gwOn(){return !!(GW&&gwFrom);}
+ function winRow(row){
+  if(!gwOn())return null;
+  var id=row[C.id],key=id+':'+gwFrom+':'+gwTo;
+  if(gwCache[key]!==undefined)return gwCache[key];
+  var rs=GW.players[id];
+  if(!rs){gwCache[key]=null;return null;}
+  var acc={n:0},i,m;
+  for(m=1;m<GW.meta.cols.length;m++)acc[GW.meta.cols[m]]=0;
+  for(i=0;i<rs.length;i++){
+   var g=rs[i][0];
+   if(g<gwFrom||g>gwTo)continue;
+   acc.n++;
+   for(m=1;m<GW.meta.cols.length;m++)acc[GW.meta.cols[m]]+=rs[i][m];
+  }
+  gwCache[key]=acc.n?acc:null;
+  return gwCache[key];
+ }
  var tb=document.getElementById('stb'),cnt=document.getElementById('stc'),
      head=document.getElementById('sth'),more=document.getElementById('stmore');
  function cols(){return GROUPS[grp];}
- function raw(row,k){return row[C[k]];}
+ function raw(row,k){
+  var w=winRow(row);
+  if(w&&WINCOLS.indexOf(k)>=0){
+   if(k==='ppg')return w.n?w.pts/w.n:0;
+   return w[k];
+  }
+  return row[C[k]];
+ }
  function val(row,k){
   var v=raw(row,k);
   if(typeof v!=='number')return v;
   if(mode==='total'||RATE.indexOf(k)<0)return v;
-  var d=mode==='p90'?row[C.mins]/90:row[C.starts];
+  var d=mode==='p90'?raw(row,'mins')/90:raw(row,'starts');
   return d>0?v/d:0;
  }
  function fmt(row,k){
@@ -1265,10 +1303,11 @@ STATS_JS = """
    var r=D.r[j];
    if(pos&&r[C.pos]!==pos)continue;
    if(team&&r[C.team]!==team)continue;
-   if(r[C.mins]<minm)continue;
+   if(gwOn()&&!winRow(r))continue;   // ei minuutteja ikkunassa
+   if(raw(r,'mins')<minm)continue;
    if(r[C.price]>maxp)continue;
    if(q&&(r[C.name]+' '+r[C.team]).toLowerCase().indexOf(q)<0)continue;
-   if(mode==='pstart'&&r[C.starts]<1)continue;
+   if(mode==='pstart'&&raw(r,'starts')<1)continue;
    out.push(r);
   }
   // Erikoistilannejarjestykset ovat sijalukuja: 1 = ensimmainen potkaisija.
@@ -1320,8 +1359,9 @@ STATS_JS = """
    s+='</tr>';
   }
   tb.innerHTML=s;
-  var lbl=mode==='total'?'season totals':(mode==='p90'?'per 90 minutes'
-    :'per start');
+  var span=gwOn()?('GW'+gwFrom+(gwTo>gwFrom?'-'+gwTo:'')):'';
+  var lbl=mode==='total'?(span?span+' totals':'season totals')
+    :(mode==='p90'?'per 90 minutes':'per start');
   cnt.textContent=rs.length+' players, '+lbl
    +(minm?', '+minm+'+ minutes':'')+'. Showing '+n
    +'. Click a column to sort.';
@@ -1380,6 +1420,54 @@ STATS_JS = """
  psel.onchange=function(){maxp=+this.value;draw();};
  var qi=document.getElementById('stq');
  qi.oninput=function(){q=this.value.toLowerCase();all=false;draw();};
+
+ // --- Gameweek-ikkuna ----------------------------------------------------
+ var gwf=document.getElementById('stgwf'),gwt=document.getElementById('stgwt');
+ function syncGroups(){
+  // Laukaustason ryhmat eivat ole ikkunoitavissa (Understat, ei
+  // kierroserittelya). Ne lukitaan nakyvasti sen sijaan etta nayttaisivat
+  // nollia tai kausisummia ikkunan otsikon alla -- kumpikin valehtelisi.
+  var on=gwOn(),e=document.getElementById('stg');
+  if(!e)return;
+  var bs=e.querySelectorAll('.chip'),i;
+  for(i=0;i<bs.length;i++){
+   var k=bs[i].getAttribute('data-v'),lock=on&&WINGROUPS.indexOf(k)<0;
+   bs[i].disabled=lock;
+   bs[i].style.opacity=lock?'0.4':'';
+   bs[i].title=lock?'No per-gameweek data for these columns':'';
+  }
+ }
+ function applyGw(){
+  var f=gwf&&gwf.value?+gwf.value:0,t=gwt&&gwt.value?+gwt.value:0;
+  if(f&&t&&t<f){t=f;if(gwt)gwt.value=String(t);}
+  gwFrom=f;gwTo=t;gwCache={};
+  if(gwOn()&&WINGROUPS.indexOf(grp)<0){grp='key';sync();}
+  syncGroups();draw();
+ }
+ function loadGw(cb){
+  if(GW||gwLoading)return cb&&cb();
+  gwLoading=true;
+  if(cnt)cnt.textContent='Loading gameweek data…';
+  fetch('/fpl/player-gw.json').then(function(r){
+   if(!r.ok)throw new Error(r.status);return r.json();
+  }).then(function(j){
+   GW=j;gwLoading=false;cb&&cb();
+  })['catch'](function(){
+   gwLoading=false;
+   // Epaonnistunut lataus palauttaa valikon kausitilaan JA sanoo sen.
+   // Hiljainen paluu kausisummiin nayttaisi silta etta ikkuna toimii.
+   if(gwf)gwf.value='';
+   gwFrom=0;gwTo=0;syncGroups();draw();
+   if(cnt)cnt.textContent='Could not load gameweek data. Showing season totals.';
+  });
+ }
+ if(gwf){
+  gwf.onchange=function(){
+   if(!this.value){applyGw();return;}
+   loadGw(applyGw);
+  };
+ }
+ if(gwt)gwt.onchange=function(){if(gwf&&gwf.value)loadGw(applyGw);};
  document.getElementById('stcsv').onclick=function(){
   var ks=cols(),hdr=['Player','Team','Pos','Price','Mins'];
   if(mode==='pstart')hdr.push('Starts');
@@ -1457,6 +1545,13 @@ _STATS_SPEC_FN = r"""function(){
    return b?(b.textContent||'').trim():'';
   }
   var bits=[];
+  // Gameweek-ikkuna ENSIN: se on vahvin rajaus ja jaettu kortti ilman sita
+  // vaittaisi kauden lukuja. Arvot luetaan valikoista, eivat muistista.
+  var gf=document.getElementById('stgwf'),gt=document.getElementById('stgwt');
+  if(gf&&gf.value){
+   var a=gf.value,b=(gt&&gt.value)||a;
+   bits.push('GW'+a+(b!==a?'-'+b:''));
+  }
   var grp=chipOn('stg'); if(grp)bits.push(grp);
   var mode=chipOn('stm'); if(mode&&mode!=='Total')bits.push(mode.toLowerCase());
   var pos=chipOn('stp'); if(pos&&pos!=='All')bits.push(pos);
@@ -1485,6 +1580,42 @@ _STATS_SPEC_FN = r"""function(){
           fileName:'goaliq-fpl-stats-'
                    +label.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.png'};
  }"""
+
+
+def _stats_gw_controls() -> str:
+    """Gameweek-ikkunan valikot.
+
+    Renderoidaan VAIN jos fpl/player-gw.json on olemassa. Jos data puuttuu,
+    koko kontrolli jaa pois eika sivulle jaa nappia joka ei tee mitaan --
+    rikkinainen suodatin on huonompi kuin puuttuva.
+    """
+    meta = _player_gw_meta()
+    if not meta:
+        return ""
+    n = int(meta.get("max_gw") or 0)
+    if n < 2:
+        return ""
+    opts_from = '<option value="">All gameweeks</option>' + "".join(
+        f'<option value="{i}">From GW{i}</option>' for i in range(1, n + 1))
+    opts_to = "".join(
+        f'<option value="{i}"{" selected" if i == n else ""}>To GW{i}</option>'
+        for i in range(1, n + 1))
+    return (
+        '<span class="lbl">Gameweeks</span>'
+        f'<select id="stgwf" aria-label="From gameweek">{opts_from}</select>'
+        f'<select id="stgwt" aria-label="To gameweek">{opts_to}</select>'
+    )
+
+
+def _player_gw_meta() -> dict | None:
+    p = _FP_ROOT / "fpl" / "player-gw.json"
+    if not p.exists():
+        return None
+    try:
+        # Vain meta tarvitaan; tiedosto on 551 KB, joten se luetaan kerran.
+        return json.loads(p.read_text(encoding="utf-8")).get("meta") or None
+    except Exception:
+        return None
 
 
 def _stats_share_card() -> str:
@@ -1574,6 +1705,7 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         '<div class="lbctl">'
         '<span class="lbl">Position</span><span id="stp" class="chips"></span>'
         '<span class="lbl">Min mins</span><span id="stmin" class="chips"></span>'
+        + _stats_gw_controls() +
         '<select id="stteam" aria-label="Filter by team"></select>'
         '<select id="stprice" aria-label="Maximum price"></select>'
         '<input id="stq" type="search" placeholder="Search player" '
