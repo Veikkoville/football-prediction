@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Top xG Performers – FPL Expected Goals Leaders | GoalIQ</title>
+<title>Top xG Performers: FPL Expected Goals Leaders | GoalIQ</title>
 <meta name="description" content="The top FPL expected-goals (xG) performers over each player&#x27;s last 5 games: Mbeumo leads at 0.79 xG per game. From official FPL match data, updated daily." />
 <link rel="canonical" href="https://goaliq.app/fpl/xg-leaders" />
 <meta property="og:type" content="article">
-<meta property="og:title" content="Top xG Performers – FPL Expected Goals Leaders | GoalIQ">
+<meta property="og:title" content="Top xG Performers: FPL Expected Goals Leaders | GoalIQ">
 <meta property="og:description" content="The top FPL expected-goals (xG) performers over each player&#x27;s last 5 games: Mbeumo leads at 0.79 xG per game. From official FPL match data, updated daily.">
 <meta property="og:url" content="https://goaliq.app/fpl/xg-leaders">
 <meta property="og:image" content="https://goaliq.app/assets/brand/og/xg-leaders-1200x630.png">
@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="GoalIQ">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@goaliqapp">
-<meta name="twitter:title" content="Top xG Performers – FPL Expected Goals Leaders | GoalIQ">
+<meta name="twitter:title" content="Top xG Performers: FPL Expected Goals Leaders | GoalIQ">
 <meta name="twitter:description" content="The top FPL expected-goals (xG) performers over each player&#x27;s last 5 games: Mbeumo leads at 0.79 xG per game. From official FPL match data, updated daily.">
 <meta name="twitter:image" content="https://goaliq.app/assets/brand/og/xg-leaders-1200x630.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -32,7 +32,7 @@
 {
  "@context": "https://schema.org",
  "@type": "WebPage",
- "name": "Top xG Performers – FPL Expected Goals Leaders | GoalIQ",
+ "name": "Top xG Performers: FPL Expected Goals Leaders | GoalIQ",
  "url": "https://goaliq.app/fpl/xg-leaders",
  "description": "The top FPL expected-goals (xG) performers over each player's last 5 games: Mbeumo leads at 0.79 xG per game. From official FPL match data, updated daily.",
  "isPartOf": {
@@ -67,7 +67,11 @@ nav a{text-decoration:none;color:var(--cream);font-weight:600;}
 .nav-cta{background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 16px;
 border-radius:var(--radius);font-weight:700;}
 .nav-cta:hover{background:var(--amber);color:var(--ink);}
-.hero{padding:26px 0 44px;}
+/* 9.8 (Villen havainto isolla naytolla): tama oli 'padding:26px 0 44px',
+   ja shorthand nollasi .wrapin vaakapaddingin -> hero-otsikko ja lede
+   alkoivat 20px muuta sisaltoa vasemmalta. Sivulla oli siis kaksi eri
+   vasenta reunaa (303 ja 323). Vain pystypadding. */
+.hero{padding-top:26px;padding-bottom:44px;}
 .hero h1{color:var(--cream);font-size:31px;line-height:1.15;margin:0 0 12px;
 letter-spacing:-0.01em;}
 .hero .lede{color:var(--hero-muted);max-width:640px;}
@@ -114,7 +118,11 @@ footer a{color:var(--teal);}
    Kapealla naytolla min() palauttaa 100% -> kaytos on tasmalleen entinen. */
 .lb-wrap{overflow-x:auto;margin:14px 0;
 width:min(96vw,1560px);margin-left:50%;transform:translateX(-50%);}
-.lb-wrap>.lb{width:auto;min-width:min(100%,820px);margin:0 auto;}
+/* 820px oli .wrapin max-width PADDING MUKAAN LUKIEN, mutta tekstipalsta
+   on 780px. Taulukko keskittyi siis 820:n levyisena tayssleveaan
+   kaareen ja alkoi 20px tekstia vasemmalta. Sama luku kuin
+   tekstipalstalla -> reunat linjassa; leveat taulukot kasvavat yha. */
+.lb-wrap>.lb{width:auto;min-width:min(100%,780px);margin:0 auto;}
 /* 96vw + translateX ei saa synnyttaa sivutason vaakavieritysta */
 html,body{overflow-x:clip;}
 .lb{width:100%;border-collapse:collapse;font-size:14px;}

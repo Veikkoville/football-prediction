@@ -164,7 +164,7 @@
 {:else}
 	<section class="tool-card">
 		<h2>
-			Clean sheet outlook, GW{gwFrom}–{gwTo}
+			Clean sheet outlook, GW{gwFrom}-{gwTo}
 		</h2>
 		<p class="muted">
 			Free · <strong>Avg CS%</strong> = the team's average chance of a clean sheet from the
@@ -188,8 +188,8 @@
 				pre-match logged track record.
 			</p>
 			<p>
-				<strong>Fixture difficulty (FDR 1–5)</strong> is derived from the same model, not
-				from FPL's official ratings: each fixture's expected outcome is scaled onto a 1–5
+				<strong>Fixture difficulty (FDR 1-5)</strong> is derived from the same model, not
+				from FPL's official ratings: each fixture's expected outcome is scaled onto a 1-5
 				band, so a "2" here means the model itself rates the matchup favourable.
 			</p>
 			<p>

@@ -460,7 +460,7 @@ def render_match_page(comp: str, e: dict) -> str:
     fav = home if e["predicted_winner"] == "home" else away
     fav_pct = _fmt_pct(ph if e["predicted_winner"] == "home" else pa)
     url = f"{BASE}/predictions/{cfg['slug']}/{_match_filename(e)[:-5]}"
-    title = f"{home} vs {away} Prediction – {cfg['name']} | GoalIQ"
+    title = f"{home} vs {away} Prediction: {cfg['name']} | GoalIQ"
     # 2.8.2026 PREMIUM-VUOTO KIINNI: raaka xG on premium-dataa (PredictScreen
     # #92: "siita johtaa total goals + BTTS + scoreline", XgStat locked=
     # !isPremium), mutta se julkaistiin 1 930 indeksoidulla sivulla ilmaiseksi.
@@ -521,7 +521,7 @@ def render_match_page(comp: str, e: dict) -> str:
 def render_league_hub(comp: str, rows: list[dict], now: datetime) -> str:
     cfg = LEAGUES[comp]
     url = f"{BASE}/predictions/{cfg['slug']}/"
-    title = f"{cfg['name']} Predictions This Week – Win Probability | GoalIQ"
+    title = f"{cfg['name']} Predictions This Week: Win Probability | GoalIQ"
     desc = (
         f"Model win probabilities for upcoming {cfg['name']} matches. Every "
         f"prediction is logged before kickoff in GoalIQ's public track record "

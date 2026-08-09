@@ -194,7 +194,7 @@
 							<td class="num m-hide">
 								{#if p.xp_per_90 == null}
 									<span class="muted" title="Too few expected minutes for a rate to mean anything"
-										>&ndash;</span
+										>-</span
 									>
 								{:else}
 									{p.xp_per_90.toFixed(2)}
@@ -202,7 +202,7 @@
 							</td>
 							<td class="num m-hide">
 								{#if p.xmins == null}
-									<span class="muted">&ndash;</span>
+									<span class="muted">-</span>
 								{:else}
 									{Math.round(p.xmins)}
 								{/if}

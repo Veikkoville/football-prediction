@@ -38,6 +38,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EM = "—"
+# 9.8 (Villen havainto): portti kattoi VAIN em dashin, joten en dash (–) eli
+# sivujen <title>-erotin ("Free FPL Tools – Rate My Team") lapaisi sen. Se
+# nakyy selaimen valilehdessa, hakutuloksissa ja X:n/Blueskyn linkkikortissa
+# eli kaikkialla missa copy nakyy. Sama sallinta kuin em dashille: yksinainen
+# merkki lainausmerkkien valissa on puuttuvan arvon merkki.
+EN = "–"
+DASHES = (EM, EN)
+ENTITIES = ("&mdash;", "&ndash;")
 
 HTML_GLOBS = ["*.html", "fpl/*.html", "predictions/*.html", "predictions/**/*.html"]
 SPA_DIR = ROOT / "web" / "pro-spa" / "src"
@@ -47,7 +55,7 @@ SPA_DIR = ROOT / "web" / "pro-spa" / "src"
 # yksi em dash paasi lapi kayttajalle asti.
 COPY_CSV = ["data/fpl_player_overrides.csv", "data/fpl_manual_overrides.csv"]
 
-PLACEHOLDER = re.compile(r"(['\"`>])" + EM + r"(['\"`<])")
+PLACEHOLDER = re.compile(r"(['\"`>])[" + EM + EN + r"](['\"`<])")
 
 
 def _blank(m: re.Match) -> str:
@@ -104,7 +112,8 @@ def _ts_string_literals_only(text: str) -> str:
 
 def scan(path: Path) -> list[tuple[int, str]]:
     raw = path.read_text(encoding="utf-8", errors="replace")
-    if EM not in raw and "&mdash;" not in raw:
+    if not any(d in raw for d in DASHES) and not any(
+            e in raw for e in ENTITIES):
         return []
     # CSV-inputeissa #-rivit ovat dokumentaatiota (suomeksi, taynna em dasheja),
     # eivat copya. Vain datarivien tekstikentat paatyvat kayttajalle.
@@ -121,7 +130,8 @@ def scan(path: Path) -> list[tuple[int, str]]:
         if is_csv and line.lstrip().startswith("#"):
             continue
         probe = PLACEHOLDER.sub("  ", line)
-        if EM in probe or "&mdash;" in probe:
+        if any(d in probe for d in DASHES) or any(
+                e in probe for e in ENTITIES):
             hits.append((i + 1, raw_lines[i].strip()[:200]))
     return hits
 

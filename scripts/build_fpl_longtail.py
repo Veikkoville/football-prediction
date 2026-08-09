@@ -100,7 +100,11 @@ nav a{text-decoration:none;color:var(--cream);font-weight:600;}
 .nav-cta{background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 16px;
 border-radius:var(--radius);font-weight:700;}
 .nav-cta:hover{background:var(--amber);color:var(--ink);}
-.hero{padding:26px 0 44px;}
+/* 9.8 (Villen havainto isolla naytolla): tama oli 'padding:26px 0 44px',
+   ja shorthand nollasi .wrapin vaakapaddingin -> hero-otsikko ja lede
+   alkoivat 20px muuta sisaltoa vasemmalta. Sivulla oli siis kaksi eri
+   vasenta reunaa (303 ja 323). Vain pystypadding. */
+.hero{padding-top:26px;padding-bottom:44px;}
 .hero h1{color:var(--cream);font-size:31px;line-height:1.15;margin:0 0 12px;
 letter-spacing:-0.01em;}
 .hero .lede{color:var(--hero-muted);max-width:640px;}
@@ -147,7 +151,11 @@ footer a{color:var(--teal);}
    Kapealla naytolla min() palauttaa 100% -> kaytos on tasmalleen entinen. */
 .lb-wrap{overflow-x:auto;margin:14px 0;
 width:min(96vw,1560px);margin-left:50%;transform:translateX(-50%);}
-.lb-wrap>.lb{width:auto;min-width:min(100%,820px);margin:0 auto;}
+/* 820px oli .wrapin max-width PADDING MUKAAN LUKIEN, mutta tekstipalsta
+   on 780px. Taulukko keskittyi siis 820:n levyisena tayssleveaan
+   kaareen ja alkoi 20px tekstia vasemmalta. Sama luku kuin
+   tekstipalstalla -> reunat linjassa; leveat taulukot kasvavat yha. */
+.lb-wrap>.lb{width:auto;min-width:min(100%,780px);margin:0 auto;}
 /* 96vw + translateX ei saa synnyttaa sivutason vaakavieritysta */
 html,body{overflow-x:clip;}
 .lb{width:100%;border-collapse:collapse;font-size:14px;}
@@ -405,7 +413,7 @@ def render_captain(xp: dict, now: datetime) -> str | None:
     # sivu antoi siis nimen JA xP:n ilmaiseksi. NIMI jaa (se on sivun
     # SEO-arvo ja teaser), LUKU menee lukon taakse — sama linja kuin
     # 2.8. ottelusivujen xG-korjauksessa: paywall kertoo mita puuttuu.
-    title = f"Best FPL Captain GW{gw} – Model Pick | GoalIQ"
+    title = f"Best FPL Captain GW{gw}: Model Pick | GoalIQ"
     desc = (
         f"The GoalIQ model's best FPL captain for Gameweek {gw}: "
         f"{top['web_name']} ({top['team_short']}). Expected points and the "
@@ -447,7 +455,7 @@ def render_differentials(diff: dict, now: datetime) -> str | None:
     gw_txt = f"GW{meta['gw']}" if meta.get("gw") else "this gameweek"
     top = players[0]
     url = f"{BASE}/fpl/differentials"
-    title = f"Best FPL Differentials {gw_txt} – Low-Owned Model Picks | GoalIQ"
+    title = f"Best FPL Differentials {gw_txt}: Low-Owned Model Picks | GoalIQ"
     # 3.8.2026 PREMIUM-VUOTO KIINNI (sama silmays kuin best-captain):
     # DifferentialsSection on appissa premium (FantasyTools.tsx:3424) eika
     # siina ole free-teaseria, joten xP-luku ei saa nakya julkisella sivulla.
@@ -488,7 +496,7 @@ def render_price_changes(pw: dict, now: datetime) -> str:
     risers = (pw or {}).get("risers") or []
     fallers = (pw or {}).get("fallers") or []
     url = f"{BASE}/fpl/price-changes"
-    title = "FPL Price Changes Tonight – Predicted Risers & Fallers | GoalIQ"
+    title = "FPL Price Changes Tonight: Predicted Risers & Fallers | GoalIQ"
     desc = (
         "Predicted FPL price changes from GoalIQ's transfer-velocity model: "
         "tonight's likely risers and fallers, updated daily. Free, no sign-in."
@@ -977,7 +985,7 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
         return None
     basis = out["meta"].get("basis_label") or ""
     url = f"{BASE}/fpl/xg-leaders"
-    title = "Top xG Performers – FPL Expected Goals Leaders | GoalIQ"
+    title = "Top xG Performers: FPL Expected Goals Leaders | GoalIQ"
     desc = (
         f"The top FPL expected-goals (xG) performers over each player's last "
         f"5 games: {rows[0]['web_name']} leads at {rows[0]['xg_per_game']:.2f} "
@@ -1103,7 +1111,7 @@ def render_defcon(leaders: dict, now: datetime) -> str | None:
     per = "starts" if out["meta"].get("hit_rate_denominator") == "starts" else "games"
     basis = out["meta"].get("basis_label") or ""
     url = f"{BASE}/fpl/defcon"
-    title = "Best DefCon Players – FPL Defensive Contribution Leaders | GoalIQ"
+    title = "Best DefCon Players: FPL Defensive Contribution Leaders | GoalIQ"
     desc = (
         f"The most reliable FPL defensive contribution (DefCon) point scorers: "
         f"{rows[0]['web_name']} hits the threshold in "
@@ -1528,7 +1536,7 @@ def render_stats(stats: dict, now: datetime) -> str | None:
     idx = {c: i for i, c in enumerate(cols)}
     basis = meta.get("basis_label") or ""
     url = f"{BASE}/fpl/stats"
-    title = "Free FPL Player Stats – Shots, xG and Filterable Raw Numbers | GoalIQ"
+    title = "Free FPL Player Stats: Shots, xG and Filterable Raw Numbers | GoalIQ"
     desc = (
         f"Every Premier League player's numbers in one filterable table: "
         f"shots, shots in the box, key passes, xG, xA, xGI, tackles, "
@@ -1695,7 +1703,7 @@ def render_defence(defence: dict, now: datetime) -> str | None:
         return None
     season = meta.get("season", "")
     url = f"{BASE}/fpl/defence"
-    title = "Premier League Defence Profiles – What Each Defence Concedes | GoalIQ"
+    title = "Premier League Defence Profiles: What Each Defence Concedes | GoalIQ"
     desc = (
         f"Not how many chances each Premier League defence concedes but what "
         f"kind: shots in the six-yard box, central box, wide box, edge of box "

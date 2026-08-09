@@ -465,7 +465,7 @@
 						<td class="num m-hide">
 							{#if p.xp_per_90 == null}
 								<span class="muted" title="Too few expected minutes for a rate to mean anything"
-									>&ndash;</span
+									>-</span
 								>
 							{:else}
 								{p.xp_per_90.toFixed(2)}

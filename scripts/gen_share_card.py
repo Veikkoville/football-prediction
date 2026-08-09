@@ -267,7 +267,12 @@ def card_defence(args) -> dict:
     foot = f"{n_have} of {n_all} clubs"
     if promoted:
         foot += f", no data yet: {', '.join(promoted)}"
-    foot2 = ("shot-level data, own xG model · free at goaliq.app, "
+    # "own xG model" tarkoittaa koodissa UNDERSTATIN omaa mallia
+    # (build_understat_shots.py: "Understat runs its own xG model"). Sivulla
+    # ymparoiva teksti kantaa sen, mutta kortti matkustaa yksin ja siina se
+    # luki kuin malli olisi meidan. Lahde nimetaan, koska luvut EIVAT tasmaa
+    # Optan eivatka FotMobin kanssa (mitattu 9.8: mediaani +11.6 % FotMobiin).
+    foot2 = ("Understat xG, not Opta · free at goaliq.app, "
              "not betting advice")
     return {
         "title": "FEWEST XG CONCEDED",

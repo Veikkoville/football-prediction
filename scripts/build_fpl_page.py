@@ -864,11 +864,11 @@ def far_grid_html(c: dict) -> str:
     if not c.get("far_rows") or not c.get("far_blocks"):
         return ""
     # Mobiili (a): kolme lahinta lohkoa nakyviin, loput piiloon kapealla
-    # naytolla. Kaukohorisontti on selailua, ja GW31–38 ei ole se mita
+    # naytolla. Kaukohorisontti on selailua, ja GW31-38 ei ole se mita
     # puhelimella avattu linkki tulee katsomaan.
     head = "".join(
         f'<th scope="col" class="num{" m-hide" if i >= MOBILE_BLOCK_COLS else ""}">'
-        f"GW{a}–{b}</th>"
+        f"GW{a}-{b}</th>"
         for i, (a, b) in enumerate(c["far_blocks"])
     )
     rows = []
@@ -878,7 +878,7 @@ def far_grid_html(c: dict) -> str:
             m = " m-hide" if i >= MOBILE_BLOCK_COLS else ""
             if not cell:
                 # Ei otteluita lohkossa. Viiva eikä 0 — tyhjä ei ole "helppo".
-                cells.append(f'<td class="num{m}">–</td>')
+                cells.append(f'<td class="num{m}">-</td>')
             else:
                 cls = fdr_cell_class(cell["avg_fdr"])
                 # n tooltippiin: 6 GW:n lohkossa voi olla tuplaviikkoja tai
@@ -1236,7 +1236,7 @@ def render_page(c: dict) -> str:
         for p in (10, 22, 34, 46, 58)
     )
 
-    title = "Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ"
+    title = "Free FPL Tools: Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ"
     meta_desc = (
         "Free FPL tools: clean sheet probability & FDR, a filterable player "
         "stats table with shots and key passes, xG/xA/xGI leaders for "
@@ -1289,7 +1289,7 @@ def render_page(c: dict) -> str:
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ">
+<meta property="og:title" content="Free FPL Tools: Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ">
 <meta property="og:description" content="{meta_desc}">
 <meta property="og:url" content="{CANONICAL}">
 <meta property="og:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
@@ -1297,7 +1297,7 @@ def render_page(c: dict) -> str:
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@goaliqapp">
-<meta name="twitter:title" content="Free FPL Tools – Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ">
+<meta name="twitter:title" content="Free FPL Tools: Rate My Team, Captain Pick & Clean Sheet Probability | GoalIQ">
 <meta name="twitter:description" content="{meta_desc}">
 <meta name="twitter:image" content="{BASE}/assets/brand/goaliq-social-1200x630.png">
 
