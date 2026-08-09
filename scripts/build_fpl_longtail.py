@@ -1437,8 +1437,34 @@ _STATS_SPEC_FN = r"""function(){
               team:(td[2].textContent||'').trim(),
               value:(hiIdx>=0&&td[hiIdx]?td[hiIdx].textContent:'').trim()});
   }
+  // Alaotsikko kokoaa AKTIIVISET suodattimet, ei pelkkaa rivimaaraa. Ilman
+  // tata jaettu kortti sanoisi "40 players" kertomatta etta ne ovat
+  // puolustajia, yhdesta seurasta tai hintakaton alta -- lukija ei voi
+  // tietaa mita han katsoo. Arvot luetaan nakyvista kontrolleista, joten
+  // ne eivat voi erkaantua ruudusta.
+  function chipOn(id){
+   var e=document.getElementById(id);
+   if(!e)return '';
+   var b=e.querySelector('.chip.on');
+   return b?(b.textContent||'').trim():'';
+  }
+  var bits=[];
+  var grp=chipOn('stg'); if(grp)bits.push(grp);
+  var mode=chipOn('stm'); if(mode&&mode!=='Total')bits.push(mode.toLowerCase());
+  var pos=chipOn('stp'); if(pos&&pos!=='All')bits.push(pos);
+  var mins=chipOn('stmin'); if(mins&&mins!=='0')bits.push(mins+'+ mins');
+  var tm=document.getElementById('stteam');
+  if(tm&&tm.value)bits.push(tm.value);
+  var pr=document.getElementById('stprice');
+  // Hintavalitsimen oletus on ylaraja (99), joka EI ole suodatin. Ilman
+  // tarkistusta kortti sanoi "max 99" jokaisessa kuvassa.
+  if(pr&&pr.value&&Number(pr.value)<99)bits.push('max '+Number(pr.value).toFixed(1)+'m');
+  var qq=document.getElementById('stq');
+  if(qq&&qq.value.trim())bits.push('"'+qq.value.trim()+'"');
   var cnt=document.getElementById('stc');
-  var sub=cnt?(cnt.textContent||'').split('.')[0].trim():'';
+  var n=cnt?(cnt.textContent||'').split(' ')[0]:'';
+  if(n)bits.push(n+' players');
+  var sub=bits.join(' · ');
   return {title:('Top 10 by '+label).toUpperCase(),
           subtitle:sub,
           nameLabel:'PLAYER',

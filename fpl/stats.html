@@ -648,9 +648,14 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
    if(ctx.roundRect){ctx.roundRect((W-120)/2,176,120,6,3);ctx.fill();}
    else{ctx.fillRect((W-120)/2,176,120,6);}
 
-   ctx.font=bold(60);ctx.fillStyle=CREAM;
+   // Otsikko ja alaotsikko kutistetaan mahtumaan. Suodatinlista voi olla
+   // pitka ("Goal threat, per 90, DEF, 900+ mins, ARS, 42 players"), ja
+   // ilman kutistusta se valuisi kortin reunojen yli.
+   var tf=shrink(ctx,spec.title,60,W-2*MX,34,bold);
+   ctx.font=bold(tf);ctx.fillStyle=CREAM;
    ctx.fillText(spec.title,(W-ctx.measureText(spec.title).width)/2,226);
-   ctx.font=med(22);ctx.fillStyle=MUTED;
+   var sf=shrink(ctx,spec.subtitle,22,W-2*MX,13,med);
+   ctx.font=med(sf);ctx.fillStyle=MUTED;
    ctx.fillText(spec.subtitle,(W-ctx.measureText(spec.subtitle).width)/2,306);
 
    var fxRight=W-MX-180;
@@ -706,11 +711,16 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
    // Alatunniste tulee SPECISTA. Oletusteksti ("logged before kickoff,
    // graded in public") on OTTELUENNUSTEEN vaite eika pida paikkaansa
    // tilastolistasta -- jaettu kuva ei saa vaittaa enempaa kuin data antaa.
-   ctx.font=med(20);ctx.fillStyle=MUTED;
-   ctx.fillText(spec.footNote||'logged before kickoff, graded in public',
-                MX,H-88);
+   // Kahva varaa oikean laidan samalta rivilta: liian pitka alatunniste
+   // piirtyisi sen PAALLE (nahtiin PIL-versiossa 9.8).
+   ctx.font=bold(20);
+   var hw=ctx.measureText('@goaliqapp').width;
+   var fn=spec.footNote||'logged before kickoff, graded in public';
+   var ff=shrink(ctx,fn,20,W-2*MX-hw-24,13,med);
+   ctx.font=med(ff);ctx.fillStyle=MUTED;
+   ctx.fillText(fn,MX,H-88);
    ctx.font=bold(20);ctx.fillStyle=AMBER;
-   ctx.fillText('@goaliqapp',W-MX-ctx.measureText('@goaliqapp').width,H-88);
+   ctx.fillText('@goaliqapp',W-MX-hw,H-88);
    ctx.font=med(17);ctx.fillStyle=MUTED;
    ctx.fillText(spec.footNote2||'model projections, not betting advice',
                 MX,H-54);
@@ -762,8 +772,34 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
               team:(td[2].textContent||'').trim(),
               value:(hiIdx>=0&&td[hiIdx]?td[hiIdx].textContent:'').trim()});
   }
+  // Alaotsikko kokoaa AKTIIVISET suodattimet, ei pelkkaa rivimaaraa. Ilman
+  // tata jaettu kortti sanoisi "40 players" kertomatta etta ne ovat
+  // puolustajia, yhdesta seurasta tai hintakaton alta -- lukija ei voi
+  // tietaa mita han katsoo. Arvot luetaan nakyvista kontrolleista, joten
+  // ne eivat voi erkaantua ruudusta.
+  function chipOn(id){
+   var e=document.getElementById(id);
+   if(!e)return '';
+   var b=e.querySelector('.chip.on');
+   return b?(b.textContent||'').trim():'';
+  }
+  var bits=[];
+  var grp=chipOn('stg'); if(grp)bits.push(grp);
+  var mode=chipOn('stm'); if(mode&&mode!=='Total')bits.push(mode.toLowerCase());
+  var pos=chipOn('stp'); if(pos&&pos!=='All')bits.push(pos);
+  var mins=chipOn('stmin'); if(mins&&mins!=='0')bits.push(mins+'+ mins');
+  var tm=document.getElementById('stteam');
+  if(tm&&tm.value)bits.push(tm.value);
+  var pr=document.getElementById('stprice');
+  // Hintavalitsimen oletus on ylaraja (99), joka EI ole suodatin. Ilman
+  // tarkistusta kortti sanoi "max 99" jokaisessa kuvassa.
+  if(pr&&pr.value&&Number(pr.value)<99)bits.push('max '+Number(pr.value).toFixed(1)+'m');
+  var qq=document.getElementById('stq');
+  if(qq&&qq.value.trim())bits.push('"'+qq.value.trim()+'"');
   var cnt=document.getElementById('stc');
-  var sub=cnt?(cnt.textContent||'').split('.')[0].trim():'';
+  var n=cnt?(cnt.textContent||'').split(' ')[0]:'';
+  if(n)bits.push(n+' players');
+  var sub=bits.join(' · ');
   return {title:('Top 10 by '+label).toUpperCase(),
           subtitle:sub,
           nameLabel:'PLAYER',

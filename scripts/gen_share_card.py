@@ -159,12 +159,18 @@ def render(spec: dict, out_path: Path) -> Path:
         d.text((W - MX - d.textlength(val, font=f_val), cy - 36 * 0.58), val,
                font=f_val, fill=AMBER if first else CREAM)
 
-    f_foot = _font(FONT_MED, 20)
-    d.text((MX, h - 88), spec["footNote"], font=f_foot, fill=MUTED)
+    # Kahva varaa oikean laidan; alatunnisteen 1. rivi jakaa saman rivin sen
+    # kanssa. Ilman kutistusta liian pitka teksti piirtyy kahvan PAALLE --
+    # niin kavi 9.8 kun defence-kortin lahdemerkintaan lisattiin puuttuvat
+    # seurat. Teksti ei saa hukkua siihen etta joku pidentaa sita myohemmin.
     f_handle = _font(FONT_BOLD, 20)
-    d.text((W - MX - d.textlength("@goaliqapp", font=f_handle), h - 88),
-           "@goaliqapp", font=f_handle, fill=AMBER)
-    d.text((MX, h - 54), spec["footNote2"], font=_font(FONT_MED, 17), fill=MUTED)
+    handle_w = d.textlength("@goaliqapp", font=f_handle)
+    foot_max = W - MX - handle_w - 24 - MX
+    f_foot = _shrink(d, spec["footNote"], 20, foot_max, 13, FONT_MED)
+    d.text((MX, h - 88), spec["footNote"], font=f_foot, fill=MUTED)
+    d.text((W - MX - handle_w, h - 88), "@goaliqapp", font=f_handle, fill=AMBER)
+    f_foot2 = _shrink(d, spec["footNote2"], 17, W - 2 * MX, 11, FONT_MED)
+    d.text((MX, h - 54), spec["footNote2"], font=f_foot2, fill=MUTED)
     d.rectangle([0, h - 8, W, h], fill=AMBER)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -199,36 +205,77 @@ def card_cs(args) -> dict:
             acc.setdefault(str(team), []).append(float(pct))
     if not acc:
         raise SystemExit(f"Ei otteluita valilla GW{lo}-{hi}.")
-    # Keskiarvo, ei summa: eri joukkueilla voi olla eri maara otteluita
-    # ikkunassa (tupla- ja blankkiviikot), ja summa palkitsisi pelimaarasta.
-    ranked = sorted(((t, sum(v) / len(v), len(v)) for t, v in acc.items()),
-                    key=lambda x: x[1], reverse=True)[:args.top]
+
+    # KAKSI ERI KYSYMYSTA, ja ne antavat eri jarjestyksen heti kun ikkunassa on
+    # tupla- tai blankkiviikkoja:
+    #   avg   = "kuinka hyva puolustus on YHDESSA ottelussa" (keskiarvo)
+    #   total = "montako puhdasta peliä ikkunasta on odotettavissa" (summa)
+    # FPL:ssa jalkimmainen on yleensa se paatos jota ollaan tekemassa, mutta
+    # se palkitsee tuplaviikosta -- kumpikin on oikea vastaus eri kysymykseen,
+    # joten kortti KERTOO kumpaa se nayttaa eika jata sita arvattavaksi.
+    if args.metric == "total":
+        ranked = sorted(((t, sum(v) / 100.0, len(v)) for t, v in acc.items()),
+                        key=lambda x: x[1], reverse=True)[:args.top]
+        value = lambda v: f"{v:.2f}"          # noqa: E731
+        vlabel, sub = "xCS", "expected clean sheets in the window"
+    else:
+        ranked = sorted(((t, sum(v) / len(v), len(v)) for t, v in acc.items()),
+                        key=lambda x: x[1], reverse=True)[:args.top]
+        # .0f pyoristaa parilliseen (46.5 -> "46"), mika nayttaa lukijasta
+        # yhden pienelta virheelta. Puolikkaat ylospain kuten ihminen odottaa.
+        value = lambda v: f"{int(v + 0.5)}%"  # noqa: E731
+        vlabel, sub = "CS%", "average clean sheet probability per fixture"
+
     span = f"GW{lo}" if lo == hi else f"GW{lo}-{hi}"
     return {
         "title": f"BEST CLEAN SHEET ODDS {span}",
-        "subtitle": "average clean sheet probability per fixture",
+        "subtitle": sub,
         "nameLabel": "TEAM",
         "midLabel": "FIXTURES",
-        "valueLabel": "CS%",
+        "valueLabel": vlabel,
         "footNote": "GoalIQ match model, logged before kickoff",
         "footNote2": "model projections, not betting advice",
-        "rows": [{"rank": i + 1, "name": t, "mid": f"{n}", "value": f"{v:.0f}%"}
+        "rows": [{"rank": i + 1, "name": t, "mid": f"{n}", "value": value(v)}
                  for i, (t, v, n) in enumerate(ranked)],
-        "file": f"goaliq-cs-{span.lower()}.png",
+        "file": f"goaliq-cs-{span.lower()}-{args.metric}.png",
     }
 
 
 def card_defence(args) -> dict:
+    """Vahiten xG:ta paastaneet.
+
+    KOLME ASIAA JOTKA KORTIN ON SANOTTAVA, koska se matkustaa yksin ilman
+    sivun ymparoivaa tekstia:
+      1. Otos on KOKO edellinen kausi (38 ottelua/joukkue), ei alkanut kausi.
+      2. xg_pm SISALTAA rangaistuspotkut -- vain vyohykesarakkeet jattavat ne
+         pois (build_understat_team_defence.py lisaa xG:n ennen penalty-
+         continueta).
+      3. Mukana on vain ne joukkueet joilla on kauden data: nousijat puuttuvat
+         kokonaan, eli nousija EI VOI nakya listalla. Ilman tata lukija
+         paattelee etta nousijoiden puolustus on huono, vaikka se on
+         mittaamatta. Sama sokea piste kaatoi /fpl/defence-sivun 8.8.
+    Arvot luetaan metasta, jotta kortti ei voi erkaantua datasta.
+    """
     d = _load("understat_team_defence_2526.json")
+    meta = d.get("meta", {})
     teams = [t for t in d.get("teams", []) if t.get("xg_pm") is not None]
     ranked = sorted(teams, key=lambda t: float(t["xg_pm"]))[:args.top]
+    season = meta.get("season", "last season")
+    promoted = meta.get("promoted_no_data") or []
+    n_have, n_all = len(teams), meta.get("n_current_teams") or len(teams)
+    sub = f"{season} full season, per match, penalties included"
+    foot = f"{n_have} of {n_all} clubs"
+    if promoted:
+        foot += f", no data yet: {', '.join(promoted)}"
+    foot2 = ("shot-level data, own xG model · free at goaliq.app, "
+             "not betting advice")
     return {
         "title": "FEWEST XG CONCEDED",
-        "subtitle": "expected goals conceded per match, lowest is best",
+        "subtitle": sub,
         "nameLabel": "TEAM",
         "valueLabel": "XGC",
-        "footNote": "shot-level data, own expected-goals model",
-        "footNote2": "free at goaliq.app, not betting advice",
+        "footNote": foot,
+        "footNote2": foot2,
         "rows": [{"rank": i + 1, "name": str(t["team"]),
                   "value": f"{float(t['xg_pm']):.2f}"}
                  for i, t in enumerate(ranked)],
@@ -246,6 +293,18 @@ def card_stats(args) -> dict:
     k = idx[args.sort]
     rows = [p for p in d["players"]
             if isinstance(p[k], (int, float)) and p[idx["mins"]] >= args.min_mins]
+    # Pariteetti sivun napin kanssa: samat suodattimet, ja ne KERROTAAN
+    # alaotsikossa. Suodatettu kortti joka ei kerro suodatustaan on
+    # harhaanjohtava jaettuna.
+    if args.pos:
+        want = args.pos.upper()
+        rows = [p for p in rows if str(p[idx["pos"]]).upper() == want]
+    if args.team:
+        want_t = args.team.upper()
+        rows = [p for p in rows if str(p[idx["team"]]).upper() == want_t]
+    if not rows:
+        raise SystemExit("Suodattimet eivat jata yhtaan pelaajaa.")
+    n_pool = len(rows)
     rows.sort(key=lambda p: p[k], reverse=True)
     rows = rows[:args.top]
     label = args.sort.upper()
@@ -253,8 +312,11 @@ def card_stats(args) -> dict:
         float(p[k]).is_integer() for p in rows) else (lambda v: f"{v:.2f}")
     return {
         "title": f"TOP {args.top} BY {label}",
-        "subtitle": f"{d['meta'].get('basis_label') or 'season totals'}"
-                    f", min {args.min_mins} minutes",
+        "subtitle": " · ".join(
+            [x for x in (args.pos.upper() if args.pos else "",
+                         args.team.upper() if args.team else "",
+                         f"{args.min_mins}+ mins" if args.min_mins else "",
+                         f"{n_pool} players") if x]),
         "nameLabel": "PLAYER",
         "valueLabel": label,
         "footNote": "free FPL stats at goaliq.app",
@@ -263,7 +325,9 @@ def card_stats(args) -> dict:
                   "tag": str(p[idx["pos"]]), "team": str(p[idx["team"]]),
                   "value": fmt(float(p[k]))}
                  for i, p in enumerate(rows)],
-        "file": f"goaliq-stats-{args.sort}.png",
+        "file": "goaliq-stats-" + "-".join(
+            [x for x in (args.sort, (args.pos or "").lower(),
+                         (args.team or "").lower()) if x]) + ".png",
     }
 
 
@@ -277,9 +341,14 @@ def main() -> int:
     ap.add_argument("--top", type=int, default=10)
     ap.add_argument("--from-gw", type=int, default=1)
     ap.add_argument("--to-gw", type=int, default=6)
+    ap.add_argument("--metric", choices=("avg", "total"), default="avg",
+                    help="cs: avg = CS%% per ottelu, total = odotetut puhtaat "
+                         "pelit ikkunassa")
     ap.add_argument("--sort", default="pts", help="stats: sarake (esim. xgi)")
     ap.add_argument("--min-mins", type=int, default=400,
                     help="stats: minimiminuutit")
+    ap.add_argument("--pos", default=None, help="stats: GKP/DEF/MID/FWD")
+    ap.add_argument("--team", default=None, help="stats: joukkuelyhenne (ARS)")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
 

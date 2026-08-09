@@ -84,9 +84,14 @@ SHARE_CARD_JS = r"""
    if(ctx.roundRect){ctx.roundRect((W-120)/2,176,120,6,3);ctx.fill();}
    else{ctx.fillRect((W-120)/2,176,120,6);}
 
-   ctx.font=bold(60);ctx.fillStyle=CREAM;
+   // Otsikko ja alaotsikko kutistetaan mahtumaan. Suodatinlista voi olla
+   // pitka ("Goal threat, per 90, DEF, 900+ mins, ARS, 42 players"), ja
+   // ilman kutistusta se valuisi kortin reunojen yli.
+   var tf=shrink(ctx,spec.title,60,W-2*MX,34,bold);
+   ctx.font=bold(tf);ctx.fillStyle=CREAM;
    ctx.fillText(spec.title,(W-ctx.measureText(spec.title).width)/2,226);
-   ctx.font=med(22);ctx.fillStyle=MUTED;
+   var sf=shrink(ctx,spec.subtitle,22,W-2*MX,13,med);
+   ctx.font=med(sf);ctx.fillStyle=MUTED;
    ctx.fillText(spec.subtitle,(W-ctx.measureText(spec.subtitle).width)/2,306);
 
    var fxRight=W-MX-180;
@@ -142,11 +147,16 @@ SHARE_CARD_JS = r"""
    // Alatunniste tulee SPECISTA. Oletusteksti ("logged before kickoff,
    // graded in public") on OTTELUENNUSTEEN vaite eika pida paikkaansa
    // tilastolistasta -- jaettu kuva ei saa vaittaa enempaa kuin data antaa.
-   ctx.font=med(20);ctx.fillStyle=MUTED;
-   ctx.fillText(spec.footNote||'logged before kickoff, graded in public',
-                MX,H-88);
+   // Kahva varaa oikean laidan samalta rivilta: liian pitka alatunniste
+   // piirtyisi sen PAALLE (nahtiin PIL-versiossa 9.8).
+   ctx.font=bold(20);
+   var hw=ctx.measureText('@goaliqapp').width;
+   var fn=spec.footNote||'logged before kickoff, graded in public';
+   var ff=shrink(ctx,fn,20,W-2*MX-hw-24,13,med);
+   ctx.font=med(ff);ctx.fillStyle=MUTED;
+   ctx.fillText(fn,MX,H-88);
    ctx.font=bold(20);ctx.fillStyle=AMBER;
-   ctx.fillText('@goaliqapp',W-MX-ctx.measureText('@goaliqapp').width,H-88);
+   ctx.fillText('@goaliqapp',W-MX-hw,H-88);
    ctx.font=med(17);ctx.fillStyle=MUTED;
    ctx.fillText(spec.footNote2||'model projections, not betting advice',
                 MX,H-54);
