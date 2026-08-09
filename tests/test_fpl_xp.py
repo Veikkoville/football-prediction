@@ -665,3 +665,31 @@ def test_preseason_prior_blank_gameweek_does_not_count_as_benching():
     assert correct["p_start_raw"] == pytest.approx(1.0)
     assert inflated_denominator["p_start_raw"] < 1.0
     assert correct["xmins"] > inflated_denominator["xmins"]
+
+
+# ---------------------------------------------------------------------------
+# Ship-gaten treeni-ikkuna (9.8.2026)
+#
+# Gate johti DC:n treenikaudet config.current_season_pair():sta eli
+# KALENTERISTA, ei backtestattavasta kaudesta. Kausiflipin jalkeen se palautti
+# ['2526','2627'], jolloin 25/26:n backtest fitattiin ilman edelliskautta ja
+# nousijalista tyhjeni - mika tappoi hiljaa kaikki vs_promoted-slicet ilman
+# yhtaan virheilmoitusta.
+# ---------------------------------------------------------------------------
+def test_seasons_for_uses_backtest_season_not_calendar():
+    from scripts.backtest_fpl_xp import seasons_for
+
+    assert seasons_for("2526") == ["2425", "2526"]
+    assert seasons_for("2627") == ["2526", "2627"]
+    # Vuosisadan vaihde ei saa tuottaa negatiivista tai 3-merkkista kautta.
+    assert seasons_for("0001") == ["9900", "0001"]
+
+
+def test_seasons_for_never_returns_the_same_season_twice():
+    """Pari [X, X] tarkoittaisi etta fit nakee vain backtestattavan kauden."""
+    from scripts.backtest_fpl_xp import seasons_for
+
+    for key in ("2324", "2425", "2526", "2627"):
+        prev, cur = seasons_for(key)
+        assert prev != cur
+        assert cur == key

@@ -16,6 +16,10 @@ FPL:n oma "form"/ep_next johdetaan.
 populaatiossa GW2-38. Tulos + per-positio-erittely raportoidaan; FAIL →
 xP:tä EI julkaista.
 
+Datalähde valitaan AUTOMAATTISESTI: jos elävässä FPL-API:ssa ei ole päättynyttä
+kautta (kausiflippi), ajo putoaa levyarkistoon 25/26. DC:n treenikaudet
+johdetaan backtestattavasta kaudesta, EI kalenterista.
+
 Ajo:  python -m scripts.backtest_fpl_xp          (välimuisti data/raw/fpl/)
       python -m scripts.backtest_fpl_xp --refresh  (pakota FPL-haku uusiksi)
 Raportti: logs/fpl_xp_backtest_<pvm>.json (gitignored) + stdout-taulukko.
@@ -46,6 +50,36 @@ FORM_WINDOW = 5          # baseline: viim. 5 joukkuekierroksen pistekeskiarvo
 GW_FIRST_EVAL = 2        # GW1:lle ei ole kummallakaan menetelmällä dataa
 LATE_SEASON_FROM = 7     # lisäraportti: vakiintunut kausi (molemmilla >=6 GW dataa)
 
+# Minuuttipolku: sama kuin tuotanto-builderin live-kausi-asetus
+# (build_fpl_xp.py: mm_window = 6). Ks. MINUTES_CAVEAT.
+MM_WINDOW = 6
+
+# Kausi on "päättynyt" vasta kun lähes kaikki ottelut on pelattu. Alle tämän
+# elävä API ei kelpaa walk-forward-backtestiin → arkisto.
+FULL_SEASON_MIN_FINISHED = 300
+
+MINUTES_CAVEAT = (
+    "minutes_model (tuotannon polku, n_last=6, pelaajakohtaiset kierrokset). "
+    "EI sisällä builderin live-kerroksia: apply_availability (FPL:n "
+    "saatavuuslippu) ja klubi+positio-syvyyskorjaus — kumpaakaan ei ole "
+    "historiallisena. Gate mittaa siis minuuttimallin, ei koko builderia."
+)
+
+
+def seasons_for(season_key: str) -> list[str]:
+    """[edellinen, backtestattava] kausi DC-fittiä varten.
+
+    MIKSI EI config.current_season_pair(): se seuraa kalenteria, joten
+    kausiflipin jälkeen se palautti ['2526','2627'] vaikka backtest ajaa
+    25/26:tta. 26/27:ssa ei ole vielä yhtään ottelua, joten
+      - DC-fit menetti KOKO edelliskauden (GW2:n fitissä oli 10 ottelua),
+      - nousijalista tyhjeni (cur − prev = ∅) → kontekstikerroksen
+        nousijakäsittely ja kaikki vs_promoted-slicet kuolivat HILJAA.
+    Backtestin kausi ratkaisee treeni-ikkunan, ei tämän päivän päivämäärä.
+    """
+    start = int(season_key[:2])
+    return [f"{(start - 1) % 100:02d}{start:02d}", season_key]
+
 
 # ---------------------------------------------------------------------------
 # Datarakenteet
@@ -73,6 +107,7 @@ def build_structures(boot: dict, fixtures: list, summaries: dict[int, list[dict]
     rows_by_round: dict[int, dict[int, list[dict]]] = {}
     mins_by_round: dict[int, dict[int, float]] = {}
     pts_by_round: dict[int, dict[int, float]] = {}
+    starts_by_round: dict[int, dict[int, int]] = {}
     for pid, hist in summaries.items():
         rr: dict[int, list[dict]] = defaultdict(list)
         for r in hist:
@@ -84,8 +119,12 @@ def build_structures(boot: dict, fixtures: list, summaries: dict[int, list[dict]
                               for rnd, rows in rr.items()}
         pts_by_round[pid] = {rnd: sum((x.get("total_points") or 0) for x in rows)
                              for rnd, rows in rr.items()}
+        # minutes_model tarvitsee startit erikseen (p_start ≠ p(minuutteja)).
+        starts_by_round[pid] = {rnd: sum((x.get("starts") or 0) for x in rows)
+                                for rnd, rows in rr.items()}
     return (tid_to_model, pos_by_player, team_by_player, name_by_player,
-            fixtures_by_event, team_rounds, rows_by_round, mins_by_round, pts_by_round)
+            fixtures_by_event, team_rounds, rows_by_round, mins_by_round,
+            pts_by_round, starts_by_round)
 
 
 # neutral_lambda + fixture_contexts siirretty src/models/fpl_context.py:hyn
@@ -152,16 +191,28 @@ def _load_archive_2526():
 
 def run_backtest(force_refresh: bool = False, use_context: bool = True,
                  bps_2627: bool = True, archive: bool = False,
-                 show_components: bool = False) -> dict:
+                 show_components: bool = False, live: bool = False,
+                 legacy_minutes: bool = False) -> dict:
     print("[1/4] FPL-data (bootstrap + fixtures + 841 element-historiaa)...")
-    if archive:
-        boot, fixtures, summaries, season_key = _load_archive_2526()
-        print("      LEVYARKISTO 25/26 (elava API on jo 26/27)")
-    else:
+    # Lähteen valinta on AUTOMAATTINEN. Aiemmin arkisto oli lipun takana ja
+    # oletusajo osui kausiflipin jälkeen tyhjään 26/27:aan: jokainen kierros
+    # sai n=0 pelannutta ja ajo kaatui vasta aggregoinnissa (KeyError:
+    # 'mae_xp'). Portti, joka vaatii muistamaan lipun, on portti jota ei ajeta.
+    if not archive:
         boot = fpl_api.fetch_bootstrap(force=force_refresh)
         fixtures = fpl_api.fetch_fixtures(force=force_refresh)
         season_key = fpl_api.season_key_from_bootstrap(boot)
-        summaries = fpl_api.fetch_all_summaries(boot, force=force_refresh)
+        n_finished = sum(1 for f in fixtures if f.get("finished"))
+        if n_finished < FULL_SEASON_MIN_FINISHED and not live:
+            print(f"      elava kausi {season_key}: vain {n_finished} pelattua "
+                  f"ottelua (< {FULL_SEASON_MIN_FINISHED}) — walk-forward "
+                  f"vaatii paattyneen kauden")
+            archive = True
+        else:
+            summaries = fpl_api.fetch_all_summaries(boot, force=force_refresh)
+    if archive:
+        boot, fixtures, summaries, season_key = _load_archive_2526()
+        print("      -> LEVYARKISTO 25/26 (paattynyt kausi)")
     print(f"      kausi {season_key}: {len(boot['elements'])} pelaajaa, "
           f"{len(fixtures)} fixturea")
     # #151: sama bonus-oikaisu kuin tuotanto-builderissa — ship-gate mittaa
@@ -175,13 +226,25 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
 
     (tid_to_model, pos_by_player, team_by_player, name_by_player,
      fixtures_by_event, team_rounds, rows_by_round, mins_by_round,
-     pts_by_round) = build_structures(boot, fixtures, summaries)
+     pts_by_round, starts_by_round) = build_structures(boot, fixtures, summaries)
+
+    # Pelaajakohtainen kierrosuniversumi = sama kuin tuotanto-builderissa:
+    # pelaajan omat rivit, ei joukkueen fixture-listaa. Kesken kautta
+    # siirtyneellä tämä on vain hänen PL-jaksonsa.
+    prounds_by_player = {pid: sorted(m) for pid, m in mins_by_round.items()}
 
     print("[2/4] PL-otteludata DC-mallia varten (Understat, sama lähde kuin tuotanto)...")
-    seasons = config.current_season_pair()
+    seasons = seasons_for(season_key)
     matches = lataa_otteludata(["ENG-Premier League"], seasons)
     if matches.empty:
         raise SystemExit("PL-otteludata tyhjä — backtest ei voi ajaa.")
+    have = set(matches["season"].astype(str))
+    if set(seasons) - have:
+        raise SystemExit(
+            f"PL-otteludata puuttuu kausilta {sorted(set(seasons) - have)} "
+            f"(saatavilla {sorted(have)}). DC-fit jäisi ilman edelliskautta, "
+            f"jolloin backtestin alkukierrokset fitataan lähes tyhjällä "
+            f"aineistolla ja nousijalista tyhjenee.")
     print(f"      {len(matches)} ottelua (kaudet {seasons})")
 
     events = sorted(fixtures_by_event)
@@ -214,6 +277,15 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
             set(matches[seasons_str == cur_s]["home_team"]),
             set(matches[seasons_str == prev_s]["home_team"]))
         print("      kontekstikerros POIS (raaka DC, Phase 1 -käyttäytyminen)")
+
+    # PL:ssä nousijoita on aina 3. Tyhjä lista tarkoittaa että treeni-ikkuna on
+    # väärä — ja se ei kaada mitään, vaan tappaa hiljaa nousijakäsittelyn ja
+    # kaikki vs_promoted-slicet (todettu 9.8.2026: slicet katosivat raportista
+    # ilman yhtään virhettä).
+    if len(promoted) != 3:
+        raise SystemExit(
+            f"Nousijoita {len(promoted)} kpl ({sorted(promoted)}), pitäisi olla 3 "
+            f"— kaudet {seasons} eivät kelpaa nousijoiden johtamiseen.")
 
     per_gw: list[dict] = []
     obs_rows: list[dict] = []  # per pelaaja-GW: diagnoosiin + sliceihin
@@ -269,7 +341,19 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
             pos = pos_by_player[pid]
             rates = xp.player_rates(acc_by_player[pid], pos, priors)
             trounds = [r for r in team_rounds[tid] if r < g]
-            xmins, p60, p1_59 = xp.minutes_form(mins_by_round[pid], trounds)
+            if legacy_minutes:
+                xmins, p60, p1_59 = xp.minutes_form(mins_by_round[pid], trounds)
+            else:
+                # TUOTANNON POLKU. minutes_form on jäänyt eläkkeelle
+                # builderista (#33), joten gate mittasi eri mallia kuin
+                # shipataan: 9.8. minuuttipriorin korjaus siirsi Palmerin
+                # 43 → 74 min tuotannossa eikä gaten luvuissa muuttunut
+                # yksikään desimaali. Walk-forward säilyy: rounds-lista on
+                # rajattu kohde-GW:tä edeltäviin.
+                prounds = [r for r in prounds_by_player[pid] if r < g]
+                mm = xp.minutes_model(mins_by_round[pid], starts_by_round[pid],
+                                      prounds, n_last=MM_WINDOW)
+                xmins, p60, p1_59 = mm["xmins"], mm["p60"], mm["p1_59"]
             comps = [xp.xp_components(pos, rates, xmins, p60, p1_59, c)
                      for c in ctxs]
             pred = sum(c["total"] for c in comps)
@@ -319,8 +403,19 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
                   f"base={entry.get('played_mae_base', float('nan')):.3f}")
 
     print("[4/4] Aggregointi + ship-gate...")
+    # Backstop: ilman tätä tyhjä populaatio eteni aggregointiin ja kaatui
+    # sinne KeyErroriin, joka ei kerro syytä. Portin pitää sanoa MIKSI se ei
+    # voinut ajaa.
+    n_played_total = sum(e["n_played"] for e in per_gw)
+    if n_played_total == 0:
+        raise SystemExit(
+            f"Kaudella {season_key} ei ole yhtään pelattua pelaaja-kierrosta "
+            f"({len(per_gw)} kierrosta läpi). Ship-gate ei ajanut. "
+            f"Yleisin syy: kausiflippi — elävä FPL-API tarjoaa uutta kautta, "
+            f"jossa ei ole vielä historiaa. Aja ilman --live (auto-arkisto).")
     res = aggregate_and_gate(per_gw, obs_rows, season_key,
-                             use_context=use_context, bps_2627=bps_2627)
+                             use_context=use_context, bps_2627=bps_2627,
+                             seasons=seasons, legacy_minutes=legacy_minutes)
     if show_components:
         report_components(obs_rows)
     return res
@@ -358,7 +453,8 @@ def _slice_stats(obs: list[dict]) -> dict:
 
 def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
                        season_key: str, use_context: bool = True,
-                       bps_2627: bool = True) -> dict:
+                       bps_2627: bool = True, seasons: list[str] | None = None,
+                       legacy_minutes: bool = False) -> dict:
     bps_rules = ("2026/27 recalibrated (#151)" if bps_2627
                  else "legacy 25/26 (vertailuajo)")
     gw_max = max(e["gw"] for e in per_gw)
@@ -411,8 +507,11 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
     report = {
         "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
         "season": season_key,
+        "dc_train_seasons": seasons,
         "context_layer": use_context,
         "bps_rules": bps_rules,
+        "minutes_path": ("minutes_form (LEGACY, ei tuotannossa)"
+                         if legacy_minutes else MINUTES_CAVEAT),
         "baseline": (f"form{FORM_WINDOW} (viim. {FORM_WINDOW} joukkuekierroksen "
                      "pistekeskiarvo; FPL:n historiallista ep_next:iä ei ole "
                      "API:ssa saatavilla)"),
@@ -528,7 +627,13 @@ def main() -> int:
     ap.add_argument("--raw", action="store_true",
                     help="aja ILMAN Phase 1b -kontekstikerrosta (vertailuajo)")
     ap.add_argument("--archive", action="store_true",
-                    help="lue 25/26 levyarkistosta (pakollinen kausiflipin jalkeen)")
+                    help="pakota 25/26 levyarkisto (lahde valitaan muuten auto)")
+    ap.add_argument("--live", action="store_true",
+                    help="pakota elava FPL-API vaikka kausi olisi kesken "
+                         "(vain diagnoosiin — tulos ei ole ship-gate)")
+    ap.add_argument("--legacy-minutes", action="store_true",
+                    help="aja eliakkeelle jaaneella minutes_form-polulla "
+                         "(vain ennen/jalkeen-vertailuun)")
     ap.add_argument("--components", action="store_true",
                     help="lisaa maali- ja syottokomponenttien validointi")
     ap.add_argument("--legacy-bps", action="store_true",
@@ -538,11 +643,14 @@ def main() -> int:
 
     report = run_backtest(show_components=args.components,
                           force_refresh=args.refresh, use_context=not args.raw,
-                          bps_2627=not args.legacy_bps, archive=args.archive)
+                          bps_2627=not args.legacy_bps, archive=args.archive,
+                          live=args.live, legacy_minutes=args.legacy_minutes)
 
     out_dir = config.PROJECT_ROOT / "logs"
     out_dir.mkdir(exist_ok=True)
-    suffix = ("_raw" if args.raw else "") + ("_legacybps" if args.legacy_bps else "")
+    suffix = (("_raw" if args.raw else "") + ("_legacybps" if args.legacy_bps else "")
+              + ("_legacymins" if args.legacy_minutes else "")
+              + ("_live" if args.live else ""))
     out = out_dir / f"fpl_xp_backtest_{_dt.date.today().isoformat()}{suffix}.json"
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2),
                    encoding="utf-8")
@@ -553,7 +661,7 @@ def main() -> int:
     # olisi pitanyt kovakoodata copyyn, jolloin ne vanhenisivat hiljaa
     # seuraavassa refitissa. Vain paaajo kirjoittaa (ei --raw/--legacy-bps,
     # jotka ovat vertailuajoja).
-    if not args.raw and not args.legacy_bps:
+    if not any((args.raw, args.legacy_bps, args.legacy_minutes, args.live)):
         agg = report["aggregates"]["played_full"]
         summary = {
             "meta": {
@@ -565,6 +673,7 @@ def main() -> int:
                            "predicted"),
                 "population": report["gate"].get("population"),
                 "gate_passed": bool(report["gate"]["PASS"]),
+                "minutes_path": report["minutes_path"],
             },
             "played": {
                 "gw_range": agg["gw_range"], "n_gws": agg["n_gws"],
