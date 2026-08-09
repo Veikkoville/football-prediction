@@ -924,6 +924,51 @@ class PredictionResponse(BaseModel):
     # kummankin joukkueen viimeisimmat ottelut momentum-kayraa varten.
     h2h_summary: dict = Field(default_factory=dict)
     form_trend: dict = Field(default_factory=dict)
+    # 9.8.2026: luokitukset sovitetaan TULOKSIIN eivatka nae siirtoikkunaa
+    # (aikavaimennus half-life ~198 pv -> GW6:ssa uusi kausi on 25 % fitin
+    # painosta). Suora korjaus yritettiin ja se ei validoitunut, joten mallia
+    # ei saadeta — sen sijaan kerrotaan milloin luku nojaa vanhentuneeseen
+    # tietoon. {"home": {...}, "away": {...}} tai tyhja jos dataa ei ole.
+    data_confidence: dict = Field(default_factory=dict)
+
+
+_TEAM_CONFIDENCE_UNSET = object()
+_team_confidence_cache: object = _TEAM_CONFIDENCE_UNSET
+
+
+def _load_team_confidence() -> dict[str, dict]:
+    """model_team -> luottamustiedot. Luetaan kerran prosessin elinaikana.
+
+    Puuttuva tiedosto ei ole virhe: kentta jaa tyhjaksi ja UI ei nayta mitaan.
+    Fail-safe on tarkoituksellinen — lippu on lisatieto, ei ehto vastaukselle.
+    """
+    global _team_confidence_cache
+    if _team_confidence_cache is _TEAM_CONFIDENCE_UNSET:
+        try:
+            doc = json.loads(
+                (PROJECT_ROOT / "data" / "team_confidence.json")
+                .read_text(encoding="utf-8"))
+            _team_confidence_cache = {t["model_team"]: t for t in doc["teams"]}
+        except Exception:
+            _team_confidence_cache = {}
+    return _team_confidence_cache  # type: ignore[return-value]
+
+
+def _data_confidence(home: str, away: str) -> dict:
+    """Kerro kummankin joukkueen osalta milloin luokitus nojaa vanhaan tietoon."""
+    conf = _load_team_confidence()
+    out = {}
+    for role, team in (("home", home), ("away", away)):
+        t = conf.get(team)
+        if not t:
+            continue
+        out[role] = {
+            "team": team,
+            "minutes_churn_pct": t.get("minutes_churn_pct"),
+            "flag": t.get("flag"),
+            "note": t.get("note"),
+        }
+    return out
 
 
 class TeamsResponse(BaseModel):
@@ -1582,6 +1627,9 @@ def predict(req: PredictionRequest):
         h2h=h2h,
         h2h_summary=h2h_summary,
         form_trend=form_trend,
+        # Vain seurajoukkueille: /api/predict-wc jattaa taman tyhjaksi, koska
+        # maajoukkueilla ei ole siirtoikkunaa eika seurakauden vaihtuvuutta.
+        data_confidence=_data_confidence(req.home_team, req.away_team),
     )
 
 

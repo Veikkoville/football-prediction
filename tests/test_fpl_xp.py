@@ -806,3 +806,29 @@ def test_confidence_number_shown_even_when_not_flagged():
         else:
             assert t["minutes_churn_pct"] is not None
             assert t["note"], f"{t['team']} jai ilman selitetta"
+
+
+def test_data_confidence_resolves_model_team_names():
+    """API:n haku kayttaa MALLINIMIA, artefakti tallentaa ne map_namella.
+
+    Jos nimimappays hajoaa, kentta jaa vain tyhjaksi eika mikaan kaadu — eli
+    ominaisuus katoaisi HILJAA. Sama vikaluokka kuin kausivaihdoksen
+    id-mappaus. Siksi tama testaa nimenomaan osumisen, ei pelkkaa rakennetta.
+    """
+    from api.main import _data_confidence, _load_team_confidence
+
+    conf = _load_team_confidence()
+    if not conf:
+        pytest.skip("team_confidence.json puuttuu")
+    assert len(conf) == 20
+    got = _data_confidence("Newcastle United", "Coventry")
+    assert "home" in got and "away" in got, f"nimimappays ei osunut: {got}"
+    assert got["home"]["minutes_churn_pct"] is not None
+    assert got["away"]["flag"] == "promoted"
+
+
+def test_data_confidence_is_fail_safe_on_unknown_team():
+    """Tuntematon joukkue ei saa kaataa ennustetta — lippu on lisatieto."""
+    from api.main import _data_confidence
+
+    assert _data_confidence("Ei Olemassa FC", "Toinen Ei-Olemassa") == {}
