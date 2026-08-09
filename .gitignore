@@ -157,3 +157,6 @@ outputs/cards/
 # ignoreen; nama tiivisteet ovat portin syote. Ilman !-poikkeusta portti
 # toimisi vain kehityskoneella ja nayttaisi muualla "artefakti puuttuu".
 !/data/fpl_prev_season_minutes_*.json
+# Joukkueiden luottamuslippu (9.8.2026): builderit ja API lukevat taman, joten
+# se on oltava repossa kuten muutkin bake-artefaktit.
+!/data/team_confidence.json

@@ -750,3 +750,59 @@ def test_prev_season_artifacts_are_keyed_by_code():
     keys = [int(k) for k in doc["players"]]
     # FPL:n player code on 5-7-numeroinen; element-id on alle 1000.
     assert min(keys) > 1000, "avaimet nayttavat element-id:ilta, ei codeilta"
+
+
+# ---------------------------------------------------------------------------
+# Luottamuslippu (9.8.2026)
+#
+# Lippu korvaa luokituksen saadon, koska kalibrointi ei validoitunut:
+# vaihtuvuuden suuruus on mitattavissa, suunta ei. Testit lukitsevat sen ettei
+# lippu ala valehdella kumpaankaan suuntaan.
+# ---------------------------------------------------------------------------
+def _confidence_doc():
+    import json
+    from pathlib import Path
+    p = Path(__file__).resolve().parents[1] / "data" / "team_confidence.json"
+    if not p.exists():
+        pytest.skip("team_confidence.json puuttuu (aja build_team_confidence)")
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def test_confidence_covers_exactly_the_current_league():
+    """20 joukkuetta, 3 nousijaa, 3 pudonnutta.
+
+    Kausivaihdos on toistuva vikalahde: 8.8.2026 /fpl/defence listasi pudonneet
+    ja unohti nousseet, koska vain toinen suunta tarkistettiin.
+    """
+    doc = _confidence_doc()
+    assert len(doc["teams"]) == 20
+    assert len(doc["promoted"]) == 3
+    assert len(doc["relegated"]) == 3
+    assert not (set(doc["promoted"]) & set(doc["relegated"]))
+
+
+def test_confidence_flag_is_earned_not_relative():
+    """Lippu laukeaa VAIN absoluuttisesta kynnyksesta.
+
+    Houkutus rauhallisena kesana on laskea kynnysta kunnes joku laukaisee sen.
+    Silloin lippu kertoisi "korkea vaihtuvuus" kesana jona vaihtuvuutta ei
+    ollut. Jokaisella liputetulla on oltava luku kynnyksen ylapuolella.
+    """
+    doc = _confidence_doc()
+    thr = doc["high_turnover_threshold_pct"]
+    for t in doc["teams"]:
+        if t["flag"] == "high_turnover":
+            assert t["minutes_churn_pct"] >= thr
+        elif not t["is_promoted"]:
+            assert t["minutes_churn_pct"] < thr
+
+
+def test_confidence_number_shown_even_when_not_flagged():
+    """Luku naytetaan aina; muuten ominaisuus olisi tyhja rauhallisena kesana."""
+    doc = _confidence_doc()
+    for t in doc["teams"]:
+        if t["is_promoted"]:
+            assert t["flag"] == "promoted" and t["note"]
+        else:
+            assert t["minutes_churn_pct"] is not None
+            assert t["note"], f"{t['team']} jai ilman selitetta"

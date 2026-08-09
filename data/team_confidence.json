@@ -1,0 +1,181 @@
+{
+ "schema_version": 1,
+ "basis_season": "2526",
+ "method": "share of last season's minutes played by players no longer at the club; ratings are fitted on results and cannot see the transfer window",
+ "high_turnover_threshold_pct": 25.0,
+ "historical_median_pct": 13.0,
+ "season_median_pct": 13.3,
+ "promoted": [
+  "Coventry City",
+  "Hull City",
+  "Ipswich Town"
+ ],
+ "relegated": [
+  "Burnley",
+  "West Ham",
+  "Wolves"
+ ],
+ "n_flagged": 3,
+ "teams": [
+  {
+   "team": "Arsenal",
+   "model_team": "Arsenal",
+   "is_promoted": false,
+   "minutes_churn_pct": 5.6,
+   "flag": null,
+   "note": "6% of last season's minutes have left the club."
+  },
+  {
+   "team": "Aston Villa",
+   "model_team": "Aston Villa",
+   "is_promoted": false,
+   "minutes_churn_pct": 20.6,
+   "flag": null,
+   "note": "21% of last season's minutes have left the club."
+  },
+  {
+   "team": "Bournemouth",
+   "model_team": "Bournemouth",
+   "is_promoted": false,
+   "minutes_churn_pct": 15.8,
+   "flag": null,
+   "note": "16% of last season's minutes have left the club."
+  },
+  {
+   "team": "Brentford",
+   "model_team": "Brentford",
+   "is_promoted": false,
+   "minutes_churn_pct": 5.8,
+   "flag": null,
+   "note": "6% of last season's minutes have left the club."
+  },
+  {
+   "team": "Brighton",
+   "model_team": "Brighton",
+   "is_promoted": false,
+   "minutes_churn_pct": 21.4,
+   "flag": null,
+   "note": "21% of last season's minutes have left the club."
+  },
+  {
+   "team": "Chelsea",
+   "model_team": "Chelsea",
+   "is_promoted": false,
+   "minutes_churn_pct": 14.2,
+   "flag": null,
+   "note": "14% of last season's minutes have left the club."
+  },
+  {
+   "team": "Coventry City",
+   "model_team": "Coventry",
+   "is_promoted": true,
+   "minutes_churn_pct": null,
+   "flag": "promoted",
+   "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record."
+  },
+  {
+   "team": "Crystal Palace",
+   "model_team": "Crystal Palace",
+   "is_promoted": false,
+   "minutes_churn_pct": 12.0,
+   "flag": null,
+   "note": "12% of last season's minutes have left the club."
+  },
+  {
+   "team": "Everton",
+   "model_team": "Everton",
+   "is_promoted": false,
+   "minutes_churn_pct": 10.0,
+   "flag": null,
+   "note": "10% of last season's minutes have left the club."
+  },
+  {
+   "team": "Fulham",
+   "model_team": "Fulham",
+   "is_promoted": false,
+   "minutes_churn_pct": 17.9,
+   "flag": null,
+   "note": "18% of last season's minutes have left the club."
+  },
+  {
+   "team": "Hull City",
+   "model_team": "Hull",
+   "is_promoted": true,
+   "minutes_churn_pct": null,
+   "flag": "promoted",
+   "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record."
+  },
+  {
+   "team": "Ipswich Town",
+   "model_team": "Ipswich",
+   "is_promoted": true,
+   "minutes_churn_pct": null,
+   "flag": "promoted",
+   "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record."
+  },
+  {
+   "team": "Leeds",
+   "model_team": "Leeds",
+   "is_promoted": false,
+   "minutes_churn_pct": 13.3,
+   "flag": null,
+   "note": "13% of last season's minutes have left the club."
+  },
+  {
+   "team": "Liverpool",
+   "model_team": "Liverpool",
+   "is_promoted": false,
+   "minutes_churn_pct": 17.1,
+   "flag": null,
+   "note": "17% of last season's minutes have left the club."
+  },
+  {
+   "team": "Man City",
+   "model_team": "Manchester City",
+   "is_promoted": false,
+   "minutes_churn_pct": 10.7,
+   "flag": null,
+   "note": "11% of last season's minutes have left the club."
+  },
+  {
+   "team": "Man Utd",
+   "model_team": "Manchester United",
+   "is_promoted": false,
+   "minutes_churn_pct": 6.9,
+   "flag": null,
+   "note": "7% of last season's minutes have left the club."
+  },
+  {
+   "team": "Newcastle",
+   "model_team": "Newcastle United",
+   "is_promoted": false,
+   "minutes_churn_pct": 18.7,
+   "flag": null,
+   "note": "19% of last season's minutes have left the club."
+  },
+  {
+   "team": "Nott'm Forest",
+   "model_team": "Nottingham Forest",
+   "is_promoted": false,
+   "minutes_churn_pct": 11.1,
+   "flag": null,
+   "note": "11% of last season's minutes have left the club."
+  },
+  {
+   "team": "Spurs",
+   "model_team": "Tottenham",
+   "is_promoted": false,
+   "minutes_churn_pct": 13.5,
+   "flag": null,
+   "note": "14% of last season's minutes have left the club."
+  },
+  {
+   "team": "Sunderland",
+   "model_team": "Sunderland",
+   "is_promoted": false,
+   "minutes_churn_pct": 9.2,
+   "flag": null,
+   "note": "9% of last season's minutes have left the club."
+  }
+ ]
+}
