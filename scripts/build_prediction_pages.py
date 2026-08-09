@@ -51,6 +51,22 @@ from scripts.slugs import fold_ascii, slug
 # jonka sitemap.xml-index listaa. Wholesale-kirjoitus joka ajolla → poistuneet
 # sivut putoavat sitemapista samassa ajossa kuin tiedostot siivotaan.
 SITEMAP_PRED_PATH = _FP_ROOT / "sitemap-predictions.xml"
+# #GSC-INDEX (9.8.2026): sitemapiin vain lahihorisontin ottelut.
+#
+# Mitattu 9.8.2026: sitemap tarjosi 1 924 URLia = KOKONAISET KAUDET (PL 380
+# ottelua, kaukaisin 293 pv paassa eli toukokuussa 2027). GSC-tila oli 1 922
+# "havaittu, ei indeksoitu" ja indeksoituja 20 — Google ei kayta
+# indeksointibudjettia tuhanteen samankaltaiseen sivuun matalan auktoriteetin
+# domainilla, ja suurin osa niista on otteluita joita kukaan ei viela hae.
+#
+# 30 pv eika 14: indeksointi vie paivia-viikkoja, joten 14 pv ei ehtisi
+# indeksoitua ennen ottelua. 30 pv jattaa 197 URLia (-90 %) ja antaa
+# jokaiselle sivulle aidon ikkunan nakya haussa ennen kickoffia.
+#
+# HUOM: tama karsii VAIN sitemapin. Kaikki sivut generoidaan ja ovat yha
+# saavutettavissa, ja liigahubit linkittavat niihin — Google loytaa ne
+# ryomimalla, ne eivat vain kilpaile budjetista etukateen.
+SITEMAP_HORIZON_DAYS = 30
 
 BASE = "https://goaliq.app"
 # #121-GEO: kompakti publisher-node jokaiselle ottelusivulle - entiteetti-
@@ -407,6 +423,15 @@ def _upcoming_by_comp(log: dict, now: datetime) -> dict[str, list[dict]]:
     return out
 
 
+def _within_horizon(entry: dict, now: datetime) -> bool:
+    """Onko ottelu SITEMAP_HORIZON_DAYS:n sisalla? Ks. vakion perustelu."""
+    try:
+        ko = datetime.fromisoformat((entry.get("kickoff") or "").replace("Z", "+00:00"))
+    except Exception:
+        return False
+    return (ko - now).days <= SITEMAP_HORIZON_DAYS
+
+
 def _apply_display_names(by_comp: dict[str, list[dict]]) -> tuple[set, set]:
     """Kirjoita nayttonimet SISAANLUKUUN, ei renderoijiin.
 
@@ -674,6 +699,7 @@ def main() -> int:
           + (f" -> {sorted(unmapped)}" if unmapped else ""))
 
     sitemap_entries: list[tuple[str, str, str, str]] = []
+    sitemap_skipped = 0
     live_hubs: list[str] = []
     match_counts: dict[str, int] = {}
     total_pages = 0
@@ -715,18 +741,26 @@ def main() -> int:
         live_hubs.append(comp)
         match_counts[comp] = len(rows)
         total_pages += 1 + len(rows)
+        # Hubi aina sitemapiin; ottelusivut vain lahihorisontista (ks.
+        # SITEMAP_HORIZON_DAYS). Sivut itse on jo kirjoitettu levylle yllä —
+        # tämä rajaa vain sen mitä Googlelle tarjotaan ryömittäväksi.
         sitemap_entries.append(
             (f"{BASE}/predictions/{cfg['slug']}/", today, "daily", "0.8")
         )
+        near = [e for e in rows if _within_horizon(e, now)]
         sitemap_entries.extend(
             (f"{BASE}/predictions/{cfg['slug']}/{_match_filename(e)[:-5]}",
              today, "daily", "0.7")
-            for e in rows
+            for e in near
         )
+        sitemap_skipped += len(rows) - len(near)
         print(f"{comp}: hub + {len(rows)} ottelusivua → predictions/{cfg['slug']}/")
 
     write_urlset(SITEMAP_PRED_PATH, sitemap_entries)
-    print(f"sitemap-predictions.xml: {len(sitemap_entries)} URL:ia")
+    print(f"sitemap-predictions.xml: {len(sitemap_entries)} URL:ia "
+          f"({sitemap_skipped} ottelusivua jatetty pois, kickoff yli "
+          f"{SITEMAP_HORIZON_DAYS} pv paassa — sivut ovat silti olemassa "
+          f"ja hubit linkittavat niihin)")
     hub_updated = update_predictions_hub_links(live_hubs)
     llms_updated = update_llms_txt(match_counts)
     print(f"Yhteensä {total_pages} sivua ({len(live_hubs)} liigaa). "
