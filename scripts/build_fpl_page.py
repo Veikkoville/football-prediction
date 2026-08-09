@@ -46,6 +46,7 @@ from scripts.mobile_css import (  # noqa: E402
     MOBILE_GW_COLS,
 )
 from scripts.slugs import slug as _slug  # noqa: E402
+from scripts.build_fpl_phase0 import map_name  # noqa: E402
 
 # #38: PostHog cookieless site-analytiikka (persistence=memory -> ei evasteita,
 # ei consent-banneria; ei PII:ta). Sama projekti kuin appi + pro-web (427890);
@@ -772,25 +773,61 @@ def record_table_html(preds: list[dict], c: dict) -> str:
     )
 
 
+def _turnover_by_model_team() -> dict[str, dict]:
+    """model_team -> luottamustiedot.
+
+    NIMIEN NORMALISOINTI ON PAKOLLINEN: tama sivu kayttaa FPL:n pitkia nimia
+    ("Leeds United", "Tottenham Hotspur", "Brighton & Hove Albion"), artefakti
+    lyhyita. Suora join olisi osunut 17/20 ja jattanyt kolme joukkuetta tyhjaksi
+    NAYTTAMATTA virhetta. map_name on sama normalisoija jota builderit kayttavat.
+    """
+    p = ROOT / "data" / "team_confidence.json"
+    if not p.exists():
+        return {}
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    return {t["model_team"]: t for t in doc["teams"]}
+
+
 def cs_table_html(c: dict) -> str:
+    conf = _turnover_by_model_team()
     rows = []
+    hits = 0
     for r in c["cs_rows"]:
         fdr = r["fdr"]
+        t = conf.get(map_name(r["team"]))
+        if t:
+            hits += 1
+        if t and t.get("is_promoted"):
+            churn = '<span title="Promoted: no Premier League record">new</span>'
+        elif t and t.get("minutes_churn_pct") is not None:
+            churn = f'{t["minutes_churn_pct"]:.0f}%'
+        else:
+            churn = "&ndash;"
         rows.append(
             "<tr>"
             f'<td class="team">{escape(r["team"])}</td>'
             f'<td class="num">{fmt_pct(r["cs_pct"])}</td>'
             f'<td>{escape(r["opponent"])} ({r["venue"]})</td>'
             f'<td class="num fdr {fdr_cell_class(fdr)}">{fdr}</td>'
+            f'<td class="num m-hide">{churn}</td>'
             "</tr>"
         )
+    # Nolla osumaa = nimien normalisointi hajosi. Sarake taynna viivoja nayttaa
+    # "ei dataa" eika vialta, joten se ei kaadu itsestaan.
+    if c["cs_rows"] and not hits:
+        raise SystemExit("cs_table: luottamusdata ei osunut yhteenkaan "
+                         "joukkueeseen — nimien normalisointi on rikki")
     return (
         '<div class="scroll"><table>'
         f"<caption>Model clean sheet probability for every Premier League team, "
-        f"Gameweek {c['next_gw']}, {c['season']} season. Sorted by clean sheet chance.</caption>"
+        f"Gameweek {c['next_gw']}, {c['season']} season. Sorted by clean sheet chance. "
+        f"Squad turnover is the share of last season's minutes played by players "
+        f"who have since left; the model is fitted on results, so it prices a "
+        f"squad by what it did rather than by who is in it now.</caption>"
         "<thead><tr>"
         '<th scope="col">Team</th><th scope="col" class="num">Clean sheet %</th>'
         '<th scope="col">Next opponent</th><th scope="col" class="num">FDR</th>'
+        '<th scope="col" class="num m-hide">Squad turnover</th>'
         "</tr></thead><tbody>"
         + "".join(rows)
         + "</tbody></table></div>"

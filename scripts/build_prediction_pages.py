@@ -461,6 +461,38 @@ def _apply_display_names(by_comp: dict[str, list[dict]]) -> tuple[set, set]:
     return mapped, unmapped
 
 
+def _attach_confidence(by_comp: dict[str, list[dict]]) -> int:
+    """Liita luottamuslippu RAAOILLA mallinimilla ennen nayttonimien vaihtoa.
+
+    Nimi vaihtuu _apply_display_names():ssa, joten renderoijassa e["home_team"]
+    on jo nayttonimi eika osuisi artefaktiin. Lippu jaisi silloin pois
+    NAYTTAMATTA virhetta — sama vikaluokka kuin slug-tormays, jota vastaan
+    tassa tiedostossa on jo oma tarkistuksensa.
+
+    Vain liputetut naytetaan (nousija / korkea vaihtuvuus). Pelkka
+    vaihtuvuusluku kuuluu tyokaluihin, ei jokaiselle ottelusivulle: 26/27
+    kukaan ei ylita kynnysta, joten luku olisi 380 sivulla kohinaa.
+    """
+    path = ROOT / "data" / "team_confidence.json"
+    if not path.exists():
+        print("VAROITUS: team_confidence.json puuttuu — ei lippuja")
+        return 0
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    conf = {t["model_team"]: t for t in doc["teams"] if t.get("flag")}
+    n = 0
+    for rows in by_comp.values():
+        for e in rows:
+            notes = []
+            for key in ("home_team", "away_team"):
+                t = conf.get(e.get(key))
+                if t and t.get("note"):
+                    notes.append((e[key], t["note"]))
+            if notes:
+                e["_confidence"] = notes
+                n += 1
+    return n
+
+
 def _match_filename(e: dict) -> str:
     return f"{_slug(e['home_team'])}-vs-{_slug(e['away_team'])}.html"
 
@@ -475,6 +507,30 @@ def _prob_block(e: dict) -> str:
         f'<div class="legend"><span>{escape(e["home_team"])} {_fmt_pct(ph)}</span>'
         f"<span>Draw {_fmt_pct(pd_)}</span>"
         f'<span>{escape(e["away_team"])} {_fmt_pct(pa)}</span></div>'
+    )
+
+
+def _confidence_block(e: dict) -> str:
+    """Nakyva varoitus kun luokitus nojaa vanhentuneeseen tietoon.
+
+    Sanamuoto kertoo MIKSI luku on epavarmempi, ei pelkkaa etikettia: malli
+    sovitetaan tuloksiin eika nae siirtoikkunaa, ja nousijalla ei ole
+    PL-tuloksia lainkaan. Vrt. yritys korjata luokitusta suoraan — se ei
+    validoitunut (calibrate_transfer_effect), joten kerromme epavarmuuden
+    emmeka saada lukua.
+    """
+    notes = e.get("_confidence")
+    if not notes:
+        return ""
+    items = "".join(
+        f"<li><strong>{escape(team)}</strong>: {escape(note)}</li>"
+        for team, note in notes
+    )
+    return (
+        '<div class="rec"><strong>Lower confidence in this one.</strong> '
+        f"<ul>{items}</ul>"
+        "The model is fitted on results, so it prices a squad by what it did, "
+        "not by who is in it now.</div>"
     )
 
 
@@ -510,7 +566,8 @@ def render_match_page(comp: str, e: dict) -> str:
         f'<div class="stat"><b>Premium</b><span>expected goals and the most likely score on '
         f'<a href="https://pro.goaliq.app/?tab=premium&amp;src=predict-page&amp;srcp=predictions">GoalIQ Premium</a></span></div>'
         f"</div>"
-        f'<div class="rec">This prediction was logged before kickoff on '
+        + _confidence_block(e)
+        + f'<div class="rec">This prediction was logged before kickoff on '
         f'{escape((e.get("logged_at") or "")[:10])} and will be graded in our '
         f'<a href="/predictions">public track record</a>, hits and misses included.</div>'
         f'<div class="cta-row">'
@@ -692,6 +749,18 @@ def main() -> int:
     now = datetime.now(timezone.utc)
     log = acc.load_log()
     by_comp = _upcoming_by_comp(log, now)
+    # JARJESTYS ON PAKOLLINEN: luottamuslippu haetaan raaoilla mallinimilla
+    # ENNEN nayttonimien vaihtoa (ks. _attach_confidence).
+    n_conf = _attach_confidence(by_comp)
+    pl_rows = len(by_comp.get("PL") or [])
+    print(f"Luottamuslippu: {n_conf} ottelusivulle (PL-otteluita {pl_rows})")
+    if pl_rows and not n_conf:
+        # PL:ssa on aina 3 nousijaa, joten liputettuja otteluita ON oltava.
+        # Nolla tarkoittaa etta nimimappays hajosi — ja se ei kaadu itsestaan.
+        print("VIRHE: PL-otteluita on mutta yksikaan ei saanut lippua — "
+              "mallinimien haku on rikki", file=sys.stderr)
+        return 1
+
     mapped, unmapped = _apply_display_names(by_comp)
     total_names = len(mapped) + len(unmapped)
     print(f"DISPLAY_NAMES: {len(mapped)}/{total_names} osumaa, "
