@@ -1351,8 +1351,11 @@ STATS_JS = """
    s+='<tr><td class="n">'+(j+1)+'</td><td>'+r[C.name]+'</td>'
     +'<td>'+r[C.team]+'</td><td class="m-hide">'+r[C.pos]+'</td>'
     +'<td class="n m-hide">'+r[C.price].toFixed(1)+'</td>'
-    +'<td class="n m-hide">'+r[C.mins]+'</td>';
-   if(mode==='pstart')s+='<td class="n m-hide">'+r[C.starts]+'</td>';
+    // Mins ja Starts ovat ikkunoitavia: ilman raw():ta ne nayttivat kauden
+    // lukuja GW-otsikon alla (Haaland 2953 min "GW1-6:lla"). Loytyi vasta
+    // livesivua katsomalla, ei koodista.
+    +'<td class="n m-hide">'+raw(r,'mins')+'</td>';
+   if(mode==='pstart')s+='<td class="n m-hide">'+raw(r,'starts')+'</td>';
    for(var m=0;m<ks.length;m++){
     s+='<td class="n'+(ks[m]===sortKey?' hi':'')+'">'+fmt(r,ks[m])+'</td>';
    }
@@ -1475,8 +1478,8 @@ STATS_JS = """
   var lines=[hdr.join(',')],rs=window.__STROWS__||[];
   for(var m=0;m<rs.length;m++){
    var r=rs[m],line=['"'+String(r[C.name]).replace(/"/g,'""')+'"',r[C.team],
-    r[C.pos],r[C.price].toFixed(1),r[C.mins]];
-   if(mode==='pstart')line.push(r[C.starts]);
+    r[C.pos],r[C.price].toFixed(1),raw(r,'mins')];
+   if(mode==='pstart')line.push(raw(r,'starts'));
    for(var n2=0;n2<ks.length;n2++){
     var v=val(r,ks[n2]);
     line.push(typeof v==='number'?v.toFixed(2):v);
