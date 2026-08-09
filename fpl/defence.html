@@ -216,6 +216,139 @@ color:var(--muted);font-weight:600;margin-right:2px;}
 .toolnav a{font-size:15px;color:var(--cream);text-decoration:none;
 border-bottom:1px solid var(--line);padding-bottom:1px;}
 .toolnav a:hover{border-bottom-color:currentColor;}
+/* GEN:MOBILE-CSS */
+/* Vain kapealla naytolla nakyva selite. Oletuksena piilossa, jotta
+   leveiden naytoiden sivut eivat muutu lainkaan. */
+.m-only{display:none;}
+
+@media (max-width:560px){
+  .m-only{display:block;}
+
+  /* --- 1. NAVI ---------------------------------------------------------
+     Vika: nav{justify-content:space-between} + kaksi joustamatonta lasta.
+     390px:ssa brandi ja linkkipari eivat mahdu samalle riville, joten
+     molemmat rivittyivat sisaisesti: "GoalIQ" katkesi logon alle ja
+     "Try it live" -napin teksti valui napin ulkopuolelle.
+     Korjaus: sallitaan rivitys ELEMENTTIEN valilla, ei niiden sisalla. */
+  nav,.nav{flex-wrap:wrap;gap:10px;padding-top:14px;padding-bottom:14px;}
+  .brand{font-size:18px;white-space:nowrap;flex:0 0 auto;}
+  .brand-icon{width:20px;height:20px;margin-right:6px;}
+  nav>span,.nav>span{flex:1 1 100%;font-size:13px;}
+  .nav-cta{display:inline-block;white-space:nowrap;padding:8px 14px;}
+
+  /* --- 2. OTTELURIVIT --------------------------------------------------
+     Vika: .mrow on flex-rivi, jossa joukkuenimi sai kolme rivia ja
+     todennakoisyys leijui oikealla eri korkeudella -- rivia ei voinut
+     lukea vasemmalta oikealle. Korjaus: pinotaan. */
+  .mrow{flex-direction:column;align-items:flex-start;gap:2px;padding:10px 0;}
+  .mrow>div{width:100%;}
+  /* Pinoaminen lyhensi ottelulinkkeja (nimi mahtuu nyt yhdelle riville),
+     jolloin kosketuskohteesta tuli alle 32px. Leveys taydeksi + pystypadding
+     nostaa rivin takaisin sormenpaan kokoon. */
+  .mrow a{display:block;width:100%;padding:7px 0;}
+  .pick{font-size:14px;}
+
+  /* --- 3. TAULUKOT: sarakeprioriteetti (Villen valinta (a) 9.8) --------
+     Builderit merkitsevat vahemman tarkeat sarakkeet .m-hide:lla; kapealla
+     naytolla nakyvat vain avainsarakkeet. Taysi taulukko sailyy
+     leveammilla naytoilla muuttumattomana. */
+  th.m-hide,td.m-hide{display:none;}
+
+  /* Pitkat tekstisolut saavat rivittya; luvut eivat (tabular-nums hajoaa
+     ja "1,25" katkeaisi kahdelle riville). */
+  .lb th,.lb td,.scroll table th,.scroll table td{white-space:normal;}
+  .lb th.n,.lb td.n,.scroll table th.num,.scroll table td.num{
+    white-space:nowrap;}
+  .lb{font-size:13px;}
+  /* Vaakapadding 8px -> 5px. Mitattu: stats.html jai 404px:aan (30px yli)
+     senkin jalkeen kun kontekstisarakkeet oli piilotettu, ja yhdeksassa
+     sarakkeessa padding yksin oli 144px. Tiukempi padding sailyttaa
+     sarakkeen; sarakkeen pudottaminen olisi hukannut tietoa. */
+  .lb th,.lb td{padding:7px 5px;}
+
+  /* Taulukoiden min-width pakotti vierityksen myos silloin kun sarakkeita
+     oli piilotettu niin etta loput olisivat mahtuneet. */
+  .lb-wrap>.lb,.scroll>table,.table-wrap>table,.rec-scroll>table{
+    min-width:0;}
+  table{min-width:0;}
+
+  /* HILJAINEN LEIKKAUS (9.8, loytyi vasta kuvasta):
+     width:auto + min-width:0 sai taulukon kutistumaan TASMALLEEN kaareen
+     (tableW=374=wrapClient), jolloin nowrap-numerosarakkeet eivat mahtuneet
+     soluihinsa ja "28.17" renderoitiin muodossa "28.". Taulukko ei ollut
+     ylileveä eika kaare vierittanyt, joten EI leveysmittaus EIKA
+     scrollWidth-tarkistus nahnyt tata -- vain silmä.
+     width:max-content pakottaa taulukon luonnolliseen leveyteensa: jos se ei
+     mahdu, kaare vierittaa nakyvasti sen sijaan etta dataa katoaisi
+     aanettomasti. Nakyva vieritys on huono, hiljaa kadonnut luku on pahempi. */
+  .lb-wrap>.lb{width:max-content;max-width:none;}
+  /* HUOM SPESIFISYYS: BYCOMP_CSS injektoidaan fpl.html:aan ja
+     predictions.html:aan OMANA <style>-elementtinaan MYOHEMMIN sivulla, eli
+     se voittaa taman lohkon dokumenttijarjestyksessa. Media query ei nosta
+     spesifisyytta, joten .rec-scroll table (0,1,1) ei riittaisi kumoamaan
+     sen min-width:640px:aa. div.-etuliite nostaa (0,1,2) ja tekee saannosta
+     jarjestyksesta riippumattoman. */
+  div.rec-scroll table{min-width:0;}
+  /* Ottelunimi oli nowrap ("Nottingham Forest v Crystal Palace" = 277px
+     yhdella rivilla), mika yksin teki track record -taulusta 3 x ruudun. */
+  div.rec-scroll td.team,.scroll td.team{white-space:normal;}
+  div.rec-scroll th,div.rec-scroll td{padding:7px 6px;font-size:13px;}
+  /* Kick-off oli "2026-08-21 19:00:00 UTC" yhdella rivilla = 195px, eli
+     yksi sarake vei kolmanneksen puhelimen leveydesta. Nama luvut ovat
+     paivamaaria eivatka tasattavia numeroita, joten rivitys on turvallinen. */
+  div.rec-scroll td.num,div.rec-scroll th.num{white-space:normal;}
+  /* FDR-ruudukon solu on "ARS (H) 60%" = kolme osaa yhdella rivilla.
+     nowrap piti ruudukon 472px:ssa vaikka sarakkeita oli jo piilotettu;
+     rivittyva solu vie kaksi rivia ja puolittaa leveyden. */
+  .fdr-grid td.num,.scroll td.num .fdr,.fdr{white-space:normal;}
+  .fdr{min-width:0;}
+
+  /* Vieritysvihje: nakyy vain siella minne builder sen lisaa, eli
+     taulukoissa jotka vierivat sarakkeiden piilotuksen jalkeenkin. */
+  .scrollhint{display:block;color:var(--muted,#A8A29A);font-size:12px;
+    margin:6px 0 0;}
+
+  /* --- 4. SUODATINNAPIT ------------------------------------------------
+     Vika: .chips{display:inline-flex} ilman rivitysta -> nappirivi oli
+     454px, ja koska html/body on overflow-x:clip, viimeinen nappi
+     ("Set pieces") oli fyysisesti saavuttamattomissa puhelimella.
+     Korjaus: rivitys + jokainen suodatinryhma omalle rivilleen. */
+  .lbctl{gap:6px 8px;}
+  .lbctl .lbl{flex:1 1 100%;margin:10px 0 0;}
+  .lbctl .lbl:first-child{margin-top:0;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;max-width:100%;}
+  .chip{min-height:36px;}
+  .lbctl select,.lbctl input{min-height:36px;max-width:100%;}
+
+  /* --- 5. LUETTAVUUS ---------------------------------------------------
+     12px monospace on puhelimessa alle luettavan rajan. */
+  .meta,.note,.stat span,.legend,.mrow .meta,footer{font-size:13px;}
+  .hero .lede,.lede{font-size:16px;}
+  .stat b{font-size:24px;}
+
+  /* --- 6. KOSKETUSKOHTEET ---------------------------------------------- */
+  .btn,.cta,.nav-cta{min-height:44px;display:inline-flex;align-items:center;
+    justify-content:center;}
+  .toolnav a{display:inline-block;padding:4px 0;}
+}
+
+/* Erittain kapea (esim. iPhone SE 375px / Galaxy Fold ulkonaytto 344px):
+   brandi ja CTA eivat mahdu edes pienennettyina, ja hero-otsikko
+   ylivuotaa jos siina on pitkia sanoja. */
+@media (max-width:400px){
+  .wrap{padding-left:14px;padding-right:14px;}
+  .hero h1,h1{font-size:26px;overflow-wrap:break-word;}
+  .brand{font-size:17px;}
+  /* Fonttia EI pienenneta 12px:aan taalla. Kokeiltiin 9.8 ja mitattiin:
+     se teki 1200 solusta alle 13px:n eli alle luettavan rajan, ja
+     sarakkeiden piilotus riitti jo mahduttamaan taulukot ilman sita.
+     Padding sen sijaan kiristetaan: stats.html on tihein taulukko
+     (9 nakyvaa saraketta) ja jai 404px:aan 6px:n paddingilla eli 14px yli
+     puhelimen leveyden. Luonnollinen leveys (width:max-content) on 383px
+     4px:n paddingilla; 3px vie sen 365:aan eli kaareen (374) mahtuvaksi. */
+  .lb th,.lb td{padding:6px 3px;}
+}
+/* /GEN:MOBILE-CSS */
 </style>
 </head>
 <body>
@@ -227,7 +360,202 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
 </div>
 </header>
 <main class="wrap content">
-<p class="note"><strong>2025/26 season, per match.</strong> This covers the 17 clubs that played in the Premier League last season and are still in it. Coventry, Hull and Ipswich came up from the Championship, so there is no Premier League shot data for them yet and they are not in the table. Burnley, West Ham and Wolverhampton Wanderers are in last season's data but went down, so they are left out.</p><p class="note">Penalties are counted separately and left out of the zone columns, because they say nothing about defensive shape.</p><div class="stat-row"><div class="stat"><b>Arsenal</b><span>Fewest expected goals conceded: 0.91 per match</span></div><div class="stat"><b>Everton</b><span>Most headers faced: 2.55 per match</span></div><div class="stat"><b>Everton</b><span>Most central-box shots faced: 5.16 per match</span></div></div><h2>These 17 defences, sorted by expected goals conceded</h2><p class="note">Why this matters for FPL: a defence that faces a lot of headers is a set-piece risk, so its clean sheet is fragile even against weak opponents. A defence that concedes mostly from long range is giving up volume without quality, and its goalkeeper is a save-points candidate. These come from shot-level data with its own expected-goals model, so the numbers are not Opta's and we do not call them that.</p><div class="lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Team</th><th class="n" title="Expected goals conceded per match">xGC</th><th class="n" title="Shots faced per match">Shots</th><th class="n" title="Six-yard box, central">6yd</th><th class="n" title="Penalty area, central band">Central</th><th class="n" title="Penalty area, wide of the central band">Wide</th><th class="n" title="Between 18 yards and the penalty area">Edge</th><th class="n" title="Long range">Far</th><th class="n" title="Headed attempts faced per match">Headers</th><th class="n" title="Set-piece expected goals conceded per match">SP xG</th><th class="n" title="Share of shots faced that came from inside the box">In box</th></tr></thead><tbody><tr><td class="n">1</td><td>Arsenal</td><td class="n hi">0.91</td><td class="n">8.2</td><td class="n">0.71</td><td class="n">2.84</td><td class="n">1.39</td><td class="n">2.37</td><td class="n">0.84</td><td class="n">1.42</td><td class="n">0.20</td><td class="n">61%</td></tr><tr><td class="n">2</td><td>Manchester City</td><td class="n hi">1.28</td><td class="n">9.7</td><td class="n">1.08</td><td class="n">3.37</td><td class="n">2.13</td><td class="n">2.32</td><td class="n">0.79</td><td class="n">1.55</td><td class="n">0.27</td><td class="n">68%</td></tr><tr><td class="n">3</td><td>Manchester United</td><td class="n hi">1.34</td><td class="n">11.6</td><td class="n">1.18</td><td class="n">4.32</td><td class="n">1.79</td><td class="n">3.29</td><td class="n">0.87</td><td class="n">2.08</td><td class="n">0.35</td><td class="n">64%</td></tr><tr><td class="n">4</td><td>Brighton</td><td class="n hi">1.43</td><td class="n">11.7</td><td class="n">1.26</td><td class="n">3.87</td><td class="n">2.82</td><td class="n">2.58</td><td class="n">1.00</td><td class="n">2.21</td><td class="n">0.29</td><td class="n">69%</td></tr><tr><td class="n">5</td><td>Liverpool</td><td class="n hi">1.44</td><td class="n">11.4</td><td class="n">0.89</td><td class="n">3.87</td><td class="n">2.50</td><td class="n">2.66</td><td class="n">1.39</td><td class="n">2.05</td><td class="n">0.30</td><td class="n">64%</td></tr><tr><td class="n">6</td><td>Tottenham</td><td class="n hi">1.48</td><td class="n">12.2</td><td class="n">1.37</td><td class="n">4.42</td><td class="n">2.18</td><td class="n">3.24</td><td class="n">0.95</td><td class="n">2.50</td><td class="n">0.37</td><td class="n">66%</td></tr><tr><td class="n">7</td><td>Bournemouth</td><td class="n hi">1.50</td><td class="n">12.6</td><td class="n">1.37</td><td class="n">4.71</td><td class="n">2.34</td><td class="n">3.29</td><td class="n">0.74</td><td class="n">2.21</td><td class="n">0.47</td><td class="n">68%</td></tr><tr><td class="n">8</td><td>Leeds</td><td class="n hi">1.51</td><td class="n">12.5</td><td class="n">1.74</td><td class="n">4.63</td><td class="n">1.68</td><td class="n">3.32</td><td class="n">1.00</td><td class="n">2.53</td><td class="n">0.39</td><td class="n">65%</td></tr><tr><td class="n">9</td><td>Aston Villa</td><td class="n hi">1.51</td><td class="n">12.9</td><td class="n">1.39</td><td class="n">4.37</td><td class="n">2.39</td><td class="n">3.47</td><td class="n">1.21</td><td class="n">2.34</td><td class="n">0.37</td><td class="n">64%</td></tr><tr><td class="n">10</td><td>Newcastle United</td><td class="n hi">1.53</td><td class="n">12.3</td><td class="n">1.08</td><td class="n">3.92</td><td class="n">2.68</td><td class="n">3.29</td><td class="n">1.21</td><td class="n">1.92</td><td class="n">0.29</td><td class="n">63%</td></tr><tr><td class="n">11</td><td>Chelsea</td><td class="n hi">1.57</td><td class="n">10.9</td><td class="n">1.26</td><td class="n">4.16</td><td class="n">2.11</td><td class="n">2.47</td><td class="n">0.87</td><td class="n">2.16</td><td class="n">0.35</td><td class="n">69%</td></tr><tr><td class="n">12</td><td>Everton</td><td class="n hi">1.59</td><td class="n">13.9</td><td class="n">1.37</td><td class="n">5.16</td><td class="n">2.34</td><td class="n">3.63</td><td class="n">1.34</td><td class="n">2.55</td><td class="n">0.42</td><td class="n">64%</td></tr><tr><td class="n">13</td><td>Brentford</td><td class="n hi">1.60</td><td class="n">13.1</td><td class="n">1.13</td><td class="n">4.68</td><td class="n">1.95</td><td class="n">3.97</td><td class="n">1.16</td><td class="n">2.05</td><td class="n">0.26</td><td class="n">60%</td></tr><tr><td class="n">14</td><td>Fulham</td><td class="n hi">1.61</td><td class="n">11.8</td><td class="n">1.74</td><td class="n">3.66</td><td class="n">2.42</td><td class="n">2.89</td><td class="n">0.97</td><td class="n">2.00</td><td class="n">0.42</td><td class="n">67%</td></tr><tr><td class="n">15</td><td>Sunderland</td><td class="n hi">1.61</td><td class="n">14.2</td><td class="n">1.39</td><td class="n">4.89</td><td class="n">2.58</td><td class="n">3.66</td><td class="n">1.61</td><td class="n">2.55</td><td class="n">0.32</td><td class="n">63%</td></tr><tr><td class="n">16</td><td>Crystal Palace</td><td class="n hi">1.64</td><td class="n">11.7</td><td class="n">1.42</td><td class="n">4.26</td><td class="n">2.05</td><td class="n">2.92</td><td class="n">0.84</td><td class="n">2.50</td><td class="n">0.39</td><td class="n">67%</td></tr><tr><td class="n">17</td><td>Nottingham Forest</td><td class="n hi">1.73</td><td class="n">13.3</td><td class="n">1.24</td><td class="n">4.87</td><td class="n">2.13</td><td class="n">3.79</td><td class="n">1.11</td><td class="n">2.55</td><td class="n">0.46</td><td class="n">63%</td></tr></tbody></table></div><div class="rec">Powered by the GoalIQ match model with a published, pre-match-logged track record. The full toolkit (captain ranker, all differentials, transfer planner) is <a href="https://pro.goaliq.app/?tab=premium">GoalIQ Premium</a>: 3.99 €/month or 25 €/season, one subscription on web, iOS and Android.</div><div class="cta-row"><a class="btn" href="https://pro.goaliq.app/?tab=premium">Open GoalIQ Premium</a><a class="btn ghost" href="/fpl.html">Free clean-sheet probability &amp; FDR</a></div><p class="note">Updated 09 Aug 2026 · GoalIQ model predictions are statistical estimates for fun and analysis, not betting advice, and not a gambling service.</p>
+<p class="note"><strong>2025/26 season, per match.</strong> This covers the 17 clubs that played in the Premier League last season and are still in it. Coventry, Hull and Ipswich came up from the Championship, so there is no Premier League shot data for them yet and they are not in the table. Burnley, West Ham and Wolverhampton Wanderers are in last season's data but went down, so they are left out.</p><p class="note">Penalties are counted separately and left out of the zone columns, because they say nothing about defensive shape.</p><div class="stat-row"><div class="stat"><b>Arsenal</b><span>Fewest expected goals conceded: 0.91 per match</span></div><div class="stat"><b>Everton</b><span>Most headers faced: 2.55 per match</span></div><div class="stat"><b>Everton</b><span>Most central-box shots faced: 5.16 per match</span></div></div><h2>These 17 defences, sorted by expected goals conceded</h2><p class="note">Why this matters for FPL: a defence that faces a lot of headers is a set-piece risk, so its clean sheet is fragile even against weak opponents. A defence that concedes mostly from long range is giving up volume without quality, and its goalkeeper is a save-points candidate. These come from shot-level data with its own expected-goals model, so the numbers are not Opta's and we do not call them that.</p><div class="lb-wrap"><table class="lb"><thead><tr><th class="n">#</th><th>Team</th><th class="n" title="Expected goals conceded per match">xGC</th><th class="n" title="Shots faced per match">Shots</th><th class="n" title="Six-yard box, central">6yd</th><th class="n m-hide" title="Penalty area, central band">Central</th><th class="n m-hide" title="Penalty area, wide of the central band">Wide</th><th class="n m-hide" title="Between 18 yards and the penalty area">Edge</th><th class="n m-hide" title="Long range">Far</th><th class="n" title="Headed attempts faced per match">Headers</th><th class="n m-hide" title="Set-piece expected goals conceded per match">SP xG</th><th class="n" title="Share of shots faced that came from inside the box">In box</th></tr></thead><tbody><tr><td class="n">1</td><td>Arsenal</td><td class="n hi">0.91</td><td class="n">8.2</td><td class="n">0.71</td><td class="n m-hide">2.84</td><td class="n m-hide">1.39</td><td class="n m-hide">2.37</td><td class="n m-hide">0.84</td><td class="n">1.42</td><td class="n m-hide">0.20</td><td class="n">61%</td></tr><tr><td class="n">2</td><td>Manchester City</td><td class="n hi">1.28</td><td class="n">9.7</td><td class="n">1.08</td><td class="n m-hide">3.37</td><td class="n m-hide">2.13</td><td class="n m-hide">2.32</td><td class="n m-hide">0.79</td><td class="n">1.55</td><td class="n m-hide">0.27</td><td class="n">68%</td></tr><tr><td class="n">3</td><td>Manchester United</td><td class="n hi">1.34</td><td class="n">11.6</td><td class="n">1.18</td><td class="n m-hide">4.32</td><td class="n m-hide">1.79</td><td class="n m-hide">3.29</td><td class="n m-hide">0.87</td><td class="n">2.08</td><td class="n m-hide">0.35</td><td class="n">64%</td></tr><tr><td class="n">4</td><td>Brighton</td><td class="n hi">1.43</td><td class="n">11.7</td><td class="n">1.26</td><td class="n m-hide">3.87</td><td class="n m-hide">2.82</td><td class="n m-hide">2.58</td><td class="n m-hide">1.00</td><td class="n">2.21</td><td class="n m-hide">0.29</td><td class="n">69%</td></tr><tr><td class="n">5</td><td>Liverpool</td><td class="n hi">1.44</td><td class="n">11.4</td><td class="n">0.89</td><td class="n m-hide">3.87</td><td class="n m-hide">2.50</td><td class="n m-hide">2.66</td><td class="n m-hide">1.39</td><td class="n">2.05</td><td class="n m-hide">0.30</td><td class="n">64%</td></tr><tr><td class="n">6</td><td>Tottenham</td><td class="n hi">1.48</td><td class="n">12.2</td><td class="n">1.37</td><td class="n m-hide">4.42</td><td class="n m-hide">2.18</td><td class="n m-hide">3.24</td><td class="n m-hide">0.95</td><td class="n">2.50</td><td class="n m-hide">0.37</td><td class="n">66%</td></tr><tr><td class="n">7</td><td>Bournemouth</td><td class="n hi">1.50</td><td class="n">12.6</td><td class="n">1.37</td><td class="n m-hide">4.71</td><td class="n m-hide">2.34</td><td class="n m-hide">3.29</td><td class="n m-hide">0.74</td><td class="n">2.21</td><td class="n m-hide">0.47</td><td class="n">68%</td></tr><tr><td class="n">8</td><td>Leeds</td><td class="n hi">1.51</td><td class="n">12.5</td><td class="n">1.74</td><td class="n m-hide">4.63</td><td class="n m-hide">1.68</td><td class="n m-hide">3.32</td><td class="n m-hide">1.00</td><td class="n">2.53</td><td class="n m-hide">0.39</td><td class="n">65%</td></tr><tr><td class="n">9</td><td>Aston Villa</td><td class="n hi">1.51</td><td class="n">12.9</td><td class="n">1.39</td><td class="n m-hide">4.37</td><td class="n m-hide">2.39</td><td class="n m-hide">3.47</td><td class="n m-hide">1.21</td><td class="n">2.34</td><td class="n m-hide">0.37</td><td class="n">64%</td></tr><tr><td class="n">10</td><td>Newcastle United</td><td class="n hi">1.53</td><td class="n">12.3</td><td class="n">1.08</td><td class="n m-hide">3.92</td><td class="n m-hide">2.68</td><td class="n m-hide">3.29</td><td class="n m-hide">1.21</td><td class="n">1.92</td><td class="n m-hide">0.29</td><td class="n">63%</td></tr><tr><td class="n">11</td><td>Chelsea</td><td class="n hi">1.57</td><td class="n">10.9</td><td class="n">1.26</td><td class="n m-hide">4.16</td><td class="n m-hide">2.11</td><td class="n m-hide">2.47</td><td class="n m-hide">0.87</td><td class="n">2.16</td><td class="n m-hide">0.35</td><td class="n">69%</td></tr><tr><td class="n">12</td><td>Everton</td><td class="n hi">1.59</td><td class="n">13.9</td><td class="n">1.37</td><td class="n m-hide">5.16</td><td class="n m-hide">2.34</td><td class="n m-hide">3.63</td><td class="n m-hide">1.34</td><td class="n">2.55</td><td class="n m-hide">0.42</td><td class="n">64%</td></tr><tr><td class="n">13</td><td>Brentford</td><td class="n hi">1.60</td><td class="n">13.1</td><td class="n">1.13</td><td class="n m-hide">4.68</td><td class="n m-hide">1.95</td><td class="n m-hide">3.97</td><td class="n m-hide">1.16</td><td class="n">2.05</td><td class="n m-hide">0.26</td><td class="n">60%</td></tr><tr><td class="n">14</td><td>Fulham</td><td class="n hi">1.61</td><td class="n">11.8</td><td class="n">1.74</td><td class="n m-hide">3.66</td><td class="n m-hide">2.42</td><td class="n m-hide">2.89</td><td class="n m-hide">0.97</td><td class="n">2.00</td><td class="n m-hide">0.42</td><td class="n">67%</td></tr><tr><td class="n">15</td><td>Sunderland</td><td class="n hi">1.61</td><td class="n">14.2</td><td class="n">1.39</td><td class="n m-hide">4.89</td><td class="n m-hide">2.58</td><td class="n m-hide">3.66</td><td class="n m-hide">1.61</td><td class="n">2.55</td><td class="n m-hide">0.32</td><td class="n">63%</td></tr><tr><td class="n">16</td><td>Crystal Palace</td><td class="n hi">1.64</td><td class="n">11.7</td><td class="n">1.42</td><td class="n m-hide">4.26</td><td class="n m-hide">2.05</td><td class="n m-hide">2.92</td><td class="n m-hide">0.84</td><td class="n">2.50</td><td class="n m-hide">0.39</td><td class="n">67%</td></tr><tr><td class="n">17</td><td>Nottingham Forest</td><td class="n hi">1.73</td><td class="n">13.3</td><td class="n">1.24</td><td class="n m-hide">4.87</td><td class="n m-hide">2.13</td><td class="n m-hide">3.79</td><td class="n m-hide">1.11</td><td class="n">2.55</td><td class="n m-hide">0.46</td><td class="n">63%</td></tr></tbody></table></div><p class="note m-only">Central, wide, edge, long range and set-piece xG are in the same table on a wider screen.</p><button type="button" class="chip" id="sharecard" style="margin:10px 0 4px;">Share as image</button>
+<script>
+(function(){
+ // --- Mitat ja paletti: 1:1 shareCard.ts:n kanssa (ala muuta yksipuolisesti)
+ var W=1080,MX=60,ROW_TOP=404,ROW_H=80,FOOT_H=146;
+ var INK='#0b0a09',INK2='#141311',AMBER='#f5c542',CREAM='#f3f2f2',
+     MUTED='#a8a29a',LINE='rgba(243,242,242,0.13)',
+     TAG_LINE='rgba(243,242,242,0.33)';
+ var FONT='"IBM Plex Mono", ui-monospace, monospace';
+ function bold(px){return '700 '+px+'px '+FONT;}
+ function med(px){return '500 '+px+'px '+FONT;}
+
+ var wmP=null;
+ function loadWordmark(){
+  if(!wmP){
+   wmP=new Promise(function(res){
+    var img=new Image();
+    img.onload=function(){res(img);};
+    // Kortti ei saa kaatua asset-puutteeseen: fallback piirtaa wordmarkin
+    // tekstina. Sama sopimus kuin SPA:ssa.
+    img.onerror=function(){res(null);};
+    img.src='/assets/brand/goaliq-wordmark-teletext.png';
+   });
+  }
+  return wmP;
+ }
+
+ function shrink(ctx,text,px,maxW,minPx,weight){
+  ctx.font=weight(px);
+  while(ctx.measureText(text).width>maxW&&px>minPx){px-=2;ctx.font=weight(px);}
+  return px;
+ }
+
+ function render(spec){
+  var fonts=(document.fonts&&document.fonts.load)
+   ? Promise.all([document.fonts.load(bold(60)),document.fonts.load(bold(36)),
+                  document.fonts.load(med(24))])['catch'](function(){})
+   : Promise.resolve();
+  return fonts.then(loadWordmark).then(function(wm){
+   var n=spec.rows.length,H=ROW_TOP+n*ROW_H+FOOT_H;
+   var c=document.createElement('canvas');
+   c.width=W;c.height=H;
+   var ctx=c.getContext('2d');
+   ctx.textBaseline='top';
+
+   var g=ctx.createLinearGradient(0,0,0,H);
+   g.addColorStop(0,INK);g.addColorStop(1,INK2);
+   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+   if(wm){
+    var wmH=84,wmW=Math.round(wm.width*wmH/wm.height);
+    ctx.drawImage(wm,(W-wmW)/2,64,wmW,wmH);
+   }else{
+    ctx.font=bold(56);
+    var gw=ctx.measureText('GOAL').width,box=76,total=gw+14+box,x0=(W-total)/2;
+    ctx.fillStyle=CREAM;ctx.fillText('GOAL',x0,72);
+    ctx.fillStyle=AMBER;ctx.fillRect(x0+gw+14,64,box,box);
+    ctx.fillStyle=INK;ctx.font=bold(40);
+    ctx.fillText('IQ',x0+gw+14+(box-ctx.measureText('IQ').width)/2,82);
+   }
+   ctx.fillStyle=AMBER;
+   ctx.beginPath();
+   if(ctx.roundRect){ctx.roundRect((W-120)/2,176,120,6,3);ctx.fill();}
+   else{ctx.fillRect((W-120)/2,176,120,6);}
+
+   ctx.font=bold(60);ctx.fillStyle=CREAM;
+   ctx.fillText(spec.title,(W-ctx.measureText(spec.title).width)/2,226);
+   ctx.font=med(22);ctx.fillStyle=MUTED;
+   ctx.fillText(spec.subtitle,(W-ctx.measureText(spec.subtitle).width)/2,306);
+
+   var fxRight=W-MX-180;
+   ctx.font=med(19);
+   ctx.fillText(spec.nameLabel||'PLAYER',MX+76,ROW_TOP-34);
+   if(spec.midLabel){
+    ctx.fillText(spec.midLabel,fxRight-ctx.measureText(spec.midLabel).width,
+                 ROW_TOP-34);
+   }
+   ctx.fillText(spec.valueLabel,
+                W-MX-ctx.measureText(spec.valueLabel).width,ROW_TOP-34);
+
+   for(var i=0;i<n;i++){
+    var r=spec.rows[i],y=ROW_TOP+i*ROW_H,cy=y+ROW_H/2,first=(i===0);
+    ctx.strokeStyle=first?AMBER:LINE;ctx.lineWidth=first?2:1;
+    ctx.strokeRect(MX-12,y+4,W-2*(MX-12),ROW_H-8);
+
+    ctx.font=bold(28);ctx.fillStyle=first?AMBER:MUTED;
+    var rk=String(r.rank);
+    ctx.fillText(rk,MX+34-ctx.measureText(rk).width,cy-16);
+
+    var x=MX+76;
+    var nPx=shrink(ctx,r.name,32,330,20,bold);
+    ctx.font=bold(nPx);ctx.fillStyle=CREAM;
+    ctx.fillText(r.name,x,cy-nPx*0.62);
+    x+=ctx.measureText(r.name).width+16;
+
+    if(r.tag){
+     ctx.font=bold(17);
+     var pw=ctx.measureText(r.tag).width+16;
+     ctx.strokeStyle=TAG_LINE;ctx.lineWidth=1;
+     ctx.strokeRect(x,cy-15,pw,30);
+     ctx.fillText(r.tag,x+8,cy-10);
+     x+=pw+12;
+    }
+
+    if(r.team){
+     ctx.font=med(20);ctx.fillStyle=MUTED;
+     ctx.fillText(r.team,x,cy-10);
+     x+=ctx.measureText(r.team).width+12;
+    }
+
+    if(r.mid){
+     var fPx=shrink(ctx,r.mid,24,190,14,med);
+     ctx.font=med(fPx);ctx.fillStyle=MUTED;
+     ctx.fillText(r.mid,fxRight-ctx.measureText(r.mid).width,cy-fPx*0.55);
+    }
+
+    ctx.font=bold(36);ctx.fillStyle=first?AMBER:CREAM;
+    ctx.fillText(r.value,W-MX-ctx.measureText(r.value).width,cy-36*0.58);
+   }
+
+   // Alatunniste tulee SPECISTA. Oletusteksti ("logged before kickoff,
+   // graded in public") on OTTELUENNUSTEEN vaite eika pida paikkaansa
+   // tilastolistasta -- jaettu kuva ei saa vaittaa enempaa kuin data antaa.
+   ctx.font=med(20);ctx.fillStyle=MUTED;
+   ctx.fillText(spec.footNote||'logged before kickoff, graded in public',
+                MX,H-88);
+   ctx.font=bold(20);ctx.fillStyle=AMBER;
+   ctx.fillText('@goaliqapp',W-MX-ctx.measureText('@goaliqapp').width,H-88);
+   ctx.font=med(17);ctx.fillStyle=MUTED;
+   ctx.fillText(spec.footNote2||'model projections, not betting advice',
+                MX,H-54);
+   ctx.fillStyle=AMBER;ctx.fillRect(0,H-8,W,8);
+
+   return new Promise(function(res,rej){
+    c.toBlob(function(b){b?res(b):rej(new Error('toBlob failed'));},'image/png');
+   });
+  });
+ }
+
+ function deliver(blob,fileName){
+  var file=null;
+  try{file=new File([blob],fileName,{type:'image/png'});}catch(e){}
+  // Puhelimessa natiivi jakovalikko on se mita kayttaja odottaa; desktopilla
+  // ja jos jako ei ole kaytettavissa, pudotaan lataukseen.
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+   return navigator.share({files:[file]})['catch'](function(){download(blob,fileName);});
+  }
+  download(blob,fileName);
+  return Promise.resolve();
+ }
+ function download(blob,fileName){
+  var u=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=u;a.download=fileName;document.body.appendChild(a);a.click();
+  a.remove();setTimeout(function(){URL.revokeObjectURL(u);},1000);
+ }
+
+ var btn=document.getElementById('sharecard');
+ if(!btn)return;
+ btn.addEventListener('click',function(){
+  var spec=null;
+  try{spec=(function(){
+  var t=document.querySelector('table.lb');
+  if(!t)return null;
+  var rows=[],trs=t.querySelectorAll('tbody tr'),i;
+  for(i=0;i<trs.length&&rows.length<10;i++){
+   var td=trs[i].children;
+   if(td.length<3)continue;
+   rows.push({rank:rows.length+1,
+              name:(td[1].textContent||'').trim(),
+              value:(td[2].textContent||'').trim()});
+  }
+  // Taulukko on NOUSEVASSA jarjestyksessa (Arsenal 0.91 = paras puolustus).
+  // Ensimmainen otsikkoehdotus "MOST XG CONCEDED" vaitti tasmalleen
+  // painvastoin kuin data, ja se olisi mennyt X:aan sellaisenaan.
+  return {title:'FEWEST XG CONCEDED',
+          subtitle:'Expected goals conceded per match, lowest is best',
+          nameLabel:'TEAM',
+          valueLabel:'XGC',
+          footNote:'shot-level data, own expected-goals model',
+          footNote2:'free at goaliq.app, not betting advice',
+          rows:rows,
+          fileName:'goaliq-defence-xgc.png'};
+ })();}catch(e){spec=null;}
+  if(!spec||!spec.rows||!spec.rows.length){
+   btn.textContent='Nothing to share yet';
+   return;
+  }
+  var label=btn.textContent;
+  btn.disabled=true;btn.textContent='Building card...';
+  render(spec).then(function(b){return deliver(b,spec.fileName);})
+   .then(function(){btn.disabled=false;btn.textContent=label;})
+   ['catch'](function(){btn.disabled=false;btn.textContent='Card failed';});
+ });
+})();
+</script>
+<div class="rec">Powered by the GoalIQ match model with a published, pre-match-logged track record. The full toolkit (captain ranker, all differentials, transfer planner) is <a href="https://pro.goaliq.app/?tab=premium">GoalIQ Premium</a>: 3.99 €/month or 25 €/season, one subscription on web, iOS and Android.</div><div class="cta-row"><a class="btn" href="https://pro.goaliq.app/?tab=premium">Open GoalIQ Premium</a><a class="btn ghost" href="/fpl.html">Free clean-sheet probability &amp; FDR</a></div><p class="note">Updated 09 Aug 2026 · GoalIQ model predictions are statistical estimates for fun and analysis, not betting advice, and not a gambling service.</p>
 <nav class="toolnav" aria-label="More free FPL tools"><b>More free FPL tools</b><a href="/fpl/best-captain">Captain picks</a><a href="/fpl/model-xi">Model XI</a><a href="/fpl/differentials">Differentials</a><a href="/fpl/price-changes">Price changes</a><a href="/fpl/xg-leaders">xG leaders</a><a href="/fpl/defcon">DefCon leaders</a><a href="/fpl/stats">Player stats</a></nav>
 <footer>© 2026 GoalIQ · <a href="/predictions">Football predictions</a> · <a href="/fpl.html">Free FPL tools</a> · <a href="/privacy.html">Privacy</a><br>GoalIQ model predictions are statistical estimates for fun and analysis, not betting advice, and not a gambling service.</footer>
 </main>

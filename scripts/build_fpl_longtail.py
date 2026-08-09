@@ -40,6 +40,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
+from scripts.mobile_css import MOBILE_CSS
+from scripts.share_card_js import SHARE_CARD_JS
 
 # #119b: long-tail-sivut omaan lapsi-sitemapiin (sitemap.xml-index listaa).
 # Wholesale OUT_DIR-globista → entry jokaiselle olemassa olevalle sivulle,
@@ -195,7 +197,7 @@ color:var(--muted);font-weight:600;margin-right:2px;}
 .toolnav a{font-size:15px;color:var(--cream);text-decoration:none;
 border-bottom:1px solid var(--line);padding-bottom:1px;}
 .toolnav a:hover{border-bottom-color:currentColor;}
-"""
+""" + MOBILE_CSS
 
 
 # 28.7: SISAINEN LINKITYS. GSC:n URL-tarkastus paljasti etta naista sivuista
@@ -868,10 +870,11 @@ XG_JS = """
   for(var i=0;i<n;i++){
    var a=r[i];
    h+='<tr><td class="n">'+(i+1)+'</td><td>'+a.n+'</td><td class="tm">'
-    +kit(a.k,a.t)+'<span>'+a.t+'</span></td><td>'
-    +a.p+'</td><td class="n">'+a.c.toFixed(1)+'</td><td class="n hi">'
+    +kit(a.k,a.t)+'<span>'+a.t+'</span></td><td class="m-hide">'
+    +a.p+'</td><td class="n m-hide">'+a.c.toFixed(1)+'</td><td class="n hi">'
     +a.xg.toFixed(2)+'</td><td class="n">'+a.xa.toFixed(2)+'</td><td class="n">'
-    +a.xgi.toFixed(2)+'</td><td class="n">'+a.m+'</td><td class="n">'+a.g
+    +a.xgi.toFixed(2)+'</td><td class="n m-hide">'+a.m
+    +'</td><td class="n m-hide">'+a.g
     +'</td></tr>';
   }
   tb.innerHTML=h;
@@ -1030,10 +1033,15 @@ def render_xg_leaders(leaders: dict, now: datetime) -> str | None:
     table = (
         '<div class="lb-wrap"><table class="lb" id="xgt2">'
         "<thead><tr>"
-        '<th class="n">#</th><th>Player</th><th>Team</th><th>Pos</th>'
-        '<th class="n">Price</th><th class="n">xG</th>'
+        # Mobiili (a) 9.8: Pos/Price/Mins/Games ovat suodatinkontekstia, xG/xA/
+        # xGI on se mita sivulta tullaan katsomaan. Taulukko oli 589px = 1,5 x
+        # puhelimen leveys; kuudella sarakkeella se mahtuu ilman vieritysta.
+        # Sarakkeita EI poisteta DOMista -> JS:n indeksiviittaukset (hh[9])
+        # ja lajittelu toimivat entiseen tapaan kaikilla leveyksilla.
+        '<th class="n">#</th><th>Player</th><th>Team</th><th class="m-hide">Pos</th>'
+        '<th class="n m-hide">Price</th><th class="n">xG</th>'
         '<th class="n">xA</th><th class="n">xGI</th>'
-        '<th class="n">Mins</th><th class="n">Games</th>'
+        '<th class="n m-hide">Mins</th><th class="n m-hide">Games</th>'
         "</tr></thead>"
         f'<tbody id="xgb">{trows}</tbody></table></div>'
         '<button type="button" class="chip" id="xgmore" '
@@ -1274,11 +1282,16 @@ STATS_JS = """
   return out;
  }
  function draw(){
+  // Mobiili (a) 9.8: Pos/Price/Mins/Starts ovat suodatinkontekstia (ne
+  // saadetaan yllä olevilla napeilla), joten kapealla naytolla nakyvat
+  // Player + Team + valitun ryhman tilastot. Taulukko oli 657px = 1,7 x
+  // puhelimen leveys. Sarakkeet ovat yha DOMissa -> lajittelu ja CSV
+  // eivat muutu.
   var ks=cols(),h='<tr><th class="n">#</th><th data-k="name">Player</th>'
-   +'<th data-k="team">Team</th><th data-k="pos">Pos</th>'
-   +'<th class="n" data-k="price">Price</th>'
-   +'<th class="n" data-k="mins">Mins</th>',j;
-  if(mode==='pstart')h+='<th class="n" data-k="starts">Starts</th>';
+   +'<th data-k="team">Team</th><th class="m-hide" data-k="pos">Pos</th>'
+   +'<th class="n m-hide" data-k="price">Price</th>'
+   +'<th class="n m-hide" data-k="mins">Mins</th>',j;
+  if(mode==='pstart')h+='<th class="n m-hide" data-k="starts">Starts</th>';
   for(j=0;j<ks.length;j++){
    h+='<th class="n" data-k="'+ks[j]+'" title="'+(SRC[ks[j]]||'')+'">'
      +LAB[ks[j]]
@@ -1289,10 +1302,10 @@ STATS_JS = """
   for(j=0;j<n;j++){
    var r=rs[j];
    s+='<tr><td class="n">'+(j+1)+'</td><td>'+r[C.name]+'</td>'
-    +'<td>'+r[C.team]+'</td><td>'+r[C.pos]+'</td>'
-    +'<td class="n">'+r[C.price].toFixed(1)+'</td>'
-    +'<td class="n">'+r[C.mins]+'</td>';
-   if(mode==='pstart')s+='<td class="n">'+r[C.starts]+'</td>';
+    +'<td>'+r[C.team]+'</td><td class="m-hide">'+r[C.pos]+'</td>'
+    +'<td class="n m-hide">'+r[C.price].toFixed(1)+'</td>'
+    +'<td class="n m-hide">'+r[C.mins]+'</td>';
+   if(mode==='pstart')s+='<td class="n m-hide">'+r[C.starts]+'</td>';
    for(var m=0;m<ks.length;m++){
     s+='<td class="n'+(ks[m]===sortKey?' hi':'')+'">'+fmt(r,ks[m])+'</td>';
    }
@@ -1401,6 +1414,80 @@ def _stats_js() -> str:
         "(function(){\n var GROUPNAMES=" + json.dumps(names) + ";", 1)
 
 
+# Jakokortin spec luetaan RENDEROIDYSTA taulukosta eika datasta: silloin
+# kortti vastaa tasmalleen sita mita kayttaja nakee ruudulla (valittu
+# tilastoryhma, lajittelu, suodattimet). Datasta rakennettu kortti voisi
+# eriytya nakymasta huomaamatta.
+_STATS_SPEC_FN = r"""function(){
+  var tb=document.getElementById('stb'),head=document.getElementById('sth');
+  if(!tb||!head)return null;
+  var ths=head.querySelectorAll('th'),hiIdx=-1,i;
+  for(i=0;i<ths.length;i++){
+   if(/[▾▴]/.test(ths[i].textContent)){hiIdx=i;break;}
+  }
+  var label=(hiIdx>=0?ths[hiIdx].textContent:'Pts')
+             .replace(/[▾▴]/g,'').trim();
+  var rows=[],trs=tb.querySelectorAll('tr');
+  for(i=0;i<trs.length&&rows.length<10;i++){
+   var td=trs[i].children;
+   if(td.length<4)continue;
+   rows.push({rank:rows.length+1,
+              name:(td[1].textContent||'').trim(),
+              tag:(td[3]?td[3].textContent:'').trim(),
+              team:(td[2].textContent||'').trim(),
+              value:(hiIdx>=0&&td[hiIdx]?td[hiIdx].textContent:'').trim()});
+  }
+  var cnt=document.getElementById('stc');
+  var sub=cnt?(cnt.textContent||'').split('.')[0].trim():'';
+  return {title:('Top 10 by '+label).toUpperCase(),
+          subtitle:sub,
+          nameLabel:'PLAYER',
+          valueLabel:label.toUpperCase(),
+          // Tama kortti on RAAKADATAA, ei mallin ennuste. Oletusalatunniste
+          // ("logged before kickoff, graded in public") vaittaisi vaarin.
+          footNote:'free FPL stats at goaliq.app',
+          footNote2:'official FPL API and shot-level data, not betting advice',
+          rows:rows,
+          fileName:'goaliq-fpl-stats-'
+                   +label.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.png'};
+ }"""
+
+
+def _stats_share_card() -> str:
+    return SHARE_CARD_JS.replace("__CARD_ROWS_FN__", _STATS_SPEC_FN)
+
+
+# Defence-sivun taulukko on palvelimella renderoity ja jarjestetty xGC:lla,
+# joten kortti on aina "eniten xG:ta paastavat" -lista.
+_DEFENCE_SPEC_FN = r"""function(){
+  var t=document.querySelector('table.lb');
+  if(!t)return null;
+  var rows=[],trs=t.querySelectorAll('tbody tr'),i;
+  for(i=0;i<trs.length&&rows.length<10;i++){
+   var td=trs[i].children;
+   if(td.length<3)continue;
+   rows.push({rank:rows.length+1,
+              name:(td[1].textContent||'').trim(),
+              value:(td[2].textContent||'').trim()});
+  }
+  // Taulukko on NOUSEVASSA jarjestyksessa (Arsenal 0.91 = paras puolustus).
+  // Ensimmainen otsikkoehdotus "MOST XG CONCEDED" vaitti tasmalleen
+  // painvastoin kuin data, ja se olisi mennyt X:aan sellaisenaan.
+  return {title:'FEWEST XG CONCEDED',
+          subtitle:'Expected goals conceded per match, lowest is best',
+          nameLabel:'TEAM',
+          valueLabel:'XGC',
+          footNote:'shot-level data, own expected-goals model',
+          footNote2:'free at goaliq.app, not betting advice',
+          rows:rows,
+          fileName:'goaliq-defence-xgc.png'};
+ }"""
+
+
+def _defence_share_card() -> str:
+    return SHARE_CARD_JS.replace("__CARD_ROWS_FN__", _DEFENCE_SPEC_FN)
+
+
 def render_stats(stats: dict, now: datetime) -> str | None:
     """Ilmainen Stats zone: koko pelaajajoukko, suodattimet, per 90 / per start.
 
@@ -1428,18 +1515,18 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         f'<td class="n">{i + 1}</td>'
         f'<td>{escape(str(r[idx["name"]]))}</td>'
         f'<td>{escape(str(r[idx["team"]]))}</td>'
-        f'<td>{escape(str(r[idx["pos"]]))}</td>'
-        f'<td class="n">{r[idx["price"]]:.1f}</td>'
-        f'<td class="n">{r[idx["mins"]]}</td>'
+        f'<td class="m-hide">{escape(str(r[idx["pos"]]))}</td>'
+        f'<td class="n m-hide">{r[idx["price"]]:.1f}</td>'
+        f'<td class="n m-hide">{r[idx["mins"]]}</td>'
         + "".join(f'<td class="n">{r[idx[k]]}</td>' for k in keys)
         + "</tr>"
         for i, r in enumerate(rows[:100])
     )
     thead = (
         '<tr><th class="n">#</th><th data-k="name">Player</th>'
-        '<th data-k="team">Team</th><th data-k="pos">Pos</th>'
-        '<th class="n" data-k="price">Price</th>'
-        '<th class="n" data-k="mins">Mins</th>'
+        '<th data-k="team">Team</th><th class="m-hide" data-k="pos">Pos</th>'
+        '<th class="n m-hide" data-k="price">Price</th>'
+        '<th class="n m-hide" data-k="mins">Mins</th>'
         + "".join(
             f'<th class="n" data-k="{k}" title="{STATS_SOURCE[k]}">'
             f'{STATS_LABELS[k]}</th>' for k in keys)
@@ -1460,6 +1547,9 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         'var(--line-strong);background:var(--paper);color:var(--cream);'
         'padding:7px 10px;font:inherit;font-size:13px;">'
         '<button type="button" class="chip" id="stcsv">Download CSV</button>'
+        # Jakokortti (Villen pyynto 9.8): sama kortti kuin SPA:ssa ja
+        # viikkopostauksessa. Vapaata dataa, joten ei premium-porttia.
+        '<button type="button" class="chip" id="sharecard">Share as image</button>'
         "</div>"
         f'<p class="note" id="stc">{len(rows)} players, season totals. '
         "Click a column to sort.</p>"
@@ -1501,7 +1591,7 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         "projected points) is a model output rather than a raw stat, so it "
         "lives in the app and the DefCon column here is the raw count. A dash "
         "means we have no data for that player, not zero.</p>"
-        f"{controls}{table}{payload}{_stats_js()}"
+        f"{controls}{table}{payload}{_stats_js()}{_stats_share_card()}"
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )
@@ -1603,12 +1693,12 @@ def render_defence(defence: dict, now: datetime) -> str | None:
         f'<td class="n hi">{r["xg_pm"]:.2f}</td>'
         f'<td class="n">{r["shots_pm"]:.1f}</td>'
         f'<td class="n">{r["six_pm"]:.2f}</td>'
-        f'<td class="n">{r["central_pm"]:.2f}</td>'
-        f'<td class="n">{r["wide_pm"]:.2f}</td>'
-        f'<td class="n">{r["edge_pm"]:.2f}</td>'
-        f'<td class="n">{r["far_pm"]:.2f}</td>'
+        f'<td class="n m-hide">{r["central_pm"]:.2f}</td>'
+        f'<td class="n m-hide">{r["wide_pm"]:.2f}</td>'
+        f'<td class="n m-hide">{r["edge_pm"]:.2f}</td>'
+        f'<td class="n m-hide">{r["far_pm"]:.2f}</td>'
         f'<td class="n">{r["head_pm"]:.2f}</td>'
-        f'<td class="n">{r["sp_xg_pm"]:.2f}</td>'
+        f'<td class="n m-hide">{r["sp_xg_pm"]:.2f}</td>'
         f'<td class="n">{r["box_share"]:.0f}%</td>'
         "</tr>"
         for i, r in enumerate(rows)
@@ -1620,15 +1710,23 @@ def render_defence(defence: dict, now: datetime) -> str | None:
         '<th class="n" title="Expected goals conceded per match">xGC</th>'
         '<th class="n" title="Shots faced per match">Shots</th>'
         '<th class="n" title="Six-yard box, central">6yd</th>'
-        '<th class="n" title="Penalty area, central band">Central</th>'
-        '<th class="n" title="Penalty area, wide of the central band">Wide</th>'
-        '<th class="n" title="Between 18 yards and the penalty area">Edge</th>'
-        '<th class="n" title="Long range">Far</th>'
+        '<th class="n m-hide" title="Penalty area, central band">Central</th>'
+        '<th class="n m-hide" title="Penalty area, wide of the central band">Wide</th>'
+        '<th class="n m-hide" title="Between 18 yards and the penalty area">Edge</th>'
+        '<th class="n m-hide" title="Long range">Far</th>'
         '<th class="n" title="Headed attempts faced per match">Headers</th>'
-        '<th class="n" title="Set-piece expected goals conceded per match">SP xG</th>'
+        '<th class="n m-hide" title="Set-piece expected goals conceded per match">SP xG</th>'
         '<th class="n" title="Share of shots faced that came from inside the box">In box</th>'
         "</tr></thead>"
         f"<tbody>{trows}</tbody></table></div>"
+        # Lede lupaa kaikki vyohykkeet, mutta kapea naytto nayttaa niista
+        # viisi. Ilman tata rivia copy lupaisi enemman kuin ruutu antaa
+        # (COPY-SYNC-GATE: pinta ja lupaus eivat saa eriytya).
+        '<p class="note m-only">Central, wide, edge, long range and set-piece '
+        "xG are in the same table on a wider screen.</p>"
+        # Jakokortti (Villen pyynto 9.8)
+        '<button type="button" class="chip" id="sharecard" '
+        'style="margin:10px 0 4px;">Share as image</button>'
     )
     hero = (
         "<h1>What each Premier League defence concedes</h1>"
@@ -1670,6 +1768,7 @@ def render_defence(defence: dict, now: datetime) -> str | None:
         "expected-goals model, so the numbers are not Opta's and we do not "
         "call them that.</p>"
         f"{table}"
+        + _defence_share_card()
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )

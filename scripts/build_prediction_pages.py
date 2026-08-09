@@ -44,6 +44,7 @@ if str(ROOT) not in sys.path:
 
 from src.models import accuracy as acc
 from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
+from scripts.mobile_css import MOBILE_CSS
 from scripts.slugs import fold_ascii, slug
 
 # #119b: KAIKKI generoidut sivut (hubit + ottelusivut) omaan lapsi-sitemapiin,
@@ -250,7 +251,7 @@ footer a{color:var(--muted);}
 .note{color:var(--muted);font-size:12px;margin:18px 0;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
-"""
+""" + MOBILE_CSS
 
 # theme-color + Google Fonts (preconnect minimoi latauskustannuksen; sama
 # family-merkkijono kuin fpl.html:ssä → yksi fonttivälimuisti koko sivustolle)

@@ -39,6 +39,11 @@ from pathlib import Path
 if str(Path(__file__).resolve().parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from scripts.mobile_css import (  # noqa: E402
+    MOBILE_BLOCK_COLS,
+    MOBILE_CSS,
+    MOBILE_GW_COLS,
+)
 from scripts.slugs import slug as _slug  # noqa: E402
 
 # #38: PostHog cookieless site-analytiikka (persistence=memory -> ei evasteita,
@@ -622,8 +627,14 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         )
         rows.append(
             f'<tr data-comp="{escape(code)}">'
-            f'<td class="num">{escape(date_txt)}</td>'
-            f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
+            # Mobiili (a): Date ja Competition piiloon kapealla naytolla.
+            # Competition-suodatin on taulukon ylapuolella ja rivit ovat
+            # uusin ensin, joten kumpikaan tieto ei katoa sivulta — ja
+            # jaljelle jaa nelja saraketta jotka ovat itse asia:
+            # ottelu, veikkaus, tulos, osui/ei. Taulukko oli 1202px = 3,1 x
+            # puhelimen leveys; Date yksin oli 102px.
+            f'<td class="num m-hide">{escape(date_txt)}</td>'
+            f'<td class="m-hide">{escape(COMP_NAMES.get(code, code))}</td>'
             f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
             f'<td><strong>{pick_sym}</strong> {escape(pick_name)}'
             f'<span class="rec-pct">{_pick_pct(e)}</span></td>'
@@ -656,12 +667,17 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         pending_rows.append(
             f'<tr data-comp="{escape(code)}">'
             f'<td class="num">{escape(ko_txt)}</td>'
-            f"<td>{escape(COMP_NAMES.get(code, code))}</td>"
+            f'<td class="m-hide">{escape(COMP_NAMES.get(code, code))}</td>'
             f'<td class="team">{escape(e.get("home_team", ""))} v {escape(e.get("away_team", ""))}</td>'
             f'<td><strong>{pick_sym}</strong> {escape(pick_name)}'
             f'<span class="rec-pct">{_pick_pct(e)}</span></td>'
-            f'<td class="num">{escape(logged)}</td>'
-            f'<td class="num"><span class="rec-pending">awaiting result</span></td>'
+            # "Logged" on todiste ennen kickoffia, mutta kick-off-sarake
+            # kertoo saman asian rivilta; kapealla naytolla toinen riittaa.
+            f'<td class="num m-hide">{escape(logged)}</td>'
+            # Status-sarake toistaa lohkon otsikon ("Upcoming: logged,
+            # awaiting result") jokaisella rivilla. Kapealla naytolla se vei
+            # 124px eli kolmanneksen ruudusta ilman uutta tietoa.
+            f'<td class="num m-hide"><span class="rec-pending">awaiting result</span></td>'
             "</tr>"
         )
     pending_block = (
@@ -673,9 +689,11 @@ def record_table_html(preds: list[dict], c: dict) -> str:
             "logged; each row moves to the graded table above when the "
             "result is in.</p>"
             '<div class="rec-scroll"><table>'
-            '<thead><tr><th scope="col">Kick-off</th><th scope="col">Competition</th>'
+            '<thead><tr><th scope="col">Kick-off</th>'
+            '<th scope="col" class="m-hide">Competition</th>'
             '<th scope="col">Match</th><th scope="col">Pick</th>'
-            '<th scope="col">Logged</th><th scope="col">Status</th></tr></thead>'
+            '<th scope="col" class="m-hide">Logged</th>'
+            '<th scope="col" class="m-hide">Status</th></tr></thead>'
             "<tbody>" + "".join(pending_rows) + "</tbody></table></div>"
         )
         if pending_rows
@@ -733,7 +751,8 @@ def record_table_html(preds: list[dict], c: dict) -> str:
         + "<caption style=\"caption-side:bottom;font-size:13px;opacity:.7;"
         + "text-align:left;padding:8px 2px;\">Every graded GoalIQ pre-match "
         + "prediction, newest first. Logged before kick-off, no edits afterwards.</caption>"
-        + '<thead><tr><th scope="col">Date</th><th scope="col">Competition</th>'
+        + '<thead><tr><th scope="col" class="m-hide">Date</th>'
+        + '<th scope="col" class="m-hide">Competition</th>'
         + '<th scope="col">Match</th><th scope="col">Pick</th>'
         + '<th scope="col">Result</th><th scope="col">1X2</th></tr></thead>'
         + "<tbody>"
@@ -843,22 +862,28 @@ def far_grid_html(c: dict) -> str:
     """
     if not c.get("far_rows") or not c.get("far_blocks"):
         return ""
+    # Mobiili (a): kolme lahinta lohkoa nakyviin, loput piiloon kapealla
+    # naytolla. Kaukohorisontti on selailua, ja GW31–38 ei ole se mita
+    # puhelimella avattu linkki tulee katsomaan.
     head = "".join(
-        f'<th scope="col" class="num">GW{a}–{b}</th>' for a, b in c["far_blocks"]
+        f'<th scope="col" class="num{" m-hide" if i >= MOBILE_BLOCK_COLS else ""}">'
+        f"GW{a}–{b}</th>"
+        for i, (a, b) in enumerate(c["far_blocks"])
     )
     rows = []
     for r in c["far_rows"]:
         cells = []
-        for cell in r["cells"]:
+        for i, cell in enumerate(r["cells"]):
+            m = " m-hide" if i >= MOBILE_BLOCK_COLS else ""
             if not cell:
                 # Ei otteluita lohkossa. Viiva eikä 0 — tyhjä ei ole "helppo".
-                cells.append('<td class="num">–</td>')
+                cells.append(f'<td class="num{m}">–</td>')
             else:
                 cls = fdr_cell_class(cell["avg_fdr"])
                 # n tooltippiin: 6 GW:n lohkossa voi olla tuplaviikkoja tai
                 # blankkeja, ja keskiarvo yksin ei kerro kumpaa.
                 cells.append(
-                    f'<td class="num {cls}" title="{cell["n"]} fixtures">'
+                    f'<td class="num {cls}{m}" title="{cell["n"]} fixtures">'
                     f'{cell["avg_fdr"]:.1f}</td>'
                 )
         rows.append(
@@ -880,13 +905,23 @@ def far_grid_html(c: dict) -> str:
 
 
 def fdr_grid_html(c: dict) -> str:
-    head = "".join(f'<th scope="col" class="num">GW{g}</th>' for g in c["gws"])
+    # Mobiili 9.8, Villen valinta (a): kapealla naytolla nakyvat vain Team +
+    # kolme seuraavaa gameweekia + Avg. Kahdeksan sarakkeen ruudukko oli
+    # 832px = 2,1 x puhelimen leveys, ja koska vieritys tapahtui sisemmassa
+    # laatikossa, kayttaja ei huomannut etta loput sarakkeet ovat olemassa.
+    # Leveilla naytoilla taulukko on tasmalleen entisellaan.
+    head = "".join(
+        f'<th scope="col" class="num{" m-hide" if i >= MOBILE_GW_COLS else ""}">'
+        f"GW{g}</th>"
+        for i, g in enumerate(c["gws"])
+    )
     rows = []
     for r in c["fdr_rows"]:
         cells = []
-        for fx in r["cells"]:
+        for i, fx in enumerate(r["cells"]):
+            m = " m-hide" if i >= MOBILE_GW_COLS else ""
             if fx is None:
-                cells.append('<td class="num">-</td>')
+                cells.append(f'<td class="num{m}">-</td>')
             else:
                 # #148: solussa vastustaja + venue + per-fixture CS% (pariteetti
                 # mobiilin #144:n kanssa); FDR-luokka siirtyi tooltippiin.
@@ -895,7 +930,7 @@ def fdr_grid_html(c: dict) -> str:
                 cls = cs_cell_class(float(fx["cs_pct"]))
                 href = predict_cell_href(r["team"], fx["opponent"], fx["venue"])
                 cells.append(
-                    f'<td class="num {cls}"><a class="fdr" href="{href}" '
+                    f'<td class="num {cls}{m}"><a class="fdr" href="{href}" '
                     f'title="{escape(fx["opponent"])} ({fx["venue"]}) '
                     f'&middot; FDR {fx["fdr"]} &middot; view model prediction">'
                     f'{escape(fx["opponent_short"])} ({fx["venue"]}) '
@@ -1183,7 +1218,7 @@ CSS = """
     .cta{ max-width:100%; text-align:center; }
   }
   html,body{ overflow-x:clip; }
-"""
+""" + MOBILE_CSS
 
 
 def render_page(c: dict) -> str:

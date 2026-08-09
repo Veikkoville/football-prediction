@@ -464,3 +464,92 @@ tbody tr:hover td {
 		var(--s-4) !important;
 	border-radius: 0 !important;
 }
+
+/* ===================================================================
+   MOBIILIKERROS (9.8.2026)
+   -------------------------------------------------------------------
+   Villen havainto X-liikenteesta: puhelimella avattu GoalIQ nayttaa
+   rikkinaiselta. Staattiset goaliq.app-sivut korjattiin
+   scripts/mobile_css.py:lla; tama on SAMA korjaus SPA:lle.
+
+   MIKSI TEEMASSA EIKA KOMPONENTEISSA: 41 komponentista yhdessa oli
+   @media-saanto ja 16:ssa on taulukko. Komponenttikohtainen korjaus
+   olisi osunut yhteen nakymaan kerrallaan ja loput olisivat jaaneet
+   rikki -- sama vika kuin liigalistoissa 8.8, jossa yhteen komponenttiin
+   haudattu korjaus jatti Fixtures- ja Table-nakymat 11 paivaksi vaaraan
+   lahteeseen. Teemaan kirjoitettuna korjaus koskee kaikkia kerralla.
+
+   Katkaisupiste 560px = sama kuin staattisilla sivuilla, jotta pinnat
+   eivat eriydy.
+   =================================================================== */
+
+/* Vain kapealla naytolla nakyva selite (pariteetti staattisten kanssa). */
+.m-only {
+	display: none;
+}
+
+@media (max-width: 560px) {
+	.m-only {
+		display: block;
+	}
+
+	/* Sarakeprioriteetti: komponentti merkitsee vahemman tarkeat sarakkeet
+	   .m-hide:lla, jolloin kapealla naytolla nakyvat vain avainsarakkeet.
+	   Leveilla naytoilla mikaan ei muutu. */
+	th.m-hide,
+	td.m-hide {
+		display: none;
+	}
+
+	/* table{white-space:nowrap} teki jokaisesta taulukosta ruutua leveamman
+	   riippumatta sarakemaarasta: pelaajan nimi ja fixture-merkkijono eivat
+	   saaneet rivittya lainkaan. Luvut pysyvat nowrapissa, koska rivittyva
+	   "12.34" on lukukelvoton ja tabular-nums hajoaa. */
+	table {
+		white-space: normal;
+	}
+	td.num,
+	th.num {
+		white-space: nowrap;
+	}
+	th,
+	td {
+		padding: 0.45em 0.4em;
+		font-size: var(--step--1);
+	}
+
+	/* Sticky-thead + vaakavieritys yhdessa jattaa otsikon jalkeen
+	   pystysuunnassa mutta ei vaakasuunnassa; kapealla naytolla se ei tuo
+	   hyotya ja vie tilaa. */
+	thead th {
+		position: static;
+	}
+
+	/* Tyokalujen suodatinnappirivit: samat kuin staattisten .chips --
+	   ilman rivitysta viimeiset napit jaavat ruudun ulkopuolelle. */
+	.chips,
+	.filters,
+	.seg,
+	.toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		max-width: 100%;
+	}
+
+	/* Kosketuskohteet sormenpaan kokoisiksi. */
+	button,
+	.btn,
+	select,
+	input[type='text'],
+	input[type='search'] {
+		min-height: 40px;
+	}
+
+	/* Sivun oma vaakavieritys ei ole koskaan haluttu: jos jokin yksittainen
+	   elementti ylivuotaa, se ei saa siirtaa koko sivua. */
+	html,
+	body {
+		overflow-x: hidden;
+	}
+}
