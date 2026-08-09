@@ -323,7 +323,19 @@ export interface PredictResponse {
 	p_btts_yes?: number;
 	p_btts_no?: number;
 	top_scores: PredictScore[];
+	/** 9.8.2026: luokitukset sovitetaan TULOKSIIN eivätkä näe siirtoikkunaa.
+	 *  Suoraa korjausta yritettiin ja se ei validoitunut, joten mallia ei
+	 *  säädetä — kerromme milloin luku nojaa vanhentuneeseen tietoon.
+	 *  Kuvaileva, EI ennustava: älä esitä tätä vaikutusarviona. */
+	data_confidence?: Record<string, TeamConfidence>;
 	[key: string]: unknown;
+}
+
+export interface TeamConfidence {
+	team: string;
+	minutes_churn_pct: number | null;
+	flag: string | null;
+	note: string | null;
 }
 
 let leaguesP: Promise<LeaguesResponse> | null = null;

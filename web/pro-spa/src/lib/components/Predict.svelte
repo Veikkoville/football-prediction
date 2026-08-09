@@ -49,6 +49,13 @@
 	let error = $state<string | null>(null);
 	let data = $state<PredictResponse | null>(null);
 
+	// Vain LIPUTETUT näytetään (nousija / korkea vaihtuvuus). Pelkkä
+	// vaihtuvuusluku kuuluu työkalutaulukoihin, ei jokaisen ennusteen alle:
+	// 26/27 kukaan ei ylitä kynnystä, joten luku olisi tässä kohinaa.
+	const confidenceNotes = $derived(
+		Object.values(data?.data_confidence ?? {}).filter((c) => c?.flag && c?.note)
+	);
+
 
 	// Fixtures-näkymästä tuleva esitäyttö. Käsitellään ENNEN liigaefektiä ja
 	// vasta joukkuelistan latauduttua: liigan vaihto tyhjentää valinnat, joten
@@ -249,6 +256,22 @@
 			<span class="seg seg-away" style="width:{data.p_away_win * 100}%"></span>
 		</div>
 
+		<!-- Luottamuslippu on VAPAAN puolella tarkoituksella: se kertoo milloin
+		     luku on epävarmempi, eikä sellaista saa myydä erikseen. Sama
+		     rajaus kuin ottelusivuilla goaliq.app:ssa. -->
+		{#if confidenceNotes.length}
+			<div class="conf">
+				<strong>Lower confidence in this one.</strong>
+				<ul>
+					{#each confidenceNotes as c (c.team)}
+						<li><strong>{c.team}</strong>: {c.note}</li>
+					{/each}
+				</ul>
+				The model is fitted on results, so it prices a squad by what it did, not by who
+				is in it now.
+			</div>
+		{/if}
+
 		{#if premium}
 			<div class="xg">
 				<div><span class="k">Expected goals</span></div>
@@ -358,6 +381,20 @@
 	}
 	.hint {
 		font-size: var(--step--1);
+	}
+	/* Sama muoto kuin errorbox mutta neutraali reunaväri: tämä ei ole virhe
+	   eikä varoitus vaan tiedon rajaus. */
+	.conf {
+		border: 1px solid var(--border);
+		border-left: 3px solid var(--accent, var(--border));
+		border-radius: var(--radius);
+		padding: var(--s-3) var(--s-4);
+		max-width: 62ch;
+		font-size: var(--step--1);
+	}
+	.conf ul {
+		margin: var(--s-2) 0;
+		padding-left: var(--s-4);
 	}
 	.errorbox {
 		border: 1px solid var(--border);
