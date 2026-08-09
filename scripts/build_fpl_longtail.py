@@ -425,16 +425,34 @@ def render_captain(xp: dict, now: datetime) -> str | None:
         f'<p class="lede">The GoalIQ match model\'s top captain pick for GW{gw} is '
         f"<strong>{escape(top['web_name'])} ({escape(top['team_short'])})</strong>.</p>"
     )
+    # 9.8: Start% nakyviin. Sivu nimesi kapteenin ja piilotti KAIKKI luvut
+    # ("xP in Premium"), joten lukija ei nahnyt onko valinta varma vai
+    # kolikonheitto. 32 % pelaajista on vyohykkeella p_start 0,35-0,70, jossa
+    # xMins on kahden lopputuloksen keskiarvo eika kumpikaan tapahdu.
+    # Aloitustodennakoisyys EI ole se mita premium myy (se on xP ja
+    # personointi), joten sen nayttaminen ei syo tuotetta - se tekee
+    # suosituksesta luettavan.
+    def _start_txt(p: dict) -> str:
+        v = p.get("p_start")
+        return f"starts {round(float(v) * 100)}%" if isinstance(v, (int, float)) \
+            else "start odds in Premium"
+
     body = (
         f'<div class="stat-row">'
         f'<div class="stat"><b>{escape(top["web_name"])}</b>'
-        f'<span>#1 pick · {escape(top["team_short"])} · xP in Premium</span></div>'
+        f'<span>#1 pick · {escape(top["team_short"])} · {_start_txt(top)} '
+        "· xP in Premium</span></div>"
         + "".join(
             f'<div class="stat"><b>{escape(p["web_name"])}</b>'
-            f'<span>contender · {escape(p["team_short"])} · xP in Premium</span></div>'
+            f'<span>contender · {escape(p["team_short"])} · {_start_txt(p)} '
+            "· xP in Premium</span></div>"
             for p in alts
         )
         + "</div>"
+        '<p class="note"><strong>Start%</strong> is how likely the model thinks '
+        "he is to be in the XI. Near 50 it is a coin flip, and a captaincy on a "
+        "coin flip is a bet on team news. Check the press conference before you "
+        "commit the armband.</p>"
         f"{UPSELL}{_cta()}"
         f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
     )
@@ -634,6 +652,40 @@ def _kit_svg(short: str, size: int = 26) -> str:
             f'<use href="#k{s}"/></svg>')
 
 
+XI_NAILED_FLOOR = 0.75
+
+
+def _xi_start_risk(xi) -> str:
+    """Nosta esiin ne XI:n pelaajat jotka EIVAT ole varmoja avaajia (9.8).
+
+    Sivu suosittelee yhdentoista pelaajan joukkuetta ja nayttaa jokaisen xP:n,
+    mutta ei kertonut kuinka varma kukin paikka on. 32 % kaikista pelaajista on
+    vyohykkeella p_start 0,35-0,70, jossa xP on kahden lopputuloksen keskiarvo
+    eika kumpikaan tapahdu — eli XI:n kokonaisluku voi levata pelaajilla jotka
+    eivat pelaa lainkaan.
+
+    Numero jokaiseen paitaan sotkisi kentan, joten nostetaan vain poikkeamat.
+    Kynnys 0,75: sen ylapuolella pelaaja on kaytannossa naulattu.
+    """
+    risky = [p for p in xi
+             if isinstance(p.get("p_start"), (int, float))
+             and p["p_start"] < XI_NAILED_FLOOR]
+    if not risky:
+        # Prosentti johdetaan vakiosta: kovakoodattuna se valehtelisi heti kun
+        # XI_NAILED_FLOOR muuttuu (havaittu negatiivisessa kontrollissa 9.8).
+        return ('<p class="note"><strong>Every player in this XI projects as a '
+                "nailed starter</strong> (start probability "
+                f"{round(XI_NAILED_FLOOR * 100)}% or higher). "
+                "The total does not rest on anyone who might be benched.</p>")
+    risky.sort(key=lambda p: p["p_start"])
+    names = ", ".join(
+        f"{escape(p['web_name'])} {round(p['p_start'] * 100)}%" for p in risky)
+    return ('<p class="note"><strong>Not everyone here is nailed.</strong> '
+            f"{names}. Those totals are an average of two outcomes, playing "
+            "and not playing, so the XI total is less certain than it looks. "
+            "Check team news before you copy it.</p>")
+
+
 def render_model_xi(xp: dict, now: datetime) -> str | None:
     """Model XI kenttagrafiikkana (26.7).
 
@@ -746,6 +798,7 @@ def render_model_xi(xp: dict, now: datetime) -> str | None:
         f"</div>"
         f"{_kit_defs(p['team_short'] for p in list(xi) + list(bench))}"
         f"{pitch}"
+        f"{_xi_start_risk(xi)}"
         '<p class="note">Shirts show club colours only. GoalIQ is not '
         "affiliated with the Premier League and uses no club badges or player "
         "images. Projected points are model estimates, not betting advice.</p>"
