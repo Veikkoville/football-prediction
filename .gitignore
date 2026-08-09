@@ -152,3 +152,8 @@ supabase/.temp/
 outputs/cards/
 .env.txt
 .env.*
+# Pre-season-priorin validointi (9.8.2026): jaadytetyt kausihistoriat, joista
+# kesatauko-foldit ajetaan. Raakadata (data/raw/fpl/season_*) on isoa ja jaa
+# ignoreen; nama tiivisteet ovat portin syote. Ilman !-poikkeusta portti
+# toimisi vain kehityskoneella ja nayttaisi muualla "artefakti puuttuu".
+!/data/fpl_prev_season_minutes_*.json

@@ -693,3 +693,60 @@ def test_seasons_for_never_returns_the_same_season_twice():
         prev, cur = seasons_for(key)
         assert prev != cur
         assert cur == key
+
+
+# ---------------------------------------------------------------------------
+# Pre-season-priorin validointi kesatauon yli (9.8.2026)
+#
+# Ship-gate ajaa walk-forwardia yhden kauden sisalla eika siksi kosketa
+# pre-season-polkua lainkaan - juuri sita joka tuottaa GW1-luvut. Validointi
+# lepaa kahden vaitteen varassa, ja molemmat lukitaan tassa.
+# ---------------------------------------------------------------------------
+def test_infinite_halflife_equals_balanced_weighting():
+    """Tasapaino = aareton puoliintuma, ei erillista koodipolkua.
+
+    Koko vertailu "vaimennus vs pre-9.8. tasapaino" nojaa tahan. Jos se ei
+    pida, tasapaino-rivi mittaisi jotain muuta kuin entista kaytosta.
+    """
+    orig = xp.PRESEASON_HALFLIFE
+    xp.PRESEASON_HALFLIFE = 1e9
+    try:
+        w = xp.start_weights(12, None)
+    finally:
+        xp.PRESEASON_HALFLIFE = orig
+    assert len(w) == 12
+    assert all(abs(x - 1.0) < 1e-6 for x in w)
+
+
+def test_preseason_weights_favour_recent_rounds():
+    """Vaimennuksen suunta: tuorein kierros painaa eniten, vanhin vahiten."""
+    w = xp.start_weights(20, None)
+    assert len(w) == 20
+    assert w == sorted(w), "painojen pitaa kasvaa vanhimmasta tuoreimpaan"
+    assert w[-1] > w[0]
+    # Puoliintuma: PRESEASON_HALFLIFE kierroksen paassa paino on puolet.
+    i = int(xp.PRESEASON_HALFLIFE)
+    assert abs(w[-1 - i] / w[-1] - 0.5) < 1e-9
+
+
+def test_prev_season_artifacts_are_keyed_by_code():
+    """Avain on code, ei element-id.
+
+    FPL:n id:t nollautuvat kausittain; id-avain kadottaisi osan pelaajista
+    NAYTTAMATTA virhetta. 25/26:n bootstrapin codet ja artefaktin avaimet
+    leikkaavat toisensa laajasti, id:t eivat leikkaisi mielekkaasti.
+    """
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    p = root / "data" / "fpl_prev_season_minutes_2425.json"
+    if not p.exists():
+        pytest.skip("artefakti puuttuu (aja build_fpl_prev_season_minutes)")
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    assert doc["schema_version"] == 1
+    assert doc["n_rounds"] == 38
+    assert doc["n_players"] > 400
+    keys = [int(k) for k in doc["players"]]
+    # FPL:n player code on 5-7-numeroinen; element-id on alle 1000.
+    assert min(keys) > 1000, "avaimet nayttavat element-id:ilta, ei codeilta"

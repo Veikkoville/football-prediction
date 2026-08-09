@@ -126,6 +126,10 @@ def test_generated_block_matches_generator_output():
     """Kasin editoitu GEN-lohko on regressio, ei korjaus."""
     from scripts.build_prediction_pages import LEAGUES, update_llms_txt
 
+    # Varmuuskopio TAVUINA: read_text/write_text normalisoi rivinvaihdot, joten
+    # palautus jatti tiedoston muuttuneeksi (CRLF -> LF) vaikka sisalto oli
+    # sama. Testi ei saa likaista tyopuuta.
+    backup = LLMS.read_bytes()
     txt = LLMS.read_text(encoding="utf-8")
     # Luvut LEVYLTA, ei sitemapista: llms.txt vastaa kysymykseen "montako
     # ottelusivua sivustolla on", sitemap kysymykseen "mita tarjoamme
@@ -146,4 +150,4 @@ def test_generated_block_matches_generator_output():
             "- lohko on kasin editoitu tai luvut ovat vanhentuneet"
         )
     finally:
-        LLMS.write_text(txt, encoding="utf-8")
+        LLMS.write_bytes(backup)
