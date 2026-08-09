@@ -2045,8 +2045,9 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         f'<td class="m-hide">{escape(r["pos"])}</td>'
         f'<td class="n m-hide">{r["price"]:.1f}</td>'
         f'<td class="n hi">{r["xp_horizon_total"]:.1f}</td>'
-        f'<td class="n">{(r.get("xp_per_gw") or 0):.2f}</td>'
+        f'<td class="n m-hide">{(r.get("xp_per_gw") or 0):.2f}</td>'
         f'<td class="n">{(r.get("xp_per_90") or 0):.2f}</td>'
+        f'<td class="n">{(r.get("p_start") or 0) * 100:.0f}</td>'
         f'<td class="n m-hide">{(r.get("xmins") or 0):.0f}</td>'
         f'<td class="n m-hide">{(r.get("owned_pct") or 0):.1f}</td>'
         "</tr>"
@@ -2061,7 +2062,8 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         '<th class="n">#</th><th>Player</th><th>Team</th>'
         '<th class="m-hide">Pos</th><th class="n m-hide">Price</th>'
         f'<th class="n">{n_gw}GW xP</th>'
-        '<th class="n">xP/GW</th><th class="n">xP/90</th>'
+        '<th class="n m-hide">xP/GW</th><th class="n">xP/90</th>'
+        '<th class="n">Start%</th>'
         '<th class="n m-hide">xMins</th><th class="n m-hide">Own%</th>'
         "</tr></thead>"
         f"<tbody>{trows}</tbody></table></div>"
@@ -2079,10 +2081,17 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         '<p class="note"><strong>How to read this.</strong> '
         f'<em>{n_gw}GW xP</em> is the total across the next {n_gw} gameweeks '
         "and is what the table is ranked by. <em>xP/90</em> is the scoring "
-        "rate if the player is on the pitch for a full match, and "
-        "<em>xMins</em> is how many minutes we expect him to play. A low "
-        "total with a high rate means a minutes question, not a quality "
-        "question. We keep them apart on purpose.</p>"
+        "rate if the player is on the pitch for a full match, "
+        "<em>Start%</em> is how likely he is to start, and <em>xMins</em> is "
+        "the two combined. A low total with a high rate means a minutes "
+        "question, not a quality question. We keep them apart on purpose.</p>"
+        '<p class="note"><strong>Start% is the one to check before you '
+        "trust a total.</strong> When it sits near 50, the player is close to "
+        "a coin flip and xMins is an average of two outcomes that will not "
+        "happen: he starts and plays around 85 minutes, or he does not play "
+        "at all. Nobody plays half of every match. A keeper on 51% is not a "
+        "45-minute keeper, he is a maybe. Read those totals as a bet on the "
+        "team news, not as a projection you can bank.</p>"
         f"{kitdefs}{table}"
         '<p class="note">This ranking is free and needs no account. The tools '
         "built on top of it, rate my team, the transfer planner, the captain "
