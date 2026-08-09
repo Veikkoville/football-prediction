@@ -146,3 +146,7 @@ dist/
 CLAUDE.md
 
 supabase/.temp/
+
+# Jakokorttien generoidut PNG:t (scripts/gen_share_card.py) - aina uudelleen
+# ajettavissa datasta, joten niita ei versioida.
+outputs/cards/
