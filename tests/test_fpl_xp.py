@@ -583,3 +583,85 @@ def test_structural_pass_never_touches_nailed_starter():
     assert sum(scaled) == pytest.approx(cut, abs=1e-6)
     # naulattu ei ole mukana leikkauksessa lainkaan -> summa = slots tasan
     assert nailed + sum(scaled) == pytest.approx(slots, abs=1e-6)
+
+
+# ---------------------------------------------------------------------------
+# Minuuttipriorin kolme korjausta (9.8.2026) — ks. cc-reports-raportti
+# ---------------------------------------------------------------------------
+def test_start_weights_length_matches_rounds():
+    """Painolista yhta pitka kuin kierroslista JOKAISELLA ikkunalla.
+
+    Regressio: START_WEIGHTS[-len(rounds):] palautti max 4 painoa, joten
+    builderin n_last=6 katkaisi zip():n neljaan pariin.
+    """
+    for n_last in (4, 6, 8, None):
+        for n in (1, 3, 4, 6, 12, 38):
+            assert len(xp.start_weights(n, n_last)) == n, (n, n_last)
+
+
+def test_start_weights_backwards_compatible_with_start_weights_const():
+    """n_last=4 tuottaa entisen START_WEIGHTSin, myos vajaalla otoksella."""
+    assert xp.start_weights(4, 4) == list(xp.START_WEIGHTS)
+    assert xp.start_weights(3, 4) == list(xp.START_WEIGHTS[-3:])
+    assert xp.start_weights(1, 4) == list(xp.START_WEIGHTS[-1:])
+
+
+def test_minutes_model_window_uses_most_recent_rounds():
+    """n_last=6: kaksi tuoreinta kierrosta EIVAT saa pudota pois.
+
+    Regressio (9.8.2026): pelaaja joka avasi kierrokset 1-4 ja jai penkille
+    5-6 sai p_start 1.0 / xmins 90.0 — malli luki hanet naulatuksi juuri kun
+    han oli menettanyt paikkansa. Live-kauden polku, laukeaisi GW1:sta.
+    """
+    rounds = [1, 2, 3, 4, 5, 6]
+    lost_place = xp.minutes_model({1: 90, 2: 90, 3: 90, 4: 90, 5: 0, 6: 0},
+                                  {1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0},
+                                  rounds, n_last=6)
+    won_place = xp.minutes_model({1: 0, 2: 0, 3: 0, 4: 0, 5: 90, 6: 90},
+                                 {1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 1},
+                                 rounds, n_last=6)
+    assert lost_place["p_start_raw"] < 1.0, "tuoreet penkitykset katosivat"
+    assert won_place["p_start_raw"] > 0.0, "tuoreet avaukset katosivat"
+    assert won_place["xmins"] > lost_place["xmins"], (
+        "recency-jarjestys on kaantynyt ikkunan sisalla")
+
+
+def test_preseason_prior_weights_recent_role_higher():
+    """Pre-season: roolinsa takaisin saanut ei saa jaada vaihtomieheksi.
+
+    Palmer-tapaus 9.8.2026: 12 kierroksen loukkaantumisjakso alkukaudella,
+    sitten avauspaikka loppukauden. Tasapaino antoi 51 min; recency nostaa.
+    """
+    mins = {r: (0.0 if r <= 12 else 90.0) for r in range(1, 39)}
+    starts = {r: (0 if r <= 12 else 1) for r in range(1, 39)}
+    rounds = list(range(1, 39))
+    mm = xp.minutes_model(mins, starts, rounds, n_last=None)
+    assert mm["xmins"] > 75.0, f"loukkaantumisjakso yha dominoi: {mm['xmins']:.1f}"
+    # Peilitapaus: 26 avausta ja sitten 12 kierrosta sivussa. Priori EI voi
+    # erottaa loukkaantumista paikan menetyksesta pelkista minuuteista (sen
+    # ratkaisee FPL:n saatavuuslippu builderissa), joten lukitaan vain suunta:
+    # loppukauden poissaolo painaa selvasti alle tasapainon (~62 min) ja
+    # reilusti alle Palmer-tapauksen. Mitattu 9.8.2026: 35,2 min.
+    mirror = xp.minutes_model({r: (90.0 if r <= 26 else 0.0) for r in range(1, 39)},
+                              {r: (1 if r <= 26 else 0) for r in range(1, 39)},
+                              rounds, n_last=None)
+    assert mirror["xmins"] < 45.0, f"loppukauden poissaolo ei nakynyt: {mirror['xmins']:.1f}"
+    assert mirror["xmins"] < mm["xmins"] - 25.0, (
+        "roolinsa saanut ja sen menettanyt eivat erotu toisistaan")
+
+
+def test_preseason_prior_blank_gameweek_does_not_count_as_benching():
+    """Rivitton kierros (blank GW) ei saa painaa p_startia.
+
+    Builder syottaa pelaajan omat kierrokset; tama lukitsee sen etta
+    universumin valinnalla on merkitysta ja etta suunta on oikea.
+    """
+    mins = {r: 90.0 for r in range(1, 39) if r not in (31, 34)}
+    starts = {r: 1 for r in range(1, 39) if r not in (31, 34)}
+    own_rounds = sorted(mins)                      # oikein: blankit pois
+    union_rounds = list(range(1, 39))              # vaarin: blankit mukana
+    correct = xp.minutes_model(mins, starts, own_rounds, n_last=None)
+    inflated_denominator = xp.minutes_model(mins, starts, union_rounds, n_last=None)
+    assert correct["p_start_raw"] == pytest.approx(1.0)
+    assert inflated_denominator["p_start_raw"] < 1.0
+    assert correct["xmins"] > inflated_denominator["xmins"]

@@ -264,7 +264,6 @@ def main(argv: list[str] | None = None) -> int:
         mins_by_round[pid] = dict(mr)
         starts_by_round[pid] = dict(sr)
     priors = xp.position_priors(acc_by_player, pos_by_player)
-    all_rounds = sorted({rnd for mr in mins_by_round.values() for rnd in mr})
 
     # #33: probabilistinen minuuttimalli — kaksi passia:
     #   A) minutes_model + saatavuus-gate per pelaaja
@@ -273,19 +272,32 @@ def main(argv: list[str] | None = None) -> int:
     # Pre-season: koko edelliskausi tasapainoin (kuten päättyneen kauden ajo);
     # live-kausi: last-6 recency.
     mm_window = 6 if recency_window else None
+    # Kierrosuniversumi on PELAAJAKOHTAINEN, ei kaikkien joukkueiden unioni:
+    # blank gameweek ei tuota riviä element-summaryyn, joten unionissa se
+    # luettiin penkitykseksi ja painoi p_startin nimittäjää (todennettu
+    # 9.8.2026: Haalandilta puuttuivat kierrokset 31 ja 34 = Cityn blankit,
+    # Palmerilta 34 = Chelsean blank). Pelaajan omat rivit = hänen joukkueensa
+    # pelaamat kierrokset, ja kesken kautta siirtyneellä vain PL-jakso.
+    prounds_by_player = {e["id"]: sorted(mins_by_round[e["id"]])
+                         for e in boot["elements"]}
     mm_by_player: dict[int, dict] = {}
     for e in boot["elements"]:
         pid = e["id"]
         mm = xp.minutes_model(mins_by_round[pid], starts_by_round[pid],
-                              all_rounds, n_last=mm_window)
+                              prounds_by_player[pid], n_last=mm_window)
         mm_by_player[pid] = xp.apply_availability(
             mm, e.get("status", "a"), e.get("chance_of_playing_next_round"))
-    window_rounds = all_rounds if mm_window is None else all_rounds[-mm_window:]
     groups: dict[tuple[int, int], list[int]] = defaultdict(list)
     for e in boot["elements"]:
         groups[(e["team"], e["element_type"])].append(e["id"])
     for (_team, _pos), pids in groups.items():
-        # slots = ryhmän toteutuneet startit / kierros ikkunassa (itsekonsistentti)
+        # slots = ryhmän toteutuneet startit / kierros ikkunassa (itsekonsistentti).
+        # Sama blank-korjaus kuin yllä: joukkueen kierrokset = ryhmän pelaajien
+        # rivien unioni, muuten nimittäjä sisältäisi pelaamattomat kierrokset ja
+        # slots deflatoituisi eri tahtiin kuin p_start.
+        team_rounds = sorted({rnd for p in pids for rnd in prounds_by_player[p]})
+        window_rounds = (team_rounds if mm_window is None
+                         else team_rounds[-mm_window:])
         slots = (sum(starts_by_round[p].get(rnd, 0)
                      for p in pids for rnd in window_rounds)
                  / max(len(window_rounds), 1))

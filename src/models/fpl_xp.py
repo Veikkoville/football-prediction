@@ -319,6 +319,27 @@ def minutes_form(mins_by_round: dict[int, float],
 # valittu walk-forward-sweepillä 25/26 (w4 voitti w5/w6/w8/w10:n xMins-MAE:ssa).
 START_WINDOW = 4
 START_WEIGHTS = (1.0, 2.0, 3.0, 4.0)
+# Pre-season (n_last=None): koko päättynyt kausi eksponentiaalisella
+# vaimennuksella, puoliintuma PRESEASON_HALFLIFE kierrosta.
+#
+# Oli aiemmin tasapaino, perusteena "kauden lopun rotaatio ei saa dominoida
+# uuden kauden GW1-arviota". Se ylikorjasi: 12 kierroksen loukkaantumisjakso
+# painoi yhtä paljon kuin sen jälkeinen 22/24-avausputki, joten roolinsa
+# TAKAISIN saaneet luettiin yhä vaihtomiehiksi (mitattu 9.8.2026: Palmer
+# 51,4 min vaikka avasi 22 kertaa 24:stä kauden lopussa).
+#
+# Mitattu kauden sisäisellä proxylla (kouluta kierroksilla 1..K, ennusta
+# K+1..K+6; K = 10/12/15/19/22/26/30; n = 2630 pelaaja-ikkunaa):
+#   tasapaino 20,96 · hl16 20,48 · hl12 20,35 · hl10 20,26 · hl8 20,13 ·
+#   hl6 19,98 · hl4 19,81 min MAE.
+# Tasapaino häviää JOKAISESSA leikkauksessa.
+#
+# Valittu 10 eikä proxyn paras 4: proxy ei näe kesätaukoa, joka on juuri se
+# mekanismi jota alkuperäinen tasapaino suojasi (kauden lopun lepuutus ei
+# ennusta elokuuta). 10 säilyttää roolisignaalin ja vaimentaa lepuutus-
+# artefaktin. Vakio on HARKINTA, ei sovitettu optimi — arvioi uudelleen kun
+# 26/27-kierroksia on kertynyt (silloin live-polku ottaa muutenkin vallan).
+PRESEASON_HALFLIFE = 10.0
 # p_start-kalibrointi: raaka start-share YLIarvioi startteja korkeissa arvoissa
 # (rotaatio-regressio, todettu backtestissä: raaka Brier 0.175 vs p60-proxy
 # 0.167) → NÄYTETTÄVÄ p_start shrinkataan neutraalia prioria kohti. xMins
@@ -342,6 +363,29 @@ CONGESTION_MULT = 0.95
 CONGESTION_XMINS_GATE = 70.0
 
 
+def start_weights(n: int, n_last: int | None) -> list[float]:
+    """Recency-painot n:lle havaitulle kierrokselle (vanhin → uusin).
+
+    n_last=None (pre-season): eksponentiaalinen vaimennus, puoliintuma
+    PRESEASON_HALFLIFE kierrosta.
+    n_last=k (live-kausi): lineaarinen ramppi 1..k, josta otetaan viimeiset n
+    → k=4 ja n≤4 tuottaa täsmälleen entisen START_WEIGHTSin (1,2,3,4).
+
+    Palauttaa AINA tasan n painoa. Aiempi `START_WEIGHTS[-len(rounds):]`
+    palautti korkeintaan 4 painoa, joten builderin live-asetuksella n_last=6
+    zip(w, rounds) katkesi neljään pariin: kaksi TUOREINTA kierrosta jäi
+    kokonaan pois ja recency-järjestys kääntyi ikkunan sisällä (todennettu
+    9.8.2026 — kierrokset 1-4 avannut, 5-6 penkittänyt pelaaja sai
+    p_start 1,0 / xmins 90,0).
+    """
+    if n <= 0:
+        return []
+    if n_last is None:
+        return [0.5 ** ((n - 1 - i) / PRESEASON_HALFLIFE) for i in range(n)]
+    base = max(n_last, n)
+    return [float(base - n + i + 1) for i in range(n)]
+
+
 def minutes_model(mins_by_round: dict[int, float],
                   starts_by_round: dict[int, int],
                   team_rounds_before: list[int],
@@ -354,8 +398,14 @@ def minutes_model(mins_by_round: dict[int, float],
     Johdetut lasketaan recompute_minutes():llä → skaalaukset (saatavuus,
     syvyys) muuttavat p_startia ja johdetut pysyvät konsistentteina.
 
-    n_last=None = koko ikkuna tasapainoin (pre-season-snapshot päättyneestä
-    kaudesta, sama konventio kuin minutes_form).
+    n_last=None = koko ikkuna eksponentiaalisella recency-vaimennuksella
+    (pre-season-snapshot päättyneestä kaudesta, ks. PRESEASON_HALFLIFE).
+    HUOM: minutes_form käyttää yhä tasapainoa n_last=None:lla — se on vanha,
+    tuotannosta korvattu polku (build_fpl_xp käyttää minutes_modelia).
+
+    team_rounds_before pitää olla PELAAJAN OMAN joukkueen pelatut kierrokset,
+    ei kaikkien joukkueiden kierrosten unioni: blank gameweek on rivitön
+    kierros, joka unionissa luetaan penkitykseksi ja painaa p_startia alas.
     """
     rounds = team_rounds_before if n_last is None else team_rounds_before[-n_last:]
     base = {
@@ -366,8 +416,7 @@ def minutes_model(mins_by_round: dict[int, float],
     }
     if not rounds:
         return recompute_minutes(base)
-    w = ([1.0] * len(rounds) if n_last is None
-         else list(START_WEIGHTS[-len(rounds):]))
+    w = start_weights(len(rounds), n_last)
     wsum = sum(w)
 
     w_start = w_sub_pool = 0.0          # painot: startit / ei-startit
