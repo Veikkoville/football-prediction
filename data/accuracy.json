@@ -1,47 +1,47 @@
 {
-  "updated_at": "2026-08-09T18:42:09+00:00",
+  "updated_at": "2026-08-09T21:34:01+00:00",
   "logged_total": 2056,
-  "pending": 1921,
+  "pending": 1919,
   "all_time": {
-    "n": 135,
+    "n": 137,
     "correct_1x2": 75,
-    "pct_1x2": 0.5556,
+    "pct_1x2": 0.5474,
     "decisive_n": 92,
     "decisive_correct": 75,
     "pct_decisive": 0.8152,
-    "exact_n": 87,
+    "exact_n": 89,
     "exact_correct": 16,
-    "pct_exact": 0.1839,
-    "brier": 0.5558,
-    "brier_n": 87
+    "pct_exact": 0.1798,
+    "brier": 0.5666,
+    "brier_n": 89
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 57,
-    "pct_1x2": 0.57,
-    "decisive_n": 68,
-    "decisive_correct": 57,
-    "pct_decisive": 0.8382,
-    "exact_n": 87,
+    "correct_1x2": 55,
+    "pct_1x2": 0.55,
+    "decisive_n": 66,
+    "decisive_correct": 55,
+    "pct_decisive": 0.8333,
+    "exact_n": 89,
     "exact_correct": 16,
-    "pct_exact": 0.1839,
-    "brier": 0.5558,
-    "brier_n": 87,
+    "pct_exact": 0.1798,
+    "brier": 0.5666,
+    "brier_n": 89,
     "window": 100
   },
   "by_competition": {
     "BSA": {
-      "n": 31,
+      "n": 33,
       "correct_1x2": 12,
-      "pct_1x2": 0.3871,
+      "pct_1x2": 0.3636,
       "decisive_n": 17,
       "decisive_correct": 12,
       "pct_decisive": 0.7059,
-      "exact_n": 31,
+      "exact_n": 33,
       "exact_correct": 5,
-      "pct_exact": 0.1613,
-      "brier": 0.6718,
-      "brier_n": 31
+      "pct_exact": 0.1515,
+      "brier": 0.6937,
+      "brier_n": 33
     },
     "WC": {
       "n": 104,
@@ -65,16 +65,16 @@
       "n": 10
     },
     {
-      "bin_mid": 0.1552,
-      "predicted": 0.1552,
-      "actual": 0.1316,
-      "n": 38
+      "bin_mid": 0.1546,
+      "predicted": 0.1546,
+      "actual": 0.1282,
+      "n": 39
     },
     {
-      "bin_mid": 0.2538,
-      "predicted": 0.2538,
-      "actual": 0.2308,
-      "n": 104
+      "bin_mid": 0.2526,
+      "predicted": 0.2526,
+      "actual": 0.243,
+      "n": 107
     },
     {
       "bin_mid": 0.3367,
@@ -89,16 +89,16 @@
       "n": 31
     },
     {
-      "bin_mid": 0.5379,
-      "predicted": 0.5379,
-      "actual": 0.6316,
-      "n": 19
+      "bin_mid": 0.5399,
+      "predicted": 0.5399,
+      "actual": 0.6,
+      "n": 20
     },
     {
-      "bin_mid": 0.6469,
-      "predicted": 0.6469,
-      "actual": 0.6111,
-      "n": 18
+      "bin_mid": 0.6473,
+      "predicted": 0.6473,
+      "actual": 0.5789,
+      "n": 19
     },
     {
       "bin_mid": 0.726,
@@ -114,6 +114,34 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-08-09",
+      "home_team": "Palmeiras",
+      "away_team": "Internacional",
+      "predicted_winner": "home",
+      "p_winner": 0.6546,
+      "most_likely_score": "1-0",
+      "actual_score": "0-0",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
+    {
+      "date": "2026-08-09",
+      "home_team": "Bahia",
+      "away_team": "Vasco",
+      "predicted_winner": "home",
+      "p_winner": 0.578,
+      "most_likely_score": "2-1",
+      "actual_score": "0-0",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-08-09",
       "home_team": "Cruzeiro",
@@ -360,34 +388,6 @@
       "p_winner": 0.4851,
       "most_likely_score": "1-0",
       "actual_score": "1-1",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-25",
-      "home_team": "Vasco",
-      "away_team": "Mirassol",
-      "predicted_winner": "home",
-      "p_winner": 0.4014,
-      "most_likely_score": "1-1",
-      "actual_score": "1-1",
-      "actual_outcome": "draw",
-      "hit_1x2": false,
-      "exact_hit": true,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-07-25",
-      "home_team": "Santos",
-      "away_team": "Chapecoense-SC",
-      "predicted_winner": "home",
-      "p_winner": 0.6497,
-      "most_likely_score": "2-0",
-      "actual_score": "2-2",
       "actual_outcome": "draw",
       "hit_1x2": false,
       "exact_hit": false,
