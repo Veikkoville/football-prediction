@@ -39,17 +39,51 @@ def _matches(url: str, urls: set[str]) -> bool:
     return bare in urls or bare + "/" in urls
 
 
-def test_llms_urls_exist_in_sitemap():
+def _exists_on_disk(url: str) -> bool:
+    """Onko osoitetta vastaava sivu repossa?
+
+    9.8.2026: sitemap karsittiin 30 paivan horisonttiin (1924 -> 197 URLia),
+    mutta SIVUT jaivat kaikki paikoilleen. Sita ennen sitemap oli sivuston
+    tayslista, ja molemmat llms-portit oli rakennettu sen varaan. Karsinnan
+    jalkeen ne alkoivat raportoida puuttuvaksi sivuja jotka ovat olemassa.
+    Portin pitaa kysya "onko sivu olemassa", ei "mainostetaanko sita nyt".
+    """
+    path = url.rstrip("/").removeprefix("https://goaliq.app").lstrip("/")
+    if not path:
+        return True
+    for cand in (ROOT / path, ROOT / f"{path}.html", ROOT / path / "index.html"):
+        if cand.exists():
+            return True
+    return False
+
+
+def test_llms_urls_exist_on_site():
     """Jokainen llms.txt:n mainitsema osoite on oikeasti sivustolla.
 
     Tama olisi napannut 29.7:n loydoksen: llms.txt mainosti 12:ta WC-ryhmasivua
     sisaltona, vaikka ne olivat jo eloonjaaneita meta-refresh-tynkia eivatka
     olleet sitemapissa. Nappaa myos rikkinaiset slugit (F2-luokka).
+
+    Lahde on sitemap TAI levylla oleva sivu: sitemapissa on tarkoituksella vain
+    30 paivan ikkuna, joten pelkka sitemap-tarkistus hylkaisi olemassa olevia
+    sivuja (esim. esimerkkina kaytetty ottelusivu, joka liukuu ikkunasta ulos).
     """
     urls = _sitemap_urls()
     assert urls, "sitemapit puuttuvat - tarkistus olisi tyhja ja vihrea"
-    missing = sorted(u for u in _llms_urls() if not _matches(u, urls))
+    missing = sorted(u for u in _llms_urls()
+                     if not _matches(u, urls) and not _exists_on_disk(u))
     assert not missing, f"llms.txt mainitsee osoitteita joita ei ole sivustolla: {missing}"
+
+
+def test_llms_url_check_has_teeth():
+    """Negatiivinen kontrolli: keksitty osoite EI saa lapaista tarkistusta.
+
+    Levy-fallback loysentaa porttia, joten sen on todistettava etta se yha
+    hylkaa jotain (vrt. muistiinpano substring-osumasta 5.8).
+    """
+    urls = _sitemap_urls()
+    fake = "https://goaliq.app/predictions/serie-a/inter-vs-eiolemassa"
+    assert not _matches(fake, urls) and not _exists_on_disk(fake)
 
 
 def test_every_live_league_hub_is_in_llms():
@@ -93,12 +127,17 @@ def test_generated_block_matches_generator_output():
     from scripts.build_prediction_pages import LEAGUES, update_llms_txt
 
     txt = LLMS.read_text(encoding="utf-8")
+    # Luvut LEVYLTA, ei sitemapista: llms.txt vastaa kysymykseen "montako
+    # ottelusivua sivustolla on", sitemap kysymykseen "mita tarjoamme
+    # indeksoitavaksi juuri nyt" (30 pv). Nama erkanivat 9.8.2026 karsinnassa,
+    # ja sitemap-pohjainen laskenta olisi vaatinut llms.txt:hen VAARAN luvun
+    # (197) jotta portti olisi vihrea.
     counts = {}
     for comp, cfg in LEAGUES.items():
-        n = len(re.findall(
-            rf"<loc>https://goaliq\.app/predictions/{cfg['slug']}/[^<]+</loc>",
-            (ROOT / "sitemap-predictions.xml").read_text(encoding="utf-8"),
-        ))
+        d = ROOT / "predictions" / cfg["slug"]
+        if not d.is_dir():
+            continue
+        n = len([p for p in d.glob("*.html") if p.name != "index.html"])
         if n:
             counts[comp] = n
     try:
