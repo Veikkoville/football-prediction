@@ -1987,6 +1987,119 @@ def render_defence(defence: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+def render_expected_points(xp: dict, now: datetime) -> str | None:
+    """Koko xP-lista ilmaiseksi, ilman kirjautumista (9.8.2026).
+
+    MIKSI TAMA SIVU ON OLEMASSA: postasimme X:aan ja Blueskyyn xP-lukuja
+    ("Bruno 34.1 xP, No.1 midfielder") ja linkitimme /fpl/stats-sivulle, jossa
+    on RAAKADATAA (laukaukset, xG) eika xP:ta lainkaan. Villen huomio 9.8:
+    lupasimme numeron ja toimitimme jotain muuta. Ilmaista xP-listaa ei ollut
+    millaan pinnalla — model-xi nayttaa 11 pelaajaa ja best-captain karjen,
+    mutta rankattua listaa ei.
+
+    Sivu on myos ainoa Reddit-kelpoinen kohde xP-sisallolle: r/FantasyPL:n
+    saanto 9 poistaa linkit sivustoihin jotka vaativat rekisteroitymisen
+    tiedon nakemiseen.
+
+    VAPAA/PREMIUM-RAJA: lista on sisaltoa, tyokalut ovat tuote. Ranking nakyy
+    kokonaan ilmaiseksi; rate-my-team, siirtosuunnittelija, kapteenirankkeri
+    ja watchlist pysyvat premiumina. Sama peruste kuin /fpl/stats-rajassa:
+    puolustettavuus, ei kustannus.
+
+    Sarakevalinta on tahallinen: xP/90 (vauhti) ja xMins (peliaika) ERIKSEEN,
+    koska niiden sekoittaminen on juuri se virhe joka korjattiin 9.8. Lukija
+    nakee itse kumpi ajaa lukua.
+    """
+    meta = xp.get("meta") or {}
+    players = xp.get("players") or []
+    if not meta.get("available") or not players:
+        return None
+
+    rows = sorted(players, key=lambda p: -(p.get("xp_horizon_total") or 0))
+    n_gw = len(rows[0].get("gameweeks") or []) or 6
+    url = f"{BASE}/fpl/expected-points"
+    title = (f"FPL Expected Points: Every Player Ranked by xP "
+             f"(next {n_gw} GWs) | GoalIQ")
+    lead = rows[0]
+    desc = (
+        f"Every FPL player ranked by expected points over the next {n_gw} "
+        f"gameweeks. {lead['web_name']} leads on "
+        f"{lead['xp_horizon_total']:.1f} xP. Scoring rate and minutes shown "
+        f"separately. Free, no sign-in."
+    )
+
+    top3 = "".join(
+        '<div class="stat">'
+        f'<b>{escape(r["web_name"])}</b>'
+        f'<span>#{i + 1} · {escape(r["team_short"])} · '
+        f'{r["xp_horizon_total"]:.1f} xP · {r["price"]:.1f}m</span></div>'
+        for i, r in enumerate(rows[:3])
+    )
+
+    trows = "".join(
+        "<tr>"
+        f'<td class="n">{i + 1}</td>'
+        f'<td>{escape(r["web_name"])}</td>'
+        f'<td class="tm">{_kit_svg(r["team_short"])}'
+        f'<span>{escape(r["team_short"])}</span></td>'
+        f'<td class="m-hide">{escape(r["pos"])}</td>'
+        f'<td class="n m-hide">{r["price"]:.1f}</td>'
+        f'<td class="n hi">{r["xp_horizon_total"]:.1f}</td>'
+        f'<td class="n">{(r.get("xp_per_gw") or 0):.2f}</td>'
+        f'<td class="n">{(r.get("xp_per_90") or 0):.2f}</td>'
+        f'<td class="n m-hide">{(r.get("xmins") or 0):.0f}</td>'
+        f'<td class="n m-hide">{(r.get("owned_pct") or 0):.1f}</td>'
+        "</tr>"
+        # Sama 100 rivin DOM-rajaus kuin xg-leadersissa; koko lista on
+        # nakyvissa positiosuodattimen kautta appissa/premiumissa.
+        for i, r in enumerate(rows[:100])
+    )
+    kitdefs = _kit_defs(p.get("team_short") for p in rows[:100])
+    table = (
+        '<div class="lb-wrap"><table class="lb">'
+        "<thead><tr>"
+        '<th class="n">#</th><th>Player</th><th>Team</th>'
+        '<th class="m-hide">Pos</th><th class="n m-hide">Price</th>'
+        f'<th class="n">{n_gw}GW xP</th>'
+        '<th class="n">xP/GW</th><th class="n">xP/90</th>'
+        '<th class="n m-hide">xMins</th><th class="n m-hide">Own%</th>'
+        "</tr></thead>"
+        f"<tbody>{trows}</tbody></table></div>"
+    )
+    hero = (
+        "<h1>FPL expected points, every player ranked</h1>"
+        '<p class="lede">What our match model projects each player to score '
+        f"over the next {n_gw} gameweeks. Scoring rate and expected minutes "
+        "are shown separately, so you can see which one is driving the "
+        "number. Free, no sign-in, updated daily.</p>"
+    )
+    body = (
+        f'<div class="stat-row">{top3}</div>'
+        f"<h2>Top 100 by expected points (of {len(rows)} players)</h2>"
+        '<p class="note"><strong>How to read this.</strong> '
+        f'<em>{n_gw}GW xP</em> is the total across the next {n_gw} gameweeks '
+        "and is what the table is ranked by. <em>xP/90</em> is the scoring "
+        "rate if the player is on the pitch for a full match, and "
+        "<em>xMins</em> is how many minutes we expect him to play. A low "
+        "total with a high rate means a minutes question, not a quality "
+        "question. We keep them apart on purpose.</p>"
+        f"{kitdefs}{table}"
+        '<p class="note">This ranking is free and needs no account. The tools '
+        "built on top of it, rate my team, the transfer planner, the captain "
+        "ranker and your watchlist, are part of GoalIQ Premium.</p>"
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · '
+        + f'{escape(str(meta.get("caveat") or ""))[:300]} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def main() -> int:
     now = datetime.now(timezone.utc)
     OUT_DIR.mkdir(exist_ok=True)
@@ -2004,6 +2117,11 @@ def main() -> int:
         if page:
             (OUT_DIR / "model-xi.html").write_text(page, encoding="utf-8")
             built.append("model-xi")
+        # 9.8: koko xP-lista ilmaiseksi — ks. render_expected_points-docstring.
+        page = render_expected_points(xp, now)
+        if page:
+            (OUT_DIR / "expected-points.html").write_text(page, encoding="utf-8")
+            built.append("expected-points")
 
     diff = _fetch_differentials()
     if diff:

@@ -25,6 +25,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/fpl/expected-points</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/fpl/model-xi</loc>
     <lastmod>2026-08-09</lastmod>
     <changefreq>daily</changefreq>
