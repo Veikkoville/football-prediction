@@ -396,8 +396,59 @@ def card_xp(args) -> dict:
     }
 
 
+def card_value(args) -> dict:
+    """xP per miljoona horisontin yli: hinta-tehokkuuskortti.
+
+    Lisatty 9.8 koska r/FantasyPL-postaus tasta kulmasta oli se joka toimi:
+    premiumit ovat parhaita pelaajia ja huonointa vastinetta. Kortti on IG:ta
+    ja Blueskyta varten, joissa kuva on formaatti eika liite.
+
+    --min-mins suodattaa avaajiin (oletus 60 xmins): ilman sita listan
+    valtaisivat vaihtomiehet, joiden pieni xP jaettuna 4.0 miljoonalla nayttaa
+    tehokkuudelta. Sama rajaus kuin postauksessa, jotta luvut tasmaavat.
+    """
+    import urllib.request
+
+    req = urllib.request.Request(
+        "https://api.goaliq.app/api/fantasy/xp",
+        headers={"User-Agent": "Mozilla/5.0 goaliq-card-gen"})
+    with urllib.request.urlopen(req, timeout=90) as r:
+        data = json.loads(r.read().decode("utf-8"))
+    players = data.get("players") or []
+    n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
+    floor = args.min_mins if args.min_mins and args.min_mins < 90 else 60
+    rows = []
+    for p in players:
+        price = float(p.get("price") or 0)
+        tot = float(p.get("xp_horizon_total") or 0)
+        if price <= 0 or tot <= 0:
+            continue
+        if float(p.get("xmins") or 0) < floor:
+            continue
+        rows.append({"name": p["web_name"], "tag": p["pos"],
+                     "team": p["team_short"],
+                     "mid": f"{price:.1f}m · {tot:.1f} xP",
+                     "_v": tot / price, "badges": []})
+    if not rows:
+        raise SystemExit("Ei rivejä value-kortille.")
+    rows.sort(key=lambda r: r["_v"], reverse=True)
+    rows = rows[:args.top]
+    return {
+        "title": f"BEST VALUE, NEXT {n_gw} GW",
+        "subtitle": f"expected points per million, {floor}+ min starters",
+        "nameLabel": "PLAYER",
+        "midLabel": "PRICE / TOTAL",
+        "valueLabel": "xP/m",
+        "footNote": "logged before kickoff, graded in public",
+        "footNote2": "model projections, not betting advice",
+        "rows": [dict(r, rank=i + 1, value=f"{r['_v']:.2f}")
+                 for i, r in enumerate(rows)],
+        "file": f"goaliq_value_{n_gw}gw_top{len(rows)}.png",
+    }
+
+
 BUILDERS = {"cs": card_cs, "defence": card_defence, "stats": card_stats,
-            "xp": card_xp}
+            "xp": card_xp, "value": card_value}
 GW_CAPABLE = {"cs"}
 
 
