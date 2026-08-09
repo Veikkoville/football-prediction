@@ -2078,21 +2078,18 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
     body = (
         f'<div class="stat-row">{top3}</div>'
         f"<h2>Top 100 by expected points (of {len(rows)} players)</h2>"
-        '<p class="note"><strong>How to read this.</strong> '
-        f'<em>{n_gw}GW xP</em> is the total across the next {n_gw} gameweeks '
-        "and is what the table is ranked by. <em>xP/90</em> is the scoring "
-        "rate if the player is on the pitch for a full match, "
-        "<em>Start%</em> is how likely he is to start, and <em>xMins</em> is "
-        "the two combined. A low total with a high rate means a minutes "
-        "question, not a quality question. We keep them apart on purpose.</p>"
-        '<p class="note"><strong>Start% is the one to check before you '
-        "trust a total.</strong> When it sits near 50, the player is close to "
-        "a coin flip and xMins is an average of two outcomes that will not "
-        "happen: he starts and plays around 85 minutes, or he does not play "
-        "at all. Nobody plays half of every match. A keeper on 51% is not a "
-        "45-minute keeper, he is a maybe. Read those totals as a bet on the "
-        "team news, not as a projection you can bank.</p>"
+        # Selitys taulukon ALLE, ei ylle (9.8): ensimmainen versio tyonsi 237
+        # sanaa datan eteen, eli X:sta tulija joutui vierittamaan kaksi
+        # ruudullista mobiilissa paastakseen siihen lukuun joka hanelle
+        # luvattiin. Sivun tyo on antaa luku ensin ja selittaa sitten.
+        '<p class="note">'
+        f"Ranked by total xP over the next {n_gw} gameweeks. <em>xP/90</em> "
+        "is the scoring rate, <em>Start%</em> is how likely he is to start, "
+        "<em>xMins</em> combines the two.</p>"
         f"{kitdefs}{table}"
+        '<p class="note"><strong>Start% near 50 means the model is split.'
+        "</strong> Those totals are a bet on team news, not a settled "
+        "projection. A keeper on 51% is not a 45-minute keeper.</p>"
         '<p class="note">This ranking is free and needs no account. The tools '
         "built on top of it, rate my team, the transfer planner, the captain "
         "ranker and your watchlist, are part of GoalIQ Premium.</p>"
