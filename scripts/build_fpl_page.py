@@ -799,13 +799,24 @@ def cs_table_html(c: dict) -> str:
             hits += 1
         if t and t.get("is_promoted"):
             churn = '<span title="Promoted: no Premier League record">new</span>'
+            sub = "no PL record"
         elif t and t.get("minutes_churn_pct") is not None:
             churn = f'{t["minutes_churn_pct"]:.0f}%'
+            sub = f'{t["minutes_churn_pct"]:.0f}% turnover'
         else:
             churn = "&ndash;"
+            sub = ""
+        # Sarake on .m-hide (5. sarake ei mahdu 390px:aan). "Show all columns"
+        # tuo sen takaisin, mutta se on kaksi tapahtumaa liian kaukana luvusta
+        # jota kukaan ei viela osaa etsia — ja puhelin on FPL-liikenteen
+        # paapinta. Alarivi antaa saman luvun ilman saraketta ja katoaa kun
+        # sarake palautetaan (body.cols-all .m-only), joten lukua ei nayteta
+        # kahdesti kummassakaan tilassa.
+        sub_html = (f'<span class="m-only m-sub">{escape(sub)}</span>'
+                    if sub else "")
         rows.append(
             "<tr>"
-            f'<td class="team">{escape(r["team"])}</td>'
+            f'<td class="team">{escape(r["team"])}{sub_html}</td>'
             f'<td class="num">{fmt_pct(r["cs_pct"])}</td>'
             f'<td>{escape(r["opponent"])} ({r["venue"]})</td>'
             f'<td class="num fdr {fdr_cell_class(fdr)}">{fdr}</td>'
