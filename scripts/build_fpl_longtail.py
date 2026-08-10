@@ -181,6 +181,12 @@ color:var(--cream);border-radius:var(--radius);padding:6px 12px;font-size:13px;
 font-weight:600;}
 /* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
+/* Luottamuslippu (10.8): joukkueen luokitus nojaa heikompaan tietoon.
+   KUVAILEVA - ei kerro kumpaan suuntaan projektio liikkuu. Vaimennettu
+   tahallaan: se on reunahuomautus rivilla, ei rivin tarkein asia. */
+.tflag{flex:0 0 auto;font-size:10px;font-weight:600;letter-spacing:.04em;
+text-transform:uppercase;padding:1px 5px;border:1px solid var(--line-strong);
+border-radius:var(--radius);opacity:.72;white-space:nowrap;}
 .kit{flex:0 0 auto;display:block;}
 /* Model XI -kentta. 26.7: sama ilme kuin SPA:n TeamPitchManagerilla ja
    mobiilin #106-pitchilla (teal-tint, #108-paletti) - EI nurmivaria. Villen
@@ -2040,6 +2046,69 @@ def render_defence(defence: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+# ---------------------------------------------------------------------------
+# LUOTTAMUSLIPPU (10.8.2026) — lippu tulee ARTEFAKTISTA (build_fpl_xp.py), ei
+# talta sivulta. Renderin tyo on vain nayttaa se. Nain SPA, mobiili, etusivu ja
+# tama sivu lukevat saman lahteen eivatka voi eriytya.
+#
+# EI SUUNTAVAITETTA copyyn: kalibrointi kaatui 9.8. (hyokkays R^2 0,000,
+# puolustus vaara merkki), joten lippu kertoo mika on muuttunut, ei mita siita
+# seuraa. Tama on sitova rajaus kaikilla pinnoilla.
+# ---------------------------------------------------------------------------
+_TFLAG_LABEL = {"promoted": "promoted", "high_turnover": "turnover"}
+
+
+def _tflag_html(row: dict) -> str:
+    label = _TFLAG_LABEL.get(row.get("team_flag") or "")
+    return f'<span class="tflag">{label}</span>' if label else ""
+
+
+def _tflag_note(xp: dict, shown: list[dict], allrows: list[dict]) -> str:
+    """Selite taulukon alle, vain jos jokin joukkue on liputettu.
+
+    KORJAUS 10.8: ensimmainen versio selitti merkin jota sivulla ei nay.
+    Liputetut ovat nousijoiden pelaajia, eika yksikaan yllä tallä hetkella
+    top 100:aan (paras on #129), joten taulukossa on nolla merkkia. Selite
+    kertoo sen nyt itse sen sijaan etta lukija etsisi merkkia turhaan.
+    """
+    tc = (xp.get("meta") or {}).get("team_confidence") or {}
+    teams = tc.get("teams") or {}
+    promoted = sorted(k for k, v in teams.items() if v.get("flag") == "promoted")
+    churn = sorted(k for k, v in teams.items()
+                   if v.get("flag") == "high_turnover")
+    if not promoted and not churn:
+        return ""
+    bits = []
+    if promoted:
+        bits.append(
+            f"<strong>{escape(', '.join(promoted))}</strong> "
+            f"{'are' if len(promoted) > 1 else 'is'} newly promoted, so "
+            "there are no Premier League results to fit a team rating on and "
+            "the model starts them from a baseline.")
+    if churn:
+        bits.append(
+            f"<strong>{escape(', '.join(churn))}</strong> lost an unusually "
+            "large share of last season's minutes, and team ratings are "
+            "fitted on results, so they still read as last season's squad.")
+    n_shown = sum(1 for r in shown if r.get("team_flag"))
+    if n_shown:
+        where = (f" Their players carry a tag in the table, {n_shown} of them "
+                 f"in this top 100.")
+    else:
+        best = next(((i + 1, r) for i, r in enumerate(allrows)
+                     if r.get("team_flag")), None)
+        where = (
+            f" No flagged player makes this top 100. The highest is "
+            f"{escape(best[1]['web_name'])} "
+            f"({escape(best[1]['team_short'])}) at #{best[0]} of "
+            f"{len(allrows)}." if best else "")
+    return (
+        '<p class="note"><strong>Flagged teams.</strong> ' + " ".join(bits) +
+        " The flag means the projection is working with weaker information. "
+        "It does not say which way that moves the number, because that is "
+        "the part the data would not support." + where + "</p>")
+
+
 def render_expected_points(xp: dict, now: datetime) -> str | None:
     """Koko xP-lista ilmaiseksi, ilman kirjautumista (9.8.2026).
 
@@ -2094,7 +2163,7 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         f'<td class="n">{i + 1}</td>'
         f'<td>{escape(r["web_name"])}</td>'
         f'<td class="tm">{_kit_svg(r["team_short"])}'
-        f'<span>{escape(r["team_short"])}</span></td>'
+        f'<span>{escape(r["team_short"])}</span>{_tflag_html(r)}</td>'
         f'<td class="m-hide">{escape(r["pos"])}</td>'
         f'<td class="n m-hide">{r["price"]:.1f}</td>'
         f'<td class="n hi">{r["xp_horizon_total"]:.1f}</td>'
@@ -2140,6 +2209,7 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         "is the scoring rate, <em>Start%</em> is how likely he is to start, "
         "<em>xMins</em> combines the two.</p>"
         f"{kitdefs}{table}"
+        + _tflag_note(xp, rows[:100], rows) +
         '<p class="note"><strong>Start% near 50 means the model is split.'
         "</strong> Those totals are a bet on team news, not a settled "
         "projection. A keeper on 51% is not a 45-minute keeper.</p>"

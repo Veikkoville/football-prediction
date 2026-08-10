@@ -2,8 +2,139 @@
   "meta": {
     "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
     "available": true,
+    "team_confidence": {
+      "schema_version": 1,
+      "basis_season": "2526",
+      "high_turnover_threshold_pct": 25.0,
+      "historical_median_pct": 13.0,
+      "method": "share of last season's minutes played by players no longer at the club; ratings are fitted on results and cannot see the transfer window",
+      "note": "Descriptive, not predictive. The flag says a rating is built on weaker information; it does not say which way that moves the projection.",
+      "n_flagged_players": 77,
+      "teams": {
+        "Arsenal": {
+          "flag": null,
+          "note": "6% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 5.6
+        },
+        "Aston Villa": {
+          "flag": null,
+          "note": "21% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 20.6
+        },
+        "Bournemouth": {
+          "flag": null,
+          "note": "16% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 15.8
+        },
+        "Brentford": {
+          "flag": null,
+          "note": "6% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 5.8
+        },
+        "Brighton": {
+          "flag": null,
+          "note": "21% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 21.4
+        },
+        "Chelsea": {
+          "flag": null,
+          "note": "14% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 14.2
+        },
+        "Coventry": {
+          "flag": "promoted",
+          "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record.",
+          "is_promoted": true,
+          "minutes_churn_pct": null
+        },
+        "Crystal Palace": {
+          "flag": null,
+          "note": "12% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 12.0
+        },
+        "Everton": {
+          "flag": null,
+          "note": "10% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 10.0
+        },
+        "Fulham": {
+          "flag": null,
+          "note": "18% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 17.9
+        },
+        "Hull": {
+          "flag": "promoted",
+          "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record.",
+          "is_promoted": true,
+          "minutes_churn_pct": null
+        },
+        "Ipswich": {
+          "flag": "promoted",
+          "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record.",
+          "is_promoted": true,
+          "minutes_churn_pct": null
+        },
+        "Leeds": {
+          "flag": null,
+          "note": "13% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 13.3
+        },
+        "Liverpool": {
+          "flag": null,
+          "note": "17% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 17.1
+        },
+        "Manchester City": {
+          "flag": null,
+          "note": "11% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 10.7
+        },
+        "Manchester United": {
+          "flag": null,
+          "note": "7% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 6.9
+        },
+        "Newcastle United": {
+          "flag": null,
+          "note": "19% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 18.7
+        },
+        "Nottingham Forest": {
+          "flag": null,
+          "note": "11% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 11.1
+        },
+        "Tottenham": {
+          "flag": null,
+          "note": "14% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 13.5
+        },
+        "Sunderland": {
+          "flag": null,
+          "note": "9% of last season's minutes have left the club.",
+          "is_promoted": false,
+          "minutes_churn_pct": 9.2
+        }
+      }
+    },
     "phase": 1,
-    "generated_at": "2026-08-10T04:25:28",
+    "generated_at": "2026-08-10T09:54:15",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -934,7 +1065,7 @@
       "predicted_starts": 85.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 23.3,
+      "owned_pct": 23.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -15687,7 +15818,8 @@
         "yellows": -0.17,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 535,
@@ -21851,7 +21983,8 @@
         "yellows": -0.05,
         "bonus": 0.29
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 298,
@@ -21959,7 +22092,8 @@
         "yellows": -0.05,
         "bonus": 0.29
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 230,
@@ -23279,7 +23413,8 @@
         "yellows": -0.05,
         "bonus": 0.29
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 317,
@@ -23387,7 +23522,8 @@
         "yellows": -0.05,
         "bonus": 0.29
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 336,
@@ -23616,7 +23752,8 @@
         "yellows": -0.05,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 194,
@@ -23724,7 +23861,8 @@
         "yellows": -0.05,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 77,
@@ -27429,7 +27567,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 287,
@@ -27537,7 +27676,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 292,
@@ -27645,7 +27785,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 293,
@@ -27753,7 +27894,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 392,
@@ -28359,7 +28501,8 @@
         "yellows": -0.07,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 313,
@@ -28467,7 +28610,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 315,
@@ -28575,7 +28719,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 318,
@@ -28683,7 +28828,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 562,
@@ -28791,7 +28937,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 246,
@@ -29020,7 +29167,8 @@
         "yellows": -0.07,
         "bonus": 0.08
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 188,
@@ -29128,7 +29276,8 @@
         "yellows": -0.07,
         "bonus": 0.08
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 271,
@@ -30085,7 +30234,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 1.4,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -30776,7 +30925,8 @@
         "yellows": -0.03,
         "bonus": 0.12
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 35,
@@ -31246,7 +31396,8 @@
         "yellows": -0.03,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 44,
@@ -33062,7 +33213,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 304,
@@ -33170,7 +33322,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 305,
@@ -33278,7 +33431,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 27,
@@ -33509,7 +33663,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 279,
@@ -33617,7 +33772,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 280,
@@ -33725,7 +33881,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 266,
@@ -33954,7 +34111,8 @@
         "yellows": -0.07,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 174,
@@ -34062,7 +34220,8 @@
         "yellows": -0.07,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 175,
@@ -34170,7 +34329,8 @@
         "yellows": -0.07,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 176,
@@ -34278,7 +34438,8 @@
         "yellows": -0.07,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 553,
@@ -35120,7 +35281,8 @@
         "yellows": -0.03,
         "bonus": 0.17
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 322,
@@ -35228,7 +35390,8 @@
         "yellows": -0.03,
         "bonus": 0.17
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 441,
@@ -35577,7 +35740,8 @@
         "yellows": -0.03,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 196,
@@ -35685,7 +35849,8 @@
         "yellows": -0.03,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 215,
@@ -37119,7 +37284,8 @@
         "yellows": -0.04,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 563,
@@ -37227,7 +37393,8 @@
         "yellows": -0.04,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 263,
@@ -37927,7 +38094,8 @@
         "yellows": -0.04,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 3,
@@ -38155,7 +38323,8 @@
         "yellows": -0.04,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 227,
@@ -40301,7 +40470,8 @@
         "yellows": -0.02,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 572,
@@ -40409,7 +40579,8 @@
         "yellows": -0.02,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 554,
@@ -40517,7 +40688,8 @@
         "yellows": -0.02,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 564,
@@ -40637,7 +40809,8 @@
         "yellows": -0.02,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 58,
@@ -41470,7 +41643,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 172,
@@ -41578,7 +41752,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 362,
@@ -42649,7 +42824,8 @@
         "yellows": -0.05,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 531,
@@ -42880,7 +43056,8 @@
         "yellows": -0.04,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 307,
@@ -42988,7 +43165,8 @@
         "yellows": -0.04,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 126,
@@ -43219,7 +43397,8 @@
         "yellows": -0.04,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 526,
@@ -43813,7 +43992,8 @@
         "yellows": -0.04,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 178,
@@ -43921,7 +44101,8 @@
         "yellows": -0.04,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 483,
@@ -44150,7 +44331,8 @@
         "yellows": -0.03,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 450,
@@ -45962,7 +46144,8 @@
         "yellows": -0.02,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 29,
@@ -47357,7 +47540,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 289,
@@ -47465,7 +47649,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 290,
@@ -47573,7 +47758,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 23,
@@ -48712,7 +48898,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 314,
@@ -48820,7 +49007,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 319,
@@ -48928,7 +49116,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 323,
@@ -49036,7 +49225,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 324,
@@ -49144,7 +49334,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 396,
@@ -49372,7 +49563,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 187,
@@ -49480,7 +49672,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 189,
@@ -49588,7 +49781,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 191,
@@ -49696,7 +49890,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 192,
@@ -49804,7 +49999,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 217,
@@ -53182,7 +53378,8 @@
         "yellows": -0.01,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 301,
@@ -53290,7 +53487,8 @@
         "yellows": -0.01,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 302,
@@ -53398,7 +53596,8 @@
         "yellows": -0.01,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 207,
@@ -55021,7 +55220,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 435,
@@ -55248,7 +55448,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 285,
@@ -55356,7 +55557,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 556,
@@ -55476,7 +55678,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 179,
@@ -55584,7 +55787,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 180,
@@ -55692,7 +55896,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 181,
@@ -55800,7 +56005,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 182,
@@ -55908,7 +56114,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 238,
@@ -57355,7 +57562,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 383,

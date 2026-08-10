@@ -440,7 +440,22 @@
 									>{p.data_basis === 'no_history' ? 'No PL data yet' : 'Limited data'}</span
 								>{/if}<SetPieceBadges sp={p.set_pieces} /></td
 						>
-						<td>{p.team_short}</td>
+						<td
+							>{p.team_short}{#if p.team_flag}
+								<!-- 10.8: JOUKKUEEN luottamuslippu (vrt. basis-tag yllä, joka on
+								     PELAAJAN datapohja). Pyydettiin r/FantasyPL:ssä nimenomaan
+								     projektioihin. Kuvaileva: kertoo että luokitus nojaa
+								     heikompaan tietoon, EI kumpaan suuntaan luku liikkuu —
+								     suunnan kalibrointi kaatui 9.8. Vain liputetut saavat
+								     kentän, joten tagi ei ilmesty 20 joukkueelle. -->
+								<span
+									class="basis-tag"
+									title={p.team_flag === 'promoted'
+										? "Promoted side. No Premier League results to fit a team rating on, so this team starts from a baseline rather than its own record."
+										: "Unusually high squad turnover. Team ratings are fitted on results, so this one still reads as last season's squad."}
+									>{p.team_flag === 'promoted' ? 'Promoted' : 'High turnover'}</span
+								>{/if}</td
+						>
 						<td class="m-hide">{p.pos}</td>
 						{#if hasPrice}
 							<td class="num m-hide">

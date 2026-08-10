@@ -148,6 +148,12 @@ color:var(--cream);border-radius:var(--radius);padding:6px 12px;font-size:13px;
 font-weight:600;}
 /* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
+/* Luottamuslippu (10.8): joukkueen luokitus nojaa heikompaan tietoon.
+   KUVAILEVA - ei kerro kumpaan suuntaan projektio liikkuu. Vaimennettu
+   tahallaan: se on reunahuomautus rivilla, ei rivin tarkein asia. */
+.tflag{flex:0 0 auto;font-size:10px;font-weight:600;letter-spacing:.04em;
+text-transform:uppercase;padding:1px 5px;border:1px solid var(--line-strong);
+border-radius:var(--radius);opacity:.72;white-space:nowrap;}
 .kit{flex:0 0 auto;display:block;}
 /* Model XI -kentta. 26.7: sama ilme kuin SPA:n TeamPitchManagerilla ja
    mobiilin #106-pitchilla (teal-tint, #108-paletti) - EI nurmivaria. Villen

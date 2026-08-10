@@ -166,6 +166,84 @@ def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str],
 
 
 # ---------------------------------------------------------------------------
+# LUOTTAMUSLIPPU xP-RIVEILLE (10.8.2026)
+#
+# MIKSI: r/FantasyPL-lukija FPLDPS pyysi lippua nimenomaan PROJEKTIOIHIN
+# ("could warn people that the projection is working with less reliable
+# information"). 9.8. lippu shipattiin ottelupolulle ja CS/FDR-taulukkoon —
+# xP-lista, se sivu jota han luki, ei saanut mitaan.
+#
+# MIKSI TASSA EIKA RENDEREISSA: tama artefakti on AINOA lahde kaikille
+# xP-pinnoille (/api/fantasy/xp -> SPA + mobiili, build_fpl_longtail ->
+# /fpl/expected-points, build_fpl_page -> etusivun projections-taulukko).
+# Yhteen renderiin haudattu korjaus korjaa yhden nakyman: 8.8. SPA:n Fixtures
+# ja Table jaivat 11 paivaksi vaaraan lahteeseen tasan nain.
+#
+# LIITOSAVAIN on `model_team`, sama merkkijono kuin player_row["team"] ->
+# ei nimien normalisointia eika 17/20-osumaa. Nolla osumaa kaataa ajon.
+#
+# EI SUUNTAVAITETTA: siirtojen hinnoittelun kalibrointi kaatui 9.8. (hyokkays
+# R^2 0,000, puolustus vaara merkki), joten lippu kertoo MIKA on muuttunut,
+# ei mita siita seuraa. Sama sitova rajaus kuin muilla pinnoilla.
+# ---------------------------------------------------------------------------
+def attach_team_confidence(players: list[dict]) -> dict:
+    """Merkitsee liputetut joukkueet xP-riveille ja palauttaa meta-lohkon.
+
+    Vain LIPUTETUT saavat rivikentan (`team_flag`): pelkka vaihtuvuusluku
+    kuuluu tyokalutaulukoihin, ei jokaisen pelaajan viereen. Koko 20 joukkueen
+    taulukko menee metaan, jotta pinta voi halutessaan nayttaa myos luvun
+    ilman uutta liitosta.
+
+    excluded[]-rivit jatetaan tarkoituksella rauhaan: ne kantavat vain FPL:n
+    virallista tietoa eivatka sisalla projektiota jota lippu koskisi.
+    """
+    p = config.PROJECT_ROOT / "data" / "team_confidence.json"
+    if not p.exists():
+        print("      VAROITUS: team_confidence.json puuttuu — xP-riveilla "
+              "EI lippuja (aja scripts.build_team_confidence)")
+        return {}
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    by_team = {t["model_team"]: t for t in doc["teams"]}
+
+    n_joined = n_flagged = 0
+    for row in players:
+        t = by_team.get(row.get("team"))
+        if t is None:
+            continue
+        n_joined += 1
+        if t.get("flag"):
+            row["team_flag"] = t["flag"]
+            n_flagged += 1
+    # Nolla osumaa = liitos on rikki. Ilman tata jokainen rivi jaisi ilman
+    # lippua ja artefakti nayttaisi tasan silta kuin mitaan liputettavaa ei
+    # olisi — hiljainen katoaminen, ei virhe.
+    if players and not n_joined:
+        raise SystemExit(
+            f"team_confidence: yksikaan {len(players)} xP-rivista ei osunut "
+            f"joukkueisiin {sorted(by_team)[:3]}... — model_team-liitos on "
+            f"rikki, EI 'ei liputettavia'")
+    print(f"      luottamuslippu: {n_flagged}/{len(players)} rivia liputettu "
+          f"({n_joined} liitosta, kynnys "
+          f"{doc.get('high_turnover_threshold_pct')} %)")
+    return {
+        "schema_version": doc.get("schema_version"),
+        "basis_season": doc.get("basis_season"),
+        "high_turnover_threshold_pct": doc.get("high_turnover_threshold_pct"),
+        "historical_median_pct": doc.get("historical_median_pct"),
+        "method": doc.get("method"),
+        "note": ("Descriptive, not predictive. The flag says a rating is "
+                 "built on weaker information; it does not say which way "
+                 "that moves the projection."),
+        "n_flagged_players": n_flagged,
+        "teams": {k: {"flag": v.get("flag"),
+                      "note": v.get("note"),
+                      "is_promoted": v.get("is_promoted"),
+                      "minutes_churn_pct": v.get("minutes_churn_pct")}
+                  for k, v in by_team.items()},
+    }
+
+
+# ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
 def main(argv: list[str] | None = None) -> int:
@@ -924,10 +1002,12 @@ def main(argv: list[str] | None = None) -> int:
             "hintajärjestyksestä (MVP-heuristiikka) — tarkentuvat kun "
             "26/27-kierroksia kertyy."
         )
+    tc_meta = attach_team_confidence(players)
     out = {
         "meta": {
             "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
             "available": True,
+            "team_confidence": tc_meta,
             "phase": 1,
             "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
             "season": SEASON_LABEL,

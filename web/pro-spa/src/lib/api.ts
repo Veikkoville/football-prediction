@@ -122,6 +122,13 @@ export interface XpPlayer {
 	minutes_override_reason?: string;
 	/** #147: koko nimi VAIN hakua varten — defensiivinen (vanha payload ei tuo). */
 	full_name?: string;
+	/** 10.8: joukkueen luottamuslippu. Kenttä on rivillä VAIN kun joukkue on
+	 *  liputettu (nousija tai poikkeuksellinen kausivaihtuvuus) — pelkkä
+	 *  vaihtuvuusluku kuuluu työkalutaulukoihin, ei jokaisen rivin viereen.
+	 *  KUVAILEVA: kertoo että luokitus nojaa heikompaan tietoon, EI kumpaan
+	 *  suuntaan projektio liikkuu (kalibrointi kaatui 9.8: hyökkäys R² 0,000,
+	 *  puolustus väärä merkki). Defensiivinen: vanha payload ei tuo. */
+	team_flag?: 'promoted' | 'high_turnover';
 	/** Edge-sprint (contract-data 1): kaikki defensiivisiä (vanha payload ei tuo). */
 	owned_pct?: number;
 	/** Minuuttijakauma 0..1: p_start + p_cameo + p_bench = 1. */
