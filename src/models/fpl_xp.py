@@ -348,6 +348,46 @@ PRESEASON_HALFLIFE = 10.0
 # = molemmat paremmat kuin baseline 21.60 / 0.167).
 P_START_SHRINK = 0.2
 P_START_PRIOR = 0.5   # neutraali — EI backtestistä sovitettu (rakenteellinen)
+
+# ---------------------------------------------------------------------------
+# CONFIDENCE-KYNNYKSET (kiristetty 10.8.2026)
+#
+# VIKA JOKA KORJATTIIN: raja oli 0.2/0.8, ja se antoi "high"-lipun 167
+# pelaajalle joista 72:lla (43 %) odotetut minuutit olivat alle 20. Chiesan
+# raaka start-share oli 0.198 — juuri kynnyksen alla → "high", vaikka näytöllä
+# luki samaan aikaan "26 % start" ja hänen todennäköisin lopputuloksensa oli
+# vaihdosta tulo (p_cameo 0.47).
+#
+# 0.2 EI OLE VAKAUS. Se tarkoittaa että pelaaja aloittaa joka viidennen pelin,
+# eli rotaatioarpajaiset — juuri se tila jossa estimaatti on epävarrimmillaan.
+# Vakaa on vasta kun lopputulos on ~90 % ratkennut kumpaan tahansa suuntaan.
+#
+# Kynnys on arvostelukysymys eikä sovitettu parametri, ja se sanotaan tässä
+# ääneen: ship-gate mittaa xP:tä eikä lippuja, joten se EI voi validoida tätä
+# lukua. Muutos ei liikuta yhtäkään xP:tä, xMins:iä tai p_startia.
+# ---------------------------------------------------------------------------
+CONF_STABLE_LO = 0.10
+# YLARAJA JATETTIIN ENNALLEEN (0.80) TARKOITUKSELLA. Kokeilin 0.90:aa ja se
+# pudotti Gabrielin (88 xmins) ja Ricen (86 xmins) med-tasolle — naulatut
+# avaajat, joiden minuutit ovat juuri niita joista olemme varmimpia.
+# Epavarmuus on epasymmetrinen vaikka varianssi p(1-p) on symmetrinen:
+# p=0.2 tarkoittaa ennustetta ~20 min kun toteuma on 0 tai 80, eli suhteellinen
+# virhe on valtava; p=0.8 tarkoittaa ~75 min kun toteuma on 0 tai 90.
+# Mitattu vika oli alapaassa, joten vain alaraja kiristettiin.
+CONF_STABLE_HI = 0.80
+CONF_MIN_OBS_HIGH = 4
+CONF_MIN_OBS_MED = 3
+_CONF_RANK = {"low": 0, "med": 1, "high": 2}
+
+
+def derive_confidence(n_obs: int, p_start_raw: float) -> str:
+    """low/med/high otoskoosta ja start-signaalin vakaudesta."""
+    stable = p_start_raw <= CONF_STABLE_LO or p_start_raw >= CONF_STABLE_HI
+    if n_obs >= CONF_MIN_OBS_HIGH and stable:
+        return "high"
+    if n_obs >= CONF_MIN_OBS_MED:
+        return "med"
+    return "low"
 # Fallbackit kun ehdollisia havaintoja ei ole (uusi pelaaja / pelkkä penkki).
 START_FALLBACK_MIN = 78.0
 SUB_FALLBACK_MIN = 18.0
@@ -454,12 +494,7 @@ def minutes_model(mins_by_round: dict[int, float],
 
     # Confidence: otoskoko + start-signaalin vakaus (ääripäät = vakaa).
     # Deterministinen ja dokumentoitu — UI:n low/med/high nojaa tähän.
-    p = base["p_start_raw"]
-    stable = p <= 0.2 or p >= 0.8
-    if base["n_obs"] >= 4 and stable:
-        base["confidence"] = "high"
-    elif base["n_obs"] >= 3:
-        base["confidence"] = "med"
+    base["confidence"] = derive_confidence(base["n_obs"], base["p_start_raw"])
     return recompute_minutes(base)
 
 
@@ -475,6 +510,19 @@ def recompute_minutes(mm: dict) -> dict:
     mm["p60"] = p_start * mm["p60_start"] + sub_path * mm["p60_sub"]
     mm["p1_59"] = (p_start * (1.0 - mm["p60_start"])
                    + sub_path * (1.0 - mm["p60_sub"]))
+    # 10.8: lippu seuraa nyt sitä lukua jota se kuvaa. Aiemmin confidence
+    # laskettiin KERRAN historiaikkunasta eikä sitä koskaan tarkistettu, vaikka
+    # saatavuus- ja syvyysskaalaukset muuttavat p_startia jälkikäteen — eli
+    # lippu kuvasi eri lukua kuin se joka näytettiin.
+    #
+    # VAIN ALASPÄIN: skaalaus ei saa NOSTAA luottamusta. Loukkaantumislippu vie
+    # p_start_raw'n nollaan, mikä näyttäisi "vakaalta" ja tuottaisi high-lipun
+    # FPL:n lipun perusteella eikä meidän datastamme. Se olisi sama vika
+    # toisin päin.
+    if "confidence" in mm:
+        cand = derive_confidence(int(mm.get("n_obs") or 0), mm["p_start_raw"])
+        if _CONF_RANK[cand] < _CONF_RANK[mm["confidence"]]:
+            mm["confidence"] = cand
     return mm
 
 

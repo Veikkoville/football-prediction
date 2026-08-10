@@ -112,6 +112,69 @@ def test_confidence_mapping_deterministic():
     assert mm2["confidence"] == "low"
 
 
+# ---------------------------------------------------------------------------
+# 10.8.2026: kynnys 0.2/0.8 -> 0.10/0.90.
+#
+# Vanha raja antoi "high"-lipun 167 pelaajalle joista 72:lla xmins < 20.
+# Chiesan raaka start-share oli 0.198 eli juuri kynnyksen alla, ja samalla
+# rivilla luki "26 % start" ja hanen todennakoisin lopputuloksensa oli
+# vaihdosta tulo. 0.2 ei ole vakaus vaan rotaatioarpajaiset.
+#
+# Ylla oleva test_confidence_mapping_deterministic EI nahnyt tata: se testasi
+# vain p=0.5:n (rotaatio) ja yhden kierroksen, eli molemmat kaukana rajalta.
+# Raja-alue jai kattamatta, ja vika eli siella.
+# ---------------------------------------------------------------------------
+def test_one_start_in_five_is_not_high_confidence():
+    """Joka viidennen pelin aloittava on epavarmin tapaus, ei vakain."""
+    rounds = [1, 2, 3, 4, 5]
+    # Aloitus kierroksella 3 (recency-painot 1..5) -> painotettu share tasan 0.2
+    mm = _mm({1: 90.0, 2: 12.0, 3: 90.0, 4: 20.0, 5: 8.0},
+             {3: 1}, rounds, n_last=5)
+    assert mm["p_start_raw"] == pytest.approx(0.2)
+    assert mm["confidence"] != "high", (
+        "0.2 start-share luettiin vakaaksi — tama on se vika joka korjattiin")
+    # Negatiivinen kontrolli: vanha kynnys olisi antanut high:n tasmalleen
+    # tassa pisteessa, uusi ei. Ilman tata rivia testi menisi lapi myos jos
+    # kynnys olisi vahingossa kiristetty liikaa (esim. 0.0).
+    assert xp.derive_confidence(mm["n_obs"], 0.20) == "med"
+    assert xp.derive_confidence(mm["n_obs"], 0.10) == "high"
+    # Ylaraja jatettiin 0.80:aan: naulattu avaaja on yha vakain tapaus.
+    # Ilman tata rivia kiristys olisi voinut vuotaa ylapaahan huomaamatta.
+    assert xp.derive_confidence(mm["n_obs"], 0.80) == "high"
+    assert xp.derive_confidence(mm["n_obs"], 0.79) == "med"
+
+
+def test_never_starts_is_still_high_confidence():
+    """Aito 'ei pelaa koskaan' -signaali on yha vakaa — muutos ei riko sita."""
+    rounds = [1, 2, 3, 4, 5]
+    mm = _mm({r: 0.0 for r in rounds}, {}, rounds, n_last=5)
+    assert mm["confidence"] == "high"
+
+
+def test_availability_scaling_never_raises_confidence():
+    """Loukkaantumislippu ei saa TUOTTAA korkeaa luottamusta.
+
+    i/s/u/n vie p_start_raw'n nollaan, mika nayttaa 'vakaalta'. Ilman
+    yksisuuntaisuutta rotaatiopelaaja saisi high-lipun FPL:n lipusta eika
+    meidan datastamme.
+    """
+    rounds = [1, 2, 3, 4]
+    mm = _mm({1: 90.0, 2: 0.0, 3: 90.0, 4: 0.0}, {1: 1, 3: 1}, rounds)
+    assert mm["confidence"] == "med"
+    out = xp.apply_availability(mm, "i", None)
+    assert out["xmins"] == 0.0
+    assert out["confidence"] == "med", "saatavuuslippu nosti luottamusta"
+
+
+def test_availability_scaling_may_lower_confidence():
+    """Naulattu avaaja joka on kyseenalainen: emme enaa tieda minuutteja."""
+    rounds = [1, 2, 3, 4]
+    mm = _mm({r: 90.0 for r in rounds}, {r: 1 for r in rounds}, rounds)
+    assert mm["confidence"] == "high"
+    out = xp.apply_availability(mm, "d", 50)
+    assert out["confidence"] == "med"
+
+
 def test_recompute_idempotent():
     rounds = [1, 2, 3, 4]
     mm = _mm({1: 90.0, 2: 60.0, 3: 20.0, 4: 90.0}, {1: 1, 2: 1, 4: 1}, rounds)
