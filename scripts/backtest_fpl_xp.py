@@ -27,6 +27,7 @@ Raportti: logs/fpl_xp_backtest_<pvm>.json (gitignored) + stdout-taulukko.
 from __future__ import annotations
 
 import argparse
+import csv
 import datetime as _dt
 import json
 import sys
@@ -189,6 +190,73 @@ def _load_archive_2526():
     return boot, sorted(fx.values(), key=lambda f: f["id"]), hist_only, "2526"
 
 
+# ---------------------------------------------------------------------------
+# TULOKAS-SLICE (10.8.2026)
+#
+# MIKSI TAMA EIKA VAIHTUVUUSLUKU: 9.8. shipattu vaihtuvuusluku on JOUKKUETASON
+# kuvaileva mitta, ja sen ennustava kaytto kaatui kalibroinnissa (hyokkays
+# R^2 0,000, puolustus vaara merkki). Pelaajatasolla kysymys on eri: pelaajan
+# omat vauhdit lasketaan HANEN PL-riveistaan, ja tulokkaalla niita ei ole
+# yhtaan -> xP nojaa positiopriorin ja hinnan varaan. Onko se oikeasti
+# huonompi? Tama slice mittaa sen sen sijaan etta arvattaisiin.
+#
+# WALK-FORWARD-LAILLINEN: "ei minuutteja EDELLISELLA kaudella" on tiedossa
+# ennen kauden alkua eika lue kohde-GW:n dataa.
+#
+# LIITOS TEHDAAN `code`-KENTALLA. `id` on kausikohtainen ja uudelleenkaytetty
+# -> id-liitos osuisi VAARIIN pelaajiin nayttamatta virhetta.
+# ---------------------------------------------------------------------------
+def _prev_season_key(season_key: str) -> str:
+    """'2526' -> '2425'."""
+    yy = int(season_key[:2])
+    return f"{yy - 1:02d}{yy:02d}"
+
+
+def _newcomer_by_pid(boot: dict, season_key: str) -> tuple[dict[int, bool], str]:
+    """pid -> True jos pelaajalla EI ole PL-minuutteja edelliselta kaudelta.
+
+    Palauttaa ({}, syy) jos edelliskauden arkistoa ei ole — slice jaa pois ja
+    syy TULOSTETAAN. Puuttuva arkisto ei saa kaataa ship-gatea, mutta se ei saa
+    myoskaan kadota hiljaa: tyhja slice raportissa nayttaa samalta kuin
+    "ei loydoksia".
+    """
+    prev = _prev_season_key(season_key)
+    p = config.RAW_DATA_DIR / "fpl" / f"season_{prev}" / "players_raw.csv"
+    if not p.exists():
+        return {}, f"{p.name} puuttuu kaudelta {prev}"
+    played_codes: set[int] = set()
+    with p.open(encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            try:
+                if float(row.get("minutes") or 0) > 0:
+                    played_codes.add(int(row["code"]))
+            except (TypeError, ValueError, KeyError):
+                continue
+    if not played_codes:
+        return {}, f"kaudella {prev} nolla pelaajaa minuuteilla"
+
+    out: dict[int, bool] = {}
+    n_prev = 0
+    for e in boot["elements"]:
+        code = e.get("code")
+        if code is None:
+            continue
+        was_there = int(code) in played_codes
+        n_prev += was_there
+        out[e["id"]] = not was_there
+    # Nolla osumaa = code-liitos on rikki (esim. arkiston skeema vaihtui).
+    # Silloin JOKAINEN pelaaja nayttaisi tulokkaalta ja slice raportoisi
+    # taysin vaaraa lukua taydella itseluottamuksella. Sama vikaluokka jonka
+    # cs_table-liitos kaataa (9.8).
+    if n_prev == 0:
+        raise SystemExit(
+            f"tulokas-slice: yksikaan {season_key}-pelaaja ei osunut kauden "
+            f"{prev} koodeihin ({len(played_codes)} koodia luettu) — "
+            f"code-liitos on rikki, EI 'kaikki ovat tulokkaita'")
+    return out, (f"kausi {prev}: {len(played_codes)} pelaajaa minuuteilla, "
+                 f"{n_prev}/{len(out)} liitosta")
+
+
 def run_backtest(force_refresh: bool = False, use_context: bool = True,
                  bps_2627: bool = True, archive: bool = False,
                  show_components: bool = False, live: bool = False,
@@ -232,6 +300,14 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
     # pelaajan omat rivit, ei joukkueen fixture-listaa. Kesken kautta
     # siirtyneellä tämä on vain hänen PL-jaksonsa.
     prounds_by_player = {pid: sorted(m) for pid, m in mins_by_round.items()}
+
+    newcomer_by_pid, newcomer_src = _newcomer_by_pid(boot, season_key)
+    if newcomer_by_pid:
+        n_new = sum(1 for v in newcomer_by_pid.values() if v)
+        print(f"      tulokas-slice: {n_new}/{len(newcomer_by_pid)} ilman "
+              f"edelliskauden PL-minuutteja ({newcomer_src})")
+    else:
+        print(f"      VAROITUS: tulokas-slice EI aja — {newcomer_src}")
 
     print("[2/4] PL-otteludata DC-mallia varten (Understat, sama lähde kuin tuotanto)...")
     seasons = seasons_for(season_key)
@@ -382,6 +458,15 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
             obs_rows.append({"gw": g, "pid": pid, "pos": pos, "pred": pred,
                              "eg": eg, "ea": ea, "ag": ag, "aa": aa,
                              "base": base, "actual": actual, "played": played,
+                             "newcomer": newcomer_by_pid.get(pid),
+                             "xmins": xmins,
+                             "amins": mins_by_round[pid][g],
+                             # Hinta TALLA kierroksella (tiedossa ennen
+                             # kickoffia -> ei vuoda). Erottaa oikean
+                             # hankinnan akatemiapelaajasta ilman etta
+                             # valitaan kauden lopputuloksen perusteella.
+                             "price": max((x.get("value") or 0)
+                                          for x in raw_rows) / 10.0,
                              "vs_promoted": any(o in promoted
                                                 for o in opps_by_tid.get(tid, ()))})
 
@@ -416,6 +501,7 @@ def run_backtest(force_refresh: bool = False, use_context: bool = True,
     res = aggregate_and_gate(per_gw, obs_rows, season_key,
                              use_context=use_context, bps_2627=bps_2627,
                              seasons=seasons, legacy_minutes=legacy_minutes)
+    report_newcomer(obs_rows)
     if show_components:
         report_components(obs_rows)
     return res
@@ -502,6 +588,23 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
         "early_gw2_6": _slice_stats([o for o in played if o["gw"] <= 6]),
         "muut (ei nousijaa, GW7+)": _slice_stats(
             [o for o in played if not o["vs_promoted"] and o["gw"] > 6]),
+        # Tulokas-slice (10.8): vertaa AINA parin sisalla xP:ta baselineen,
+        # ala vertaa ryhmien MAE:ta keskenaan. Tulokas pelaa vahemman ja
+        # skooraa vahemman -> hanen absoluuttinen virheensa on pienempi
+        # vaikka malli olisi hanesta huonompi. GW7+ kertoo sulkeutuuko ero
+        # kun pelaajan omia rivelja kertyy — se ratkaisee vaimeneeko lippu.
+        "tulokas (ei edelliskauden PL-min)": _slice_stats(
+            [o for o in played if o.get("newcomer") is True]),
+        "tulokas, GW2-6": _slice_stats(
+            [o for o in played if o.get("newcomer") is True and o["gw"] <= 6]),
+        "tulokas, GW7+": _slice_stats(
+            [o for o in played if o.get("newcomer") is True and o["gw"] > 6]),
+        "vakiintunut (on edelliskauden PL-min)": _slice_stats(
+            [o for o in played if o.get("newcomer") is False]),
+        "vakiintunut, GW2-6": _slice_stats(
+            [o for o in played if o.get("newcomer") is False and o["gw"] <= 6]),
+        "vakiintunut, GW7+": _slice_stats(
+            [o for o in played if o.get("newcomer") is False and o["gw"] > 6]),
     }
 
     report = {
@@ -556,6 +659,97 @@ def aggregate_and_gate(per_gw: list[dict], obs_rows: list[dict],
     print("=" * 72)
     return report
 
+
+
+# ---------------------------------------------------------------------------
+# TULOKAS-RAPORTTI (10.8.2026)
+#
+# KOLME MITTARIA, KOSKA YKSI VALEHTELEE:
+#   1. Pisteet, PELANNEET — vertaa aina parin sisalla xP:ta baselineen. Ryhmien
+#      MAE:ta EI saa verrata keskenaan: tulokas pelaa ja skooraa vahemman, joten
+#      hanen absoluuttinen virheensa on pienempi vaikka malli olisi hanesta
+#      huonompi. Tama on se ansa johon slice-taulukko yksin johtaa.
+#   2. Pisteet, KAIKKI REKISTEROIDYT — "pelanneet"-rajaus suodattaa pois tasan
+#      sen riskin josta lippu kertoisi: pelaako han lainkaan.
+#   3. MINUUTIT — tulokkaalla ei ole omia rivelja joista xMins lasketaan. Jos
+#      pelaajatason lippu on olemassa, sen pitaa nakya taalla.
+# ---------------------------------------------------------------------------
+def _grp(obs: list[dict]) -> dict:
+    if len(obs) < 30:
+        return {"n": len(obs)}
+    preds = np.array([o["pred"] for o in obs])
+    bases = np.array([o["base"] for o in obs])
+    ys = np.array([o["actual"] for o in obs])
+    xm = np.array([o["xmins"] for o in obs if o.get("xmins") is not None])
+    am = np.array([o["amins"] for o in obs if o.get("xmins") is not None])
+    out = {
+        "n": len(obs),
+        "mae_xp": float(np.mean(np.abs(preds - ys))),
+        "mae_base": float(np.mean(np.abs(bases - ys))),
+        "bias_xp": float(np.mean(preds - ys)),
+    }
+    # Lift = kuinka paljon xP voittaa baselinen SAMASSA ryhmassa. Tama on
+    # ainoa ryhmien valilla vertailukelpoinen luku.
+    out["lift_pct"] = (out["mae_base"] - out["mae_xp"]) / out["mae_base"] * 100
+    if len(xm) >= 30:
+        out["mae_mins"] = float(np.mean(np.abs(xm - am)))
+        out["bias_mins"] = float(np.mean(xm - am))
+    return out
+
+
+def report_newcomer(obs_rows: list[dict]) -> None:
+    known = [o for o in obs_rows if o.get("newcomer") is not None]
+    if not known:
+        print("\nTULOKAS-RAPORTTI: ei ajettu (edelliskauden arkisto puuttuu)")
+        return
+    print()
+    print("=" * 72)
+    print("TULOKAS vs VAKIINTUNUT — onko xP huonompi ilman liigahistoriaa?")
+    print("  tulokas = ei yhtaan PL-minuuttia edellisella kaudella (code-liitos)")
+    print("=" * 72)
+    for pop_name, pop in (("PELANNEET (min > 0)", [o for o in known if o["played"]]),
+                          ("KAIKKI REKISTEROIDYT", known)):
+        print(f"  {pop_name}:")
+        for label, sel in (("tulokas    ", [o for o in pop if o["newcomer"]]),
+                           ("vakiintunut", [o for o in pop if not o["newcomer"]])):
+            for win, rows in (("koko kausi", sel),
+                              ("GW2-6     ", [o for o in sel if o["gw"] <= 6]),
+                              ("GW7+      ", [o for o in sel if o["gw"] > 6])):
+                s = _grp(rows)
+                if "mae_xp" not in s:
+                    print(f"      {label} {win}: n={s['n']} (alle 30, ei laskettu)")
+                    continue
+                mins = (f"  |  min-MAE {s['mae_mins']:.1f} "
+                        f"(bias {s['bias_mins']:+.1f})" if "mae_mins" in s else "")
+                print(f"      {label} {win}: MAE {s['mae_xp']:.3f} vs base "
+                      f"{s['mae_base']:.3f} = LIFT {s['lift_pct']:+.1f} %  "
+                      f"bias {s['bias_xp']:+.3f}  (n={s['n']}){mins}")
+    # TERAVAMPI LEIKKAUS: "ei minuutteja viime kaudella" on noin puolet
+    # rekisteroidyista, koska se nappaa akatemia- ja reunapelaajat samaan
+    # ryhmaan ulkomaisten hankintojen kanssa. Jos lippu shipattaisiin, se
+    # naytettaisiin nimenomaan hankinnoista. Hinta on karkea mutta
+    # VUOTAMATON erotin (tiedossa ennen kierrosta) — huom. 9.8. mitattiin
+    # ettei FPL-hinta ole laatusignaali, joten tama on populaation rajaus
+    # eika laadun mittari.
+    price_cut = 5.5
+    print(f"  HANKINNAT VAIN (hinta >= {price_cut} milj., pelanneet):")
+    for label, is_new in (("tulokas    ", True), ("vakiintunut", False)):
+        base_sel = [o for o in known
+                    if o["played"] and o["newcomer"] is is_new
+                    and o.get("price", 0) >= price_cut]
+        for win, rows in (("koko kausi", base_sel),
+                          ("GW2-6     ", [o for o in base_sel if o["gw"] <= 6])):
+            s = _grp(rows)
+            if "mae_xp" not in s:
+                print(f"      {label} {win}: n={s['n']} (alle 30, ei laskettu)")
+                continue
+            mins = (f"  |  min-MAE {s['mae_mins']:.1f} "
+                    f"(bias {s['bias_mins']:+.1f})" if "mae_mins" in s else "")
+            print(f"      {label} {win}: MAE {s['mae_xp']:.3f} vs base "
+                  f"{s['mae_base']:.3f} = LIFT {s['lift_pct']:+.1f} %  "
+                  f"bias {s['bias_xp']:+.3f}  (n={s['n']}){mins}")
+    print("  LUKUOHJE: vertaa LIFT-lukuja ryhmien valilla, ala MAE-lukuja.")
+    print("=" * 72)
 
 
 # ---------------------------------------------------------------------------
