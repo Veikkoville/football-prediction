@@ -29,6 +29,24 @@ let ready = false;
 let loading = false;
 const onceKeys = new Set<string>();
 
+/* 10.8.2026: paywall-versiotagi WEBILLE (mobiilin #61-pariteetti).
+ *
+ * Mobiili rekisteroi `paywall_variant`-super-propin 12.7 alkaen
+ * (goaliq-app/lib/analytics.ts). Web ei ole koskaan rekisteroinyt sita, joten
+ * jokainen variantti-suodatettu funnel on pudottanut webin HILJAA pois — ja web
+ * tuotti 1/3 mitatuista ostoista. Sama vika toiseen suuntaan: kysely
+ * "paywall_variant is not set" = pre-#61-mobiili + KAIKKI web, aina.
+ *
+ * ARVO EI OLE 'v2_value_trust'. #61 kosketti vain mobiilia (817413f: App.tsx,
+ * ProfileScreen, i18n, purchases) eika webissa ole v2:n trust-puoliskoa
+ * lainkaan: mobiilin luottamusrivi hakee track recordin LIVENA /api/accuracy:sta
+ * (ProfileScreen.tsx:651), webin Paywall.svelte ei hae mitaan, ja vuosi-ankkuri
+ * on staattinen merkkijono planin labelissa (billing.ts:17) eika laskettu
+ * save-%. Saman merkkijonon lisaaminen yhdistaisi kaksi eri tarjousta yhdeksi
+ * kohortiksi — vale-signaali, joka nayttaisi portissa vihrealta.
+ * Vrt. muisti `portti-voi-mitata-eri-koodipolkua`. */
+export const PAYWALL_VARIANT = 'web_v1_dual_product';
+
 type Queued = { event: string; props?: Record<string, unknown>; beacon?: boolean };
 const queue: Queued[] = [];
 let pendingIdentity: { userId: string; email?: string | null } | null = null;
@@ -140,7 +158,11 @@ function boot(): void {
 				autocapture: false,
 				persistence: 'localStorage+cookie'
 			});
-			posthog.register({ platform: 'web', source_app: 'pro-web-spa' });
+			posthog.register({
+				platform: 'web',
+				source_app: 'pro-web-spa',
+				paywall_variant: PAYWALL_VARIANT
+			});
 			ready = true;
 			if (pendingIdentity) {
 				const { userId, email } = pendingIdentity;
