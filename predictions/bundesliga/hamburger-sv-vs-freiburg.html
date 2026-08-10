@@ -188,6 +188,13 @@ footer a{color:var(--muted);}
   body.cols-all th.m-hide,body.cols-all td.m-hide{display:table-cell;}
   body.cols-all .m-only{display:none;}
 
+  /* Piilotetun sarakkeen luku takaisin riville alarivina (10.8). Sarake ei
+     mahdu 5. sarakkeeksi 390px:aan, mutta "Show all columns" on kaksi
+     tapahtumaa liian kaukana luvulta jota kukaan ei viela osaa etsia.
+     Alarivi antaa saman luvun ilman saraketta, ja koska se on .m-only, se
+     KATOAA kun sarake palautetaan -> lukua ei nayteta koskaan kahdesti. */
+  td .m-sub{font-size:11px;font-weight:400;opacity:.72;padding-top:2px;}
+
   .colstoggle{display:inline-block;margin:10px 0 4px;padding:9px 14px;
     min-height:40px;border:1px solid var(--line-strong,rgba(128,128,128,.5));
     background:transparent;color:inherit;font:inherit;font-size:13px;
