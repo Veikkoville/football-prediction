@@ -1,0 +1,71 @@
+# Siirtovahti — havaitsee kun julkaistu xP-artefakti on eri mielta FPL:n
+# kanssa siita missa joukkueessa pelaaja on, ja kaynnistaa refreshin.
+#
+# MIKSI TAMA EIKA VAIN TIHEAMPI REFRESH
+# fpl-data-refresh kestaa ~6 min ja ajaa 3 h valein. Tunnin valein ajaminen
+# kolminkertaistaisi CI-minuutit vuorokaudessa, ja 23 ajosta 24:sta ei loytaisi
+# mitaan. Tama vahti kestaa ~20 s (yksi bootstrap-haku + yksi API-haku) ja
+# kaynnistaa raskaan tyon vain kun siirto on TAPAHTUNUT.
+#
+# Tausta: 10.8.2026 Ville huomasi listalta etta Bruno Guimaraes oli yha
+# Newcastlessa vaikka FPL sanoi Arsenal. Projektio oli laskettu Newcastlen
+# ohjelmaa vastaan. Yksikaan builderin portti ei voi nahda tata, koska builderi
+# lukee joukkueen samasta bootstrapista jonka se juuri haki.
+name: fpl-transfer-watch
+
+on:
+  schedule:
+    # Tunnin valein. Siirtoikkuna on auki GW1:een (21.8.) ja sen jalkeen
+    # siirtoja tulee erissa deadlinejen ympärilla, joten tahtia ei sidota
+    # ikkunaan: vahti on halpa ymparivuotisesti.
+    - cron: "20 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: fpl-transfer-watch
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write   # tarvitaan refreshin kaynnistamiseen
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install deps
+        run: pip install "requests>=2.31"
+
+      - name: Vertaa tuotannon artefakti FPL:n nykytilaan
+        id: check
+        run: |
+          set +e
+          python scripts/check_fpl_transfers.py --api | tee watch.log
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          # 0 = tasmaa · 3 = siirto loytyi · 2 = ei voitu mitata (ei
+          # hiljaista PASSia: nostetaan workflow punaiseksi)
+          if [ "$code" = "2" ]; then
+            echo "::error::Siirtovahti ei voinut mitata — ks. loki"
+            exit 1
+          fi
+
+      - name: Kaynnista refresh jos siirto loytyi
+        if: steps.check.outputs.code == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::notice::Siirto havaittu — kaynnistetaan fpl-data-refresh"
+          gh workflow run fpl-data-refresh.yml --repo "$GITHUB_REPOSITORY"
+
+      - name: Yhteenveto
+        if: always()
+        run: cat watch.log >> "$GITHUB_STEP_SUMMARY" || true

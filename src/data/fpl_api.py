@@ -59,8 +59,16 @@ def _write_cache(path: Path, data: dict | list) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
-def fetch_bootstrap(max_age_s: float = 6 * 3600, force: bool = False) -> dict:
-    """bootstrap-static: pelaajat (elements), joukkueet, GW:t (events)."""
+def fetch_bootstrap(max_age_s: float = 3600, force: bool = False) -> dict:
+    """bootstrap-static: pelaajat (elements), joukkueet, GW:t (events).
+
+    TTL oli 6 h ja refresh ajaa 3 h valein, eli cache oli PIDEMPI kuin
+    paivitysvali: paikallinen builderiajo saattoi leipoa artefaktiin jopa 6 h
+    vanhan joukkuejaon. Siirtoikkunassa se tarkoittaa etta pelaajan projektio
+    lasketaan vaaran joukkueen otteluita vastaan (10.8.2026: Bruno G. yha
+    Newcastlessa, 10,2 % omistus). 1 h pitaa cachen tarkoituksen (ei hakata
+    FPL:aa 500 kutsulla) ilman etta se voi olla tuoreinta refreshia jaljessa.
+    Lukittu testissa tests/test_fpl_transfer_watch.py."""
     path = _cache_path("bootstrap_static.json")
     if not force:
         cached = _read_cache(path, max_age_s)
