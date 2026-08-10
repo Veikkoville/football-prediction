@@ -39,6 +39,9 @@ from pathlib import Path
 if str(Path(__file__).resolve().parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# Pending-predikaatti JAETTUNA: sama saanto API:lle ja generoiduille sivuille.
+from src.models.accuracy import is_pending as acc_is_pending  # noqa: E402
+
 from scripts.mobile_css import (  # noqa: E402
     MOBILE_BLOCK_COLS,
     MOBILE_COLS_JS,
@@ -657,7 +660,12 @@ def record_table_html(preds: list[dict], c: dict) -> str:
     # kutsun ENNEN kickoffia, receipts livenä". Lähin kickoff ensin. EI
     # vaikuta headline-%:iin (vain gradatut lasketaan); reconcile siirtää
     # rivin gradattuun tauluun automaattisesti kun ottelu on pelattu.
-    pending = [e for e in preds if not e.get("result")]
+    # 10.8: `void` (siirretty/peruttu ottelu) pois — TAMA SUODATIN ON ERI KUIN
+    # accuracy.pending_rows, ja juuri siksi se jai ensin korjaamatta: sama
+    # lista rakennetaan kahdesti, API:lle ja tälle sivulle. Ilman tata riviä
+    # web-taulu olisi nayttanyt neljä 29.7. POSTPONED-ottelua karjessa senkin
+    # jalkeen kun mobiili oli jo korjaantunut.
+    pending = [e for e in preds if acc_is_pending(e)]
     pending.sort(key=lambda e: e.get("kickoff") or e.get("date") or "9999")
     pending_rows = []
     for e in pending:

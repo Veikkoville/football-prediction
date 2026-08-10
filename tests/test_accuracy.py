@@ -519,3 +519,24 @@ def test_voided_match_is_not_graded_if_replayed_later():
     e = next(x for x in log["predictions"] if x["match_id"] == "fd-902")
     assert e["void"] == "POSTPONED"
     assert e.get("result") is None
+
+
+def test_is_pending_is_the_single_source_for_both_surfaces():
+    """API ja generoidut sivut kayttavat SAMAA predikaattia.
+
+    10.8: void-suodatin lisattiin ensin vain accuracy.pending_rows'iin, ja
+    build_fpl_page rakensi oman listansa omalla ehdollaan -> mobiili
+    korjaantui ja web olisi jaanyt nayttamaan neljaa siirrettya ottelua.
+    Sama vikaluokka kuin 8.8. SPA:n Fixtures/Table.
+    """
+    import inspect
+    from scripts import build_fpl_page as bp
+
+    assert acc.is_pending({}) is True
+    assert acc.is_pending({"result": {"actual_outcome": "home"}}) is False
+    assert acc.is_pending({"void": "POSTPONED"}) is False
+    # Sivubuilderi kayttaa jaettua predikaattia eika omaa ehtoaan.
+    assert bp.acc_is_pending is acc.is_pending
+    src = inspect.getsource(bp.update_predictions)
+    assert 'not e.get("result")' not in src, (
+        "sivubuilderilla on taas oma pending-ehto - kaytä acc_is_pending")

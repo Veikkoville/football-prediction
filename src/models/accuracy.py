@@ -282,6 +282,21 @@ def regrade_result(
 # ---------------------------------------------------------------------------
 # Aggregaatin laskenta (reuse backtest-infra)
 # ---------------------------------------------------------------------------
+def is_pending(e: dict) -> bool:
+    """Onko rivi aidosti 'logattu, odottaa tulosta'?
+
+    YKSI LAHDE KAHDELLE PINNALLE. Sama lista rakennetaan API:lle
+    (pending_rows) ja generoiduille sivuille (build_fpl_page), ja 10.8.
+    void-suodatin lisattiin ensin vain toiseen — mobiili korjaantui ja web
+    olisi jaanyt nayttamaan neljaa siirrettya ottelua. Sama vikaluokka kuin
+    8.8. SPA:n Fixtures/Table. Predikaatti asuu nyt tassa.
+
+    `void` = ottelua ei pelata (siirretty/peruttu). Ennuste jaa lokiin mutta
+    se ei ole odottava eika gradattava.
+    """
+    return not e.get("result") and not e.get("void")
+
+
 def _resolved(log: dict) -> list[dict]:
     """Ennusteet joilla on toteutunut tulos, aikajärjestyksessä (vanhin->uusin)."""
     rows = [e for e in log["predictions"] if e.get("result")]
@@ -447,8 +462,7 @@ def compute_aggregate(
     Villen valinta, data tukee molempia.
     """
     rows = _resolved(log)
-    pending = sum(1 for e in log["predictions"]
-                  if not e.get("result") and not e.get("void"))
+    pending = sum(1 for e in log["predictions"] if is_pending(e))
     voided = sum(1 for e in log["predictions"] if e.get("void"))
 
     all_time = _metrics_block(rows)
@@ -507,8 +521,7 @@ def pending_rows(limit: int | None = None, path: Path = LOG_PATH) -> list[dict]:
     # `void` = ottelua ei pelattu (siirretty/peruttu). Ilman tata suodatinta
     # ne nousevat listan karkeen, koska jarjestys on kickoff nousevasti ja
     # siirretyn ottelun paivamaara jaa menneisyyteen.
-    rows = [e for e in log.get("predictions", [])
-            if not e.get("result") and not e.get("void")]
+    rows = [e for e in log.get("predictions", []) if is_pending(e)]
     rows.sort(key=lambda e: e.get("kickoff") or e.get("date") or "9999")
     out = []
     for e in rows[: limit if limit else len(rows)]:
