@@ -295,6 +295,17 @@
 		<span class="conf conf-med">&#9679;</span> medium,
 		<span class="conf conf-low">&#9679;</span> low.
 	</p>
+	<!-- 10.8: mitattu harha julki. Neljä korjausyritystä hävisi (viimeisin
+	     ristiinvalidoitu kalibrointi, kaikki variantit huonompia), joten lukua
+	     EI säädetä. Kuvaileva kerronta on sama vaste kuin siirtosokeudessa.
+	     Luvut: scripts/calibrate_preseason_minutes.py, 3 kesätaukoa. -->
+	<p>
+		<strong>Our pre-season minutes run high at the top.</strong> We tested our own prior
+		across the last three summers. Players we projected at 80+ minutes came in about 14
+		minutes lower than we said, and players we projected at the bottom came in a little
+		higher. The order of this list is unchanged by that, and the gap closes as 2026/27
+		results arrive.
+	</p>
 	<p>
 		Honesty notes: these are GoalIQ model projections, not FPL's official expected points.
 		Pre-season projections lean on last season's baselines until the new season's data

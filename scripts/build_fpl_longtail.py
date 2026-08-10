@@ -2213,6 +2213,16 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         '<p class="note"><strong>Start% near 50 means the model is split.'
         "</strong> Those totals are a bet on team news, not a settled "
         "projection. A keeper on 51% is not a 45-minute keeper.</p>"
+        # 10.8: mitattu harha julki (Villen valinta C). Nelja korjausyritysta
+        # havisi, viimeisin ristiinvalidoitu kalibrointi kaikilla varianteilla,
+        # joten lukua EI sadeta. Sama vaste kuin siirtosokeudessa: kerro se.
+        # Lahde: scripts/calibrate_preseason_minutes.py, 3 kesataukoa.
+        '<p class="note"><strong>Our pre-season minutes run high at the top.'
+        "</strong> We tested our own prior across the last three summers. "
+        "Players we projected at 80+ minutes came in about 14 minutes lower "
+        "than we said, and players we projected at the bottom came in a "
+        "little higher. The order of this list is unchanged by that, and the "
+        "gap closes as 2026/27 results arrive.</p>"
         '<p class="note">This ranking is free and needs no account. The tools '
         "built on top of it, rate my team, the transfer planner, the captain "
         "ranker and your watchlist, are part of GoalIQ Premium.</p>"
