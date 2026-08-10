@@ -58,13 +58,30 @@ jobs:
             exit 1
           fi
 
-      - name: Kaynnista refresh jos siirto loytyi
+      # Ketju on ajettava loppuun asti: refresh korjaa vain REPON datan.
+      # API (Render) lukee committatun tiedoston LEVYLTA, joten ilman deployta
+      # mobiili ja SPA naytt.avat vaaraa joukkuetta seuraavaan
+      # render-daily-deployhin asti (04:45 UTC) eli jopa ~24 h.
+      # Render-deploy on tahallaan 1x/vrk (#86, 14.7) — siksi tama ketju
+      # laukaisee sen VAIN kun siirto on oikeasti tapahtunut, ei joka refreshissa.
+      - name: Kaynnista refresh ja vie se Renderiin asti
         if: steps.check.outputs.code == '3'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "::notice::Siirto havaittu — kaynnistetaan fpl-data-refresh"
           gh workflow run fpl-data-refresh.yml --repo "$GITHUB_REPOSITORY"
+          # Odota etta juuri kaynnistetty ajo valmistuu (~6 min). Ilman tata
+          # Render-deploy vietaisiin ENNEN uutta dataa eli turhaan.
+          sleep 30
+          rid=$(gh run list --workflow fpl-data-refresh.yml \
+                  --event workflow_dispatch --limit 1 --json databaseId \
+                  --jq '.[0].databaseId')
+          echo "refresh-run $rid"
+          gh run watch "$rid" --exit-status --interval 20 || {
+            echo "::error::refresh ei onnistunut — Renderia EI deployata"; exit 1; }
+          echo "::notice::Refresh valmis — viedaan data Renderiin"
+          gh workflow run render-daily-deploy.yml --repo "$GITHUB_REPOSITORY"
 
       - name: Yhteenveto
         if: always()
