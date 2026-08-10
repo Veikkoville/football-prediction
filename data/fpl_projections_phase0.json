@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-08-10T15:54:50",
+    "generated_at": "2026-08-10T20:44:15",
     "season": "2026/27",
     "source": "fpl-api",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -16,11 +16,11 @@
         "Ipswich"
       ],
       "manual_overrides": 8,
-      "note": "Phase 1b: nousija-koti-avaus-buusti + manuaaliset yliajot (data/fpl_manual_overrides.csv)"
+      "note": "Phase 1b: promoted-side home opener attack boost and manual overrides (data/fpl_manual_overrides.csv)"
     },
-    "fdr_method": "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), kvintiilibucket koko kauden joukkue-fixtureiden yli",
-    "att_fdr_method": "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä (vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden joukkue-fixtureiden yli. 1 = helpoin hyökätä, 5 = vaikein.",
-    "caveat": "Pre-season: 26/27 team-voimat = viime kauden priorit, suuntaa-antava. Nousijat ilman ylätason dataa = empiirinen promoted baseline.",
+    "fdr_method": "Model based 1-5: 0.55*rank(1 - win%) + 0.45*rank(expected goals conceded), quintile bucket across every team fixture of the season",
+    "att_fdr_method": "Attack FDR 1-5: rank(own expected xG in the fixture) inverted (little xG of your own means a hard fixture), quintile bucket across every team fixture. 1 = easiest to attack against, 5 = hardest.",
+    "caveat": "Pre-season: 2026/27 team strengths are last-season priors, indicative only. Promoted sides with no top-flight data use an empirical baseline.",
     "promoted_baseline_teams": [
       "Coventry",
       "Hull",
@@ -674,8 +674,8 @@
           "opponent_short": "NEW",
           "venue": "A",
           "kickoff_ms": 1798297200000,
-          "fdr": 2,
-          "def_fdr": 2,
+          "fdr": 3,
+          "def_fdr": 3,
           "att_fdr": 2,
           "tier": "far"
         },
@@ -3585,7 +3585,7 @@
           "kickoff_ms": 1791640800000,
           "fdr": 2,
           "def_fdr": 2,
-          "att_fdr": 2,
+          "att_fdr": 3,
           "tier": "near",
           "cs_pct": 36.3
         },
@@ -3685,7 +3685,7 @@
           "kickoff_ms": 1797087600000,
           "fdr": 2,
           "def_fdr": 2,
-          "att_fdr": 3,
+          "att_fdr": 2,
           "tier": "far"
         },
         {
@@ -6479,8 +6479,8 @@
           "opponent_short": "MCI",
           "venue": "H",
           "kickoff_ms": 1808575200000,
-          "fdr": 4,
-          "def_fdr": 4,
+          "fdr": 5,
+          "def_fdr": 5,
           "att_fdr": 4,
           "tier": "far"
         },
@@ -7268,8 +7268,8 @@
           "opponent_short": "BHA",
           "venue": "A",
           "kickoff_ms": 1803135600000,
-          "fdr": 5,
-          "def_fdr": 5,
+          "fdr": 4,
+          "def_fdr": 4,
           "att_fdr": 4,
           "tier": "far"
         },
@@ -9951,7 +9951,7 @@
       "att_fdr_home": 4,
       "fdr_away": 2,
       "def_fdr_away": 2,
-      "att_fdr_away": 2
+      "att_fdr_away": 3
     },
     {
       "gameweek": 6,

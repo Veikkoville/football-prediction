@@ -597,23 +597,23 @@ def main() -> int:
             "context_layer": {
                 "promoted_teams": sorted(promoted),
                 "manual_overrides": len(ctx_cfg["overrides"]),
-                "note": ("Phase 1b: nousija-koti-avaus-buusti + manuaaliset "
-                         "yliajot (data/fpl_manual_overrides.csv)"),
+                "note": ("Phase 1b: promoted-side home opener attack boost "
+                         "and manual overrides (data/fpl_manual_overrides.csv)"),
             },
             "fdr_method": (
-                "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), "
-                "kvintiilibucket koko kauden joukkue-fixtureiden yli"
+                "Model based 1-5: 0.55*rank(1 - win%) + 0.45*rank(expected goals conceded), "
+                "quintile bucket across every team fixture of the season"
             ),
             # EDGE-sprint: def_fdr = alias fdr:lle (CS/puolustussuunta),
             # att_fdr = hyökkäyssuunnan vaikeus samasta DC-mallista.
             "att_fdr_method": (
-                "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä "
-                "(vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden "
-                "joukkue-fixtureiden yli. 1 = helpoin hyökätä, 5 = vaikein."
+                "Attack FDR 1-5: rank(own expected xG in the fixture) inverted "
+                "(little xG of your own means a hard fixture), quintile bucket "
+                "across every team fixture. 1 = easiest to attack against, 5 = hardest."
             ),
             "caveat": (
-                "Pre-season: 26/27 team-voimat = viime kauden priorit, suuntaa-antava. "
-                "Nousijat ilman ylätason dataa = empiirinen promoted baseline."
+                "Pre-season: 2026/27 team strengths are last-season priors, indicative "
+                "only. Promoted sides with no top-flight data use an empirical baseline."
             ),
             "promoted_baseline_teams": missing,
             "promoted_baseline_values": baseline,

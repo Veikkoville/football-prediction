@@ -4,14 +4,14 @@
     "available": true,
     "phase": 0,
     "league": "SAU-Saudi Pro League",
-    "generated_at": "2026-08-10T15:54:56",
+    "generated_at": "2026-08-10T20:44:18",
     "season": "2026/27",
     "source": "spl-fantasy-api",
     "fixture_source": "RSL Fantasy official API (fantasy.spl.com.sa)",
     "team_strength_source": "GoalIQ Dixon-Coles, SPL results (ESPN) ['2425', '2526'] — goals-based fit (decay=0.0035, bayes=2.0); no free per-match xG feed exists for the SPL",
-    "cs_method": "P(vastustaja 0 maalia) DC-score-matriisista (tau-korjattu)",
-    "fdr_method": "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), kvintiilibucket koko kauden joukkue-fixtureiden yli",
-    "att_fdr_method": "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä (vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden joukkue-fixtureiden yli. 1 = helpoin hyökätä, 5 = vaikein.",
+    "cs_method": "P(opponent scores 0) from the DC score matrix (tau corrected)",
+    "fdr_method": "Model based 1-5: 0.55*rank(1 - win%) + 0.45*rank(expected goals conceded), quintile bucket across every team fixture of the season",
+    "att_fdr_method": "Attack FDR 1-5: rank(own expected xG in the fixture) inverted (little xG of your own means a hard fixture), quintile bucket across every team fixture. 1 = easiest to attack against, 5 = hardest.",
     "caveat": "Pre-season: 26/27 team strengths are last-season priors from a goals-based model (no xG data for the SPL), indicative only. Promoted sides without top-flight data use an empirical promoted baseline measured from last season's promoted trio. No manual context layer (unlike FPL Phase 1b).",
     "promoted_baseline_teams": [
       "Abha",
@@ -2048,8 +2048,8 @@
           "opponent_short": "ABH",
           "venue": "A",
           "kickoff_ms": 1788537600000,
-          "fdr": 3,
-          "def_fdr": 3,
+          "fdr": 2,
+          "def_fdr": 2,
           "att_fdr": 2,
           "tier": "near",
           "cs_pct": 27.6
@@ -2226,8 +2226,8 @@
           "opponent_short": "DIR",
           "venue": "A",
           "kickoff_ms": 1803513600000,
-          "fdr": 2,
-          "def_fdr": 2,
+          "fdr": 3,
+          "def_fdr": 3,
           "att_fdr": 2,
           "tier": "far"
         },
@@ -2376,7 +2376,7 @@
         }
       ],
       "next_avg_cs_pct": 27.9,
-      "next_avg_fdr": 2.83,
+      "next_avg_fdr": 2.67,
       "next_n": 6
     },
     {
@@ -4505,8 +4505,8 @@
           "opponent_short": "TWN",
           "venue": "A",
           "kickoff_ms": 1796256000000,
-          "fdr": 4,
-          "def_fdr": 4,
+          "fdr": 5,
+          "def_fdr": 5,
           "att_fdr": 5,
           "tier": "far"
         },
@@ -6171,8 +6171,8 @@
           "opponent_short": "TWN",
           "venue": "A",
           "kickoff_ms": 1807743600000,
-          "fdr": 5,
-          "def_fdr": 5,
+          "fdr": 4,
+          "def_fdr": 4,
           "att_fdr": 5,
           "tier": "far"
         },
@@ -6303,8 +6303,8 @@
           "opponent_short": "ABH",
           "venue": "A",
           "kickoff_ms": 1787673900000,
-          "fdr": 4,
-          "def_fdr": 4,
+          "fdr": 3,
+          "def_fdr": 3,
           "att_fdr": 3,
           "tier": "near",
           "cs_pct": 20.3
@@ -6637,8 +6637,8 @@
           "opponent_short": "DIR",
           "venue": "A",
           "kickoff_ms": 1811113200000,
-          "fdr": 3,
-          "def_fdr": 3,
+          "fdr": 4,
+          "def_fdr": 4,
           "att_fdr": 3,
           "tier": "far"
         },
@@ -6655,7 +6655,7 @@
         }
       ],
       "next_avg_cs_pct": 18.5,
-      "next_avg_fdr": 3.83,
+      "next_avg_fdr": 3.67,
       "next_n": 6
     },
     {
@@ -6775,7 +6775,7 @@
           "kickoff_ms": 1792018800000,
           "fdr": 4,
           "def_fdr": 4,
-          "att_fdr": 4,
+          "att_fdr": 3,
           "tier": "far"
         },
         {
@@ -6852,7 +6852,7 @@
           "kickoff_ms": 1796860800000,
           "fdr": 4,
           "def_fdr": 4,
-          "att_fdr": 3,
+          "att_fdr": 4,
           "tier": "far"
         },
         {
@@ -7498,7 +7498,7 @@
       "xg_home": 1.748,
       "xg_away": 0.901,
       "p_home_win": 0.5657,
-      "p_draw": 0.2505,
+      "p_draw": 0.2504,
       "p_away_win": 0.1838,
       "cs_home_pct": 40.6,
       "cs_away_pct": 17.4,
@@ -7528,8 +7528,8 @@
       "fdr_home": 3,
       "def_fdr_home": 3,
       "att_fdr_home": 2,
-      "fdr_away": 4,
-      "def_fdr_away": 4,
+      "fdr_away": 3,
+      "def_fdr_away": 3,
       "att_fdr_away": 3
     },
     {
@@ -7888,7 +7888,7 @@
       "away_short": "KLD",
       "xg_home": 1.475,
       "xg_away": 1.197,
-      "p_home_win": 0.4271,
+      "p_home_win": 0.427,
       "p_draw": 0.2743,
       "p_away_win": 0.2987,
       "cs_home_pct": 30.2,
@@ -7965,8 +7965,8 @@
       "fdr_home": 4,
       "def_fdr_home": 4,
       "att_fdr_home": 3,
-      "fdr_away": 3,
-      "def_fdr_away": 3,
+      "fdr_away": 2,
+      "def_fdr_away": 2,
       "att_fdr_away": 2
     },
     {

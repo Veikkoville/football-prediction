@@ -986,21 +986,22 @@ def main(argv: list[str] | None = None) -> int:
     todo = []
     if src["source"] != "fpl-api":
         todo.append(
-            "TODO(kaudenvaihto): FPL-API ei vielä tarjoile 26/27-kautta — "
-            "fixturet pulselive-fallbackista, pelaajabaselinet = koko 25/26-kausi "
-            "(siirtoja ei tunneta). Aja uudelleen kun FPL-peli avautuu."
+            "TODO(season rollover): the FPL API does not serve 2026/27 yet, "
+            "so fixtures come from the pulselive fallback and player baselines "
+            "are the whole 2025/26 season, with transfers unknown. Re-run once "
+            "the FPL game opens."
         )
     if uncovered:
         todo.append(
-            f"Ilman pelaajadataa (nousijat, ei vielä FPL:ssä): {uncovered} — "
-            "täyttyvät automaattisesti kun 26/27-peli avautuu."
+            f"No player data yet (promoted sides, not in FPL yet): {uncovered}. "
+            "These fill in automatically once the 2026/27 game opens."
         )
     if prior_pids:
         todo.append(
-            f"Nousijaseurojen pelaajista {len(prior_pids)} on positiopriori-"
-            f"arviolla (ei PL-historiaa): {no_history_teams}. Roolit "
-            "hintajärjestyksestä (MVP-heuristiikka) — tarkentuvat kun "
-            "26/27-kierroksia kertyy."
+            f"{len(prior_pids)} promoted-club players are on a position prior "
+            f"with no Premier League history: {no_history_teams}. Roles come "
+            "from price order, and they sharpen as 2026/27 gameweeks are "
+            "played."
         )
     tc_meta = attach_team_confidence(players)
     out = {
@@ -1018,27 +1019,29 @@ def main(argv: list[str] | None = None) -> int:
             "overrides_applied": len(override_applied),
             "fixture_source": src["source_label"],
             "player_source": (
-                "FPL official API bootstrap (26/27) + jäädytetty 25/26-"
-                "baseline-artefakti (data/fpl_prev_baselines_2526.json, "
-                "element code -mappaus)" if preseason
+                "FPL official API bootstrap (26/27) + frozen 25/26 "
+                "baseline artifact (data/fpl_prev_baselines_2526.json, "
+                "element code mapping)" if preseason
                 else "FPL official API (bootstrap + element-summary history)"),
             "team_strength_source": (
                 f"GoalIQ Dixon-Coles, Understat PL {seasons} "
                 "(sama fit-config kuin /api/predict)"
             ),
             "method": (
-                "xP = esiintyminen + maalit + syötöt + CS + päästetyt + torjunnat "
-                "+ def.contribution + bonus-proxy - kortit; kaava src/models/fpl_xp.py, "
-                "validoitu walk-forward-backtestillä 25/26 (scripts/backtest_fpl_xp.py)"
+                "xP = appearance + goals + assists + clean sheets + goals "
+                "conceded + saves + defensive contribution + bonus proxy - "
+                "cards; formula in src/models/fpl_xp.py, validated with a "
+                "walk-forward backtest on 2025/26 (scripts/backtest_fpl_xp.py)"
             ),
             # #151: bonus-proxyn historia oikaistu 26/27 BPS-sääntöihin
             # (CBI 1/3, pilkkutorjunta 7; premierleague.com news/4679946).
             "bps_rules": ("legacy 25/26 (vertailuajo)" if args.legacy_bps
                           else "2026/27 recalibrated (#151)"),
             "caveat": (
-                "Pre-season: pelaajabaselinet = edellisen kauden FPL-historia, "
-                "minuuttiarvio = kauden lopun rotaatio + FPL-saatavuustieto. "
-                "Tarkentuu automaattisesti kun 26/27-kierroksia kertyy."
+                "Pre-season: player baselines come from last season's FPL "
+                "history, and the minutes estimate comes from end-of-season "
+                "rotation plus FPL availability. It sharpens automatically as "
+                "2026/27 gameweeks are played."
             ),
             "promoted_baseline_teams": missing,
             "promoted_baseline_values": baseline,
@@ -1056,10 +1059,11 @@ def main(argv: list[str] | None = None) -> int:
                 "teams_without_player_history": no_history_teams,
                 "promoted_prior_players": len(prior_pids),
                 "promoted_prior_method": (
-                    "Nousijaseurojen pelaajat ilman PL-minuutteja: minuutit = "
-                    "roolipriori FPL-hintajärjestyksestä (XI-paikat 1/4/4/2 per "
-                    "positio; kärki p_start 0.72, seuraavat 2 0.30, loput 0.08) "
-                    "x FPL:n saatavuusportti; vauhdit = positiopriori. "
+                    "Promoted-club players with no Premier League minutes: "
+                    "minutes come from a role prior built on FPL price order "
+                    "(XI slots 1/4/4/2 per position; top p_start 0.72, next two "
+                    "0.30, rest 0.08) times the FPL availability gate. Rates "
+                    "come from a position prior. "
                     "data_basis=no_history, minutes_confidence=low, "
                     "minutes_method=promoted_price_prior."),
                 "player_basis_counts": {
@@ -1068,11 +1072,12 @@ def main(argv: list[str] | None = None) -> int:
                 },
                 "basis_threshold_minutes": xp.M_PRIOR_ATTACK,
                 "note": (
-                    "data_basis per pelaaja: pl_history = oma PL-historia "
-                    "kantaa >= 50 % painon; limited_history = ohut otos, "
-                    "positiopriori dominoi; no_history = ei PL-minuutteja. "
-                    "transfers_known=false: pre-season-bootstrap on edellisen "
-                    "kauden -> kesäsiirrot eivät näy."
+                    "data_basis per player: pl_history = the player's own "
+                    "Premier League history carries at least 50% of the weight; "
+                    "limited_history = thin sample, the position prior "
+                    "dominates; no_history = no Premier League minutes. "
+                    "transfers_known=false means the pre-season bootstrap is "
+                    "last season's, so summer transfers are not visible."
                 ),
             },
             "context_layer": {
@@ -1080,9 +1085,9 @@ def main(argv: list[str] | None = None) -> int:
                 "promoted_home_opener_att_boost": PROMOTED_HOME_OPENER_ATT_BOOST,
                 "manual_overrides": len(overrides),
                 "applied_in_horizon": ctx_notes,
-                "note": ("Phase 1b: nousija-koti-avaus-buusti + manuaaliset "
-                         "yliajot (data/fpl_manual_overrides.csv) + "
-                         "MM-väsymyskertoimet (täytetään ~20.7)"),
+                "note": ("Phase 1b: promoted-side home opener attack boost, "
+                         "manual overrides (data/fpl_manual_overrides.csv) and "
+                         "World Cup fatigue factors"),
             },
             "sanity_gate": "PASS",
             "next_gameweek": next_gw,
@@ -1095,11 +1100,11 @@ def main(argv: list[str] | None = None) -> int:
             # rankkauslista. Rivit kantavat vain FPL:n virallisen tiedon
             # (status/news/hinta/EO/erikoistilanteet) — EI mallilukuja.
             "excluded_note": (
-                "excluded[] = FPL-listatut pelaajat jotka EIVAT ole "
-                "projektiossa (saatavuuslippu i/s/u/n tai horisontin xP alle "
-                f"{MIN_XP_TOTAL}). Rivit ovat hakua/player cardia varten: "
-                "in_projection=false, ei xP/xmins/p_start-kenttia. Vanhat "
-                "klientit voivat jattaa listan huomiotta."),
+                "excluded[] lists FPL players who are not in the projection "
+                "(availability flag i/s/u/n, or horizon xP below "
+                f"{MIN_XP_TOTAL}). The rows exist for search and the player "
+                "card: in_projection=false, with no xP/xmins/p_start fields. "
+                "Older clients can ignore the list."),
             "todo": todo,
         },
         "players": players,

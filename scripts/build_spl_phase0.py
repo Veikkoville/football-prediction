@@ -375,15 +375,15 @@ def main() -> int:
                 f"goals-based fit (decay={FIT_DECAY}, bayes={FIT_BAYES}); "
                 "no free per-match xG feed exists for the SPL"
             ),
-            "cs_method": "P(vastustaja 0 maalia) DC-score-matriisista (tau-korjattu)",
+            "cs_method": "P(opponent scores 0) from the DC score matrix (tau corrected)",
             "fdr_method": (
-                "Mallipohjainen 1-5: 0.55*rank(1-voitto%) + 0.45*rank(odotetut päästetyt), "
-                "kvintiilibucket koko kauden joukkue-fixtureiden yli"
+                "Model based 1-5: 0.55*rank(1 - win%) + 0.45*rank(expected goals conceded), "
+                "quintile bucket across every team fixture of the season"
             ),
             "att_fdr_method": (
-                "Hyökkäys-FDR 1-5: rank(oma odotettu xG fixturessa) käännettynä "
-                "(vähän omaa xG:tä = vaikea), kvintiilibucket koko kauden "
-                "joukkue-fixtureiden yli. 1 = helpoin hyökätä, 5 = vaikein."
+                "Attack FDR 1-5: rank(own expected xG in the fixture) inverted "
+                "(little xG of your own means a hard fixture), quintile bucket "
+                "across every team fixture. 1 = easiest to attack against, 5 = hardest."
             ),
             "caveat": (
                 "Pre-season: 26/27 team strengths are last-season priors from a "
