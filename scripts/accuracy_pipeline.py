@@ -190,6 +190,12 @@ def cmd_seed(log: dict) -> int:
 # ---------------------------------------------------------------------------
 # football-data.org -haku (yleinen; WC + domestic-kilpailut, #110)
 # ---------------------------------------------------------------------------
+# Ottelutilat joissa ottelua EI pelata. FD kayttaa naita kaikkia; SUSPENDED
+# voi jatkua, mutta silloin se palaa FINISHEDiksi omalla id:llaan ja rivi on
+# jo void -> ei gradata vanhalla ennusteella (ks. cmd_reconcile).
+VOID_STATUSES = {"POSTPONED", "CANCELLED", "CANCELED", "SUSPENDED", "AWARDED"}
+
+
 def _fetch_matches(comp_code: str, season: str | None = None) -> list[dict] | None:
     """Hae kilpailun ottelut (yksi pyyntö). None jos avain puuttuu/virhe.
 
@@ -499,6 +505,7 @@ def cmd_reconcile(log: dict, matches: list[dict] | None) -> int:
         return 0
     by_id = {m.get("id"): m for m in matches}
     reconciled = 0
+    voided = 0
     for e in log["predictions"]:
         if e.get("result") is not None:
             continue
@@ -510,14 +517,31 @@ def cmd_reconcile(log: dict, matches: list[dict] | None) -> int:
         except ValueError:
             continue
         m = by_id.get(fd_id)
-        if not m or m.get("status") != "FINISHED":
+        if not m:
+            continue
+        # 10.8: ottelu jota EI PELATA ei ole "odottaa tulosta". Nelja 29.7.
+        # BSA-ottelua oli POSTPONED, ja koska pending-lista on kickoff-
+        # jarjestyksessa, ne istuivat julkisen "tulevat ennusteet" -lohkon
+        # KARJESSA 12 paivaa. Merkitaan void, ei tulosta.
+        #
+        # EIKA GRADATA MYOHEMMIN: jos ottelu pelataan kuukausia myohemmin,
+        # heinakuinen ennuste koski eri joukkuetilannetta. Uusi paivamaara saa
+        # uuden ennusteen normaalin logauksen kautta.
+        if m.get("status") in VOID_STATUSES:
+            if not e.get("void"):
+                e["void"] = m["status"]
+                e["void_at"] = acc._now_iso()
+                voided += 1
+            continue
+        if e.get("void") or m.get("status") != "FINISHED":
             continue
         disp = _disp_score(m)
         if disp is None:
             continue
         if acc.set_result(log, mid, disp[0], disp[1], **_grading_kwargs(m, mid)):
             reconciled += 1
-    print(f"RECONCILE: {reconciled} ottelua täytetty FT-tuloksella.")
+    print(f"RECONCILE: {reconciled} ottelua täytetty FT-tuloksella"
+          + (f", {voided} merkitty void (ei pelata)." if voided else "."))
     return 0
 
 

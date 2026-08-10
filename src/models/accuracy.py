@@ -447,7 +447,9 @@ def compute_aggregate(
     Villen valinta, data tukee molempia.
     """
     rows = _resolved(log)
-    pending = sum(1 for e in log["predictions"] if not e.get("result"))
+    pending = sum(1 for e in log["predictions"]
+                  if not e.get("result") and not e.get("void"))
+    voided = sum(1 for e in log["predictions"] if e.get("void"))
 
     all_time = _metrics_block(rows)
     rolling_rows = rows[-rolling_window:]
@@ -464,6 +466,12 @@ def compute_aggregate(
         "updated_at": _now_iso(),
         "logged_total": len(log["predictions"]),
         "pending": pending,
+        # 10.8: siirretty/peruttu ottelu EI ole pending. Nelja 29.7. BSA-ottelua
+        # oli FD:ssa POSTPONED ja ne istuivat pending-listan KARJESSA (lista on
+        # kickoff-jarjestyksessa) 12 paivaa — eli julkinen "tulevat ennusteet"
+        # -lohko avautui neljalla ottelulla joita ei pelattu. Luku on omana
+        # kenttanaan eika piilotettuna: ennuste on yha logissa ja laskettavissa.
+        "voided": voided,
         "all_time": all_time,
         "rolling": rolling,
         "by_competition": by_comp,
@@ -496,7 +504,11 @@ def pending_rows(limit: int | None = None, path: Path = LOG_PATH) -> list[dict]:
     Lähin kickoff ensin. Kevyt riviformaatti; EI vaikuta aggregaattiin
     (headline-% ja by_competition lasketaan vain gradatuista)."""
     log = load_log(path)
-    rows = [e for e in log.get("predictions", []) if not e.get("result")]
+    # `void` = ottelua ei pelattu (siirretty/peruttu). Ilman tata suodatinta
+    # ne nousevat listan karkeen, koska jarjestys on kickoff nousevasti ja
+    # siirretyn ottelun paivamaara jaa menneisyyteen.
+    rows = [e for e in log.get("predictions", [])
+            if not e.get("result") and not e.get("void")]
     rows.sort(key=lambda e: e.get("kickoff") or e.get("date") or "9999")
     out = []
     for e in rows[: limit if limit else len(rows)]:

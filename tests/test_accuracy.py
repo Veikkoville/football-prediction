@@ -468,3 +468,54 @@ def test_aggregate_by_competition_split():
     bc = agg["by_competition"]
     assert bc["WC"]["n"] == 1 and bc["WC"]["correct_1x2"] == 1        # WC säilyy
     assert bc["BSA"]["n"] == 1 and bc["BSA"]["correct_1x2"] == 0
+
+
+# ---------------------------------------------------------------------------
+# 10.8.2026: siirretty ottelu ei ole "odottaa tulosta".
+#
+# Nelja 29.7. BSA-ottelua oli FD:ssa POSTPONED. Ne eivat gradautuneet (oikein,
+# niita ei pelattu) mutta ne jaivat pending-tilaan — ja koska pending-lista on
+# kickoff-jarjestyksessa nousevasti, ne istuivat JULKISEN "tulevat ennusteet"
+# -lohkon KARJESSA 12 paivaa, sekä mobiilissa etta webissa.
+# ---------------------------------------------------------------------------
+def test_postponed_match_is_voided_not_pending():
+    from scripts.accuracy_pipeline import cmd_reconcile
+
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("fd-900", "home", mls="1-0"))
+    acc.upsert_prediction(log, _entry("fd-901", "home", mls="1-0"))
+
+    cmd_reconcile(log, [
+        _fd_match(900, "A", "B", "2026-07-29T00:00:00Z", status="POSTPONED"),
+        _fd_match(901, "C", "D", "2026-09-01T00:00:00Z", status="TIMED"),
+    ])
+
+    voided = next(e for e in log["predictions"] if e["match_id"] == "fd-900")
+    normal = next(e for e in log["predictions"] if e["match_id"] == "fd-901")
+    assert voided["void"] == "POSTPONED"
+    assert voided.get("result") is None
+    # Negatiivinen kontrolli: tavallinen pelaamaton rivi EI saa void-merkintaa.
+    # Ilman tata testi menisi lapi myos jos jokainen gradaamaton mitatoitaisiin.
+    assert "void" not in normal
+
+    agg = acc.compute_aggregate(log)
+    assert agg["pending"] == 1
+    assert agg["voided"] == 1
+
+
+def test_voided_match_is_not_graded_if_replayed_later():
+    """Kuukausia myohemmin pelattu ottelu EI saa gradautua heinakuun
+    ennusteella: se koski eri joukkuetilannetta."""
+    from scripts.accuracy_pipeline import cmd_reconcile
+
+    log = acc.empty_log()
+    acc.upsert_prediction(log, _entry("fd-902", "home", mls="1-0"))
+    cmd_reconcile(log, [_fd_match(902, "A", "B", "2026-07-29T00:00:00Z",
+                                  status="POSTPONED")])
+    # sama id palaa myohemmin pelattuna
+    cmd_reconcile(log, [_fd_match(902, "A", "B", "2026-11-02T00:00:00Z",
+                                  score=(2, 0))])
+
+    e = next(x for x in log["predictions"] if x["match_id"] == "fd-902")
+    assert e["void"] == "POSTPONED"
+    assert e.get("result") is None
