@@ -244,6 +244,85 @@ def _upsert_web_subscription(fields: dict, match: dict | None = None) -> bool:
         return False
 
 
+def _promo_code_string(promo) -> Optional[str]:
+    """Promokoodi-viitteestä sen näkyvä merkkijono (esim. "ROWAN").
+
+    Webhookin payload voi kantaa promokoodin joko laajennettuna objektina tai
+    pelkkänä ID:nä (`promo_...`) riippuen siitä miten sessio luotiin. Kumpikin
+    tapaus on käsiteltävä, koska väärä oletus näkyy vasta tuotannossa
+    puuttuvana leimana — eikä silloin ole enää mitään mistä leimata.
+    """
+    if isinstance(promo, dict):
+        return promo.get("code") or None
+    if isinstance(promo, str) and promo.startswith("promo_"):
+        try:
+            obj = stripe.PromotionCode.retrieve(promo)
+            return (obj or {}).get("code") or None
+        except Exception as e:
+            print(f"[affiliate] PromotionCode.retrieve epäonnistui {promo}: {e}")
+            return None
+    return None
+
+
+def _affiliate_code_from_session(obj: dict) -> Optional[str]:
+    """Checkout-sessiosta käytetty promokoodi affiliate-leimaksi.
+
+    AFF-ATTRIB (11.8): affiliate-kupongit ovat `duration: once`, joten alennus
+    IRTOAA tilaukselta ensimmäisen laskun jälkeen eikä Stripe enää kerro että
+    juuri tämä uusiutuva tilaus tuli affiliate-koodista. Provisio on kuitenkin
+    luvattu "for as long as they stay subscribed", joten yhteys on tallennettava
+    pysyvästi. `checkout.session.completed` on se ainoa hetki jolloin se on
+    luettavissa: se laukeaa heti ensimmäisen maksun jälkeen, jolloin discount on
+    vielä kiinni sekä sessiossa että tilauksessa.
+
+    Kaksi polkua, koska webhookin payload ei ole aina laajennettu:
+      1. session.discounts[].promotion_code
+      2. fallback: tilauksen oma discount samalla hetkellä
+    """
+    for d in (obj.get("discounts") or []):
+        if not isinstance(d, dict):
+            continue
+        code = _promo_code_string(d.get("promotion_code"))
+        if code:
+            return code
+
+    sub_id = obj.get("subscription")
+    if not sub_id or not isinstance(sub_id, str):
+        return None
+    try:
+        sub = stripe.Subscription.retrieve(sub_id)
+    except Exception as e:
+        print(f"[affiliate] Subscription.retrieve epäonnistui {sub_id}: {e}")
+        return None
+    discount = (sub or {}).get("discount") or {}
+    if isinstance(discount, dict):
+        code = _promo_code_string(discount.get("promotion_code"))
+        if code:
+            return code
+    return None
+
+
+def _stamp_affiliate(subscription_id: str, code: str) -> bool:
+    """Leimaa affiliate-koodi tilauksen metadataan (pysyvä, ei vanhene).
+
+    Tilauksen metadata säilyy vaikka alennus irtoaa, joten uusiutumislaskut
+    kuuluvat leimattuun tilaukseen ja payout on yksi kysely eikä käsintäsmäys.
+
+    Fail-soft tarkoituksella: leiman epäonnistuminen EI saa kaataa
+    fulfillmentia. Asiakas on jo maksanut ja premium on aktivoitava; puuttuva
+    leima on korjattavissa jälkikäteen ensimmäiseltä laskulta, menetetty
+    premium ei ole.
+    """
+    try:
+        stripe.Subscription.modify(subscription_id,
+                                   metadata={"affiliate": code})
+        print(f"[affiliate] leimattu {subscription_id} <- {code}")
+        return True
+    except Exception as e:
+        print(f"[affiliate] leimaus EPÄONNISTUI {subscription_id} <- {code}: {e}")
+        return False
+
+
 def _provision_supabase_user(email: str) -> Optional[str]:
     """Luo (tai löydä) Supabase-käyttäjä emaililla — #101 account-after-payment.
 
@@ -2705,6 +2784,14 @@ async def stripe_web_webhook(request: Request):
             "stripe_customer_id": obj.get("customer"),
             "stripe_subscription_id": obj.get("subscription"),
         })
+        # AFF-ATTRIB (11.8): leimaa affiliate-koodi tilaukseen NYT, koska
+        # `duration: once` -alennus irtoaa ensimmäisen laskun jälkeen. Tehdään
+        # fulfillmentin jälkeen ja fail-softina: leima ei koskaan saa estää
+        # premiumin aktivointia.
+        if obj.get("subscription"):
+            _affiliate = _affiliate_code_from_session(obj)
+            if _affiliate:
+                _stamp_affiliate(obj["subscription"], _affiliate)
         # Cross-platform (#7): web-tilaus avaa myös MOBIILIAPPIN premiumin —
         # appi gateaa profiles.is_premium-kentällä ensisijaisesti.
         profile_fields = {"is_premium": True,
