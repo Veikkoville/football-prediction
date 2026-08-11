@@ -111,6 +111,40 @@ def test_no_new_ungated_endpoint_appeared():
     )
 
 
+def test_gated_endpoints_actually_truncate():
+    """Gate ei riita: jokaisen on myos TYPISTETTAVA payload.
+
+    Todellinen vikatila jota tama vahtii: endpoint laskee
+    `premium = is_premium_request(request)` ja **ei kayta muuttujaa mihinkaan**.
+    Silloin `test_premium_endpoints_are_gated` on vihrea, koodinluku nayttaa
+    oikealta, ja koko payload menee silti ulos. Sama luokka kuin muisti
+    `portti-voi-mitata-eri-koodipolkua`.
+
+    Hyvaksytaan joko FREE_*-vakio (inline-typistys, fantasy_edge.py) tai
+    mask_*-funktio (main.py) — molemmat ovat aitoja typistyksia.
+    """
+    import re
+    gates: dict[str, str] = {}
+    pat = re.compile(r'@(?:app|router)\.(?:get|post)\("(/api/fantasy/[^"]+)"')
+    for src in (API_DIR / "main.py", API_DIR / "fantasy_edge.py"):
+        lines = src.read_text(encoding="utf-8").split("\n")
+        hits = [(i, m.group(1)) for i, ln in enumerate(lines)
+                if (m := pat.match(ln.strip()))]
+        for k, (i, path) in enumerate(hits):
+            end = hits[k + 1][0] if k + 1 < len(hits) else len(lines)
+            gates[path] = "\n".join(lines[i:end])
+
+    toothless = []
+    for path in sorted(GATED_EXPECTED):
+        body = gates.get(path, "")
+        if not ("FREE_" in body or "mask_" in body):
+            toothless.append(path)
+    assert not toothless, (
+        f"Gate ilman typistysta: {toothless}. Endpoint laskee premium-lipun "
+        "mutta ei kutista payloadia — portti on vihrea ja data vuotaa silti."
+    )
+
+
 def test_free_endpoints_stay_ungated():
     """Negatiivinen kontrolli luokittelulle: ilmaiset EIVAT ole gatettuja.
 
