@@ -96,8 +96,8 @@
 					{#if hasDelta}
 						<th class="num"
 							><abbr
-								title="Model xP percentile minus ownership percentile, within position. Positive: the model rates the player higher than the crowd owns him."
-								>Δ vs crowd</abbr
+								title="Model xP percentile minus ownership percentile, within position. Positive: the model rates the player higher than the crowd owns him. This is a percentile gap, NOT expected points."
+								>Δ vs crowd (%ile)</abbr
 							></th
 						>
 					{/if}
@@ -116,8 +116,13 @@
 						<td class="num total-col m-hide">{p.xp_horizon_total.toFixed(2)}</td>
 						{#if hasDelta}
 							<td class="num" class:delta-pos={(p.model_vs_crowd_delta ?? 0) > 0}>
+								<!-- 11.8: yksikko NAKYVIIN soluun. Tooltip ei nay mobiilissa eika
+								     kuvakaappauksessa: FPL Rowan julkaisi "+27.50 vs crowd" suoraan
+								     "27.00 total xP":n alla ja lukija luki sen pisteina. -->
 								{p.model_vs_crowd_delta != null
-									? (p.model_vs_crowd_delta > 0 ? '+' : '') + p.model_vs_crowd_delta.toFixed(2)
+									? (p.model_vs_crowd_delta > 0 ? '+' : '') +
+										p.model_vs_crowd_delta.toFixed(2) +
+										' %ile'
 									: '–'}
 							</td>
 						{/if}
@@ -131,9 +136,10 @@
 		<section class="mvc">
 			<h3>Where the model disagrees with the crowd</h3>
 			<p class="muted">
-				Model xP percentile minus ownership percentile, within each position. Others track what
-				the template owns; GoalIQ shows where its independent model breaks from it. The ownership
-				filter above does not apply to these lists.
+				Model xP percentile minus ownership percentile, within each position. A percentile gap,
+				not expected points. Others track what the template owns; GoalIQ shows where its
+				independent model breaks from it. The ownership filter above does not apply to these
+				lists.
 			</p>
 			<div class="mvc-cols">
 				<div>
@@ -147,7 +153,8 @@
 									<span>{p.web_name} <span class="muted">{p.team_short} · {p.pos}</span></span>
 									<span class="num"
 										>{p.owned_pct.toFixed(1)}% owned ·
-										<strong class="delta-pos">+{(p.model_vs_crowd_delta ?? 0).toFixed(2)}</strong
+										<strong class="delta-pos"
+											>+{(p.model_vs_crowd_delta ?? 0).toFixed(2)} %ile</strong
 										></span
 									>
 								</li>
@@ -166,7 +173,8 @@
 									<span>{p.web_name} <span class="muted">{p.team_short} · {p.pos}</span></span>
 									<span class="num"
 										>{p.owned_pct.toFixed(1)}% owned ·
-										<strong class="delta-neg">{(p.model_vs_crowd_delta ?? 0).toFixed(2)}</strong
+										<strong class="delta-neg"
+											>{(p.model_vs_crowd_delta ?? 0).toFixed(2)} %ile</strong
 										></span
 									>
 								</li>
