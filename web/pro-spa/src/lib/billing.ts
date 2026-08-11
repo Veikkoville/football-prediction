@@ -15,13 +15,16 @@ import { capture, captureBeforeUnload } from './analytics';
 
 /** 11.8: alennettu hinta hintapaikkaan ja koodi NAPIN TEKSTIIN. Ennen tata
  *  paywall sanoi "25 €/year" ja koodi mainittiin hintissa, eli kayttaja klikkasi
- *  itsensa Stripeen tietamatta etta kentta pitaa tayttaa. Takaraja tulee
- *  Stripesta (promo_1U3IHt expires 21.8.2026 23:59 EEST) — jos sita muutetaan,
- *  muuta se myos tassa, index.htmlissa, faq/predictions/llms ja build_fpl_page.
+ *  itsensa Stripeen tietamatta etta kentta pitaa tayttaa.
+ *  Kuponki on `once`, joten 17.50 koskee VAIN ensimmaista vuotta ja tilaus
+ *  uusiutuu 25 eurolla. Uusiutumishinta on sanottava joka pinnalla.
+ *  Takaraja sidotaan GW1-deadlineen (pe 21.8. 17:30 UTC, luettu FPL:n
+ *  bootstrap-staticista) eika Stripen expiryyn (20:59 UTC): deadline on
+ *  aikaisempi, yleison oma kello, ja tosi joka aikavyohykkeella.
  *  `price` on ja pysyy LISTAhinta: se menee analytiikkaan (upgrade_tapped,
  *  checkout_opened) ja sen vaihtaminen katkaisisi vertailun vanhaan dataan. */
 export const PLANS = {
-	season: { label: 'Season pass: 17.50 € with EARLY30', price: 25.0, hint: 'Enter EARLY30 at checkout. Offer ends 21 August, after that 25 €/year (under 2.10 €/month)' },
+	season: { label: 'Season pass: 17.50 € with EARLY30', price: 25.0, hint: 'Enter EARLY30 at checkout before the GW1 deadline on Friday 21 August. 30% off the first year, then 25 €/year' },
 	monthly: { label: 'Monthly: 3.99 €/mo', price: 3.99, hint: 'Flexible, try it for a month' }
 } as const;
 

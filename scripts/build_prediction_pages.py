@@ -305,7 +305,9 @@ FOOTER = (
     '<a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">'
     "Google Play</a> and the "
     '<a href="https://apps.apple.com/app/id6780047163">App Store</a>. '
-    "Premium is 3.99 €/month or 25 €/year, one subscription on web, iOS "
+    "Premium is 3.99 €/month or 25 €/year. Enter EARLY30 at checkout before "
+    "the GW1 deadline on Friday 21 August for 30% off the first year "
+    "(17.50 €, then 25 €). One subscription on web, iOS "
     "and Android.<br>" + DISCLAIMER + "</footer>\n"
 )
 
