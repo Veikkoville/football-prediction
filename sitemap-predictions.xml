@@ -793,6 +793,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/predictions/bundesliga/union-berlin-vs-schalke</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/predictions/serie-a/</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>daily</changefreq>
@@ -979,6 +985,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/predictions/serie-a/venezia-vs-fiorentina</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/predictions/ligue-1/</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>daily</changefreq>
@@ -1142,6 +1154,12 @@
   </url>
   <url>
     <loc>https://goaliq.app/predictions/ligue-1/nice-vs-le-mans</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goaliq.app/predictions/ligue-1/rennes-vs-marseille</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
