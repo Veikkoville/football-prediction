@@ -219,7 +219,7 @@ export async function renderCard(spec: CardSpec): Promise<Blob> {
 	// Footer + amber-alaraita (brandin tunniste)
 	ctx.font = med(20);
 	ctx.fillStyle = MUTED;
-	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.fillText('projections from the GoalIQ match model', MX, H - 88);
 	ctx.font = bold(20);
 	ctx.fillStyle = AMBER;
 	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
@@ -453,7 +453,7 @@ export async function renderPitchCard(spec: PitchCardSpec): Promise<Blob> {
 
 	ctx.font = med(20);
 	ctx.fillStyle = MUTED;
-	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.fillText('projections from the GoalIQ match model', MX, H - 88);
 	ctx.font = bold(20);
 	ctx.fillStyle = AMBER;
 	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
@@ -635,7 +635,7 @@ export async function renderCompareCard(spec: CompareCardSpec): Promise<Blob> {
 
 	ctx.font = med(20);
 	ctx.fillStyle = MUTED;
-	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.fillText('projections from the GoalIQ match model', MX, H - 88);
 	ctx.font = bold(20);
 	ctx.fillStyle = AMBER;
 	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
@@ -895,7 +895,7 @@ export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
 	// Footer identtinen listakortin kanssa
 	ctx.font = med(20);
 	ctx.fillStyle = MUTED;
-	ctx.fillText('logged before kickoff, graded in public', MX, H - 88);
+	ctx.fillText('projections from the GoalIQ match model', MX, H - 88);
 	ctx.font = bold(20);
 	ctx.fillStyle = AMBER;
 	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);

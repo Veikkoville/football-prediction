@@ -354,7 +354,7 @@
 	<title>Saudi Pro League fantasy tools | GoalIQ</title>
 	<meta
 		name="description"
-		content="Free model-based tools for RSL Fantasy (Saudi Pro League): clean sheet odds, fixture difficulty and expected points from the GoalIQ match model."
+		content="Free model-based tools for RSL Fantasy (Saudi Pro League): clean sheet probability, fixture difficulty and expected points from the GoalIQ match model."
 	/>
 	<!-- /spl-prerender (7.8): canonical tälle työkalusivulle itselleen —
 	     goaliq.app/spl (staattinen landing) on erillinen sisältösivu joka
@@ -372,7 +372,7 @@
 		<h1>Saudi Pro League <span class="accent">fantasy tools</span></h1>
 		<p class="lede">
 			Model-based tools for <strong>RSL Fantasy</strong>, the official Saudi Pro League fantasy
-			game. Clean sheet odds, fixture difficulty and expected points from the same GoalIQ match
+			game. Clean sheet probability, fixture difficulty and expected points from the same GoalIQ match
 			model that powers our FPL toolkit. <strong>Completely free.</strong>
 		</p>
 		{#if deadline}
@@ -707,9 +707,14 @@
 							<tr><td>xP / GW</td>{#each cmpPlayers as p (p.id)}<td class="num strong">{p.xp_per_gw.toFixed(2)}</td>{/each}</tr>
 							<tr><td>xP / 90</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.xp_per_90?.toFixed(2) ?? '–'}</td>{/each}</tr>
 							<tr><td>Expected minutes</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.xmins.toFixed(0)}</td>{/each}</tr>
-							<tr><td>25/26 goals</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.goals ?? '–'}</td>{/each}</tr>
-							<tr><td>25/26 assists</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.assists ?? '–'}</td>{/each}</tr>
-							<tr><td>25/26 fantasy points</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.points ?? '–'}</td>{/each}</tr>
+							<!-- 11.8: otsikot olivat kovakoodattu "25/26" mutta rivi renderoi
+							     last_season-kentan riippumatta kaudesta. 535 pelaajasta 13:lla se on
+							     2024/25 ja 7:lla 2023/24 (mm. nousijoiden pelaajat), joten sivu
+							     valitti heidan kohdallaan kautta. Kausi nakyviin omalle riville. -->
+							<tr><td>Season shown</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.season ?? '–'}</td>{/each}</tr>
+							<tr><td>Goals</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.goals ?? '–'}</td>{/each}</tr>
+							<tr><td>Assists</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.assists ?? '–'}</td>{/each}</tr>
+							<tr><td>Fantasy points</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.points ?? '–'}</td>{/each}</tr>
 						</tbody>
 					</table>
 				</div>
