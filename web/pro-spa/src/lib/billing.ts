@@ -13,8 +13,15 @@ import { API_BASE } from './config';
 import { accessToken } from './auth.svelte';
 import { capture, captureBeforeUnload } from './analytics';
 
+/** 11.8: alennettu hinta hintapaikkaan ja koodi NAPIN TEKSTIIN. Ennen tata
+ *  paywall sanoi "25 €/year" ja koodi mainittiin hintissa, eli kayttaja klikkasi
+ *  itsensa Stripeen tietamatta etta kentta pitaa tayttaa. Takaraja tulee
+ *  Stripesta (promo_1U3IHt expires 21.8.2026 23:59 EEST) — jos sita muutetaan,
+ *  muuta se myos tassa, index.htmlissa, faq/predictions/llms ja build_fpl_page.
+ *  `price` on ja pysyy LISTAhinta: se menee analytiikkaan (upgrade_tapped,
+ *  checkout_opened) ja sen vaihtaminen katkaisisi vertailun vanhaan dataan. */
 export const PLANS = {
-	season: { label: 'Season pass: 25 €/year', price: 25.0, hint: 'Best value, under 2.10 €/month. 30% off with code EARLY30 at checkout' },
+	season: { label: 'Season pass: 17.50 € with EARLY30', price: 25.0, hint: 'Enter EARLY30 at checkout. Offer ends 21 August, after that 25 €/year (under 2.10 €/month)' },
 	monthly: { label: 'Monthly: 3.99 €/mo', price: 3.99, hint: 'Flexible, try it for a month' }
 } as const;
 

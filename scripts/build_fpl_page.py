@@ -1448,10 +1448,10 @@ differential picks, player compare for up to four players and predicted
 same match model as this page. Rate my team, a captain pick, price watch and
 the top three of every leaderboard are free.</p>
 <div class="cta-row">
-  <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium, &euro;25/year</a>
+  <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start GoalIQ Premium, &euro;17.50 for the season</a>
 </div>
-<p class="price-note">From €25 a year (under €2.10 a month), or €3.99 a month.
-Early adopters: 30% off the season pass with code EARLY30 at checkout, so €17.50 for the year.
+<p class="price-note"><strong>Until 21 August:</strong> 30% off the season pass with code EARLY30 at
+checkout, so €17.50 for the year. After that it is €25 a year (under €2.10 a month), or €3.99 a month.
 One subscription covers web, iOS and Android.</p>
 </aside>
 
