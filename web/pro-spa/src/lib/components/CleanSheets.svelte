@@ -1,10 +1,10 @@
 <script lang="ts">
 	/**
-	 * CleanSheets — CS%/FDR-matriisi GW-välivalitsimella. Web P1 (30.7):
+	 * CleanSheets – CS%/FDR-matriisi GW-välivalitsimella. Web P1 (30.7):
 	 * ekstraktoitu FreeView'sta omaksi komponentiksi, jotta yhdistetty
 	 * 6 ryhmän ToolsHome voi renderöidä sen Players-ryhmässä. Logiikka ja
 	 * markup ovat 1:1 entiset (27.7-horisonttikontrakti + 26.7 classic
-	 * -värisäännöt) — vain kuori vaihtui.
+	 * -värisäännöt) – vain kuori vaihtui.
 	 */
 	import { fetchFantasy, type FantasyResponse, type FantasyTeam } from '$lib/api';
 	import { canShareToApps, shareCard } from '$lib/shareCard';
@@ -97,7 +97,7 @@
 	 * listoille sillä perusteella että kortti on premium-datan johdannainen.
 	 * Clean sheet -ennuste EI ole premiumia (FAQ: "Free: clean sheet
 	 * probabilities, fixture difficulty ratings"), joten tässä ei ole mitään
-	 * porttia — ja juuri free-datan jakaminen on se jakelusilmukka jonka
+	 * porttia – ja juuri free-datan jakaminen on se jakelusilmukka jonka
 	 * haluamme: jakaja mainostaa meitä ilman että hän on maksanut. */
 	let sharing = $state(false);
 
@@ -105,7 +105,7 @@
 	 * kierroksilla avgCs on null (far_basis), eikä korttiin panna tyhjää
 	 * lukua eikä FDR:ää CS%:n paikalle.
 	 * 6.8 laiteverify-pariteetti: kortin rivit AINA CS%-järjestyksessä UI-
-	 * sortista riippumatta — FDR-sortilla rank-numerot näyttivät CS-rankingilta
+	 * sortista riippumatta – FDR-sortilla rank-numerot näyttivät CS-rankingilta
 	 * jossa 31 % oli sijalla 10 ja 35 % sijalla 4 = julkisena kuvana bugilta. */
 	let shareRows = $derived(
 		sortedTeams
@@ -280,8 +280,8 @@
 					{#each sortedTeams as { t, a } (t.name)}
 						<tr class:is-blank={a.n === 0}>
 							<td>{t.name}</td>
-							<td class="num">{a.avgCs != null ? a.avgCs.toFixed(1) : '—'}</td>
-							<td class="num m-hide">{a.avgFdr != null ? a.avgFdr.toFixed(2) : '—'}</td>
+							<td class="num">{a.avgCs != null ? a.avgCs.toFixed(1) : '–'}</td>
+							<td class="num m-hide">{a.avgFdr != null ? a.avgFdr.toFixed(2) : '–'}</td>
 							<td class="num m-hide">{a.n}</td>
 							{#each gwCols as gw (gw)}
 								{@const f = t.fixtures.find((x) => x.gw === gw)}

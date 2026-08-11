@@ -160,3 +160,6 @@ outputs/cards/
 # Joukkueiden luottamuslippu (9.8.2026): builderit ja API lukevat taman, joten
 # se on oltava repossa kuten muutkin bake-artefaktit.
 !/data/team_confidence.json
+
+# 11.8: generoidut Reels-videot ovat artefakteja, ei lahdekoodia
+outputs/reels/

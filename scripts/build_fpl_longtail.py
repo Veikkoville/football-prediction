@@ -74,6 +74,24 @@ UPSELL = (
 # tumma ink-hero, cream-body, paper-kortit, pillerinapit). Longtail-sivuilla
 # OMA template — build_prediction_pages.CSS/NAV/_page jää prediction-sivujen
 # vanhaan asuun, ei sivuvaikutuksia sinne.
+def _strip_css_comments(css: str) -> str:
+    """Poista /* ... */ -kommentit ENNEN kuin CSS kirjoitetaan sivulle.
+
+    11.8.2026: CSS-lohkon perustelukommentit ovat suomeksi ja sisaltavat em
+    dasheja, ja ne servattiin sellaisenaan julkisella englanninkielisella
+    sivulla (nakyvat view-sourcesta). Kommentit kuuluvat lahdekoodiin, eivat
+    tuotokseen. Ei kaanneta niita: pidetaan perustelut taalla ja jatetaan ne
+    pois HTML:sta.
+
+    Huom: ei koske MOBILE_CSS/SHARE_CARD_JS -moduuleja, ne injektoidaan
+    erikseen; jos niissa on kommentteja, aja sama funktio niillekin.
+    """
+    out = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
+    # Kommenttien tilalle jaaneet tyhjat rivit pois, muuten sivulle jaa
+    # kymmenia perakkaisia rivinvaihtoja.
+    return re.sub(r"\n{2,}", "\n", out).strip()
+
+
 CSS = """
 .brand-icon{width:22px;height:22px;display:inline-block;vertical-align:-4px;margin-right:8px;flex:none;}
 :root{--teal:#2ED6C2;
@@ -330,7 +348,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         'IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>\n'
         '<meta name="theme-color" content="#0B0A09">\n'
         f"{ld}"
-        f"<style>{CSS}</style>\n"
+        f"<style>{_strip_css_comments(CSS)}</style>\n"
         "</head>\n<body>\n"
         '<header class="dark">\n'
         '<div class="bar"></div>\n'
