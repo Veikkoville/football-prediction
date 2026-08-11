@@ -433,7 +433,13 @@
 								<td class="num {fdrClass(avgFdr)}">{avgFdr === 99 ? '–' : avgFdr.toFixed(2)}</td>
 								<td class="fixtures">
 									{#each t.fixtures.filter((f) => f.gw >= nextGw && f.gw < nextGw + nearHorizon) as f (f.gw + f.opponent_short)}
+										<!-- 11.8: kierrosnumero oli VAIN title-attribuutissa, eli
+										     mobiilissa saavuttamaton. Ilman sita tyhjaa kierrosta ei
+										     voi nahda sivulta: puuttuva GW nakyy vain siina etta
+										     numerosarjassa on aukko (GW1 GW2 GW4 GW4 ...). Sama
+										     vikaluokka kuin `varoitus-kaukana-luvusta`. -->
 										<span class="chip {fdrClass(f.fdr)}" title="GW{f.gw}: {f.opponent} ({f.venue})">
+											<span class="gw">GW{f.gw}</span>
 											{f.opponent_short}
 											{f.venue === 'H' ? '(H)' : '(A)'}{typeof f.cs_pct === 'number'
 												? ` ${Math.round(f.cs_pct)}%`
@@ -834,6 +840,15 @@
 		padding: 0 var(--s-1);
 		margin: 1px 2px;
 		font-size: 0.8em;
+	}
+	/* 11.8: kierrosnumero chipin sisaan. Vaimennettu ja pienempi, jotta
+	   vastustaja pysyy chipin paaasiana — numeron tehtava on tehda AUKOSTA
+	   nakyva (tyhja kierros = puuttuva numero sarjassa), ei kilpailla nimen
+	   kanssa. Ei omaa varia, jotta se ei riitele fdr-varituksen kanssa. */
+	.chip .gw {
+		opacity: 0.65;
+		font-size: 0.85em;
+		margin-right: 1px;
 	}
 	.is-easy {
 		color: var(--ok, #2e7d32);
