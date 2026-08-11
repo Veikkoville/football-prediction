@@ -45,7 +45,8 @@ import requests
 # Edge-sprint P0: admin-portti + PREMIUM_ENFORCE-maskit (default off — kun
 # flagi on pois, is_premium_request palauttaa aina True eika mikaan muutu).
 from api.premium import (
-    is_premium_request, mask_plan_payload, mask_xp_payload, require_admin,
+    is_premium_request, mask_plan_payload, mask_xp_payload,
+    premium_enforce_on, require_admin,
 )
 
 # Stripe-konfiguraatio (Render env varseista)
@@ -3513,4 +3514,13 @@ def stripe_config():
         "webhook_secret_set": bool(STRIPE_WEBHOOK_SECRET),
         "supabase_url_set": bool(SUPABASE_URL),
         "supabase_service_role_key_set": bool(SUPABASE_SERVICE_ROLE_KEY),
+        # 11.8: PREMIUM_ENFORCE-tila jouduttiin päättelemään /api/fantasy/xp:n
+        # payloadin koosta, eikä se päättely erota kolmea eri syytä toisistaan
+        # (arvo väärin / deploy kesken / vastaus välimuistista). Luetaan samasta
+        # funktiosta jota gate itse käyttää — ei uusintatoteutusta, koska silloin
+        # diagnostiikka voisi olla eri mieltä kuin portti.
+        # Ei paljasta salaisuutta: bool + raakamerkkijonon pituus, jolla näkee
+        # onko kentässä esim. lainausmerkit ("on" = 4) ilman että arvo vuotaa.
+        "premium_enforce": premium_enforce_on(),
+        "premium_enforce_raw_len": len((os.getenv("PREMIUM_ENFORCE") or "").strip()),
     }
