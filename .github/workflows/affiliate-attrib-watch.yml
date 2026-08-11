@@ -1,0 +1,37 @@
+name: affiliate-attrib-watch
+
+# AFF-ATTRIB-tasmaytys (11.8.2026): vertaa promokoodin lunastuslaskuria
+# niiden tilausten maaraan joilla on vastaava metadata.affiliate-leima.
+#
+# MIKSI AIKATAULULLA EIKA OSTON YHTEYDESSA: Stripen Subscription.search on
+# eventually consistent (~1 min viive), joten heti oston jalkeen ajettu
+# tasmaytys raportoisi vuotoja joita ei ole.
+#
+# MIKSI VIIKOTTAIN EIKA PAIVITTAIN: ostovolyymi on yksinumeroinen. Paivittainen
+# ajo tuottaisi 7x enemman ajoja loytamatta mitaan uutta, ja vahti jonka
+# tuloksia ei lueta on huonompi kuin ei vahtia. Ensimmainen payout on GW19:n
+# kohdalla, joten viikko on reilusti riittava korjausikkuna.
+#
+# EXIT 2 = "ei voitu mitata" nostaa ajon PUNAISEKSI. Se ei ole PASS.
+
+on:
+  schedule:
+    # maanantaisin 06:17 UTC. Ei tasatunti: GitHubin jaettu ajastin ruuhkautuu
+    # tasatunneilla ja siirtaa ajoja arvaamattomasti.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Asenna stripe
+        run: pip install "stripe>=9,<13"
+      - name: Tasmayta affiliate-attribuutio
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: python scripts/check_affiliate_attribution.py
