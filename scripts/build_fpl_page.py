@@ -1333,9 +1333,9 @@ def render_page(c: dict) -> str:
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
-<!-- 2.8 PERF: pro.goaliq.app on SPA jonka kaynnistys maksaa; avataan
-     yhteys ja DNS valmiiksi jo landingilla, jolloin klikkauksen jalkeen
-     jaljelle jaa vain lataus eika kattely. Ei vaikuta tahan sivuun. -->
+<!-- pro.goaliq.app is a single page app and its boot costs time. Opening the
+     connection and DNS here means a click only pays for the download, not the
+     handshake. No effect on this page. -->
 <link rel="preconnect" href="https://pro.goaliq.app">
 <link rel="preconnect" href="https://api.goaliq.app" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1455,8 +1455,8 @@ the top three of every leaderboard are free.</p>
 month), or €3.99 a month. One subscription covers web, iOS and Android.</p>
 </aside>
 
-<!-- #78: career-kortin löydettävyys - ilmainen jakelutyökalu, teal-reunus
-     erottaa premium-upsellista (delegoitu pro_cta_clicked kattaa linkin). -->
+<!-- Career card discoverability. This is a free distribution tool, so the teal
+     border separates it from the Premium upsell. Click tracking is delegated. -->
 <aside class="upsell" style="border-color:var(--teal-ink);">
 <h2 id="career-card">Your FPL Career Card - free, on one shareable image</h2>
 <p>Best season, all-time points and your rank history on one card, built from
@@ -1466,12 +1466,12 @@ your public FPL entry ID. No login. Made for sharing with your mini-league.</p>
 </div>
 </aside>
 
-<!-- SPL (7.8): oma osio -linjaus — fpl.html:ssä vain yksi hillitty aside,
-     ei SPL-sisältöä FPL-työkalujen seassa. Ilmainen = hankintakiila;
-     disclaimer-rivi on osa etiikkakehystä (ks. /spl-sivu). -->
+<!-- SPL keeps its own section. This page carries one restrained aside only, no
+     SPL content mixed in with the FPL tools. Free by design, and the disclaimer
+     line is part of the ethics framing set out on the SPL page. -->
 <aside class="upsell" style="border-color:var(--teal-ink);">
 <h2 id="spl-tools">Play RSL Fantasy too? Saudi Pro League tools, free</h2>
-<p>Clean sheet odds, model fixture difficulty and expected points for the
+<p>Clean sheet probability, model fixture difficulty and expected points for the
 official Saudi Pro League fantasy game, from the same match model. Goals-based
 model (no xG feed exists for the SPL), labeled honestly. Independent data
 tool; not affiliated with or paid by the SPL.</p>

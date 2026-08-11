@@ -460,7 +460,7 @@ def render_captain(xp: dict, now: datetime) -> str | None:
     def _start_txt(p: dict) -> str:
         v = p.get("p_start")
         return f"starts {round(float(v) * 100)}%" if isinstance(v, (int, float)) \
-            else "start odds in Premium"
+            else "start probability in Premium"
 
     body = (
         f'<div class="stat-row">'
@@ -1977,7 +1977,7 @@ def render_defence(defence: dict, now: datetime) -> str | None:
     )
     hero = (
         "<h1>What each Premier League defence concedes</h1>"
-        '<p class="lede">Clean sheet odds tell you how likely a shutout is. '
+        '<p class="lede">Clean sheet probability tells you how likely a shutout is. '
         "This tells you what a defence actually gives up: shots from the "
         "six-yard box, the central penalty area, wide in the box, the edge and "
         "long range, plus headers faced and set-piece expected goals. Two "

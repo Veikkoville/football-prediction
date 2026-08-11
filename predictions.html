@@ -10,9 +10,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
-<!-- 2.8 PERF: pro.goaliq.app on SPA jonka kaynnistys maksaa; avataan
-     yhteys ja DNS valmiiksi jo landingilla, jolloin klikkauksen jalkeen
-     jaljelle jaa vain lataus eika kattely. Ei vaikuta tahan sivuun. -->
+<!-- pro.goaliq.app is a single page app and its boot costs time. Opening the
+     connection and DNS here means a click only pays for the download, not the
+     handshake. No effect on this page. -->
 <link rel="preconnect" href="https://pro.goaliq.app">
 <link rel="preconnect" href="https://api.goaliq.app" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -594,11 +594,12 @@ document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
   if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta'), page: location.pathname}); }
 });
-/* 2.8.2026 saapumisattribuutio: goaliq.app ajaa persistence:'memory' -tilassa ja
-   pro.goaliq.app localStorage+cookie -tilassa, joten distinct_id EI jatku domainien
-   yli — landing→pro-siirtymaa ei voinut laskea lainkaan. Liitetaan pro-linkkeihin
-   ei-identifioiva lahdetagi, jonka SPA lukee pro_page_viewed-eventtiin. Ei evastetta,
-   ei PII:ta → privacy.html:n evasteeton lupaus sailyy ennallaan. */
+/* Arrival attribution. This site runs analytics in memory-only mode and
+   pro.goaliq.app uses local storage, so the distinct id does not carry across
+   domains and the landing to pro handoff could not be counted at all. We attach
+   a non-identifying source tag to pro links, which the app reads into its page
+   view event. No cookie and no personal data, so the cookieless promise on
+   privacy.html still holds. */
 (function () {
   var links = document.querySelectorAll('a[data-cta]');
   for (var i = 0; i < links.length; i++) {
@@ -610,7 +611,7 @@ document.addEventListener('click', function (e) {
       u.searchParams.set('src', a.getAttribute('data-cta'));
       u.searchParams.set('srcp', location.pathname.replace(/^\/|\.html$/g, '') || 'index');
       a.setAttribute('href', u.toString());
-    } catch (err) { /* virheellinen href — jata linkki ennalleen */ }
+    } catch (err) { /* malformed href: leave the link untouched */ }
   }
 })();
 </script>

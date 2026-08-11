@@ -11,9 +11,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">
-<!-- 2.8 PERF: pro.goaliq.app on SPA jonka kaynnistys maksaa; avataan
-     yhteys ja DNS valmiiksi jo landingilla, jolloin klikkauksen jalkeen
-     jaljelle jaa vain lataus eika kattely. Ei vaikuta tahan sivuun. -->
+<!-- pro.goaliq.app is a single page app and its boot costs time. Opening the
+     connection and DNS here means a click only pays for the download, not the
+     handshake. No effect on this page. -->
 <link rel="preconnect" href="https://pro.goaliq.app">
 <link rel="preconnect" href="https://api.goaliq.app" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,7 +111,7 @@
    "name": "What FPL tools does GoalIQ have?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, shareable image cards of the clean sheet outlook and price watch tables (web), xG/xA/xGI leaders for every player with data, and a filterable player stats table (shots, shots on target, shots in the box, headed attempts, non-penalty xG, key passes, tackles, clearances, recoveries and set-piece order) with per 90 and per start views and CSV export, and defence profiles showing what each team concedes by pitch zone. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook, the scoring rate per 90 minutes shown separately from expected minutes and CSV export (web), the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, a live DefCon panel that tracks your own squad against the threshold while a gameweek is being played (web), the full DefCon leaderboard, price-band filters with the model's xP on both leaderboards, shareable image cards of your XI, the captain ranker, the value ranking and leaderboards (web), GK rotation pairs, differentials, player compare for up to four players, and predicted starting minutes. The web app also predicts any match: win probability, expected goals, the most likely scorelines, upcoming fixtures and league tables. Available on the web, iOS and Android."
+    "text": "Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win probability, a fit checker and pre-season draft rater with saved drafts, price watch, shareable image cards of the clean sheet outlook and price watch tables (web), xG/xA/xGI leaders for every player with data, and a filterable player stats table (shots, shots on target, shots in the box, headed attempts, non-penalty xG, key passes, tackles, clearances, recoveries and set-piece order) with per 90 and per start views and CSV export, and defence profiles showing what each team concedes by pitch zone. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook, the scoring rate per 90 minutes shown separately from expected minutes and CSV export (web), the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, a live DefCon panel that tracks your own squad against the threshold while a gameweek is being played (web), the full DefCon leaderboard, price-band filters with the model's xP on both leaderboards, shareable image cards of your XI, the captain ranker, the value ranking and leaderboards (web), GK rotation pairs, differentials, player compare for up to four players, and predicted starting minutes. The web app also predicts any match: win probability, expected goals, the most likely scorelines, upcoming fixtures and league tables. Available on the web, iOS and Android."
    }
   },
   {
@@ -496,12 +496,11 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="nav-links">
         <a href="fpl.html">Free FPL tools</a>
         <a href="/predictions">Match predictions</a>
-        <!-- Career card oli sivustolla mutta vain kolmessa haudatussa kohdassa
-             (tama sivu rivi ~580, predictions-footer, fpl.html:n keski-CTA)
-             eika kertaakaan ylanavigaatiossa -> sita ei loytanyt kukaan. -->
+        <!-- Keep the career card in the top nav. It existed for a while but only
+             in three buried places and never up here, so nobody found it. -->
         <a href="/career">Career card</a>
-        <!-- SPL (7.8): oma osio -linjaus, mutta loydettavyys ylanavista —
-             sama oppi kuin career-kortissa (haudattu linkki = ei kayttajia). -->
+        <!-- SPL keeps its own section, but discoverability comes from the top
+             nav. Same lesson as the career card: a buried link gets no users. -->
         <a href="/spl">SPL tools</a>
         <a class="nav-cta" href="https://pro.goaliq.app/?tab=premium" data-cta="nav">Try Premium</a>
       </div>
@@ -611,7 +610,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
             <li>Clean sheet probability &amp; fixture difficulty, attack and defence views, every PL team</li>
             <li>Player lookup: official availability news, start chance, set-piece roles, price &amp; ownership</li>
             <li>Rate my team, with a captain pick</li>
-            <li>Mini-league view: standings and head-to-head win odds</li>
+            <li>Mini-league view: standings and head-to-head win probability</li>
             <li>xG, xA and xGI leaders: every player with data, two decimals, no cut-off</li>
             <li><a href="/fpl/stats" data-cta="toolkit-stats">Player stats</a>: shots, shots in
               the box, key passes, tackles and the rest in one filterable table, per 90 or per
@@ -771,7 +770,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       </div>
       <div class="faq-item">
         <dt>What FPL tools does GoalIQ have?</dt>
-        <dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win odds, a fit checker and pre-season draft rater with saved drafts, price watch, shareable image cards of the clean sheet outlook and price watch tables (web), xG/xA/xGI leaders for every player with data, and a filterable player stats table (shots, shots on target, shots in the box, headed attempts, non-penalty xG, key passes, tackles, clearances, recoveries and set-piece order) with per 90 and per start views and CSV export, and defence profiles showing what each team concedes by pitch zone. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook, the scoring rate per 90 minutes shown separately from expected minutes and CSV export (web), the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, a live DefCon panel that tracks your own squad against the threshold while a gameweek is being played (web), the full DefCon leaderboard, price-band filters with the model's xP on both leaderboards, shareable image cards of your XI, the captain ranker, the value ranking and leaderboards (web), GK rotation pairs, differentials, player compare for up to four players, and predicted starting minutes. The web app also predicts any match: win probability, expected goals, the most likely scorelines, upcoming fixtures and league tables. Available on the web, iOS and Android.</dd>
+        <dd>Free: clean sheet probabilities, fixture difficulty ratings (FDR) with separate attack and defence views, a player lookup with official availability news, start chance and set-piece roles, rate my team with a captain pick, a mini-league view with head-to-head win probability, a fit checker and pre-season draft rater with saved drafts, price watch, shareable image cards of the clean sheet outlook and price watch tables (web), xG/xA/xGI leaders for every player with data, and a filterable player stats table (shots, shots on target, shots in the box, headed attempts, non-penalty xG, key passes, tackles, clearances, recoveries and set-piece order) with per 90 and per start views and CSV export, and defence profiles showing what each team concedes by pitch zone. GoalIQ Premium: an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook, the scoring rate per 90 minutes shown separately from expected minutes and CSV export (web), the captain ranker with a differential pick, chip timing for the best Wildcard, Bench Boost, Triple Captain and Free Hit windows, transfer plans that chain 1 to 2 moves over the coming gameweeks, an edge mode with rank-aware picks for your mini-league, transfer suggestions with apply, player value, a live DefCon panel that tracks your own squad against the threshold while a gameweek is being played (web), the full DefCon leaderboard, price-band filters with the model's xP on both leaderboards, shareable image cards of your XI, the captain ranker, the value ranking and leaderboards (web), GK rotation pairs, differentials, player compare for up to four players, and predicted starting minutes. The web app also predicts any match: win probability, expected goals, the most likely scorelines, upcoming fixtures and league tables. Available on the web, iOS and Android.</dd>
       </div>
       <div class="faq-item">
         <dt>Is GoalIQ a betting app?</dt>
@@ -804,7 +803,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <div class="career-band">
       <div>
         <h2>New · Saudi Pro League fantasy tools</h2>
-        <p>Model xP, clean sheet odds and fixture difficulty for RSL Fantasy. Completely free, no login. Independent data tool, not affiliated with the SPL.</p>
+        <p>Model xP, clean sheet probability and fixture difficulty for RSL Fantasy. Completely free, no login. Independent data tool, not affiliated with the SPL.</p>
       </div>
       <a class="btn btn-ghost" href="/spl" data-cta="index-spl">Open SPL tools &#9656;</a>
     </div>
@@ -850,11 +849,12 @@ document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
   if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta'), page: location.pathname}); }
 });
-/* 2.8.2026 saapumisattribuutio: goaliq.app ajaa persistence:'memory' -tilassa ja
-   pro.goaliq.app localStorage+cookie -tilassa, joten distinct_id EI jatku domainien
-   yli — landing→pro-siirtymaa ei voinut laskea lainkaan. Liitetaan pro-linkkeihin
-   ei-identifioiva lahdetagi, jonka SPA lukee pro_page_viewed-eventtiin. Ei evastetta,
-   ei PII:ta → privacy.html:n evasteeton lupaus sailyy ennallaan. */
+/* Arrival attribution. This site runs analytics in memory-only mode and
+   pro.goaliq.app uses local storage, so the distinct id does not carry across
+   domains and the landing to pro handoff could not be counted at all. We attach
+   a non-identifying source tag to pro links, which the app reads into its page
+   view event. No cookie and no personal data, so the cookieless promise on
+   privacy.html still holds. */
 (function () {
   var links = document.querySelectorAll('a[data-cta]');
   for (var i = 0; i < links.length; i++) {
@@ -866,7 +866,7 @@ document.addEventListener('click', function (e) {
       u.searchParams.set('src', a.getAttribute('data-cta'));
       u.searchParams.set('srcp', location.pathname.replace(/^\/|\.html$/g, '') || 'index');
       a.setAttribute('href', u.toString());
-    } catch (err) { /* virheellinen href — jata linkki ennalleen */ }
+    } catch (err) { /* malformed href: leave the link untouched */ }
   }
 })();
 </script>
@@ -938,11 +938,10 @@ document.addEventListener('click', function (e) {
 (function () {
   var region = '';
   try { region = new Intl.Locale(navigator.language).maximize().region || ''; } catch (e) {}
-  // 1.8.2026: kovakoodatut kurssit vanhenevat hiljaa eika mikaan porti nae sita.
-  // Stripe nayttaa tarkan paikallisen summan checkoutissa (Adaptive Pricing), joten
-  // sivulla riittaa valuutan nimeaminen ilman omaa lukua.
-  // Ei vaiteta veloitusmekanismista (Stripen Adaptive Pricing voi veloittaa
-  // paikallisessa valuutassa) — sanotaan vain se mika on varmasti totta.
+  // Hardcoded exchange rates go stale silently and no gate would catch it.
+  // Stripe shows the exact local amount at checkout, so naming the currency
+  // without quoting our own figure is enough here. We also avoid claiming
+  // anything about how the charge is made, and say only what is certainly true.
   var local = (region === 'GB' || region === 'US')
     ? 'your local price is shown at checkout' : null;
   if (!local) return;

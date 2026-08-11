@@ -9,12 +9,10 @@
 			name="description"
 			content="FPL tools from a real match model: player expected points with scoring rate and minutes shown separately, clean sheets, captain ranker and a transfer planner. Graded in public from GW1."
 		/>
-		<!-- 32/48 lisättiin koska selaimet suosivat välilehtikokoa vastaavaa
-		     varianttia; pelkkä 192 skaalattiin alas ja IQ sumeni.
-		     29.7 (Villen havainto): nämä olivat yhä MAGENTA-aikakaudelta, koska
-		     SPA:lla on omat kopiot static/-kansiossa eikä 28.7. teletext-passi
-		     koskenut niitä. goaliq.app näytti amber-merkkiä ja pro.goaliq.app
-		     magentaa. Nyt molemmat tulevat samasta gen_teletext_social.py:sta. -->
+		<!-- Keep the 32 and 48 sizes: browsers pick the variant matching the tab
+		     size, and scaling 192 down blurred the mark. All icons are generated
+		     by gen_teletext_social.py so both hosts stay on one palette; the SPA
+		     keeps its own copies under static/ and drifted once because of it. -->
 		<link rel="icon" type="image/png" sizes="32x32" href="%sveltekit.assets%/goaliq-appicon-32.png" />
 		<link rel="icon" type="image/png" sizes="48x48" href="%sveltekit.assets%/goaliq-appicon-48.png" />
 		<link rel="icon" type="image/png" sizes="192x192" href="%sveltekit.assets%/goaliq-appicon-192.png" />
@@ -26,16 +24,12 @@
 		/>
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://pro.goaliq.app/" />
-		<!-- #155-fix: og:image OLI suhteellinen (%sveltekit.assets%) — X/FB-crawlerit
-		     vaativat absoluuttisen URLin, ja twitter:card puuttui → tweet-kortti jäi
-		     ilman ikonia.
-		     28.7: summary → summary_large_image. Villen havainto: X näytti pienen
-		     ikonin, ja se oli vieläpä vanhan magenta-aikakauden sovellusikoni, kun
-		     goaliq.app-linkit saivat classic-ilmeisen 1200x630-kortin. Kaksi eri
-		     korttia samasta tuotteesta on brändivirhe, ja pieni neliö häviää
-		     syötteessä isolle kortille. Kuva servataan pro-originista (ei
-		     ristiinviittauksena goaliq.appiin), koska osa crawlereista ei seuraa
-		     toiselle hostille. -->
+		<!-- og:image must stay absolute. It was relative once and social crawlers
+		     dropped it, so shared links had no image. Card type must stay
+		     summary_large_image: a small square loses to a large card in the feed,
+		     and goaliq.app links already use the 1200x630 one. Serve the image from
+		     this origin, not from goaliq.app, because some crawlers do not follow
+		     cross-host image URLs. -->
 		<meta property="og:image" content="https://pro.goaliq.app/goaliq-social-1200x630.png" />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
@@ -48,22 +42,17 @@
 			content="FPL tools from a real match model: player expected points with scoring rate and minutes shown separately, clean sheets, captain ranker and a transfer planner. Graded in public from GW1."
 		/>
 		<meta name="twitter:image" content="https://pro.goaliq.app/goaliq-social-1200x630.png" />
-		<!-- 2.8 PERF: API ja Supabase avataan valmiiksi, koska molempiin
-		     soitetaan heti kun sovellus on kaynnistynyt. Sailyttaa TLS-kattelyn
-		     ajan kriittiselta polulta. -->
+		<!-- Warm the API connection: it is called immediately after boot, so this
+		     takes the TLS handshake off the critical path. -->
 		<link rel="preconnect" href="https://api.goaliq.app" crossorigin />
-		<!-- 4.8.2026: KAYNNISTYSVAHTI. Miksi tama on HTML:ssa eika moduulissa:
-		     3.8. shipattu varhaispuskuri (lib/analytics.ts) asennetaan
-		     +layout.svelten onMountissa, eli VASTA kun juuri-layoutin chunk on
-		     ladattu ja hydraatio onnistunut. Jos juuri sen chunkin import
-		     epaonnistuu — tasmalleen se vika joka nahtiin 30.7, 31.7, 2.8 ja
-		     4.8 — onMount ei aja koskaan, mikaan ei asenna kuuntelijoita eika
-		     mikaan laheta mitaan. Kayttajalle nakyy SvelteKitin oma
-		     "500 Internal Error" -sivu 200-dokumentin paalla ja PostHogiin ei
-		     tule riviakaan. Toistettu paikallisesti: nodes/0.*.js pois ->
-		     sama ruutu, DOM 1404 B (terveena 11533 B).
-		     Tama skripti on osa HTML:aa, joten se ajetaan ennen yhtakaan
-		     moduulia eika se voi epaonnistua chunkin mukana. -->
+		<!-- Boot watchdog. This lives in the HTML, not in a module, on purpose:
+		     the in-app error buffer installs from the root layout's onMount, which
+		     only runs after that chunk has loaded and hydrated. When that import is
+		     the thing that fails, onMount never runs, no listener is installed and
+		     nothing is ever reported. The user sees SvelteKit's own error screen on
+		     top of a 200 response and no telemetry arrives at all. Reproduced by
+		     removing the root node chunk. Inline script runs before any module, so
+		     it cannot fail with one. -->
 		<script>
 			(function () {
 				var MAX = 10;
@@ -79,24 +68,23 @@
 				}
 				window.addEventListener('error', onErr);
 				window.addEventListener('unhandledrejection', onRej);
-				/* Sovellus kutsuu taman heti kun analytics on ottanut vastuun:
-				   omat kuuntelijat pois (muuten tuplakirjaus) ja vahti peruutetaan. */
+				/* The app calls this once analytics takes over: drop our listeners
+				   to avoid double reporting, and cancel the watchdog. */
 				window.__goaliqEarlyDetach = function () {
 					window.removeEventListener('error', onErr);
 					window.removeEventListener('unhandledrejection', onRej);
 					clearTimeout(timer);
 				};
-				/* 10 s: hidas mutta onnistunut kaynnistys yli 10 sekunnin on
-				   itsessaan signaali jonka haluamme nahda, joten sita ei
-				   yriteta suodattaa pois. Vaara positiivinen on halvempi kuin
-				   nykytila, jossa taysin kaatunut kaynnistys on nakymaton. */
+				/* 10s. A slow but successful boot past ten seconds is itself a
+				   signal worth seeing, so we do not try to filter it out. A false
+				   positive is cheaper than a dead boot nobody can see. */
 				var timer = setTimeout(function () {
 					var KEY = 'phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7';
 					var HOST = 'https://us.i.posthog.com';
 					var did = null;
 					try {
-						/* Sama distinct_id kuin posthog-js:lla, jotta tapahtuma
-						   liittyy samaan henkiloon eika luo haamuprofiilia. */
+						/* Reuse the posthog-js distinct_id so the event attaches to
+						   the same person instead of creating a ghost profile. */
 						var raw = localStorage.getItem('ph_' + KEY + '_posthog');
 						if (raw) did = JSON.parse(raw).distinct_id || null;
 					} catch (e) {}
@@ -112,11 +100,11 @@
 							error_count: buf.length,
 							first_error: first ? String((first && first.message) || first) : null,
 							first_error_kind: buf.length ? buf[0].kind : null,
-							/* Erottaa kaksi vikaa (mitattu, ei paateltu):
-							   false = SvelteKitin runtime eli ja ehti korvata
-							   rungon omalla virhesivullaan (nodes/*-chunk
-							   kaatui); true = runtime ei kaynnistynyt
-							   lainkaan, esim. entry-chunk jai saamatta. */
+							/* Separates two failures, measured rather than guessed:
+							   false = the runtime came up and replaced this shell
+							   with its own error page (a route chunk failed);
+							   true = the runtime never started at all, for example
+							   the entry chunk never arrived. */
 							boot_shell_present: !!document.getElementById('boot'),
 							ready_state: document.readyState
 						}
@@ -136,17 +124,15 @@
 				}, 10000);
 			})();
 		</script>
-		<!-- 9.8.2026: "Show all columns" -kytkin. Kapealla naytolla osa
-		     sarakkeista on .m-hide:lla piilossa, mutta piilotettu ei saa
-		     tarkoittaa saavuttamatonta (Villen huomio) — tama on ulospaasy,
-		     ja sama sopimus kuin goaliq.app-sivuilla.
+		<!-- "Show all columns" toggle. Narrow screens hide some columns with
+		     .m-hide, but hidden must never mean unreachable, so this is the way
+		     out. Same contract as the goaliq.app pages.
 
-		     MIKSI HTML-SKRIPTI JA MutationObserver EIKA SVELTE-KOMPONENTTI:
-		     SPA:n taulukot syntyvat ja katoavat valilehtia vaihdettaessa, joten
-		     kertaluontoinen kiinnitys jattaisi myohemmin ilmestyvat taulukot
-		     ilman kytkinta. Komponenttiin kirjoitettuna se pitaisi lisata
-		     16 taulukkokomponenttiin erikseen — sama nelinkertainen kopio josta
-		     koko tama urakka alkoi. Observer hoitaa kaikki, myos tulevat. -->
+		     Why an inline script with a MutationObserver instead of a Svelte
+		     component: tables here appear and disappear as tabs change, so a
+		     one-time attach would leave later tables without a toggle. As a
+		     component it would have to be added to sixteen table components by
+		     hand. The observer covers all of them, including future ones. -->
 		<script>
 			(function () {
 				var WRAP = '.table-wrap';
@@ -184,8 +170,8 @@
 						w.parentNode.insertBefore(host, w);
 						btns.push(b);
 					}
-					/* Poistuneet napit pois listalta, ettei sync() kaada
-					   irronneita solmuja eika lista kasva rajatta. */
+					/* Drop detached buttons so sync() never touches removed nodes
+					   and the list cannot grow without bound. */
 					btns = btns.filter(function (b) {
 						return b.isConnected;
 					});
@@ -206,8 +192,8 @@
 		</script>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<!-- 26.7 PERF: preload+onload, ei render-blocking stylesheetiä (sama
-		     kaava kuin goaliq.app-sivuilla). noscript = varmistus. -->
+		<!-- preload plus onload rather than a render-blocking stylesheet, same
+		     pattern as the goaliq.app pages. The noscript block is the fallback. -->
 		<link
 			rel="preload"
 			as="style"
@@ -223,11 +209,12 @@
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<!-- 2.8 PERF: kuori on 5,5 kB ja sovellus 736 kB JS:aa, joten ilman tata
-		     ruutu oli TYHJA koko latauksen ajan. Tama runko on osa HTML:aa eli
-		     maalautuu heti ensimmaisesta tavusta. +layout poistaa sen mountissa.
-		     Tarkoituksella pelkka kehys, EI valeskeleton datalle jota ei viela
-		     ole: tyhja rivi joka tayttyy on rehellinen, valeluku ei olisi. -->
+		<!-- The shell is a few kilobytes and the app is several hundred, so
+		     without this the screen was blank for the whole load. This markup is
+		     part of the HTML, so it paints from the first byte, and the root
+		     layout removes it on mount. Deliberately a frame only, not a fake
+		     skeleton of data we do not have yet: an empty row that fills in is
+		     honest, an invented number would not be. -->
 		<div id="boot" aria-hidden="true">
 			<div class="boot-bar">GoalIQ Premium</div>
 			<div class="boot-lines"><i></i><i></i><i></i></div>
