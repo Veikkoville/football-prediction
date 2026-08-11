@@ -718,6 +718,15 @@
 							     2024/25 ja 7:lla 2023/24 (mm. nousijoiden pelaajat), joten sivu
 							     valitti heidan kohdallaan kautta. Kausi nakyviin omalle riville. -->
 							<tr><td>Season shown</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.season ?? '–'}</td>{/each}</tr>
+							<!-- 11.8: minuutit puuttuivat kokonaan. `last_season.minutes` tulee
+							     API:sta mutta sita ei renderoitu missaan koko sivulla, joten
+							     "2 maalia / 2732 minuuttia" -tyyppista vaitetta EI voinut
+							     tarkistaa talta sivulta — ja rivi "Expected minutes" yllapuolella
+							     nayttaa eri suureen (xmins ~82), joten lukija olisi katsonut
+							     vaaraa lukua ja luullut tarkistaneensa. Maalit ilman minuutteja
+							     on lisaksi harhaanjohtava pari: 2 maalia on eri asia 400 ja 2700
+							     minuutissa. -->
+							<tr><td>Minutes played</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.minutes ?? '–'}</td>{/each}</tr>
 							<tr><td>Goals</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.goals ?? '–'}</td>{/each}</tr>
 							<tr><td>Assists</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.assists ?? '–'}</td>{/each}</tr>
 							<tr><td>Fantasy points</td>{#each cmpPlayers as p (p.id)}<td class="num">{p.last_season?.points ?? '–'}</td>{/each}</tr>
