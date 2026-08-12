@@ -1051,6 +1051,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/predictions/serie-a/genoa-vs-frosinone</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/predictions/ligue-1/</loc>
     <lastmod>2026-08-12</lastmod>
     <changefreq>daily</changefreq>
