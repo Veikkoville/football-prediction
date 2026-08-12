@@ -23,7 +23,12 @@ FINNISH = re.compile(
     r"\b(eli|joten|jotta|ilman|koska|mutta|vaatii|siksi|muuten|nakyy|"
     r"korjattu|lisatty|poistettu|kaytetaan|naytetaan|tama|tassa|nama|"
     r"seka|myos|evasteita|kavijoita|sivulla|taulukko|sarake|kentta|"
-    r"tämä|myös|tässä|nämä|näkyy|kenttä|käytetään|näytetään)\b",
+    r"tämä|myös|tässä|nämä|näkyy|kenttä|käytetään|näytetään|"
+    # 12.8 ilta: live-etusivulta loytyi suomenkielinen CSS-kommentti jota
+    # tama lista ei nahnyt ("Ottelunimi oli nowrap ... yhdella rivilla").
+    # Lisatyt sanat ovat ASCII-suomea joka ei esiinny englannissa.
+    r"yhdella|rivilla|puhelimessa|luettavan|ottelunimi|luettavuus|"
+    r"kosketuskohteet|ruudun|oli)\b",
     re.I,
 )
 

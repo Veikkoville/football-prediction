@@ -127,8 +127,9 @@ _RULES = """
      override its min-width:640px. The div. prefix raises it to (0,1,2) and
      makes the rule order-independent. */
   div.rec-scroll table{min-width:0;}
-  /* Ottelunimi oli nowrap ("Nottingham Forest v Crystal Palace" = 277px
-     yhdella rivilla), mika yksin teki track record -taulusta 3 x ruudun. */
+  /* The match name was nowrap ("Nottingham Forest v Crystal Palace" =
+     277px on one line), which alone made the track record table three
+     screens wide. */
   div.rec-scroll td.team,.scroll td.team{white-space:normal;}
   div.rec-scroll th,div.rec-scroll td{padding:7px 6px;font-size:13px;}
   /* Kick-off was "2026-08-21 19:00:00 UTC" on one line = 195px, so a single
@@ -158,13 +159,13 @@ _RULES = """
   .chip{min-height:36px;}
   .lbctl select,.lbctl input{min-height:36px;max-width:100%;}
 
-  /* --- 5. LUETTAVUUS ---------------------------------------------------
-     12px monospace on puhelimessa alle luettavan rajan. */
+  /* --- 5. READABILITY --------------------------------------------------
+     12px monospace is below the readable limit on a phone. */
   .meta,.note,.stat span,.legend,.mrow .meta,footer{font-size:13px;}
   .hero .lede,.lede{font-size:16px;}
   .stat b{font-size:24px;}
 
-  /* --- 6. KOSKETUSKOHTEET ---------------------------------------------- */
+  /* --- 6. TOUCH TARGETS ------------------------------------------------ */
   .btn,.cta,.nav-cta{min-height:44px;display:inline-flex;align-items:center;
     justify-content:center;}
   .toolnav a{display:inline-block;padding:4px 0;}
