@@ -162,7 +162,7 @@
      Grotesk -display-fontti, tumma ink-hero + 6px magenta-raita, cream-body.
      GEN:ACC-/GEN:PRED-markerit sailyvat: chip herossa (.num/.lbl), proof
      demossa, record + leagues sisallossa, trust premium-kortissa. */
-  :root {/* 1.8.2026: magenta poistettiin paletista; nama korvaavat tokenit olivat viittauksina mutta puuttuivat :rootista. */--amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;--paper:#1F1D1A;
+  :root {/* 1 Aug 2026: magenta was removed from the palette; these replacement tokens were referenced but missing from :root. */--amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;--paper:#1F1D1A;
     --bg: #0B0A09;
     --bg-alt: #1F1D1A;
     --card: #141311;
@@ -196,9 +196,9 @@
   :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 
   /* ============ Dark ink hero shell (index-tyyli) ============ */
-  /* 2.8: sama vika kuin career.html:ssa - --cream ja --ink ovat molemmat #F3F2F2,
-     joten "dark hero" renderoityi valkoisena ja teksti hukkui siihen. Tumma tausta
-     on myos taman lohkon alkuperainen tarkoitus (ks. otsikko yllä). */
+  /* 2 Aug: same bug as career.html - --cream and --ink are both #F3F2F2, so
+     the "dark hero" rendered white and the text drowned in it. A dark
+     background is also this block's original intent (see heading above). */
   .hero-shell {
     background: var(--bg);
     color: var(--ink);
@@ -285,8 +285,8 @@
   }
   .matchrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .matchrow .team { font-weight: 700; font-size: 15px; }
-  /* 26.7 CLASSIC: 12px:n taytto -> 4px:n viiva (vari viivana, ei tayttona);
-     prosentit ovat legendassa lukuina. */
+  /* 26 Jul CLASSIC: 12px fill -> 4px line (color as a line, not a fill);
+     the percentages are numbers in the legend. */
   .prob-bar { display: flex; height: 4px; overflow: hidden; margin: 16px 0 8px; }
   .prob-bar .home { background: var(--amber); }
   .prob-bar .draw { background: rgba(243,242,242,0.24); }
@@ -301,8 +301,8 @@
     background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
     padding: 28px;
   }
-  /* 26.7 CLASSIC: magenta-tinttitaytto -> gold outline (magenta ei koskaan
-     tayttona; sama askelmerkki-kaava kuin index.html:ssa). */
+  /* 26 Jul CLASSIC: magenta tint fill -> gold outline (magenta never as a
+     fill; same step formula as index.html). */
   .step .n {
     width: 38px; height: 38px; border-radius: 0; background: transparent;
     border: 1px solid var(--gold,#F5C542);
@@ -341,9 +341,9 @@
   .trust-line { color: var(--muted); font-size: 14px; margin-top: 16px; }
 
   /* Beat the Model -liiganauha (index .league-band -malli) */
-  /* 🐛 26.7: tama oli background:var(--ink) + color:var(--ink) = ink ink-
-     pohjalla -> nauhan otsikko oli TAYSIN nakymaton. Jaanne tummasta
-     nauhasta; index.html:n vastaava oli jo korjattu. Nyt sama kuin siella. */
+  /* Bug 26 Jul: this was background:var(--ink) + color:var(--ink) = ink on
+     ink -> the strip's heading was COMPLETELY invisible. Leftover from the
+     dark strip; index.html's equivalent was already fixed. Now matches it. */
   .league-band { background: var(--paper); color: var(--ink); border-block: 1px solid var(--line); padding: 44px 0; }
   .league-inner { display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
   .league-inner h2 { font-size: clamp(22px, 2.6vw, 30px); color: var(--ink); }
@@ -376,7 +376,7 @@
     }
   }
 </style>
-<!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
+<!-- PostHog (#38): cookieless site analytics - persistence=memory, no cookies, no PII -->
 <script>
 !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
 posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only',capture_pageview:true});
@@ -588,7 +588,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </footer>
 
-<!-- Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<!-- Pro CTA click metric (PostHog pro_cta_clicked) - non-blocking, no PII, still cookieless -->
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
@@ -617,9 +617,9 @@ document.addEventListener('click', function (e) {
 </script>
 
 <script>
-/* 31.7: Stripe Adaptive Pricing veloittaa kavijan valuutassa checkoutissa;
-   tama lisaa NAYTON likiarvon UK/US-kavijoille. Kurssit paivitetaan kasin,
-   "about" pitaa ne rehellisina. */
+/* 31 Jul: Stripe Adaptive Pricing charges the visitor's currency at
+   checkout; this adds a DISPLAY approximation for UK/US visitors. The rates
+   are updated by hand, "about" keeps them honest. */
 (function () {
   var region = '';
   try { region = new Intl.Locale(navigator.language).maximize().region || ''; } catch (e) {}
@@ -646,9 +646,9 @@ document.addEventListener('click', function (e) {
    if(!wraps[i].querySelector('.m-hide'))continue;
    seen.push(wraps[i]);
   }
-  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
-  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
-  // ilman ulospaasya.
+  // Table without a known wrapper (e.g. a hand-written page): put the
+  // button directly before the table itself, so no hidden column is ever
+  // left without a way out.
   var tables=document.querySelectorAll('table');
   for(i=0;i<tables.length;i++){
    if(!tables[i].querySelector('.m-hide'))continue;

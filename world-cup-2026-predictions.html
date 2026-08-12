@@ -103,13 +103,14 @@
   /* Redesign 24.7 (brand-tokens.md): Space Grotesk -display-fontti + tumma
      ink-hero (index-gradientti, 6px magenta-raita) + cream-body.
      GEN:WCRECAP-lohko sailyy: .statrow/.stat/.num/.lbl/.meta tyylit alla. */
-  :root{/* 1.8.2026: magenta poistettiin paletista; nama korvaavat tokenit olivat viittauksina mutta puuttuivat :rootista. */--cream:#F3F2F2; --bg:#0B0A09; --bg2:#1F1D1A; --card:#141311; --line:rgba(243,242,242,0.24); --accent:#F5C542; --accent-deep:#2ED6C2; --teal:#2ED6C2; --teal-ink:#2ED6C2; --ink:#F3F2F2; --ink-2:#F3F2F2; --text:#F3F2F2; --muted:#A8A29A; --hero-muted:#A8A29A; --radius:2px; --font-display:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  :root{/* 1 Aug 2026: magenta was removed from the palette; these replacement tokens were referenced but missing from :root. */--cream:#F3F2F2; --bg:#0B0A09; --bg2:#1F1D1A; --card:#141311; --line:rgba(243,242,242,0.24); --accent:#F5C542; --accent-deep:#2ED6C2; --teal:#2ED6C2; --teal-ink:#2ED6C2; --ink:#F3F2F2; --ink-2:#F3F2F2; --text:#F3F2F2; --muted:#A8A29A; --hero-muted:#A8A29A; --radius:2px; --font-display:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px 80px; }
   h1,h2,h3,.brand{ font-family:var(--font-display); }
-  /* 2.8: --cream ja --ink ovat molemmat #F3F2F2 -> valkoinen banneri + nakymaton
-     teksti (sama vika kuin career.html + predictions.html). Tumma teletext-tausta. */
+  /* 2 Aug: --cream and --ink are both #F3F2F2 -> white banner + invisible
+     text (same bug as career.html + predictions.html). Dark teletext
+     background. */
   header{ background:var(--bg); color: var(--ink); border-bottom:6px solid var(--accent); }
   .nav{ max-width:960px; margin:0 auto; padding:22px 20px; display:flex; align-items:center; justify-content:space-between; }
   .brand{ font-size:20px; font-weight:700; display:flex; align-items:center; }
@@ -298,7 +299,7 @@
 }
 /* /GEN:MOBILE-CSS */
 </style>
-<!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
+<!-- PostHog (#38): cookieless site analytics - persistence=memory, no cookies, no PII -->
 <script>
 !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
 posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only',capture_pageview:true});
@@ -373,7 +374,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Get the app</a>
 </footer>
 
-<!-- Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<!-- Pro CTA click metric (PostHog pro_cta_clicked) - non-blocking, no PII, still cookieless -->
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;

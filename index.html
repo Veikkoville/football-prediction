@@ -168,58 +168,61 @@
 
 <style>
   /* ============================================================
-     Redesign 28.7 "TELETEXT": 90-luvun teksti-tv tumma-ilme.
-     Mustapohja, IBM Plex Mono, kahdeksan signaalivaria, litteat
-     varipalkit sivunumeroilla (P100-P107). Ei pyoristyksia, ei
-     varjoja, ei gradientteja (poikkeus: CRT-overlayt + tickerin
-     reunahaivytys).
+     Redesign 28 Jul "TELETEXT": 90s teletext dark look. Black base,
+     IBM Plex Mono, eight signal colors, flat color bars with page
+     numbers (P100-P107). No rounding, no shadows, no gradients
+     (exception: CRT overlays + the ticker's edge fade).
 
-     MITA SAILYI:
-       - kaikki head-metat, JSON-LD:t ja GEN:ACC-DATASET sellaisenaan
+     WHAT WAS KEPT:
+       - all head metas, JSON-LDs and GEN:ACC-DATASET as-is
        - GEN:ACC-CHIP (.record-chip .num/.lbl), GEN:ACC-TRUST
-         (.trust-line), GEN:ACC-PROOF ja GEN:ACC-BYCOMP (.wc-visual)
-         markerit, luokkanimet ja sisennykset ennallaan
-       - #72 GW-countdown (id:t cd-d/h/m/s, #gw-countdown) ja sen JS
-       - PostHog + data-cta -mittaus, kaikki linkkikohteet
-       - copy sanasta sanaan (em dash -portti: 0 osumaa)
+         (.trust-line), GEN:ACC-PROOF and GEN:ACC-BYCOMP (.wc-visual)
+         markers, class names and indentation unchanged
+       - the #72 GW countdown (ids cd-d/h/m/s, #gw-countdown) and its JS
+       - PostHog + data-cta metrics, every link target
+       - copy word for word (em dash gate: 0 hits)
 
-     VARIDISIPLIINI (sama saanto kuin classicissa, tummalle kaannettyna):
-       magenta  VAIN kirjainmuotona (mark, kirjain Q, live-tila). EI koskaan tayttona.
-       amber    luvut, primaari-CTA, korostettu otsikkorivi
-       teal     linkit, sekundaariaksentti, Premium-pinta
-       green    ilmaistaso ja positiiviset palkit
-       cream    neutraali otsikkopalkki
+     COLOR DISCIPLINE (same rule as classic, flipped for dark):
+       magenta  ONLY as letterform (mark, the letter Q, live state).
+                NEVER as a fill.
+       amber    numbers, primary CTA, emphasized heading row
+       teal     links, secondary accent, Premium surface
+       green    free tier and positive bars
+       cream    neutral heading bar
 
-     KONTRASTIT, mitattuna WCAG 2.1 -kaavalla (ei arvattu), pohja --bg #0B0A09:
+     CONTRASTS, measured with the WCAG 2.1 formula (not guessed),
+     base --bg #0B0A09:
        cream   #F3F2F2  17.70:1   amber   #F5C542  12.20:1
        muted   #A8A29A   7.82:1   teal    #2ED6C2  10.85:1
        faint   #7A746B   4.27:1   green   #5FD97A  11.01:1
        magenta #F5C542   5.60:1   ember   #FF8A5C   8.52:1
-       musta #0B0A09 amberilla 12.20:1, tealilla 10.85:1, greenilla 11.01:1,
-       creamilla 17.70:1 (kaikki varipalkkien mustat tekstit).
-       HUOM: --panel (#141311) vs --bg on 1.07:1. Se on tarkoitus: rakenteen
-       kantaa 1-2 px hiusviiva, EI taytto. Ala nosta panelia "nakyvammaksi"
-       kontrastia mittaamatta, se on juuri se 0.08/0.14-ansa 28.7:lta.
+       black #0B0A09 on amber 12.20:1, teal 10.85:1, green 11.01:1,
+       cream 17.70:1 (all black texts on the color bars).
+       NOTE: --panel (#141311) vs --bg is 1.07:1. That is intentional:
+       structure is carried by a 1-2 px hairline, NOT a fill. Do not make
+       the panel "more visible" without measuring contrast; that is
+       exactly the 0.08/0.14 trap from 28 Jul.
 
-       Brandin kirkas #B68235 (gold) jaa tummalla 5.87:1 ja #00C2AD 8.78:1:
-       molemmat lapaisisivat, mutta lukuina ja pikkutekstina ne sammuvat
-       mustaa vasten, joten tumman variantin askelmat ovat --amber ja --teal.
-       Kanoniset hexit elavat edelleen classic-pinnoilla (longtail :root,
-       pro-spa/theme.css, goaliq-app/lib/theme.ts).
+       The brand's bright #B68235 (gold) lands at 5.87:1 on dark and
+       #00C2AD at 8.78:1: both would pass, but as numbers and small text
+       they die against black, so the dark variant's steps are --amber
+       and --teal. The canonical hexes still live on the classic surfaces
+       (longtail :root, pro-spa/theme.css, the app's lib/theme.ts).
      ============================================================ */
   :root {
     --bg: #0B0A09;
     --panel: #141311;
     --track: #1F1D1A;
-    /* 28.7 mitattu korjaus: --panel vs --bg on tarkoituksella 1.07:1, joten
-       viiva on ainoa rakenne. 0.14 = 1.38:1 katoaa; 0.24 = 1.97:1 erottaa
-       pinnat ja 0.40 = 3.50:1 kantaa kontrollireunat 1.4.11:n yli. */
+    /* 28 Jul measured fix: --panel vs --bg is intentionally 1.07:1, so the
+       hairline is the only structure. 0.14 = 1.38:1 disappears; 0.24 =
+       1.97:1 separates surfaces and 0.40 = 3.50:1 carries control borders
+       past 1.4.11. */
     --line: rgba(243,242,242,0.24);
     --line-strong: rgba(243,242,242,0.40);
     --line-soft: rgba(243,242,242,0.12);
     --cream: #F3F2F2;
     --muted: #A8A29A;
-    /* 28.7 mitattu korjaus: #7A746B on 4.27:1 eli AA:n alle (ja .page-no on
+    /* 28 Jul measured fix: #7A746B is 4.27:1, i.e. below AA (and .page-no is
        11 px). #8A847A = 5.33:1 bg / 4.53:1 track. */
     --faint: #8A847A;
     --amber: #F5C542;
@@ -310,7 +313,7 @@
   .btn-ghost:hover { background: var(--teal); color: var(--ink); }
   .btn-green { border-color: var(--green); color: var(--green); font-weight: 600; }
   .btn-green:hover { background: var(--green); color: var(--ink); }
-  /* nappimainen kontrolli: reuna on sen ainoa rajaus -> 1.4.11 vaatii 3:1 */
+  /* button-like control: the border is its only boundary -> 1.4.11 requires 3:1 */
   .btn-quiet { border-color: var(--line-strong); color: var(--cream); font-weight: 600; }
   .btn-quiet:hover { border-color: var(--cream); background: transparent; color: var(--cream); }
   .cta-note { color: var(--faint); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; margin-top: 20px; }
@@ -349,13 +352,13 @@
                    color: var(--faint); border-bottom: 1px solid var(--line); }
   .mock-row:not(.head):hover { background: var(--track); }
 
-  /* 9.8: landingin esikatselutaulukko oli 217px ruudun yli puhelimessa, eli
-     ensivaikutelma X:sta tulevalle oli sivuttain vieritettava taulukko.
-     .table-inner{min-width:560px} pakotti sen. Kapealla naytolla naytetaan
-     kolme saraketta: joukkue, pelaaja ja xP -- Price ja Owned ovat
-     kontekstia, ja xP on se luku jota tama lohko myy.
-     CSS-only: rivit generoidaan GEN:XP-TABLE-markkereiden valiin, joten
-     markupin muokkaus kumoutuisi seuraavassa bakessa. */
+  /* 9 Aug: the landing preview table ran 217px past the screen on a phone,
+     so the first impression for anyone arriving from X was a sideways-
+     scrolling table. .table-inner{min-width:560px} forced it. On narrow
+     screens show three columns: team, player and xP -- Price and Owned are
+     context, and xP is the number this block sells.
+     CSS-only: the rows are generated between GEN:XP-TABLE markers, so a
+     markup edit would be undone by the next bake. */
   @media (max-width: 560px) {
     .table-inner { min-width: 0; }
     .mock-row { grid-template-columns: 46px 1fr 72px; }
@@ -470,7 +473,7 @@
     .bar span:last-child { display: none; }
   }
 </style>
-<!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
+<!-- PostHog (#38): cookieless site analytics - persistence=memory, no cookies, no PII -->
 <script>
 !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
 posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only',capture_pageview:true});
@@ -486,8 +489,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <div class="tt-top">
   <div class="wrap">
     <nav>
-      <!-- Merkki: IQ-monogrammi. Q on magenta = brandin kirjainmuotosaanto
-           (magenta ei koskaan tayttona, tassa se on kirjain). -->
+      <!-- Mark: the IQ monogram. Q is magenta = the brand letterform rule
+           (magenta never as a fill; here it is a letter). -->
       <a class="logo" href="#top">
         <svg class="logo-mark" width="34" height="34" viewBox="0 0 44 44" role="img" aria-label="GoalIQ" focusable="false"><rect x="0" y="0" width="44" height="44" fill="#F5C542"/><text x="22" y="30" text-anchor="middle" font-family="IBM Plex Mono,ui-monospace,Consolas,monospace" font-size="20" font-weight="700" letter-spacing="-0.5" fill="#0B0A09">IQ</text></svg>
         GoalIQ
@@ -576,8 +579,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </header>
 </div>
 
-<!-- LIVE-PROJEKTIOT: oikeat Total xP -luvut tuotannon value-ajosta 24.7.
-     Paivita luvut jos datassa iso liike (rehellisyys: ei mock-kautta). -->
+<!-- LIVE PROJECTIONS: real Total xP numbers from the production value run
+     24 Jul. Update if the data moves a lot (honesty: no mock season). -->
 <section>
   <div class="wrap">
     <div class="bar"><span>&#9612; Live model projections · GW1-6 · 2026/27</span><span>P101</span></div>
@@ -622,8 +625,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
             <li>Price watch</li>
             <li>Beat the model: log your calls before the deadline, get them graded against the model's every gameweek</li>
             <li>Watchlist: track the players you are deciding on, price and availability at a glance (three players free)</li>
-          <!-- COPY-SYNC 28.7: ottelu-ennuste, otteluohjelma ja sarjataulukot
-               tulivat webiin tanaan. Ne olivat siihen asti vain sovelluksessa. -->
+          <!-- COPY-SYNC 28 Jul: match predictions, fixtures and league tables came
+               to the web today. Until then they were app-only. -->
           <li>Predict any match on the web: win probability, most likely scorelines,
             fixtures and league tables</li>
           </ul>
@@ -701,8 +704,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <section class="trust-band">
   <div class="wrap">
     <div class="bar"><span>&#9612; Published track record, hits and misses</span><span>P104</span></div>
-    <!-- Iso luku pysyy tuoreena CHIP-markerin kautta herossa; tassa sama
-         luku proof-lauseena + per-kilpailu-erittely (molemmat botin). -->
+    <!-- The big number stays fresh through the CHIP marker in the hero; here
+         the same number as a proof line + per-competition breakdown (both
+         bot-maintained). -->
     <div class="wc-visual">
       <p><!-- GEN:ACC-PROOF-START -->The model logs every prediction before kickoff. 54.3% correct results across 140 completed matches.<!-- GEN:ACC-PROOF-END --></p>
       <div class="bycomp-scope">
@@ -843,7 +847,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </footer>
 
-<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<!-- #56: Pro CTA click metric (PostHog pro_cta_clicked) - non-blocking, no PII, still cookieless -->
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
@@ -872,9 +876,10 @@ document.addEventListener('click', function (e) {
 </script>
 
 <script>
-/* #72: GW-deadline-countdown. Fallback-kohde = GW1-avaus (PL 26/27, pe 21.8.2026
-   ~20:00 UK). Progressiivinen parannus: /api/fantasy meta.deadline_utc korvaa
-   kohteen ja labelin kun kausi on flipannut. Piiloutuu kun kohde ohitettu. */
+/* #72: GW deadline countdown. Fallback target = the GW1 opener (PL 26/27,
+   Fri 21 Aug 2026 ~20:00 UK). Progressive enhancement: /api/fantasy
+   meta.deadline_utc replaces the target and label once the season has
+   flipped. Hides itself once the target has passed. */
 (function () {
   var target = new Date('2026-08-21T19:00:00Z');
   var el = document.getElementById('gw-countdown');
@@ -912,9 +917,10 @@ document.addEventListener('click', function (e) {
 </script>
 
 <script>
-/* Track record -luku tikittaa auki kerran latauksessa. Lopullinen arvo on jo
-   HTML:ssa (GEN:ACC-CHIP kirjoittaa sen), joten ilman JS:aa ja crawlerille
-   nakyy oikea luku. prefers-reduced-motion ohittaa animaation kokonaan. */
+/* The track record number ticks up once per load. The final value is
+   already in the HTML (GEN:ACC-CHIP writes it), so without JS and for
+   crawlers the correct number shows. prefers-reduced-motion skips the
+   animation entirely. */
 (function () {
   var el = document.querySelector('.record-chip .num');
   if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -932,9 +938,9 @@ document.addEventListener('click', function (e) {
 </script>
 
 <script>
-/* 31.7: Stripe Adaptive Pricing veloittaa kavijan valuutassa checkoutissa;
-   tama lisaa NAYTON likiarvon UK/US-kavijoille. Kurssit paivitetaan kasin,
-   "about" pitaa ne rehellisina. */
+/* 31 Jul: Stripe Adaptive Pricing charges the visitor's currency at
+   checkout; this adds a DISPLAY approximation for UK/US visitors. The rates
+   are updated by hand, "about" keeps them honest. */
 (function () {
   var region = '';
   try { region = new Intl.Locale(navigator.language).maximize().region || ''; } catch (e) {}
@@ -964,9 +970,9 @@ document.addEventListener('click', function (e) {
    if(!wraps[i].querySelector('.m-hide'))continue;
    seen.push(wraps[i]);
   }
-  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
-  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
-  // ilman ulospaasya.
+  // Table without a known wrapper (e.g. a hand-written page): put the
+  // button directly before the table itself, so no hidden column is ever
+  // left without a way out.
   var tables=document.querySelectorAll('table');
   for(i=0;i<tables.length;i++){
    if(!tables[i].querySelector('.m-hide'))continue;

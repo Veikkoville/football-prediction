@@ -144,11 +144,12 @@ SHARE_CARD_JS = r"""
     ctx.fillText(r.value,W-MX-ctx.measureText(r.value).width,cy-36*0.58);
    }
 
-   // Alatunniste tulee SPECISTA. Oletusteksti ("logged before kickoff,
-   // graded in public") on OTTELUENNUSTEEN vaite eika pida paikkaansa
-   // tilastolistasta -- jaettu kuva ei saa vaittaa enempaa kuin data antaa.
-   // Kahva varaa oikean laidan samalta rivilta: liian pitka alatunniste
-   // piirtyisi sen PAALLE (nahtiin PIL-versiossa 9.8).
+   // The footer comes from the SPEC. The default text ("logged before
+   // kickoff, graded in public") is a MATCH PREDICTION claim and is not
+   // true of a stats list -- a shared image must not claim more than the
+   // data supports. The handle reserves the right edge of the same row: a
+   // footer that runs long would draw OVER it (seen in the PIL version,
+   // 9 Aug).
    ctx.font=bold(20);
    var hw=ctx.measureText('@goaliqapp').width;
    var fn=spec.footNote||'logged before kickoff, graded in public';
@@ -171,8 +172,8 @@ SHARE_CARD_JS = r"""
  function deliver(blob,fileName){
   var file=null;
   try{file=new File([blob],fileName,{type:'image/png'});}catch(e){}
-  // Puhelimessa natiivi jakovalikko on se mita kayttaja odottaa; desktopilla
-  // ja jos jako ei ole kaytettavissa, pudotaan lataukseen.
+  // On a phone the native share sheet is what the user expects; on desktop
+  // and wherever sharing is unavailable, fall back to download.
   if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
    return navigator.share({files:[file]})['catch'](function(){download(blob,fileName);});
   }

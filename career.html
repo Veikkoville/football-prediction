@@ -37,7 +37,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </script>
 
 <style>
-  :root {/* 1.8.2026: magenta poistettiin paletista; nama korvaavat tokenit olivat viittauksina mutta puuttuivat :rootista. */--amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;
+  :root {/* 1 Aug 2026: magenta was removed from the palette; these replacement tokens were referenced but missing from :root. */--amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;
     --bg: #0B0A09;
     --bg-alt: #1F1D1A;
     --card: #141311;
@@ -56,8 +56,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   body {
     background: var(--bg);
     color: var(--text);
-    /* #78: leipäteksti luettavaan system-sansiin - Space Grotesk on display-
-       fontti ja jää otsikoihin, nappeihin ja kortin canvas-typoon (jaon pointti). */
+    /* #78: body text moves to a readable system sans - Space Grotesk is a
+       display font and stays in headings, buttons and the card's canvas
+       type (the point of the split). */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
@@ -65,18 +66,19 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   h1, h2, .logo, .btn, .nav-cta {
     font-family: "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
-  /* 2.8: talta sivulta puuttui globaali linkkisaanto kokonaan -> leipatekstin
-     linkit renderoityivat selaimen oletussinisella keskella tummaa teletext-teemaa.
-     Alleviivaus jatetaan (leipatekstissa vari ei saa olla ainoa erottaja);
-     .hint a, footer a ja .nav-cta yliajavat taman omilla saannoillaan. */
+  /* 2 Aug: this page had no global link rule at all -> body links rendered
+     browser-default blue in the middle of the dark teletext theme.
+     Underline stays (in body text color must not be the only distinction);
+     .hint a, footer a and .nav-cta override this with their own rules. */
   a { color: var(--teal-ink); }
   .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
   /* Tumma ink-hero (redesign 24.7): sama gradientti + 6px magenta-raita kuin index.html */
-  /* 2.8: banneri oli VALKOINEN ja teksti hukkui siihen. Talla sivulla --cream JA
-     --ink ovat molemmat #F3F2F2, eli tausta ja teksti olivat sama vari. Ennen 1.8:aa
-     --cream puuttui :rootista -> var(--cream) oli invalidi -> tausta jai tummaksi ja
-     vika oli nakymaton; puuttuvan tokenin LISAAMINEN paljasti sen. Teema on tumma
-     teletext (index.html), joten hero kayttaa --bg:ta ja erottuu alaviivalla. */
+  /* 2 Aug: the banner was WHITE and the text drowned in it. On this page
+     --cream AND --ink are both #F3F2F2, so background and text were the
+     same color. Before 1 Aug --cream was missing from :root -> var(--cream)
+     was invalid -> the background stayed dark and the bug was invisible;
+     ADDING the missing token exposed it. The theme is dark teletext
+     (index.html), so the hero uses --bg and separates with an underline. */
   .hero-shell {
     background: var(--bg);
     color: var(--ink);
@@ -286,8 +288,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 /* /GEN:MOBILE-CSS */
 </style>
 
-<!-- #85 GEO: sivukohtainen structured data (sivulla ei ollut yhtaan JSON-LD:ta).
-     Organization = sama @id kuin etusivulla (kompakti kopio, ei driftia). -->
+<!-- #85 GEO: page-level structured data (the page had no JSON-LD at all).
+     Organization = same @id as the front page (compact copy, no drift). -->
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -369,9 +371,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <script>
 (function () {
   'use strict';
-  // Lokaalikehitys osoittaa lokaaliin API:in; tuotanto omaan domainiin.
-  // 27.7: pois jaetusta *.onrender.com-vyöhykkeestä — DNA:n nimipalvelu esti
-  // koko vyöhykkeen (NXDOMAIN) ja tämä sivu kaatui operaattorin käyttäjillä.
+  // Local dev points at the local API; production at our own domain.
+  // 27 Jul: off the shared *.onrender.com zone - a Finnish ISP's resolver
+  // blocked the whole zone (NXDOMAIN) and this page crashed for that
+  // ISP's users.
   var API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://127.0.0.1:8000'
     : 'https://api.goaliq.app';
@@ -380,13 +383,13 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   var statusEl = document.getElementById('status');
   var stage = document.getElementById('cardStage');
   var currentEntry = null;
-  var accuracyLine = null; // haetaan livena, ei kovakoodata (stale-suoja)
+  var accuracyLine = null; // fetched live, never hardcoded (stale guard)
 
-  // 26.7 CLASSIC: kortin paletti oli yha vanha (sinertava ink #F3F2F2,
-  // lampin cream #0B0A09, sinertava muted #A8A29A) - vakiot ovat JS:ssa,
-  // joten CSS-token-ajot eivat nahneet niita. Fontit olivat jo Cormorantia.
-  // Magenta jaa: se on tassa merkki (IQ), 14px:n ylapalkkiviiva ja
-  // laatikon reunaviiva - ei tayttoa, eli ilmeen saannon mukainen.
+  // 26 Jul CLASSIC: the card palette was still old (bluish ink #F3F2F2,
+  // warm cream #0B0A09, bluish muted #A8A29A) - the constants live in JS,
+  // so the CSS token passes never saw them. Fonts were already Cormorant.
+  // Magenta stays: here it is the mark (IQ), the 14px top bar line and
+  // the box border - not a fill, so within the look's rule.
   var INK = '#F3F2F2', CREAM = '#0B0A09', MAGENTA = '#F5C542',
       MUTED = '#A8A29A', WHITE = '#141311', LINE = 'rgba(243,242,242,0.24)';
 
@@ -466,7 +469,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     ctx.fillStyle = INK;
     ctx.font = font(sz, 700);
     ctx.fillText(name, PAD, 218);
-    // Tyhjä/whitespace-nimi → subtitle-rivi jää kokonaan pois (ei placeholderia).
+    // Empty/whitespace name -> the subtitle row is dropped entirely (no placeholder).
     var teamName = String((d.manager && d.manager.team_name) || '').trim();
     if (teamName) {
       var tsz = fitText(teamName, W - 2 * PAD, 40, 500);
@@ -498,14 +501,14 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     if (lat.available) {
       var latLabel = lat.finished ? ('Last season' + (lat.season ? ' (' + lat.season + ')' : '')) : 'This season';
       var latVal = fmtPts(lat.total_points) + ' pts';
-      // 'pts'-yksikkö erottaa pistemäärän kierrosnumerosta (GW:t ovat 1-38).
+      // The 'pts' unit separates a points total from a gameweek number (GWs are 1-38).
       if (lat.best_gw) latVal += '  ·  best GW: ' + lat.best_gw.points + ' pts';
       statBlock(colX[1], 640, latLabel, latVal, 52, colW);
     } else {
       statBlock(colX[1], 640, 'New season', 'Starts GW1', 52, colW);
     }
 
-    // Malliteaser-laatikko (vain jos backend palautti sen - ei placeholderia)
+    // Model teaser box (only if the backend returned it - no placeholder)
     var boxTop = 790, boxH = 300;
     var t = d.model_teaser;
     if (t) {
