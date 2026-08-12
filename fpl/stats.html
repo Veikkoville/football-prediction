@@ -422,10 +422,9 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
  }
  function draw(){
   // Mobile (a) 9 Aug: Pos/Price/Mins/Starts are filter context (they are
-  // set with the buttons above), so a narrow screen shows
-  // Player + Team + valitun ryhman tilastot. Taulukko oli 657px = 1,7 x
-  // a phone's width. The columns are still in the DOM -> sorting and CSV
-  // eivat muutu.
+  // set with the buttons above), so a narrow screen shows Player + Team +
+  // the chosen group's stats. The table was 657px = 1.7x a phone's width.
+  // The columns are still in the DOM -> sorting and CSV are unchanged.
   var ks=cols(),h='<tr><th class="n">#</th><th data-k="name">Player</th>'
    +'<th data-k="team">Team</th><th class="m-hide" data-k="pos">Pos</th>'
    +'<th class="n m-hide" data-k="price">Price</th>'

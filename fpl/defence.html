@@ -469,9 +469,9 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
               name:(td[1].textContent||'').trim(),
               value:(td[2].textContent||'').trim()});
   }
-  // Taulukko on NOUSEVASSA jarjestyksessa (Arsenal 0.91 = paras puolustus).
-  // Ensimmainen otsikkoehdotus "MOST XG CONCEDED" vaitti tasmalleen
-  // the opposite of the data, and it would have gone out to X as it was.
+  // The table is in ASCENDING order (Arsenal 0.91 = best defence). The
+  // first proposed heading "MOST XG CONCEDED" claimed exactly the opposite
+  // of the data, and it would have gone out to X as it was.
   return {title:'FEWEST XG CONCEDED',
           subtitle:'Expected goals conceded per match, lowest is best',
           nameLabel:'TEAM',

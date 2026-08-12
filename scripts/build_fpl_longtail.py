@@ -159,7 +159,7 @@ footer{border-top:1px solid var(--line);margin-top:36px;padding:22px 0 34px;
 color:var(--muted);font-size:13px;}
 footer a{color:var(--teal);}
 .note{color:var(--muted);font-size:12px;margin:18px 0;}
-/* 26.7: vapautettu xG-leaderboard, koko taulukko ilmaiseksi */
+/* 26 Jul: the xG leaderboard opened up, full table free */
 /* 8 Aug (user report): the page column is 820px, so even a wide screen did
    not show every table column and you had to scroll sideways with the arrow.
    Now EVERY table may escape the column and grow with the window up to
@@ -1412,10 +1412,9 @@ STATS_JS = """
  }
  function draw(){
   // Mobile (a) 9 Aug: Pos/Price/Mins/Starts are filter context (they are
-  // set with the buttons above), so a narrow screen shows
-  // Player + Team + valitun ryhman tilastot. Taulukko oli 657px = 1,7 x
-  // a phone's width. The columns are still in the DOM -> sorting and CSV
-  // eivat muutu.
+  // set with the buttons above), so a narrow screen shows Player + Team +
+  // the chosen group's stats. The table was 657px = 1.7x a phone's width.
+  // The columns are still in the DOM -> sorting and CSV are unchanged.
   var ks=cols(),h='<tr><th class="n">#</th><th data-k="name">Player</th>'
    +'<th data-k="team">Team</th><th class="m-hide" data-k="pos">Pos</th>'
    +'<th class="n m-hide" data-k="price">Price</th>'
@@ -1723,9 +1722,9 @@ _DEFENCE_SPEC_FN = r"""function(){
               name:(td[1].textContent||'').trim(),
               value:(td[2].textContent||'').trim()});
   }
-  // Taulukko on NOUSEVASSA jarjestyksessa (Arsenal 0.91 = paras puolustus).
-  // Ensimmainen otsikkoehdotus "MOST XG CONCEDED" vaitti tasmalleen
-  // the opposite of the data, and it would have gone out to X as it was.
+  // The table is in ASCENDING order (Arsenal 0.91 = best defence). The
+  // first proposed heading "MOST XG CONCEDED" claimed exactly the opposite
+  // of the data, and it would have gone out to X as it was.
   return {title:'FEWEST XG CONCEDED',
           subtitle:'Expected goals conceded per match, lowest is best',
           nameLabel:'TEAM',
