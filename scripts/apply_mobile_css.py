@@ -106,6 +106,33 @@ def _strip_existing(html: str) -> str:
     return html
 
 
+def _insert_cut(html: str) -> int:
+    """Kohta jonka eteen lohko liitetaan: viimeinen </style> jonka RIVILLA
+    ei ole GEN:-markkeria. Palauttaa -1 jos sellaista ei ole.
+
+    Pelkka rindex("</style>") osui index.html:ssa ja predictions.html:ssa
+    sivun keskella olevaan generoituun yksiriviseen <style>-lohkoon
+    (GEN:ACC-BYCOMP / GEN:ACC-RECORD). Lohko olisi mennyt generoidun alueen
+    SISAAN: seuraava bake pyyhkii sen, ja uusi ajo lisaa uudestaan -- tasta
+    syntyi 11.-12.8 kahdesti peruutettu tuplausdiff. Rivitarkistus riittaa,
+    koska generoidut inline-lohkot ovat yksirivisia ja markkerit ovat
+    samalla rivilla kuin niiden </style>.
+    """
+    cuts = []
+    start = 0
+    while True:
+        i = html.find("</style>", start)
+        if i == -1:
+            break
+        ls = html.rfind("\n", 0, i) + 1
+        le = html.find("\n", i)
+        line = html[ls:le if le != -1 else len(html)]
+        if "GEN:" not in line:
+            cuts.append(i)
+        start = i + 1
+    return cuts[-1] if cuts else -1
+
+
 def apply_to(path: Path) -> str:
     """Palauttaa 'updated' | 'ok' | 'skipped:<syy>'."""
     if not path.exists():
@@ -117,7 +144,11 @@ def apply_to(path: Path) -> str:
         return "skipped:ei <style>-elementtia"
 
     stripped = _strip_existing(original)
-    cut = stripped.rindex("</style>")
+    cut = _insert_cut(stripped)
+    if cut == -1:
+        # Kaikki </style>-elementit ovat generoiduilla riveilla -> ei
+        # turvallista liitoskohtaa. Raportoitava, ei vaiettava.
+        return "skipped:vain generoituja <style>-elementteja"
     new = stripped[:cut] + MOBILE_CSS + stripped[cut:]
     new = _apply_cols_js(new)
     if new == original:
@@ -134,7 +165,9 @@ def check(path: Path) -> bool:
     if "</style>" not in original:
         return False
     stripped = _strip_existing(original)
-    cut = stripped.rindex("</style>")
+    cut = _insert_cut(stripped)
+    if cut == -1:
+        return False
     built = stripped[:cut] + MOBILE_CSS + stripped[cut:]
     return _apply_cols_js(built) == original
 
