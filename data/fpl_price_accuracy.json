@@ -1191,6 +1191,18 @@
    "actual_fallers": 0,
    "risers_caught_any_tier": 0,
    "fallers_caught_any_tier": 0
+  },
+  {
+   "graded_at": "2026-08-12T15:58:49Z",
+   "pred_at": "2026-08-12T12:58:31Z",
+   "rise_soon_pred": 0,
+   "rise_soon_hits": 0,
+   "fall_soon_pred": 0,
+   "fall_soon_hits": 0,
+   "actual_risers": 0,
+   "actual_fallers": 0,
+   "risers_caught_any_tier": 0,
+   "fallers_caught_any_tier": 0
   }
  ]
 }
