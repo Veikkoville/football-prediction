@@ -72,50 +72,58 @@
     }
     main a:hover { background: rgba(245,197,66,0.14); }
   /* GEN:MOBILE-CSS */
-/* Vain kapealla naytolla nakyva selite. Oletuksena piilossa, jotta
-   leveiden naytoiden sivut eivat muutu lainkaan. */
+/* Note shown only on narrow screens. Hidden by default so that pages on
+   wide screens do not change at all. */
 .m-only{display:none;}
 
 @media (max-width:560px){
   .m-only{display:block;}
 
-  /* --- 1. NAVI ---------------------------------------------------------
-     Vika: nav{justify-content:space-between} + kaksi joustamatonta lasta.
-     390px:ssa brandi ja linkkipari eivat mahdu samalle riville, joten
-     molemmat rivittyivat sisaisesti: "GoalIQ" katkesi logon alle ja
-     "Try it live" -napin teksti valui napin ulkopuolelle.
-     Korjaus: sallitaan rivitys ELEMENTTIEN valilla, ei niiden sisalla. */
+  /* --- 1. NAV ----------------------------------------------------------
+     Bug: nav{justify-content:space-between} plus two inflexible children.
+     At 390px the brand and the link pair do not fit on one line, so both
+     wrapped internally instead: "GoalIQ" broke below the logo and the
+     "Try it live" button text spilled outside the button.
+     Fix: allow wrapping BETWEEN elements, not inside them. */
   nav,.nav{flex-wrap:wrap;gap:10px;padding-top:14px;padding-bottom:14px;}
   .brand{font-size:18px;white-space:nowrap;flex:0 0 auto;}
   .brand-icon{width:20px;height:20px;margin-right:6px;}
   nav>span,.nav>span{flex:1 1 100%;font-size:13px;}
   .nav-cta{display:inline-block;white-space:nowrap;padding:8px 14px;}
 
-  /* --- 2. OTTELURIVIT --------------------------------------------------
-     Vika: .mrow on flex-rivi, jossa joukkuenimi sai kolme rivia ja
-     todennakoisyys leijui oikealla eri korkeudella -- rivia ei voinut
-     lukea vasemmalta oikealle. Korjaus: pinotaan. */
+  /* --- 2. MATCH ROWS ---------------------------------------------------
+     Bug: .mrow is a flex row where the team name took three lines and the
+     probability floated right at a different height, so the row could not
+     be read left to right. Fix: stack it. */
   .mrow{flex-direction:column;align-items:flex-start;gap:2px;padding:10px 0;}
   .mrow>div{width:100%;}
-  /* Pinoaminen lyhensi ottelulinkkeja (nimi mahtuu nyt yhdelle riville),
-     jolloin kosketuskohteesta tuli alle 32px. Leveys taydeksi + pystypadding
-     nostaa rivin takaisin sormenpaan kokoon. */
+  /* Stacking shortened the match links (the name now fits on one line),
+     which dropped the touch target below 32px. Full width plus vertical
+     padding brings the row back to fingertip size. */
   .mrow a{display:block;width:100%;padding:7px 0;}
   .pick{font-size:14px;}
 
-  /* --- 3. TAULUKOT: sarakeprioriteetti (Villen valinta (a) 9.8) --------
-     Builderit merkitsevat vahemman tarkeat sarakkeet .m-hide:lla; kapealla
-     naytolla nakyvat vain avainsarakkeet. Taysi taulukko sailyy
-     leveammilla naytoilla muuttumattomana. */
+  /* --- 3. TABLES: column priority (option (a), chosen 9 Aug) -----------
+     Builders mark the less important columns with .m-hide; on a narrow
+     screen only the key columns show. The full table stays unchanged on
+     wider screens. */
   th.m-hide,td.m-hide{display:none;}
 
-  /* ...MUTTA piilotettu ei saa tarkoittaa saavuttamatonta (Villen huomio
-     9.8). Karsinta on OLETUS, ei lopputila: "Show all columns" palauttaa
-     jokaisen sarakkeen jokaisessa taulukossa kerralla, ja taulukko
-     vierittaa vaakaan kuten leveallakin naytolla. Korkeampi spesifisyys
-     samassa media queryssa -> voittaa jarjestyksesta riippumatta. */
+  /* ...BUT hidden must not mean unreachable (raised 9 Aug). The trimming is
+     a DEFAULT, not an end state: "Show all columns" restores every column
+     in every table at once, and the table then scrolls horizontally just
+     as it does on a wide screen. Higher specificity inside the same media
+     query -> wins regardless of order. */
   body.cols-all th.m-hide,body.cols-all td.m-hide{display:table-cell;}
   body.cols-all .m-only{display:none;}
+
+  /* Bring a hidden column's number back into the row as a subline (10 Aug).
+     The column does not fit as a 5th column at 390px, but "Show all
+     columns" is two interactions too far from a number nobody knows to
+     look for yet. The subline gives the same number without the column,
+     and because it is .m-only it DISAPPEARS when the column comes back ->
+     the number is never shown twice. */
+  td .m-sub{font-size:11px;font-weight:400;opacity:.72;padding-top:2px;}
 
   .colstoggle{display:inline-block;margin:10px 0 4px;padding:9px 14px;
     min-height:40px;border:1px solid var(--line-strong,rgba(128,128,128,.5));
@@ -124,65 +132,65 @@
   .colstoggle[aria-pressed="true"]{border-color:var(--amber,#F5C542);
     color:var(--amber,#F5C542);}
 
-  /* Pitkat tekstisolut saavat rivittya; luvut eivat (tabular-nums hajoaa
-     ja "1,25" katkeaisi kahdelle riville). */
+  /* Long text cells may wrap; numbers may not (tabular-nums breaks down and
+     "1.25" would split across two lines). */
   .lb th,.lb td,.scroll table th,.scroll table td{white-space:normal;}
   .lb th.n,.lb td.n,.scroll table th.num,.scroll table td.num{
     white-space:nowrap;}
   .lb{font-size:13px;}
-  /* Vaakapadding 8px -> 5px. Mitattu: stats.html jai 404px:aan (30px yli)
-     senkin jalkeen kun kontekstisarakkeet oli piilotettu, ja yhdeksassa
-     sarakkeessa padding yksin oli 144px. Tiukempi padding sailyttaa
-     sarakkeen; sarakkeen pudottaminen olisi hukannut tietoa. */
+  /* Horizontal padding 8px -> 5px. Measured: stats.html still came out at
+     404px (30px over) after the context columns were hidden, and across
+     nine columns the padding alone was 144px. Tighter padding keeps the
+     column; dropping a column would have lost information. */
   .lb th,.lb td{padding:7px 5px;}
 
-  /* Taulukoiden min-width pakotti vierityksen myos silloin kun sarakkeita
-     oli piilotettu niin etta loput olisivat mahtuneet. */
+  /* The tables' min-width forced scrolling even when enough columns were
+     hidden that the rest would have fit. */
   .lb-wrap>.lb,.scroll>table,.table-wrap>table,.rec-scroll>table{
     min-width:0;}
   table{min-width:0;}
 
-  /* HILJAINEN LEIKKAUS (9.8, loytyi vasta kuvasta):
-     width:auto + min-width:0 sai taulukon kutistumaan TASMALLEEN kaareen
-     (tableW=374=wrapClient), jolloin nowrap-numerosarakkeet eivat mahtuneet
-     soluihinsa ja "28.17" renderoitiin muodossa "28.". Taulukko ei ollut
-     ylileveä eika kaare vierittanyt, joten EI leveysmittaus EIKA
-     scrollWidth-tarkistus nahnyt tata -- vain silmä.
-     width:max-content pakottaa taulukon luonnolliseen leveyteensa: jos se ei
-     mahdu, kaare vierittaa nakyvasti sen sijaan etta dataa katoaisi
-     aanettomasti. Nakyva vieritys on huono, hiljaa kadonnut luku on pahempi. */
+  /* SILENT TRUNCATION (9 Aug, only ever caught in a screenshot):
+     width:auto + min-width:0 shrank the table to EXACTLY the wrapper
+     (tableW=374=wrapClient), so nowrap number columns no longer fit their
+     cells and "28.17" rendered as "28.". The table was not overwide and
+     the wrapper did not scroll, so NEITHER a width measurement NOR a
+     scrollWidth check could see this. Only the eye could.
+     width:max-content forces the table to its natural width: if it does not
+     fit, the wrapper scrolls visibly instead of data disappearing in
+     silence. Visible scrolling is bad, a quietly lost number is worse. */
   .lb-wrap>.lb{width:max-content;max-width:none;}
-  /* HUOM SPESIFISYYS: BYCOMP_CSS injektoidaan fpl.html:aan ja
-     predictions.html:aan OMANA <style>-elementtinaan MYOHEMMIN sivulla, eli
-     se voittaa taman lohkon dokumenttijarjestyksessa. Media query ei nosta
-     spesifisyytta, joten .rec-scroll table (0,1,1) ei riittaisi kumoamaan
-     sen min-width:640px:aa. div.-etuliite nostaa (0,1,2) ja tekee saannosta
-     jarjestyksesta riippumattoman. */
+  /* SPECIFICITY WARNING: BYCOMP_CSS is injected into fpl.html and
+     predictions.html as its OWN <style> element LATER in the page, so it
+     beats this block on document order. A media query does not raise
+     specificity, so .rec-scroll table (0,1,1) would not be enough to
+     override its min-width:640px. The div. prefix raises it to (0,1,2) and
+     makes the rule order-independent. */
   div.rec-scroll table{min-width:0;}
   /* Ottelunimi oli nowrap ("Nottingham Forest v Crystal Palace" = 277px
      yhdella rivilla), mika yksin teki track record -taulusta 3 x ruudun. */
   div.rec-scroll td.team,.scroll td.team{white-space:normal;}
   div.rec-scroll th,div.rec-scroll td{padding:7px 6px;font-size:13px;}
-  /* Kick-off oli "2026-08-21 19:00:00 UTC" yhdella rivilla = 195px, eli
-     yksi sarake vei kolmanneksen puhelimen leveydesta. Nama luvut ovat
-     paivamaaria eivatka tasattavia numeroita, joten rivitys on turvallinen. */
+  /* Kick-off was "2026-08-21 19:00:00 UTC" on one line = 195px, so a single
+     column took a third of the phone's width. These values are dates rather
+     than numbers that need aligning, so wrapping is safe here. */
   div.rec-scroll td.num,div.rec-scroll th.num{white-space:normal;}
-  /* FDR-ruudukon solu on "ARS (H) 60%" = kolme osaa yhdella rivilla.
-     nowrap piti ruudukon 472px:ssa vaikka sarakkeita oli jo piilotettu;
-     rivittyva solu vie kaksi rivia ja puolittaa leveyden. */
+  /* An FDR grid cell is "ARS (H) 60%" = three parts on one line. nowrap kept
+     the grid at 472px even after columns had been hidden; a wrapping cell
+     takes two lines and halves the width. */
   .fdr-grid td.num,.scroll td.num .fdr,.fdr{white-space:normal;}
   .fdr{min-width:0;}
 
-  /* Vieritysvihje: nakyy vain siella minne builder sen lisaa, eli
-     taulukoissa jotka vierivat sarakkeiden piilotuksen jalkeenkin. */
+  /* Scroll hint: appears only where the builder adds it, that is, in tables
+     that still scroll after columns have been hidden. */
   .scrollhint{display:block;color:var(--muted,#A8A29A);font-size:12px;
     margin:6px 0 0;}
 
-  /* --- 4. SUODATINNAPIT ------------------------------------------------
-     Vika: .chips{display:inline-flex} ilman rivitysta -> nappirivi oli
-     454px, ja koska html/body on overflow-x:clip, viimeinen nappi
-     ("Set pieces") oli fyysisesti saavuttamattomissa puhelimella.
-     Korjaus: rivitys + jokainen suodatinryhma omalle rivilleen. */
+  /* --- 4. FILTER CHIPS -------------------------------------------------
+     Bug: .chips{display:inline-flex} without wrapping -> the chip row was
+     454px, and because html/body is overflow-x:clip the last chip ("Set
+     pieces") was physically unreachable on a phone.
+     Fix: allow wrapping, and give each filter group its own line. */
   .lbctl{gap:6px 8px;}
   .lbctl .lbl{flex:1 1 100%;margin:10px 0 0;}
   .lbctl .lbl:first-child{margin-top:0;}
@@ -202,20 +210,20 @@
   .toolnav a{display:inline-block;padding:4px 0;}
 }
 
-/* Erittain kapea (esim. iPhone SE 375px / Galaxy Fold ulkonaytto 344px):
-   brandi ja CTA eivat mahdu edes pienennettyina, ja hero-otsikko
-   ylivuotaa jos siina on pitkia sanoja. */
+/* Very narrow (e.g. iPhone SE 375px / Galaxy Fold cover screen 344px):
+   the brand and the CTA do not fit even when scaled down, and the hero
+   heading overflows if it contains long words. */
 @media (max-width:400px){
   .wrap{padding-left:14px;padding-right:14px;}
   .hero h1,h1{font-size:26px;overflow-wrap:break-word;}
   .brand{font-size:17px;}
-  /* Fonttia EI pienenneta 12px:aan taalla. Kokeiltiin 9.8 ja mitattiin:
-     se teki 1200 solusta alle 13px:n eli alle luettavan rajan, ja
-     sarakkeiden piilotus riitti jo mahduttamaan taulukot ilman sita.
-     Padding sen sijaan kiristetaan: stats.html on tihein taulukko
-     (9 nakyvaa saraketta) ja jai 404px:aan 6px:n paddingilla eli 14px yli
-     puhelimen leveyden. Luonnollinen leveys (width:max-content) on 383px
-     4px:n paddingilla; 3px vie sen 365:aan eli kaareen (374) mahtuvaksi. */
+  /* The font is NOT dropped to 12px here. Tried and measured 9 Aug: it took
+     1200 cells below 13px, which is under the readable limit, and hiding
+     columns was already enough to fit the tables without it.
+     Padding is tightened instead: stats.html is the densest table
+     (9 visible columns) and came out at 404px with 6px padding, i.e. 14px
+     over the phone's width. Its natural width (width:max-content) is 383px
+     at 4px padding; 3px takes it to 365px, which fits the wrapper (374). */
   .lb th,.lb td{padding:6px 3px;}
 }
 /* /GEN:MOBILE-CSS */
