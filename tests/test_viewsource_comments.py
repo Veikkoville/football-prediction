@@ -40,6 +40,10 @@ SAMPLE_PAGES = [
     "career.html", "privacy.html", "reset-password.html",
     "fpl/stats.html", "fpl/xg-leaders.html", "fpl/expected-points.html",
     "predictions/premier-league", "predictions/la-liga",
+    # pro.goaliq.app:n shell servataan lahes sellaisenaan JOKAISELLA
+    # SPA-sivulla -> sen kommentit ovat julkista view-sourcea siina missa
+    # juurisivujenkin. Siivottu kasin 11.8; ilman porttia ajautuu takaisin.
+    "web/pro-spa/src/app.html",
 ]
 
 
