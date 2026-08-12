@@ -106,9 +106,9 @@ body{background:var(--ink);color:var(--cream);font-family:"IBM Plex Mono",ui-mon
 h1,h2,h3,.brand{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-transform:uppercase;letter-spacing:-0.01em;}
 .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
 .bar{height:1px;background:var(--line);}
-/* 🐛 26.7: color oli var(--cream) = cream cream-pohjalla -> kaikki
-   color:inherit -lapset olisivat nakymattomia. Jaanne tumma->vaalea-
-   vaihdosta. */
+/* Bug 26 Jul: color was var(--cream) = cream on a cream background -> every
+   color:inherit child would be invisible. Leftover from the dark-to-light
+   switch. */
 .dark{background:var(--ink);
 color:var(--cream);}
 nav{display:flex;align-items:center;justify-content:space-between;
@@ -119,10 +119,10 @@ nav a{text-decoration:none;color:var(--cream);font-weight:600;}
 .nav-cta{background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 16px;
 border-radius:var(--radius);font-weight:700;}
 .nav-cta:hover{background:var(--amber);color:var(--ink);}
-/* 9.8 (Villen havainto isolla naytolla): tama oli 'padding:26px 0 44px',
-   ja shorthand nollasi .wrapin vaakapaddingin -> hero-otsikko ja lede
-   alkoivat 20px muuta sisaltoa vasemmalta. Sivulla oli siis kaksi eri
-   vasenta reunaa (303 ja 323). Vain pystypadding. */
+/* 9 Aug (spotted on a large screen): this was 'padding:26px 0 44px', and
+   the shorthand zeroed .wrap's horizontal padding -> the hero heading and
+   lede started 20px left of everything else. The page had two different
+   left edges (303 and 323). Vertical padding only. */
 .hero{padding-top:26px;padding-bottom:44px;}
 .hero h1{color:var(--cream);font-size:31px;line-height:1.15;margin:0 0 12px;
 letter-spacing:-0.01em;}
@@ -160,22 +160,23 @@ color:var(--muted);font-size:13px;}
 footer a{color:var(--teal);}
 .note{color:var(--muted);font-size:12px;margin:18px 0;}
 /* 26.7: vapautettu xG-leaderboard, koko taulukko ilmaiseksi */
-/* 8.8 (Villen havainto): sivun palsta on 820px, joten leveakaan naytto ei
-   nayttanyt kaikkia sarakkeita — piti vierittaa vaakaan nuolella. Nyt JOKAINEN
-   taulukko paasee ulos palstasta ja kasvaa ikkunan mukana 1560 pikseliin asti;
-   header, leipateksti ja footer pysyvat 820:ssa (rivinpituus = luettavuus).
-   96vw eika 100vw, jotta pystyvierityspalkki ei tyonna sivua vaakaan.
-   Taulukko itse EI veny taytteeksi: width:auto + min-width pitaa kapeat
-   taulukot entisen levyisina keskitettyna, ja vain leveat kayttavat lisatilan.
-   Kapealla naytolla min() palauttaa 100% -> kaytos on tasmalleen entinen. */
+/* 8 Aug (user report): the page column is 820px, so even a wide screen did
+   not show every table column and you had to scroll sideways with the arrow.
+   Now EVERY table may escape the column and grow with the window up to
+   1560px; header, body text and footer stay at 820 (line length is
+   readability). 96vw rather than 100vw so the vertical scrollbar cannot push
+   the page sideways. The table itself does NOT stretch as filler: width:auto
+   + min-width keeps narrow tables at their previous width, centered, and
+   only wide ones use the extra room. On a narrow screen min() returns 100%
+   -> behavior is exactly what it was. */
 .lb-wrap{overflow-x:auto;margin:14px 0;
 width:min(96vw,1560px);margin-left:50%;transform:translateX(-50%);}
-/* 820px oli .wrapin max-width PADDING MUKAAN LUKIEN, mutta tekstipalsta
-   on 780px. Taulukko keskittyi siis 820:n levyisena tayssleveaan
-   kaareen ja alkoi 20px tekstia vasemmalta. Sama luku kuin
-   tekstipalstalla -> reunat linjassa; leveat taulukot kasvavat yha. */
+/* 820px was .wrap's max-width INCLUDING PADDING, but the text column is
+   780px. A table centered at 820 in the full-width wrapper thus started
+   20px left of the text. Same number as the text column -> edges align;
+   wide tables still grow. */
 .lb-wrap>.lb{width:auto;min-width:min(100%,780px);margin:0 auto;}
-/* 96vw + translateX ei saa synnyttaa sivutason vaakavieritysta */
+/* 96vw + translateX must not create page-level horizontal scrolling */
 html,body{overflow-x:clip;}
 .lb{width:100%;border-collapse:collapse;font-size:14px;}
 .lb th,.lb td{padding:8px 10px;text-align:left;
@@ -198,19 +199,19 @@ font-weight:600;cursor:pointer;}
 .lbctl select{border:1px solid var(--line-strong);background:var(--paper);
 color:var(--cream);border-radius:var(--radius);padding:6px 12px;font-size:13px;
 font-weight:600;}
-/* Neutraali joukkuepaita (ei krestia/pelaajakuvaa, ks. IP-huomio koodissa) */
+/* Neutral team shirt (no crest or player likeness, see the IP note in code) */
 .lb td.tm{display:flex;align-items:center;gap:7px;}
-/* Luottamuslippu (10.8): joukkueen luokitus nojaa heikompaan tietoon.
-   KUVAILEVA - ei kerro kumpaan suuntaan projektio liikkuu. Vaimennettu
-   tahallaan: se on reunahuomautus rivilla, ei rivin tarkein asia. */
+/* Confidence flag (10 Aug): the team's rating rests on weaker information.
+   DESCRIPTIVE - it does not say which way the projection moves. Muted on
+   purpose: it is a margin note on the row, not the row's main point. */
 .tflag{flex:0 0 auto;font-size:10px;font-weight:600;letter-spacing:.04em;
 text-transform:uppercase;padding:1px 5px;border:1px solid var(--line-strong);
 border-radius:var(--radius);opacity:.72;white-space:nowrap;}
 .kit{flex:0 0 auto;display:block;}
-/* Model XI -kentta. 26.7: sama ilme kuin SPA:n TeamPitchManagerilla ja
-   mobiilin #106-pitchilla (teal-tint, #108-paletti) - EI nurmivaria. Villen
-   paatos: brandipaletti voittaa kirjaimellisen nurmen, ja kolmen pinnan
-   pitaa nayttaa samalta. */
+/* Model XI pitch. 26 Jul: same look as the SPA's TeamPitchManager and the
+   mobile #106 pitch (teal tint, #108 palette) - NOT grass green. Decision:
+   the brand palette beats literal grass, and all three surfaces must look
+   the same. */
 .pitch{background:rgba(46,214,194,0.22);border:1px solid var(--line);
 border-radius:var(--radius);padding:10px 6px;margin:18px 0;}
 .xirow{display:flex;justify-content:space-evenly;flex-wrap:wrap;gap:8px;
@@ -887,14 +888,14 @@ XG_JS = """
 <script>
 (function(){
  var D=window.__XG__||[],w=5,per90=false,pos='',team='',key=5,desc=true;
- // Nayta oletuksena 100 rivia. MIKSI: 373 riviä = ~5000 DOM-solmua ja jokainen
- // kontrolliklikkaus rakensi ne kaikki uudelleen innerHTML:lla -> sivu lagasi
- // pahasti. 100 riittaa kaytannossa kaikkeen, ja "show all" on yhden klikin
- // paassa. Payloadissa on silti kaikki, joten suodatus ja lajittelu koskevat
- // koko aineistoa - vain NAYTTO on rajattu.
+ // Show 100 rows by default. WHY: 373 rows = ~5000 DOM nodes, and every
+ // control click rebuilt them all through innerHTML -> the page lagged
+ // badly. 100 covers practically everything, and "show all" is one click
+ // away. The payload still holds everything, so filtering and sorting work
+ // on the full data - only the DISPLAY is capped.
  var LIMIT=100,showAll=false;
- // Sama neutraali paitasiluetti kuin palvelinrenderoinnissa ja
- // TeamKit.svelte/TeamKit.tsx:ssa. Ei krestia eika pelaajakuvaa (IP).
+ // Same neutral shirt silhouette as in server rendering and in
+ // TeamKit.svelte/TeamKit.tsx. No crest, no player likeness (IP).
  var JP='M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 '
   +'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
  function kit(c,lbl){
@@ -902,17 +903,17 @@ XG_JS = """
   return '<svg class="kit" width="26" height="26" aria-hidden="true">'
    +'<use href="#k'+(lbl||'').toUpperCase()+'"/></svg>';
  }
- // Minuuttikynnys. Per 90 ilman tata on rikki: 2 minuuttia pelannut nousee
- // karkeen puhtaana kohinana. Kynnys on NAKYVA ja saadettava, ei hiljainen
- // piilotus: kayttaja nakee mika suodatin on paalla ja voi ottaa sen pois.
+ // Minutes threshold. Per 90 is broken without it: a player with 2 minutes
+ // tops the list as pure noise. The threshold is VISIBLE and adjustable,
+ // not a silent hide: the user sees which filter is on and can remove it.
  var minm=0;
  var tb=document.getElementById('xgb'),cnt=document.getElementById('xgc');
  if(!tb)return;
  function agg(p){
   if(w==='S'){
-   // Koko kausi: bootstrapin totaalit. "Per game" -tilassa naytetaan
-   // TOTAALIT (kaudelle per-ottelu ei ole mielekas: meilla on avaukset,
-   // ei esiintymisia), "Per 90" jakaa minuuteilla.
+   // Full season: bootstrap totals. "Per game" mode shows TOTALS (per
+   // match is not meaningful for the season: we have starts, not
+   // appearances), "Per 90" divides by minutes.
    var s=p[5]||[0,0,0,0,0],d=per90?(s[0]/90):1;
    if(!d)d=1;
    return {n:p[0],t:p[1],p:p[2],c:p[3],g:s[1],m:s[0],k:p[6],
@@ -929,8 +930,9 @@ XG_JS = """
   var r=[];
   for(var i=0;i<D.length;i++){
    // Sama saanto kuin palvelimella (fpl_leaders.rank_xg_leaders): maalivahdit
-   // pois oletuksena, koska tama on xG-lista eika torjuntalista. GKP-suodatin
-   // nayttaa ne erikseen. Ilman tata sivu antaisi kaksi eri lukua.
+   // out by default, because this is an xG list, not a saves list. The GKP
+   // filter shows them separately. Without this the page would give two
+   // different numbers.
    if(D[i][2]==='GKP'&&pos!=='GKP')continue;
    if(pos&&D[i][2]!==pos)continue;
    if(team&&D[i][1]!==team)continue;
@@ -970,8 +972,8 @@ XG_JS = """
    else{more.style.display='';
         more.textContent='Show all '+r.length+' players';}
   }
-  // Kausitilassa viimeisessa sarakkeessa on AVAUKSET, ei esiintymisia
-  // (bootstrap antaa startsin). Otsikko kertoo kumpi, ei arvata.
+  // In season mode the last column holds STARTS, not appearances (the
+  // bootstrap provides starts). The header says which one, no guessing.
   var hh=document.querySelectorAll('#xgt2 thead th');
   if(hh&&hh[9])hh[9].textContent=(w==='S')?'Starts':'Games';
   var span=(w==='S')?', full season':', last '+w+' games each';
@@ -992,15 +994,15 @@ XG_JS = """
  function sync(){
   chips('xgw',[[3,'3'],[5,'5'],[10,'10'],['S','Season']],
         function(){return w;},function(v){w=v;});
-  // Kausitilassa vasen vaihtoehto EI ole per ottelu vaan summa (meilla on
-  // avaukset, ei esiintymisia -> aitoa per-ottelu-jakajaa ei ole). Chipin
-  // teksti kertoo sen, muuten 25.50 nayttaisi "per game" -lukemalta.
+  // In season mode the left option is NOT per match but a sum (we have
+  // starts, not appearances -> there is no true per-match divisor). The
+  // chip text says so, otherwise 25.50 would read like a "per game" figure.
   chips('xgr',[[0,(w==='S')?'Total':'Per game'],[1,'Per 90']],
         function(){return per90?1:0;},
         function(v){
          var was=per90;per90=!!v;
          // Per 90:een siirryttaessa oletuskynnys paalle, takaisin per game:een
-         // siirryttaessa pois. Kayttajan oma valinta jaa voimaan jos han on
+         // when navigating away. The user's own choice stays in force if they
          // sita jo koskenut talla naytolla.
          if(!was&&per90&&minm===0)minm=180;
          if(was&&!per90&&minm===180)minm=0;
@@ -1317,14 +1319,15 @@ STATS_JS = """
  var grp='key',mode='total',pos='',team='',minm=0,maxp=99,q='',
      sortKey='pts',desc=true,all=false;
  // --- Gameweek-ikkuna (Villen pyynto 9.8) --------------------------------
- // Kausisummista ei voi laskea "GW1-6" jalkikateen, joten kierroskohtaiset
- // rivit haetaan ERILLISESTA tiedostosta ja VASTA kun kayttaja koskee
+ // "GW1-6" cannot be derived from season totals after the fact, so the
+ // per-gameweek rows come from a SEPARATE file and only WHEN the user
  // suodattimeen: se on 551 KB (122 KB gzip) eika sita makseta niiden
  // puolesta jotka eivat sita kayta.
  var GW=null,gwFrom=0,gwTo=0,gwLoading=false,gwCache={},GWI=null;
- // Vain FPL:n virallisen APIn sarakkeet ovat ikkunoitavissa. Laukaustason
- // luvut tulevat Understatista ilman kierroserittelya, joten niiden
- // ikkunointi olisi vale: sivu estaa sen sen sijaan etta nayttaisi nollia.
+ // Only columns from the official FPL API can be windowed. Shot-level
+ // numbers come from Understat with no per-gameweek breakdown, so
+ // windowing them would be a lie: the page blocks it rather than show
+ // zeros.
  var WINCOLS=['pts','g','a','tkl','cbi','rec','dc','cs','gc','saves','bps',
               'bonus','yc','rc','starts','mins','xg','xa','xgi','xgc','ict',
               'ppg'];
@@ -1367,7 +1370,8 @@ STATS_JS = """
  }
  function fmt(row,k){
   var v=val(row,k);
-  // null = pelaajaa ei matsattu laukausdataan. Tyhja viiva on totuus,
+  // null = the player was not matched to shot data. An empty dash is the
+  // truth,
   // nolla olisi vaite ettei han laukonut kertaakaan.
   if(v===null||v===undefined)return '\\u2013';
   if(k==='pen'||k==='cor'||k==='fk')return v?String(v):'\\u2013';
@@ -1381,20 +1385,20 @@ STATS_JS = """
    var r=D.r[j];
    if(pos&&r[C.pos]!==pos)continue;
    if(team&&r[C.team]!==team)continue;
-   if(gwOn()&&!winRow(r))continue;   // ei minuutteja ikkunassa
+   if(gwOn()&&!winRow(r))continue;   // no minutes in the window
    if(raw(r,'mins')<minm)continue;
    if(r[C.price]>maxp)continue;
    if(q&&(r[C.name]+' '+r[C.team]).toLowerCase().indexOf(q)<0)continue;
    if(mode==='pstart'&&raw(r,'starts')<1)continue;
    out.push(r);
   }
-  // Erikoistilannejarjestykset ovat sijalukuja: 1 = ensimmainen potkaisija.
-  // Suurin-ensin olisi vaarinpain (5. pilkkuvuorossa oleva karkeen), ja
-  // 0 = "ei listalla" pitaa aina valua loppuun kumpaankin suuntaan.
+  // Set-piece orders are ordinal ranks: 1 = first taker. Largest-first
+  // would be backwards (5th in the penalty queue at the top), and
+  // 0 = "not listed" must always sink to the end in both directions.
   var ORD=ORDCOLS.indexOf(sortKey)>=0;
   out.sort(function(a,b){
    var x=val(a,sortKey),y=val(b,sortKey);
-   // Tuntematon arvo ei kilpaile jarjestyksesta kumpaankaan suuntaan.
+   // An unknown value competes in neither sort direction.
    var xn=(x===null||x===undefined),yn=(y===null||y===undefined);
    if(xn||yn)return xn&&yn?0:(xn?1:-1);
    if(ORD){
@@ -1407,10 +1411,10 @@ STATS_JS = """
   return out;
  }
  function draw(){
-  // Mobiili (a) 9.8: Pos/Price/Mins/Starts ovat suodatinkontekstia (ne
-  // saadetaan yllä olevilla napeilla), joten kapealla naytolla nakyvat
+  // Mobile (a) 9 Aug: Pos/Price/Mins/Starts are filter context (they are
+  // set with the buttons above), so a narrow screen shows
   // Player + Team + valitun ryhman tilastot. Taulukko oli 657px = 1,7 x
-  // puhelimen leveys. Sarakkeet ovat yha DOMissa -> lajittelu ja CSV
+  // a phone's width. The columns are still in the DOM -> sorting and CSV
   // eivat muutu.
   var ks=cols(),h='<tr><th class="n">#</th><th data-k="name">Player</th>'
    +'<th data-k="team">Team</th><th class="m-hide" data-k="pos">Pos</th>'
@@ -1429,9 +1433,9 @@ STATS_JS = """
    s+='<tr><td class="n">'+(j+1)+'</td><td>'+r[C.name]+'</td>'
     +'<td>'+r[C.team]+'</td><td class="m-hide">'+r[C.pos]+'</td>'
     +'<td class="n m-hide">'+r[C.price].toFixed(1)+'</td>'
-    // Mins ja Starts ovat ikkunoitavia: ilman raw():ta ne nayttivat kauden
+    // Mins and Starts are windowable: without raw() they showed the season
     // lukuja GW-otsikon alla (Haaland 2953 min "GW1-6:lla"). Loytyi vasta
-    // livesivua katsomalla, ei koodista.
+    // by looking at the live page, not from code.
     +'<td class="n m-hide">'+raw(r,'mins')+'</td>';
    if(mode==='pstart')s+='<td class="n m-hide">'+raw(r,'starts')+'</td>';
    for(var m=0;m<ks.length;m++){
@@ -1465,11 +1469,11 @@ STATS_JS = """
    if(cols().indexOf(sortKey)<0){sortKey=cols()[0];desc=true;}paint();});
   chips('stm',[['total','Total'],['p90','Per 90'],['pstart','Per start']],
    mode,function(v){
-    // Otoskokovahti: 7 pelattua minuuttia tuottaa 12.86 tacklea/90 ja
-    // valtaa koko listan karjen. Suhdeluku ilman otoskokoa on harhaanjohtava,
-    // joten rate-tilaan siirtyminen nostaa minimin 450 minuuttiin. Kayttaja
-    // voi laskea sen takaisin nollaan yhdella klikilla - sita ei estetä,
-    // se vain lakkaa olemasta oletus.
+    // Sample-size guard: 7 minutes played yields 12.86 tackles/90 and
+    // takes over the top of the list. A rate without sample size is
+    // misleading, so switching to rate mode raises the minimum to 450
+    // minutes. The user can drop it back to zero in one click - it is not
+    // blocked, it just stops being the default.
     if(v!=='total'&&mode==='total'&&minm===0){minm=450;}
     mode=v;paint();});
   chips('stp',[['','All'],['GKP','GKP'],['DEF','DEF'],['MID','MID'],
@@ -1505,8 +1509,8 @@ STATS_JS = """
  // --- Gameweek-ikkuna ----------------------------------------------------
  var gwf=document.getElementById('stgwf'),gwt=document.getElementById('stgwt');
  function syncGroups(){
-  // Laukaustason ryhmat eivat ole ikkunoitavissa (Understat, ei
-  // kierroserittelya). Ne lukitaan nakyvasti sen sijaan etta nayttaisivat
+  // Shot-level groups cannot be windowed (Understat, no per-gameweek
+  // breakdown). They lock visibly instead of showing
   // nollia tai kausisummia ikkunan otsikon alla -- kumpikin valehtelisi.
   var on=gwOn(),e=document.getElementById('stg');
   if(!e)return;
@@ -1535,7 +1539,7 @@ STATS_JS = """
    GW=j;gwLoading=false;cb&&cb();
   })['catch'](function(){
    gwLoading=false;
-   // Epaonnistunut lataus palauttaa valikon kausitilaan JA sanoo sen.
+   // A failed load returns the picker to season mode AND says so.
    // Hiljainen paluu kausisummiin nayttaisi silta etta ikkuna toimii.
    if(gwf)gwf.value='';
    gwFrom=0;gwTo=0;syncGroups();draw();
@@ -1614,10 +1618,11 @@ _STATS_SPEC_FN = r"""function(){
               team:(td[2].textContent||'').trim(),
               value:(hiIdx>=0&&td[hiIdx]?td[hiIdx].textContent:'').trim()});
   }
-  // Alaotsikko kokoaa AKTIIVISET suodattimet, ei pelkkaa rivimaaraa. Ilman
-  // tata jaettu kortti sanoisi "40 players" kertomatta etta ne ovat
-  // puolustajia, yhdesta seurasta tai hintakaton alta -- lukija ei voi
-  // tietaa mita han katsoo. Arvot luetaan nakyvista kontrolleista, joten
+  // The subtitle collects the ACTIVE filters, not just a row count.
+  // Without it a shared card would say "40 players" without saying they
+  // are defenders, from one club, or under a price cap -- the reader
+  // cannot know what they are looking at. Values are read from the visible
+  // controls, so
   // ne eivat voi erkaantua ruudusta.
   function chipOn(id){
    var e=document.getElementById(id);
@@ -1626,7 +1631,8 @@ _STATS_SPEC_FN = r"""function(){
    return b?(b.textContent||'').trim():'';
   }
   var bits=[];
-  // Gameweek-ikkuna ENSIN: se on vahvin rajaus ja jaettu kortti ilman sita
+  // Gameweek window FIRST: it is the strongest scope, and a shared card
+  // without it
   // vaittaisi kauden lukuja. Arvot luetaan valikoista, eivat muistista.
   var gf=document.getElementById('stgwf'),gt=document.getElementById('stgwt');
   if(gf&&gf.value){
@@ -1640,7 +1646,8 @@ _STATS_SPEC_FN = r"""function(){
   var tm=document.getElementById('stteam');
   if(tm&&tm.value)bits.push(tm.value);
   var pr=document.getElementById('stprice');
-  // Hintavalitsimen oletus on ylaraja (99), joka EI ole suodatin. Ilman
+  // The price picker's default is the upper bound (99), which is NOT a
+  // filter. Without
   // tarkistusta kortti sanoi "max 99" jokaisessa kuvassa.
   if(pr&&pr.value&&Number(pr.value)<99)bits.push('max '+Number(pr.value).toFixed(1)+'m');
   var qq=document.getElementById('stq');
@@ -1653,7 +1660,7 @@ _STATS_SPEC_FN = r"""function(){
           subtitle:sub,
           nameLabel:'PLAYER',
           valueLabel:label.toUpperCase(),
-          // Tama kortti on RAAKADATAA, ei mallin ennuste. Oletusalatunniste
+          // This card is RAW DATA, not a model prediction. The default footer
           // ("logged before kickoff, graded in public") vaittaisi vaarin.
           footNote:'free FPL stats at goaliq.app',
           footNote2:'official FPL API and shot-level data, not betting advice',
@@ -1718,7 +1725,7 @@ _DEFENCE_SPEC_FN = r"""function(){
   }
   // Taulukko on NOUSEVASSA jarjestyksessa (Arsenal 0.91 = paras puolustus).
   // Ensimmainen otsikkoehdotus "MOST XG CONCEDED" vaitti tasmalleen
-  // painvastoin kuin data, ja se olisi mennyt X:aan sellaisenaan.
+  // the opposite of the data, and it would have gone out to X as it was.
   return {title:'FEWEST XG CONCEDED',
           subtitle:'Expected goals conceded per match, lowest is best',
           nameLabel:'TEAM',

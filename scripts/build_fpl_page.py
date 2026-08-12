@@ -54,17 +54,17 @@ from scripts.build_fpl_phase0 import map_name  # noqa: E402
 # #38: PostHog cookieless site-analytiikka (persistence=memory -> ei evasteita,
 # ei consent-banneria; ei PII:ta). Sama projekti kuin appi + pro-web (427890);
 # client-avain on julkinen by design (sama avain SPA-bundlessa).
-POSTHOG_SNIPPET = """<!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
+POSTHOG_SNIPPET = """<!-- PostHog (#38): cookieless site analytics - persistence=memory, no cookies, no PII -->
 <script>
 !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-/* 1.8.2026: capture_pageview lisatty, persistence EI muutettu.
-   $pageview puuttui kokonaan -> PostHogin Web Analytics naytti
-   goaliq.app:lle ~nollaa vaikka liikennetta oli (sama vika korjattiin
-   pro.goaliq.app:lle 25.7, mutta korjaus ei levinnyt tanne).
-   persistence:'memory' + identified_only PIDETAAN: privacy.html lupaa
-   evasteettoman tilan ja sanoo sen olevan syy siihen ettei sivulla ole
-   evastebanneria. Siksi tama mittaa SIVULATAUKSIA, ei uniikkeja
-   kavijoita — uniikit vaatisivat pysyvan tunnisteen eli bannerin. */
+/* 1 Aug 2026: capture_pageview added, persistence NOT changed.
+   $pageview was missing entirely, so PostHog Web Analytics showed
+   goaliq.app near zero despite real traffic (the same bug was fixed for
+   pro.goaliq.app on 25 Jul but the fix never spread here).
+   persistence:'memory' + identified_only STAYS: privacy.html promises a
+   cookieless setup and names it as the reason the page has no cookie
+   banner. This therefore counts PAGE LOADS, not unique visitors, since
+   uniques would need a persistent identifier and thus a banner. */
 posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only',capture_pageview:true});
 posthog.register({platform:'web',source_app:'goaliq-static'});
 posthog.capture('web_landing_viewed',{page:location.pathname});
@@ -75,16 +75,16 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 # 2.8.2026: sama snippet liittaa pro.goaliq.app-linkkeihin lahdetagin (src/srcp),
 # jonka SPA lukee pro_page_viewed-eventtiin -> saapumisaste per CTA-paikka.
 # Raw-string, koska tagays sisaltaa regex-kenoviivoja.
-CTA_TRACK_SNIPPET = r"""<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+CTA_TRACK_SNIPPET = r"""<!-- #56: Pro CTA click metric (PostHog pro_cta_clicked) - non-blocking, no PII, still cookieless -->
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
   if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta'), page: location.pathname}); }
 });
-/* 2.8.2026 saapumisattribuutio: goaliq.app ajaa persistence:'memory' -tilassa ja
-   pro.goaliq.app localStorage+cookie -tilassa, joten distinct_id EI jatku domainien
-   yli. Liitetaan pro-linkkeihin ei-identifioiva lahdetagi, jonka SPA lukee
-   pro_page_viewed-eventtiin. Ei evastetta, ei PII:ta. */
+/* 2 Aug 2026 arrival attribution: goaliq.app runs persistence:'memory' and
+   pro.goaliq.app runs localStorage+cookie, so distinct_id does NOT carry
+   across the domains. Pro links get a non-identifying source tag that the
+   SPA reads into its pro_page_viewed event. No cookie, no PII. */
 (function () {
   var links = document.querySelectorAll('a[data-cta]');
   for (var i = 0; i < links.length; i++) {
@@ -1174,26 +1174,27 @@ def accuracy_dataset_ld(c: dict, page_url: str) -> dict:
 # Kanoninen brändipaletti (goaliq-app/assets/brand/brand-tokens.md) - täsmähexit.
 # Hero = tumma (Ink) + magenta, sisältö = vaalea (Cream/Paper) + ink-teksti.
 CSS = """
-  /* 28.7 TELETEXT. Arvot ovat tasan samat kuin landingin :root-lohkossa,
-     pro-spa/theme.css:ssa ja goaliq-app/lib/theme.ts:ssa.
-     Mitatut kontrastit --ink #0B0A09 -pohjaa vasten:
+  /* 28 Jul TELETEXT. Values are exactly the same as in the landing page's
+     :root block, pro-spa/theme.css and the app's lib/theme.ts.
+     Measured contrasts against the --ink #0B0A09 base:
        --cream 17.70:1  --ink-muted 7.82:1  --amber 12.20:1
        --teal 10.85:1   --negative 8.52:1   --faint 5.33:1
-     HUOM --magenta-deep on tummalla 3.31:1 eli AA:n ALLE: se ei ole
-     enaa linkki- eika lukuvari, vain mark. Linkit = teal, luvut = amber. */
+     NOTE --magenta-deep is 3.31:1 on dark, i.e. BELOW AA: it is no longer
+     a link or number color, only a mark. Links = teal, numbers = amber. */
   :root{ --coral:#FF8A5C; --gold:#F5C542; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#F5C542; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
-    /* jaetun record-lohkon tokenit (build_fpl_page.by_comp/record).
-       predictions.html EI maarita naita -> se saa classic-fallbackit. */
+    /* Tokens for the shared record block (build_fpl_page.by_comp/record).
+       predictions.html does NOT define these -> it gets the classic
+       fallbacks. */
     --rec-thead-bg:#1F1D1A; --rec-thead-fg:#A8A29A; --rec-hit:#5FD97A;
     --rec-miss:#FF8A5C; --rec-pending:#F5C542; --rec-pct:#A8A29A;
     --rec-on-bg:#F5C542; --rec-on-line:#F5C542; --rec-on-fg:#0B0A09; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:var(--ink); color:var(--cream); line-height:1.6; font-size:17px; }
   h1,h2,h3,.brand{ font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; text-transform:uppercase; letter-spacing:-0.01em; }
-  /* Peruslinkki: ilman tata .content-lohkon ULKOPUOLISET linkit (esim.
-     .note-kappaleen mini-liigalinkki) jaavat selaimen oletussiniseksi
-     #0000EE:ksi. Elementtivalitsin (0,0,1) haviaa kaikille luokkasaannoille,
-     joten se osuu vain aidosti tyylittelemattomiin linkkeihin. */
+  /* Base link rule: without this, links OUTSIDE the .content block (e.g.
+     the mini league link in the .note paragraph) stay browser-default
+     blue #0000EE. An element selector (0,0,1) loses to every class rule,
+     so it only hits genuinely unstyled links. */
   a{ color:var(--teal); }
   .dark{ background:var(--ink); color:var(--cream); }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
@@ -1219,13 +1220,14 @@ CSS = """
   .content a.cta{ color:var(--amber); }
   .content a.cta.secondary{ color:var(--cream); }
   .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:4px 12px 10px; }
-  /* 8.8 (Villen havainto): palsta on 960px, joten leveakaan naytto ei nayttanyt
-     kaikkia sarakkeita. Taulukot paasevat ulos palstasta ja kasvavat ikkunan
-     mukana; leipateksti pysyy 960:ssa. Taulukko itse ei veny taytteeksi. */
+  /* 8 Aug (user report): the column is 960px, so even a wide screen did not
+     show every table column. Tables may now escape the column and grow with
+     the window; body text stays at 960. The table itself does not stretch
+     as filler. */
   .scroll,.table-wrap,.rec-scroll{ width:min(96vw,1560px); margin-left:50%; transform:translateX(-50%); }
   .scroll>table,.table-wrap>table,.rec-scroll>table{ width:auto; min-width:min(100%,560px); margin:0 auto; }
-  /* .table-wrap oli tyylittelematon: FDR-ruudukko vuoti ulos kapealla
-     naytolla ilman vieritysta. Sama kaare kuin muillakin. */
+  /* .table-wrap was unstyled: the FDR grid overflowed on narrow screens
+     with no way to scroll. Same wrapper as everywhere else. */
   .table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   table{ width:100%; border-collapse:collapse; min-width:560px; }
   caption{ caption-side:bottom; color:var(--ink-muted); font-size:13px; text-align:left; padding:10px 2px 4px; }
@@ -1234,13 +1236,14 @@ CSS = """
   th{ color:var(--ink-muted); font-weight:600; font-size:13px; }
   th.num,td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
   td.team{ font-weight:700; white-space:nowrap; }
-  /* 26.7 CLASSIC: lämpökartta pois. Väri ja paino ovat LUVUSSA, ei solun
-     taustassa; paino kulkee värin mukana, joten sarake luetaan myös
-     värisokeana. Sama kaava kuin SPA:n FreeView (is-easy/is-hard). */
+  /* 26 Jul CLASSIC: heatmap removed. Color and weight live in the NUMBER,
+     not the cell background; weight travels with the color, so the column
+     reads under color blindness too. Same formula as the SPA's FreeView
+     (is-easy/is-hard). */
   .fdr{ display:inline-block; min-width:34px; text-align:center; font-size:13px; text-decoration:none; color:inherit; font-variant-numeric:tabular-nums; }
-  /* .content a värittää linkit magentaksi ja voittaa .fdr:n spesifisyydessä
-     (0,1,1 > 0,1,0) -> ilman tätä JOKA neutraali solu olisi magenta. Löytyi
-     vain selaimesta; portit eivät näe kaskadia. */
+  /* .content a colors links magenta and beats .fdr on specificity
+     (0,1,1 > 0,1,0) -> without this EVERY neutral cell would be magenta.
+     Only ever found in a browser; the gates cannot see the cascade. */
   .content a.fdr{ color:inherit; }
   a.fdr:hover{ text-decoration:underline; }
   td.is-easy,td.is-easy .fdr,span.fdr.is-easy{ color:var(--amber); font-weight:600; }
@@ -1263,13 +1266,14 @@ CSS = """
   .upsell .price-note{ color:var(--ink-muted); font-size:14px; margin:10px 0 0; }
   footer{ padding:30px 0 40px; font-size:14px; }
   footer .wrap{ color:var(--hero-muted); }
-  /* 🐛 26.7: tama oli var(--cream) = cream cream-pohjalla -> 8 footer-
-     linkkia oli TAYSIN nakymattomia (kontrasti 1.00). Jaanne tummasta
-     footerista; classic-vaihto teki pohjasta vaalean muttei tasta. */
+  /* Bug 26 Jul: this was var(--cream) = cream on a cream background -> 8
+     footer links were COMPLETELY invisible (contrast 1.00). Leftover from
+     the dark footer; the classic switch lightened the background but not
+     this. */
   footer a{ color:var(--hero-muted); text-decoration:underline; }
   footer a:hover{ color:var(--amber); }
   @media (max-width:640px){ .hero h1{ font-size:29px; } .hero .lede{ font-size:17px; } .nav{ padding:14px 16px; } .hero{ padding:30px 0 40px; } }
-  /* Kapea mobiili: CTA-napit pinoon täysleveinä, pitkä label ei ylivuoda (#15) */
+  /* Narrow mobile: CTA buttons stack full width, a long label cannot overflow (#15) */
   @media (max-width:520px){
     .cta-row{ flex-direction:column; align-items:stretch; }
     .cta{ max-width:100%; text-align:center; }

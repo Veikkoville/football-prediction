@@ -226,26 +226,27 @@
 
 <meta name="theme-color" content="#0B0A09">
 <style>
-  /* 28.7 TELETEXT. Arvot ovat tasan samat kuin landingin :root-lohkossa,
-     pro-spa/theme.css:ssa ja goaliq-app/lib/theme.ts:ssa.
-     Mitatut kontrastit --ink #0B0A09 -pohjaa vasten:
+  /* 28 Jul TELETEXT. Values are exactly the same as in the landing page's
+     :root block, pro-spa/theme.css and the app's lib/theme.ts.
+     Measured contrasts against the --ink #0B0A09 base:
        --cream 17.70:1  --ink-muted 7.82:1  --amber 12.20:1
        --teal 10.85:1   --negative 8.52:1   --faint 5.33:1
-     HUOM --magenta-deep on tummalla 3.31:1 eli AA:n ALLE: se ei ole
-     enaa linkki- eika lukuvari, vain mark. Linkit = teal, luvut = amber. */
+     NOTE --magenta-deep is 3.31:1 on dark, i.e. BELOW AA: it is no longer
+     a link or number color, only a mark. Links = teal, numbers = amber. */
   :root{ --coral:#FF8A5C; --gold:#F5C542; --gold-deep:#F5C542; --amber:#F5C542; --amber-deep:#F5C542; --teal:#2ED6C2; --ink:#0B0A09; --ink2:#141311; --cream:#F3F2F2; --paper:#1F1D1A; --ink-muted:#A8A29A; --hero-muted:#A8A29A; --faint:#8A847A; --line:rgba(243,242,242,0.24); --line-strong:rgba(243,242,242,0.40); --negative:#FF8A5C; --radius:0;
-    /* jaetun record-lohkon tokenit (build_fpl_page.by_comp/record).
-       predictions.html EI maarita naita -> se saa classic-fallbackit. */
+    /* Tokens for the shared record block (build_fpl_page.by_comp/record).
+       predictions.html does NOT define these -> it gets the classic
+       fallbacks. */
     --rec-thead-bg:#1F1D1A; --rec-thead-fg:#A8A29A; --rec-hit:#5FD97A;
     --rec-miss:#FF8A5C; --rec-pending:#F5C542; --rec-pct:#A8A29A;
     --rec-on-bg:#F5C542; --rec-on-line:#F5C542; --rec-on-fg:#0B0A09; }
   *{ box-sizing:border-box; }
   body{ margin:0; font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:var(--ink); color:var(--cream); line-height:1.6; font-size:17px; }
   h1,h2,h3,.brand{ font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; text-transform:uppercase; letter-spacing:-0.01em; }
-  /* Peruslinkki: ilman tata .content-lohkon ULKOPUOLISET linkit (esim.
-     .note-kappaleen mini-liigalinkki) jaavat selaimen oletussiniseksi
-     #0000EE:ksi. Elementtivalitsin (0,0,1) haviaa kaikille luokkasaannoille,
-     joten se osuu vain aidosti tyylittelemattomiin linkkeihin. */
+  /* Base link rule: without this, links OUTSIDE the .content block (e.g.
+     the mini league link in the .note paragraph) stay browser-default
+     blue #0000EE. An element selector (0,0,1) loses to every class rule,
+     so it only hits genuinely unstyled links. */
   a{ color:var(--teal); }
   .dark{ background:var(--ink); color:var(--cream); }
   .wrap{ max-width:960px; margin:0 auto; padding:0 20px; }
@@ -271,13 +272,14 @@
   .content a.cta{ color:var(--amber); }
   .content a.cta.secondary{ color:var(--cream); }
   .scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:4px 12px 10px; }
-  /* 8.8 (Villen havainto): palsta on 960px, joten leveakaan naytto ei nayttanyt
-     kaikkia sarakkeita. Taulukot paasevat ulos palstasta ja kasvavat ikkunan
-     mukana; leipateksti pysyy 960:ssa. Taulukko itse ei veny taytteeksi. */
+  /* 8 Aug (user report): the column is 960px, so even a wide screen did not
+     show every table column. Tables may now escape the column and grow with
+     the window; body text stays at 960. The table itself does not stretch
+     as filler. */
   .scroll,.table-wrap,.rec-scroll{ width:min(96vw,1560px); margin-left:50%; transform:translateX(-50%); }
   .scroll>table,.table-wrap>table,.rec-scroll>table{ width:auto; min-width:min(100%,560px); margin:0 auto; }
-  /* .table-wrap oli tyylittelematon: FDR-ruudukko vuoti ulos kapealla
-     naytolla ilman vieritysta. Sama kaare kuin muillakin. */
+  /* .table-wrap was unstyled: the FDR grid overflowed on narrow screens
+     with no way to scroll. Same wrapper as everywhere else. */
   .table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   table{ width:100%; border-collapse:collapse; min-width:560px; }
   caption{ caption-side:bottom; color:var(--ink-muted); font-size:13px; text-align:left; padding:10px 2px 4px; }
@@ -286,13 +288,14 @@
   th{ color:var(--ink-muted); font-weight:600; font-size:13px; }
   th.num,td.num{ text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
   td.team{ font-weight:700; white-space:nowrap; }
-  /* 26.7 CLASSIC: lämpökartta pois. Väri ja paino ovat LUVUSSA, ei solun
-     taustassa; paino kulkee värin mukana, joten sarake luetaan myös
-     värisokeana. Sama kaava kuin SPA:n FreeView (is-easy/is-hard). */
+  /* 26 Jul CLASSIC: heatmap removed. Color and weight live in the NUMBER,
+     not the cell background; weight travels with the color, so the column
+     reads under color blindness too. Same formula as the SPA's FreeView
+     (is-easy/is-hard). */
   .fdr{ display:inline-block; min-width:34px; text-align:center; font-size:13px; text-decoration:none; color:inherit; font-variant-numeric:tabular-nums; }
-  /* .content a värittää linkit magentaksi ja voittaa .fdr:n spesifisyydessä
-     (0,1,1 > 0,1,0) -> ilman tätä JOKA neutraali solu olisi magenta. Löytyi
-     vain selaimesta; portit eivät näe kaskadia. */
+  /* .content a colors links magenta and beats .fdr on specificity
+     (0,1,1 > 0,1,0) -> without this EVERY neutral cell would be magenta.
+     Only ever found in a browser; the gates cannot see the cascade. */
   .content a.fdr{ color:inherit; }
   a.fdr:hover{ text-decoration:underline; }
   td.is-easy,td.is-easy .fdr,span.fdr.is-easy{ color:var(--amber); font-weight:600; }
@@ -315,69 +318,71 @@
   .upsell .price-note{ color:var(--ink-muted); font-size:14px; margin:10px 0 0; }
   footer{ padding:30px 0 40px; font-size:14px; }
   footer .wrap{ color:var(--hero-muted); }
-  /* 🐛 26.7: tama oli var(--cream) = cream cream-pohjalla -> 8 footer-
-     linkkia oli TAYSIN nakymattomia (kontrasti 1.00). Jaanne tummasta
-     footerista; classic-vaihto teki pohjasta vaalean muttei tasta. */
+  /* Bug 26 Jul: this was var(--cream) = cream on a cream background -> 8
+     footer links were COMPLETELY invisible (contrast 1.00). Leftover from
+     the dark footer; the classic switch lightened the background but not
+     this. */
   footer a{ color:var(--hero-muted); text-decoration:underline; }
   footer a:hover{ color:var(--amber); }
   @media (max-width:640px){ .hero h1{ font-size:29px; } .hero .lede{ font-size:17px; } .nav{ padding:14px 16px; } .hero{ padding:30px 0 40px; } }
-  /* Kapea mobiili: CTA-napit pinoon täysleveinä, pitkä label ei ylivuoda (#15) */
+  /* Narrow mobile: CTA buttons stack full width, a long label cannot overflow (#15) */
   @media (max-width:520px){
     .cta-row{ flex-direction:column; align-items:stretch; }
     .cta{ max-width:100%; text-align:center; }
   }
   html,body{ overflow-x:clip; }
 /* GEN:MOBILE-CSS */
-/* Vain kapealla naytolla nakyva selite. Oletuksena piilossa, jotta
-   leveiden naytoiden sivut eivat muutu lainkaan. */
+/* Note shown only on narrow screens. Hidden by default so that pages on
+   wide screens do not change at all. */
 .m-only{display:none;}
 
 @media (max-width:560px){
   .m-only{display:block;}
 
-  /* --- 1. NAVI ---------------------------------------------------------
-     Vika: nav{justify-content:space-between} + kaksi joustamatonta lasta.
-     390px:ssa brandi ja linkkipari eivat mahdu samalle riville, joten
-     molemmat rivittyivat sisaisesti: "GoalIQ" katkesi logon alle ja
-     "Try it live" -napin teksti valui napin ulkopuolelle.
-     Korjaus: sallitaan rivitys ELEMENTTIEN valilla, ei niiden sisalla. */
+  /* --- 1. NAV ----------------------------------------------------------
+     Bug: nav{justify-content:space-between} plus two inflexible children.
+     At 390px the brand and the link pair do not fit on one line, so both
+     wrapped internally instead: "GoalIQ" broke below the logo and the
+     "Try it live" button text spilled outside the button.
+     Fix: allow wrapping BETWEEN elements, not inside them. */
   nav,.nav{flex-wrap:wrap;gap:10px;padding-top:14px;padding-bottom:14px;}
   .brand{font-size:18px;white-space:nowrap;flex:0 0 auto;}
   .brand-icon{width:20px;height:20px;margin-right:6px;}
   nav>span,.nav>span{flex:1 1 100%;font-size:13px;}
   .nav-cta{display:inline-block;white-space:nowrap;padding:8px 14px;}
 
-  /* --- 2. OTTELURIVIT --------------------------------------------------
-     Vika: .mrow on flex-rivi, jossa joukkuenimi sai kolme rivia ja
-     todennakoisyys leijui oikealla eri korkeudella -- rivia ei voinut
-     lukea vasemmalta oikealle. Korjaus: pinotaan. */
+  /* --- 2. MATCH ROWS ---------------------------------------------------
+     Bug: .mrow is a flex row where the team name took three lines and the
+     probability floated right at a different height, so the row could not
+     be read left to right. Fix: stack it. */
   .mrow{flex-direction:column;align-items:flex-start;gap:2px;padding:10px 0;}
   .mrow>div{width:100%;}
-  /* Pinoaminen lyhensi ottelulinkkeja (nimi mahtuu nyt yhdelle riville),
-     jolloin kosketuskohteesta tuli alle 32px. Leveys taydeksi + pystypadding
-     nostaa rivin takaisin sormenpaan kokoon. */
+  /* Stacking shortened the match links (the name now fits on one line),
+     which dropped the touch target below 32px. Full width plus vertical
+     padding brings the row back to fingertip size. */
   .mrow a{display:block;width:100%;padding:7px 0;}
   .pick{font-size:14px;}
 
-  /* --- 3. TAULUKOT: sarakeprioriteetti (Villen valinta (a) 9.8) --------
-     Builderit merkitsevat vahemman tarkeat sarakkeet .m-hide:lla; kapealla
-     naytolla nakyvat vain avainsarakkeet. Taysi taulukko sailyy
-     leveammilla naytoilla muuttumattomana. */
+  /* --- 3. TABLES: column priority (option (a), chosen 9 Aug) -----------
+     Builders mark the less important columns with .m-hide; on a narrow
+     screen only the key columns show. The full table stays unchanged on
+     wider screens. */
   th.m-hide,td.m-hide{display:none;}
 
-  /* ...MUTTA piilotettu ei saa tarkoittaa saavuttamatonta (Villen huomio
-     9.8). Karsinta on OLETUS, ei lopputila: "Show all columns" palauttaa
-     jokaisen sarakkeen jokaisessa taulukossa kerralla, ja taulukko
-     vierittaa vaakaan kuten leveallakin naytolla. Korkeampi spesifisyys
-     samassa media queryssa -> voittaa jarjestyksesta riippumatta. */
+  /* ...BUT hidden must not mean unreachable (raised 9 Aug). The trimming is
+     a DEFAULT, not an end state: "Show all columns" restores every column
+     in every table at once, and the table then scrolls horizontally just
+     as it does on a wide screen. Higher specificity inside the same media
+     query -> wins regardless of order. */
   body.cols-all th.m-hide,body.cols-all td.m-hide{display:table-cell;}
   body.cols-all .m-only{display:none;}
 
-  /* Piilotetun sarakkeen luku takaisin riville alarivina (10.8). Sarake ei
-     mahdu 5. sarakkeeksi 390px:aan, mutta "Show all columns" on kaksi
-     tapahtumaa liian kaukana luvulta jota kukaan ei viela osaa etsia.
-     Alarivi antaa saman luvun ilman saraketta, ja koska se on .m-only, se
-     KATOAA kun sarake palautetaan -> lukua ei nayteta koskaan kahdesti. */
+  /* Bring a hidden column's number back into the row as a subline (10 Aug).
+     The column does not fit as a 5th column at 390px, but "Show all
+     columns" is two interactions too far from a number nobody knows to
+     look for yet. The subline gives the same number without the column,
+     and because it is .m-only it DISAPPEARS when the column comes back ->
+     the number is never shown twice. */
   td .m-sub{font-size:11px;font-weight:400;opacity:.72;padding-top:2px;}
 
   .colstoggle{display:inline-block;margin:10px 0 4px;padding:9px 14px;
@@ -387,65 +392,65 @@
   .colstoggle[aria-pressed="true"]{border-color:var(--amber,#F5C542);
     color:var(--amber,#F5C542);}
 
-  /* Pitkat tekstisolut saavat rivittya; luvut eivat (tabular-nums hajoaa
-     ja "1,25" katkeaisi kahdelle riville). */
+  /* Long text cells may wrap; numbers may not (tabular-nums breaks down and
+     "1.25" would split across two lines). */
   .lb th,.lb td,.scroll table th,.scroll table td{white-space:normal;}
   .lb th.n,.lb td.n,.scroll table th.num,.scroll table td.num{
     white-space:nowrap;}
   .lb{font-size:13px;}
-  /* Vaakapadding 8px -> 5px. Mitattu: stats.html jai 404px:aan (30px yli)
-     senkin jalkeen kun kontekstisarakkeet oli piilotettu, ja yhdeksassa
-     sarakkeessa padding yksin oli 144px. Tiukempi padding sailyttaa
-     sarakkeen; sarakkeen pudottaminen olisi hukannut tietoa. */
+  /* Horizontal padding 8px -> 5px. Measured: stats.html still came out at
+     404px (30px over) after the context columns were hidden, and across
+     nine columns the padding alone was 144px. Tighter padding keeps the
+     column; dropping a column would have lost information. */
   .lb th,.lb td{padding:7px 5px;}
 
-  /* Taulukoiden min-width pakotti vierityksen myos silloin kun sarakkeita
-     oli piilotettu niin etta loput olisivat mahtuneet. */
+  /* The tables' min-width forced scrolling even when enough columns were
+     hidden that the rest would have fit. */
   .lb-wrap>.lb,.scroll>table,.table-wrap>table,.rec-scroll>table{
     min-width:0;}
   table{min-width:0;}
 
-  /* HILJAINEN LEIKKAUS (9.8, loytyi vasta kuvasta):
-     width:auto + min-width:0 sai taulukon kutistumaan TASMALLEEN kaareen
-     (tableW=374=wrapClient), jolloin nowrap-numerosarakkeet eivat mahtuneet
-     soluihinsa ja "28.17" renderoitiin muodossa "28.". Taulukko ei ollut
-     ylileveä eika kaare vierittanyt, joten EI leveysmittaus EIKA
-     scrollWidth-tarkistus nahnyt tata -- vain silmä.
-     width:max-content pakottaa taulukon luonnolliseen leveyteensa: jos se ei
-     mahdu, kaare vierittaa nakyvasti sen sijaan etta dataa katoaisi
-     aanettomasti. Nakyva vieritys on huono, hiljaa kadonnut luku on pahempi. */
+  /* SILENT TRUNCATION (9 Aug, only ever caught in a screenshot):
+     width:auto + min-width:0 shrank the table to EXACTLY the wrapper
+     (tableW=374=wrapClient), so nowrap number columns no longer fit their
+     cells and "28.17" rendered as "28.". The table was not overwide and
+     the wrapper did not scroll, so NEITHER a width measurement NOR a
+     scrollWidth check could see this. Only the eye could.
+     width:max-content forces the table to its natural width: if it does not
+     fit, the wrapper scrolls visibly instead of data disappearing in
+     silence. Visible scrolling is bad, a quietly lost number is worse. */
   .lb-wrap>.lb{width:max-content;max-width:none;}
-  /* HUOM SPESIFISYYS: BYCOMP_CSS injektoidaan fpl.html:aan ja
-     predictions.html:aan OMANA <style>-elementtinaan MYOHEMMIN sivulla, eli
-     se voittaa taman lohkon dokumenttijarjestyksessa. Media query ei nosta
-     spesifisyytta, joten .rec-scroll table (0,1,1) ei riittaisi kumoamaan
-     sen min-width:640px:aa. div.-etuliite nostaa (0,1,2) ja tekee saannosta
-     jarjestyksesta riippumattoman. */
+  /* SPECIFICITY WARNING: BYCOMP_CSS is injected into fpl.html and
+     predictions.html as its OWN <style> element LATER in the page, so it
+     beats this block on document order. A media query does not raise
+     specificity, so .rec-scroll table (0,1,1) would not be enough to
+     override its min-width:640px. The div. prefix raises it to (0,1,2) and
+     makes the rule order-independent. */
   div.rec-scroll table{min-width:0;}
   /* Ottelunimi oli nowrap ("Nottingham Forest v Crystal Palace" = 277px
      yhdella rivilla), mika yksin teki track record -taulusta 3 x ruudun. */
   div.rec-scroll td.team,.scroll td.team{white-space:normal;}
   div.rec-scroll th,div.rec-scroll td{padding:7px 6px;font-size:13px;}
-  /* Kick-off oli "2026-08-21 19:00:00 UTC" yhdella rivilla = 195px, eli
-     yksi sarake vei kolmanneksen puhelimen leveydesta. Nama luvut ovat
-     paivamaaria eivatka tasattavia numeroita, joten rivitys on turvallinen. */
+  /* Kick-off was "2026-08-21 19:00:00 UTC" on one line = 195px, so a single
+     column took a third of the phone's width. These values are dates rather
+     than numbers that need aligning, so wrapping is safe here. */
   div.rec-scroll td.num,div.rec-scroll th.num{white-space:normal;}
-  /* FDR-ruudukon solu on "ARS (H) 60%" = kolme osaa yhdella rivilla.
-     nowrap piti ruudukon 472px:ssa vaikka sarakkeita oli jo piilotettu;
-     rivittyva solu vie kaksi rivia ja puolittaa leveyden. */
+  /* An FDR grid cell is "ARS (H) 60%" = three parts on one line. nowrap kept
+     the grid at 472px even after columns had been hidden; a wrapping cell
+     takes two lines and halves the width. */
   .fdr-grid td.num,.scroll td.num .fdr,.fdr{white-space:normal;}
   .fdr{min-width:0;}
 
-  /* Vieritysvihje: nakyy vain siella minne builder sen lisaa, eli
-     taulukoissa jotka vierivat sarakkeiden piilotuksen jalkeenkin. */
+  /* Scroll hint: appears only where the builder adds it, that is, in tables
+     that still scroll after columns have been hidden. */
   .scrollhint{display:block;color:var(--muted,#A8A29A);font-size:12px;
     margin:6px 0 0;}
 
-  /* --- 4. SUODATINNAPIT ------------------------------------------------
-     Vika: .chips{display:inline-flex} ilman rivitysta -> nappirivi oli
-     454px, ja koska html/body on overflow-x:clip, viimeinen nappi
-     ("Set pieces") oli fyysisesti saavuttamattomissa puhelimella.
-     Korjaus: rivitys + jokainen suodatinryhma omalle rivilleen. */
+  /* --- 4. FILTER CHIPS -------------------------------------------------
+     Bug: .chips{display:inline-flex} without wrapping -> the chip row was
+     454px, and because html/body is overflow-x:clip the last chip ("Set
+     pieces") was physically unreachable on a phone.
+     Fix: allow wrapping, and give each filter group its own line. */
   .lbctl{gap:6px 8px;}
   .lbctl .lbl{flex:1 1 100%;margin:10px 0 0;}
   .lbctl .lbl:first-child{margin-top:0;}
@@ -465,35 +470,35 @@
   .toolnav a{display:inline-block;padding:4px 0;}
 }
 
-/* Erittain kapea (esim. iPhone SE 375px / Galaxy Fold ulkonaytto 344px):
-   brandi ja CTA eivat mahdu edes pienennettyina, ja hero-otsikko
-   ylivuotaa jos siina on pitkia sanoja. */
+/* Very narrow (e.g. iPhone SE 375px / Galaxy Fold cover screen 344px):
+   the brand and the CTA do not fit even when scaled down, and the hero
+   heading overflows if it contains long words. */
 @media (max-width:400px){
   .wrap{padding-left:14px;padding-right:14px;}
   .hero h1,h1{font-size:26px;overflow-wrap:break-word;}
   .brand{font-size:17px;}
-  /* Fonttia EI pienenneta 12px:aan taalla. Kokeiltiin 9.8 ja mitattiin:
-     se teki 1200 solusta alle 13px:n eli alle luettavan rajan, ja
-     sarakkeiden piilotus riitti jo mahduttamaan taulukot ilman sita.
-     Padding sen sijaan kiristetaan: stats.html on tihein taulukko
-     (9 nakyvaa saraketta) ja jai 404px:aan 6px:n paddingilla eli 14px yli
-     puhelimen leveyden. Luonnollinen leveys (width:max-content) on 383px
-     4px:n paddingilla; 3px vie sen 365:aan eli kaareen (374) mahtuvaksi. */
+  /* The font is NOT dropped to 12px here. Tried and measured 9 Aug: it took
+     1200 cells below 13px, which is under the readable limit, and hiding
+     columns was already enough to fit the tables without it.
+     Padding is tightened instead: stats.html is the densest table
+     (9 visible columns) and came out at 404px with 6px padding, i.e. 14px
+     over the phone's width. Its natural width (width:max-content) is 383px
+     at 4px padding; 3px takes it to 365px, which fits the wrapper (374). */
   .lb th,.lb td{padding:6px 3px;}
 }
 /* /GEN:MOBILE-CSS */
 </style>
-<!-- PostHog (#38): cookieless site-analytiikka - persistence=memory, ei evasteita, ei PII -->
+<!-- PostHog (#38): cookieless site analytics - persistence=memory, no cookies, no PII -->
 <script>
 !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-/* 1.8.2026: capture_pageview lisatty, persistence EI muutettu.
-   $pageview puuttui kokonaan -> PostHogin Web Analytics naytti
-   goaliq.app:lle ~nollaa vaikka liikennetta oli (sama vika korjattiin
-   pro.goaliq.app:lle 25.7, mutta korjaus ei levinnyt tanne).
-   persistence:'memory' + identified_only PIDETAAN: privacy.html lupaa
-   evasteettoman tilan ja sanoo sen olevan syy siihen ettei sivulla ole
-   evastebanneria. Siksi tama mittaa SIVULATAUKSIA, ei uniikkeja
-   kavijoita — uniikit vaatisivat pysyvan tunnisteen eli bannerin. */
+/* 1 Aug 2026: capture_pageview added, persistence NOT changed.
+   $pageview was missing entirely, so PostHog Web Analytics showed
+   goaliq.app near zero despite real traffic (the same bug was fixed for
+   pro.goaliq.app on 25 Jul but the fix never spread here).
+   persistence:'memory' + identified_only STAYS: privacy.html promises a
+   cookieless setup and names it as the reason the page has no cookie
+   banner. This therefore counts PAGE LOADS, not unique visitors, since
+   uniques would need a persistent identifier and thus a banner. */
 posthog.init('phc_ASmq5P9R5goGTDxze3GkXHJqU6RsvMCNqunSVBMgGkn7',{api_host:'https://us.i.posthog.com',persistence:'memory',autocapture:false,person_profiles:'identified_only',capture_pageview:true});
 posthog.register({platform:'web',source_app:'goaliq-static'});
 posthog.capture('web_landing_viewed',{page:location.pathname});
@@ -701,16 +706,16 @@ predictions and analytics. Not betting advice.</p>
   </div>
 </footer>
 
-<!-- #56: Pro CTA -klikkimittaus (PostHog pro_cta_clicked) - ei-blokkaava, ei PII, cookieless ennallaan -->
+<!-- #56: Pro CTA click metric (PostHog pro_cta_clicked) - non-blocking, no PII, still cookieless -->
 <script>
 document.addEventListener('click', function (e) {
   var a = e.target && e.target.closest ? e.target.closest('a[data-cta]') : null;
   if (a && window.posthog) { posthog.capture('pro_cta_clicked', {location: a.getAttribute('data-cta'), page: location.pathname}); }
 });
-/* 2.8.2026 saapumisattribuutio: goaliq.app ajaa persistence:'memory' -tilassa ja
-   pro.goaliq.app localStorage+cookie -tilassa, joten distinct_id EI jatku domainien
-   yli. Liitetaan pro-linkkeihin ei-identifioiva lahdetagi, jonka SPA lukee
-   pro_page_viewed-eventtiin. Ei evastetta, ei PII:ta. */
+/* 2 Aug 2026 arrival attribution: goaliq.app runs persistence:'memory' and
+   pro.goaliq.app runs localStorage+cookie, so distinct_id does NOT carry
+   across the domains. Pro links get a non-identifying source tag that the
+   SPA reads into its pro_page_viewed event. No cookie, no PII. */
 (function () {
   var links = document.querySelectorAll('a[data-cta]');
   for (var i = 0; i < links.length; i++) {
@@ -738,9 +743,9 @@ document.addEventListener('click', function (e) {
    if(!wraps[i].querySelector('.m-hide'))continue;
    seen.push(wraps[i]);
   }
-  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
-  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
-  // ilman ulospaasya.
+  // Table without a known wrapper (e.g. a hand-written page): put the
+  // button directly before the table itself, so no hidden column is ever
+  // left without a way out.
   var tables=document.querySelectorAll('table');
   for(i=0;i<tables.length;i++){
    if(!tables[i].querySelector('.m-hide'))continue;

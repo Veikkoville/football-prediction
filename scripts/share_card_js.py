@@ -22,7 +22,7 @@ MUUTTUJAT (korvataan kutsujassa):
 SHARE_CARD_JS = r"""
 <script>
 (function(){
- // --- Mitat ja paletti: 1:1 shareCard.ts:n kanssa (ala muuta yksipuolisesti)
+ // --- Dimensions and palette: 1:1 with shareCard.ts (do not change one-sidedly)
  var W=1080,MX=60,ROW_TOP=404,ROW_H=80,FOOT_H=146;
  var INK='#0b0a09',INK2='#141311',AMBER='#f5c542',CREAM='#f3f2f2',
      MUTED='#a8a29a',LINE='rgba(243,242,242,0.13)',
@@ -37,7 +37,7 @@ SHARE_CARD_JS = r"""
    wmP=new Promise(function(res){
     var img=new Image();
     img.onload=function(){res(img);};
-    // Kortti ei saa kaatua asset-puutteeseen: fallback piirtaa wordmarkin
+    // The card must not fail on a missing asset: the fallback draws the wordmark
     // tekstina. Sama sopimus kuin SPA:ssa.
     img.onerror=function(){res(null);};
     img.src='/assets/brand/goaliq-wordmark-teletext.png';
@@ -84,9 +84,9 @@ SHARE_CARD_JS = r"""
    if(ctx.roundRect){ctx.roundRect((W-120)/2,176,120,6,3);ctx.fill();}
    else{ctx.fillRect((W-120)/2,176,120,6);}
 
-   // Otsikko ja alaotsikko kutistetaan mahtumaan. Suodatinlista voi olla
-   // pitka ("Goal threat, per 90, DEF, 900+ mins, ARS, 42 players"), ja
-   // ilman kutistusta se valuisi kortin reunojen yli.
+   // Title and subtitle shrink to fit. The filter list can be long
+   // ("Goal threat, per 90, DEF, 900+ mins, ARS, 42 players"), and
+   // without shrinking it would spill over the card edges.
    var tf=shrink(ctx,spec.title,60,W-2*MX,34,bold);
    ctx.font=bold(tf);ctx.fillStyle=CREAM;
    ctx.fillText(spec.title,(W-ctx.measureText(spec.title).width)/2,226);

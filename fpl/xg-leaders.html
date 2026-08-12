@@ -239,14 +239,14 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
 <script>
 (function(){
  var D=window.__XG__||[],w=5,per90=false,pos='',team='',key=5,desc=true;
- // Nayta oletuksena 100 rivia. MIKSI: 373 riviä = ~5000 DOM-solmua ja jokainen
- // kontrolliklikkaus rakensi ne kaikki uudelleen innerHTML:lla -> sivu lagasi
- // pahasti. 100 riittaa kaytannossa kaikkeen, ja "show all" on yhden klikin
- // paassa. Payloadissa on silti kaikki, joten suodatus ja lajittelu koskevat
- // koko aineistoa - vain NAYTTO on rajattu.
+ // Show 100 rows by default. WHY: 373 rows = ~5000 DOM nodes, and every
+ // control click rebuilt them all through innerHTML -> the page lagged
+ // badly. 100 covers practically everything, and "show all" is one click
+ // away. The payload still holds everything, so filtering and sorting work
+ // on the full data - only the DISPLAY is capped.
  var LIMIT=100,showAll=false;
- // Sama neutraali paitasiluetti kuin palvelinrenderoinnissa ja
- // TeamKit.svelte/TeamKit.tsx:ssa. Ei krestia eika pelaajakuvaa (IP).
+ // Same neutral shirt silhouette as in server rendering and in
+ // TeamKit.svelte/TeamKit.tsx. No crest, no player likeness (IP).
  var JP='M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 '
   +'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
  function kit(c,lbl){
@@ -254,17 +254,17 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
   return '<svg class="kit" width="26" height="26" aria-hidden="true">'
    +'<use href="#k'+(lbl||'').toUpperCase()+'"/></svg>';
  }
- // Minuuttikynnys. Per 90 ilman tata on rikki: 2 minuuttia pelannut nousee
- // karkeen puhtaana kohinana. Kynnys on NAKYVA ja saadettava, ei hiljainen
- // piilotus: kayttaja nakee mika suodatin on paalla ja voi ottaa sen pois.
+ // Minutes threshold. Per 90 is broken without it: a player with 2 minutes
+ // tops the list as pure noise. The threshold is VISIBLE and adjustable,
+ // not a silent hide: the user sees which filter is on and can remove it.
  var minm=0;
  var tb=document.getElementById('xgb'),cnt=document.getElementById('xgc');
  if(!tb)return;
  function agg(p){
   if(w==='S'){
-   // Koko kausi: bootstrapin totaalit. "Per game" -tilassa naytetaan
-   // TOTAALIT (kaudelle per-ottelu ei ole mielekas: meilla on avaukset,
-   // ei esiintymisia), "Per 90" jakaa minuuteilla.
+   // Full season: bootstrap totals. "Per game" mode shows TOTALS (per
+   // match is not meaningful for the season: we have starts, not
+   // appearances), "Per 90" divides by minutes.
    var s=p[5]||[0,0,0,0,0],d=per90?(s[0]/90):1;
    if(!d)d=1;
    return {n:p[0],t:p[1],p:p[2],c:p[3],g:s[1],m:s[0],k:p[6],
@@ -281,8 +281,9 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
   var r=[];
   for(var i=0;i<D.length;i++){
    // Sama saanto kuin palvelimella (fpl_leaders.rank_xg_leaders): maalivahdit
-   // pois oletuksena, koska tama on xG-lista eika torjuntalista. GKP-suodatin
-   // nayttaa ne erikseen. Ilman tata sivu antaisi kaksi eri lukua.
+   // out by default, because this is an xG list, not a saves list. The GKP
+   // filter shows them separately. Without this the page would give two
+   // different numbers.
    if(D[i][2]==='GKP'&&pos!=='GKP')continue;
    if(pos&&D[i][2]!==pos)continue;
    if(team&&D[i][1]!==team)continue;
@@ -322,8 +323,8 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
    else{more.style.display='';
         more.textContent='Show all '+r.length+' players';}
   }
-  // Kausitilassa viimeisessa sarakkeessa on AVAUKSET, ei esiintymisia
-  // (bootstrap antaa startsin). Otsikko kertoo kumpi, ei arvata.
+  // In season mode the last column holds STARTS, not appearances (the
+  // bootstrap provides starts). The header says which one, no guessing.
   var hh=document.querySelectorAll('#xgt2 thead th');
   if(hh&&hh[9])hh[9].textContent=(w==='S')?'Starts':'Games';
   var span=(w==='S')?', full season':', last '+w+' games each';
@@ -344,15 +345,15 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
  function sync(){
   chips('xgw',[[3,'3'],[5,'5'],[10,'10'],['S','Season']],
         function(){return w;},function(v){w=v;});
-  // Kausitilassa vasen vaihtoehto EI ole per ottelu vaan summa (meilla on
-  // avaukset, ei esiintymisia -> aitoa per-ottelu-jakajaa ei ole). Chipin
-  // teksti kertoo sen, muuten 25.50 nayttaisi "per game" -lukemalta.
+  // In season mode the left option is NOT per match but a sum (we have
+  // starts, not appearances -> there is no true per-match divisor). The
+  // chip text says so, otherwise 25.50 would read like a "per game" figure.
   chips('xgr',[[0,(w==='S')?'Total':'Per game'],[1,'Per 90']],
         function(){return per90?1:0;},
         function(v){
          var was=per90;per90=!!v;
          // Per 90:een siirryttaessa oletuskynnys paalle, takaisin per game:een
-         // siirryttaessa pois. Kayttajan oma valinta jaa voimaan jos han on
+         // when navigating away. The user's own choice stays in force if they
          // sita jo koskenut talla naytolla.
          if(!was&&per90&&minm===0)minm=180;
          if(was&&!per90&&minm===180)minm=0;
@@ -405,9 +406,9 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
    if(!wraps[i].querySelector('.m-hide'))continue;
    seen.push(wraps[i]);
   }
-  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
-  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
-  // ilman ulospaasya.
+  // Table without a known wrapper (e.g. a hand-written page): put the
+  // button directly before the table itself, so no hidden column is ever
+  // left without a way out.
   var tables=document.querySelectorAll('table');
   for(i=0;i<tables.length;i++){
    if(!tables[i].querySelector('.m-hide'))continue;

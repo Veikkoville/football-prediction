@@ -204,16 +204,16 @@ CSS = """
 :root{--teal:#2ED6C2;--teal-ink:#2ED6C2;
 --ink:#F3F2F2;--ink2:#141311;--cream:#0B0A09;--paper:#1F1D1A;--card:#141311;
 --muted:#A8A29A;--hero-muted:#A8A29A;--line:rgba(243,242,242,0.24);--radius:0;
-/* 1.8.2026: magenta poistettiin paletista (Villen paatos). Nama tokenit
-   olivat kaytossa var()-viittauksina mutta puuttuivat :rootista, joten ne
-   maaritellaan tassa eksplisiittisesti. */
+/* 1 Aug 2026: magenta was removed from the palette. These tokens were in
+   use as var() references but missing from :root, so they are defined here
+   explicitly. */
 --amber:#F5C542;--gold:#F5C542;--gold-deep:#F5C542;--ember:#FF8A5C;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--cream);color:var(--ink);font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;line-height:1.6;}
 h1,h2,h3,.brand{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
-/* Peruslinkki: ilman tata .rec-laatikon "public track record" -linkki jai
-   selaimen oletussiniseksi #0000EE:ksi. Elementtivalitsin haviaa kaikille
-   luokkasaannoille, joten se osuu vain tyylittelemattomiin linkkeihin. */
+/* Base link rule: without this the "public track record" link in the .rec
+   box stayed browser-default blue #0000EE. An element selector loses to
+   every class rule, so it only hits unstyled links. */
 a{color:var(--teal);}
 .dark{background:var(--cream);color:var(--ink);}
 .wrap{max-width:820px;margin:0 auto;padding:0 20px;}
@@ -234,8 +234,8 @@ h1{font-size:30px;line-height:1.2;margin:16px 0 10px;letter-spacing:-0.02em;}
 .content{padding-top:26px;}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
 padding:18px 20px;margin-bottom:14px;}
-/* 26.7 CLASSIC: 12px:n täyttöpalkki -> 4px:n viiva. Ilme sallii värin
-   viivana, ei täyttönä; prosentit ovat legendassa lukuina. */
+/* 26 Jul CLASSIC: 12px filled bar -> 4px line. The look allows color as a
+   line, not as a fill; the percentages are numbers in the legend. */
 .probbar{display:flex;height:4px;overflow:hidden;margin:10px 0 6px;}
 .probbar .h{background:var(--amber);} .probbar .d{background:rgba(243,242,242,0.24);}
 .probbar .a{background:var(--teal);}

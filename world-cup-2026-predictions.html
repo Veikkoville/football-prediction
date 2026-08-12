@@ -392,9 +392,9 @@ document.addEventListener('click', function (e) {
    if(!wraps[i].querySelector('.m-hide'))continue;
    seen.push(wraps[i]);
   }
-  // Taulukko ilman tunnettua kaarta (esim. kasin kirjoitettu sivu): laitetaan
-  // nappi taulukon itsensa eteen, jotta yksikaan piilotettu sarake ei jaa
-  // ilman ulospaasya.
+  // Table without a known wrapper (e.g. a hand-written page): put the
+  // button directly before the table itself, so no hidden column is ever
+  // left without a way out.
   var tables=document.querySelectorAll('table');
   for(i=0;i<tables.length;i++){
    if(!tables[i].querySelector('.m-hide'))continue;
