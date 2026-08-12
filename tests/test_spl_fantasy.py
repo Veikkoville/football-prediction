@@ -164,3 +164,65 @@ def test_availability_factor():
     assert sx.availability_factor("a", None) == 1.0
     assert sx.availability_factor("d", 75) == 0.75
     assert sx.availability_factor("i", None) == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Model squad: laillisuus ja kahden rikkovan seuran umpikuja (12.8.2026).
+# Halvimmat oletushintaiset (4.0/4.5) kasautuivat nousijaseuroihin niin etta
+# lahtorungossa oli KAKSI seuraa yli katon. Yksittaisvaihto korjaa vain
+# toisen -> club_ok hylkasi kaikki trialit ja laiton 64m-runko julkaistiin
+# "model squadina". Nama testit kaatuvat vanhalla koodilla.
+
+def _mk_player(pid, pos, team, price, xp):
+    return {"id": pid, "web_name": f"P{pid}", "team_short": team, "pos": pos,
+            "price": price, "xp_per_gw": round(xp / 6, 2),
+            "xp_horizon_total": xp}
+
+
+def _deadlock_pool():
+    """Pooli jossa halvin runko rikkoo katon kahdella seuralla (TW4 + AB4),
+    ja kalliit tahdet ovat selvasti parempia."""
+    players = []
+    pid = 0
+    # TW: halvin GKP + 3 halvinta MID + halvin DEF = 5 halpaa samasta seurasta
+    for pos, n in (("GKP", 1), ("DEF", 1), ("MID", 3)):
+        for _ in range(n):
+            pid += 1
+            players.append(_mk_player(pid, pos, "TW", 4.0, 12.0))
+    # AB: 2 halvinta DEF + 2 halvinta MID
+    for pos, n in (("DEF", 2), ("MID", 2)):
+        for _ in range(n):
+            pid += 1
+            players.append(_mk_player(pid, pos, "AB", 4.0, 11.0))
+    # Taytto: riittavasti halpoja muista seuroista (eri seura joka rivilla)
+    fill = [("GKP", 2), ("DEF", 4), ("MID", 2), ("FWD", 4)]
+    for pos, n in fill:
+        for _ in range(n):
+            pid += 1
+            players.append(_mk_player(pid, pos, f"F{pid}", 4.5, 10.0))
+    # Tahdet: kalliita ja selvasti parempia, eri seuroista
+    for pos in ("FWD", "FWD", "MID", "DEF"):
+        pid += 1
+        players.append(_mk_player(pid, pos, f"S{pid}", 11.0, 40.0))
+    return players
+
+
+def test_model_squad_respects_club_cap():
+    from scripts.build_spl_xp import build_model_squad
+    sq = build_model_squad(_deadlock_pool())
+    assert sq is not None
+    counts: dict[str, int] = {}
+    for p in sq["players"]:
+        counts[p["team_short"]] = counts.get(p["team_short"], 0) + 1
+    assert all(v <= 3 for v in counts.values()), counts
+    assert sq["cost"] <= sq["budget"]
+
+
+def test_model_squad_escapes_cheap_skeleton():
+    """Umpikujapoolissa tahtien (40 xp) TAYTYY paatya joukkueeseen: jos
+    squad jaa pelkkiin halpoihin, silmukka ei ikina arvioinut vaihtoja."""
+    from scripts.build_spl_xp import build_model_squad
+    sq = build_model_squad(_deadlock_pool())
+    assert sq is not None
+    assert any(p["price"] >= 11.0 for p in sq["players"]), (
+        "yksikaan tahti ei paassyt squadiin - vaihtosilmukka umpikujassa")

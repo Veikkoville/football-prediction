@@ -155,12 +155,28 @@ def build_model_squad(players_out: list[dict]) -> dict | None:
                 counts[p["pos"]] += 1
         return sum(p["xp_horizon_total"] for p in xi), xi
 
-    # Lähtöratkaisu: halvin mahdollinen runko + paras arvo -täyttö
+    # Lähtöratkaisu: halvin mahdollinen LAILLINEN runko + paras arvo -täyttö.
+    #
+    # Seurakatto pakotetaan jo tässä: 12.8 halvimmat oletushintaiset (4.0/4.5)
+    # kasautuivat nousijaseuroihin niin että rungossa oli TWN 4 + ABH 4.
+    # Kahden rikkovan seuran tilassa YKSIKÄÄN yksittäisvaihto ei tuota
+    # laillista joukkuetta (vaihto korjaa vain toisen), joten club_ok hylkäsi
+    # kaikki trialit ja silmukka palautti laittoman 64m-rungon "model
+    # squadina" — best_xi_value ehti kutsutuksi tasan 2 kertaa.
     squad: list[dict] = []
+    club_n: dict[str, int] = {}
     for pos, n in QUOTA.items():
-        cheap = sorted([p for p in pool if p["pos"] == pos], key=lambda p: p["price"])
-        squad.extend(cheap[:n])
-    if len(squad) < 15 or squad_cost(squad) > BUDGET:
+        took = 0
+        for p in sorted([q for q in pool if q["pos"] == pos],
+                        key=lambda q: q["price"]):
+            if took == n:
+                break
+            if club_n.get(p["team_short"], 0) >= 3:
+                continue
+            squad.append(p)
+            club_n[p["team_short"]] = club_n.get(p["team_short"], 0) + 1
+            took += 1
+    if len(squad) < 15 or squad_cost(squad) > BUDGET or not club_ok(squad):
         return None
     # Paikalliset parannusvaihdot kunnes ei parane
     improved = True
@@ -183,6 +199,10 @@ def build_model_squad(players_out: list[dict]) -> dict | None:
                     base_val = val
                     improved = True
                     break
+    if not club_ok(squad) or squad_cost(squad) > BUDGET:
+        # Ei koskaan lientä ulos laitonta joukkuetta: mieluummin ei squadia
+        # kuin sääntöjen vastainen (12.8 sellainen EHTI julkiselle sivulle).
+        return None
     total_val, xi = best_xi_value(squad)
     xi_ids = {p["id"] for p in xi}
     return {
