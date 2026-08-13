@@ -37,8 +37,19 @@ def _hae_csv(url: str, cache_path: Path, force: bool = False) -> pd.DataFrame:
             return pd.read_csv(cache_path, encoding="latin-1")
         except Exception:
             pass
-    r = requests.get(url, timeout=30)
+    # allow_redirects=False: football-data.co.uk 301-ohjaa PUUTTUVAN kausitiedoston
+    # lähimpään olemassa olevaan nimeen (mitattu 13.8.2026: 2627/E0.csv → EC.csv eli
+    # Conference, 2627/SP1.csv → P1.csv eli Portugalin liiga). Seurattu redirect
+    # treenasi PL-mallin Conference-datalla → Aldershot ym. tuotannon
+    # joukkuevalitsimessa 12.8 illalla. 3xx = tiedostoa ei ole julkaistu = ei dataa.
+    r = requests.get(url, timeout=30, allow_redirects=False)
     r.raise_for_status()
+    if r.status_code != 200:
+        kohde = r.headers.get("Location", "?")
+        raise ValueError(
+            f"HTTP {r.status_code} → {kohde} — kausitiedostoa ei ole julkaistu, "
+            f"redirectiä ei seurata (väärän sarjan data)"
+        )
     cache_path.write_bytes(r.content)
     return pd.read_csv(cache_path, encoding="latin-1")
 
@@ -109,6 +120,21 @@ def lataa_mainstream(liiga: str, kausi: str, force: bool = False) -> pd.DataFram
     cache = CACHE_DIR / f"{liiga.replace(' ', '_').replace('-', '_')}_{kausi}.csv"
     try:
         df = _hae_csv(url, cache, force=force)
+        # Div-vartija: CSV kantaa oman sarjakoodinsa — jos se ei täsmää pyydettyyn,
+        # sisältö on väärän sarjan (upstream-redirect, myrkyttynyt cache tai
+        # upstream servaa väärää tiedostoa 200:lla). Hylkää JA poista cache,
+        # ettei väärä sisältö jää levylle odottamaan seuraavaa fittiä.
+        # Div-sarakkeeton CSV hyväksytään (vanha formaatti) — vartija ei saa
+        # muuttaa toimivien kausien käytöstä.
+        if "Div" in df.columns:
+            divs = set(df["Div"].dropna().astype(str).str.strip().unique()) - {""}
+            if divs and divs != {code}:
+                cache.unlink(missing_ok=True)
+                print(
+                    f"football-data ({liiga} {kausi}): Div {sorted(divs)} != {code} "
+                    f"— väärän sarjan tiedosto hylätty, cache poistettu"
+                )
+                return pd.DataFrame()
         df["Season"] = kausi
         return _normalisoi(df, liiga)
     except Exception as e:

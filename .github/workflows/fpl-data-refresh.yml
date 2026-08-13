@@ -181,6 +181,20 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_stats
 
+      # 13.8: SIIRRETTY accuracy-logista tänne. Steppi vaatii koko FPL-cachen
+      # (bootstrap + element-summaryt), jonka VAIN tämän workflown builderit
+      # hakevat — accuracy-logissa se failasi joka ajossa 9.8 alkaen
+      # ("Puuttuu: data/raw/fpl/bootstrap_static.json", 26 punaista ajoa)
+      # eikä stats-sivun GW-ikkuna päivittynyt CI:stä kertaakaan. Tässä cache
+      # on lämmin build_fpl_stats:n jäljiltä → nolla lisä-API-kuormaa.
+      # continue-on-error: GW-rivit eivät saa estää projektioiden pushia;
+      # health-steppi lopussa punaa runin silti (fail loud, data jo pushattu).
+      - name: Build per-gameweek player rows (stats GW window)
+        id: bake_player_gw
+        if: steps.guard.outputs.proceed == 'true'
+        continue-on-error: true
+        run: python -m scripts.build_fpl_player_gw
+
       # Beat the model V1: gradaa lukitut päätökset valmiilta kierroksilta.
       # Idempotentti (gradatut ohitetaan, trigger estää uudelleengradauksen),
       # joten päivittäinen kutsu on turvallinen myös GW:iden välissä.
@@ -221,6 +235,8 @@ jobs:
             git add "$f" || echo "::warning::git add $f epäonnistui (gitignore?) — muu data pushataan silti"
           done
           [ -d data/fpl_xp_frozen ] && git add data/fpl_xp_frozen
+          # 13.8: GW-rivit stats-sivulle (siirretty accuracy-logista, ks. yllä)
+          [ -f fpl/player-gw.json ] && git add fpl/player-gw.json
           true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (data ennallaan) — ohitetaan commit."
@@ -242,3 +258,13 @@ jobs:
           done
           echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
           exit 1
+
+      # 13.8: sama fail loud -malli kuin accuracy-login Page-build health.
+      # continue-on-error piilottaisi GW-buildin kaatumisen vihreän runin
+      # taakse — tasan se vikaluokka joka piti accuracy-login punaisena
+      # 26 ajoa ilman että kukaan huomasi.
+      - name: Player-GW health (fail loud, data jo pushattu)
+        if: always() && steps.guard.outputs.proceed == 'true'
+        run: |
+          [ "${{ steps.bake_player_gw.outcome }}" = "failure" ] && { echo "::error::build_fpl_player_gw FAILAA (stats-sivun GW-ikkuna jaa vanhaksi)"; exit 1; }
+          exit 0

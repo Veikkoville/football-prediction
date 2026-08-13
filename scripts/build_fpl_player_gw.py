@@ -162,6 +162,33 @@ def sanity(d: dict, stats: dict) -> list[str]:
 
 def main() -> int:
     stats = _load(STATS)
+    # 13.8: jäädytetyn basis-kauden lähdecache (arkisto-bootstrap + summary-
+    # hakemisto) elää vain koneella jolla kausi arkistoitiin — CI-runnerilta
+    # se puuttuu AINA eikä sitä voi enää hakea FPL-API:sta (API servaa vain
+    # kuluvan kauden historiat). Jos committoitu output on jo samalta basis-
+    # kaudelta, se on lopullinen → SKIP on oikea tulos, ei virhe. Kun basis
+    # flippaa kuluvaan kauteen (GW1+), lähteet tulevat builderien tuoreesta
+    # cachesta ja buildi ajaa CI:ssä normaalisti. Ilman tätä steppi failasi
+    # accuracy-logissa joka ajossa 9.8–13.8 (26 punaista runia).
+    basis = stats["meta"].get("basis_season")
+    if basis in SEASON_DIRS:
+        summary_dir_name, boot_name = SEASON_DIRS[basis]
+        if not (CACHE / boot_name).exists() or not (CACHE / summary_dir_name).exists():
+            out_basis = None
+            if OUT.exists():
+                try:
+                    out_basis = json.loads(
+                        OUT.read_text(encoding="utf-8"))["meta"].get("basis_season")
+                except Exception:
+                    pass
+            if out_basis == basis:
+                print(f"basis {basis}: lähdecache puuttuu mutta committoitu "
+                      f"output on jo samalta (jäädytetyltä) kaudelta — SKIP.")
+                return 0
+            print(f"Puuttuu basis-kauden {basis} lähdecache "
+                  f"({boot_name} / {summary_dir_name}/) eikä kelvollista "
+                  f"outputtia ole — tämä on aito virhe.")
+            return 1
     d = build()
     fails = sanity(d, stats)
     if fails:
