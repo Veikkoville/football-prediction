@@ -206,3 +206,62 @@ export function isOpenForLogging(deadlineUtc: string | null | undefined): boolea
 	const t = Date.parse(deadlineUtc);
 	return Number.isFinite(t) && Date.now() < t;
 }
+
+/** V2 päätöspäiväkirjan what-if -rivi: mitä poikkeaminen mallista maksoi
+ *  tai tuotti. delta = user - model, eli > 0 = OMA kutsusi voitti.
+ *
+ *  EI UUTTA LASKENTAA: luvut ovat samat graderin kirjoittamat pisteet joita
+ *  tuloskortti summaa. Tämä on esitys, ei toinen totuus.
+ *
+ *  SAMA logiikka kuin mobiilin lib/fplDecisions.ts:ssä — silmukan lopputulos
+ *  ei saa riippua pinnasta (kuten seasonScore ja latestDebrief). */
+export interface WhatIfRow {
+	gw: number;
+	kind: DecisionKind;
+	delta: number;
+	/** Valmis lause ilman etumerkkiä; UI lisää pisteet ja värin. */
+	text: string;
+}
+
+function choiceName(c: Record<string, unknown>): string | null {
+	const name = c?.name;
+	if (typeof name === 'string' && name) return name;
+	const out = c?.out;
+	const inn = c?.in;
+	if (typeof out === 'string' && typeof inn === 'string') return `${out} → ${inn}`;
+	return null;
+}
+
+/** Gradatut päätökset joissa POIKETTIIN mallista, uusin ensin.
+ *
+ *  Vain poikkeamat: jos seurasit mallia, vastakohtaa ei ole olemassa eikä
+ *  what-if-lausetta voi muodostaa rehellisesti.
+ *
+ *  Järjestys on kierros laskevasti EIKÄ |delta| laskevasti: suurin ensin
+ *  olisi kertomuksen kalastelua, ja sama kortti näyttäisi eri tarinan sen
+ *  mukaan kumpi suunta sattuu olemaan isompi. */
+export function whatIfRows(rows: StoredDecision[], limit = 5): WhatIfRow[] {
+	const out: WhatIfRow[] = [];
+	for (const r of rows) {
+		if (r.graded_at == null) continue;
+		if (typeof r.model_points !== 'number' || typeof r.user_points !== 'number') continue;
+		if (r.followed) continue;
+		const modelName = choiceName(r.model_choice);
+		const userName = choiceName(r.user_choice);
+		const delta = Math.round((r.user_points - r.model_points) * 10) / 10;
+		let text: string;
+		if (r.kind === 'captain') {
+			text =
+				userName && modelName
+					? `captained ${userName} over ${modelName}`
+					: modelName
+						? `picked a different captain to ${modelName}`
+						: 'picked a different captain';
+		} else {
+			text = modelName ? `skipped ${modelName}` : 'made a different move';
+		}
+		out.push({ gw: r.gw, kind: r.kind, delta, text });
+	}
+	out.sort((a, b) => b.gw - a.gw);
+	return out.slice(0, limit);
+}

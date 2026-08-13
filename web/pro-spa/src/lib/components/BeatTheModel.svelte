@@ -17,6 +17,7 @@
 		latestDebrief,
 		loadDecisions,
 		seasonScore,
+		whatIfRows,
 		type StoredDecision
 	} from '$lib/fplDecisions';
 	import {
@@ -75,6 +76,9 @@
 		)
 	);
 	let debrief = $derived(rows ? latestDebrief(rows) : null);
+	// V2 päätöspäiväkirja: mitä poikkeaminen maksoi tai tuotti. Premium —
+	// tuloskortti itse pysyy ilmaisena (V1-linjaus).
+	let whatIf = $derived(rows ? whatIfRows(rows) : []);
 </script>
 
 {#if auth.user && rows != null && score != null}
@@ -136,6 +140,24 @@
 					</li>
 				{/each}
 			</ul>
+		{/if}
+
+		{#if whatIf.length > 0 && auth.sub}
+			<!-- Decision journal (V2): ei uutta laskentaa, sama graderin luku
+			     toisin esitettynä. Molemmat suunnat samalla painolla. -->
+			<div class="journal">
+				<span class="debrief-title">Decision journal</span>
+				<ul>
+					{#each whatIf as w (`${w.gw}-${w.kind}`)}
+						<li>
+							<span class="muted">GW{w.gw} · you {w.text}</span>
+							<span class="d" class:ahead={w.delta > 0} class:behind={w.delta < 0}>
+								{w.delta > 0 ? '+' : ''}{w.delta.toFixed(1)}
+							</span>
+						</li>
+					{/each}
+				</ul>
+			</div>
 		{/if}
 
 		{#if score.ungradableCount > 0}
@@ -258,6 +280,20 @@
 	.debrief-sentence {
 		margin: 0.2rem 0 0.3rem;
 		font-size: var(--step--1);
+	}
+	.journal {
+		border-top: 1px solid var(--border);
+		padding-top: var(--s-2);
+		margin-top: var(--s-2);
+	}
+	.d {
+		font-weight: 700;
+	}
+	.d.ahead {
+		color: var(--positive);
+	}
+	.d.behind {
+		color: var(--negative);
 	}
 	.objective {
 		border-top: 1px solid var(--border);
