@@ -592,3 +592,52 @@ export interface DefconLiveResponse {
 export async function fetchDefconLive(entry: number): Promise<DefconLiveResponse> {
 	return getJson<DefconLiveResponse>(`/api/fantasy/defcon-live?entry=${entry}`);
 }
+
+// ---------------------------------------------------------------------------
+// Beat the Model V2 — Season race (13.8). Mallin lukittu rivi vs oma kausi.
+// Luvut tulevat backendin gradaamasta immutable-lokista; klientti EI laske
+// pisteitä (V1-tuloskortin linjaus — sama kaava kahdessa klientissä olisi
+// tasan se rakenne josta 28.7 syntyi kaksi eri lukua mallin joukkueesta).
+// ---------------------------------------------------------------------------
+export interface ModelRaceAutosub {
+	out: number;
+	in: number;
+	pos: number;
+}
+
+export interface ModelRaceGameweek {
+	gw: number;
+	model_points: number;
+	fpl_average: number | null;
+	/** null = kierrosta ei ole omassa historiassa (EI nolla — ks. backend). */
+	your_points: number | null;
+	diff: number | null;
+	cumulative_diff: number | null;
+	/** Premium-erittely; puuttuu kokonaan ilman premiumia. */
+	model_captain_id?: number | null;
+	model_captain_reason?: string;
+	model_captain_points?: number;
+	model_bench_points?: number;
+	model_autosubs?: ModelRaceAutosub[];
+	your_bench_points?: number;
+	your_transfer_cost?: number;
+}
+
+export interface ModelRaceResponse {
+	meta: {
+		/** false = ensimmäistä gradausta ei ole vielä → näytä selite, älä lukuja. */
+		available: boolean;
+		graded_gws: number;
+		compared_gws?: number;
+		masked: boolean;
+		model_plays_chips: boolean;
+		note: string | null;
+	};
+	totals: { model: number; you: number | null; diff: number | null };
+	gameweeks: ModelRaceGameweek[];
+}
+
+export async function fetchModelRace(entry?: number | null): Promise<ModelRaceResponse> {
+	const q = entry != null ? `?entry=${entry}` : '';
+	return getJson<ModelRaceResponse>(`/api/fantasy/model-race${q}`);
+}

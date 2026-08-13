@@ -31,6 +31,7 @@
 	import WeeklyActions, { type WeeklyAction } from './WeeklyActions.svelte';
 	import { isOpenForLogging, loadDecisions, logDecision } from '$lib/fplDecisions';
 	import BeatTheModel from './BeatTheModel.svelte';
+	import SeasonRace from './SeasonRace.svelte';
 	import { fetchFantasy } from '$lib/api';
 	import ModelWorking from './ModelWorking.svelte';
 	import PlayerSearch from './PlayerSearch.svelte';
@@ -674,6 +675,9 @@
 			refreshToken={decisionsVersion}
 		/>
 		<BeatTheModel />
+		<!-- V2 (13.8): mallin joukkue pysyvana rivaalina. V1 vertaa
+		     PAATOKSIA, tama JOUKKUEITA - eri kysymys, sama silmukka. -->
+		<SeasonRace />
 		<p class="captain">
 			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
 			<span class="muted">({data.captain.pick.team_short})</span>,
@@ -1030,6 +1034,7 @@
 		<!-- Silmukan askel 5: kauden "sinä vs malli" -tuloskortti (V1).
 		     Etuoven alle: tulos on kirjaamisen palkinto. -->
 		<BeatTheModel />
+		<SeasonRace />
 
 		<p class="captain">
 			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
