@@ -134,7 +134,7 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-13T01:21:10",
+    "generated_at": "2026-08-13T04:47:29",
     "season": "2026/27",
     "overrides_applied": 1,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -581,7 +581,7 @@
       "predicted_starts": 91.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.0,
+      "owned_pct": 16.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2396,7 +2396,7 @@
       "predicted_starts": 100.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.7,
+      "owned_pct": 16.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2759,7 +2759,7 @@
       "predicted_starts": 72.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 24.6,
+      "owned_pct": 24.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3485,7 +3485,7 @@
       "predicted_starts": 73.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 22.3,
+      "owned_pct": 22.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4090,7 +4090,7 @@
       "predicted_starts": 90.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 11.0,
+      "owned_pct": 11.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5179,7 +5179,7 @@
       "predicted_starts": 100.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.4,
+      "owned_pct": 3.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6994,7 +6994,7 @@
       "predicted_starts": 87.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.0,
+      "owned_pct": 2.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -60012,40 +60012,6 @@
       "excluded_reason": "unavailable"
     },
     {
-      "id": 451,
-      "web_name": "A.Murphy",
-      "full_name": "Alex Murphy",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "DEF",
-      "price": 4.0,
-      "owned_pct": 0.8,
-      "status": "u",
-      "news": "Has joined FC Kaiserslautern on loan for the rest of the season",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 7,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.0,
-        "cs": 0,
-        "points": 2,
-        "per90": null
-      },
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 50,
       "web_name": "Burrowes",
       "full_name": "Bradley Burrowes",
@@ -60112,6 +60078,40 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 451,
+      "web_name": "A.Murphy",
+      "full_name": "Alex Murphy",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "DEF",
+      "price": 4.0,
+      "owned_pct": 0.7,
+      "status": "u",
+      "news": "Has joined FC Kaiserslautern on loan for the rest of the season",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 7,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.0,
+        "cs": 0,
+        "points": 2,
+        "per90": null
+      },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
     },
     {
       "id": 278,
@@ -61022,28 +61022,6 @@
       "excluded_reason": "below_min_xp"
     },
     {
-      "id": 281,
-      "web_name": "Drameh",
-      "full_name": "Cody Drameh",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "DEF",
-      "price": 4.0,
-      "owned_pct": 0.1,
-      "status": "i",
-      "news": "Hamstring injury - Expected back 29 Aug",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 216,
       "web_name": "Esse",
       "full_name": "Romain Esse",
@@ -61850,6 +61828,28 @@
           "xgi": 0.17
         }
       },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
+      "id": 281,
+      "web_name": "Drameh",
+      "full_name": "Cody Drameh",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "DEF",
+      "price": 4.0,
+      "owned_pct": 0.0,
+      "status": "i",
+      "news": "Hamstring injury - Expected back 29 Aug",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
       "in_projection": false,
       "excluded_reason": "unavailable"
     },
