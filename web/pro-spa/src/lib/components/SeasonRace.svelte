@@ -59,7 +59,7 @@
 
 {#if data && !failed}
 	<section class="race">
-		<h3>Season race — you vs the model</h3>
+		<h3>Season race: you vs the model</h3>
 
 		{#if !data.meta.available}
 			<p class="muted">{data.meta.note}</p>
@@ -106,7 +106,7 @@
 								{r.diff > 0 ? '+' : ''}{r.diff}
 							</span>
 						{:else}
-							<span class="d muted">—</span>
+							<span class="d muted">-</span>
 						{/if}
 					</li>
 					{#if r.model_autosubs != null}
