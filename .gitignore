@@ -106,6 +106,10 @@ raw_data/
 # vaite olisi todistamaton juuri silla mekanismilla jolla se myydaan.
 !/data/model_squad_frozen/
 !/data/model_squad_frozen/*.json
+# Vaihe b: gradatut pisteet (append-only). Sama peruste kuin freezella —
+# Season race -paneeli lukee taman, ja ilman !-poikkeusta luku eläisi vain
+# runnerilla eika koskaan paatyisi sivulle.
+!/data/model_squad_gw_scores.json
 
 # 1.8: perustajalohkon luvut julkisesta entrysta (build_founder_stats.py).
 # Tama !-poikkeus PUUTTUI shipatessa -> data-refreshin commit-step kaatui

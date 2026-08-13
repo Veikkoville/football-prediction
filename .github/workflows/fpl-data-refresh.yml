@@ -157,6 +157,13 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.grade_fpl_xp_gw
 
+      # BTM V2 vaihe b (13.8): mallin lukitun rivin pisteet FPL:n omista
+      # luvuista (autosubit + kapteenisääntö). Gradaus ENNEN freezea kuten
+      # xP-puolella: ratkennut kierros suljetaan ennen kuin seuraava lukitaan.
+      - name: Grade finished model squad gameweeks
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.grade_model_squad_gw
+
       - name: Freeze next gameweek xP at deadline window
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.freeze_fpl_xp_gw
@@ -247,6 +254,8 @@ jobs:
           [ -d data/fpl_xp_frozen ] && git add data/fpl_xp_frozen
           # 13.8 (BTM V2 a): mallirivin freeze — sama kohtelu kuin xP-freezella.
           [ -d data/model_squad_frozen ] && git add data/model_squad_frozen
+          # 13.8 (BTM V2 b): gradatut pisteet, append-only.
+          [ -f data/model_squad_gw_scores.json ] && git add data/model_squad_gw_scores.json
           # 13.8: GW-rivit stats-sivulle (siirretty accuracy-logista, ks. yllä)
           [ -f fpl/player-gw.json ] && git add fpl/player-gw.json
           true
