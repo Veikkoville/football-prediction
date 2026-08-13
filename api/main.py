@@ -122,6 +122,21 @@ def _update_profile_premium(user_id: str, is_premium: bool) -> bool:
     return _update_profile(user_id, {"is_premium": is_premium})
 
 
+def _stamp_premium_source(user_id: str, source: str) -> bool:
+    """WEB-SUB-SYNC (13.8): premium-lahteen leima profiiliin.
+
+    source: 'stripe_web' | 'revenuecat' ('comp' asetetaan vain kasin/SQL:lla
+    — koodipolkua compille ei ole olemassa tarkoituksella).
+
+    ERILLINEN kutsu tarkoituksella, EI osana is_premium-PATCHia: PATCH on
+    atominen, ja jos premium_source-saraketta ei ole viela migratoitu,
+    yhdistetty kutsu kaataisi myos premium-aktivoinnin. Leima ei koskaan
+    saa estaa premiumin avausta — epaonnistuminen jaa lokiin ja
+    seuraava webhook-event yrittaa uudelleen.
+    """
+    return _update_profile(user_id, {"premium_source": source})
+
+
 def _web_subscription_active(user_id: str) -> bool:
     """Onko käyttäjällä aktiivinen WEB-tilaus (web_subscriptions).
 
@@ -2600,6 +2615,7 @@ async def revenuecat_webhook(request: Request):
             "subscription_cancel_at_period_end": False,
             "subscription_current_period_end": period_end_iso,
         })
+        _stamp_premium_source(user_id, "revenuecat")
     elif event_type == "CANCELLATION":
         # Auto-renew pois paalta; access jatkuu expiration-paivaan asti.
         cancel_reason = event.get("cancel_reason", "")
@@ -2800,6 +2816,7 @@ async def stripe_web_webhook(request: Request):
         if period_end:
             profile_fields["subscription_current_period_end"] = period_end
         _update_profile(user_id, profile_fields)
+        _stamp_premium_source(user_id, "stripe_web")
         # #101: guest sai tilin → kirjautumislinkki mailiin (premium on jo
         # aktivoitu yllä → linkin klikkaus laskeutuu suoraan avattuun tilaan).
         if guest_email:
@@ -2824,6 +2841,7 @@ async def stripe_web_webhook(request: Request):
                 if period_end_iso:
                     pf["subscription_current_period_end"] = period_end_iso
                 _update_profile(row["user_id"], pf)
+                _stamp_premium_source(row["user_id"], "stripe_web")
     elif event_type == "customer.subscription.deleted":
         _upsert_web_subscription({"status": "cancelled"},
                                  match={"stripe_subscription_id": obj["id"]})
@@ -2847,6 +2865,12 @@ async def stripe_web_webhook(request: Request):
                     "subscription_cancel_at_period_end": False,
                     "subscription_current_period_end": None,
                 })
+    else:
+        # WEB-SUB-SYNC (13.8): nakyva jalki jokaisesta ohitetusta eventista.
+        # Dashboard-tilaus ratkaisee mita tanne SAAPUU, ja tama rivi on ainoa
+        # tapa nahda Render-lokista etta esim. subscription.updated alkoi
+        # oikeasti tulla perille konfiguraatiomuutoksen jalkeen.
+        print(f"[Stripe web] ohitettu event_type={event_type} (ei kasittelijaa)")
 
     return {"received": True}
 
