@@ -63,6 +63,24 @@ FREE_EXPECTED = {
     "/api/fantasy/defcon/{player_id}",
 }
 
+# KOLMAS LUOKKA (13.8): ilmainen ydin + premium-erittely samassa vastauksessa.
+# Taksonomia oli binaarinen, ja `/api/fantasy/model-race` ei mahtunut
+# kumpaankaan: Season race -tulos on ilmainen (silmukan palkinto), mutta
+# "missa ero syntyi" -erittely on premiumia. Pakottaminen GATEDiin olisi
+# vaittanyt etta koko endpoint on maksumuurin takana; FREEhen pakottaminen
+# olisi kaatanut test_free_endpoints_stay_ungatedin ja poistanut gaten.
+# Nailla on TIUKEMMAT saannot kuin kummallakaan: gate on pakollinen JA
+# maskaus todennetaan ajamalla, ei merkkijonohaulla.
+PARTIAL_EXPECTED = {
+    "/api/fantasy/model-race",
+}
+
+# Erittelykentat jotka EIVAT saa nakya ilman premiumia.
+PARTIAL_PREMIUM_KEYS = {
+    "/api/fantasy/model-race": (
+        "model_captain_id", "model_bench_points", "model_autosubs"),
+}
+
 
 def _scan_gates() -> dict[str, bool]:
     """Lue @app/@router-dekoraattorit ja kerro kutsuuko runko gatea.
@@ -103,7 +121,7 @@ def test_no_new_ungated_endpoint_appeared():
     ilman etta kukaan paatti onko se ilmainen vai maksullinen.
     """
     gates = _scan_gates()
-    known = GATED_EXPECTED | FREE_EXPECTED
+    known = GATED_EXPECTED | FREE_EXPECTED | PARTIAL_EXPECTED
     surprises = sorted(set(gates) - known)
     assert not surprises, (
         f"Luokittelematon fantasy-endpoint: {surprises}. Lisaa se joko "
@@ -157,6 +175,69 @@ def test_free_endpoints_stay_ungated():
         f"Ilmaiseksi luokiteltu endpoint on gatettu: {wrongly_gated}. "
         "Tama katkaisee ilmaispinnan ja mahdollisesti sivugeneraattorit."
     )
+
+
+def test_partial_endpoints_are_gated():
+    """Osittain gatetun endpointin runko ON kutsuttava gatea.
+
+    Ilman tata erittelykentat vuotaisivat kaikille, ja koska ydin on
+    ilmainen, mikaan 403 tai tyhja vastaus ei paljastaisi vuotoa.
+    """
+    gates = _scan_gates()
+    missing = sorted(p for p in PARTIAL_EXPECTED if not gates.get(p))
+    assert not missing, (
+        f"Osittain gatettu endpoint ilman is_premium_requestia: {missing}.")
+
+
+@pytest.fixture()
+def race_client(tmp_path, monkeypatch):
+    """TestClient jolla on synteettinen gradausloki levylla.
+
+    Esikaudella oikea loki on tyhja, jolloin maskaustesti mittaisi tyhjaa
+    vastausta eika maskausta (vrt. muisti `gate-substring-osuma-on-sokea`).
+    """
+    import json as _json
+
+    import api.main as m
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "model_squad_gw_scores.json").write_text(
+        _json.dumps({"gameweeks": [{
+            "gw": 1, "points": 61, "fpl_average": 57, "captain_id": 351,
+            "captain_reason": "captain", "captain_points_added": 12,
+            "bench_points": 5,
+            "autosubs": [{"out": 7, "in": 13, "pos": 2}]}]}),
+        encoding="utf-8")
+    monkeypatch.setattr(m, "PROJECT_ROOT", tmp_path)
+    return TestClient(m.app)
+
+
+def test_model_race_hides_breakdown_when_enforcement_on(race_client, monkeypatch):
+    """Flagi paalla + ei tokenia -> tulos nakyy, erittely ei."""
+    monkeypatch.setenv("PREMIUM_ENFORCE", "on")
+    d = race_client.get("/api/fantasy/model-race").json()
+    assert d["meta"]["available"] is True
+    assert d["meta"]["masked"] is True
+    assert d["totals"]["model"] == 61          # ydin on ilmainen
+    row = d["gameweeks"][0]
+    assert row["model_points"] == 61
+    leaked = [k for k in PARTIAL_PREMIUM_KEYS["/api/fantasy/model-race"]
+              if k in row]
+    assert not leaked, f"Premium-erittely vuoti ilmaiselle: {leaked}"
+
+
+def test_model_race_full_when_enforcement_off(race_client, monkeypatch):
+    """NEGATIIVINEN KONTROLLI: flagi pois -> erittely on mukana.
+
+    Ilman tata edellinen testi lapaisisi myos silloin jos kentat puuttuisivat
+    aina — eli mittaisimme kentan poissaoloa emmeka maskausta.
+    """
+    monkeypatch.setenv("PREMIUM_ENFORCE", "off")
+    d = race_client.get("/api/fantasy/model-race").json()
+    assert d["meta"]["masked"] is False
+    row = d["gameweeks"][0]
+    for k in PARTIAL_PREMIUM_KEYS["/api/fantasy/model-race"]:
+        assert k in row, f"Erittelykentta {k} puuttuu premiumilta"
+    assert row["model_captain_id"] == 351
 
 
 @pytest.fixture()

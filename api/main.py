@@ -3207,6 +3207,56 @@ def fantasy_model_squad(response: Response):
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
+@app.get("/api/fantasy/model-race")
+def fantasy_model_race(
+    request: Request,
+    response: Response,
+    entry: int | None = Query(default=None, ge=1, le=99_999_999,
+                              description="Julkinen FPL entry-ID (valinnainen)"),
+):
+    """Beat the Model V2 — Season race: mallin lukittu rivi vs sinun kautesi.
+
+    Mallin luvut tulevat committatusta lokista (data/model_squad_gw_scores.json),
+    joka on gradattu FPL:n omista pisteistä riville jonka git-historia todistaa
+    lukituksi ennen deadlinea. Tämä endpoint EI laske pisteitä pyynnössä.
+
+    FREE: kumulatiivinen ero + kierrosrivit (kilpailu on silmukan palkinto,
+    V1-linjaus säilyy). PREMIUM: erittely siitä MISSÄ ero syntyi
+    (kapteenivalinta, penkkipisteet, autosubit, siirtokustannukset).
+
+    Esikausi: ennen ensimmäistä gradausta available=False + selite siitä
+    milloin luvut tulevat — EI blank eikä arvattua nollaa (Hub-oppi #52).
+    """
+    import json as _json
+
+    from src.models.fpl_model_race import build_race
+    from src.models.fpl_rate_team import RateTeamError
+
+    response.headers["Cache-Control"] = "no-store"
+    log = None
+    path = PROJECT_ROOT / "data" / "model_squad_gw_scores.json"
+    if path.exists():
+        try:
+            log = _json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            log = None
+
+    history = None
+    if entry is not None:
+        import src.models.fpl_rate_team as _rt
+        try:
+            history = _rt._fetch_fpl(f"/entry/{entry}/history/")
+        except RateTeamError as e:
+            if e.status_code == 404:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"FPL entry {entry} was not found. Check the ID "
+                           "(it is the number in your FPL points-page URL).")
+            raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+    return build_race(log, history, premium=is_premium_request(request))
+
+
 @app.get("/api/fantasy/plan")
 def fantasy_plan(
     request: Request,
