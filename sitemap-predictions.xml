@@ -1255,6 +1255,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/predictions/serie-a/lazio-vs-ac-milan</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/predictions/ligue-1/</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>daily</changefreq>
@@ -1466,6 +1472,12 @@
   </url>
   <url>
     <loc>https://goaliq.app/predictions/ligue-1/le-mans-vs-lens</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goaliq.app/predictions/ligue-1/brest-vs-paris-saint-germain</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
