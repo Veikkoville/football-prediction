@@ -19,6 +19,8 @@
 		'Watchlist for up to 50 players: track everyone you are deciding on',
 		// COPY-SYNC 13.8 (BTM V2): pari on mobiilin paywall.bullet_race.
 		'Where the gap to the model came from: captaincy, bench points and autosubs, round by round',
+		// COPY-SYNC 13.8 (MINI-LEAGUE-RIVAL): pari on mobiilin paywall.bullet_rival.
+		'Which players actually close the gap on your mini-league rival, and whether they already have them',
 		'Player compare: up to four players side by side',
 		'CSV export of the full projection set',
 		// 4.8: synkattu paywall.bullet_match-avaimeen (goaliq-app/lib/i18n/en.ts).
