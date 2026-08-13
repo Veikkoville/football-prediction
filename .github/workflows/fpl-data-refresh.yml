@@ -161,6 +161,16 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.freeze_fpl_xp_gw
 
+      # Beat the Model V2 vaihe a (13.8): mallin joukkue lukitaan SAMASSA
+      # ajossa ja samasta ikkunasta kuin xP yllä — eri hetki tarkoittaisi että
+      # "sinä vs malli" vertaa kahta eri maailmantilaa. Askel on tarkoituksella
+      # xP-freezen JÄLKEEN: free_optimum lukee juuri kirjoitetun projektion.
+      # EI fail-safea: laiton tai puuttuva mallirivi on kauden mittainen virhe
+      # (immutable), joten ajon KUULUU kaatua ennen kuin se jäätyy.
+      - name: Freeze model squad at deadline window
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.freeze_model_squad_gw
+
       # #124/#125: xG- + DefCon-leaders samasta bootstrap+element-summary-
       # datasta (levyvälimuisti — valmiin kauden summaryt eivät uudelleenhae).
       # 1.8: perustajalohkon luvut julkisesta entrysta (ei kovakoodausta
@@ -235,6 +245,8 @@ jobs:
             git add "$f" || echo "::warning::git add $f epäonnistui (gitignore?) — muu data pushataan silti"
           done
           [ -d data/fpl_xp_frozen ] && git add data/fpl_xp_frozen
+          # 13.8 (BTM V2 a): mallirivin freeze — sama kohtelu kuin xP-freezella.
+          [ -d data/model_squad_frozen ] && git add data/model_squad_frozen
           # 13.8: GW-rivit stats-sivulle (siirretty accuracy-logista, ks. yllä)
           [ -f fpl/player-gw.json ] && git add fpl/player-gw.json
           true

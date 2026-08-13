@@ -99,6 +99,14 @@ raw_data/
 !/data/fpl_xp_frozen/
 !/data/fpl_xp_frozen/*.json
 
+# 13.8 (Beat the Model V2 vaihe a): mallin joukkueen deadline-freeze.
+# Koko V2:n julkinen vaite on "logged before kickoff, todistettavissa
+# git-historiasta" — ilman tata !-poikkeusta freeze kirjoittuisi levylle,
+# git add ohittaisi sen aanettomasti (vrt. founder_entry.json alla) ja
+# vaite olisi todistamaton juuri silla mekanismilla jolla se myydaan.
+!/data/model_squad_frozen/
+!/data/model_squad_frozen/*.json
+
 # 1.8: perustajalohkon luvut julkisesta entrysta (build_founder_stats.py).
 # Tama !-poikkeus PUUTTUI shipatessa -> data-refreshin commit-step kaatui
 # "paths are ignored"-virheeseen 4 ajossa (1.-2.8) eika MITAAN dataa pushattu.

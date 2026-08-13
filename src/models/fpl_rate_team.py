@@ -572,6 +572,7 @@ def build_optimal_squad(pool: list[dict],
     # HALVIN mahdollinen penkki, jotta DP:n kustannusakseli on tarpeeksi pitkä;
     # kukin muodostelma käyttää sisällä omaa, tiukempaa budjettiaan.
     cheapest_bench = None
+    bench_lb: dict[tuple[int, int, int], int] = {}
     for n_def in range(XI_MIN[2], XI_MAX[2] + 1):
         for n_mid in range(XI_MIN[3], XI_MAX[3] + 1):
             n_fwd = 10 - n_def - n_mid
@@ -581,17 +582,28 @@ def build_optimal_squad(pool: list[dict],
             if any(shape[t] < locked_shape[t] for t in shape):
                 continue
             _b, c = _bench_for_shape(pool, shape, locked_ids)
-            if c >= 0 and (cheapest_bench is None or c < cheapest_bench):
-                cheapest_bench = c
+            if c >= 0:
+                bench_lb[(n_def, n_mid, n_fwd)] = c
+                if cheapest_bench is None or c < cheapest_bench:
+                    cheapest_bench = c
     if cheapest_bench is None:
         return empty
+    # DP:n kustannusakseli tarvitsee LÖYSIMMÄN varauksen (muuten eksakti
+    # yläraja jäisi laskematta); muodostelmakohtainen kiristys tehdään
+    # varapolulla per shape, ks. bench_lb-käyttö alla.
     xi_budget = BUDGET_TENTHS - cheapest_bench
     min_price = min(p["price"] for p in pool)
 
     ranked = sorted(pool, key=lambda p: p["xp_horizon_total"], reverse=True)
 
-    def _fill(shape: dict[int, int]) -> list[dict]:
+    def _fill(shape: dict[int, int], budget: int) -> list[dict]:
         """Ahne täyttö KIINTEÄLLE muodostelmalle, lukitut pohjalla.
+
+        `budget` on TÄMÄN muodostelman XI-budjetti (100.0m − sen oma halvin
+        pelattava penkki). 13.8: aiemmin tässä käytettiin kaikkien
+        muodostelmien halvinta penkkiä, jolloin kalliimman penkin vaativa
+        muoto sai liikaa rahaa XI:hin ja lopullinen 15 ylitti budjetin
+        äänettömästi — tuotannossa 101.5m eli runko jota ei voi omistaa.
         Palauttaa [] jos ei onnistu."""
         xi: list[dict] = list(locked)
         counts = _shape_of(xi)
@@ -613,7 +625,7 @@ def build_optimal_squad(pool: list[dict],
                 continue
             slots_left = 11 - len(xi) - 1
             # Budjettiturvaus: loput paikat halvimmalla täytettävissä.
-            if cost + p["price"] + slots_left * min_price > xi_budget:
+            if cost + p["price"] + slots_left * min_price > budget:
                 continue
             xi.append(p)
             counts[t] += 1
@@ -624,8 +636,13 @@ def build_optimal_squad(pool: list[dict],
     def _result(xi: list[dict], proven: bool) -> dict:
         if not xi:
             return empty
-        bench = _bench_for_shape(pool, _shape_of(xi), {p["id"] for p in xi},
-                                 _club_counts(xi))[0]
+        bench, bench_cost = _bench_for_shape(
+            pool, _shape_of(xi), {p["id"] for p in xi}, _club_counts(xi))
+        # 13.8: viimeinen vahti. Runko joka ylittää 100.0m ei ole omistettava,
+        # eikä sitä saa palauttaa "mallin joukkueena" — se meni ennen läpi
+        # äänettömästi, koska vain eksakti polku tarkisti kokonaishinnan.
+        if not bench or sum(p["price"] for p in xi) + bench_cost > BUDGET_TENTHS:
+            return empty
         return {
             "xi": xi,
             "bench": bench,
@@ -657,10 +674,20 @@ def build_optimal_squad(pool: list[dict],
             n_fwd = 10 - n_def - n_mid
             if not XI_MIN[4] <= n_fwd <= XI_MAX[4]:
                 continue
-            cand = _fill({1: 1, 2: n_def, 3: n_mid, 4: n_fwd})
+            # Muodostelmakohtainen budjetti: tämän muodon oma halvin
+            # pelattava penkki, ei kaikkien muotojen halvin.
+            lb = bench_lb.get((n_def, n_mid, n_fwd))
+            if lb is None:
+                continue
+            shape_budget = BUDGET_TENTHS - lb
+            cand = _fill({1: 1, 2: n_def, 3: n_mid, 4: n_fwd}, shape_budget)
             if not cand:
                 continue
-            cand = _improve_legal(cand, pool, xi_budget, locked_ids)
+            cand = _improve_legal(cand, pool, shape_budget, locked_ids)
+            # Penkin lopullinen hinta riippuu siitä keitä XI vei (klubikatto,
+            # poissulut), joten alaraja ei riitä — koko 15 punnitaan tässä.
+            if not _result(cand, False)["xi"]:
+                continue
             total = sum(p["xp_horizon_total"] for p in cand)
             if total > best_total:
                 best_total, best = total, cand
