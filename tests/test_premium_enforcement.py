@@ -73,12 +73,16 @@ FREE_EXPECTED = {
 # maskaus todennetaan ajamalla, ei merkkijonohaulla.
 PARTIAL_EXPECTED = {
     "/api/fantasy/model-race",
+    # 13.8: sama kuvio — sija ja piste-ero ovat FPL:n julkista dataa
+    # (free), mallin kanta siihen mita erolle pitaisi tehda on premium.
+    "/api/fantasy/rival",
 }
 
 # Erittelykentat jotka EIVAT saa nakya ilman premiumia.
 PARTIAL_PREMIUM_KEYS = {
     "/api/fantasy/model-race": (
         "model_captain_id", "model_bench_points", "model_autosubs"),
+    "/api/fantasy/rival": ("differentials",),
 }
 
 

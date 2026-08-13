@@ -34,7 +34,7 @@ from src.models.fpl_rate_team import (
     AVAILABILITY_GATE_NOTE, MAX_PER_CLUB, POS_NAME, SQUAD_QUOTA, XI_MAX,
     XI_MIN, BUDGET_TENTHS, RateTeamError, _fetch_fpl, _gw_xp, _resolve_gw,
     apply_availability_gate, build_context, clamp_gw_to_projections,
-    get_bootstrap, optimal_xi, resolve_squad,
+    get_bootstrap, get_entry_picks, optimal_xi, resolve_squad,
 )
 from src.models.fpl_xp import load_xp
 
@@ -860,6 +860,96 @@ def fantasy_h2h(
         "p_draw_band": round(p_band, 4),
         "p_b": round(p_b, 4),
     }
+
+
+# ---------------------------------------------------------------------------
+# GET /api/fantasy/rival — "Catch your rival" (MINI-LEAGUE-RIVAL, 13.8)
+# ---------------------------------------------------------------------------
+
+@router.get("/api/fantasy/rival")
+def fantasy_rival(
+    request: Request,
+    response: Response,
+    entry: int = Query(..., ge=1, le=99_999_999, description="Oma FPL entry-ID"),
+    rival: int = Query(..., ge=1, le=99_999_999, description="Rivaalin entry-ID"),
+    league_id: int | None = Query(default=None,
+                                  description="Classic-liiga jonka taulukosta ero luetaan"),
+    gap: float | None = Query(default=None,
+                              description="Piste-ero suoraan (> 0 = olet jaljessa); ohittaa league_id:n"),
+    gw: int | None = Query(default=None, ge=1, le=38),
+):
+    """Catch your rival: mita eron kiinni kurominen vaatii.
+
+    FREE: ero + jaljella olevat kierrokset + P(catch) — kaikki
+    tarkistettavissa FPL:n omasta taulukosta.
+    PREMIUM: differentiaalilista ja asemakohtainen suositus, eli mallin kanta
+    siihen mita erolle pitaisi tehda.
+
+    Todennakoisyys tulee SAMASTA normaaliapproksimaatiosta ja samasta
+    per-pelaaja-varianssista kuin /api/fantasy/h2h — yksi koneisto, ei kahta.
+    Riippumattomuusoletus kerrotaan meta.method-kentassa.
+    """
+    from src.models.fpl_rival import build_rival_view
+
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        xp_data, bootstrap, pool, pool_by_id = build_context()
+        picks_gw = _resolve_gw(bootstrap, gw)
+        target_gw = clamp_gw_to_projections(picks_gw, pool, xp_data)
+
+        # Piste-ero: eksplisiittinen arvo voittaa, muuten liigataulukosta.
+        # Ilman kumpaakaan emme ARVAA nollaa — se olisi vaite jota kukaan ei
+        # tehnyt (sama linja kuin Season racen puuttuvilla kierroksilla).
+        the_gap = gap
+        if the_gap is None:
+            if league_id is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Provide either league_id (to read the gap from the "
+                           "table) or gap (the points difference directly).")
+            data = _fetch_fpl(
+                f"/leagues-classic/{league_id}/standings/?page_standings=1")
+            rows = ((data.get("standings") or {}).get("results") or [])
+            by_entry = {int(r.get("entry")): r for r in rows if r.get("entry")}
+            me, them = by_entry.get(entry), by_entry.get(rival)
+            if me is None or them is None:
+                missing = [e for e, r in ((entry, me), (rival, them)) if r is None]
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Entry {missing[0]} is not on the first page of "
+                           f"league {league_id}. Pass gap directly if the "
+                           "rival is further down the table.")
+            the_gap = float(them.get("total") or 0) - float(me.get("total") or 0)
+
+        mu_you, var_you, m_you, miss_you, name_you = _entry_xi_xp(
+            entry, picks_gw, target_gw, pool_by_id)
+        mu_riv, var_riv, m_riv, miss_riv, name_riv = _entry_xi_xp(
+            rival, picks_gw, target_gw, pool_by_id)
+    except RateTeamError as e:
+        raise _http(e)
+
+    events = bootstrap.get("events") or []
+    gws_left = sum(1 for e in events if not e.get("finished"))
+
+    your_ids = {int(p["element"]) for p in
+                (get_entry_picks(entry, picks_gw).get("picks") or [])}
+    rival_ids = {int(p["element"]) for p in
+                 (get_entry_picks(rival, picks_gw).get("picks") or [])}
+
+    out = build_rival_view(
+        gap=the_gap, gameweeks_left=gws_left,
+        mu_you=mu_you, mu_rival=mu_riv,
+        var_you=var_you, var_rival=var_riv,
+        pool=pool, your_ids=your_ids, rival_ids=rival_ids,
+        premium=is_premium_request(request))
+    out["meta"]["gw"] = target_gw
+    out["meta"]["generated_at"] = xp_data["meta"].get("generated_at")
+    out["meta"]["disclaimer"] = DISCLAIMER
+    out["you"] = {"entry": entry, "team_name": name_you,
+                  "xi_xp": round(mu_you, 2), "players_matched": m_you}
+    out["rival"] = {"entry": rival, "team_name": name_riv,
+                    "xi_xp": round(mu_riv, 2), "players_matched": m_riv}
+    return out
 
 
 # ---------------------------------------------------------------------------
