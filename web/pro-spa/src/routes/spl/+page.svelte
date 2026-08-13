@@ -30,6 +30,7 @@
 		type PitchCardPlayer
 	} from '$lib/shareCard';
 	import { teamColorByShort } from '$lib/teamColors';
+	import SquadPitch from '$lib/components/SquadPitch.svelte';
 
 	let cs = $state<FantasyResponse | null>(null);
 	let xp = $state<XpResponse | null>(null);
@@ -306,6 +307,19 @@
 		});
 
 	const POS_ROWS = ['GKP', 'DEF', 'MID', 'FWD'] as const;
+	// 13.8 (Villen pyyntö): squad myös on-page-pitchinä, ei vain jakokorttina.
+	// Sama toCardPlayer-muunnos kuin kortilla → pitch ja kortti eivät voi
+	// ajautua eri lukuihin.
+	let pitchRows = $derived(
+		modelSquad
+			? POS_ROWS.map((pos) =>
+					modelSquad!.players.filter((p) => p.in_xi && p.pos === pos).map(toCardPlayer)
+				).filter((row) => row.length > 0)
+			: []
+	);
+	let pitchBench = $derived(
+		modelSquad ? modelSquad.players.filter((p) => !p.in_xi).map(toCardPlayer) : []
+	);
 	function toCardPlayer(p: NonNullable<ModelSquad>['players'][number]): PitchCardPlayer {
 		const { color, textColor } = teamColorByShort(p.team_short);
 		return {
@@ -328,6 +342,7 @@
 				subtitle:
 					`${squad.cost.toFixed(1)}m of 100.0m, XI ${squad.xi_xp_horizon.toFixed(1)} xP ` +
 					`next ${(xp?.meta?.horizon_gw as number) ?? 6} GWs, GoalIQ model`,
+				unitNote: 'xP per GW under each name',
 				fileName: 'goaliq_spl_model_squad.png',
 				rows: POS_ROWS.map((pos) =>
 					xi.filter((p) => p.pos === pos).map(toCardPlayer)
@@ -569,6 +584,7 @@
 					{modelSquad.note} Starting XI in bold, projected XI total {modelSquad.xi_xp_horizon.toFixed(1)}
 					xP over the next {(xp?.meta?.horizon_gw as number) ?? 6} GWs.
 				</p>
+				<SquadPitch rows={pitchRows} bench={pitchBench} unitNote="xP per GW" />
 				<div class="table-wrap">
 					<table>
 						<thead>

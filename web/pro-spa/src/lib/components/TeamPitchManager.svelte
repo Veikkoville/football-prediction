@@ -302,6 +302,7 @@
 			const method = await sharePitchCard({
 				title: selGw != null ? `GAMEWEEK ${selGw} XI` : 'MY FPL XI',
 				subtitle: `projected ${gwXp.toFixed(1)} points, captain doubled, GoalIQ model`,
+				unitNote: 'xP under each name',
 				fileName: selGw != null ? `goaliq_xi_gw${selGw}.png` : 'goaliq_xi.png',
 				rows: rows.map((row) => row.map(toCardPlayer)),
 				bench: bench.map(toCardPlayer)

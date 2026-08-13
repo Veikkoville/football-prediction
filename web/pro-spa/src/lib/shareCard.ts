@@ -248,6 +248,12 @@ export interface PitchCardPlayer {
 export interface PitchCardSpec {
 	title: string;
 	subtitle: string;
+	/**
+	 * Pelaajien alla olevien lukujen yksikkö (esim. "xP per GW"). Renderöidään
+	 * kentän yläreunaan lukujen viereen — EI footeriin: yksikkö kaukana
+	 * luvusta on sama vikaluokka josta Δ vs crowd luettiin pisteinä (11.8).
+	 */
+	unitNote?: string;
 	/** XI positioriveinä (GKP → FWD), sama järjestys kuin pitchillä */
 	rows: PitchCardPlayer[][];
 	bench: PitchCardPlayer[];
@@ -373,6 +379,16 @@ export async function renderPitchCard(spec: PitchCardSpec): Promise<Blob> {
 	ctx.lineWidth = 2;
 	const inset = 14;
 	ctx.strokeRect(PX + inset, PY + inset, PW - 2 * inset, PH - 2 * inset);
+	if (spec.unitNote) {
+		// Yksikkö kentän sisään yläkulmaan, samaan näkymään lukujen kanssa.
+		ctx.font = med(17);
+		ctx.fillStyle = 'rgba(46,214,194,0.85)';
+		ctx.fillText(
+			spec.unitNote,
+			PX + PW - inset - 12 - ctx.measureText(spec.unitNote).width,
+			PY + inset + 10
+		);
+	}
 	// PUOLIKAS kenttä (31.7, Villen tarkennus; OfficialFPL/FFScout-kaava):
 	// maali + boksit + D ylhäällä, alareuna = keskiviiva keskiympyränkaarineen
 	// → FWD-rivi istuu keskiviivan tuntumaan.
