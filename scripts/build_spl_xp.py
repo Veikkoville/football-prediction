@@ -225,10 +225,12 @@ OVERRIDES_PATH = config.PROJECT_ROOT / "data" / "spl_availability_overrides.json
 
 
 def apply_availability_overrides(elements: list[dict]) -> list[str]:
-    """13.8: RSL Fantasyn oma availability-data voi olla vanhentunut
-    (mitattu: Enrique status 'a' vaikka toistuva nilkkavamma + ohitti
-    King's Cup -finaalin + yhteisoraportti leikkauksesta — pelin lippu-
-    mekanismi toimii, 29 muuta pelaajaa liputettu, mutta tama puuttui).
+    """13.8: pelin availability-data voi olla vaarassa/jaljessa, ja override
+    on tapa korjata se auditoitavasti. Ensimmainen tapaus: Enrique (521)
+    status 'a' vaikka yhteisoraportti kertoo leikkauksesta (ainoa lahde;
+    otettu tietoisesti luottaen, riski epasymmetrinen — perustelu ja
+    epavarmuus kirjattu override-tiedostoon). Pelin lippumekanismi toimii
+    muille (10 pelaajaa liputettuna samassa datassa).
 
     Korjaus tehdaan SYOTTEESEEN (status/chance) ennen mallia — optimoija
     ja kaikki kuluttajat nakevat saman korjatun datan, lopputulokseen ei
