@@ -45,6 +45,9 @@ raw_data/
 !/data/spl_results.README.md
 !/data/spl_projections_phase0.json
 !/data/spl_xp_projections.json
+# 13.8: availability-overridet OSA LAHDEKOODIA - ilman tata CI-refresh
+# rebuildaa squadin ilman korjausta ja peruu sen hiljaa 3 h valein
+!/data/spl_availability_overrides.json
 # xP-backtestin tiiviste (26.7): rate-team-selite kertoo projektioiden
 # osuvuuden, ja taysi raportti on logs/-alla gitignorattuna -> Render lukee taman.
 !/data/fpl_xp_accuracy.json

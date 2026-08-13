@@ -221,12 +221,49 @@ def build_model_squad(players_out: list[dict]) -> dict | None:
     }
 
 
+OVERRIDES_PATH = config.PROJECT_ROOT / "data" / "spl_availability_overrides.json"
+
+
+def apply_availability_overrides(elements: list[dict]) -> list[str]:
+    """13.8: RSL Fantasyn oma availability-data voi olla vanhentunut
+    (mitattu: Enrique status 'a' vaikka toistuva nilkkavamma + ohitti
+    King's Cup -finaalin + yhteisoraportti leikkauksesta — pelin lippu-
+    mekanismi toimii, 29 muuta pelaajaa liputettu, mutta tama puuttui).
+
+    Korjaus tehdaan SYOTTEESEEN (status/chance) ennen mallia — optimoija
+    ja kaikki kuluttajat nakevat saman korjatun datan, lopputulokseen ei
+    kosketa kasin. Override vaatii web_name-tasmayksen: pelin id:t voivat
+    driftata kausien valilla eika korjaus saa ikina osua vaaraan pelaajaan
+    (silloin ohitetaan aanekkasti eika arvata)."""
+    if not OVERRIDES_PATH.exists():
+        return []
+    data = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
+    applied: list[str] = []
+    by_id = {e["id"]: e for e in elements}
+    for pid_str, o in (data.get("players") or {}).items():
+        e = by_id.get(int(pid_str))
+        if not e:
+            print(f"      VAROITUS: override-id {pid_str} ei loydy bootstrapista — ohitetaan")
+            continue
+        if (e.get("web_name") or "") != o.get("web_name"):
+            print(f"      VAROITUS: override {pid_str} nimi ei tasmaa "
+                  f"({e.get('web_name')!r} != {o.get('web_name')!r}) — ohitetaan")
+            continue
+        e["status"] = o.get("status", "i")
+        e["chance_of_playing_next_round"] = o.get("chance", 0)
+        applied.append(f"{e['web_name']}: {o.get('reason', '')[:60]}")
+    return applied
+
+
 def main() -> int:
     src = fetch_source()
 
     print("[2/6] SPL-pelaajadata (bootstrap + element-historiat, ~590 hakua)...")
     boot = fetch_bootstrap()
     elements = boot["elements"]
+    overridden = apply_availability_overrides(elements)
+    for line in overridden:
+        print(f"      AVAILABILITY-OVERRIDE: {line}")
     teams_by_id = {t["id"]: t for t in boot["teams"]}
     history = fetch_history_past(elements)
     n_hist = sum(1 for v in history.values() if v)

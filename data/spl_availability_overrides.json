@@ -1,0 +1,19 @@
+{
+  "note": "Manuaaliset availability-korjaukset kun RSL Fantasyn oma data on todistetusti vanhentunut. Korjaus kohdistuu SYOTTEESEEN (status/chance) ennen mallia - optimoija ja kaikki kuluttajat nakevat saman korjatun datan, lopputulosta ei muokata kasin. Jokainen rivi vaatii lahteet ja web_name-varmistuksen (id-drift ei saa osua vaaraan pelaajaan). Committoitu tiedosto = jokainen override on julkisesti auditoitavissa git-historiasta.",
+  "players": {
+    "521": {
+      "web_name": "Enrique",
+      "status": "i",
+      "chance": 0,
+      "reason": "Toistuva nilkkavamma (18.3 semifinaali ~6 vk + uusiutuminen 4.5), ohitti King's Cup -finaalin; yhteisoraportti 13.8: leikkaus, sivussa syyskauden. RSL Fantasy nayttaa yha status a - pelin data vanhentunut.",
+      "sources": [
+        "https://arriyadiyah.com/890546/ (5.5.2026: uusiutunut nilkkavamma, tutkimukset Jeddassa, ohitti finaalin)",
+        "https://arriyadiyah.com/890509/ (4.5.2026: vaihto 34. min Al Ittihad -ottelussa)",
+        "https://www.alwatan.com.sa/article/1180324 (5.5.2026: seura odotti kuvantamistuloksia)",
+        "@FPLKarim_ 13.8.2026: 'He had a surgery and won't be playing the first half of the season' (x.com/fplkarim_/status/2087878136969175416)"
+      ],
+      "added": "2026-08-13",
+      "review_by": "2026-12-01"
+    }
+  }
+}
