@@ -641,3 +641,52 @@ export async function fetchModelRace(entry?: number | null): Promise<ModelRaceRe
 	const q = entry != null ? `?entry=${entry}` : '';
 	return getJson<ModelRaceResponse>(`/api/fantasy/model-race${q}`);
 }
+
+// ---------------------------------------------------------------------------
+// MINI-LEAGUE-RIVAL — "Catch your rival" (13.8). Free = ero + P(catch),
+// premium = differentiaalit + asemakohtainen suositus. Todennäköisyys tulee
+// samasta koneistosta kuin /h2h; klientti ei laske mitään.
+// ---------------------------------------------------------------------------
+export type RivalStance = 'chase_steady' | 'chase_variance' | 'protect' | 'level';
+
+export interface RivalDifferential {
+	id: number;
+	web_name: string;
+	team_short: string;
+	price: number;
+	owned_pct: number;
+	xp_horizon: number;
+	/** Varianssikontribuutio: kuinka paljon pelaaja voi kääntää eroa. */
+	swing: number;
+	rival_owns: boolean;
+}
+
+export interface RivalResponse {
+	meta: {
+		gameweeks_left: number;
+		method: string;
+		masked: boolean;
+		variance_mode_below: number;
+		gw: number;
+		generated_at: string | null;
+		disclaimer: string;
+	};
+	gap: number;
+	behind: boolean;
+	p_catch: number;
+	stance: RivalStance;
+	/** Premium; puuttuu kokonaan ilman (backend maskaa). */
+	differentials?: RivalDifferential[];
+	you: { entry: number; team_name: string | null; xi_xp: number; players_matched: number };
+	rival: { entry: number; team_name: string | null; xi_xp: number; players_matched: number };
+}
+
+export async function fetchRival(
+	entry: number,
+	rival: number,
+	leagueId: number
+): Promise<RivalResponse> {
+	return getJson<RivalResponse>(
+		`/api/fantasy/rival?entry=${entry}&rival=${rival}&league_id=${leagueId}`
+	);
+}

@@ -11,6 +11,7 @@
 		type LeagueRow
 	} from '$lib/fantasyTools';
 	import { capture } from '$lib/analytics';
+	import RivalPanel from './RivalPanel.svelte';
 	import { fplEntry } from '$lib/fplEntry.svelte';
 
 	// UX-palaute-erä (25.7) kohta 5: "Use this team" — FPL:ssä ei ole
@@ -102,6 +103,15 @@
 			h2hLoading = false;
 		}
 	}
+
+	// "Catch your rival": oma entry vs valittu rivi. Erillinen H2H-valinnasta,
+	// jotta kaksi eri kysymystä eivät kilpaile samasta klikkauksesta.
+	let rivalRow = $state<LeagueRow | null>(null);
+	let ownEntry = $derived(
+		/^\d{1,10}$/.test((fplEntry.entry || fplEntry.savedEntry || '').trim())
+			? Number((fplEntry.entry || fplEntry.savedEntry || '').trim())
+			: null
+	);
 
 	function isSelected(row: LeagueRow): boolean {
 		return selected.some((r) => r.entry === row.entry);
@@ -227,12 +237,34 @@
 								>
 									Use this team
 								</button>
+								{#if ownEntry != null && row.entry !== ownEntry}
+									<button
+										type="button"
+										class="use-btn"
+										title="What closing this gap takes"
+										onclick={(e) => {
+											e.stopPropagation();
+											rivalRow = rivalRow?.entry === row.entry ? null : row;
+										}}
+									>
+										{rivalRow?.entry === row.entry ? 'Hide' : 'Catch'}
+									</button>
+								{/if}
 							</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 		</div>
+
+		{#if rivalRow && ownEntry != null && idValid}
+			<RivalPanel
+				entry={ownEntry}
+				rival={rivalRow.entry}
+				leagueId={Number(leagueId.trim())}
+				rivalName={rivalRow.entry_name}
+			/>
+		{/if}
 	{/if}
 {/if}
 
