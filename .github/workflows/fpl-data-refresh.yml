@@ -205,6 +205,23 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.freeze_model_squad_gw
 
+      # 14.8: FREEZE EI KOSKETA FPL-TILIA. Rivi syotetaan FPL:aan kasin, joten
+      # jaadytetty tiedosto ja tili ovat kaksi eri totuutta mallin joukkueesta
+      # eika niiden valilla ollut mitaan joka huomaisi eron. Mitattu: entryn
+      # rivi valittiin 23.7 eli ENNEN 13.8:n P0-korjausta joka muutti mallin
+      # XI:n (101,5 m laiton -> 100,0 m). Jos entrya ei paivitetty, julkinen
+      # vaite "malli pelaa omaa FPL-joukkuettaan" osoittaa joukkueeseen jota
+      # malli ei valinnut — ja Beat the Model, Season race seka "logged before
+      # kickoff" nojaavat kaikki siihen.
+      #
+      # Vahti ei voi korjata tata (FPL-kirjautuminen on kasityota). Se tekee
+      # erosta aanekkaan: ennen deadlinea tulostaa rivin syotettavassa
+      # muodossa ja palauttaa 0, deadlinen jalkeen ero on exit 1.
+      # EI continue-on-erroria: taman kuuluu nakya punaisena.
+      - name: Verify FPL entry matches the frozen squad
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.verify_model_entry_matches_freeze
+
       # #124/#125: xG- + DefCon-leaders samasta bootstrap+element-summary-
       # datasta (levyvälimuisti — valmiin kauden summaryt eivät uudelleenhae).
       # 1.8: perustajalohkon luvut julkisesta entrysta (ei kovakoodausta

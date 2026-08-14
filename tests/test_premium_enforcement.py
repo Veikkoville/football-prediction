@@ -398,7 +398,12 @@ def test_pool_lisays_nosti_etag_skeemaversiota():
     vanhan vastauksen ja valitsin olisi tyhja tasan niilla kayttajilla joilla
     vastaus on jo valimuistissa.
     """
-    NYKYINEN = "s5"   # nosta AINA kun pooliin/vastaukseen tulee serve-time-kentta
+    # nosta AINA kun pooliin/vastaukseen tulee serve-time-kentta.
+    # s6 (14.8): `why.lang` = toteutunut kieli (WHY-I18N). Tama lukitustesti
+    # puri kuten kuuluu — se on ainoa asia joka pakottaa nostamaan version
+    # kasin, ja se loysi noston puuttumisen ennen kuin kayttajat loysivat
+    # tyhjan kentan valimuistista.
+    NYKYINEN = "s6"
     src = (API_DIR / "main.py").read_text(encoding="utf-8")
     assert f'schema = "{NYKYINEN}"' in src, (
         f"ETagin skeemaversio ei ole {NYKYINEN}. Jos lisasit pooliin kentan "
