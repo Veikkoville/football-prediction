@@ -7,7 +7,7 @@
 		type RateTeamResponse,
 		type TransferSuggestion
 	} from '$lib/fantasyTools';
-	import { fetchXp, type XpPlayer } from '$lib/api';
+	import { draftPool, fetchXp, type XpPoolPlayer } from '$lib/api';
 	import { buildRoast } from '$lib/roast';
 	import { capture } from '$lib/analytics';
 	import { auth } from '$lib/auth.svelte';
@@ -195,9 +195,9 @@
 	const DRAFT_CAPS: Record<string, number> = { GKP: 2, DEF: 5, MID: 5, FWD: 3 };
 	const DRAFT_ORDER = ['GKP', 'DEF', 'MID', 'FWD'];
 	let draftOpen = $state(false);
-	let pool = $state<XpPlayer[]>([]);
+	let pool = $state<XpPoolPlayer[]>([]);
 	let poolError = $state(false);
-	let picks = $state<XpPlayer[]>([]);
+	let picks = $state<XpPoolPlayer[]>([]);
 	let draftQuery = $state('');
 
 	// Web-pariteetti mobiilin cc-inbox #2 -fixille: draft-pickit persistoituvat
@@ -243,8 +243,12 @@
 	$effect(() => {
 		// 1.8: myös Joukkue 2:n draft-valitsin tarvitsee poolin (jaettu haku).
 		if ((draftOpen || draftOpenB) && pool.length === 0 && !poolError) {
+			// 14.8: draftPool = taydet rivit + kevyet rivit lopuille. Pelkka
+			// `players` oli free-kayttajalla 10 rivia joissa 0 maalivahtia,
+			// jolloin 15/15 ei ollut taytettavissa eika lahetysnappi
+			// aktivoitunut koskaan.
 			fetchXp().then(
-				(d) => (pool = d.players ?? []),
+				(d) => (pool = draftPool(d)),
 				() => (poolError = true)
 			);
 		}
@@ -256,7 +260,7 @@
 			const byId = new Map(pool.map((p) => [p.id, p]));
 			const resolved = savedDraftIds
 				.map((id) => byId.get(id))
-				.filter((p): p is XpPlayer => p != null);
+				.filter((p): p is XpPoolPlayer => p != null);
 			if (picks.length === 0 && resolved.length > 0) {
 				picks = resolved;
 				// Kohta 4: 15/15 tallessa → aja arvio automaattisesti.
@@ -330,7 +334,7 @@
 			)
 			.slice(0, 6);
 	});
-	function addPick(p: XpPlayer) {
+	function addPick(p: XpPoolPlayer) {
 		if (picks.length >= 15 || (posCount[p.pos] ?? 0) >= (DRAFT_CAPS[p.pos] ?? 0)) return;
 		picks = [...picks, p];
 		draftQuery = '';
@@ -482,7 +486,7 @@
 			const byId = new Map(pool.map((p) => [p.id, p]));
 			const resolved = ids
 				.map((id) => byId.get(id))
-				.filter((p): p is XpPlayer => p != null);
+				.filter((p): p is XpPoolPlayer => p != null);
 			if (resolved.length === ids.length) picks = resolved;
 		}
 	}
@@ -529,7 +533,7 @@
 	let dataB = $state<RateTeamResponse | null>(null);
 	let picksNotPublishedB = $state(false);
 	let draftOpenB = $state(false);
-	let picksB = $state<XpPlayer[]>([]);
+	let picksB = $state<XpPoolPlayer[]>([]);
 	let draftQueryB = $state('');
 	const posCountB = $derived.by(() => {
 		const c: Record<string, number> = { GKP: 0, DEF: 0, MID: 0, FWD: 0 };
@@ -560,7 +564,7 @@
 		captaincyB.captain_id = captainId;
 		captaincyB.vice_id = viceId;
 	}
-	function addPickB(p: XpPlayer) {
+	function addPickB(p: XpPoolPlayer) {
 		if (picksB.length >= 15 || (posCountB[p.pos] ?? 0) >= (DRAFT_CAPS[p.pos] ?? 0)) return;
 		picksB = [...picksB, p];
 		draftQueryB = '';
@@ -622,12 +626,12 @@
 			const ms = await fetchModelSquad();
 			if (pool.length === 0) {
 				const d = await fetchXp();
-				pool = d.players ?? [];
+				pool = draftPool(d);
 			}
 			const byId = new Map(pool.map((p) => [p.id, p]));
 			const resolved = ms.players
 				.map((p) => byId.get(p.id))
-				.filter((p): p is XpPlayer => p != null);
+				.filter((p): p is XpPoolPlayer => p != null);
 			if (resolved.length !== 15) {
 				throw new Error('The model squad is not available right now. Please try again shortly.');
 			}

@@ -188,9 +188,25 @@ export interface XpMeta {
 	[key: string]: unknown;
 }
 
+/** Kevyt valitsinrivi (14.8). Vain julkista FPL-bootstrap-tietoa — EI
+ *  yhtään mallin lukua. Muoto on tarkoituksella `SearchItem`-yhteensopiva. */
+export interface XpPoolPlayer {
+	id: number;
+	web_name: string;
+	team_short: string;
+	pos: 'GKP' | 'DEF' | 'MID' | 'FWD';
+	price?: number;
+	/** Vain täysillä riveillä (haku koko nimellä). Kevyt rivi ei tuo. */
+	full_name?: string;
+}
+
 export interface XpResponse {
 	meta: XpMeta;
 	players: XpPlayer[];
+	/** 14.8: koko pelaajalista draft-valitsimelle. Maskattu teaser antaa
+	 *  free-käyttäjälle 10 riviä joissa oli 0 maalivahtia, jolloin drafti ei
+	 *  ollut täytettävissä lainkaan. Defensiivinen: vanha payload ei tuo. */
+	pool?: XpPoolPlayer[];
 	/** Edge-sprint addendum 2: FPL-listatut pelaajat jotka EIVÄT ole
 	 * projektiossa (saatavuuslippu i/s/u/n tai xP alle kynnyksen). Erillinen
 	 * lista players[]:n rinnalla → rankkauslistat eivät näe näitä, mutta haku
@@ -248,6 +264,25 @@ let accuracyP: Promise<AccuracyResponse> | null = null;
 export function fetchFantasy(): Promise<FantasyResponse> {
 	fantasyP ??= getJson<FantasyResponse>('/api/fantasy?horizon=all');
 	return fantasyP;
+}
+
+/** Draft-/lukitusvalitsimen pooli: täydet rivit ensin, sitten kevyet rivit
+ *  niille joita täysissä ei ole (14.8).
+ *
+ *  MIKSI YHDISTETÄÄN eikä korvata: täydet rivit kantavat `full_name`-haun,
+ *  joten pelkkä kevyen listan käyttö veisi koko nimellä hakemisen myös
+ *  premium-käyttäjältä. Yhdistäminen antaa free-käyttäjälle täytettävän
+ *  valitsimen ilman että premium-pinta menettää mitään.
+ *
+ *  Fallback `players` on tarkoituksellinen: jos backend ei vielä tuo poolia
+ *  (vanha deploy), käytös on tasan entinen eikä valitsin kaadu. */
+export function draftPool(d: XpResponse): XpPoolPlayer[] {
+	const rows: XpPoolPlayer[] = [...(d.players ?? [])];
+	const seen = new Set(rows.map((p) => p.id));
+	for (const p of d.pool ?? []) {
+		if (!seen.has(p.id)) rows.push(p);
+	}
+	return rows;
 }
 
 export async function fetchXp(): Promise<XpResponse> {
