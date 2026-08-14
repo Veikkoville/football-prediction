@@ -204,6 +204,35 @@ def mask_xp_payload(payload: dict) -> dict:
     return out
 
 
+# Kevyen valitsinpoolin kentat. TAHAN EI LISATA xP-kenttia: pooli menee myos
+# maskatussa vastauksessa, ja arvojen lisaaminen myisi premium-ytimen
+# ilmaiseksi. Sama linjaus kuin xP-teaserissa jo on: nimet nakyvat, arvot eivat.
+XP_POOL_FIELDS = ("id", "web_name", "pos", "team_short", "price")
+
+
+def xp_pool_rows(players: list[dict]) -> list[dict]:
+    """Kevyt pelaajapooli draft-valitsimelle (14.8).
+
+    MIKSI: 11.8 lisatty maski typistaa /api/fantasy/xp:n free-kayttajalle
+    kymmeneen riviin. Mitattu 14.8 tuotannosta: ne kymmenen olivat MID 4 /
+    DEF 4 / FWD 2 / GKP 0. Draft vaatii 2 GKP + 5 DEF + 5 MID + 3 FWD, joten
+    maalivahtislotin lista oli tyhja ja lahetysnappi pysyi ikuisesti
+    disabloituna — seka mobiilissa etta webissa, koska molemmat hakevat
+    poolinsa samasta kutsusta. Backend vastasi 200 ja tsc oli vihrea: rikki
+    oli tyhja lista eika virhe, joten yksikaan portti ei nahnyt sita.
+
+    Maskia EI pureta — sen syy on patea. Valitsin saa oman listansa jossa on
+    vain julkista FPL-bootstrap-tietoa (nimi, positio, seura, hinta) kaikille
+    pelaajille, eika yhtaan mallin tuottamaa lukua.
+    """
+    out: list[dict] = []
+    for p in players:
+        if p.get("id") is None:
+            continue
+        out.append({k: p.get(k) for k in XP_POOL_FIELDS})
+    return out
+
+
 def mask_plan_payload(payload: dict) -> dict:
     """/api/fantasy/plan freelle: vain ensimmaisen GW:n suunnitelma-askel.
     plan[0] on taysi rivi -> renderointi (lista-iterointi) ei kaadu."""

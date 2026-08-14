@@ -45,7 +45,7 @@ import requests
 # Edge-sprint P0: admin-portti + PREMIUM_ENFORCE-maskit (default off — kun
 # flagi on pois, is_premium_request palauttaa aina True eika mikaan muutu).
 from api.premium import (
-    is_premium_request, mask_plan_payload, mask_xp_payload,
+    is_premium_request, mask_plan_payload, mask_xp_payload, xp_pool_rows,
     premium_enforce_on, require_admin,
 )
 
@@ -3092,6 +3092,8 @@ def fantasy_xp(
     if lg not in XP_PATHS:
         raise HTTPException(status_code=404, detail=f"Unknown fantasy league '{league}'.")
     payload = load_xp(XP_PATHS[lg])
+    # Talteen ENNEN maskausta: kevyt valitsinpooli rakennetaan koko listasta.
+    full_players = list(payload.get("players") or [])
     # Edge-sprint P0c: PREMIUM_ENFORCE=on + ei-premium -> typistetty teaser
     # (top-10 taysia riveja, meta.masked=true). Flagi off (default) -> tama
     # haara ei koskaan aja ja vastaus on bittitarkasti ennallaan.
@@ -3112,6 +3114,13 @@ def fantasy_xp(
     if lg == "fpl" and not masked:
         payload = attach_why(payload)
         why_tag = why_stamp()
+    # FREE-DRAFT-POOL (14.8): draft rater ja fit checker tarvitsevat KAIKKI
+    # pelaajat valitsimeensa, myos maalivahdit. Maskattu teaser (10 rivia)
+    # ei sisaltanyt yhtaan maalivahtia -> ilmainen draft rater oli rikki
+    # molemmilla pinnoilla. Pooli menee mukaan aina, jotta klientilla on yksi
+    # koodipolku eivatka pinnat voi eriytya; se ei sisalla yhtaan xP-arvoa.
+    payload = dict(payload)
+    payload["pool"] = xp_pool_rows(full_players)
     # ETag erottaa maskatun ja täyden vastauksen: ilman mask-bittiä free-
     # käyttäjän 304 voisi validoida premium-rivit selaimen välimuistista.
     generated = str(payload.get("meta", {}).get("generated_at") or "0")
@@ -3124,7 +3133,11 @@ def fantasy_xp(
     # 14.8 s3: `why` on serve-time-kenttä omasta tiedostostaan, joten sen
     # päivittyminen EI liikuta `generated_at`ia — ilman versionostoa ehdollinen
     # pyyntö validoisi vanhan vastauksen 304:llä ja selitys jäisi näkymättä.
-    schema = "s3"
+    # 14.8 s4: `pool` on serve-time-kentta ilman uutta projektiota. Ilman
+    # versionostoa free-kayttajan ehdollinen pyynto validoisi vanhan
+    # vastauksen 304:lla ja valitsin jaisi tyhjaksi juuri niille joilla
+    # vastaus on jo valimuistissa — eli niille jotka ovat kayneet sivulla.
+    schema = "s4"
     # Liiga-avain ETagiin: ilman sitä fpl- ja spl-vastaukset voisivat
     # 304-validoitua ristiin samasta selainvälimuistista (sama URL-polku,
     # eri query) — sama vikaluokka kuin mask-bitin puuttuminen olisi.

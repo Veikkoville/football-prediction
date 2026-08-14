@@ -304,3 +304,100 @@ def test_masked_rows_stay_complete(client, monkeypatch):
     for p in players:
         for field in ("web_name", "team", "pos", "xp_per_gw", "xp_horizon_total"):
             assert p.get(field) is not None, f"Maskattu rivi menetti kentan {field}"
+
+
+# --- FREE-DRAFT-POOL (14.8) ------------------------------------------------
+#
+# Loydos 14.8: maskattu vastaus antoi free-kayttajalle 10 rivia 505:sta ja
+# niissa oli MID 4 / DEF 4 / FWD 2 / **GKP 0**. Draft rater vaatii 2 GKP, joten
+# lahetysnappi ei aktivoitunut koskaan — seka mobiilissa etta webissa, koska
+# molemmat hakevat valitsinpoolinsa samasta kutsusta. Yksikaan portti ei
+# nahnyt sita: backend vastasi 200, tsc oli vihrea, ja rikki oli tyhja lista.
+# Nama testit lukitsevat KAYTETTAVYYDEN (voiko 15 slottia tayttaa) eivatka
+# vain listan pituutta.
+
+DRAFT_SLOTS = {"GKP": 2, "DEF": 5, "MID": 5, "FWD": 3}
+
+
+def _pos_counts(rows: list[dict]) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for r in rows:
+        out[r.get("pos")] = out.get(r.get("pos"), 0) + 1
+    return out
+
+
+def test_maskattu_vastaus_ei_riita_valitsimeksi(client, monkeypatch):
+    """Kontrolli itse oireelle: teaser-rivit EIVAT tayta draftin slotteja.
+
+    Jos tama joskus lakkaa patemasta, `pool` on tarpeeton — mutta silloin se
+    on paatettava eksplisiittisesti eika vahingossa.
+    """
+    monkeypatch.setenv("PREMIUM_ENFORCE", "on")
+    d = client.get("/api/fantasy/xp").json()
+    counts = _pos_counts(d["players"])
+    puuttuu = {p: n for p, n in DRAFT_SLOTS.items() if counts.get(p, 0) < n}
+    assert puuttuu, ("teaser tayttaa jo draftin slotit — tama testi ei enaa "
+                     "mittaa mitaan")
+
+
+def test_anonyymi_saa_taydentavan_valitsinpoolin(client, monkeypatch):
+    """POSITIIVINEN: anonyymi pystyy tayttamaan 15/15 slottia."""
+    monkeypatch.setenv("PREMIUM_ENFORCE", "on")
+    r = client.get("/api/fantasy/xp")
+    assert r.status_code == 200
+    pool = r.json().get("pool")
+    assert pool, "kevyt valitsinpooli puuttuu maskatusta vastauksesta"
+    counts = _pos_counts(pool)
+    vajaat = {p: (counts.get(p, 0), n) for p, n in DRAFT_SLOTS.items()
+              if counts.get(p, 0) < n}
+    assert not vajaat, f"valitsimesta ei saa koottua 15:ta: {vajaat}"
+
+
+def test_valitsinpooli_ei_sisalla_yhtaan_xp_arvoa(client, monkeypatch):
+    """NEGATIIVINEN KONTROLLI: pooli ei saa vuotaa premium-ydinta.
+
+    Testataan kentat NIMELTA eika vain otoksesta: uusi kentta joka livahtaa
+    XP_POOL_FIELDSiin loytyisi vasta tuotannosta.
+    """
+    monkeypatch.setenv("PREMIUM_ENFORCE", "on")
+    from api.premium import XP_POOL_FIELDS
+
+    pool = client.get("/api/fantasy/xp").json()["pool"]
+    assert pool
+    kielletyt = {"xp_per_gw", "xp_horizon_total", "xp_per_90", "components",
+                 "owned_pct", "why", "gameweeks", "xmins"}
+    for row in pool:
+        assert set(row) == set(XP_POOL_FIELDS), (
+            f"valitsinpoolin kenttajoukko muuttui: {sorted(row)}")
+        assert not (set(row) & kielletyt)
+    # ...ja sama vaite kenttalistalle itselleen, jotta lisays huomataan
+    # myos silloin kun rivi sattuisi olemaan tyhja.
+    assert not (set(XP_POOL_FIELDS) & kielletyt)
+    assert not [f for f in XP_POOL_FIELDS if "xp" in f.lower()]
+
+
+def test_valitsinpooli_on_myos_premiumilla(client, monkeypatch):
+    """Yksi koodipolku klientilla: pooli tulee myos maskaamattomana.
+
+    Jos pooli olisi vain maskatussa vastauksessa, klientti tarvitsisi kaksi
+    haaraa ja pinnat voisivat eriytya — sama vikaluokka josta tama korjaus
+    lahti liikkeelle.
+    """
+    monkeypatch.setenv("PREMIUM_ENFORCE", "off")
+    d = client.get("/api/fantasy/xp").json()
+    assert d["meta"].get("masked") is not True
+    assert _pos_counts(d.get("pool") or {}) and all(
+        _pos_counts(d["pool"]).get(p, 0) >= n for p, n in DRAFT_SLOTS.items())
+
+
+def test_pool_lisays_nosti_etag_skeemaversiota():
+    """Serve-time-kentta ilman skeemanostoa jaisi 304:n taakse.
+
+    Muisti `serve-time-kentta-ei-invalidoi-etagia`: `generated_at` ei liiku
+    kun kentta lisataan servaushetkella, joten ehdollinen pyynto validoisi
+    vanhan vastauksen ja valitsin olisi tyhja tasan niilla kayttajilla joilla
+    vastaus on jo valimuistissa.
+    """
+    src = (API_DIR / "main.py").read_text(encoding="utf-8")
+    assert 'schema = "s4"' in src, (
+        "ETagin skeemaversio ei ole s4 — `pool` lisattiin ilman versionostoa")

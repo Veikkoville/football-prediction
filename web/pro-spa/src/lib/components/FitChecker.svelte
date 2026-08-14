@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fetchFit, fetchXp, type FitResponse, type XpPlayer } from '$lib/api';
+	import { draftPool, fetchFit, fetchXp, type FitResponse, type XpPoolPlayer } from '$lib/api';
 	import { capture } from '$lib/analytics';
 	import { saveDraftIds } from '$lib/draft';
 	import MethodNote from './MethodNote.svelte';
@@ -16,22 +16,24 @@
 	// (FreeView vaihtaa segmentin) ja draft latautuu siellä automaattisesti.
 	let { onOpenRateTeam }: { onOpenRateTeam?: () => void } = $props();
 
-	let pool = $state<XpPlayer[]>([]);
+	let pool = $state<XpPoolPlayer[]>([]);
 	let poolError = $state(false);
 	$effect(() => {
+		// 14.8: sama pooli kuin draft raterilla — lukitusvalitsin oli rikki
+		// samasta syysta (maskattu teaser 10 rivia).
 		fetchXp().then(
-			(d) => (pool = d.players ?? []),
+			(d) => (pool = draftPool(d)),
 			() => (poolError = true)
 		);
 	});
 
-	let locks = $state<(XpPlayer | null)[]>([null, null, null]);
+	let locks = $state<(XpPoolPlayer | null)[]>([null, null, null]);
 	let query = $state('');
 	let result = $state<FitResponse | null>(null);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
-	let chosen = $derived(locks.filter((p): p is XpPlayer => p != null));
+	let chosen = $derived(locks.filter((p): p is XpPoolPlayer => p != null));
 
 	// Sama normalisointi kuin XpTable-haussa (#145/#147-pariteetti, suppea).
 	function norm(s: string): string {
@@ -59,7 +61,7 @@
 			.slice(0, 6);
 	});
 
-	function addLock(p: XpPlayer) {
+	function addLock(p: XpPoolPlayer) {
 		const i = locks.findIndex((l) => l == null);
 		if (i === -1) return;
 		locks[i] = p;
