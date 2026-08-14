@@ -189,3 +189,44 @@ def test_freeze_ohittaa_paattyneet_kierrokset():
 def test_freeze_ei_osu_menneeseen_deadlineen():
     evs = [_ev(1, "2026-08-20T11:00:00Z")]        # jo mennyt, ei finished
     assert next_freeze_gw(evs, NOW) is None
+
+
+# --- optimaalisuusvahti (14.8) --------------------------------------------
+
+def _horizon(xi: list[dict], bench: list[dict],
+             xi_xp: list[float], bench_xp: list[float]) -> None:
+    """Lisää horisontti-xP:t paikan päällä; ilman niitä vahti ohittaa."""
+    for p, v in zip(xi, xi_xp):
+        p["xp_horizon_total"] = v
+    for p, v in zip(bench, bench_xp):
+        p["xp_horizon_total"] = v
+
+
+def test_optimaalisuusvahti_ei_valita_parhaasta_jaosta():
+    """Kontrolli: kun jako on jo paras, vahti on hiljaa."""
+    xi, bench = legal_squad()
+    _horizon(xi, bench, [30.0] * 11, [5.0] * 4)
+    assert validate_squad(xi, bench) == []
+
+
+def test_optimaalisuusvahti_havaitsee_penkille_haviavan_xin():
+    """14.8:n oire: laillinen runko jonka penkillä on XI:tä parempi pelaaja.
+
+    Ilman tätä vahtia freeze olisi lukinnut sen koko kaudeksi immutablena.
+    """
+    xi, bench = legal_squad()
+    # XI:n heikoin on hyökkääjä 4.0; penkillä on hyökkääjä 25.0 -> sama
+    # muodostelma paremmalla jaolla tuottaa enemmän.
+    _horizon(xi, bench,
+             [30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 4.0],
+             [1.0, 1.0, 1.0, 25.0])
+    problems = validate_squad(xi, bench)
+    assert any("häviää omalle penkilleen" in p for p in problems), problems
+
+
+def test_optimaalisuusvahti_ohitetaan_ilman_horisonttilukuja():
+    """Eksplisiittinen ohitus: kevyt poolirivi ei saa kaataa vahtia
+    KeyErroriin eikä toisaalta teeskennellä tarkistaneensa."""
+    xi, bench = legal_squad()
+    assert all("xp_horizon_total" not in p for p in xi + bench)
+    assert validate_squad(xi, bench) == []

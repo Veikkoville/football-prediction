@@ -91,6 +91,29 @@ def validate_squad(xi: list[dict], bench: list[dict]) -> list[str]:
     cost = sum(int(p.get("price") or 0) for p in squad)
     if cost > BUDGET_TENTHS:
         problems.append(f"hinta {cost / 10:.1f}m yli {BUDGET_TENTHS / 10:.1f}m")
+
+    # OPTIMAALISUUSVAHTI (14.8): laillinen ei riitä. 14.8 julkaistu malli-XI
+    # oli täysin laillinen mutta hävisi omalle penkilleen 7.4 % — kuka tahansa
+    # olisi voittanut "mallin" siirtämällä kaksi pelaajaa penkiltä avaukseen.
+    # Freeze on immutable ja kestää koko kauden, joten se on viimeinen paikka
+    # jossa tämän voi vielä pysäyttää.
+    # Vaatii horisontti-xP:n; ilman sitä tarkistus ohitetaan eksplisiittisesti
+    # (yksikkötestien kevyet poolirivit) — hiljainen KeyError-nielaisu tekisi
+    # vahdista näennäisen.
+    if len(squad) == 15 and all(p.get("xp_horizon_total") is not None
+                                for p in squad):
+        from src.models.fpl_rate_team import RateTeamError, optimal_xi
+        try:
+            best = sum(p["xp_horizon_total"] for p in optimal_xi(squad))
+        except RateTeamError:
+            best = None
+        if best is not None:
+            cur = sum(float(p.get("xp_horizon_total") or 0.0) for p in xi)
+            if best > cur + 1e-6:
+                problems.append(
+                    f"XI häviää omalle penkilleen: paras jako {best:.2f} xP "
+                    f"> jäädytettävä XI {cur:.2f} xP "
+                    f"(+{best - cur:.2f}, {(best / cur - 1) * 100:+.1f} %)")
     return problems
 
 
