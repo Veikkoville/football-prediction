@@ -326,6 +326,13 @@ def main() -> None:
     baseline = add_promoted_baseline(dc, missing)
     print(f"      promoted baseline: {baseline}")
 
+    # 14.8: JOUKKUETASON VOIMAOHITUS — sama lahde kuin xP-builderilla.
+    # Ilman tata rivia tama pinta nayttaisi samasta seurasta eri luvun kuin
+    # xP, ja kayttaja nakee molemmat samassa tuotteessa. Sijainti on sama
+    # kaikilla kolmella: promoted baselinen JALKEEN, laskennan EDELLA.
+    from src.models.fpl_team_overrides import apply_to_fit
+    apply_to_fit(dc, "cs-fdr")
+
     print("[4/5] Lasketaan CS% + win% + FDR per fixture...")
     rows = compute_fixtures(dc, fixtures)
     add_fdr(rows)

@@ -311,24 +311,8 @@ def main(argv: list[str] | None = None) -> int:
     # nae siirtoikkunaa — esikaudella se on pahimmillaan. Sovelletaan TASSA:
     # promoted baselinen JALKEEN (jotta nousijoiden rivi on olemassa) ja
     # xP-laskennan EDELLA. Ks. data/fpl_team_overrides.csv merkkisopimuksesta.
-    from src.models.fpl_team_overrides import (
-        apply_team_overrides, load_team_overrides,
-    )
-    _team_ovr, _team_warn = load_team_overrides()
-    for _w in _team_warn:
-        print(f"::warning::[Joukkueohitus] {_w}")
-    team_overrides_applied = apply_team_overrides(dc, _team_ovr)
-    for _r in team_overrides_applied:
-        if not _r["found"]:
-            # Nimikirjoitusvirhe on todennakoisin tapa saada ohitus
-            # nayttamaan toimivalta tekematta mitaan.
-            print(f"::error::[Joukkueohitus] tuntematon joukkue "
-                  f"{_r['team']!r} — ohitus EI vaikuttanut mihinkaan")
-        else:
-            print(f"      joukkueohitus {_r['team']}: "
-                  f"attack {_r['attack_before']:+.3f} -> {_r['attack_after']:+.3f}, "
-                  f"defence {_r['defence_before']:+.3f} -> {_r['defence_after']:+.3f} "
-                  f"(review_by {_r['review_by']})")
+    from src.models.fpl_team_overrides import apply_to_fit
+    team_overrides_applied = apply_to_fit(dc, "xp")
 
     print("[4/6] Pelaajavauhdit + minuuttimalli (koko saatavilla oleva historia)...")
     pos_by_player = {e["id"]: e["element_type"] for e in boot["elements"]}

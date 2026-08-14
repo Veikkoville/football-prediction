@@ -178,7 +178,12 @@ def test_the_override_never_reaches_the_graded_prediction_surface():
     silloin mikaan ei huutaisi. Nyt huutaa tama.
     """
     root = _Path(__file__).resolve().parents[1]
-    allowed = {"scripts/build_fpl_xp.py"}
+    # Kolme FPL-pintaa saavat ohituksen (yhtenäistetty 14.8: aiemmin vain xP,
+    # jolloin fixture-ticker näytti samasta seurasta eri luvun kuin xP).
+    # `/api/predict` EI ole listalla eikä sinne saa lisätä.
+    allowed = {"scripts/build_fpl_xp.py",
+               "scripts/build_fpl_cs_fdr.py",
+               "scripts/build_fpl_phase0.py"}
     offenders = []
     for f in list(root.glob("api/**/*.py")) + list(root.glob("scripts/**/*.py")) \
             + list(root.glob("src/**/*.py")):
@@ -189,7 +194,8 @@ def test_the_override_never_reaches_the_graded_prediction_surface():
             src = f.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):  # pragma: no cover
             continue
-        if "load_team_overrides" in src or "apply_team_overrides" in src:
+        if any(k in src for k in ("load_team_overrides", "apply_team_overrides",
+                                  "apply_to_fit")):
             offenders.append(rel)
     assert not offenders, (
         "joukkueohitus vuoti gradatulle tai muulle pinnalle: " + ", ".join(offenders)

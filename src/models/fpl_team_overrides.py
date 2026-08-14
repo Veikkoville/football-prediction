@@ -153,6 +153,53 @@ def load_team_overrides(path: Path | None = None,
     return out, warnings
 
 
+def apply_to_fit(dc, surface: str, today: _dt.date | None = None) -> list[dict]:
+    """Lataa, sovella ja raportoi — YKSI polku kaikille FPL-pinnoille.
+
+    🔴 MIKSI TAMA ON JAETTU FUNKTIO. Ohitus oli 14.8 kytketty vain
+    `build_fpl_xp.py`:hyn, jolloin xP sanoi Newcastlesta yhta ja CS/FDR
+    (fixture-ticker, chip-EV) toista. Repon oma ennakkotapaus varoittaa tasan
+    tasta: `add_promoted_baseline` oli aikanaan KOPIOITU kahteen builderiin
+    eika /api/predict kayttanyt sita lainkaan, jolloin ennuste palautti 404:n
+    Coventrylle vaikka CS%/FDR tunsi seuran. Sen korjauksen opetus kirjattiin
+    koodiin: "Yksi lahde = pinnat eivat voi ajautua erilleen." Sama saanto
+    tassa.
+
+    🔴 `attack_mult` EI KULJE TATA KAUTTA, eika se ole epajohdonmukaisuus.
+    Se on PELAAJAVAUHDIN kerroin (`xg90`/`xa90`) eika DC-suure, ja
+    CS/FDR- ja Phase 0 -pinnoilla ei ole pelaajavauhteja lainkaan. Jos haluat
+    saman asian nakyvan myos fixture-tason luvuissa, se sanotaan
+    `attack_delta`lla — se on juuri se sarake joka liikuttaa lambdaa.
+
+    🔴 `/api/predict` EI KUTSU TATA. Sen ennusteet logataan pre-match
+    julkiseen track recordiin, joten kasisaato siella tarkoittaisi etta
+    julkaistu osumatarkkuus mittaa kasisaatoa eika mallia. Rajaus on lukittu
+    porttiin (`test_the_override_never_reaches_the_graded_prediction_surface`).
+
+    `surface` nakyy lokissa, jotta kolmen ajon tulosteet erottuvat toisistaan.
+    """
+    overrides, warnings = load_team_overrides(today=today)
+    for w in warnings:
+        print(f"::warning::[Joukkueohitus/{surface}] {w}")
+    applied = apply_team_overrides(dc, overrides)
+    for r in applied:
+        if not r["found"]:
+            # Nimikirjoitusvirhe on todennakoisin tapa saada ohitus
+            # nayttamaan toimivalta tekematta mitaan.
+            print(f"::error::[Joukkueohitus/{surface}] tuntematon joukkue "
+                  f"{r['team']!r} — ohitus EI vaikuttanut mihinkaan")
+        else:
+            print(f"      joukkueohitus/{surface} {r['team']}: "
+                  f"attack {r['attack_before']:+.3f} -> {r['attack_after']:+.3f}, "
+                  f"defence {r['defence_before']:+.3f} -> {r['defence_after']:+.3f} "
+                  f"(review_by {r['review_by']})")
+    if not applied:
+        # Tyhja on laillinen tila, mutta sen on nayttava: muuten "ei rivejä"
+        # ja "lukija on rikki" nayttavat lokissa tasan samalta.
+        print(f"      joukkueohitus/{surface}: 0 rivia voimassa")
+    return applied
+
+
 def apply_team_overrides(dc, overrides: dict) -> list[dict]:
     """Muokkaa dc.attack / dc.defence PAIKALLAAN. Palauttaa sovelletut rivit.
 
