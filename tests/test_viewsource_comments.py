@@ -42,7 +42,7 @@ GENERATORS = [
 
 SAMPLE_PAGES = [
     "index.html", "fpl.html", "predictions.html", "faq.html", "spl.html",
-    "career.html", "privacy.html", "reset-password.html",
+    "career.html", "creators.html", "privacy.html", "reset-password.html",
     "fpl/stats.html", "fpl/xg-leaders.html", "fpl/expected-points.html",
     "predictions/premier-league", "predictions/la-liga",
     # pro.goaliq.app:n shell servataan lahes sellaisenaan JOKAISELLA

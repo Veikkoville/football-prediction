@@ -57,20 +57,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
  ]
 }
 </script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "WebApplication",
- "name": "FPL Career Card by GoalIQ",
- "url": "https://goaliq.app/career",
- "applicationCategory": "SportsApplication",
- "operatingSystem": "Any (web browser)",
- "isAccessibleForFree": true,
- "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
- "description": "Turn your public FPL entry ID into a shareable career card: best season, all-time points and rank history, plus a GoalIQ model read on your squad in season. Free, no login.",
- "author": {"@id": "https://goaliq.app/#organization"}
-}
-</script>
 <style>
   :root {/* 1 Aug 2026: magenta was removed from the palette; these replacement tokens were referenced but missing from :root. */--amber:#F5C542;--ember:#FF8A5C;--cream:#F3F2F2;
     --bg: #0B0A09;
@@ -107,7 +93,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
      .hint a, footer a and .nav-cta override this with their own rules. */
   a { color: var(--teal-ink); }
   .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 80px; }
-  /* Tumma ink-hero (redesign 24.7): sama gradientti + 6px magenta-raita kuin index.html */
+  /* Dark ink hero: same gradient and 6px magenta rule as index.html */
   /* 2 Aug: the banner was WHITE and the text drowned in it. On this page
      --cream AND --ink are both #F3F2F2, so background and text were the
      same color. Before 1 Aug --cream was missing from :root -> var(--cream)
@@ -132,12 +118,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; margin: 44px 0 14px; }
   h1 span { color: var(--gold-deep,#F5C542); }
   .lede { font-size: 18px; color: var(--muted); max-width: 56ch; line-height: 1.7; }
-  .entry-form { margin: 28px 0 10px; display: flex; gap: 10px; flex-wrap: wrap; }
-  .entry-form input {
-    flex: 1 1 220px; font: inherit; font-size: 17px; padding: 12px 16px;
-    border: 1px solid var(--line); border-radius: 0; background: var(--card); color: var(--text);
-  }
-  .entry-form input:focus { outline: 2px solid var(--amber); border-color: transparent; }
   .btn {
     display: inline-block; border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 16px;
     background: transparent; color: var(--gold-deep,#F5C542); border: 1px solid var(--gold,#F5C542); padding: 12px 24px; border-radius: 0; text-decoration: none;
@@ -148,20 +128,11 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   .hint { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 62ch; margin-top: 2px; }
   .hint a { color: var(--teal-ink); }
   .status { margin: 18px 0; font-size: 15px; color: var(--muted); min-height: 1.4em; }
-  .status.error { color: var(--ember); font-weight: 500; }
-  .card-stage { display: none; margin-top: 8px; }
-  .card-stage.visible { display: block; }
-  #cardCanvas {
-    width: 100%; max-width: 432px; height: auto; display: block;
-    border: 1px solid var(--line); border-radius: var(--radius);
-    box-shadow: 0 12px 40px rgba(10,8,32,0.10);
-  }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
+  .status.error { color: var(--ember); font-weight: 500; }.actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
   .fineprint { font-size: 13px; color: var(--muted); margin-top: 14px; max-width: 60ch; line-height: 1.6; }
   .get-app { margin-top: 44px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
   .get-app h2 { font-size: 20px; margin-bottom: 6px; }
   .get-app p { color: var(--muted); font-size: 15px; margin-bottom: 14px; }
-  .store-links { display: flex; gap: 10px; flex-wrap: wrap; }
   footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; padding: 28px 20px; text-align: center; margin-top: 60px; }
   footer a { color: var(--muted); }
   footer a:hover { color: var(--amber); }
@@ -329,11 +300,11 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   ul.plain { margin: 0 0 12px; padding-left: 18px; }
   ul.plain li { margin: 0 0 10px; line-height: 1.55; }
   table.rates { width: 100%; border-collapse: collapse; margin: 12px 0; }
-  table.rates th, table.rates td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(0,0,0,.1); }
+  table.rates th, table.rates td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.14); }
   table.rates th { font-weight: 600; }
   .note { font-size: .92rem; opacity: .8; }
-  a.cta { display: inline-block; margin-top: 8px; padding: 12px 18px; border-radius: 10px;
-          background: #0B0A09; color: #fff; text-decoration: none; font-weight: 600; }
+  a.cta { display: inline-block; margin-top: 8px; padding: 12px 18px; border-radius: 2px;
+          background: var(--ink); color: var(--bg); text-decoration: none; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -344,7 +315,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     <a class="nav-cta" href="https://goaliq.app/fpl.html">FPL tools</a>
   </nav>
   <h1>GoalIQ <span>creator program</span></h1>
-  <p class="lede">You get a discount code for your audience and 30 percent of what they pay. The terms are below in full, including the parts that are still open. Nothing here is a teaser rate.</p>
+  <p class="lede">You get a discount code for your audience and 30 percent of what they pay. That's the rate for as long as they stay subscribed.</p>
 
   
 </div>
@@ -354,43 +325,51 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 <section class="block">
     <h2>What you get</h2>
     <ul class="plain">
-      <li><strong>A code with your name on it.</strong> Your audience gets 30 percent off their first payment. It works on the season pass and on the monthly plan.</li>
+      <li><strong>A code with your name on it.</strong> Your audience gets 30 percent off their first payment. It works on every plan at the web checkout.</li>
       <li><strong>30 percent of what they pay.</strong> On the season pass that is 5.25 euros on the first year and 7.50 euros on every renewal after it.</li>
       <li><strong>Attribution that survives the discount.</strong> The code is written into the subscription when the payment goes through, so renewals stay attributed to you even though the discount itself only applies once.</li>
-      <li><strong>No exclusivity and no quota.</strong> Promote whatever else you want. There is no minimum you have to hit.</li>
+      <li><strong>No exclusivity and no quota.</strong> Promote whatever else you want.</li>
     </ul>
   </section>
 
   <section class="block">
-    <h2>The numbers, in full</h2>
-    <p>Commission is 30 percent of the euro list price, not of a local price. GoalIQ uses Stripe Adaptive Pricing, so a reader in the UK sees pounds and a reader in the US sees dollars. Your commission is still calculated in euros, which means you can check it yourself without knowing what currency the buyer saw.</p>
+    <h2>What you earn</h2>
+    <p>Commission is 30 percent of the euro price the buyer pays. GoalIQ uses Stripe Adaptive Pricing, so a reader in the UK sees pounds and a reader in the US sees dollars; your commission is still counted in euros. The season pass is 25 euros a year on our front page, and your code takes 30 percent off the first payment, which is where the 17.50 comes from.</p>
     <table class="rates">
       <thead><tr><th>Plan</th><th>Buyer pays</th><th>You get</th></tr></thead>
       <tbody>
         <tr><td>Season pass, first year</td><td>17.50 euros</td><td>5.25 euros</td></tr>
         <tr><td>Season pass, each renewal</td><td>25 euros</td><td>7.50 euros</td></tr>
-        <tr><td>Monthly plan</td><td>2.79 euros first month</td><td>Not fixed yet, see below</td></tr>
       </tbody>
     </table>
-    <p class="note">The monthly rate is genuinely undecided. The codes work on the monthly plan, but we have not set a commission for it, and we would rather say that than quote you a number we might change. If your audience buys monthly, we will agree the rate with you before anything is owed.</p>
+    <p><strong>Send people to pro.goaliq.app.</strong> A subscription bought inside the iOS or Android app goes through Apple
+    or Google, where a code can't be attached, so that sale won't carry your name.</p>
   </section>
 
-  <section class="block">
-    <h2>What is not ready yet</h2>
-    <p>The program is new and small. Being straight about it now is cheaper for both of us than a surprise later.</p>
+    <section class="block">
+    <h2>What we ask</h2>
     <ul class="plain">
-      <li><strong>Payouts are not running yet.</strong> GoalIQ does not have a business ID registered yet, and until it does there is no way to pay anyone. The work is in progress. We are not going to name a date we cannot keep, so if a firm payment date is what you need, wait for us to come back to you.</li>
-      <li><strong>Commissions accrue in the meantime.</strong> Every redemption is recorded against your code from the day it goes live, so nothing is lost while registration finishes.</li>
-      <li><strong>Payment is a normal SEPA transfer</strong> in euros, once it starts.</li>
+      <li><strong>Say it is an affiliate link.</strong> Whatever your platform calls it, mark it. That one isn't negotiable.</li>
+      <li><strong>Only use numbers a reader can check.</strong> Everything on goaliq.app that sits outside the paywall is fair game. Don't quote figures from behind it.</li>
+      <li><strong>Don't promise results.</strong> The model is graded in public and it misses. Point people at the record and let them decide.</li>
     </ul>
   </section>
 
   <section class="block">
-    <h2>What we ask</h2>
+    <h2>The small print</h2>
     <ul class="plain">
-      <li><strong>Say it is an affiliate link.</strong> Whatever your platform calls it, mark it. This is not negotiable.</li>
-      <li><strong>Only use numbers a reader can check.</strong> Everything on goaliq.app that sits outside the paywall is fair game. Please do not quote figures from behind it, because your audience cannot verify those and it makes both of us look worse.</li>
-      <li><strong>Do not promise results.</strong> The model is graded in public and it misses. Point people at the record and let them decide.</li>
+      <li><strong>When you get paid.</strong> Commission builds up from your first
+        referral. The first payouts go out at gameweek 19, against your invoice. If
+        invoicing is awkward for you, say so when you apply and we'll sort something
+        else.</li>
+      <li><strong>Commission follows completed payments.</strong> If a subscription is
+        refunded or charged back, the commission on it doesn't stand.</li>
+      <li>Your own subscription doesn't count.</li>
+      <li><strong>The rates above are for the season pass.</strong> The code also works on
+        the 3.99 euro monthly plan. If someone uses it there, we'll agree the commission
+        with you before it is paid.</li>
+      <li><strong>Either of us can stop.</strong> Tell us and we'll retire the code.
+        Anything already earned still gets paid.</li>
     </ul>
   </section>
 
@@ -402,7 +381,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <li>What code you want, if you have a preference</li>
       <li>Which country you would be paid into</li>
     </ul>
-    <p class="note">We read every one and reply either way. If it is not a fit we will say so rather than leave you waiting.</p>
+    <p class="note">We read every one and reply either way. If it's not a fit we'll say so.</p>
     <p><a class="cta" href="mailto:hello@goaliq.app?subject=Creator%20program">Email us about the program</a></p>
   </section>
 
@@ -415,7 +394,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
 </div>
 
 <footer>
-  © 2026 GoalIQ · Made in Lahti, Finland &middot; <a href="/predictions">Match predictions</a> &middot; <a href="/fpl.html">FPL clean sheets &amp; FDR</a> &middot; <a href="https://pro.goaliq.app">GoalIQ Premium (web)</a> &middot; <a href="/privacy.html">Privacy</a> &middot; <a href="/faq.html">FAQ</a> &middot; <a href="#get">Get the app</a>
+  © 2026 GoalIQ &middot; <a href="/predictions">Match predictions</a> &middot; <a href="/fpl.html">FPL clean sheets &amp; FDR</a> &middot; <a href="https://pro.goaliq.app">GoalIQ Premium (web)</a> &middot; <a href="/privacy.html">Privacy</a> &middot; <a href="/faq.html">FAQ</a> &middot; <a href="https://goaliq.app/#get">Get the app</a>
 </footer>
 </body>
 </html>
