@@ -83,7 +83,8 @@
 
 {#if auth.user && rows != null && score != null}
 	<section class="beat">
-		<h3>You vs the model</h3>
+		<h3>Your calls vs the model</h3>
+		<p class="sub">Only the calls you logged, decision by decision.</p>
 
 		{#if rows.length === 0}
 			<p class="muted">Log your first call above and the season scoreboard starts here.</p>
@@ -212,10 +213,18 @@
 		background: var(--surface);
 	}
 	h3 {
-		margin: 0 0 var(--s-3);
+		margin: 0 0 var(--s-1);
 		font-size: var(--step--1);
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+	/* Kertoo MITA tama paneeli laskee (PAATOKSET), erotuksena SeasonRacesta
+	   joka laskee JOUKKUEET. Ilman tata kaksi korttia allekkain lukee
+	   duplikaatilta ja niiden eriavat luvut bugilta. */
+	.sub {
+		margin: 0 0 var(--s-3);
+		font-size: var(--step--1);
 		color: var(--text-muted);
 	}
 	.totals {

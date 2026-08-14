@@ -59,7 +59,8 @@
 
 {#if data && !failed}
 	<section class="race">
-		<h3>Season race: you vs the model</h3>
+		<h3>Season race: your squad vs the model's</h3>
+		<p class="sub">Every point your team scored, gameweek by gameweek.</p>
 
 		{#if !data.meta.available}
 			<p class="muted">{data.meta.note}</p>
@@ -153,10 +154,18 @@
 		background: var(--surface);
 	}
 	h3 {
-		margin: 0 0 var(--s-3);
+		margin: 0 0 var(--s-1);
 		font-size: var(--step--1);
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
+		color: var(--text-muted);
+	}
+	/* Kertoo MITA tama paneeli laskee (JOUKKUEET), erotuksena
+	   BeatTheModelista joka laskee PAATOKSET. Ilman tata kaksi korttia
+	   allekkain lukee duplikaatilta ja niiden eriavat luvut bugilta. */
+	.sub {
+		margin: 0 0 var(--s-3);
+		font-size: var(--step--1);
 		color: var(--text-muted);
 	}
 	.totals {
