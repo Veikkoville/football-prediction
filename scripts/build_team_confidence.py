@@ -94,9 +94,19 @@ def build() -> dict:
                 "team": team, "model_team": map_name(team),
                 "is_promoted": True, "minutes_churn_pct": None,
                 "flag": "promoted",
-                "note": ("Promoted side. No Premier League results to fit a "
-                         "rating on, so this team starts from a baseline "
-                         "rather than its own record."),
+                # 14.8: EDELLINEN TEKSTI OLI VAARA. Se sanoi "No Premier
+                # League results to fit a rating on", mutta Ipswich pelasi
+                # PL:aa 2024/25 — ja meidan oma nousijabaseline on MITATTU
+                # muun muassa sen kaudesta (`promoted_baseline.py:157`
+                # REFERENCE_TRIO = Ipswich/Leicester/Southampton). Vaite oli
+                # tosi vain suhteessa nykyiseen fit-ikkunaan; tavallisena
+                # englantina se oli valhe yhdesta kolmesta seurasta, ja se oli
+                # livena ilmaissivulla seka API:ssa. Uusi teksti sanoo mika on
+                # oikeasti totta: naillä ei ole OMAA luokitusta nykyikkunasta.
+                "note": ("Promoted side. No results inside the model's "
+                         "current fitting window, so this team runs on a "
+                         "measured baseline from recent promoted sides "
+                         "instead of a rating of its own."),
             })
             continue
         t, g = total.get(team, 0.0), gone.get(team, 0.0)

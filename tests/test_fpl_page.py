@@ -64,7 +64,10 @@ def test_cs_table_turnover_reaches_narrow_screen(monkeypatch):
         ]})
     # Luku on rivilla ILMAN etta sarake tarvitsee palauttaa...
     assert '<span class="m-only m-sub">21% turnover</span>' in html
-    assert '<span class="m-only m-sub">no PL record</span>' in html
+    # 14.8: teksti oli "no PL record", mutta se oli VAARA — Ipswich pelasi
+    # PL:aa 24/25 ja on osa mitattua nousijabaselinea. Nyt merkinta kertoo
+    # mika on totta: naillä ei ole omaa luokitusta nykyisesta fit-ikkunasta.
+    assert '<span class="m-only m-sub">baseline rating</span>' in html
     # ...ja sarake on yha paikallaan leveille naytoille.
     assert '<td class="num m-hide">21%</td>' in html
     # Negatiivinen kontrolli: ilman tata testi menisi lapi myos jos alarivi

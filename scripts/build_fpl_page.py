@@ -161,6 +161,27 @@ API_BASE = "https://api.goaliq.app"   # #85: accuracy-Datasetin distribution
 # ---------------------------------------------------------------------------
 # 1. Data
 # ---------------------------------------------------------------------------
+def _strength_window_label(c: dict) -> str:
+    """Fit-ikkuna ARTEFAKTISTA, ei kovakoodattuna.
+
+    14.8: sivulla luki "2024/25 and 2025/26" kun renderoity artefakti oli
+    jo ['2526','2627']. Metodiseloste on juuri se rivi jonka tarkka lukija
+    tarkistaa, ja se oli vanhentunut hiljaa — kovakoodattu vuosiluku ei liiku
+    kun malli refitataan. Tuntematon muoto palauttaa yleisen sanamuodon eika
+    arvaa vuosia.
+    """
+    src = str(c.get("team_strength_source") or "")
+    seasons = re.findall(r"'(\d{4})'", src)
+    if not seasons:
+        return "recent Premier League"
+    def pretty(s: str) -> str:
+        return f"20{s[:2]}/{s[2:]}"
+    labels = [pretty(x) for x in seasons]
+    if len(labels) == 1:
+        return labels[0]
+    return " and ".join([", ".join(labels[:-1]), labels[-1]])
+
+
 def load_data() -> tuple[dict, dict]:
     fpl = json.loads(FPL_PATH.read_text(encoding="utf-8"))
     acc = json.loads(ACC_PATH.read_text(encoding="utf-8"))
@@ -341,6 +362,11 @@ def build_context(fpl: dict, acc: dict) -> dict:
         "far_blocks": far_blocks,
         "far_rows": far_rows,
         "far_basis_label": (fpl.get("meta") or {}).get("far_basis_label") or "",
+        # 14.8: fit-ikkuna kontekstiin, jotta metodiseloste ei ole
+        # kovakoodattu. Ilman tata rivia _strength_window_label putoaa
+        # varasanamuotoon ja sivu menettaa juuri ne vuodet jotka tarkka
+        # lukija tarkistaa.
+        "team_strength_source": (fpl.get("meta") or {}).get("team_strength_source") or "",
         "top3": cs_rows[:3],
         "acc_n": n,
         "acc_pct_1x2": pct_1x2,
@@ -814,8 +840,17 @@ def cs_table_html(c: dict) -> str:
         if t:
             hits += 1
         if t and t.get("is_promoted"):
-            churn = '<span title="Promoted: no Premier League record">new</span>'
-            sub = "no PL record"
+            # 14.8 kaksi korjausta yhdessa:
+            # (a) "no Premier League record" oli VAARA Ipswichista (se pelasi
+            #     PL:aa 24/25 ja on osa mitattua nousijabaselinea);
+            # (b) tyopoydalla merkinta oli paljas "new" ja merkitys vain
+            #     `title=`-attribuutissa, jota ei nae kosketuslaitteella eika
+            #     nappaimistolla — sama tooltip-ansa joka puri 11.8 (`vs crowd`
+            #     -yksikko oli tooltipissa). Nyt sana kantaa merkityksen itse.
+            churn = ('<span title="Promoted: runs on a measured '
+                     'promoted-side baseline, not a rating of its own">'
+                     'baseline</span>')
+            sub = "baseline rating"
         elif t and t.get("minutes_churn_pct") is not None:
             churn = f'{t["minutes_churn_pct"]:.0f}%'
             sub = f'{t["minutes_churn_pct"]:.0f}% turnover'
@@ -1431,9 +1466,10 @@ log, match by match with every miss included, is published on the
 Gameweek {c["next_gw"]} ({c["gw_label"]}). FDR is GoalIQ's model fixture
 difficulty for that match, 1 easiest to 5 hardest.</p>
 {cs_table}
-<p class="note">Pre-season projection: team strengths use 2024/25 and 2025/26
-results as priors, and newly promoted sides use an empirical promoted-team
-baseline. The numbers sharpen as {c["season"]} results arrive.</p>
+<p class="note">Pre-season projection: team strengths are fitted on
+{_strength_window_label(c)} results, and newly promoted sides use an empirical
+promoted-team baseline measured from recent promoted seasons. The numbers
+sharpen as {c["season"]} results arrive.</p>
 
 <h2 id="fixture-difficulty">Fixture difficulty for the next six gameweeks</h2>
 <p>Clean sheet probability per team and gameweek. Each cell shows the opponent,
@@ -1564,6 +1600,11 @@ predictions and analytics. Not betting advice.</p>
   <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
   <a href="faq.html">App FAQ</a> &middot;
   <a href="privacy.html">Privacy</a></p>
+  <!-- Creator program (14.8). This is the page FPL creators actually use to
+       pull free numbers from, so it is where the invitation belongs. It was
+       previously linked only from the front page, career and predictions. -->
+  <p class="foot-creators">Make FPL content? We run a
+  <a href="/creators">creator program</a>.</p>
   <p>&copy; 2026 GoalIQ. Premier League is a trademark of the Football
   Association Premier League Limited. GoalIQ is not affiliated with or endorsed
   by the Premier League. Data on this page is a statistical model output for

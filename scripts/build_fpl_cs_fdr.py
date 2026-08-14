@@ -10,7 +10,9 @@ Lähteet:
     yhä päättynyttä 25/26-kautta (current GW 38, ei next), joten 26/27 luetaan
     PL:n omasta fixtuurifeed:stä (julkaistu 19.6.2026).
   - Joukkuevoimat: GoalIQ:n OLEMASSA OLEVA Dixon-Coles -ottelumalli (Understat
-    PL 24/25 + 25/26), sama fit-config kuin tuotannon /api/predict (_saa_malli).
+    ikkuna config.current_season_pair()), sama fit-config kuin tuotannon
+    /api/predict (_saa_malli). ALA kovakoodaa vuosia tahan: 14.8 tassa luki
+    yha 24/25+25/26 vaikka ikkuna oli jo 25/26+26/27.
 
 Metodologia:
   - CS-% = Poisson(0; vastustajan odotetut maalit)  (FPL-speksi / kickoff-memo).
@@ -314,7 +316,7 @@ def main() -> None:
     teams_2627 = fetch_teams()
     print(f"      {len(fixtures)} fixturea, {len(teams_2627)} joukkuetta")
 
-    print("[2/5] Sovitetaan PL Dixon-Coles -malli (Understat 24/25+25/26)...")
+    print("[2/5] Sovitetaan PL Dixon-Coles -malli (ikkuna configista)...")
     dc, seasons = fit_model()
     print(f"      {len(dc.teams_)} joukkuetta mallissa (kaudet {seasons})")
 
