@@ -134,9 +134,9 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-14T21:13:24",
+    "generated_at": "2026-08-14T21:27:32",
     "season": "2026/27",
-    "overrides_applied": 3,
+    "overrides_applied": 4,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + frozen 25/26 baseline artifact (data/fpl_prev_baselines_2526.json, element code mapping)",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2526', '2627'] (sama fit-config kuin /api/predict)",
@@ -15353,6 +15353,127 @@
         "bonus": 0.31
       },
       "components_gw": 1
+    },
+    {
+      "id": 110,
+      "web_name": "Rushworth",
+      "full_name": "Carl Rushworth",
+      "team": "Coventry",
+      "team_short": "COV",
+      "pos": "GKP",
+      "xmins": 70.8,
+      "predicted_starts": 90.0,
+      "minutes_confidence": "low",
+      "minutes_source": "override",
+      "minutes_override_reason": "Permanent signing from Brighton and Coventry's undisputed number one. Fantasy Football Scout 4/8/2026: 'Rushworth's return removes any uncertainty over Coventry's goalkeeping position' and 'started all 46 Championship matches last season and looks set to remain Lampard's first-choice goalkeeper in the Premier League'. Model had him at 0.38 with Dovin and Wilson on 0.16, so no Coventry keeper was projected as a starter at all",
+      "data_basis": "no_history",
+      "owned_pct": 0.9,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 4.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 0,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.0,
+        "cs": 0,
+        "points": 0,
+        "per90": null
+      },
+      "p_start": 0.9,
+      "p_cameo": 0.035,
+      "p_bench": 0.065,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.2,
+      "xp_per_gw": 2.76,
+      "xp_per_90": 3.37,
+      "xp_horizon_total": 16.59,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.17
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "HUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.59
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.02
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.89
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.82
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.1
+        }
+      ],
+      "minutes_method": "promoted_price_prior",
+      "components": {
+        "appearance": 1.7,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.19,
+        "conceded": -0.89,
+        "saves": 1.1,
+        "defensive_contribution": 0.0,
+        "yellows": -0.06,
+        "bonus": 0.12
+      },
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 265,
@@ -31266,127 +31387,6 @@
         "bonus": 0.08
       },
       "components_gw": 1
-    },
-    {
-      "id": 110,
-      "web_name": "Rushworth",
-      "full_name": "Carl Rushworth",
-      "team": "Coventry",
-      "team_short": "COV",
-      "pos": "GKP",
-      "xmins": 33.5,
-      "predicted_starts": 38.0,
-      "minutes_confidence": "low",
-      "minutes_source": "price_prior",
-      "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
-      "data_basis": "no_history",
-      "owned_pct": 0.9,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 4.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 0,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.0,
-        "cs": 0,
-        "points": 0,
-        "per90": null
-      },
-      "p_start": 0.38,
-      "p_cameo": 0.217,
-      "p_bench": 0.403,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.09,
-      "xp_per_gw": 1.4,
-      "xp_per_90": 3.37,
-      "xp_horizon_total": 8.37,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.13
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "HUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.77
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.06
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.45
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.42
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.54
-        }
-      ],
-      "minutes_method": "promoted_price_prior",
-      "components": {
-        "appearance": 0.92,
-        "goals": 0.0,
-        "assists": 0.0,
-        "clean_sheet": 0.08,
-        "conceded": -0.42,
-        "saves": 0.52,
-        "defensive_contribution": 0.0,
-        "yellows": -0.03,
-        "bonus": 0.06
-      },
-      "components_gw": 1,
-      "team_flag": "promoted"
     },
     {
       "id": 44,

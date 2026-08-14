@@ -539,42 +539,6 @@ def main(argv: list[str] | None = None) -> int:
               f"GKP-summa max {max(struct_before):.2f} -> {max(struct_after):.2f} "
               f"(paikkoja {xp.TEAM_GK_SLOTS:.0f})")
 
-    # Pelaajatason minuuttiohitukset — VIIMEISENÄ, syvyyskorjauksen JÄLKEEN.
-    #
-    # Järjestys on olennainen: depth_factor skaalaa koko klubi+positio-ryhmää
-    # historiallisten starttipaikkojen mukaan, ja jos ohitus tehtäisiin ennen
-    # sitä, se skaalattaisiin osittain pois — eli ohitus ei tarkoittaisi sitä
-    # mitä CSV:ssä lukee.
-    #
-    # Miksi ohituksia on: minuuttimalli käyttää priorina viime kauden
-    # minuutteja eikä erota "ei ollut tarpeeksi hyvä" ja "oli myynnissä tai
-    # loukkaantunut". Isak: 694 min / 8 avausta 25/26 -> p_start 0.30 -> xP
-    # 1.06/GW 9.0M ykköshyökkääjälle. Väliaikainen; hintapriori korvaa.
-    player_overrides = load_player_overrides()
-    # 28.7 SIGNAALI. Ohituslataus on tarkoituksella fail-safe (puuttuva tiedosto
-    # -> tyhjä dict, ei kaadu). Se on oikein, MUTTA ilman signaalia se on myös
-    # täysin hiljainen: 27.7. korjattu Isak (6.34 -> 18.93) palautui tuotannossa
-    # heti takaisin 6.34:ään, koska CSV oli gitignoressa eikä sitä ollut koskaan
-    # committoitu -> CI-runnerilla tiedostoa ei ollut olemassa. Mikään ei
-    # huutanut: gate meni PASS, ajo onnistui, luku oli vain väärä.
-    #
-    # Nyt lukumäärä tulostetaan AINA ja se viedään meta.overrides_applied-kenttään,
-    # jolloin sama vika näkyy suoraan tuotannon payloadista eikä vaadi että joku
-    # sattuu katsomaan yhtä pelaajaa.
-    if not player_overrides:
-        print("[Overrides] 0 riviä ladattu "
-              "(data/fpl_player_overrides.csv puuttuu tai on tyhjä)")
-    override_applied: dict[int, dict] = {}
-    for pid, ov in player_overrides.items():
-        if pid not in mm_by_player:
-            print(f"[Overrides] pelaaja {pid} ei ole bootstrapissa — rivi ohitettu")
-            continue
-        before = mm_by_player[pid]["p_start_raw"]
-        mm_by_player[pid] = xp.set_p_start(mm_by_player[pid], ov["p_start"])
-        override_applied[pid] = ov
-        print(f"[Overrides] {pid}: p_start {before:.2f} -> {ov['p_start']:.2f} "
-              f"(xmins {mm_by_player[pid]['xmins']:.1f}) — {ov['reason'][:60]}")
-
     print("[5/6] xP per pelaaja per GW (horisontti + Phase 1b -konteksti)...")
     # Tulevat fixturet per GW mallinimillä
     upcoming = [f for f in src["fixtures"] if f["gameweek"] and not f["finished"]]
@@ -750,6 +714,53 @@ def main(argv: list[str] | None = None) -> int:
     print(f"      hintapriori (historiattomat): {len(prior_pids)} pelaajaa "
           f"({len(prior_team_ids)} seuraa) — positiopriori x "
           f"hintapohjainen rooliarvio, data_basis=no_history")
+
+    # Pelaajatason minuuttiohitukset — AIVAN VIIMEISENÄ.
+    #
+    # 🔴 14.8: TÄMÄ LOHKO OLI VÄÄRÄSSÄ PAIKASSA JA OHITUS EI MENNYT PERILLE.
+    # Se oli syvyyskorjauksen jälkeen mutta hintapriorin EDELLÄ. Hintapriori
+    # yllä kirjoittaa `mm_by_player[e["id"]]` UUSIKSI jokaiselle pelaajalle
+    # jolla ei ole PL-minuutteja, joten jokainen ohitus historiattomaan
+    # pelaajaan katosi. Vika oli täysin hiljainen ja PAHEMMALLA tavalla kuin
+    # gitignore-vika 28.7: loki tulosti "[Overrides] 110: p_start 0.00 -> 0.90"
+    # ja lopputiedostoon jäi 0.38 — eli signaali VALEHTELI onnistumisesta.
+    # Löytyi kun Coventryn Rushworth-ohitus ei liikuttanut lukua.
+    # Alkuperäinen järjestysperustelu pätee yhä: depth_factor skaalaa koko
+    # klubi+positio-ryhmää, joten ohitus ennen sitä ei tarkoittaisi sitä mitä
+    # CSV:ssä lukee. Nyt sääntö on yksinkertaisempi: ohitus on VIIMEINEN SANA
+    # jokaista minuuttipassia vastaan. Portti: test_shipped_overrides_land.
+    #
+    # Miksi ohituksia on: minuuttimalli käyttää priorina viime kauden
+    # minuutteja eikä erota "ei ollut tarpeeksi hyvä" ja "oli myynnissä tai
+    # loukkaantunut". Isak: 694 min / 8 avausta 25/26 -> p_start 0.30 -> xP
+    # 1.06/GW 9.0M ykköshyökkääjälle. Väliaikainen; hintapriori korvaa.
+    player_overrides = load_player_overrides()
+    # 28.7 SIGNAALI. Ohituslataus on tarkoituksella fail-safe (puuttuva tiedosto
+    # -> tyhjä dict, ei kaadu). Se on oikein, MUTTA ilman signaalia se on myös
+    # täysin hiljainen: 27.7. korjattu Isak (6.34 -> 18.93) palautui tuotannossa
+    # heti takaisin 6.34:ään, koska CSV oli gitignoressa eikä sitä ollut koskaan
+    # committoitu -> CI-runnerilla tiedostoa ei ollut olemassa. Mikään ei
+    # huutanut: gate meni PASS, ajo onnistui, luku oli vain väärä.
+    #
+    # Nyt lukumäärä tulostetaan AINA ja se viedään meta.overrides_applied-kenttään,
+    # jolloin sama vika näkyy suoraan tuotannon payloadista eikä vaadi että joku
+    # sattuu katsomaan yhtä pelaajaa.
+    if not player_overrides:
+        print("[Overrides] 0 riviä ladattu "
+              "(data/fpl_player_overrides.csv puuttuu tai on tyhjä)")
+    override_applied: dict[int, dict] = {}
+    for pid, ov in player_overrides.items():
+        if pid not in mm_by_player:
+            print(f"[Overrides] pelaaja {pid} ei ole bootstrapissa — rivi ohitettu")
+            continue
+        before = mm_by_player[pid]["p_start_raw"]
+        mm_by_player[pid] = xp.set_p_start(mm_by_player[pid], ov["p_start"])
+        override_applied[pid] = ov
+        # Kerro jos ohitus söi juuri annetun hintapriorin — se on odotettu ja
+        # haluttu, mutta sen on näyttävä lokissa ettei kukaan ihmettele.
+        tag = " (kumosi hintapriorin)" if pid in prior_pids else ""
+        print(f"[Overrides] {pid}: p_start {before:.2f} -> {ov['p_start']:.2f} "
+              f"(xmins {mm_by_player[pid]['xmins']:.1f}){tag} — {ov['reason'][:60]}")
 
     covered_fids = history_fids | prior_fids
     uncovered = sorted(n for n, fid in name_to_fid.items() if fid not in covered_fids)
