@@ -754,26 +754,52 @@
 </div>
 
 {#if slot === 'a'}
-<form class="entry-form" onsubmit={rate}>
-	<div>
-		<label for="rate-entry">FPL entry ID</label>
-		<input
-			id="rate-entry"
-			inputmode="numeric"
-			autocomplete="off"
-			placeholder="e.g. 1234567"
-			bind:value={fplEntry.entry}
-		/>
+<!-- 14.8 LAYOUT + TUOTEKORJAUS (Villen palaute kortin sisaisesta tyhjasta
+     tilasta). Kaksi ALOITUSPOLKUA vierekkain sen sijaan etta toinen on
+     linkkina alempana. Peruste ei ole esteettinen: **ennen GW1-deadlinea
+     entry-ID-polku ei voi toimia lainkaan** (FPL julkaisee kokoonpanot vasta
+     deadlinen jalkeen -> 404), joten esikaudella draft-polku on se joka
+     TOIMII. Sen hautaaminen linkiksi lomakkeen alle piilotti ainoan
+     toimivan reitin juuri vuoden korkeimman ostoaikeen ikkunassa.
+     Sivutuote: lomake kaytti ~kolmanneksen kortin leveydesta. -->
+<div class="start-grid">
+	<div class="start-col">
+		<p class="start-title">I have an FPL team</p>
+		<form class="entry-form" onsubmit={rate}>
+			<div>
+				<label for="rate-entry">FPL entry ID</label>
+				<input
+					id="rate-entry"
+					inputmode="numeric"
+					autocomplete="off"
+					placeholder="e.g. 1234567"
+					bind:value={fplEntry.entry}
+				/>
+			</div>
+			<button class="primary" type="submit" disabled={!entryValid || loading}>
+				{loading ? 'Rating…' : 'Rate my team'}
+			</button>
+		</form>
+		<p class="muted hint">
+			Find the ID on the FPL website: open your Points page and copy the number from the
+			address bar (fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...).
+		</p>
 	</div>
-	<button class="primary" type="submit" disabled={!entryValid || loading}>
-		{loading ? 'Rating…' : 'Rate my team'}
-	</button>
-</form>
-<p class="muted hint">
-	Find the ID on the FPL website: open your Points page and copy the number from the address
-	bar (fantasy.premierleague.com/entry/<strong>YOUR-ID</strong>/event/...). FPL publishes
-	squads only after each deadline, so before Gameweek 1 use the draft option below.
-</p>
+	<div class="start-col start-alt">
+		<p class="start-title">I am still drafting</p>
+		<p class="muted hint">
+			FPL publishes squads only after each deadline, so before Gameweek 1 nobody can import
+			one. Pick your 15 here and the model rates them exactly the same way.
+		</p>
+		<button
+			type="button"
+			class="linklike draft-toggle"
+			onclick={() => (draftOpen = !draftOpen)}
+		>
+			{draftOpen ? 'Hide the draft rater' : 'Rate a draft instead'}
+		</button>
+	</div>
+</div>
 
 {#if picksNotPublished}
 	<!-- 28.7 (PI-16): tämä on koko esikauden normaalitila, ei virhe. Vanha
@@ -789,10 +815,9 @@
 
 <!-- P1: esikausi-draft ilman entry-ID:tä (backendin players=-moodi).
      28.7: teksti korjattu. "No team ID yet?" oli väärä kysymys esikaudella,
-     jolloin 1,66 M managerilla ON team ID mutta ei julkaistua kokoonpanoa. -->
-<button type="button" class="linklike draft-toggle" onclick={() => (draftOpen = !draftOpen)}>
-	{draftOpen ? 'Hide the draft rater' : 'Rate a draft instead (works before Gameweek 1)'}
-</button>
+     jolloin 1,66 M managerilla ON team ID mutta ei julkaistua kokoonpanoa.
+     14.8: avausnappi siirtyi ylos `.start-grid`in oikeaan sarakkeeseen —
+     valitsin itse jaa tanne, koska se tarvitsee koko leveyden. -->
 {#if draftOpen}
 	<div class="draft-box">
 		{#if poolError}
@@ -1441,6 +1466,35 @@
 	.model-squad-btn:disabled {
 		opacity: 0.5;
 		cursor: default;
+	}
+	/* 14.8: kaksi aloituspolkua vierekkain (entry-ID | draft).
+	   Kortin sisainen tyhja tila oli isompi hukka kuin korttien valinen:
+	   lomake kaytti ~kolmanneksen leveydesta. Alle 860px palataan
+	   allekkain, jolloin lukujarjestys on entry-ID ensin kuten ennen. */
+	.start-grid {
+		display: grid;
+		gap: var(--s-4);
+		margin-bottom: var(--s-4);
+	}
+	.start-col {
+		min-width: 0;
+	}
+	.start-title {
+		margin: 0 0 var(--s-2);
+		font-weight: 700;
+	}
+	@media (min-width: 860px) {
+		.start-grid {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+			gap: var(--s-6);
+			align-items: start;
+		}
+		/* Pystyviiva erottaa polut ilman toista laatikkokerrosta — kortteja
+		   oli jo kolme sisakkain, eika neljas auta luettavuutta. */
+		.start-alt {
+			border-left: 1px solid var(--border);
+			padding-left: var(--s-6);
+		}
 	}
 	/* 14.8: "This week" kahteen sarakkeeseen leveilla ruuduilla.
 	   VASEN = tekeminen (viikon paatokset, kapteenisuositus),
