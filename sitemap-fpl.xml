@@ -7,6 +7,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/fpl/club-best</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/fpl/defcon</loc>
     <lastmod>2026-08-14</lastmod>
     <changefreq>daily</changefreq>

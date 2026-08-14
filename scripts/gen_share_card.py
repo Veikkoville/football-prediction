@@ -33,6 +33,12 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+ROOT_FOR_IMPORT = Path(__file__).resolve().parents[1]
+if str(ROOT_FOR_IMPORT) not in sys.path:
+    sys.path.insert(0, str(ROOT_FOR_IMPORT))
+
+from src.models.fpl_club_best import club_best_rows, gap_text  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT_DIR = ROOT / "outputs" / "cards"
@@ -509,59 +515,28 @@ def card_club_best(args) -> dict:
     players = data.get("players") or []
     n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
 
-    by_club: dict[str, list[dict]] = {}
-    for p in players:
-        if p.get("pos") != pos:
-            continue
-        by_club.setdefault(p.get("team_short") or "???", []).append(p)
+    # 🔴 JAETTU LASKENTA. Alatunniste ohjaa lukijan /fpl/club-best-sivulle
+    # todistamaan nama luvut. Jos kortti ja sivu laskisivat ne erikseen, ne
+    # voisivat ajautua erilleen ja vaite kaatuisi tasan silla reitilla jolla
+    # se piti todistaa. Ks. src/models/fpl_club_best.py.
+    src_rows = club_best_rows(players, pos)
+    if not src_rows:
+        raise SystemExit(f"Ei rivejä positiolle {pos}.")
 
     rows = []
-    for club, group in by_club.items():
-        group.sort(key=lambda p: -float(p.get("xp_horizon_total") or 0.0))
-        top = group[0]
-        v = float(top.get("xp_horizon_total") or 0.0)
-        if v <= 0:
-            continue
-        second = float(group[1].get("xp_horizon_total") or 0.0) if len(group) > 1 else None
-        prior = top.get("data_basis") == "no_history"
-        if second is None:
-            # 🔴 EI "only option". Se lukisi "seurassa ei ole toista pelaajaa",
-            # mutta koodi tietaa vain ettei projektiossa ole toista RIVIA — 80
-            # pelaajaa on suodattunut pois min_xp_total-rajalla ja loukkaantuneet
-            # ovat `excluded`-listalla. Liverpoolilla nain OLI toinen hyokkaaja
-            # (Ekitike, akillesvamma), joten kortti olisi vaittanyt epatotta.
-            mid = "no 2nd projected"
-        elif v - second < 0.05:
-            # Kaksi taysin eri asiaa ei saa saada samoja sanoja. Mitattu 0,02
-            # pisteen ero on aito ja kiinnostava; nousijaseuran kolmen tasan
-            # identtinen luku tarkoittaa ettei mallilla ole tietoa erottaa
-            # heita. Jalkimmainen sanotaan suoraan.
-            mid = "no data to separate" if prior else "tied with next"
-        else:
-            mid = f"+{v - second:.1f} vs next"
-        # LUOTTAMUSINDIKAATTORI (Villen saanto 14.8): luku on mallista johdettu
-        # ja sille on reitti samaan tiedostoon. Naytetaan vain kun se kertoo
-        # jotain — `high` on oletus eika kaipaa selitysta. Tama kattaa myos
+    for r in src_rows:
+        # LUOTTAMUSINDIKAATTORI (Villen saanto 14.8): naytetaan vain kun se
+        # kertoo jotain — `high` on oletus eika kaipaa selitysta. Tama kattaa
         # tapauksen jota "?" EI kata: pelaaja jolla on tayi PL-historia mutta
-        # epavarmat minuutit (tyoparijako), missa epavarmuus on minuuteissa
-        # eika datan puutteessa.
-        price = f"{float(top.get('price') or 0):.1f}m"
-        if top.get("minutes_confidence") != "high":
-            price += f" · {float(top.get('xmins') or 0):.0f} min"
+        # epavarmat minuutit (tyoparijako).
+        price = f"{r['price']:.1f}m"
+        if r["uncertain_minutes"]:
+            price += f" · {r['xmins']:.0f} min"
         rows.append({
-            "name": top.get("web_name"), "tag": club,
-            "team": price, "mid": mid, "_v": v,
-            # 🔴 EHTO ON `== "no_history"`, EI `!= "pl_history"`. Jalkimmainen
-            # merkitsi myos `limited_history`-pelaajat, ja alatunniste vaitti
-            # heista "no Premier League minutes" — Trafford (LEE) on
-            # limited_history ja hanella on 360 PL-minuuttia MEIDAN OMASSA
-            # tiedostossamme. Kortti olisi siis julkaissut asiavirheen jonka
-            # lukija voi kumota juuri silla tiedostolla johon alatunniste ohjaa.
-            "badges": ["?"] if prior else [],
+            "name": r["name"], "tag": r["club"], "team": price,
+            "mid": gap_text(r), "_v": r["xp"],
+            "badges": ["?"] if r["prior"] else [],
         })
-    if not rows:
-        raise SystemExit(f"Ei rivejä positiolle {pos}.")
-    rows.sort(key=lambda r: r["_v"], reverse=True)
 
     n_prior = sum(1 for r in rows if r["badges"])
     foot2 = "model projections, not betting advice"
@@ -595,14 +570,19 @@ def card_club_best(args) -> dict:
         "nameLabel": "PLAYER",
         "midLabel": "GAP TO CLUB'S 2ND",
         "valueLabel": "xP",
-        # 🔴 EI "goaliq.app/fpl". Ilmainen /api/fantasy/xp on premium-portin
-        # takana MASKATTU top-10:een, ja se sivu renderoi listansa siita — eli
-        # 17 rivia 20:sta EI olisi ollut tarkistettavissa siella minne
-        # alatunniste ohjaa. Tama polku palauttaa koko tiedoston omalta
-        # domainilta (verifioitu: 200, 1 339 818 B, 507 pelaajaa) ja laskeutuu
-        # suoraan tiedostoon, toisin kuin repon juuri jossa lukija joutuisi
-        # etsimaan. Vrt. muisti: vaite tarvitsee reitin, ei vain katteen.
-        "footNote": "every club · full file: goaliq.app/data/fpl_xp_projections.json",
+        # 🔴 REITTI ON KOLMAS YRITYS, ja kaksi edellista olivat vaarin.
+        # (1) "goaliq.app/fpl" — se sivu renderoi listansa MASKATUSTA
+        #     top-10-teaserista, eli 17 rivia 20:sta ei olisi tarkistettavissa.
+        # (2) raaka JSON goaliq.app/data/... — reitti oli tosi mutta 1,3 MB
+        #     JSON puhelimen selaimessa ei ole kenellekaan tarkistus vaan este.
+        #     Portti ei nostanut sita koska se testasi vain etta URL vastaa 200.
+        # (3) /fpl/club-best — ihmisluettava, ilmainen, ei kirjautumista, ja
+        #     TASMALLEEN samat rivit koska laskenta on jaettu moduuli.
+        # Huom miksi /fpl/expected-points EI kelpaa: se on `rows[:100]`, ja
+        # nousijaseurojen karjet (Belloumi, Tchaouna, Florentino, Smith Rowe)
+        # eivat mahdu koko liigan top-100:aan — eli tasan ne rivit joita
+        # lukija todennakoisimmin haluaa tarkistaa puuttuisivat.
+        "footNote": "every club, free at goaliq.app/fpl/club-best",
         "footNote2": foot2,
         "rows": [dict(r, rank=i + 1, value=f"{r['_v']:.1f}")
                  for i, r in enumerate(rows)],

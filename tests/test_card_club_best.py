@@ -166,8 +166,11 @@ def test_footer_does_not_point_at_the_masked_free_surface(monkeypatch):
     on osoitettava julkiseen projektiotiedostoon."""
     players = [_pl(i, f"P{i}", f"C{i}", "DEF", 3.0 + i) for i in range(20)]
     foot = _run(monkeypatch, players)["footNote"]
-    assert "goaliq.app/fpl" not in foot
-    assert "goaliq.app/data/fpl_xp_projections.json" in foot
+    # Kohde on OMA sivunsa, ei /fpl-etusivu (maskattu top-10) eika raaka JSON
+    # (reitti vastaa 200 mutta 1,3 MB tiedosto ei ole tarkistus vaan este).
+    assert "goaliq.app/fpl/club-best" in foot
+    assert ".json" not in foot
+    assert not foot.rstrip().endswith("goaliq.app/fpl")
 
 
 def test_subtitle_carries_the_data_date_and_the_gameweek_window(monkeypatch):

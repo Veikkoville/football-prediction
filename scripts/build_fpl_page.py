@@ -1566,6 +1566,9 @@ one refreshes on the same schedule. No login, no paywall.</p>
   per 90 or per start, with CSV export.</li>
   <li><a href="/fpl/defence">Defence profiles</a>: what each defence actually
   concedes, by pitch zone, plus headers faced and set-piece xG.</li>
+  <li><a href="/fpl/club-best">Best player at every club</a>: each club's
+  leading goalkeeper, defender, midfielder and forward by projected points,
+  with the gap to that club's second option.</li>
 </ul>
 
 <h2 id="about">About GoalIQ</h2>
@@ -1605,6 +1608,7 @@ predictions and analytics. Not betting advice.</p>
   <a href="/fpl/defcon">DefCon leaders</a> &middot;
   <a href="/fpl/stats">Player stats</a> &middot;
   <a href="/fpl/defence">Defence profiles</a> &middot;
+  <a href="/fpl/club-best">Best per club</a> &middot;
   <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
   <a href="faq.html">App FAQ</a> &middot;
   <a href="privacy.html">Privacy</a></p>

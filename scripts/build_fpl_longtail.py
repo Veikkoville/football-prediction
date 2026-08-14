@@ -48,6 +48,7 @@ from scripts.share_card_js import SHARE_CARD_JS
 # myös silloin kun jokin data-lähde puuttui tältä ajolta (sivu jää voimaan).
 SITEMAP_FPL_PATH = _FP_ROOT / "sitemap-fpl.xml"
 from scripts.build_prediction_pages import DISCLAIMER
+from src.models.fpl_club_best import POSITIONS, club_best_rows, gap_text
 
 BASE = "https://goaliq.app"
 OUT_DIR = ROOT / "fpl"
@@ -243,6 +244,7 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
 # Naiden sivujen koko olemassaolon syy on FPL-hakuliikenne ennen GW1:ta.
 _TOOL_LINKS = [
     ("/fpl/best-captain", "Captain picks"),
+    ("/fpl/club-best", "Best per club"),
     ("/fpl/model-xi", "Model XI"),
     ("/fpl/differentials", "Differentials"),
     ("/fpl/price-changes", "Price changes"),
@@ -2134,6 +2136,120 @@ def _tflag_note(xp: dict, shown: list[dict], allrows: list[dict]) -> str:
         "the part the data would not support." + where + "</p>")
 
 
+def render_club_best(xp: dict, now: datetime) -> str | None:
+    """Jokaisen seuran paras pelaaja per positio (14.8.2026).
+
+    MIKSI TAMA SIVU ON OLEMASSA. Jakokortti (`gen_share_card.py club-best`)
+    julkaisee samat 80 rivia kuvana, ja sen alatunniste ohjaa TANNE. Ilman
+    tata sivua kortin luvut eivat olisi tarkistettavissa milläan ilmaisella
+    pinnalla: `/api/fantasy/xp` on premium-portin takana maskattu top-10:een,
+    ja `/fpl/expected-points` on `rows[:100]` — eli nousijaseurojen karjet
+    (Belloumi, Tchaouna, Florentino, Smith Rowe) eivat mahdu koko liigan
+    sadan parhaan joukkoon, ja ne ovat tasan ne rivit joita lukija
+    todennakoisimmin haluaa tarkistaa.
+
+    Laskenta on JAETTU MODUULI (`src/models/fpl_club_best.py`) kortin kanssa.
+    Jos ne laskettaisiin erikseen, ne voisivat ajautua erilleen ja kortin
+    vaite kaatuisi tasan silla reitilla jolla se piti todistaa.
+
+    VAPAA/PREMIUM-RAJA: tama on seurakohtainen KARKI, ei koko lista — 80
+    rivia 507:sta. Rate-my-team, siirtosuunnittelija ja kapteenirankkeri
+    pysyvat premiumina. Sama peruste kuin /fpl/expected-points-rajassa:
+    lista on sisaltoa, tyokalut ovat tuote.
+    """
+    meta = xp.get("meta") or {}
+    players = xp.get("players") or []
+    if not meta.get("available") or not players:
+        return None
+
+    n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
+    first_gw = meta.get("next_gameweek")
+    window = f"GW{first_gw}-{first_gw + n_gw - 1}" if first_gw else f"next {n_gw} GWs"
+    url = f"{BASE}/fpl/club-best"
+
+    sections, all_clubs, lead = [], [], None
+    for pos in POSITIONS:
+        rows = club_best_rows(players, pos)
+        if not rows:
+            continue
+        if pos == "MID":
+            lead = rows[0]
+        all_clubs.extend(r["club"] for r in rows)
+        n_prior = sum(1 for r in rows if r["prior"])
+        trows = "".join(
+            "<tr>"
+            f'<td class="n">{i + 1}</td>'
+            f'<td>{escape(str(r["name"]))}'
+            + (' <span class="flag" title="No Premier League games yet, '
+               'role guessed from price">?</span>' if r["prior"] else "")
+            + "</td>"
+            f'<td class="tm">{_kit_svg(r["club"])}'
+            f'<span>{escape(r["club"])}</span></td>'
+            f'<td class="n m-hide">{r["price"]:.1f}</td>'
+            f'<td class="n hi">{r["xp"]:.1f}</td>'
+            f'<td>{escape(gap_text(r))}</td>'
+            f'<td class="n m-hide">{r["xmins"]:.0f}</td>'
+            "</tr>"
+            for i, r in enumerate(rows)
+        )
+        note = ""
+        if n_prior:
+            note = (f'<p class="note">? = no Premier League games yet, role '
+                    f"guessed from price ({n_prior} of {len(rows)}).</p>")
+        sections.append(
+            f'<h2 id="{pos.lower()}">Best {pos} at every club</h2>'
+            '<div class="lb-wrap"><table class="lb">'
+            "<thead><tr>"
+            '<th class="n">#</th><th>Player</th><th>Club</th>'
+            '<th class="n m-hide">Price</th>'
+            f'<th class="n">{n_gw}GW xP</th>'
+            "<th>Gap to club's 2nd</th>"
+            '<th class="n m-hide">xMins</th>'
+            "</tr></thead>"
+            f"<tbody>{trows}</tbody></table></div>{note}"
+        )
+    if not sections:
+        return None
+
+    title = (f"Best FPL Player at Every Club by Position "
+             f"({window}) | GoalIQ")
+    desc = (
+        f"Every Premier League club's best goalkeeper, defender, midfielder "
+        f"and forward by projected points for {window}, with the gap to that "
+        f"club's second option. Free, no sign-in."
+    )
+    lead_txt = ""
+    if lead:
+        lead_txt = (
+            f" {escape(str(lead['name']))} leads the midfielders on "
+            f"{lead['xp']:.1f} xP.")
+    hero = (
+        "<h1>The best player at every club, by position</h1>"
+        '<p class="lede">Our match model projects every player over '
+        f"{escape(window)}. This page shows the leader at each club in each "
+        "position, plus the gap to that club's second option, which tells you "
+        "whether the club has one obvious pick or a real choice."
+        f"{lead_txt} Free, no sign-in, updated daily.</p>"
+    )
+    body = (
+        f"{_kit_defs(all_clubs)}"
+        + "".join(sections)
+        + '<p class="note">The gap is measured against the same club and the '
+          "same position, not against the row above. \"No 2nd projected\" "
+          "means no other player at that club cleared the projection "
+          "threshold, which is not the same as the club having only one.</p>"
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def render_expected_points(xp: dict, now: datetime) -> str | None:
     """Koko xP-lista ilmaiseksi, ilman kirjautumista (9.8.2026).
 
@@ -2286,6 +2402,11 @@ def main() -> int:
         if page:
             (OUT_DIR / "expected-points.html").write_text(page, encoding="utf-8")
             built.append("expected-points")
+        # 14.8: jakokortin tarkistuskohde — ks. render_club_best-docstring.
+        page = render_club_best(xp, now)
+        if page:
+            (OUT_DIR / "club-best.html").write_text(page, encoding="utf-8")
+            built.append("club-best")
 
     diff = _fetch_differentials()
     if diff:
