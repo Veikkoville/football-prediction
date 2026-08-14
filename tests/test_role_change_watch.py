@@ -140,7 +140,7 @@ def test_bootstrap_failure_is_loud_not_silent(monkeypatch, capsys):
     ajettu'. Sama vikaluokka kuin render-daily-deployn hiljainen vihrea,
     joka raportoi onnistuneeksi tekematta mitaan joka ajossa."""
     monkeypatch.setattr(w, "load_projection", lambda: ({}, {}))
-    monkeypatch.setattr(w, "load_player_overrides", lambda: {})
+    monkeypatch.setattr(w, "load_player_overrides", lambda: ({}, []))
     monkeypatch.setattr(w, "fetch_bootstrap",
                         lambda: (_ for _ in ()).throw(RuntimeError("verkko")))
     monkeypatch.setattr("sys.argv", ["x"])

@@ -28,8 +28,32 @@
 #   web_name    vain luettavuutta varten, EI käytetä täsmäytykseen
 #   p_start     aloitus-tn 0..1 (korvaa mallin arvion, minuutit johdetaan tästä)
 #   reason      näytetään käyttäjälle
-#   review_by   päivä johon mennessä rivi on tarkistettava tai poistettava
-player_id,web_name,p_start,reason,review_by
+#   review_by   PORTTI: vanhentunutta riviä EI sovelleta (yhtenäistetty
+#               joukkueohituksen kanssa 14.8 — ks. alla)
+#   xg_mult     maaliuhkan kerroin, oletus 1.0 (VALINNAINEN, viimeisenä jotta
+#               vanhat 5-sarakkeiset rivit pysyvät koskemattomina)
+#
+# 🔴 xg_mult (14.8.2026) — MIKSI TÄTÄ TARVITAAN
+# `p_start` säätää minuutteja. Se EI säädä maaliuhkaa, eikä joukkuetason
+# `attack_delta` säädä sitä myöskään — ei heikosti vaan EI LAINKAAN:
+#     goals     = rates["xg90"] * share * goal_mult * GOAL_PTS  (fpl_xp.py:762)
+#     goal_mult = lam(t, vast.) / lam_avg[t]              (fpl_context.py:239)
+# `lam_avg[t]` on saman joukkueen keskiarvo, joten attack[t] += d kertoo sekä
+# osoittajan että nimittäjän luvulla exp(d) ja kerroin supistuu pois
+# TÄSMÄLLEEN. Mitattu 14.8: Newcastlen hyökkäysvoiman leikkaus ~18 %:lla jätti
+# Osulan goals-komponentin lukemaan 1,09 -> 1,09.
+#
+# xg_mult kertoo xg90:n ja vaikuttaa siten suoraan goals-komponenttiin. Se EI
+# koske xa90:tä: pelaajan omat syötöt eivät ole sama asia kuin maalinteko.
+# Käyttötapaus jota varten se tehtiin: keskuspuolustaja jonka xG tuli kulmista,
+# ja kulmien syöttäjät lähtivät seurasta.
+#
+# 🔴 review_by ON NYT PORTTI TÄSSÄKIN TIEDOSTOSSA (muutos 14.8)
+# Aiemmin se oli pelkkää dokumentaatiota. Vanhentunut maaliuhkaleikkaus on
+# tasan yhtä haitallinen kuin vanhentunut joukkueleikkaus: molemmat alkavat
+# taistella mallia vastaan silloin kun mallilla on vihdoin oikeaa 26/27-dataa.
+# Vanhentunut rivi ohitetaan ÄÄNEKKÄÄSTI (::warning:: + lokirivi).
+player_id,web_name,p_start,reason,review_by,xg_mult
 379,Isak,0.85,"Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",2026-09-20
 #
 # HARKITTU JA HYLÄTTY — Havertz (ARS, 7.5M, p_start 0.25, xmins 15.5), 27.7:

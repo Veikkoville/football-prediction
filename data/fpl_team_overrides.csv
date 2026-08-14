@@ -22,6 +22,22 @@
 #
 # 🔴 |delta| <= 0.25 (log-avaruus, ~ ±25 % maaleja). Suurempi hylätään.
 #
+# 🔴 KOLMAS SARAKE attack_mult (14.8.2026) — LUE ENNEN KUIN OLETAT
+# `attack_delta` EI YLLÄ pelaajien maaliodotukseen lainkaan. Ei heikosti: nolla.
+#     goals     = rates["xg90"] * share * goal_mult * GOAL_PTS  (fpl_xp.py:762)
+#     goal_mult = lam(t, vast.) / lam_avg[t]              (fpl_context.py:239)
+# `lam_avg[t]` on saman joukkueen keskiarvo, joten attack[t] += d kertoo sekä
+# osoittajan että nimittäjän luvulla exp(d) ja kerroin supistuu pois
+# TÄSMÄLLEEN. Mitattu 14.8: hyökkäysvoiman leikkaus ~18 %:lla jätti Osulan
+# goals-komponentin lukemaan 1,09 -> 1,09 ja Thiawin 1,04 -> 1,04.
+#
+#   attack_delta = "vastustajat saavat helpomman ottelun"
+#   attack_mult  = "tämän seuran pelaajat tekevät vähemmän maaleja"
+#
+# attack_mult kertoo seuran JOKAISEN pelaajan xg90:n JA xa90:n (molemmat, koska
+# jokaisella maalilla on korkeintaan yksi syöttö). Rajat 0.5..1.5 — tiukemmat
+# kuin pelaajatasolla, koska tämä liikuttaa koko runkoa kerralla.
+#
 # NEWCASTLE 14.8.2026 — mitattu perustelu
 #   minutes_churn_pct 25,2 % = liigan korkein ja ainoa ei-nousija yli 25 %:n
 #   kynnyksen (mediaani 13 %). Lähteneet verifioitu FPL:n bootstrapista:
@@ -35,5 +51,5 @@
 #   tarkoituksella: tarkoitus on poistaa ilmeisin yliarvio, ei ennustaa
 #   kautta käsin. review_by = kuuden kierroksen jälkeen, jolloin 26/27-fitissä
 #   on oikeaa dataa ja tämä rivi kuuluu poistaa.
-team,attack_delta,defence_delta,reason,review_by
+team,attack_delta,defence_delta,reason,review_by,attack_mult
 Newcastle United,-0.10,0.05,"Lost Isak, Bruno Guimaraes, Tonali and Gordon plus a manager change. Highest minutes churn in the league at 25.2 percent, the only non-promoted side over the 25 percent threshold. The rating is fitted on results those players produced and cannot see the window",2026-10-05

@@ -33,7 +33,35 @@ PAKOLLINEN ja **vanhentunutta riviä EI SOVELLETA**: se ohitetaan aanekkaasti.
 Pelaajaohituksissa `review_by` on dokumentaatiota; tassa se on portti, koska
 tama rivi liikuttaa jokaista seuran pelaajaa kerralla.
 
-Rajat: |delta| <= MAX_DELTA. Kirjoitusvirhe ei saa tuhota projektiota.
+🔴 KOLMAS SARAKE `attack_mult` (14.8.2026) — LUE MIKSI.
+`attack_delta` EI KOSKAAN yllä pelaajien maaliodotukseen. Se ei ole heikko
+vaikutus vaan nolla, ja syy on rakenteellinen:
+
+    goals    = rates["xg90"] * share * goal_mult * GOAL_PTS   (fpl_xp.py:762)
+    goal_mult = lam(t, vastustaja) / lam_avg[t]               (fpl_context.py:239)
+
+`lam_avg[t]` on saman joukkueen keskiarvo kaikkia muita vastaan, joten
+`attack[t] += d` kertoo seka osoittajan etta nimittajan luvulla `exp(d)` ja
+kerroin **supistuu pois tasmalleen**. Mitattu: Newcastlen hyokkaysvoiman
+leikkaus ~18 %:lla jatti Osulan `goals`-komponentin lukemaan 1,09 -> 1,09.
+
+Se on tarkoituksellista: `goal_mult` kertoo onko tama hyva VIIKKO taman
+joukkueen pelaajalle, ei kuinka hyva joukkue on. Absoluuttinen taso tulee
+pelaajan omasta `xg90`:sta, eika mikaan saada sita kun joukkue pelaajan
+ymparilta muuttuu.
+
+`attack_mult` on se saato: se kertoo seuran JOKAISEN pelaajan `xg90`:n JA
+`xa90`:n. Molemmat, koska seuran maalimaaran lasku laskee syottoja
+identiteetin nojalla (jokaisella maalilla on korkeintaan yksi syotto).
+Pelaajatason vastine (`xg_mult`) koskee vain `xg90`:ta, koska yksittaisen
+pelaajan syotot eivat ole sama asia kuin hanen maalintekonsa.
+
+Kaytannossa: `attack_delta` = "vastustajat saavat helpomman ottelun",
+`attack_mult` = "taman seuran pelaajat tekevat vahemman maaleja". Jos haluat
+jalkimmaisen, `attack_delta` EI riita — se ei tee sita lainkaan.
+
+Rajat: |delta| <= MAX_DELTA, attack_mult valilla [MULT_MIN, MULT_MAX].
+Kirjoitusvirhe ei saa tuhota projektiota.
 """
 
 from __future__ import annotations
@@ -48,6 +76,11 @@ OVERRIDES_PATH = ROOT / "data" / "fpl_team_overrides.csv"
 # log-avaruudessa: 0.25 ~ +28 % / -22 % maaleja. Kaytannon ylaraja
 # kasisaadolle; sita isompi muutos ei ole enaa "silta" vaan uusi malli.
 MAX_DELTA = 0.25
+
+# `attack_mult` liikuttaa seuran JOKAISEN pelaajan maaliodotusta, joten sen
+# rajat ovat tiukemmat kuin pelaajatason vastineella (0.25..2.0). Puolittaminen
+# tai puolitoistakertaistaminen kerralla koko rungolle on jo raju kasisaato.
+MULT_MIN, MULT_MAX = 0.5, 1.5
 
 
 def load_team_overrides(path: Path | None = None,
@@ -82,6 +115,19 @@ def load_team_overrides(path: Path | None = None,
                     f"{team}: |delta| > {MAX_DELTA}, rivi ohitettu "
                     f"(attack {atk}, defence {dfc})")
                 continue
+            raw_mult = str(r.get("attack_mult") or "").strip()
+            mult = 1.0
+            if raw_mult:
+                try:
+                    mult = float(raw_mult)
+                except ValueError:
+                    warnings.append(f"{team}: attack_mult ei ole luku, rivi ohitettu")
+                    continue
+                if not MULT_MIN <= mult <= MULT_MAX:
+                    warnings.append(
+                        f"{team}: attack_mult {mult} rajojen "
+                        f"[{MULT_MIN}, {MULT_MAX}] ulkopuolella, rivi ohitettu")
+                    continue
             review = (r.get("review_by") or "").strip()
             if not review:
                 warnings.append(f"{team}: review_by puuttuu, rivi ohitettu")
@@ -99,7 +145,7 @@ def load_team_overrides(path: Path | None = None,
                     f"{team}: review_by {review} on MENNYT -> ohitusta EI "
                     f"sovelleta. Poista rivi tai paivita paiva.")
                 continue
-            out[team] = {"attack": atk, "defence": dfc,
+            out[team] = {"attack": atk, "defence": dfc, "attack_mult": mult,
                          "reason": (r.get("reason") or "").strip(),
                          "review_by": review}
     except Exception as e:  # pragma: no cover — luku ei saa kaataa ajoa
@@ -119,6 +165,11 @@ def apply_team_overrides(dc, overrides: dict) -> list[dict]:
         found = team in getattr(dc, "attack", {})
         rec = {"team": team, "found": found,
                "attack_delta": o["attack"], "defence_delta": o["defence"],
+               # attack_mult EI ole DC-suure eika sita sovelleta tassa: se
+               # kertoo seuran pelaajien xg90:n ja xa90:n builderissa. Se
+               # kulkee mukana jotta kutsujan ei tarvitse lukea CSV:ta uusiksi
+               # eika meta joudu arvaamaan mita oli voimassa.
+               "attack_mult": o.get("attack_mult", 1.0),
                "review_by": o["review_by"], "reason": o["reason"]}
         if found:
             rec["attack_before"] = dc.attack[team]

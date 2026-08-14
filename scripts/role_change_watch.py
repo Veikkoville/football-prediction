@@ -343,9 +343,14 @@ def main() -> int:
     args = ap.parse_args()
 
     ours, meta = load_projection()
-    overrides = load_player_overrides()
+    overrides, ovr_warn = load_player_overrides()
     print(f"Projektio: {len(ours)} pelaajaa, generoitu {meta.get('generated_at')}")
     print(f"Ohituksia voimassa: {len(overrides)}")
+    # Vahdin koko tehtava on nostaa eroja mallin ja todellisuuden valilla.
+    # Pudonnut ohitus on tasan sellainen ero, joten se kuuluu tanne nakyviin
+    # eika vain builderin lokiin jota kukaan ei lue jalkikateen.
+    for w in ovr_warn:
+        print(f"  VAROITUS ohituksissa: {w}")
     print()
 
     if args.offline:

@@ -108,6 +108,63 @@ def test_unknown_team_is_reported_not_silently_skipped():
     assert dc.attack == FakeDC().attack
 
 
+# --------------------------------------------------------------------------
+# attack_mult — se sarake joka oikeasti tekee sen mita attack_delta ei tee
+# --------------------------------------------------------------------------
+
+def _write6(tmp_path, body):
+    p = tmp_path / "t6.csv"
+    p.write_text("team,attack_delta,defence_delta,reason,review_by,attack_mult\n"
+                 + body, encoding="utf-8")
+    return p
+
+
+def test_attack_mult_defaults_to_one_on_old_five_column_rows(tmp_path):
+    """Sarake lisattiin VIIMEISEKSI jotta vanhat rivit pysyvat toiminnassa.
+    Jos joku siirtaa sen keskelle, reason ja review_by liukuvat sarakkeen
+    verran ja rivi hylataan hiljaa."""
+    p = _write6(tmp_path, 'Newcastle United,-0.10,0.05,"x",2026-10-05\n')
+    out, warn = tov.load_team_overrides(p, today=TODAY)
+    assert out["Newcastle United"]["attack_mult"] == 1.0 and warn == []
+
+
+def test_attack_mult_is_loaded(tmp_path):
+    p = _write6(tmp_path, 'Newcastle United,-0.10,0.05,"x",2026-10-05,0.85\n')
+    out, _ = tov.load_team_overrides(p, today=TODAY)
+    assert out["Newcastle United"]["attack_mult"] == 0.85
+
+
+@pytest.mark.parametrize("bad", ["0.2", "1.9"])
+def test_oversized_attack_mult_is_rejected(tmp_path, bad):
+    """Tama kerroin liikuttaa seuran JOKAISTA pelaajaa, joten rajat ovat
+    tiukemmat kuin pelaajatasolla."""
+    p = _write6(tmp_path, f'Newcastle United,-0.10,0.05,"x",2026-10-05,{bad}\n')
+    out, warn = tov.load_team_overrides(p, today=TODAY)
+    assert out == {} and any("attack_mult" in w for w in warn)
+
+
+def test_attack_mult_is_not_applied_to_the_rating(tmp_path):
+    """attack_mult EI ole DC-suure. Jos se vuotaisi `dc.attack`iin, se
+    laskisi lambdan JA pelaajien xg90:n eli tekisi saman asian kahdesti."""
+    dc = FakeDC()
+    tov.apply_team_overrides(dc, {"Newcastle United": {
+        "attack": 0.0, "defence": 0.0, "attack_mult": 0.85,
+        "reason": "", "review_by": "2026-10-05"}})
+    assert dc.attack["Newcastle United"] == pytest.approx(0.20)
+    assert dc.defence["Newcastle United"] == pytest.approx(-0.30)
+
+
+def test_attack_mult_is_carried_to_the_caller(tmp_path):
+    """Builderi tarvitsee kertoimen pelaajasilmukassa. Jos se ei kulje
+    `applied`-listassa, builderi joutuisi lukemaan CSV:n uusiksi ja ne kaksi
+    lukua voisivat erota."""
+    dc = FakeDC()
+    applied = tov.apply_team_overrides(dc, {"Newcastle United": {
+        "attack": -0.10, "defence": 0.05, "attack_mult": 0.85,
+        "reason": "", "review_by": "2026-10-05"}})
+    assert applied[0]["attack_mult"] == 0.85
+
+
 def test_missing_file_is_not_an_error(tmp_path):
     """Ohituksen puuttuminen ei saa KOSKAAN kaataa projektioajoa."""
     out, warn = tov.load_team_overrides(tmp_path / "ei-ole.csv", today=TODAY)

@@ -734,7 +734,13 @@ def main(argv: list[str] | None = None) -> int:
     # minuutteja eikä erota "ei ollut tarpeeksi hyvä" ja "oli myynnissä tai
     # loukkaantunut". Isak: 694 min / 8 avausta 25/26 -> p_start 0.30 -> xP
     # 1.06/GW 9.0M ykköshyökkääjälle. Väliaikainen; hintapriori korvaa.
-    player_overrides = load_player_overrides()
+    player_overrides, _po_warn = load_player_overrides()
+    for w in _po_warn:
+        # EI HILJAISTA OHITUSTA. Vanhentunut tai rajojen ulkopuolinen rivi
+        # tarkoittaa etta tuotannossa on eri luku kuin CSV:ssa lukee, ja se on
+        # tasan se tila jonka pitaa nakya ilman etta joku katsoo yhta pelaajaa.
+        print(f"::warning::[Overrides] {w}")
+        print(f"[Overrides] VAROITUS: {w}")
     # 28.7 SIGNAALI. Ohituslataus on tarkoituksella fail-safe (puuttuva tiedosto
     # -> tyhjä dict, ei kaadu). Se on oikein, MUTTA ilman signaalia se on myös
     # täysin hiljainen: 27.7. korjattu Isak (6.34 -> 18.93) palautui tuotannossa
@@ -753,14 +759,22 @@ def main(argv: list[str] | None = None) -> int:
         if pid not in mm_by_player:
             print(f"[Overrides] pelaaja {pid} ei ole bootstrapissa — rivi ohitettu")
             continue
-        before = mm_by_player[pid]["p_start_raw"]
-        mm_by_player[pid] = xp.set_p_start(mm_by_player[pid], ov["p_start"])
         override_applied[pid] = ov
-        # Kerro jos ohitus söi juuri annetun hintapriorin — se on odotettu ja
-        # haluttu, mutta sen on näyttävä lokissa ettei kukaan ihmettele.
-        tag = " (kumosi hintapriorin)" if pid in prior_pids else ""
-        print(f"[Overrides] {pid}: p_start {before:.2f} -> {ov['p_start']:.2f} "
-              f"(xmins {mm_by_player[pid]['xmins']:.1f}){tag} — {ov['reason'][:60]}")
+        # `p_start` on nyt VALINNAINEN: rivi voi säätää pelkkää maaliuhkaa
+        # (xg_mult) koskematta minuutteihin.
+        if ov["p_start"] is not None:
+            before = mm_by_player[pid]["p_start_raw"]
+            mm_by_player[pid] = xp.set_p_start(mm_by_player[pid], ov["p_start"])
+            # Kerro jos ohitus söi juuri annetun hintapriorin — se on odotettu ja
+            # haluttu, mutta sen on näyttävä lokissa ettei kukaan ihmettele.
+            tag = " (kumosi hintapriorin)" if pid in prior_pids else ""
+            print(f"[Overrides] {pid}: p_start {before:.2f} -> "
+                  f"{ov['p_start']:.2f} "
+                  f"(xmins {mm_by_player[pid]['xmins']:.1f}){tag} — "
+                  f"{ov['reason'][:60]}")
+        if ov["xg_mult"] != 1.0:
+            print(f"[Overrides] {pid}: xg_mult x{ov['xg_mult']:.2f} "
+                  f"(maaliuhka) — {ov['reason'][:60]}")
 
     covered_fids = history_fids | prior_fids
     uncovered = sorted(n for n, fid in name_to_fid.items() if fid not in covered_fids)
@@ -809,6 +823,16 @@ def main(argv: list[str] | None = None) -> int:
             "excluded_reason": reason,
         }
 
+    # Joukkuetason maaliuhkakerroin mallinimen mukaan. Vain `found=True` -rivit:
+    # nimikirjoitusvirhe on jo raportoitu äänekkäästi ylempänä, eikä sitä saa
+    # täällä tulkita hiljaa kertoimeksi jota ei sovelleta mihinkään.
+    team_xg_mult = {r["team"]: float(r.get("attack_mult") or 1.0)
+                    for r in team_overrides_applied
+                    if r.get("found") and float(r.get("attack_mult") or 1.0) != 1.0}
+    if team_xg_mult:
+        for t, m in sorted(team_xg_mult.items()):
+            print(f"      joukkueen maaliuhkakerroin {t}: xg90 ja xa90 x{m:.2f}")
+
     players = []
     excluded = []
     for e in boot["elements"]:
@@ -825,6 +849,26 @@ def main(argv: list[str] | None = None) -> int:
         xmins, p60, p1_59 = mm["xmins"], mm["p60"], mm["p1_59"]
 
         model_team_name = [n for n, i in name_to_fid.items() if i == fid][0]
+
+        # MAALIUHKAN OHITUS. Tämä on ainoa paikka jossa "seura tekee vähemmän
+        # maaleja" voidaan sanoa: `attack_delta` ei yllä tänne lainkaan, koska
+        # `goal_mult` on suhde joukkueen OMAAN keskiarvoon ja kerroin supistuu
+        # pois täsmälleen (ks. fpl_team_overrides.py:n docstring, mitattu 14.8).
+        #
+        # Järjestys: joukkuekerroin ensin, pelaajakerroin sen päälle. Ne ovat
+        # eri väitteitä eivätkä vaihtoehtoja — "koko seura tekee vähemmän" ja
+        # "tältä pelaajalta katosi kulmasyöttö" voivat molemmat päteä.
+        t_mult = team_xg_mult.get(model_team_name, 1.0)
+        p_mult = (override_applied.get(pid) or {}).get("xg_mult", 1.0)
+        if t_mult != 1.0:
+            # Seuran maalimäärän lasku laskee syöttöjä identiteetin nojalla:
+            # jokaisella maalilla on korkeintaan yksi syöttö.
+            rates = dict(rates, xg90=rates["xg90"] * t_mult,
+                         xa90=rates["xa90"] * t_mult)
+        if p_mult != 1.0:
+            # Pelaajakerroin EI koske xa90:tä: yksittäisen pelaajan syötöt
+            # eivät ole sama asia kuin hänen maalintekonsa.
+            rates = dict(rates, xg90=rates["xg90"] * p_mult)
         gws = []
         total = 0.0
         # #3 OSA A: komponenttierittely headline-GW:lle (next_gw). Kertyy
