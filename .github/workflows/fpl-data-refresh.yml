@@ -142,6 +142,15 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python scripts/build_team_confidence.py
 
+      # 14.8: tama ei ollut MISSAAN cronissa. Tiedosto on 25/26-kauden
+      # DefCon-arkisto NYKYKAUDEN pelaajille mapattuna, joten arkisto ei
+      # vanhene mutta PELAAJALISTA vanhenee: 1.8 jalkeen siirtyneilta puuttui
+      # DefCon-historia kokonaan. Mitattu 14.8: ajo nosti 373 -> 374 pelaajaa.
+      # Kesto 2 s, joten se mahtuu 3 h sykliin ilman ehtoja.
+      - name: Build per-GW DefCon matrix
+        if: steps.guard.outputs.proceed == 'true'
+        run: python scripts/build_fpl_defcon_gw.py
+
       # SPL (7.8): samat refresh-hyödyt (saatavuusliput, hinnat) RSL-projektioille.
       # continue-on-error: SPL EI saa koskaan kaataa FPL-refreshiä (Villen ehto:
       # FPL-GW1-prep SPL:n edellä). SPL-gate-FAIL → vanha SPL-data jää voimaan
@@ -283,7 +292,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json data/fpl_player_stats.json data/fpl_cs_fdr.json data/team_confidence.json
+          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json data/fpl_player_stats.json data/fpl_cs_fdr.json data/team_confidence.json data/fpl_defcon_gw.json
           # 30.7 tarkkuuslokit: olemassa vain kun gradattavaa/jäädytettävää on ollut
           # 2.8: yhden valinnaisen tiedoston add EI saa kaataa koko pushia.
           # Tausta: founder_entry.json puuttui .gitignoren !-poikkeuksista →
