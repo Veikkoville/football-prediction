@@ -547,6 +547,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/predictions/premier-league/leeds-vs-newcastle-united</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/predictions/la-liga/</loc>
     <lastmod>2026-08-14</lastmod>
     <changefreq>daily</changefreq>
