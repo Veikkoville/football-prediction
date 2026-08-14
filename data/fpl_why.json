@@ -35,7 +35,7 @@
   "109": {
    "drivers": [],
    "gw": 1,
-   "hash": "d10920a05c1db7a2",
+   "hash": "3ee515cc13f5d89f",
    "sentence": "Most of this comes from about 90 minutes a game, with AVL (H), CHE (A) to come.",
    "source": "template",
    "tpl": 2
@@ -243,7 +243,7 @@
   "208": {
    "drivers": [],
    "gw": 1,
-   "hash": "8381ddf43663838c",
+   "hash": "8e0b753836217281",
    "sentence": "Most of this comes from about 63 minutes a game, 0.5 expected goal involvements per 90 last season and set piece duties, with EVE (A), MCI (H) to come.",
    "source": "template",
    "tpl": 2
@@ -283,7 +283,7 @@
   "226": {
    "drivers": [],
    "gw": 1,
-   "hash": "0dde2dee86e547aa",
+   "hash": "2b41c9f06fcc871a",
    "sentence": "Most of this comes from about 90 minutes a game, with CRY (H), BOU (A) to come.",
    "source": "template",
    "tpl": 2
@@ -523,7 +523,7 @@
   "356": {
    "drivers": [],
    "gw": 1,
-   "hash": "3505339b05db9ce1",
+   "hash": "fa5a19793bee371e",
    "sentence": "This one rests on about 90 minutes a game, with NEW (A), NFO (H), IPS (A) to come.",
    "source": "template",
    "tpl": 2
@@ -555,7 +555,7 @@
   "368": {
    "drivers": [],
    "gw": 1,
-   "hash": "6bb44cb3e3b2a719",
+   "hash": "7e7850c1e50f22c2",
    "sentence": "This one rests on about 89 minutes a game, 0.32 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H), IPS (A) to come.",
    "source": "template",
    "tpl": 2
@@ -587,7 +587,7 @@
   "379": {
    "drivers": [],
    "gw": 1,
-   "hash": "79d0e00005f523a2",
+   "hash": "ec769b68aa87e4c9",
    "sentence": "Most of this comes from about 64 minutes a game, 0.35 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H) to come.",
    "source": "template",
    "tpl": 2
@@ -659,7 +659,7 @@
   "40": {
    "drivers": [],
    "gw": 1,
-   "hash": "84be45cab81e4552",
+   "hash": "9c502eb88dad6876",
    "sentence": "Most of this comes from about 84 minutes a game and 0.31 expected goal involvements per 90 last season, with FUL (A), BHA (H) to come.",
    "source": "template",
    "tpl": 2
@@ -723,7 +723,7 @@
   "427": {
    "drivers": [],
    "gw": 1,
-   "hash": "ea293d01210022f0",
+   "hash": "076b540ebbcb8550",
    "sentence": "Most of this comes from about 65 minutes a game, 0.58 expected goal involvements per 90 last season and set piece duties, with HUL (A), IPS (H) to come.",
    "source": "template",
    "tpl": 2
@@ -891,7 +891,7 @@
   "481": {
    "drivers": [],
    "gw": 1,
-   "hash": "c68093219b8c4481",
+   "hash": "bd4069d9072b3a68",
    "sentence": "Most of this comes from about 87 minutes a game, 0.21 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A) to come.",
    "source": "template",
    "tpl": 2
@@ -915,7 +915,7 @@
   "491": {
    "drivers": [],
    "gw": 1,
-   "hash": "328657a274f209c6",
+   "hash": "2824690132ab1f69",
    "sentence": "This one rests on about 64 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with LEE (H), LIV (A), TOT (H) to come.",
    "source": "template",
    "tpl": 2
@@ -995,7 +995,7 @@
   "534": {
    "drivers": [],
    "gw": 1,
-   "hash": "04ad52a0cccab46c",
+   "hash": "41b24b87f994f3a8",
    "sentence": "The projection leans on about 85 minutes a game and set piece duties, with IPS (A), FUL (H), BRE (A) to come.",
    "source": "template",
    "tpl": 2
@@ -1202,10 +1202,10 @@
   }
  },
  "meta": {
-  "generated_from": "2026-08-14T07:15:11",
+  "generated_from": "2026-08-14T09:54:11",
   "gw": 1,
   "model": "claude-opus-5",
-  "n_entries": 154,
+  "n_entries": 150,
   "note": "Explanations are generated from the model's own components. Every number is checked against those components before publishing; sentences that fail fall back to a template.",
   "product": "GoalIQ Fantasy - why this pick"
  },
