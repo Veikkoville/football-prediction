@@ -307,6 +307,29 @@ def main(argv: list[str] | None = None) -> int:
     baseline = add_promoted_baseline(dc, missing)
     print(f"      {len(dc.teams_)} joukkuetta, promoted baseline: {missing or '-'}")
 
+    # 14.8: JOUKKUETASON VOIMAOHITUS. DC-reittaus sovitetaan tuloksiin eika se
+    # nae siirtoikkunaa — esikaudella se on pahimmillaan. Sovelletaan TASSA:
+    # promoted baselinen JALKEEN (jotta nousijoiden rivi on olemassa) ja
+    # xP-laskennan EDELLA. Ks. data/fpl_team_overrides.csv merkkisopimuksesta.
+    from src.models.fpl_team_overrides import (
+        apply_team_overrides, load_team_overrides,
+    )
+    _team_ovr, _team_warn = load_team_overrides()
+    for _w in _team_warn:
+        print(f"::warning::[Joukkueohitus] {_w}")
+    team_overrides_applied = apply_team_overrides(dc, _team_ovr)
+    for _r in team_overrides_applied:
+        if not _r["found"]:
+            # Nimikirjoitusvirhe on todennakoisin tapa saada ohitus
+            # nayttamaan toimivalta tekematta mitaan.
+            print(f"::error::[Joukkueohitus] tuntematon joukkue "
+                  f"{_r['team']!r} — ohitus EI vaikuttanut mihinkaan")
+        else:
+            print(f"      joukkueohitus {_r['team']}: "
+                  f"attack {_r['attack_before']:+.3f} -> {_r['attack_after']:+.3f}, "
+                  f"defence {_r['defence_before']:+.3f} -> {_r['defence_after']:+.3f} "
+                  f"(review_by {_r['review_by']})")
+
     print("[4/6] Pelaajavauhdit + minuuttimalli (koko saatavilla oleva historia)...")
     pos_by_player = {e["id"]: e["element_type"] for e in boot["elements"]}
     acc_by_player: dict[int, dict] = {}
@@ -1027,6 +1050,17 @@ def main(argv: list[str] | None = None) -> int:
                 f"GoalIQ Dixon-Coles, Understat PL {seasons} "
                 "(sama fit-config kuin /api/predict)"
             ),
+            # 14.8: kasin tehdyt joukkuevoiman ohitukset NAKYVIIN dataan asti.
+            # Sama peruste kuin `overrides_applied`illa: Isak-regressiossa CSV
+            # oli gitignoressa, CI ajoi 0 ohituksella ja luku putosi
+            # 18,93 -> 6,34 eika yksikaan portti huutanut. Joukkueohitus
+            # liikuttaa koko seuran kerralla, joten se on nakyva tai se on
+            # nakymaton virhe.
+            "team_overrides": [
+                {k: r[k] for k in ("team", "found", "attack_delta",
+                                   "defence_delta", "review_by", "reason")}
+                for r in team_overrides_applied
+            ],
             "method": (
                 "xP = appearance + goals + assists + clean sheets + goals "
                 "conceded + saves + defensive contribution + bonus proxy - "

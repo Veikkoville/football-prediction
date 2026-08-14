@@ -68,6 +68,12 @@ raw_data/
 # Isak (6.34 -> 18.93) oli tuotannossa yha 6.34. Sama refresh-konventio kuin
 # muilla versioiduilla inputeilla: builderi lukee taman gitista.
 !/data/fpl_player_overrides.csv
+# 14.8: JOUKKUETASON ohitus samasta syysta ja SAMALLA ansalla. Ilman tata
+# rivia CI ajaisi nolla joukkueohituksella, `load_team_overrides()` palauttaisi
+# hiljaa tyhjan dictin ja Newcastle-korjaus olisi olemassa vain
+# kehityskoneella — tasmalleen Isak-regressio uudelleen. Tama ohitus liikuttaa
+# KOKO SEURAA kerralla, joten sen hiljainen katoaminen olisi kalliimpaa.
+!/data/fpl_team_overrides.csv
 # #142 OSA A: PL-seura->MM-2026-minuuttikartta (versioitu artefakti, OSA B:n
 # mitoitusevidenssi; uusinta-ajo ~15.8 ennen GW1:ta).
 !/data/wc2026_club_load.csv

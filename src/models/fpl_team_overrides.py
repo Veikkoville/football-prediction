@@ -1,0 +1,131 @@
+"""Joukkuetason voimaohitukset (data/fpl_team_overrides.csv).
+
+MIKSI TAMA ON OLEMASSA. Dixon-Coles-reittaus sovitetaan TULOKSIIN, eika se
+nae siirtoikkunaa. Esikaudella se on pahimmillaan: seura voi menettaa koko
+rungon, ja malli reittaa sen yha niilla tuloksilla jotka lahteneet pelaajat
+tuottivat.
+
+Mitattu 14.8.2026: Newcastle 25,2 % minuuttivaihtuvuus = liigan korkein ja
+ainoa ei-nousija yli 25 %:n kynnyksen. Lahtijoina Isak (Liverpool), Bruno
+Guimaraes (Arsenal), Gordon (pois liigasta) ja Tonali (Tottenham) — plus
+valmentajanvaihto, jolle mallilla ei ole mitaan signaalia. Silti mallilla oli
+kahdeksan Newcastle-pelaajaa yli 15 xP6:n, karjessa koko liigan paras
+<= 5,5 M£ pelaaja.
+
+🔴 MERKKISOPIMUS — LUE TAMA ENNEN KUIN LISAAT RIVIN.
+Mallissa (`dixon_coles.py`):
+
+    lam = exp(attack[koti]  + defence[vieras] + kotietu)
+    mu  = exp(attack[vieras] + defence[koti])
+
+`defence[X]` esiintyy VASTUSTAJAN maaliodotuksessa. Siksi:
+
+    attack_delta  < 0  ->  joukkue TEKEE vahemman maaleja
+    defence_delta > 0  ->  joukkue PAASTAA enemman maaleja
+
+Eli heikentyneelle joukkueelle: **attack negatiivinen, defence POSITIIVINEN.**
+Vaara merkki defencessa parantaisi juuri sita joukkuetta jota yritit heikentaa.
+
+🔴 VAISTYY ITSESTAAN. Reittaus sovitetaan tuloksiin, joten kun 26/27-otteluita
+kertyy, malli korjaa itsensa ilman tata tiedostoa. Ohitus on siis
+VALIAIKAINEN silta esikauden yli — ei pysyva korjaus. Siksi `review_by` on
+PAKOLLINEN ja **vanhentunutta riviä EI SOVELLETA**: se ohitetaan aanekkaasti.
+Pelaajaohituksissa `review_by` on dokumentaatiota; tassa se on portti, koska
+tama rivi liikuttaa jokaista seuran pelaajaa kerralla.
+
+Rajat: |delta| <= MAX_DELTA. Kirjoitusvirhe ei saa tuhota projektiota.
+"""
+
+from __future__ import annotations
+
+import csv
+import datetime as _dt
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+OVERRIDES_PATH = ROOT / "data" / "fpl_team_overrides.csv"
+
+# log-avaruudessa: 0.25 ~ +28 % / -22 % maaleja. Kaytannon ylaraja
+# kasisaadolle; sita isompi muutos ei ole enaa "silta" vaan uusi malli.
+MAX_DELTA = 0.25
+
+
+def load_team_overrides(path: Path | None = None,
+                        today: _dt.date | None = None) -> tuple[dict, list[str]]:
+    """(team -> {"attack": float, "defence": float, "reason", "review_by"}, varoitukset).
+
+    Puuttuva tai rikkinainen tiedosto -> tyhja dict. Ohituksen puuttuminen ei
+    saa KOSKAAN kaataa projektioajoa: ilman sita malli on tasmalleen se mika
+    se oli ennen tata mekanismia.
+    """
+    p = path or OVERRIDES_PATH
+    today = today or _dt.date.today()
+    out: dict[str, dict] = {}
+    warnings: list[str] = []
+    if not p.exists():
+        return out, warnings
+    try:
+        with p.open(encoding="utf-8", newline="") as fh:
+            rows = [r for r in fh if not r.lstrip().startswith("#")]
+        for r in csv.DictReader(rows):
+            team = (r.get("team") or "").strip()
+            if not team:
+                continue
+            try:
+                atk = float(str(r.get("attack_delta", "0") or 0).strip())
+                dfc = float(str(r.get("defence_delta", "0") or 0).strip())
+            except (TypeError, ValueError):
+                warnings.append(f"{team}: delta ei ole luku, rivi ohitettu")
+                continue
+            if abs(atk) > MAX_DELTA or abs(dfc) > MAX_DELTA:
+                warnings.append(
+                    f"{team}: |delta| > {MAX_DELTA}, rivi ohitettu "
+                    f"(attack {atk}, defence {dfc})")
+                continue
+            review = (r.get("review_by") or "").strip()
+            if not review:
+                warnings.append(f"{team}: review_by puuttuu, rivi ohitettu")
+                continue
+            try:
+                due = _dt.date.fromisoformat(review)
+            except ValueError:
+                warnings.append(f"{team}: review_by ei ole ISO-paiva, ohitettu")
+                continue
+            if due < today:
+                # EI HILJAISTA JATKAMISTA. Vanhentunut joukkueohitus taistelisi
+                # mallia vastaan tasan silloin kun mallilla on vihdoin oikeaa
+                # 26/27-dataa jonka perusteella korjata itsensa.
+                warnings.append(
+                    f"{team}: review_by {review} on MENNYT -> ohitusta EI "
+                    f"sovelleta. Poista rivi tai paivita paiva.")
+                continue
+            out[team] = {"attack": atk, "defence": dfc,
+                         "reason": (r.get("reason") or "").strip(),
+                         "review_by": review}
+    except Exception as e:  # pragma: no cover — luku ei saa kaataa ajoa
+        return {}, [f"luku epaonnistui, jatketaan ilman: {type(e).__name__}: {e}"]
+    return out, warnings
+
+
+def apply_team_overrides(dc, overrides: dict) -> list[dict]:
+    """Muokkaa dc.attack / dc.defence PAIKALLAAN. Palauttaa sovelletut rivit.
+
+    Tuntematon joukkuenimi EI ole hiljainen ohitus: se palautuu `applied`-
+    listassa `found=False`, jotta kutsuja voi huutaa. Nimikirjoitusvirhe on
+    todennakoisin tapa saada ohitus nayttamaan toimivalta tekematta mitaan.
+    """
+    applied = []
+    for team, o in overrides.items():
+        found = team in getattr(dc, "attack", {})
+        rec = {"team": team, "found": found,
+               "attack_delta": o["attack"], "defence_delta": o["defence"],
+               "review_by": o["review_by"], "reason": o["reason"]}
+        if found:
+            rec["attack_before"] = dc.attack[team]
+            rec["defence_before"] = dc.defence[team]
+            dc.attack[team] = dc.attack[team] + o["attack"]
+            dc.defence[team] = dc.defence[team] + o["defence"]
+            rec["attack_after"] = dc.attack[team]
+            rec["defence_after"] = dc.defence[team]
+        applied.append(rec)
+    return applied

@@ -1,0 +1,39 @@
+# FPL — JOUKKUETASON voimaohitukset. Builderi lukee tämän Dixon-Coles-fitin
+# JÄLKEEN ja ENNEN xP-laskentaa.
+#
+# MIKSI TÄMÄ ON OLEMASSA
+# DC-reittaus sovitetaan TULOKSIIN eikä se näe siirtoikkunaa. Esikaudella se
+# on pahimmillaan: seura voi menettää koko rungon, ja malli reittaa sen yhä
+# niillä tuloksilla jotka lähteneet pelaajat tuottivat.
+#
+# 🔴 MERKKISOPIMUS — LUE ENNEN KUIN LISÄÄT RIVIN
+#   lam = exp(attack[koti] + defence[vieras] + kotietu)
+#   `defence[X]` on VASTUSTAJAN maaliodotuksessa.
+#     attack_delta  < 0  ->  tekee vähemmän maaleja
+#     defence_delta > 0  ->  päästää enemmän maaleja
+#   Heikentyneelle joukkueelle: attack NEGATIIVINEN, defence POSITIIVINEN.
+#   Väärä merkki defencessa PARANTAISI juuri sitä joukkuetta jota heikennät.
+#
+# 🔴 review_by ON PAKOLLINEN JA SE ON PORTTI
+# Vanhentunutta riviä EI sovelleta, se ohitetaan äänekkäästi. Syy: reittaus
+# korjaa itsensä kun 26/27-otteluita kertyy, ja vanhentunut ohitus alkaisi
+# taistella mallia vastaan tasan silloin kun mallilla on vihdoin oikeaa dataa.
+# Tämä on väliaikainen silta esikauden yli, ei pysyvä korjaus.
+#
+# 🔴 |delta| <= 0.25 (log-avaruus, ~ ±25 % maaleja). Suurempi hylätään.
+#
+# NEWCASTLE 14.8.2026 — mitattu perustelu
+#   minutes_churn_pct 25,2 % = liigan korkein ja ainoa ei-nousija yli 25 %:n
+#   kynnyksen (mediaani 13 %). Lähteneet verifioitu FPL:n bootstrapista:
+#   Isak -> Liverpool, Bruno Guimarães -> Arsenal, Tonali -> Tottenham,
+#   Gordon -> ei osumaa FPL:ssä eli pois liigasta. Lisäksi valmentajanvaihto,
+#   jolle mallilla EI OLE MITÄÄN SIGNAALIA (churn-% mittaa minuutteja, ei
+#   järjestelmää) — eli mitattu 25,2 % ALIARVIOI muutoksen.
+#   Vaikutus ennen ohitusta: 8 Newcastle-pelaajaa yli 15 xP6:n, kärjessä
+#   Thiaw 27,0 xP = koko liigan paras <= 5,5 M£ pelaaja.
+#   Arvot ovat HARKINTA eivätkä sovitettu suure. Ne on pidetty maltillisina
+#   tarkoituksella: tarkoitus on poistaa ilmeisin yliarvio, ei ennustaa
+#   kautta käsin. review_by = kuuden kierroksen jälkeen, jolloin 26/27-fitissä
+#   on oikeaa dataa ja tämä rivi kuuluu poistaa.
+team,attack_delta,defence_delta,reason,review_by
+Newcastle United,-0.10,0.05,"Lost Isak, Bruno Guimaraes, Tonali and Gordon plus a manager change. Highest minutes churn in the league at 25.2 percent, the only non-promoted side over the 25 percent threshold. The rating is fitted on results those players produced and cannot see the window",2026-10-05
