@@ -904,6 +904,16 @@
 {#if error}
 	<p class="banner error">{error}</p>
 {:else if data}
+	<!-- 14.8: TULOS JA SILMUKKA VIERELLE, EI ALLE.
+	     `.rating` on tarkoituksella `max-width: 680px` (lukumitta), joten
+	     kortin leventaminen olisi vaara korjaus — pitka tekstipalsta on
+	     vaikeampi lukea eika helpompi. Oikea korjaus on laittaa jotain sen
+	     VIEREEN. Viikkosilmukka oli kortin SISALLA ja siksi ~530px levea
+	     1080px:n palstassa; nyt se on oma sarakkeensa.
+	     WeeklyActionsin alkuperainen sijoitusperuste sailyy: se on yha
+	     nakyvissa samalla hetkella kun kayttaja nakee mita malli suosittaa —
+	     nyt vierella eika alla, eli itse asiassa varmemmin. -->
+	<div class="result-grid">
 	<!-- #50: hero-luku = Team xP horisontilla (FPL-natiivi mittari); rating
 	     sen alla = "% of the best possible budget team" (uusi semantiikka,
 	     gap_to_optimal_xp defensiivisesti jos backend jo tarjoaa sen) -->
@@ -1063,22 +1073,6 @@
 			</div>
 		{/if}
 
-		<!-- FM-silmukan etuovi. Sama sijoitus kuin mobiilissa: rate-team on
-		     ainoa paikka jossa kapteeni JA siirtoehdotus ovat samassa datassa,
-		     ja silmukka alkaa siitä hetkestä kun käyttäjä on juuri nähnyt
-		     mitä malli suosittelee. -->
-		<WeeklyActions
-			gw={data.meta.gw}
-			{deadlineUtc}
-			actions={weeklyActions}
-			onFollowTransfer={followTransferFromLoop}
-			refreshToken={decisionsVersion}
-		/>
-		<!-- Silmukan askel 5: kauden "sinä vs malli" -tuloskortti (V1).
-		     Etuoven alle: tulos on kirjaamisen palkinto. -->
-		<BeatTheModel />
-		<SeasonRace />
-
 		<p class="captain">
 			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
 			<span class="muted">({data.captain.pick.team_short})</span>,
@@ -1097,6 +1091,25 @@
 		{#if typeof data.meta.note === 'string'}
 			<p class="muted">{data.meta.note}</p>
 		{/if}
+	</div>
+
+	<div class="result-side">
+		<!-- FM-silmukan etuovi. Sama sijoitus kuin mobiilissa: rate-team on
+		     ainoa paikka jossa kapteeni JA siirtoehdotus ovat samassa datassa,
+		     ja silmukka alkaa siitä hetkestä kun käyttäjä on juuri nähnyt
+		     mitä malli suosittelee. -->
+		<WeeklyActions
+			gw={data.meta.gw}
+			{deadlineUtc}
+			actions={weeklyActions}
+			onFollowTransfer={followTransferFromLoop}
+			refreshToken={decisionsVersion}
+		/>
+		<!-- Silmukan askel 5: kauden "sinä vs malli" -tuloskortti (V1).
+		     Etuoven alle: tulos on kirjaamisen palkinto. -->
+		<BeatTheModel />
+		<SeasonRace />
+	</div>
 	</div>
 
 	<!-- #113: pitch + kitit + what-if-manager (pariteetti mobiilin #106+#112:lle;
@@ -1666,6 +1679,28 @@
 	}
 	.linklike:hover {
 		text-decoration: underline;
+	}
+	/* 14.8: rate-tulos vasemmalle, viikkosilmukka oikealle.
+	   `.rating`in oma 680px:n lukumitta SAILYY — grid ei venyta sita, vaan
+	   antaa jaljelle jaavalle tilalle sisallon. Ilman `minmax(0, ...)`
+	   oikean sarakkeen taulukot levittaisivat rivin. Alle 1040px palataan
+	   allekkain samassa jarjestyksessa: tulos ensin, silmukka sen alle. */
+	.result-grid {
+		display: grid;
+		gap: var(--s-4);
+	}
+	.result-side {
+		min-width: 0;
+		display: grid;
+		gap: var(--s-4);
+		align-content: start;
+	}
+	@media (min-width: 1040px) {
+		.result-grid {
+			grid-template-columns: minmax(0, 680px) minmax(0, 1fr);
+			gap: var(--s-6);
+			align-items: start;
+		}
 	}
 	.rating {
 		max-width: 680px;

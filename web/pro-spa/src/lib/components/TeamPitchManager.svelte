@@ -47,6 +47,15 @@
 	];
 	const POS_ORDER = ['GKP', 'DEF', 'MID', 'FWD'] as const;
 
+	/* 14.8 (Villen palaute: "pitchia vois tehda isommaksi"): kentta on
+	   GRAAFIIKKAA eika tekstia, joten viereisilta tekstikorteilta peritty
+	   680px:n lukumitta ei koske sita. Leveilla ruuduilla koko kentta
+	   skaalataan SUHTEESSA — pelkka leveyden kasvatus olisi litistanyt sen,
+	   koska korkeus tulee sisallosta eika kuvasuhteesta.
+	   Paidan koko on komponentin propi eika CSS:aa, joten se on pakko
+	   johtaa ikkunan leveydesta taalla; media query ei ylla siihen. */
+	let winW = $state(0);
+	const kitSize = $derived(winW >= 1040 ? 58 : 44);
 	let xiIds = $state<number[]>([]);
 	let captainId = $state<number | null>(null);
 	let viceId = $state<number | null>(null);
@@ -314,6 +323,8 @@
 	}
 </script>
 
+<svelte:window bind:innerWidth={winW} />
+
 {#if players.length > 0}
 	<div class="pitch-block">
 		{#if premium}
@@ -372,6 +383,12 @@
 				</button>
 			{/if}
 		</div>
+		<!-- 14.8 (Villen palaute "täyttää toi enemmän dashboard maiseksi"):
+		     penkki kentan VIEREEN eika alle leveilla ruuduilla. Kentta jatti
+		     oikealle tyhjan kaistan ja penkki oli neljan paidan rivi jonka
+		     alla sivu jatkui — nyt se tayttaa kaistan ja sivu lyhenee.
+		     Kapealla ruudulla penkki palaa kentan alle kuten ennen. -->
+		<div class="pitch-row" class:has-bench={bench.length > 0}>
 		<div class="pitch">
 			<!-- 31.7 (Villen palaute "saataisko kentästä parempi" + tarkennus):
 			     PUOLIKAS kenttä kuten OfficialFPL/FFScout — maali+boksit ylhäällä,
@@ -397,7 +414,11 @@
 							onclick={() => onPlayerClick(p.id)}
 						>
 							<span class="kitwrap">
-								<TeamKit {...teamColorByShort(p.team_short)} label={p.team_short} size={44} />
+								<TeamKit
+									{...teamColorByShort(p.team_short)}
+									label={p.team_short}
+									size={kitSize}
+								/>
 								{#if effCaptain === p.id}<span class="badge">C</span>{/if}
 								{#if effCaptain !== p.id && effVice === p.id}<span class="badge vice">V</span>{/if}
 							</span>
@@ -413,7 +434,8 @@
 		</div>
 
 		{#if bench.length > 0}
-			<p class="label" style="margin-top: var(--s-3)">Bench</p>
+			<div class="pitch-side">
+			<p class="label bench-label">Bench</p>
 			<div class="benchrow">
 				{#each bench as p (p.id)}
 					<button
@@ -431,7 +453,9 @@
 					</button>
 				{/each}
 			</div>
+			</div>
 		{/if}
+		</div>
 
 		{#if premium}
 			<p class="muted hint">
@@ -479,6 +503,59 @@
 	.pitch-block {
 		max-width: 680px;
 		margin-top: var(--s-4);
+	}
+	/* 14.8: koko kentta suuremmaksi leveilla ruuduilla. Skaalataan kaikki
+	   mitat samassa suhteessa (leveys, paikan leveys, nimikentat,
+	   nurmiraidat) — paidan koko tulee `kitSize`-propista yllä, koska se on
+	   komponentin propi eika CSS. Pelkka `.pitch-block`in leventaminen olisi
+	   litistanyt kentan: korkeus tulee sisallosta eika kuvasuhteesta. */
+	.pitch-row {
+		display: grid;
+		gap: var(--s-3);
+	}
+	.bench-label {
+		margin-top: var(--s-3);
+	}
+	@media (min-width: 1040px) {
+		.pitch-block {
+			max-width: 1040px;
+		}
+		/* Penkki kentan viereen. `minmax(0, ...)` kentalle, jotta paidat
+		   eivat levita saraketta yli gridin. 210px riittaa kahdelle
+		   paidalle rinnakkain -> 4 penkkilaista asettuu 2x2. */
+		.pitch-row.has-bench {
+			grid-template-columns: minmax(0, 1fr) 210px;
+			align-items: start;
+			gap: var(--s-5);
+		}
+		.pitch-row.has-bench .benchrow {
+			flex-wrap: wrap;
+			justify-content: flex-start;
+			gap: var(--s-2);
+		}
+		.pitch-row.has-bench .bench-label {
+			margin-top: 0;
+		}
+		.player {
+			width: 90px;
+		}
+		.pname,
+		.popp {
+			max-width: 88px;
+		}
+		.pname {
+			font-size: 11.5px;
+		}
+		.popp {
+			font-size: 10px;
+		}
+		.pitch {
+			background: repeating-linear-gradient(
+				180deg,
+				rgba(46, 214, 194, 0.2) 0 56px,
+				rgba(46, 214, 194, 0.27) 56px 112px
+			);
+		}
 	}
 	.label {
 		margin: 0 0 var(--s-1);
