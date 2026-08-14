@@ -918,8 +918,19 @@
 		margin-bottom: var(--s-2);
 	}
 	.cmp-row select {
-		background: none;
-		color: inherit;
+		/* 🔴 14.8: tässä luki `background: none; color: inherit`, ja se teki
+		   pudotusvalikosta LUKUKELVOTTOMAN. Suljettuna kontrolli näytti
+		   oikealta, koska tumma sivu kuulsi läpi — mutta natiivi popup ei
+		   peri sivun taustaa: selain maalaa sen valkoiseksi, ja `--text`
+		   (#F3F2F2) valkoisella on näkymätön. Villen havainto.
+
+		   Kaikki muut SPA:n selectit (CleanSheets, Fixtures, Leaders,
+		   Predict, Standings, Value, Watchlist) asettavat nämä kaksi arvoa
+		   eksplisiittisesti, ja theme.css:294 tekee saman globaalisti. Tämä
+		   sivu oli ainoa joka kumosi ne. Älä palauta `none`/`inherit`:
+		   ne eivät tarkoita "peri teema" vaan "anna selaimen päättää". */
+		background: var(--surface);
+		color: var(--text);
 		border: 1px solid var(--border);
 		padding: var(--s-1);
 		max-width: 100%;
