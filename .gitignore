@@ -111,6 +111,13 @@ raw_data/
 # runnerilla eika koskaan paatyisi sivulle.
 !/data/model_squad_gw_scores.json
 
+# 14.8 (PUSH-NOTIF vaihe b): push_dispatchin idempotenssimarkkerit.
+# ILMAN TATA POIKKEUSTA TUPLAPUSHI ON VARMA: markkeri elaisi vain runnerin
+# levylla, seuraava runner aloittaisi tyhjasta tilasta ja lahettaisi saman
+# deadline-pushin uudelleen. Tiedosto on samalla toimituksen auditointiloki
+# (specin kova saanto 5) — sama "logged"-periaate kuin freezeilla yllä.
+!/data/push_state.json
+
 # 1.8: perustajalohkon luvut julkisesta entrysta (build_founder_stats.py).
 # Tama !-poikkeus PUUTTUI shipatessa -> data-refreshin commit-step kaatui
 # "paths are ignored"-virheeseen 4 ajossa (1.-2.8) eika MITAAN dataa pushattu.

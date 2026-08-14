@@ -2154,6 +2154,98 @@ def grade_decisions(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# ENDPOINT: PUSH-NOTIF — toimituskohteet + tokenin siivous (admin-eräajo)
+# ---------------------------------------------------------------------------
+# Spec: goaliq-app/cos-reports/push-notif-spec-2026-08-13.md (vaiheet b+c).
+#
+# MIKSI TÄMÄ ON OLEMASSA: scripts/push_dispatch.py ajetaan GitHub-runnerilla
+# (se tarvitsee repon, koska idempotenssimarkkeri committoidaan). Vaihtoehto
+# olisi ollut viedä SUPABASE_SERVICE_ROLE_KEY GitHub-secretiksi — koko kannan
+# kirjoitusoikeus CI:hin, jotta voidaan lukea yksi taulu. Render pitää avainta
+# jo hallussaan ja ADMIN_TOKEN on jo repo-secret, joten liitos tehdään täällä
+# ja runner saa vain sen mitä lähetys vaatii. Sama kaava kuin grade-decisions.
+class PushTokenDeleteRequest(BaseModel):
+    token: str = Field(min_length=10, max_length=255)
+
+
+@app.get("/api/admin/push-targets")
+def push_targets(request: Request):
+    """Push-tokenit premium-lipulla ja watchlistilla liitettynä.
+
+    Liitos tehdään täällä eikä runnerilla, jotta runner ei näe profiles-
+    taulua lainkaan (se sisältää is_premium- ja fpl_entry_id-kentät koko
+    käyttäjäkunnasta).
+    """
+    require_admin(request)
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        raise HTTPException(status_code=503, detail="Supabase env missing")
+    sb_headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+    }
+    rows = requests.get(
+        f"{SUPABASE_URL}/rest/v1/push_tokens"
+        f"?select=expo_token,user_id,platform,locale,"
+        f"opted_in_deadline,opted_in_price,opted_in_picks",
+        headers=sb_headers, timeout=30,
+    ).json()
+    if not isinstance(rows, list):
+        return {"targets": [], "n": 0}
+
+    # Premium + watchlist vain niille riveille joilla on tili. Anon-laitteet
+    # saavat pelkän ilmaisen deadline-kanavan (migraation otsikkokommentti).
+    user_ids = sorted({r["user_id"] for r in rows if r.get("user_id")})
+    premium: set[str] = set()
+    watchlists: dict[str, list] = {}
+    for i in range(0, len(user_ids), 100):
+        ids = ",".join(f'"{u}"' for u in user_ids[i:i + 100])
+        prof = requests.get(
+            f"{SUPABASE_URL}/rest/v1/profiles?id=in.({ids})"
+            f"&select=id,is_premium,fpl_prefs",
+            headers=sb_headers, timeout=30,
+        ).json()
+        for p in prof if isinstance(prof, list) else []:
+            if p.get("is_premium"):
+                premium.add(str(p["id"]))
+            prefs = p.get("fpl_prefs") or {}
+            wl = prefs.get("watchlist") if isinstance(prefs, dict) else None
+            if isinstance(wl, list):
+                watchlists[str(p["id"])] = wl
+
+    targets = []
+    for r in rows:
+        uid = str(r["user_id"]) if r.get("user_id") else None
+        targets.append({
+            **r,
+            "is_premium": bool(uid and uid in premium),
+            "watchlist": watchlists.get(uid or "", []),
+        })
+    return {"targets": targets, "n": len(targets)}
+
+
+@app.post("/api/admin/push-token-delete")
+def push_token_delete(req: PushTokenDeleteRequest, request: Request):
+    """Poista token (Expon DeviceNotRegistered). Idempotentti.
+
+    Hiljainen siivous: appin poistanut laite palauttaa DeviceNotRegisteredin
+    ikuisesti, ja siivoamaton taulu kasvaisi kuolleista tokeneista joille
+    lähetetään joka kierros.
+    """
+    require_admin(request)
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        raise HTTPException(status_code=503, detail="Supabase env missing")
+    resp = requests.delete(
+        f"{SUPABASE_URL}/rest/v1/push_tokens",
+        params={"expo_token": f"eq.{req.token}"},
+        headers={"apikey": SUPABASE_SERVICE_ROLE_KEY,
+                 "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+                 "Prefer": "return=minimal"},
+        timeout=15,
+    )
+    return {"deleted": resp.status_code in (200, 204)}
+
+
+# ---------------------------------------------------------------------------
 # STRIPE: Checkout-session ja webhook
 # ---------------------------------------------------------------------------
 class CheckoutRequest(BaseModel):

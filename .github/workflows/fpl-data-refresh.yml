@@ -236,6 +236,30 @@ jobs:
             echo "::warning::grading epäonnistui (HTTP $code) — päätökset jäävät gradaamatta tähän ajoon."
           fi
 
+      # PUSH-NOTIF vaiheet b+c (14.8): palvelinpushit (deadline / price /
+      # picks). Askel on TÄSSÄ eikä omassa workflowssaan kahdesta syystä:
+      # (1) se lukee juuri kirjoitetun price watchin ja xP-projektion, ja
+      # (2) sen idempotenssimarkkeri data/push_state.json committoidaan alla
+      # olevassa stepissä — ilman committia seuraava runner aloittaisi
+      # tyhjästä tilasta ja lähettäisi saman deadline-pushin uudelleen.
+      #
+      # ADMIN_TOKEN = sama arvo kuin Renderin ADMIN_TOKEN. Runner EI saa
+      # Supabasen service-avainta: /api/admin/push-targets tekee premium- ja
+      # watchlist-liitoksen palvelimella. Secretin puuttuminen ei kaada ajoa
+      # (skripti kirjaa ohituksen näkyvästi ja palauttaa 0).
+      #
+      # continue-on-error: push-kanavan vika EI saa estää projektioiden
+      # pushia — mutta se ei myöskään saa jäädä vihreän runin taakse, joten
+      # health-steppi lopussa punaa ajon (sama malli kuin bake_player_gw).
+      - name: Dispatch push notifications (deadline / price / picks)
+        id: push_dispatch
+        if: steps.guard.outputs.proceed == 'true'
+        continue-on-error: true
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+        run: python -m scripts.push_dispatch
+
       - name: Commit + push to main (Render serves fresh data)
         if: steps.guard.outputs.proceed == 'true'
         run: |
@@ -258,6 +282,10 @@ jobs:
           [ -f data/model_squad_gw_scores.json ] && git add data/model_squad_gw_scores.json
           # 13.8: GW-rivit stats-sivulle (siirretty accuracy-logista, ks. yllä)
           [ -f fpl/player-gw.json ] && git add fpl/player-gw.json
+          # 14.8 (PUSH-NOTIF b): idempotenssimarkkeri + toimituksen auditointi.
+          # TÄMÄ RIVI ON KOKO TUPLAPUSHISUOJA: ilman committia markkeri elää
+          # vain tämän runnerin levyllä.
+          [ -f data/push_state.json ] && git add data/push_state.json
           true
           if git diff --cached --quiet; then
             echo "Ei muutoksia (data ennallaan) — ohitetaan commit."
@@ -284,8 +312,10 @@ jobs:
       # continue-on-error piilottaisi GW-buildin kaatumisen vihreän runin
       # taakse — tasan se vikaluokka joka piti accuracy-login punaisena
       # 26 ajoa ilman että kukaan huomasi.
-      - name: Player-GW health (fail loud, data jo pushattu)
+      - name: Step health (fail loud, data jo pushattu)
         if: always() && steps.guard.outputs.proceed == 'true'
         run: |
-          [ "${{ steps.bake_player_gw.outcome }}" = "failure" ] && { echo "::error::build_fpl_player_gw FAILAA (stats-sivun GW-ikkuna jaa vanhaksi)"; exit 1; }
-          exit 0
+          fail=0
+          [ "${{ steps.bake_player_gw.outcome }}" = "failure" ] && { echo "::error::build_fpl_player_gw FAILAA (stats-sivun GW-ikkuna jaa vanhaksi)"; fail=1; }
+          [ "${{ steps.push_dispatch.outcome }}" = "failure" ] && { echo "::error::push_dispatch FAILAA (deadline-/price-pushit jaavat lahettamatta)"; fail=1; }
+          exit $fail
