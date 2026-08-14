@@ -207,7 +207,15 @@ def mask_xp_payload(payload: dict) -> dict:
 # Kevyen valitsinpoolin kentat. TAHAN EI LISATA xP-kenttia: pooli menee myos
 # maskatussa vastauksessa, ja arvojen lisaaminen myisi premium-ytimen
 # ilmaiseksi. Sama linjaus kuin xP-teaserissa jo on: nimet nakyvat, arvot eivat.
-XP_POOL_FIELDS = ("id", "web_name", "pos", "team_short", "price")
+#
+# 14.8 LISAYS status + news: nama EIVAT ole mallin lukuja vaan FPL:n omaa
+# virallista saatavuustietoa, ja ne ovat jo nyt ilmaisia FantasyPlayerCardissa
+# jokaiselle pelaajalle. Ilman niita ilmainen watchlist ei voi pitaa
+# store-listauksen lupausta "track up to three players you are deciding on,
+# price and availability at a glance" — rivi nayttaisi hinnan mutta ei
+# loukkaantumislippua. Lupaus on olemassa, joten data kuuluu tanne.
+XP_POOL_FIELDS = ("id", "web_name", "pos", "team_short", "price",
+                  "status", "news")
 
 
 def xp_pool_rows(players: list[dict]) -> list[dict]:

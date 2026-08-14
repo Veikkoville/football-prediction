@@ -398,6 +398,18 @@ def test_pool_lisays_nosti_etag_skeemaversiota():
     vanhan vastauksen ja valitsin olisi tyhja tasan niilla kayttajilla joilla
     vastaus on jo valimuistissa.
     """
+    NYKYINEN = "s5"   # nosta AINA kun pooliin/vastaukseen tulee serve-time-kentta
     src = (API_DIR / "main.py").read_text(encoding="utf-8")
-    assert 'schema = "s4"' in src, (
-        "ETagin skeemaversio ei ole s4 — `pool` lisattiin ilman versionostoa")
+    assert f'schema = "{NYKYINEN}"' in src, (
+        f"ETagin skeemaversio ei ole {NYKYINEN}. Jos lisasit pooliin kentan "
+        "(XP_POOL_FIELDS) tai muun serve-time-kentan, nosta BOTH: "
+        "api/main.py:n `schema` JA tama vakio. Jos et lisannyt, joku muu "
+        "nosti version ja tama testi on jaljessa.")
+    # Sidonta kenttajoukkoon: jos XP_POOL_FIELDS kasvaa mutta versio ei liiku,
+    # yllaoleva assert kaatuu vasta jos joku muistaa paivittaa NYKYISEN.
+    # Tama rivi tekee kytkennan nakyvaksi lukijalle: s4 = 5 kenttaa (draft),
+    # s5 = 7 kenttaa (+ status/news ilmaista watchlistia varten).
+    from api.premium import XP_POOL_FIELDS
+    assert len(XP_POOL_FIELDS) == 7, (
+        "XP_POOL_FIELDS muuttui — tarkista ETagin skeemaversio ja paivita "
+        "tama luku samassa committissa")

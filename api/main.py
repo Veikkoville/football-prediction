@@ -3137,7 +3137,10 @@ def fantasy_xp(
     # versionostoa free-kayttajan ehdollinen pyynto validoisi vanhan
     # vastauksen 304:lla ja valitsin jaisi tyhjaksi juuri niille joilla
     # vastaus on jo valimuistissa — eli niille jotka ovat kayneet sivulla.
-    schema = "s4"
+    # 14.8 s5: pooliin lisattiin status + news (ilmainen watchlist tarvitsee
+    # saatavuuslipun). Sama peruste kuin s4:lla — ilman nostoa rivi jaisi
+    # ilman lippua tasan niille joilla vastaus on jo valimuistissa.
+    schema = "s5"
     # Liiga-avain ETagiin: ilman sitä fpl- ja spl-vastaukset voisivat
     # 304-validoitua ristiin samasta selainvälimuistista (sama URL-polku,
     # eri query) — sama vikaluokka kuin mask-bitin puuttuminen olisi.
