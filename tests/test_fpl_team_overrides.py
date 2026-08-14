@@ -8,6 +8,7 @@ mahdottomuus.
 from __future__ import annotations
 
 import datetime as _dt
+from pathlib import Path as _Path
 
 import pytest
 
@@ -163,6 +164,36 @@ def test_attack_mult_is_carried_to_the_caller(tmp_path):
         "attack": -0.10, "defence": 0.05, "attack_mult": 0.85,
         "reason": "", "review_by": "2026-10-05"}})
     assert applied[0]["attack_mult"] == 0.85
+
+
+def test_the_override_never_reaches_the_graded_prediction_surface():
+    """🔴 RAJAUSPORTTI (14.8). Repossa on nelja erillista Dixon-Coles-fittia
+    ja tama ohitus kuuluu tasan yhteen.
+
+    `/api/predict`-ennusteet logataan pre-match julkiseen track recordiin
+    (accuracy_pipeline.py -> prediction_log.json -> accuracy.json). Jos
+    kasisaato vuotaisi sinne, julkaistu osumatarkkuutemme mittaisi
+    kasisaatoa eika mallia — eli tasan sen lupauksen jonka varaan tuote
+    myydaan. Rajaus on helppo rikkoa vahingossa yhdella importilla, ja
+    silloin mikaan ei huutaisi. Nyt huutaa tama.
+    """
+    root = _Path(__file__).resolve().parents[1]
+    allowed = {"scripts/build_fpl_xp.py"}
+    offenders = []
+    for f in list(root.glob("api/**/*.py")) + list(root.glob("scripts/**/*.py")) \
+            + list(root.glob("src/**/*.py")):
+        rel = f.relative_to(root).as_posix()
+        if rel in allowed or rel.endswith("fpl_team_overrides.py"):
+            continue
+        try:
+            src = f.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):  # pragma: no cover
+            continue
+        if "load_team_overrides" in src or "apply_team_overrides" in src:
+            offenders.append(rel)
+    assert not offenders, (
+        "joukkueohitus vuoti gradatulle tai muulle pinnalle: " + ", ".join(offenders)
+        + " — ks. data/fpl_team_overrides.csv:n rajauslohko ennen kuin laajennat")
 
 
 def test_missing_file_is_not_an_error(tmp_path):

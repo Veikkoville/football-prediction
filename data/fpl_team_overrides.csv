@@ -14,6 +14,26 @@
 #   Heikentyneelle joukkueelle: attack NEGATIIVINEN, defence POSITIIVINEN.
 #   Väärä merkki defencessa PARANTAISI juuri sitä joukkuetta jota heikennät.
 #
+# 🔴 MIHIN TÄMÄ PÄTEE — JA MIHIN EI (kartoitettu 14.8.2026)
+# Repossa on NELJÄ erillistä Dixon-Coles-fittiä. Tämä ohitus sovelletaan
+# tasan yhdessä:
+#     scripts/build_fpl_xp.py       KYLLÄ  (xP-projektiot)
+#     scripts/build_fpl_cs_fdr.py   ei     (CS/FDR -> chip-EV, fixture-ticker)
+#     scripts/build_fpl_phase0.py   ei     (Phase 0 -projektiot)
+#     api/main.py                   ei     (/api/predict, ottelu-ennusteet)
+#
+# /api/predict ON TARKOITUKSELLA ULKOPUOLELLA, älä "korjaa" sitä. Sen
+# ennusteet logataan pre-match julkiseen track recordiin
+# (scripts/accuracy_pipeline.py:301-306 -> data/prediction_log.json ->
+# data/accuracy.json). Käsisäädön vieminen sinne tarkoittaisi, että julkaistu
+# osumatarkkuutemme mittaisi käsisäätöä eikä mallia. Se on tasan se lupaus
+# jonka varaan koko tuote myydään.
+#
+# CS/FDR ja Phase 0 ovat eri asia: ne ovat FPL-pintoja eivätkä gradattuja
+# ennusteita, joten niiden jääminen ulkopuolelle tarkoittaa että kaksi
+# FPL-pintaa voi näyttää samasta seurasta eri lukua. Se on AVOIN kysymys
+# Villelle (jono: TEAM-OVERRIDE-SCOPE), ei tässä ratkaistu.
+#
 # 🔴 review_by ON PAKOLLINEN JA SE ON PORTTI
 # Vanhentunutta riviä EI sovelleta, se ohitetaan äänekkäästi. Syy: reittaus
 # korjaa itsensä kun 26/27-otteluita kertyy, ja vanhentunut ohitus alkaisi
