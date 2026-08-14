@@ -46,9 +46,19 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
+          # 14.8: TAMA OLI HILJAINEN VIHREA. Aiemmin puuttuva secret tulosti
+          # ::notice:: ja poistui exit 0:lla, joten workflow raportoi
+          # ONNISTUNEEKSI tekematta mitaan — ja niin se oli tehnyt joka
+          # ajossa. Havaittu kun tuotannon API tarjoili vanhaa dataa vaikka
+          # "deploy" oli vihrea. Deploy-workflow joka ei voi deployata on
+          # rikki, ei "skipattu", ja sen on nayttava rikkinaiselta.
+          # (Sama vikaluokka kuin accuracy-login vahti joka huusi
+          # ::warning::-tasolla jota virhegreppi ei nahnyt.)
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then
-            echo "::notice::RENDER_DEPLOY_HOOK-secret puuttuu — skip (setup: ks. workflow-kommentti)."
-            exit 0
+            echo "::error::RENDER_DEPLOY_HOOK-secret puuttuu — Render EI ole deployattu."
+            echo "::error::Lisaa secret: gh secret set RENDER_DEPLOY_HOOK --repo Veikkoville/football-prediction"
+            echo "::error::Hook-URL: Render dashboard -> service -> Settings -> Deploy Hook."
+            exit 1
           fi
           # Manuaalinen dispatch deployaa aina; schedule vain jos data/** muuttui 24 h:ssa.
           if [ "${{ github.event_name }}" = "schedule" ]; then
