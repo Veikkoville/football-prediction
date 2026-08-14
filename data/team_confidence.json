@@ -15,7 +15,7 @@
   "West Ham",
   "Wolves"
  ],
- "n_flagged": 3,
+ "n_flagged": 4,
  "teams": [
   {
    "team": "Arsenal",
@@ -71,7 +71,7 @@
    "is_promoted": true,
    "minutes_churn_pct": null,
    "flag": "promoted",
-   "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record."
+   "note": "Promoted side. No results inside the model's current fitting window, so this team runs on a measured baseline from recent promoted sides instead of a rating of its own."
   },
   {
    "team": "Crystal Palace",
@@ -93,9 +93,9 @@
    "team": "Fulham",
    "model_team": "Fulham",
    "is_promoted": false,
-   "minutes_churn_pct": 17.9,
+   "minutes_churn_pct": 22.5,
    "flag": null,
-   "note": "18% of last season's minutes have left the club."
+   "note": "22% of last season's minutes have left the club."
   },
   {
    "team": "Hull City",
@@ -103,7 +103,7 @@
    "is_promoted": true,
    "minutes_churn_pct": null,
    "flag": "promoted",
-   "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record."
+   "note": "Promoted side. No results inside the model's current fitting window, so this team runs on a measured baseline from recent promoted sides instead of a rating of its own."
   },
   {
    "team": "Ipswich Town",
@@ -111,7 +111,7 @@
    "is_promoted": true,
    "minutes_churn_pct": null,
    "flag": "promoted",
-   "note": "Promoted side. No Premier League results to fit a rating on, so this team starts from a baseline rather than its own record."
+   "note": "Promoted side. No results inside the model's current fitting window, so this team runs on a measured baseline from recent promoted sides instead of a rating of its own."
   },
   {
    "team": "Leeds",
@@ -149,9 +149,9 @@
    "team": "Newcastle",
    "model_team": "Newcastle United",
    "is_promoted": false,
-   "minutes_churn_pct": 18.7,
-   "flag": null,
-   "note": "19% of last season's minutes have left the club."
+   "minutes_churn_pct": 25.2,
+   "flag": "high_turnover",
+   "note": "25% of last season's minutes were played by players who have since left. The rating is fitted on results, so it has not priced that in yet."
   },
   {
    "team": "Nott'm Forest",

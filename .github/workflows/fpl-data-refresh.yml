@@ -124,6 +124,24 @@ jobs:
         if: steps.guard.outputs.proceed == 'true'
         run: python -m scripts.build_fpl_xp
 
+      # 14.8: NAMA KAKSI PUUTTUIVAT CRONISTA JA JAIVAT 25.7:N TILAAN.
+      # `fpl_cs_fdr.json` on koko kauden 380 fixturen CS%/FDR jota
+      # `api/fantasy_edge.py` tarjoilee, ja se oli sovitettu VANHAAN
+      # fit-ikkunaan ['2425','2526'] kolme viikkoa sen jalkeen kun malli
+      # siirtyi ikkunaan ['2526','2627']. Sen nousijalistasta puuttui myos
+      # Ipswich. Ilman tata askelta korjaukset eivat pysy: seuraava refresh
+      # ei koske tiedostoon lainkaan, joten se vanhenee uudelleen.
+      - name: Build season CS/FDR table
+        if: steps.guard.outputs.proceed == 'true'
+        run: python -m scripts.build_fpl_cs_fdr
+
+      # Nousijaliput ja vaihtuvuusluvut. Sama syy: liput renderoityvat
+      # ilmaissivulle ja menevat API:n `meta.team_confidence`iin, mutta
+      # tiedosto rakennettiin vain kasin.
+      - name: Build team confidence flags
+        if: steps.guard.outputs.proceed == 'true'
+        run: python scripts/build_team_confidence.py
+
       # SPL (7.8): samat refresh-hyödyt (saatavuusliput, hinnat) RSL-projektioille.
       # continue-on-error: SPL EI saa koskaan kaataa FPL-refreshiä (Villen ehto:
       # FPL-GW1-prep SPL:n edellä). SPL-gate-FAIL → vanha SPL-data jää voimaan
@@ -265,7 +283,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json data/fpl_player_stats.json
+          git add data/fpl_projections_phase0.json data/fpl_xp_projections.json data/fpl_price_watch.json data/fpl_player_leaders.json data/fpl_player_stats.json data/fpl_cs_fdr.json data/team_confidence.json
           # 30.7 tarkkuuslokit: olemassa vain kun gradattavaa/jäädytettävää on ollut
           # 2.8: yhden valinnaisen tiedoston add EI saa kaataa koko pushia.
           # Tausta: founder_entry.json puuttui .gitignoren !-poikkeuksista →
