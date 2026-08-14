@@ -150,14 +150,51 @@ def test_hash_changes_only_when_components_change(facts):
         == why.component_hash(facts)
 
 
-def test_select_players_orders_by_this_gw_xp():
+def test_selection_matches_visible_order():
+    """Valinnan on vastattava SITA jarjestysta jonka ostaja nakee ruudulla.
+
+    MIKSI TAMA MUUTTUI (14.8): valinta oli taman kierroksen xP:lla, mutta
+    molemmat pinnat lajittelevat ja nayttavat `xp_horizon_total`-luvun
+    (`XpTable.svelte` SORTS.total + sarake "Total xP"; `FantasyScreen.tsx`
+    oletuslajittelu 'total'). Ero ei ollut teoreettinen: nakyvan top 150:n
+    joukossa oli nelja rivia ILMAN selitysta (Van de Ven 132, Porro 134,
+    Maatsen 138, McGinn 143) ja nelja selitysta sen ULKOPUOLELLA. Maksumuuri
+    lupaa "top 150 by Total xP" ja ostaja tarkistaa sen avaamalla rivin.
+
+    Tama testi korvaa `test_select_players_orders_by_this_gw_xp`:n, joka
+    koodasi vanhan kaytoksen.
+    """
     payload = {"players": [
-        {"id": 1, "gameweeks": [{"gw": 1, "xp": 2.0}]},
-        {"id": 2, "gameweeks": [{"gw": 1, "xp": 9.0}]},
-        {"id": 3, "gameweeks": [{"gw": 2, "xp": 9.9}]},   # ei GW1:ta
+        # Jarjestys KAANTYY jos katsotaan GW1:ta horisontin sijaan -> tama
+        # on negatiivinen kontrolli vanhaa toteutusta vastaan.
+        {"id": 1, "xp_horizon_total": 30.0, "gameweeks": [{"gw": 1, "xp": 2.0}]},
+        {"id": 2, "xp_horizon_total": 10.0, "gameweeks": [{"gw": 1, "xp": 9.0}]},
+        {"id": 3, "xp_horizon_total": 0.0, "gameweeks": [{"gw": 2, "xp": 9.9}]},
     ]}
     got = why.select_players(payload, gw=1, top_n=5)
-    assert [p["id"] for p in got] == [2, 1]
+    assert [p["id"] for p in got] == [1, 2], (
+        "valinta ei seuraa xp_horizon_totalia -> maksumuurin lupaus on vaarin")
+
+
+def test_template_drops_meaningless_xgi():
+    """`leans on 0.03 expected goal involvements` vaittaa projektion nojaavan
+    lukuun joka ei kanna mitaan. Mitattu 14.8: 43/150 lausetta teki niin."""
+    facts = {"id": 0, "expected_minutes": 62,
+             "last_season": {"xgi_per90": 0.03}, "next_opponents": ["IPS (A)"]}
+    assert "expected goal involvements" not in why.template_sentence(facts)
+    facts["last_season"]["xgi_per90"] = 0.42
+    assert "0.42 expected goal involvements" in why.template_sentence(facts)
+
+
+def test_template_frames_vary_by_player():
+    """Yksi runko 150 rivilla luetaan botiksi, ja rivien avaaminen perakkain
+    on tuotteen normaali kaytto. Valinnan on silti oltava deterministinen,
+    jotta refresh ei vaihda tekstia turhaan."""
+    base = {"expected_minutes": 80, "last_season": {}, "next_opponents": ["A (H)"]}
+    seen = {why.template_sentence({**base, "id": i}).split(" ")[0] for i in range(9)}
+    assert len(seen) > 1, "kaikki lauseet alkavat samalla sanalla"
+    a = why.template_sentence({**base, "id": 7})
+    assert a == why.template_sentence({**base, "id": 7}), "ei deterministinen"
 
 
 def test_drivers_enum_is_closed():

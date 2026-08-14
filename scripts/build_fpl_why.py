@@ -45,6 +45,22 @@ OUT_PATH = config.PROJECT_ROOT / "data" / "fpl_why.json"
 
 MODEL = "claude-opus-5"
 TOP_N = 150
+
+# Alle taman xGI/90 jatetaan pois lauseesta: se ei kanna painoa jonka
+# "leans on" sille antaisi (ks. template_sentence).
+XGI_MIN = 0.15
+
+# Nosta AINA kun `template_sentence` muuttuu: se on osa valimuistin avainta
+# mallipohjaisille lauseille. v2 (14.8): xGI-kynnys + kolme runkoa.
+TEMPLATE_VERSION = 2
+
+# Kolme runkoa, valinta deterministinen pelaajan id:sta. Kaikki sanovat saman
+# asian; vain rakenne vaihtuu, jotta perakkain avatut rivit eivat lue botilta.
+FRAMES = [
+    "The projection leans on {lead}{tail}.",
+    "Most of this comes from {lead}{tail}.",
+    "This one rests on {lead}{tail}.",
+]
 MAX_TOKENS = 2000
 POLL_SECONDS = 20
 POLL_MAX_MINUTES = 55
@@ -269,7 +285,12 @@ def template_sentence(facts: dict) -> str:
     if mins is not None:
         bits.append(f"about {mins:g} minutes a game")
     xgi = (facts.get("last_season") or {}).get("xgi_per90")
-    if xgi:
+    # KYNNYS: 48/138 lausetta siteerasi xGI/90:n alle 0,15 ja 23 alle 0,10
+    # (pienin 0,01). "The projection leans on 0.09 expected goal involvements
+    # per 90" vaittaa projektion nojaavan lukuun joka ei kanna mitaan — se on
+    # kaiken perusteleminen samalla syvyydella, eli konetunnusmerkki JA
+    # epatosi painotusvaite. Alle kynnyksen luku jatetaan pois, ei pyoristeta.
+    if xgi and float(xgi) >= XGI_MIN:
         bits.append(f"{xgi:g} expected goal involvements per 90 last season")
     if facts.get("set_piece_duties"):
         bits.append("set piece duties")
@@ -279,8 +300,16 @@ def template_sentence(facts: dict) -> str:
         lead = bits[0]
     else:
         lead = ", ".join(bits[:-1]) + " and " + bits[-1]
-    tail = (f", with {', '.join(opponents[:3])} to come" if opponents else "")
-    return f"The projection leans on {lead}{tail}."
+    # RUNGON VAIHTELU: kaikki 150 lausetta alkoivat "The projection" ja
+    # paattyivat "with A, B, C to come." Rivien avaaminen perakkain on tuotteen
+    # normaali kaytto, joten yksi runko luetaan botiksi. Valinta on
+    # DETERMINISTINEN pelaajan id:sta: sama rivi antaa aina saman lauseen,
+    # joten `component_hash` pysyy vakaana eika refresh vaihda tekstia turhaan.
+    n_opp = 2 if (facts.get("id") or 0) % 3 == 1 else 3
+    opps = opponents[:n_opp]
+    tail = (f", with {', '.join(opps)} to come" if opps else "")
+    frame = FRAMES[(facts.get("id") or 0) % len(FRAMES)]
+    return frame.format(lead=lead, tail=tail)
 
 
 def component_hash(facts: dict) -> str:
@@ -295,14 +324,25 @@ def component_hash(facts: dict) -> str:
 
 
 def select_players(payload: dict, gw: int, top_n: int) -> list[dict]:
-    """TOP_N pelaajaa taman kierroksen xP-jarjestyksessa."""
-    def gw_xp(p: dict) -> float:
-        for g in p.get("gameweeks") or []:
-            if g.get("gw") == gw:
-                return float(g.get("xp") or 0.0)
-        return 0.0
-    players = [p for p in (payload.get("players") or []) if gw_xp(p) > 0]
-    players.sort(key=gw_xp, reverse=True)
+    """TOP_N pelaajaa SILLA jarjestyksella jonka ostaja nakee ruudulla.
+
+    JARJESTYS ON `xp_horizon_total`, EI taman kierroksen xP. Molemmat pinnat
+    lajittelevat ja nayttavat horisonttiluvun (`XpTable.svelte` SORTS.total,
+    sarake "Total xP"; `FantasyScreen.tsx` oletuslajittelu 'total', rivin iso
+    luku `xp_horizon_total`). Kun valinta tehtiin GW1:n xP:lla, nakyvan top
+    150:n joukossa oli nelja rivia ILMAN selitysta (Van de Ven 132, Porro 134,
+    Maatsen 138, McGinn 143) ja nelja selitysta sen ULKOPUOLELLA (155-177).
+    Maksumuuri lupaa "top 150 by Total xP", ja ostaja tarkistaa sen 30
+    sekunnissa avaamalla rivin 132 — joten valinnan on vastattava lupausta.
+    Portti: `tests/test_fpl_why.py::test_selection_matches_visible_order`.
+
+    `gw`-parametri sailyy allekirjoituksessa: sita kaytetaan faktalohkon
+    poimintaan, ei enaa jarjestykseen.
+    """
+    def horizon(p: dict) -> float:
+        return float(p.get("xp_horizon_total") or 0.0)
+    players = [p for p in (payload.get("players") or []) if horizon(p) > 0]
+    players.sort(key=horizon, reverse=True)
     return players[:top_n]
 
 
@@ -420,13 +460,48 @@ def main() -> int:
         facts_by_id[pid] = facts
         h = component_hash(facts)
         prev = entries.get(pid)
-        if prev and prev.get("hash") == h and prev.get("gw") == gw:
+        # MALLIPOHJAN VERSIO ON OSA AVAINTA. Ilman tata `template_sentence`in
+        # muutos ei paivittanyt mitaan: faktat eivat liiku, joten hash osui ja
+        # 140/150 vanhaa lausetta jai voimaan. Skripti olisi kertonut "OK"
+        # mutta tuote olisi ollut ennallaan. Sama vikaluokka kuin serve-time-
+        # kentta joka ei invalidoi ETagia.
+        #
+        # Koskee VAIN mallipohjaisia: mallin kirjoittamat eivat kayta runkoa,
+        # joten niiden regenerointi maksaisi API-kutsuja ilman tekstimuutosta.
+        stale_template = (prev is not None
+                          and prev.get("source") == "template"
+                          and prev.get("tpl") != TEMPLATE_VERSION)
+        if (prev and prev.get("hash") == h and prev.get("gw") == gw
+                and not stale_template):
             reused += 1
             continue
         jobs.append({"custom_id": pid, "facts": facts})
 
+    # KARSINTA: varastoon jaa merkintoja pelaajista jotka ovat pudonneet
+    # valinnasta, ja `attach_why` liittaa selityksen KAIKILLE riveille joilta
+    # id loytyy — ei vain top 150:lle. Ilman tata maksumuurin lupaus "top 150
+    # by Total xP" on vaarin myos toiseen suuntaan: rivilla 177 olisi selitys
+    # jota copy ei lupaa. Mitattu 14.8: 4 tallaista merkintaa (154 vs 150).
+    keep = {str(p.get("id")) for p in players}
+    dropped = [k for k in entries if k not in keep]
+    for k in dropped:
+        del entries[k]
+    if dropped:
+        print(f"  karsittu {len(dropped)} merkintaa valinnan ulkopuolelta")
+
     print(f"  cache-osumat {reused}, generoitavia {len(jobs)}")
     if not jobs:
+        # KARSINTA ON KIRJOITETTAVA VAIKKA GENEROITAVIA EI OLE. Ensimmainen
+        # versio laski karsinnan ja palasi tasta ennen tallennusta, joten
+        # skripti tulosti "karsittu 4" ja tiedosto sailyi ennallaan — korjaus
+        # nayttaisi menneen lapi eika olisi tehnyt mitaan.
+        if dropped:
+            store["entries"] = entries
+            OUT_PATH.write_text(
+                json.dumps(store, ensure_ascii=False, indent=1, sort_keys=True),
+                encoding="utf-8")
+            print(f"OK: karsittu {len(dropped)}, ei uusia selityksia.")
+            return 0
         print("OK: kaikki selitykset ajan tasalla.")
         return 0
 
@@ -470,6 +545,9 @@ def main() -> int:
             "sentence": sentence,
             "drivers": drivers,
             "source": source,
+            # Vain mallipohjaisilla: kertoo milla rungolla lause kirjoitettiin,
+            # jotta rungon muutos invalidoi valimuistin (ks. yllä).
+            **({"tpl": TEMPLATE_VERSION} if source == "template" else {}),
         }
 
     store["meta"] = {
