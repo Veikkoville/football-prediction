@@ -134,9 +134,9 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-14T21:35:58",
+    "generated_at": "2026-08-14T21:50:52",
     "season": "2026/27",
-    "overrides_applied": 4,
+    "overrides_applied": 6,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + frozen 25/26 baseline artifact (data/fpl_prev_baselines_2526.json, element code mapping)",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2526', '2627'] (sama fit-config kuin /api/predict)",
@@ -14263,6 +14263,129 @@
       "components_gw": 1
     },
     {
+      "id": 350,
+      "web_name": "A.Becker",
+      "full_name": "Alisson Becker",
+      "team": "Liverpool",
+      "team_short": "LIV",
+      "pos": "GKP",
+      "xmins": 72.0,
+      "predicted_starts": 80.0,
+      "minutes_confidence": "med",
+      "minutes_source": "override",
+      "minutes_override_reason": "Liverpool's number one, not a job share. Model read last season's 26/10 split as an ongoing rotation. This Is Anfield 8/2026: back at the AXA training centre after the World Cup and 'set for his ninth season as Liverpool's undisputed number one goalkeeper'; Liverpool triggered a 12-month extension in March so he is contracted through 26/27, and reporting is that he 'remains the first choice despite the 29m deal for Mamardashvili'. Held at 0.80 rather than 0.90 because the same sources call it a DELAYED pre-season return, which is a real GW1 risk",
+      "data_basis": "pl_history",
+      "owned_pct": 4.0,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 1,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 2340,
+        "starts": 26,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.03,
+        "cs": 8,
+        "points": 91,
+        "per90": {
+          "goals": 0.0,
+          "assists": 0.0,
+          "xgi": 0.0
+        }
+      },
+      "p_start": 0.8,
+      "p_cameo": 0.0,
+      "p_bench": 0.2,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.23,
+      "xp_per_gw": 2.86,
+      "xp_per_90": 3.62,
+      "xp_horizon_total": 17.14,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.59
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.69
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "A"
+            }
+          ],
+          "xp": 3.52
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.3
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.57
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.46
+        }
+      ],
+      "components": {
+        "appearance": 1.54,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.56,
+        "conceded": -0.47,
+        "saves": 0.78,
+        "defensive_contribution": 0.0,
+        "yellows": -0.04,
+        "bonus": 0.22
+      },
+      "components_gw": 1
+    },
+    {
       "id": 330,
       "web_name": "Bogle",
       "full_name": "Jayden Bogle",
@@ -23526,127 +23649,6 @@
       "team_flag": "promoted"
     },
     {
-      "id": 350,
-      "web_name": "A.Becker",
-      "full_name": "Alisson Becker",
-      "team": "Liverpool",
-      "team_short": "LIV",
-      "pos": "GKP",
-      "xmins": 46.8,
-      "predicted_starts": 50.7,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 4.0,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 1,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2340,
-        "starts": 26,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.03,
-        "cs": 8,
-        "points": 91,
-        "per90": {
-          "goals": 0.0,
-          "assists": 0.0,
-          "xgi": 0.0
-        }
-      },
-      "p_start": 0.5075,
-      "p_cameo": 0.0,
-      "p_bench": 0.4925,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.15,
-      "xp_per_gw": 1.85,
-      "xp_per_90": 3.62,
-      "xp_horizon_total": 11.13,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.68
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.75
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "A"
-            }
-          ],
-          "xp": 2.28
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.14
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.67
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.6
-        }
-      ],
-      "components": {
-        "appearance": 1.0,
-        "goals": 0.0,
-        "assists": 0.0,
-        "clean_sheet": 0.36,
-        "conceded": -0.31,
-        "saves": 0.51,
-        "defensive_contribution": 0.0,
-        "yellows": -0.02,
-        "bonus": 0.14
-      },
-      "components_gw": 1
-    },
-    {
       "id": 77,
       "web_name": "Adli",
       "full_name": "Amine Adli",
@@ -31631,129 +31633,6 @@
         "defensive_contribution": 0.17,
         "yellows": -0.07,
         "bonus": 0.1
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 351,
-      "web_name": "Mamardashvili",
-      "full_name": "Giorgi Mamardashvili",
-      "team": "Liverpool",
-      "team_short": "LIV",
-      "pos": "GKP",
-      "xmins": 33.8,
-      "predicted_starts": 42.2,
-      "minutes_confidence": "med",
-      "minutes_source": "price_blend",
-      "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
-      "data_basis": "pl_history",
-      "owned_pct": 0.2,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 5.0,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 867,
-        "starts": 10,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.0,
-        "cs": 2,
-        "points": 34,
-        "per90": {
-          "goals": 0.0,
-          "assists": 0.0,
-          "xgi": 0.0
-        }
-      },
-      "p_start": 0.4221,
-      "p_cameo": 0.0,
-      "p_bench": 0.5779,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.09,
-      "xp_per_gw": 1.36,
-      "xp_per_90": 3.83,
-      "xp_horizon_total": 8.17,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.27
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "NFO",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.29
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "IPS",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.65
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "FUL",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.53
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.25
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "MCI",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.17
-        }
-      ],
-      "components": {
-        "appearance": 0.7,
-        "goals": 0.0,
-        "assists": 0.0,
-        "clean_sheet": 0.23,
-        "conceded": -0.22,
-        "saves": 0.49,
-        "defensive_contribution": 0.0,
-        "yellows": -0.01,
-        "bonus": 0.08
       },
       "components_gw": 1
     },
@@ -52414,6 +52293,129 @@
         "defensive_contribution": 0.0,
         "yellows": -0.02,
         "bonus": 0.04
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 351,
+      "web_name": "Mamardashvili",
+      "full_name": "Giorgi Mamardashvili",
+      "team": "Liverpool",
+      "team_short": "LIV",
+      "pos": "GKP",
+      "xmins": 12.7,
+      "predicted_starts": 15.0,
+      "minutes_confidence": "med",
+      "minutes_source": "override",
+      "minutes_override_reason": "Successor in waiting, not the incumbent. Paired with the Alisson row: without it the club's keeper p_start sums to 1.22, i.e. more than one starting keeper. Same reasoning and sources as id 350",
+      "data_basis": "pl_history",
+      "owned_pct": 0.2,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 5.0,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 867,
+        "starts": 10,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.0,
+        "cs": 2,
+        "points": 34,
+        "per90": {
+          "goals": 0.0,
+          "assists": 0.0,
+          "xgi": 0.0
+        }
+      },
+      "p_start": 0.15,
+      "p_cameo": 0.0,
+      "p_bench": 0.85,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.03,
+      "xp_per_gw": 0.51,
+      "xp_per_90": 3.83,
+      "xp_horizon_total": 3.08,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.48
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "NFO",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.49
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "IPS",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.62
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "FUL",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.58
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.47
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "MCI",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.44
+        }
+      ],
+      "components": {
+        "appearance": 0.27,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.09,
+        "conceded": -0.08,
+        "saves": 0.18,
+        "defensive_contribution": 0.0,
+        "yellows": -0.01,
+        "bonus": 0.03
       },
       "components_gw": 1
     },
