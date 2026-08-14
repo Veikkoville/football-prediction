@@ -190,6 +190,48 @@ def render(spec: dict, out_path: Path) -> Path:
 # ---------------------------------------------------------------------------
 # Datarakentajat
 # ---------------------------------------------------------------------------
+def _xp_payload() -> dict:
+    """Taysi xP-projektio korttigeneraattorille.
+
+    🔴 14.8 BUGI: kortit lukivat JULKISTA /api/fantasy/xp-endpointia, joka on
+    premium-portin takana MASKATTU top-10-teaseriksi (meta.masked=true, 10
+    riviä 507:sta). Kortit siis rakennettiin myyntipinnasta eika omasta
+    datasta. `xp`-kortille se sattui olemaan oikein — top 10 on top 10 —
+    mutta `value`-kortti ("best xP per million") oli SYSTEMAATTISESTI vaara:
+    vastine asuu halvoissa pelaajissa, ja ne on maskattu pois maaritelman
+    nojalla. Kortti siis vastasi kysymykseen "kuka kymmenesta kalleimmasta on
+    vahiten kallis". Se ehti olla kaytossa 9.8 alkaen.
+    Vikaluokka on sama kuin muistiinpanossa "maski katkaisee ilmaispinnan
+    hiljaa": tyhja tai typistetty lista ei ole virhe, se on uskottava vastaus.
+
+    Lahde on nyt repon artefakti — sama tiedosto jonka API servaa, ilman
+    maskia. Verkkohaku jaa varalle jos ajetaan repon ulkopuolelta, ja
+    KUMPIKIN polku kertoo itsestaan aanekkaasti: hiljainen fallback
+    maskattuun dataan olisi tasan tama bugi uudelleen.
+    """
+    import urllib.request
+
+    p = DATA / "fpl_xp_projections.json"
+    if p.exists():
+        data = json.loads(p.read_text(encoding="utf-8"))
+        n = len(data.get("players") or [])
+        print(f"[data] repon artefakti: {n} pelaajaa (maskaamaton)")
+        return data
+    req = urllib.request.Request(
+        "https://api.goaliq.app/api/fantasy/xp",
+        headers={"User-Agent": "Mozilla/5.0 goaliq-card-gen"})
+    with urllib.request.urlopen(req, timeout=90) as r:
+        data = json.loads(r.read().decode("utf-8"))
+    n = len(data.get("players") or [])
+    if data.get("meta", {}).get("masked"):
+        raise SystemExit(
+            f"VIRHE: API palautti MASKATUN teaserin ({n} pelaajaa). Kortteja ei "
+            f"rakenneta myyntipinnasta — aja tama repossa, jolloin "
+            f"data/fpl_xp_projections.json on kaytettavissa.")
+    print(f"[data] API: {n} pelaajaa")
+    return data
+
+
 def _load(name: str) -> dict:
     p = DATA / name
     if not p.exists():
@@ -353,13 +395,7 @@ def card_xp(args) -> dict:
     live-endpoint kuin ennen, joten kortti ja webin Captain ranker nayttavat
     samat luvut.
     """
-    import urllib.request
-
-    req = urllib.request.Request(
-        "https://api.goaliq.app/api/fantasy/xp",
-        headers={"User-Agent": "Mozilla/5.0 goaliq-card-gen"})
-    with urllib.request.urlopen(req, timeout=90) as r:
-        data = json.loads(r.read().decode("utf-8"))
+    data = _xp_payload()
     gw = data["meta"]["next_gameweek"]
     rows = []
     for p in data.get("players", []):
@@ -407,13 +443,7 @@ def card_value(args) -> dict:
     valtaisivat vaihtomiehet, joiden pieni xP jaettuna 4.0 miljoonalla nayttaa
     tehokkuudelta. Sama rajaus kuin postauksessa, jotta luvut tasmaavat.
     """
-    import urllib.request
-
-    req = urllib.request.Request(
-        "https://api.goaliq.app/api/fantasy/xp",
-        headers={"User-Agent": "Mozilla/5.0 goaliq-card-gen"})
-    with urllib.request.urlopen(req, timeout=90) as r:
-        data = json.loads(r.read().decode("utf-8"))
+    data = _xp_payload()
     players = data.get("players") or []
     n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
     floor = args.min_mins if args.min_mins and args.min_mins < 90 else 60
@@ -447,8 +477,98 @@ def card_value(args) -> dict:
     }
 
 
+def card_club_best(args) -> dict:
+    """Jokaisen seuran paras pelaaja YHDESSA positiossa, ennustetuilla pisteilla.
+
+    KULMA (Villen idea 14.8, WGTA_FPL:n talismaani-kortin muoto). Se kortti
+    listasi joukkueittain yhden pelaajan VIIME kauden pisteilla ja osuudella
+    seuran pisteista. Sama muoto, eri data: meilla luku on ETEENPAIN katsova
+    ennuste, ja "osuus" korvautuu erolla saman seuran ja saman position
+    kakkoseen. Se on kysymys johon menneet pisteet eivat vastaa: onko tama
+    seuran ainoa vaihtoehto talta paikalta vai yksi monesta.
+
+    🔴 KAIKKI 20 SEURAA, EI MINUUTTILATTIAA. Aiempi versio suodatti
+    xmins >= 60 ja tuotti hyokkaajakortin jossa oli 10 seuraa 20:sta —
+    otsikko olisi luvannut "every club" ja kuva nayttanyt puolet. Lattian
+    sijaan seuran paras kelpaa sellaisenaan: xP sisaltaa jo minuutit, joten
+    vahan pelaava nousee seuransa karkeen vain jos seuralla ei ole ketaan
+    parempaa, ja se on kortin kannalta TOSI vastaus.
+
+    🔴 "?"-MERKKI ON PAKOLLINEN REHELLISYYSLIPPU. Pelaaja jolla ei ole
+    Valioliigaminuutteja saa roolinsa hintapriorista eika mallilta. Nousijoiden
+    riveilla se on saanto eika poikkeus, ja ilman merkkia kortti esittaisi
+    priorin ennusteena. Sama periaate kuin data_basis-kentalla API:ssa.
+    """
+    pos = (args.pos or "").upper()
+    if pos not in ("GKP", "DEF", "MID", "FWD"):
+        raise SystemExit(
+            "club-best vaatii --pos GKP|DEF|MID|FWD. Kortti on per positio: "
+            "20 seuraa x 4 positiota olisi 80 rivia eika luettava kuva.")
+
+    data = _xp_payload()
+    players = data.get("players") or []
+    n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
+
+    by_club: dict[str, list[dict]] = {}
+    for p in players:
+        if p.get("pos") != pos:
+            continue
+        by_club.setdefault(p.get("team_short") or "???", []).append(p)
+
+    rows = []
+    for club, group in by_club.items():
+        group.sort(key=lambda p: -float(p.get("xp_horizon_total") or 0.0))
+        top = group[0]
+        v = float(top.get("xp_horizon_total") or 0.0)
+        if v <= 0:
+            continue
+        second = float(group[1].get("xp_horizon_total") or 0.0) if len(group) > 1 else None
+        if second is None:
+            mid = "only option"
+        elif v - second < 0.05:
+            # Nousijaseuroilla hintapriorin tasot ovat identtisia, jolloin
+            # "+0.0 vs next" nayttaisi mitatulta erolta joka sattui olemaan
+            # nolla. Se ei ole mittaus vaan tasapeli — sanotaan se.
+            mid = "tied with next"
+        else:
+            mid = f"+{v - second:.1f} vs next"
+        rows.append({
+            "name": top.get("web_name"), "tag": club,
+            "team": f"{float(top.get('price') or 0):.1f}m", "mid": mid,
+            "_v": v,
+            "badges": ["?"] if top.get("data_basis") != "pl_history" else [],
+        })
+    if not rows:
+        raise SystemExit(f"Ei rivejä positiolle {pos}.")
+    rows.sort(key=lambda r: r["_v"], reverse=True)
+
+    n_prior = sum(1 for r in rows if r["badges"])
+    foot2 = "model projections, not betting advice"
+    if n_prior:
+        foot2 = (f"? = no Premier League minutes, role from price prior "
+                 f"({n_prior} of {len(rows)}) · {foot2}")
+    return {
+        "title": f"BEST {pos} AT EVERY CLUB",
+        "subtitle": f"projected points, next {n_gw} gameweeks",
+        "nameLabel": "PLAYER",
+        "midLabel": "GAP TO CLUB'S 2ND",
+        "valueLabel": "xP",
+        # 🔴 EI "checkable free at goaliq.app/fpl". Ilmainen /api/fantasy/xp on
+        # premium-portin takana MASKATTU top-10:een, ja sivu renderoi listansa
+        # siita — eli 17 rivia 20:sta EI olisi ollut tarkistettavissa siella
+        # minne alatunniste ohjaa. Tama tiedosto sen sijaan on julkisessa
+        # repossa kokonaan (507 rivia, verifioitu HTTP 200), joten reitti on
+        # tosi. Vrt. muisti: vaite tarvitsee reitin, ei vain katteen.
+        "footNote": "every club · full file: github.com/veikkoville/football-prediction",
+        "footNote2": foot2,
+        "rows": [dict(r, rank=i + 1, value=f"{r['_v']:.1f}")
+                 for i, r in enumerate(rows)],
+        "file": f"goaliq_club_best_{pos.lower()}_{n_gw}gw.png",
+    }
+
+
 BUILDERS = {"cs": card_cs, "defence": card_defence, "stats": card_stats,
-            "xp": card_xp, "value": card_value}
+            "xp": card_xp, "value": card_value, "club-best": card_club_best}
 GW_CAPABLE = {"cs"}
 
 
