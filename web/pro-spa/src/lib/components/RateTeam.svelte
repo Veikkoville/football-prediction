@@ -671,25 +671,39 @@
 			<button class="primary" type="button" onclick={() => onGoToTeam?.()}>Go to My team</button>
 		</div>
 	{:else}
-		<WeeklyActions
-			gw={data.meta.gw}
-			{deadlineUtc}
-			actions={weeklyActions}
-			onFollowTransfer={followTransferFromLoop}
-			refreshToken={decisionsVersion}
-		/>
-		<BeatTheModel />
-		<!-- V2 (13.8): mallin joukkue pysyvana rivaalina. V1 vertaa
-		     PAATOKSIA, tama JOUKKUEITA - eri kysymys, sama silmukka. -->
-		<SeasonRace />
-		<p class="captain">
-			Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
-			<span class="muted">({data.captain.pick.team_short})</span>,
-			{data.captain.pick.gw_xp.toFixed(2)} xP in GW{data.meta.gw}{#if data.captain.alternative}.
-				Alternative: {data.captain.alternative.web_name}
-				<span class="muted">({data.captain.alternative.team_short})</span>,
-				{data.captain.alternative.gw_xp.toFixed(2)} xP{/if}.
-		</p>
+		<!-- 14.8 LAYOUT (Villen palaute: "ne ovat tossa allekain ns listana"):
+		     kaksi saraketta leveilla ruuduilla, TEKEMINEN vasemmalle ja TILA
+		     oikealle. Kolme taysleveaa lohkoa allekkain nayttivat
+		     samanpainoisilta eika mikaan kertonut mista aloittaa, ja ~65 %
+		     vaakatilasta oli tyhjaa. Jako ei ole esteettinen vaan
+		     merkityksellinen: vasen sarake on se mihin kayttaja koskee ennen
+		     deadlinea, oikea kertoo miten menee. Kapea ruutu palaa yhteen
+		     sarakkeeseen samassa jarjestyksessa kuin ennen. -->
+		<div class="week-grid">
+			<div class="week-col">
+				<WeeklyActions
+					gw={data.meta.gw}
+					{deadlineUtc}
+					actions={weeklyActions}
+					onFollowTransfer={followTransferFromLoop}
+					refreshToken={decisionsVersion}
+				/>
+				<p class="captain">
+					Captain suggestion: <strong>{data.captain.pick.web_name}</strong>
+					<span class="muted">({data.captain.pick.team_short})</span>,
+					{data.captain.pick.gw_xp.toFixed(2)} xP in GW{data.meta.gw}{#if data.captain.alternative}.
+						Alternative: {data.captain.alternative.web_name}
+						<span class="muted">({data.captain.alternative.team_short})</span>,
+						{data.captain.alternative.gw_xp.toFixed(2)} xP{/if}.
+				</p>
+			</div>
+			<div class="week-col">
+				<BeatTheModel />
+				<!-- V2 (13.8): mallin joukkue pysyvana rivaalina. V1 vertaa
+				     PAATOKSIA, tama JOUKKUEITA - eri kysymys, sama silmukka. -->
+				<SeasonRace />
+			</div>
+		</div>
 	{/if}
 {:else}
 <h2>Rate my FPL team</h2>
@@ -1427,6 +1441,28 @@
 	.model-squad-btn:disabled {
 		opacity: 0.5;
 		cursor: default;
+	}
+	/* 14.8: "This week" kahteen sarakkeeseen leveilla ruuduilla.
+	   VASEN = tekeminen (viikon paatokset, kapteenisuositus),
+	   OIKEA = tila (calls vs model, season race).
+	   `minmax(0, ...)` on pakollinen: ilman sita sisalla oleva taulukko
+	   levittaisi sarakkeen yli gridin ja rikkoisi koko rivin.
+	   Alle 980px palataan yhteen sarakkeeseen samassa lukujarjestyksessa. */
+	.week-grid {
+		display: grid;
+		gap: var(--s-5);
+	}
+	.week-col {
+		display: grid;
+		gap: var(--s-5);
+		align-content: start;
+		min-width: 0;
+	}
+	@media (min-width: 980px) {
+		.week-grid {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+			align-items: start;
+		}
 	}
 	/* Web P1: week-tyhjätilan kortti */
 	.week-setup {

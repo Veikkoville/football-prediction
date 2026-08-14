@@ -302,14 +302,24 @@
 			</div>
 			{#if segment === 'team'}
 				<!-- Järjestys 30.7: fit checker HETI raten alle (esikauden
-				     sankarityökalu), watchlist viimeiseksi (pisin lista). -->
-				<div class="tool-card" id="tc-fit">
-					<FitChecker onOpenRateTeam={() => (segment = 'team')} />
+				     sankarityökalu), watchlist viimeiseksi (pisin lista).
+				     14.8 (Villen palaute: "ne ovat tossa allekain ns listana"):
+				     sama järjestys, mutta kaksi saraketta leveillä ruuduilla.
+				     Fit on yhä ensimmäinen; watchlist ei ole enää pitkän
+				     vierityksen pohjalla vaan sen VIERESSÄ — 30.7:n peruste
+				     ("pisin lista viimeiseksi") koski vierityksen pituutta,
+				     eikä se päde kun se ei enää ole vierityksessä.
+				     Planner saa koko leveyden: se sisältää taulukoita joita
+				     puolikas sarake ei kanna. -->
+				<div class="team-grid">
+					<div class="tool-card" id="tc-fit">
+						<FitChecker onOpenRateTeam={() => (segment = 'team')} />
+					</div>
+					<div class="tool-card" id="tc-watchlist"><Watchlist {premium} /></div>
+					{#if premium}
+						<div class="tool-card span-all" id="tc-planner"><TransferPlanner /></div>
+					{/if}
 				</div>
-				{#if premium}
-					<div class="tool-card" id="tc-planner"><TransferPlanner /></div>
-				{/if}
-				<div class="tool-card" id="tc-watchlist"><Watchlist {premium} /></div>
 			{/if}
 		</div>
 	{:else if segment === 'players'}
@@ -527,6 +537,25 @@
 		border-bottom: 1px solid var(--border);
 	}
 	/* 6.8: ylätabit mukaan scrolliin — Players → My team ilman paluuta ylös */
+	/* 14.8: My teamin työkalut kahteen sarakkeeseen leveillä ruuduilla.
+	   `minmax(0, 1fr)` on pakollinen — ilman sitä kortin sisällä oleva
+	   taulukko levittäisi sarakkeen yli gridin. `.tool-card` tuo oman
+	   `margin-bottom`insa, joten rivivälin hoitaa se eikä `row-gap`
+	   (muuten väli olisi kaksinkertainen). */
+	.team-grid {
+		display: grid;
+		gap: 0;
+	}
+	@media (min-width: 1100px) {
+		.team-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			column-gap: var(--s-5);
+			align-items: start;
+		}
+		.team-grid > :global(.span-all) {
+			grid-column: 1 / -1;
+		}
+	}
 	.segnav-sticky {
 		position: sticky;
 		top: 0;
