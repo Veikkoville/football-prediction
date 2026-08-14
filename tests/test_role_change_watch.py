@@ -183,3 +183,45 @@ def test_a4_missing_history_outweighs_medium_confidence():
     out = w.direction_a4(ours, {}, min_owned=2.0)
     assert out[0]["web_name"] == "Unknown"
     assert out[0]["mass"] > out[1]["mass"]
+
+
+# --------------------------------------------------------------------------
+# Suunta A5 — seura heikentynyt (Villen havainto: "jos joukkue heikentynyt
+# niin arvioi uusiksi noita ennusteita")
+# --------------------------------------------------------------------------
+
+def _meta(churn_by_team, thr=25.0):
+    return {"team_confidence": {
+        "high_turnover_threshold_pct": thr,
+        "teams": {k: {"minutes_churn_pct": v,
+                      "flag": "high_turnover" if v >= thr else None}
+                  for k, v in churn_by_team.items()},
+    }}
+
+
+def test_a5_flags_players_at_gutted_clubs():
+    """A1-A4 katsovat PELAAJAA. A5 katsoo JOUKKUETTA jonka varassa pelaajan
+    luku lepaa. Newcastle on mitattu esimerkki: 25,2 % minuuteista lahtenyt
+    (Isak, Bruno G, Gordon) ja silti Thiaw on mallin mukaan liigan paras
+    halpa pelaaja."""
+    ours = {1: dict(mine(1, "Thiaw", p_start=0.9, xp6=27.0, owned=2.0,
+                         pos="DEF", team="NEW"), team="Newcastle United")}
+    out = w.direction_a5(ours, _meta({"Newcastle United": 25.2}), {}, 15.0)
+    assert [r["web_name"] for r in out] == ["Thiaw"]
+    assert out[0]["churn"] == 25.2
+
+
+def test_a5_silent_for_stable_clubs():
+    """NEGATIIVINEN KONTROLLI. Korkea xP EI riita — seuran on oltava
+    heikentynyt. Arsenal menetti 5,6 % minuuteista eika kuulu listalle."""
+    ours = {1: dict(mine(1, "Gabriel", p_start=0.95, xp6=30.9, owned=20.0,
+                         pos="DEF", team="ARS"), team="Arsenal")}
+    assert w.direction_a5(ours, _meta({"Arsenal": 5.6}), {}, 15.0) == []
+
+
+def test_a5_ignores_low_xp_at_gutted_club():
+    """Heikentynyt seura ei yksin riita: jos luku on pieni, se ei ole
+    suositus eika sen uudelleenarviointi ole kiireellista."""
+    ours = {1: dict(mine(1, "Bench", p_start=0.3, xp6=4.0, owned=1.0,
+                         pos="DEF", team="NEW"), team="Newcastle United")}
+    assert w.direction_a5(ours, _meta({"Newcastle United": 25.2}), {}, 15.0) == []

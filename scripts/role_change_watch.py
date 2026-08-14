@@ -224,6 +224,70 @@ def direction_a4(ours: dict[int, dict], overrides: dict,
     return out
 
 
+def direction_a5(ours: dict[int, dict], meta: dict, overrides: dict,
+                 min_xp: float = 15.0) -> list[dict]:
+    """SEURA HEIKENTYNYT: pelaajan luku nojaa vanhentuneeseen joukkuevoimaan.
+
+    Villen havainto 14.8: *"jos joukkue heikentynyt niin arvioi uusiksi noita
+    ennusteita eiks nii"*. Kylla — ja malli LASKEE taman jo itse:
+    `meta.team_confidence.teams[*].minutes_churn_pct` = viime kauden
+    minuuteista se osuus jonka pelanneet ovat lahteneet seurasta. Luemme sen
+    emmeka arvaa (sama linjaus kuin A4:lla ja Villen luottamuslukituksessa).
+
+    Miksi tama on oma suuntansa: A1-A4 katsovat PELAAJAA. Tama katsoo
+    JOUKKUETTA jonka varassa pelaajan luku lepaa. Newcastle on mitattu
+    esimerkki: 25,2 % minuuteista lahtenyt (liigan korkein, ainoa ei-nousija
+    yli kynnyksen), ja lahtijoissa Isak, Bruno Guimaraes ja Gordon. Silti
+    Thiaw on koko liigan paras <= 5,5 M£ pelaaja mallin mukaan (27,0 xP) —
+    luku joka lepaa joukkuereittauksella joka on sovitettu NIIDEN pelaajien
+    tuottamiin tuloksiin.
+
+    🔴 TIEDOSSA OLEVA RAJA JOTA TAMA EI MITTAA: valmentajanvaihto. Newcastle
+    vaihtoi valmentajan, eika mallilla ole sille mitaan signaalia —
+    `minutes_churn_pct` mittaa minuutteja, ei jarjestelmaa. Ala oleta etta
+    churn-% kattaa sen.
+    """
+    tc = (meta.get("team_confidence") or {})
+    teams = tc.get("teams") or {}
+    thr = float(tc.get("high_turnover_threshold_pct") or 25.0)
+    # Seuran nimi projektiossa on lyhenne, team_confidence kayttaa pitkaa —
+    # sovitetaan churn seuran mukaan pelaajan omasta rivista loytyvalla
+    # avaimella jos se on, muuten pitkalla nimella.
+    churn_by_short: dict[str, tuple[float, str, bool]] = {}
+    for long_name, v in teams.items():
+        churn_by_short[long_name] = (
+            float(v.get("minutes_churn_pct") or 0.0),
+            long_name,
+            bool(v.get("flag")),
+        )
+    out = []
+    for pid, p in ours.items():
+        xp6 = float(p.get("xp_horizon_total") or 0.0)
+        if xp6 < min_xp:
+            continue
+        team_long = p.get("team")
+        hit = churn_by_short.get(team_long)
+        if hit is None:
+            continue
+        churn, name, flagged = hit
+        if churn < thr and not flagged:
+            continue
+        out.append({
+            "id": pid,
+            "web_name": p.get("web_name"),
+            "pos": p.get("pos"),
+            "team": p.get("team_short"),
+            "team_long": name,
+            "churn": churn,
+            "xp6": xp6,
+            "owned": float(p.get("owned_pct") or 0.0),
+            "price": p.get("price"),
+            "overridden": pid in overrides,
+        })
+    out.sort(key=lambda r: (-r["churn"], -r["xp6"]))
+    return out
+
+
 def direction_b(ours: dict[int, dict], min_xp: float, max_owned: float,
                 overrides: dict) -> list[dict]:
     out = []
@@ -262,6 +326,10 @@ def main() -> int:
                     help="suunta A2: p_start jonka alle liputetaan")
     ap.add_argument("--b-min-xp", type=float, default=12.0)
     ap.add_argument("--b-max-owned", type=float, default=1.0)
+    ap.add_argument("--a5-min-xp", type=float, default=15.0,
+                    help="suunta A5: xP6-kynnys heikentyneiden seurojen "
+                         "pelaajille (oletus 15.0)")
+    ap.add_argument("--top-a5", type=int, default=12)
     ap.add_argument("--a4-min-owned", type=float, default=2.0,
                     help="suunta A4: omistuskynnys %% (oletus 2.0)")
     ap.add_argument("--top-a4", type=int, default=15)
@@ -346,6 +414,19 @@ def main() -> int:
     if len(a4) > len(a4_shown):
         print(f"  ...ja {len(a4) - len(a4_shown)} muuta kynnyksen ylittavaa "
               f"(--top-a4 {len(a4)} nayttaa kaikki)")
+    print()
+
+    a5 = direction_a5(ours, meta, overrides, args.a5_min_xp)
+    a5_shown = a5[:args.top_a5]
+    print(f"=== SUUNTA A5: SEURA HEIKENTYNYT, xP6 >= {args.a5_min_xp} ===")
+    print("    (luku lepaa joukkuereittauksella joka on sovitettu NIIDEN")
+    print("     pelaajien tuloksiin jotka ovat lahteneet)")
+    print("    🔴 EI MITTAA VALMENTAJANVAIHTOA — mallilla ei ole sille signaalia.")
+    _print(a5_shown, lambda r: (f"churn {r['churn']:4.1f} %  {r['team']:<4} "
+                                f"{r['web_name']:<16} {r['pos']} {r['price']}m  "
+                                f"xP6={r['xp6']:5.1f}  omistus {r['owned']:4.1f} %"))
+    if len(a5) > len(a5_shown):
+        print(f"  ...ja {len(a5) - len(a5_shown)} muuta (--top-a5 {len(a5)})")
     print()
 
     b = direction_b(ours, args.b_min_xp, args.b_max_owned, overrides)
