@@ -570,8 +570,8 @@
 				{/if}
 				<p class="why-source">
 					{selected.why.source === 'model'
-						? 'Written by an AI from the model's own numbers'
-						: 'Auto-generated from the model's own numbers'}
+						? "Written by an AI from the model's own numbers"
+						: "Auto-generated from the model's own numbers"}
 				</p>
 			</div>
 		{/if}
