@@ -8,7 +8,14 @@
 	// #95: login-seinä myy ennen lomaketta — sama arvolupaus kuin mobiilin
 	// UpgradeCard-paywallissa. Copy 1:1 paywall.bullet_* -en-avaimista
 	// (goaliq-app/lib/i18n/en.ts) → yksi lähde arvoviestille molemmilla pinnoilla.
+	// PREMIUM-KARKI (14.8, mitattu): karki oli xP. Expected points on ILMAINEN
+	// kolmella kilpailijalla (Fine Line, FPL Pundit, OddAlerts), joten listan
+	// ensimmainen rivi lupasi asiaa jonka lukija saa muualta maksutta. Karkeen
+	// se mita muilla EI ole. COPY-SYNC: sama jarjestys mobiilin
+	// ProfileScreen.tsx:n bullets-listassa.
 	const BULLETS = [
+		'Where the gap to the model came from: captaincy, bench points and autosubs, round by round',
+		'Which players actually close the gap on your mini-league rival, and whether they already have them',
 		'Per-player xP projections for every gameweek',
 		'Captain ranker with top picks',
 		'Share as image: post-ready cards from your XI, the captain ranker, the value ranking and leaderboards',
@@ -17,10 +24,6 @@
 		'Chip timing: best window for Wildcard, Bench Boost, Triple Captain and Free Hit',
 		'Edge mode: protect or climb your rank with ownership-weighted picks',
 		'Watchlist for up to 50 players: track everyone you are deciding on',
-		// COPY-SYNC 13.8 (BTM V2): pari on mobiilin paywall.bullet_race.
-		'Where the gap to the model came from: captaincy, bench points and autosubs, round by round',
-		// COPY-SYNC 13.8 (MINI-LEAGUE-RIVAL): pari on mobiilin paywall.bullet_rival.
-		'Which players actually close the gap on your mini-league rival, and whether they already have them',
 		'Player compare: up to four players side by side',
 		'CSV export of the full projection set',
 		// 4.8: synkattu paywall.bullet_match-avaimeen (goaliq-app/lib/i18n/en.ts).
