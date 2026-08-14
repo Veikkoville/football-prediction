@@ -4,6 +4,7 @@
 	import { capture } from '$lib/analytics';
 	import { PLANS, planApprox, startCheckout, type PlanKey } from '$lib/billing';
 	import Provenance from './Provenance.svelte';
+	import { preferredStore, appCtaLabel, STORE_URL } from '$lib/appHandoff';
 
 	// #95: login-seinä myy ennen lomaketta — sama arvolupaus kuin mobiilin
 	// UpgradeCard-paywallissa. Copy 1:1 paywall.bullet_* -en-avaimista
@@ -13,6 +14,15 @@
 	// ensimmainen rivi lupasi asiaa jonka lukija saa muualta maksutta. Karkeen
 	// se mita muilla EI ole. COPY-SYNC: sama jarjestys mobiilin
 	// ProfileScreen.tsx:n bullets-listassa.
+	// WEB-TO-APP-CTA (14.8): puhelimella sovellus on ensisijainen ostopolku.
+	// Luetaan onMountissa, koska `navigator` ei ole olemassa staattisessa
+	// prerenderissa — SSR-aikainen luku kaataisi buildin.
+	let appStore = $state<ReturnType<typeof preferredStore>>(null);
+	onMount(() => {
+		appStore = preferredStore(navigator?.userAgent);
+		if (appStore) capture('app_handoff_shown', { store: appStore });
+	});
+
 	const BULLETS = [
 		'Where the gap to the model came from: captaincy, bench points and autosubs, round by round',
 		'Which players actually close the gap on your mini-league rival, and whether they already have them',
@@ -119,6 +129,25 @@
 
 	<!-- #101: osto suoraan esikatselusta — ei pakko-sign-iniä. Stripe kerää
 	     emailin ja maksun; tili + kirjautumislinkki tulevat maksun jälkeen. -->
+	<!-- WEB-TO-APP-CTA (14.8, mitattu): puhelimella sovellus ENSIN, Stripe jaa
+	     alle. Molemmat polut jaavat nakyviin — vain jarjestys vaihtuu, ja
+	     kumpikin napautus kirjaa oman eventtinsa, jotta tama on peruttavissa
+	     mittauksen perusteella eika mielipiteen. -->
+	{#if appStore}
+		<a
+			class="app-cta"
+			href={STORE_URL[appStore]}
+			rel="noopener"
+			onclick={() => capture('app_handoff_tapped', { store: appStore })}
+		>
+			{appCtaLabel(appStore)}
+		</a>
+		<p class="muted app-cta-note">
+			Same subscription either way. On your phone the store already has your
+			payment details, so it takes a few seconds.
+		</p>
+	{/if}
+
 	<div class="plans">
 		{#each Object.entries(PLANS) as [key, plan] (key)}
 			{@const approx = planApprox(key as PlanKey)}
@@ -216,6 +245,21 @@
 	}
 	.lock-pill svg {
 		color: var(--accent);
+	}
+	.app-cta {
+		display: block;
+		margin: 0 0 0.5rem;
+		padding: 0.85rem 1rem;
+		border-radius: 10px;
+		background: var(--accent, #e5006d);
+		color: #fff;
+		font-weight: 600;
+		text-align: center;
+		text-decoration: none;
+	}
+	.app-cta-note {
+		margin: 0 0 1rem;
+		font-size: 0.8rem;
 	}
 	.plans {
 		display: flex;
