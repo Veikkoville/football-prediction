@@ -75,8 +75,9 @@
 	<!-- 24.7 conviction-löydös: perumiset tapahtuvat maksuhetkellä → proof
 	     suoraan ostopäätöksen viereen (ei numeroita jotka vanhenisivat) -->
 	<p class="muted proof">
-		Built on a publicly tracked match model: every prediction logged before kick-off,
-		hits and misses included. This season the model even plays FPL itself, squad public.
+		Built on a publicly tracked match model: every prediction is logged before kick-off
+		and graded afterwards, hits and misses in the same place. Nothing gets edited once
+		kick-off comes. <a href="/fpl/model-xi">See the model's own squad</a>.
 	</p>
 
 	{#if top3.length > 0}
