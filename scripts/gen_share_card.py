@@ -523,20 +523,41 @@ def card_club_best(args) -> dict:
         if v <= 0:
             continue
         second = float(group[1].get("xp_horizon_total") or 0.0) if len(group) > 1 else None
+        prior = top.get("data_basis") == "no_history"
         if second is None:
-            mid = "only option"
+            # 🔴 EI "only option". Se lukisi "seurassa ei ole toista pelaajaa",
+            # mutta koodi tietaa vain ettei projektiossa ole toista RIVIA — 80
+            # pelaajaa on suodattunut pois min_xp_total-rajalla ja loukkaantuneet
+            # ovat `excluded`-listalla. Liverpoolilla nain OLI toinen hyokkaaja
+            # (Ekitike, akillesvamma), joten kortti olisi vaittanyt epatotta.
+            mid = "no 2nd projected"
         elif v - second < 0.05:
-            # Nousijaseuroilla hintapriorin tasot ovat identtisia, jolloin
-            # "+0.0 vs next" nayttaisi mitatulta erolta joka sattui olemaan
-            # nolla. Se ei ole mittaus vaan tasapeli — sanotaan se.
-            mid = "tied with next"
+            # Kaksi taysin eri asiaa ei saa saada samoja sanoja. Mitattu 0,02
+            # pisteen ero on aito ja kiinnostava; nousijaseuran kolmen tasan
+            # identtinen luku tarkoittaa ettei mallilla ole tietoa erottaa
+            # heita. Jalkimmainen sanotaan suoraan.
+            mid = "no data to separate" if prior else "tied with next"
         else:
             mid = f"+{v - second:.1f} vs next"
+        # LUOTTAMUSINDIKAATTORI (Villen saanto 14.8): luku on mallista johdettu
+        # ja sille on reitti samaan tiedostoon. Naytetaan vain kun se kertoo
+        # jotain — `high` on oletus eika kaipaa selitysta. Tama kattaa myos
+        # tapauksen jota "?" EI kata: pelaaja jolla on tayi PL-historia mutta
+        # epavarmat minuutit (tyoparijako), missa epavarmuus on minuuteissa
+        # eika datan puutteessa.
+        price = f"{float(top.get('price') or 0):.1f}m"
+        if top.get("minutes_confidence") != "high":
+            price += f" · {float(top.get('xmins') or 0):.0f} min"
         rows.append({
             "name": top.get("web_name"), "tag": club,
-            "team": f"{float(top.get('price') or 0):.1f}m", "mid": mid,
-            "_v": v,
-            "badges": ["?"] if top.get("data_basis") != "pl_history" else [],
+            "team": price, "mid": mid, "_v": v,
+            # 🔴 EHTO ON `== "no_history"`, EI `!= "pl_history"`. Jalkimmainen
+            # merkitsi myos `limited_history`-pelaajat, ja alatunniste vaitti
+            # heista "no Premier League minutes" — Trafford (LEE) on
+            # limited_history ja hanella on 360 PL-minuuttia MEIDAN OMASSA
+            # tiedostossamme. Kortti olisi siis julkaissut asiavirheen jonka
+            # lukija voi kumota juuri silla tiedostolla johon alatunniste ohjaa.
+            "badges": ["?"] if prior else [],
         })
     if not rows:
         raise SystemExit(f"Ei rivejä positiolle {pos}.")
@@ -545,21 +566,43 @@ def card_club_best(args) -> dict:
     n_prior = sum(1 for r in rows if r["badges"])
     foot2 = "model projections, not betting advice"
     if n_prior:
-        foot2 = (f"? = no Premier League minutes, role from price prior "
+        # "price prior" on mallijargonia julkisessa copyssa (vrt. `legal squad`
+        # joka vuoti neljalle pinnalle). Sanotaan mita se tarkoittaa.
+        foot2 = (f"? = no Premier League games yet, role guessed from price "
                  f"({n_prior} of {len(rows)}) · {foot2}")
+
+    # 🔴 PAIVAYS ON TARKISTETTAVUUTTA, EI KOSMETIIKKAA. Lahdetiedosto
+    # paivittyy useita kertoja paivassa (14.8: nelja refresh-committia), joten
+    # ilman paivaysta lukija nakee huomenna eri luvut eika kortilla ole mitaan
+    # joka selittaisi eron. Paivays luetaan artefaktin omasta leimasta eika
+    # ajohetkesta: se kertoo milloin LUVUT syntyivat.
+    gen = str(data.get("meta", {}).get("generated_at") or "")
+    stamp = ""
+    if len(gen) >= 10:
+        y, m, dd = gen[:4], gen[5:7], gen[8:10]
+        months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        try:
+            stamp = f", as of {int(dd)} {months[int(m) - 1]}"
+        except (ValueError, IndexError):
+            stamp = ""
+    first_gw = data.get("meta", {}).get("next_gameweek")
+    window = (f"GW{first_gw}-{first_gw + n_gw - 1}" if first_gw
+              else f"next {n_gw} gameweeks")
     return {
         "title": f"BEST {pos} AT EVERY CLUB",
-        "subtitle": f"projected points, next {n_gw} gameweeks",
+        "subtitle": f"projected points, {window}{stamp}",
         "nameLabel": "PLAYER",
         "midLabel": "GAP TO CLUB'S 2ND",
         "valueLabel": "xP",
-        # 🔴 EI "checkable free at goaliq.app/fpl". Ilmainen /api/fantasy/xp on
-        # premium-portin takana MASKATTU top-10:een, ja sivu renderoi listansa
-        # siita — eli 17 rivia 20:sta EI olisi ollut tarkistettavissa siella
-        # minne alatunniste ohjaa. Tama tiedosto sen sijaan on julkisessa
-        # repossa kokonaan (507 rivia, verifioitu HTTP 200), joten reitti on
-        # tosi. Vrt. muisti: vaite tarvitsee reitin, ei vain katteen.
-        "footNote": "every club · full file: github.com/veikkoville/football-prediction",
+        # 🔴 EI "goaliq.app/fpl". Ilmainen /api/fantasy/xp on premium-portin
+        # takana MASKATTU top-10:een, ja se sivu renderoi listansa siita — eli
+        # 17 rivia 20:sta EI olisi ollut tarkistettavissa siella minne
+        # alatunniste ohjaa. Tama polku palauttaa koko tiedoston omalta
+        # domainilta (verifioitu: 200, 1 339 818 B, 507 pelaajaa) ja laskeutuu
+        # suoraan tiedostoon, toisin kuin repon juuri jossa lukija joutuisi
+        # etsimaan. Vrt. muisti: vaite tarvitsee reitin, ei vain katteen.
+        "footNote": "every club · full file: goaliq.app/data/fpl_xp_projections.json",
         "footNote2": foot2,
         "rows": [dict(r, rank=i + 1, value=f"{r['_v']:.1f}")
                  for i, r in enumerate(rows)],

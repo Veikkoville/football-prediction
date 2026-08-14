@@ -25,14 +25,17 @@ gsc = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(gsc)
 
 
-def _pl(pid, name, club, pos, xp, price=5.0, basis="pl_history"):
+def _pl(pid, name, club, pos, xp, price=5.0, basis="pl_history",
+        conf="high", xmins=85.0):
     return {"id": pid, "web_name": name, "team_short": club, "pos": pos,
             "price": price, "xp_horizon_total": xp, "data_basis": basis,
+            "minutes_confidence": conf, "xmins": xmins,
             "gameweeks": [{"gw": i} for i in range(1, 7)]}
 
 
 def _payload(players):
-    return {"meta": {}, "players": players}
+    return {"meta": {"generated_at": "2026-08-14T21:35:58", "next_gameweek": 1},
+            "players": players}
 
 
 def _args(pos="DEF"):
@@ -92,18 +95,24 @@ def test_gap_is_against_the_same_club_not_the_league(monkeypatch):
     assert top["mid"] == "+10.0 vs next"
 
 
-def test_identical_prior_values_say_tied_not_plus_zero(monkeypatch):
-    """Nousijaseuroilla hintapriorin tasot ovat identtisia. '+0.0 vs next'
-    lukisi mitatuksi eroksi joka sattui olemaan nolla."""
-    players = [_pl(1, "A", "AAA", "DEF", 7.8, basis="no_history"),
-               _pl(2, "B", "AAA", "DEF", 7.8, basis="no_history")]
-    spec = _run(monkeypatch, players)
-    assert spec["rows"][0]["mid"] == "tied with next"
+def test_prior_tie_and_measured_tie_do_not_share_words(monkeypatch):
+    """Kaksi taysin eri asiaa ei saa saada samoja sanoja. Nousijaseuran kolmen
+    tasan identtinen luku tarkoittaa ettei mallilla ole tietoa erottaa heita;
+    mitattu 0,02 pisteen ero on aito ja kiinnostava."""
+    prior = [_pl(1, "A", "AAA", "DEF", 7.8, basis="no_history"),
+             _pl(2, "B", "AAA", "DEF", 7.8, basis="no_history")]
+    assert _run(monkeypatch, prior)["rows"][0]["mid"] == "no data to separate"
+    measured = [_pl(1, "A", "AAA", "DEF", 18.42), _pl(2, "B", "AAA", "DEF", 18.40)]
+    assert _run(monkeypatch, measured)["rows"][0]["mid"] == "tied with next"
 
 
-def test_single_player_club_says_only_option(monkeypatch):
+def test_single_projected_row_does_not_claim_the_club_has_one_player(monkeypatch):
+    """EI "only option". Koodi tietaa vain ettei PROJEKTIOSSA ole toista
+    rivia — 80 pelaajaa suodattuu min_xp_total-rajalla ja loukkaantuneet ovat
+    excluded-listalla. Liverpoolilla oli toinen hyokkaaja (Ekitike, vamma),
+    joten "only option" olisi ollut julkisesti epatosi."""
     players = [_pl(1, "Solo", "AAA", "DEF", 12.0)]
-    assert _run(monkeypatch, players)["rows"][0]["mid"] == "only option"
+    assert _run(monkeypatch, players)["rows"][0]["mid"] == "no 2nd projected"
 
 
 # --------------------------------------------------------------------------
@@ -118,20 +127,33 @@ def test_players_without_pl_minutes_are_flagged(monkeypatch):
     assert flags["Unknown"] == ["?"] and flags["Known"] == []
 
 
+def test_thin_sample_is_not_flagged_as_having_no_minutes(monkeypatch):
+    """🔴 REGRESSIO 14.8. Ehto oli `!= "pl_history"`, jolloin myos
+    `limited_history` sai merkin — ja alatunniste vaittaa merkitysta rivista
+    "no Premier League games yet". Trafford (LEE) on limited_history ja
+    hanella on 360 PL-minuuttia MEIDAN OMASSA tiedostossamme. Kortti olisi
+    julkaissut asiavirheen jonka lukija voi kumota tasan silla tiedostolla
+    johon alatunniste ohjaa."""
+    players = [_pl(1, "Trafford", "LEE", "GKP", 7.1, basis="limited_history")]
+    assert _run(monkeypatch, players, pos="GKP")["rows"][0]["badges"] == []
+
+
 def test_the_flag_is_explained_and_counted_in_the_footer(monkeypatch):
     """Merkki ilman selitysta on koriste. Lukumaara kertoo lisaksi kuinka
     iso osa kortista on prioria eika mallia."""
     players = [_pl(1, "Known", "AAA", "DEF", 20.0),
                _pl(2, "Unknown", "BBB", "DEF", 8.0, basis="no_history")]
     foot = _run(monkeypatch, players)["footNote2"]
-    assert "no Premier League minutes" in foot and "1 of 2" in foot
+    assert "no Premier League games yet" in foot and "1 of 2" in foot
+    # "price prior" on mallijargonia julkisessa copyssa.
+    assert "prior" not in foot
 
 
 def test_footer_omits_the_flag_note_when_nothing_is_flagged(monkeypatch):
     """NEGATIIVINEN KONTROLLI: selitys ei saa olla aina paalla, muuten
     edellinen testi lapaisisi ilman etta merkkia lasketaan lainkaan."""
     players = [_pl(1, "Known", "AAA", "DEF", 20.0)]
-    assert "price prior" not in _run(monkeypatch, players)["footNote2"]
+    assert "no Premier League" not in _run(monkeypatch, players)["footNote2"]
 
 
 # --------------------------------------------------------------------------
@@ -145,7 +167,27 @@ def test_footer_does_not_point_at_the_masked_free_surface(monkeypatch):
     players = [_pl(i, f"P{i}", f"C{i}", "DEF", 3.0 + i) for i in range(20)]
     foot = _run(monkeypatch, players)["footNote"]
     assert "goaliq.app/fpl" not in foot
-    assert "github.com/veikkoville/football-prediction" in foot
+    assert "goaliq.app/data/fpl_xp_projections.json" in foot
+
+
+def test_subtitle_carries_the_data_date_and_the_gameweek_window(monkeypatch):
+    """Lahdetiedosto paivittyy useita kertoja paivassa (14.8: nelja
+    refresh-committia). Ilman paivaysta lukija nakee huomenna eri luvut eika
+    kortilla ole mitaan joka selittaisi eron — se on tarkistettavuusaukko."""
+    players = [_pl(1, "A", "AAA", "DEF", 20.0)]
+    sub = _run(monkeypatch, players)["subtitle"]
+    assert "as of 14 Aug" in sub and "GW1-6" in sub
+
+
+def test_uncertain_minutes_are_shown_next_to_the_price(monkeypatch):
+    """Villen saanto 14.8: luottamusindikaattori lukujen mukana. `?` EI kata
+    tata tapausta — pelaajalla voi olla tayi PL-historia ja silti epavarmat
+    minuutit (tyoparijako). Alisson oli tasmalleen se rivi."""
+    players = [_pl(1, "Sure", "AAA", "GKP", 20.0),
+               _pl(2, "Shared", "BBB", "GKP", 17.1, conf="med", xmins=72.0)]
+    got = {r["name"]: r["team"] for r in _run(monkeypatch, players, pos="GKP")["rows"]}
+    assert got["Shared"] == "5.0m · 72 min"
+    assert got["Sure"] == "5.0m"
 
 
 # --------------------------------------------------------------------------
