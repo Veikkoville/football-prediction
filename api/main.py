@@ -2296,7 +2296,13 @@ def create_checkout_session(req: CheckoutRequest):
             # Deep linkit takaisin mobiili-appiin
             success_url="goaliq://payment-success?session_id={CHECKOUT_SESSION_ID}",
             cancel_url="goaliq://payment-cancel",
-            allow_promotion_codes=True,
+            # 14.8 ATTRIBUUTIOAUKKO: tama endpoint on kuollut (vain docstring-viite),
+            # mutta se hyvaksyi promokoodeja JA sen webhook (/api/webhook/stripe,
+            # rivi ~2543) ei kutsu _stamp_affiliatea koskaan. Jos joku olisi
+            # paatynyt tanne, luojan koodi olisi antanut 30 % alennuksen mutta
+            # provisio olisi jaanyt kirjaamatta hiljaa — pahempi kuin ettei koodi
+            # toimi lainkaan. Leimaus elaa vain /api/webhook/stripe-webissa.
+            allow_promotion_codes=False,
         )
         return CheckoutResponse(
             checkout_url=session.url or "",

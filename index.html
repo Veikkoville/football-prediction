@@ -629,8 +629,6 @@
   .lb th,.lb td{padding:6px 3px;}
 }
 /* /GEN:MOBILE-CSS */
-
-  .foot-creators { margin: 0 0 10px; font-size: 14px; color: var(--muted, #A8A29A); }
 </style>
 <!-- PostHog (#38): cookieless site analytics - persistence=memory, no cookies, no PII -->
 <script>
@@ -979,6 +977,21 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </section>
 
+<!-- Creator program: its own band, not just a footer link. Same discovery
+     pattern as the career and SPL bands. Commission and full terms live on
+     /creators; this carries only the core of the offer. -->
+<section>
+  <div class="wrap">
+    <div class="career-band">
+      <div>
+        <h2>Make FPL content? Join the creator program</h2>
+        <p>Your code takes 30 percent off your audience's first payment at the web checkout, and you keep earning on the renewals after it. The free tools stay free to quote either way.</p>
+      </div>
+      <a class="btn btn-ghost" href="/creators" data-cta="index-creators">Read the terms &#9656;</a>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="wrap">
@@ -988,11 +1001,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <a class="key-amber" href="/fpl/best-captain">Captain picks</a>
       <a class="key-teal" href="https://pro.goaliq.app">GoalIQ Premium (web)</a>
     </div>
-    <!-- Creator program on its own line: it used to sit in the tool-link row
-         between "Price changes" and "xG leaders", where it read as one more
-         free tool page. No numbers here - commission and terms live on
-         /creators. -->
-    <p class="foot-creators">Make FPL content? We run a <a href="/creators">creator program</a>.</p>
     <div class="foot-links">
       <a href="/fpl/differentials">Differentials</a>
       <a href="/fpl/price-changes">Price changes</a>
