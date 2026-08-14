@@ -52,15 +52,69 @@ XGI_MIN = 0.15
 
 # Nosta AINA kun `template_sentence` muuttuu: se on osa valimuistin avainta
 # mallipohjaisille lauseille. v2 (14.8): xGI-kynnys + kolme runkoa.
-TEMPLATE_VERSION = 2
+# v3 (14.8): es/pt-lokalisointi — jokainen merkinta kantaa nyt kolme lausetta.
+TEMPLATE_VERSION = 3
 
-# Kolme runkoa, valinta deterministinen pelaajan id:sta. Kaikki sanovat saman
-# asian; vain rakenne vaihtuu, jotta perakkain avatut rivit eivat lue botilta.
-FRAMES = [
-    "The projection leans on {lead}{tail}.",
-    "Most of this comes from {lead}{tail}.",
-    "This one rests on {lead}{tail}.",
-]
+# Maksumuuri lupaa `paywall.bullet_why`-rivilla selityksen ostajan omalla
+# kielella es- ja pt-lokaaleilla. Ilman naita kaikki 150 lausetta olisivat
+# englanniksi ja espanjankielinen ostaja maksaisi lupauksesta jota tuote ei
+# pida. SPA on englanninkielinen eika kysy muuta kuin en:aa.
+LANGS = ("en", "es", "pt")
+DEFAULT_LANG = "en"
+
+# Kolme runkoa per kieli, valinta deterministinen pelaajan id:sta. Kaikki
+# sanovat saman asian; vain rakenne vaihtuu, jotta perakkain avatut rivit
+# eivat lue botilta. Runkojen MAARA on sama kaikilla kielilla, jotta sama
+# pelaaja saa saman rakenteen riippumatta lukijan kielesta.
+FRAMES = {
+    "en": [
+        "The projection leans on {lead}{tail}.",
+        "Most of this comes from {lead}{tail}.",
+        "This one rests on {lead}{tail}.",
+    ],
+    "es": [
+        "La proyección se apoya en {lead}{tail}.",
+        "La mayor parte viene de {lead}{tail}.",
+        "Esta se sostiene en {lead}{tail}.",
+    ],
+    "pt": [
+        "A projeção se apoia em {lead}{tail}.",
+        "A maior parte vem de {lead}{tail}.",
+        "Esta se sustenta em {lead}{tail}.",
+    ],
+}
+
+# Lauseen palaset per kieli. LUVUT EIVAT LOKALISOIDU: `0.65` pysyy pisteella
+# kaikilla kielilla, koska lukija tarkistaa luvun samalta riviltä jonka
+# taulukko renderoi, ja taulukko renderoi pisteen kaikilla lokaaleilla
+# (toFixed, ei toLocaleString). Desimaalipilkku lauseessa ja piste taulukossa
+# olisi kaksi eri lukua samasta asiasta.
+PHRASES = {
+    "en": {
+        "minutes": "about {mins} minutes a game",
+        "xgi": "{xgi} expected goal involvements per 90 last season",
+        "set_pieces": "set piece duties",
+        "join": " and ",
+        "tail": ", with {opps} to come",
+        "no_bits": "The projection is built from expected minutes and fixtures.",
+    },
+    "es": {
+        "minutes": "unos {mins} minutos por partido",
+        "xgi": "{xgi} participaciones de gol esperadas por 90 la temporada pasada",
+        "set_pieces": "los balones parados",
+        "join": " y ",
+        "tail": ", con {opps} por delante",
+        "no_bits": "La proyección se construye con los minutos esperados y el calendario.",
+    },
+    "pt": {
+        "minutes": "cerca de {mins} minutos por jogo",
+        "xgi": "{xgi} participações em gols esperadas por 90 na temporada passada",
+        "set_pieces": "as bolas paradas",
+        "join": " e ",
+        "tail": ", com {opps} pela frente",
+        "no_bits": "A projeção é construída com os minutos esperados e o calendário.",
+    },
+}
 MAX_TOKENS = 2000
 POLL_SECONDS = 20
 POLL_MAX_MINUTES = 55
@@ -273,17 +327,23 @@ def sentence_problems(sentence: str, facts: dict) -> list[str]:
     return problems
 
 
-def template_sentence(facts: dict) -> str:
+def template_sentence(facts: dict, lang: str = DEFAULT_LANG) -> str:
     """Deterministinen varalause kun malli hylataan tai ei vastaa.
 
     EI ole huono lopputulos: se on tarkka ja tylsa. Tyhja kentta olisi
     huonompi kuin tylsa kentta, ja keksitty lause olisi huonompi kuin molemmat.
+
+    ILMAN `ANTHROPIC_API_KEY`:TA TAMA ON AINOA POLKU (Villen linjaus 14.8: ei
+    maksullisia ilman erillista hyvaksyntaa), joten `lang` ei ole varapolun
+    yksityiskohta vaan se ON koko lokalisointi: jokainen 150 lauseesta
+    kirjoitetaan taalla, kaikilla kolmella kielella.
     """
+    ph = PHRASES.get(lang) or PHRASES[DEFAULT_LANG]
     mins = facts.get("expected_minutes")
     opponents = facts.get("next_opponents") or []
     bits = []
     if mins is not None:
-        bits.append(f"about {mins:g} minutes a game")
+        bits.append(ph["minutes"].format(mins=f"{mins:g}"))
     xgi = (facts.get("last_season") or {}).get("xgi_per90")
     # KYNNYS: 48/138 lausetta siteerasi xGI/90:n alle 0,15 ja 23 alle 0,10
     # (pienin 0,01). "The projection leans on 0.09 expected goal involvements
@@ -291,15 +351,15 @@ def template_sentence(facts: dict) -> str:
     # kaiken perusteleminen samalla syvyydella, eli konetunnusmerkki JA
     # epatosi painotusvaite. Alle kynnyksen luku jatetaan pois, ei pyoristeta.
     if xgi and float(xgi) >= XGI_MIN:
-        bits.append(f"{xgi:g} expected goal involvements per 90 last season")
+        bits.append(ph["xgi"].format(xgi=f"{xgi:g}"))
     if facts.get("set_piece_duties"):
-        bits.append("set piece duties")
+        bits.append(ph["set_pieces"])
     if not bits:
-        return "The projection is built from expected minutes and fixtures."
+        return ph["no_bits"]
     if len(bits) == 1:
         lead = bits[0]
     else:
-        lead = ", ".join(bits[:-1]) + " and " + bits[-1]
+        lead = ", ".join(bits[:-1]) + ph["join"] + bits[-1]
     # RUNGON VAIHTELU: kaikki 150 lausetta alkoivat "The projection" ja
     # paattyivat "with A, B, C to come." Rivien avaaminen perakkain on tuotteen
     # normaali kaytto, joten yksi runko luetaan botiksi. Valinta on
@@ -307,8 +367,9 @@ def template_sentence(facts: dict) -> str:
     # joten `component_hash` pysyy vakaana eika refresh vaihda tekstia turhaan.
     n_opp = 2 if (facts.get("id") or 0) % 3 == 1 else 3
     opps = opponents[:n_opp]
-    tail = (f", with {', '.join(opps)} to come" if opps else "")
-    frame = FRAMES[(facts.get("id") or 0) % len(FRAMES)]
+    tail = (ph["tail"].format(opps=", ".join(opps)) if opps else "")
+    frames = FRAMES.get(lang) or FRAMES[DEFAULT_LANG]
+    frame = frames[(facts.get("id") or 0) % len(frames)]
     return frame.format(lead=lead, tail=tail)
 
 
@@ -466,10 +527,14 @@ def main() -> int:
         # mutta tuote olisi ollut ennallaan. Sama vikaluokka kuin serve-time-
         # kentta joka ei invalidoi ETagia.
         #
-        # Koskee VAIN mallipohjaisia: mallin kirjoittamat eivat kayta runkoa,
-        # joten niiden regenerointi maksaisi API-kutsuja ilman tekstimuutosta.
+        # 14.8 (v3): EHTO KOSKEE NYT KAIKKIA MERKINTOJA, ei vain mallipohjaisia.
+        # Jokainen merkinta kantaa es/pt-lauseet jotka tulevat AINA rungosta,
+        # joten mallin kirjoittama en-lause ei enaa tarkoita etta merkinta olisi
+        # rungosta riippumaton. Aiempi `source == "template"` -rajaus jattaisi
+        # mallilta tulleiden rivien es/pt-lauseet ikuisesti vanhaan versioon.
+        # Tama EI maksa API-kutsuja: kirjoitussilmukka sailyttaa olemassa olevan
+        # mallilauseen kun hash on ennallaan (ks. `n_kept` alla).
         stale_template = (prev is not None
-                          and prev.get("source") == "template"
                           and prev.get("tpl") != TEMPLATE_VERSION)
         if (prev and prev.get("hash") == h and prev.get("gw") == gw
                 and not stale_template):
@@ -505,10 +570,21 @@ def main() -> int:
         print("OK: kaikki selitykset ajan tasalla.")
         return 0
 
-    if args.dry_run or not os.environ.get("ANTHROPIC_API_KEY"):
+    # KAKSI LUKKOA, EI YHTA (Villen linjaus 14.8: ei mitaan maksullista ilman
+    # erillista hyvaksyntaa). Pelkka avaimen olemassaolo EI riita kaynnistamaan
+    # maksullista polkua: jos `ANTHROPIC_API_KEY` joskus lisataan repoon jotain
+    # MUUTA tarkoitusta varten, tama cron alkaisi muuten kuluttaa rahaa
+    # hiljaa ja ilman paatosta. `WHY_USE_MODEL=1` on se paatos.
+    use_model = (os.environ.get("WHY_USE_MODEL") == "1"
+                 and bool(os.environ.get("ANTHROPIC_API_KEY")))
+    if args.dry_run or not use_model:
         if not args.dry_run:
-            print("::warning::ANTHROPIC_API_KEY puuttuu — kirjoitetaan "
-                  "varalauseet (ei virhe).")
+            if not os.environ.get("ANTHROPIC_API_KEY"):
+                print("::notice::ANTHROPIC_API_KEY puuttuu — kirjoitetaan "
+                      "runkolauseet (ei virhe, ei kuluja).")
+            else:
+                print("::notice::WHY_USE_MODEL != 1 — maksullinen polku on "
+                      "pois paalta vaikka avain on olemassa. Runkolauseet.")
         results: dict[str, dict] = {}
     else:
         import anthropic
@@ -520,34 +596,64 @@ def main() -> int:
               f"virhe {batch.request_counts.errored}")
         results = collect_results(client, batch.id)
 
-    n_model, n_template, n_rejected = 0, 0, 0
+    n_model, n_template, n_rejected, n_kept = 0, 0, 0, 0
     for job in jobs:
         pid = job["custom_id"]
         facts = job["facts"]
+        h = component_hash(facts)
+        prev = entries.get(pid) or {}
         parsed = results.get(pid) or {}
         sentence = (parsed.get("sentence") or "").strip()
         drivers = [d for d in (parsed.get("drivers") or []) if d in DRIVERS]
         problems = sentence_problems(sentence, facts) if sentence else ["ei vastausta"]
-        if problems:
+        if not problems:
+            en_sentence, en_source = sentence, "model"
+            n_model += 1
+        else:
             if sentence:
                 n_rejected += 1
                 print(f"::warning::{facts['name']}: hylatty portissa "
                       f"({'; '.join(problems)})")
-            sentence = template_sentence(facts)
-            source = "template"
-            n_template += 1
-        else:
-            source = "model"
-            n_model += 1
+            # SAILYTA OLEMASSA OLEVA MALLILAUSE kun regenerointi johtuu
+            # PELKASTA runkoversion noususta eika faktojen muutoksesta. Ilman
+            # tata `TEMPLATE_VERSION`-nosto ilman API-avainta DEGRADOISI
+            # mallilta saadut lauseet takaisin rungoiksi — korjaus nayttaisi
+            # menneen lapi ja tuote menisi taaksepain. Hash-ehto on olennainen:
+            # jos faktat ovat liikkuneet, vanha lause voi olla epatosi.
+            prev_en = (prev.get("sentences") or {}).get("en") or prev.get("sentence")
+            prev_src = (prev.get("sources") or {}).get("en") or prev.get("source")
+            if prev_en and prev_src == "model" and prev.get("hash") == h:
+                en_sentence, en_source = prev_en, "model"
+                drivers = drivers or prev.get("drivers") or []
+                n_kept += 1
+            else:
+                en_sentence = template_sentence(facts, DEFAULT_LANG)
+                en_source = "template"
+                n_template += 1
+        # es/pt tulevat AINA rungosta: mallipolkua ei ajeta lainkaan ilman
+        # maksullista API-avainta, eika sita oteta kayttoon ilman Villen
+        # erillista hyvaksyntaa. Runkolause on tarkka ja tylsa, ei rikki.
+        sentences = {DEFAULT_LANG: en_sentence}
+        sources = {DEFAULT_LANG: en_source}
+        for lang in LANGS:
+            if lang == DEFAULT_LANG:
+                continue
+            sentences[lang] = template_sentence(facts, lang)
+            sources[lang] = "template"
         entries[pid] = {
             "gw": gw,
-            "hash": component_hash(facts),
-            "sentence": sentence,
+            "hash": h,
+            # `sentence` + `source` sailyvat en-aliaksina: datatiedosto ja
+            # API-deploy ovat eri portaat (muisti: api-lukee-levylta-render-
+            # deploy), joten vanha deployattu backend lukee naita viela.
+            "sentence": en_sentence,
+            "source": en_source,
+            "sentences": sentences,
+            "sources": sources,
             "drivers": drivers,
-            "source": source,
-            # Vain mallipohjaisilla: kertoo milla rungolla lause kirjoitettiin,
-            # jotta rungon muutos invalidoi valimuistin (ks. yllä).
-            **({"tpl": TEMPLATE_VERSION} if source == "template" else {}),
+            # Kaikilla merkinnoilla: es/pt tulevat rungosta myos silloin kun
+            # en on mallilta, joten runkoversio koskee jokaista merkintaa.
+            "tpl": TEMPLATE_VERSION,
         }
 
     store["meta"] = {

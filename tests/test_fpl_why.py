@@ -322,3 +322,138 @@ def test_premium_request_does_carry_explanations(client, monkeypatch):
     row = next(p for p in body["players"] if str(p.get("id")) == "1")
     assert row["why"]["sentence"] == "Because minutes."
     assert body["meta"]["n_explained"] == 1
+
+
+# --------------------------------------------------------------------------
+# Lokalisointi (WHY-I18N, 14.8)
+#
+# Maksumuuri lupaa `paywall.bullet_why`-rivilla es/pt-lokaaleilla selityksen
+# ostajan OMALLA KIELELLA. Ennen tata kaikki 150 lausetta olivat englanniksi,
+# eli espanjankielinen ostaja maksoi lupauksesta jota tuote ei pitanyt.
+# --------------------------------------------------------------------------
+
+def test_template_sentence_is_localised(facts):
+    en = why.template_sentence(facts, "en")
+    es = why.template_sentence(facts, "es")
+    pt = why.template_sentence(facts, "pt")
+    assert len({en, es, pt}) == 3, "kaksi kielta antoi saman lauseen"
+    assert "minutes a game" in en
+    assert "minutos por partido" in es
+    assert "minutos por jogo" in pt
+
+
+def test_localised_templates_keep_their_accents():
+    """NEGATIIVINEN KONTROLLI OMALLE VIRHEELLE: taman kaannoksen ensimmainen
+    versio riisui aksentit ("proyeccion", "projecao", "participacoes") repon
+    ASCII-kommenttikonvention mukana. Kommentit saavat olla ASCIIta;
+    kayttajalle NAKYVA espanja ja portugali eivat."""
+    for lang in ("es", "pt"):
+        blob = "".join(why.FRAMES[lang]) + "".join(
+            str(v) for v in why.PHRASES[lang].values())
+        assert any(ord(ch) > 127 for ch in blob), (
+            f"{lang}: ei yhtaan aksenttia — teksti on riisuttu ASCIIksi")
+
+
+def test_numbers_are_not_localised(facts):
+    """Desimaalipiste sailyy kaikilla kielilla. Lukija tarkistaa luvun samalta
+    riviltä jonka taulukko renderoi, ja taulukko renderoi pisteen kaikilla
+    lokaaleilla — pilkku lauseessa ja piste taulukossa lukisi kahtena eri
+    lukuna samasta asiasta."""
+    es = why.template_sentence(facts, "es")
+    assert "0.68" in es
+    assert "0,68" not in es
+
+
+def test_unknown_lang_falls_back_to_english(facts):
+    assert why.template_sentence(facts, "fi") == why.template_sentence(facts, "en")
+
+
+def test_attach_why_serves_the_requested_language():
+    import src.models.fpl_xp as fx
+    entries = {"1": {
+        "sentence": "English one.",
+        "sentences": {"en": "English one.", "es": "Frase en espanol.",
+                      "pt": "Frase em portugues."},
+        "sources": {"en": "model", "es": "template", "pt": "template"},
+        "drivers": ["minutes"], "source": "model",
+    }}
+    got = fx.attach_why({"players": [{"id": 1}], "meta": {}},
+                        entries=entries, lang="es")
+    w = got["players"][0]["why"]
+    assert w["sentence"] == "Frase en espanol."
+    assert w["lang"] == "es"
+    assert w["source"] == "template", "lahde on kielikohtainen, ei en:n lahde"
+
+
+def test_attach_why_does_not_claim_a_localisation_it_did_not_do():
+    """REHELLISYYSPORTTI. Vanha merkinta ilman `sentences`-lohkoa palauttaa
+    englannin — tietoinen varapolku, koska tyhja kentta olisi huonompi. Mutta
+    `lang` EI SAA sanoa "es": muuten pinta voi vaittaa lokalisointia jota ei
+    tapahtunut, ja se on sama vikaluokka kuin honest-data-labels."""
+    import src.models.fpl_xp as fx
+    entries = {"1": {"sentence": "English only.", "drivers": [],
+                     "source": "template"}}
+    got = fx.attach_why({"players": [{"id": 1}], "meta": {}},
+                        entries=entries, lang="es")
+    w = got["players"][0]["why"]
+    assert w["sentence"] == "English only."
+    assert w["lang"] == "en"
+
+
+def test_etag_separates_languages(client, monkeypatch):
+    """ILMAN KIELTA ETagissa es-kayttajan ehdollinen pyynto validoituisi
+    englanninkielisesta valimuistista ja han saisi englantia — eli tasan se
+    vika jonka tama korjaa, mutta hiljaa ja vain niilla klienteilla joilla
+    vastaus on jo valimuistissa (muisti: serve-time-kentta ei invalidoi
+    ETagia)."""
+    import api.main as m
+    import src.models.fpl_xp as fx
+    monkeypatch.setattr(m, "is_premium_request", lambda request: True)
+    monkeypatch.setattr(fx, "load_why", lambda path=None: {
+        "1": {"sentence": "EN.",
+              "sentences": {"en": "EN.", "es": "ES.", "pt": "PT."},
+              "sources": {"en": "template", "es": "template",
+                          "pt": "template"},
+              "drivers": [], "source": "template"},
+    })
+    en = client.get("/api/fantasy/xp?lang=en")
+    es = client.get("/api/fantasy/xp?lang=es")
+    assert en.status_code == 200 and es.status_code == 200
+    assert en.headers["ETag"] != es.headers["ETag"], "kieli puuttuu ETagista"
+
+    # Ristiinvalidointi: en-ETag EI saa validoida es-vastausta 304:lla.
+    cross = client.get("/api/fantasy/xp?lang=es",
+                       headers={"If-None-Match": en.headers["ETag"]})
+    assert cross.status_code == 200, "en-ETag validoi es-vastauksen 304:lla"
+    row = next(p for p in cross.json()["players"] if str(p.get("id")) == "1")
+    assert row["why"]["sentence"] == "ES."
+
+    # POSITIIVINEN KONTROLLI: sama kieli SAA validoitua 304:lla, muuten
+    # testi olisi vihrea myos silla etta ETag on rikki joka pyynnolla.
+    same = client.get("/api/fantasy/xp?lang=es",
+                      headers={"If-None-Match": es.headers["ETag"]})
+    assert same.status_code == 304
+
+
+def test_endpoint_unknown_lang_falls_back_instead_of_404(client):
+    """`league` on RESURSSI (tuntematon = 404), kieli on ESITYSMUOTO."""
+    r = client.get("/api/fantasy/xp?lang=zz")
+    assert r.status_code == 200
+
+
+def test_paid_path_needs_two_locks_not_one(monkeypatch):
+    """KULULUKKO (Villen linjaus 14.8). Pelkka API-avaimen olemassaolo EI saa
+    kaynnistaa maksullista polkua: jos avain lisataan repoon jotain MUUTA
+    tarkoitusta varten, vuorokausittainen why-cron alkaisi muuten kuluttaa
+    rahaa hiljaa eika kukaan paattaisi sita. `WHY_USE_MODEL=1` on se paatos.
+
+    Tama testi lukee vahdin ehdon suoraan lahteesta: se on tarkoituksella
+    hauras kirjoitusasulle, koska ehdon lieventaminen on tasan se muutos
+    joka pitaa huomata review'ssa.
+    """
+    import inspect
+    src = inspect.getsource(why.main)
+    assert 'WHY_USE_MODEL") == "1"' in src, (
+        "maksullisen polun toinen lukko on poistettu tai nimetty uudelleen")
+    assert "use_model" in src and "if args.dry_run or not use_model:" in src, (
+        "mallipolun vahti ei enaa portita batch-lahetysta")

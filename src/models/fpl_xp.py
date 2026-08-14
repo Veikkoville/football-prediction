@@ -906,7 +906,12 @@ def why_stamp(path: Path = WHY_PATH) -> str:
         return "0"
 
 
-def attach_why(payload: dict, entries: dict | None = None) -> dict:
+WHY_DEFAULT_LANG = "en"
+WHY_LANGS = ("en", "es", "pt")
+
+
+def attach_why(payload: dict, entries: dict | None = None,
+               lang: str = WHY_DEFAULT_LANG) -> dict:
     """Liita selitys jokaiselle riville jolle sellainen on.
 
     SERVE-TIME eikä putkessa, koska projektio kirjoitetaan uusiksi 3 h välein
@@ -916,25 +921,43 @@ def attach_why(payload: dict, entries: dict | None = None) -> dict:
     HUOM ETag: tämä on serve-time-kenttä, joten `generated_at` EI muutu kun
     selitykset päivittyvät. Endpointin ETag-skeemaversio on nostettava kun
     tämä kenttäjoukko muuttuu (muisti: serve-time-kenttä ei invalidoi ETagia).
+    **`lang` on oltava ETagissa**: ilman sitä es-käyttäjän ehdollinen pyyntö
+    validoituisi englanninkielisestä välimuistista ja hän saisi englantia.
+
+    LOKAALI (14.8): maksumuuri lupaa `paywall.bullet_why`-rivillä selityksen
+    ostajan omalla kielellä es/pt-lokaaleilla. Vanha merkintä ilman
+    `sentences`-lohkoa palauttaa englannin — se on tietoinen varapolku (parempi
+    kuin tyhjä kenttä), ja `why.lang` kertoo klientille MITÄ kieltä se
+    oikeasti sai, jotta pinta ei voi väittää lokalisointia jota ei tapahtunut.
     """
     if entries is None:
         entries = load_why()
     if not entries:
         return payload
+    lang = lang if lang in WHY_LANGS else WHY_DEFAULT_LANG
     n = 0
     for p in payload.get("players") or []:
         if not isinstance(p, dict):
             continue
         entry = entries.get(str(p.get("id")))
-        if not entry or not entry.get("sentence"):
+        if not entry:
             continue
+        sentences = entry.get("sentences") or {}
+        localized = sentences.get(lang)
+        sentence = localized or entry.get("sentence")
+        if not sentence:
+            continue
+        sources = entry.get("sources") or {}
         p["why"] = {
-            "sentence": entry["sentence"],
+            "sentence": sentence,
             "drivers": entry.get("drivers") or [],
             # Lukija saa tietää kummasta lähteestä lause tuli. "template" ei
             # ole vika vaan tarkka mutta tylsä lause; sen piilottaminen tekisi
             # provenienssilupauksesta valikoivan.
-            "source": entry.get("source") or "template",
+            "source": (sources.get(lang) if localized else None)
+                      or entry.get("source") or "template",
+            # Toteutunut kieli, EI pyydetty kieli.
+            "lang": lang if localized else WHY_DEFAULT_LANG,
         }
         n += 1
     if n:

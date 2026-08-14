@@ -3065,6 +3065,14 @@ def fantasy_xp(
         default="fpl",
         description="Fantasy-liiga: 'fpl' (oletus) tai 'spl' (Saudi Pro League).",
     ),
+    lang: str = Query(
+        default="en",
+        description=(
+            "WHY-selitysten kieli: 'en' (oletus), 'es' tai 'pt'. Tuntematon "
+            "arvo putoaa hiljaa englantiin — kieli ei ole resurssin "
+            "olemassaolo, joten 404 olisi vaara vastaus (vrt. `league`)."
+        ),
+    ),
 ):
     """FPL Phase 1 — xP (expected points) per pelaaja per GW (premium-ydin).
 
@@ -3091,7 +3099,9 @@ def fantasy_xp(
         vastaa 304:llä eikä 60 kB:tä siirretä uudelleen.
     Mobiili (fetchXp) ja SPA hyötyvät molemmat ilman klienttimuutosta.
     """
-    from src.models.fpl_xp import XP_PATHS, attach_why, load_xp, why_stamp
+    from src.models.fpl_xp import (
+        WHY_DEFAULT_LANG, WHY_LANGS, XP_PATHS, attach_why, load_xp, why_stamp,
+    )
     # SPL-laajennos (7.8): sama sopimus kuin /api/fantasy — oletus 'fpl' =
     # entinen vastaus, tuntematon avain = 404, ei hiljaista fallbackia.
     lg = (league or "fpl").strip().lower()
@@ -3116,9 +3126,15 @@ def fantasy_xp(
     # riviä; selityksen antaminen niille myisi featuren ilmaiseksi juuri sillä
     # pinnalla jolla se on tarkoitus myydä. SPL on kokonaan ilmainen eikä
     # kanna selityksiä (Villen 7.8 linjaus), joten se rajataan pois nimeltä.
+    # WHY-LOKAALI (14.8): maksumuuri lupaa es/pt-lokaaleilla selityksen
+    # ostajan omalla kielella. Tuntematon kieli putoaa englantiin hiljaa —
+    # `league` on resurssi (tuntematon = 404), kieli on esitysmuoto.
+    wl = (lang or WHY_DEFAULT_LANG).strip().lower()[:2]
+    if wl not in WHY_LANGS:
+        wl = WHY_DEFAULT_LANG
     why_tag = ""
     if lg == "fpl" and not masked:
-        payload = attach_why(payload)
+        payload = attach_why(payload, lang=wl)
         why_tag = why_stamp()
     # FREE-DRAFT-POOL (14.8): draft rater ja fit checker tarvitsevat KAIKKI
     # pelaajat valitsimeensa, myos maalivahdit. Maskattu teaser (10 rivia)
@@ -3146,13 +3162,21 @@ def fantasy_xp(
     # 14.8 s5: pooliin lisattiin status + news (ilmainen watchlist tarvitsee
     # saatavuuslipun). Sama peruste kuin s4:lla — ilman nostoa rivi jaisi
     # ilman lippua tasan niille joilla vastaus on jo valimuistissa.
-    schema = "s5"
+    # 14.8 s6: `why` sai `lang`-kentan (toteutunut kieli). Serve-time-kentta
+    # ilman uutta projektiota -> ilman nostoa ehdollinen pyynto validoisi
+    # vanhan vastauksen 304:lla ja kentta jaisi puuttumaan tasan niilta
+    # joilla vastaus on jo valimuistissa.
+    schema = "s6"
     # Liiga-avain ETagiin: ilman sitä fpl- ja spl-vastaukset voisivat
     # 304-validoitua ristiin samasta selainvälimuistista (sama URL-polku,
     # eri query) — sama vikaluokka kuin mask-bitin puuttuminen olisi.
     etag = 'W/"xp-{}-{}-{}-{}{}"'.format(
         lg, generated, "m" if masked else "f", schema,
-        f"-{why_tag}" if why_tag else "")
+        # KIELI ON OLTAVA ETagissa. Ilman sita es-kayttajan ehdollinen pyynto
+        # validoituisi englanninkielisesta valimuistista ja han saisi
+        # englantia — eli tasan sen vian jota tama commit korjaa, mutta
+        # hiljaa ja vain valimuistin lampoisilla klienteilla.
+        f"-{why_tag}-{wl}" if why_tag else "")
     cache_control = "private, max-age=300"
     inm = request.headers.get("if-none-match", "")
     if etag in [t.strip() for t in inm.split(",")]:
