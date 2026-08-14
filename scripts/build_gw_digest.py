@@ -47,7 +47,32 @@ FPL_HEADERS = {"User-Agent": "Mozilla/5.0 (GoalIQ digest)"}
 
 # CTA on aina season-checkout (muisti: goaliq-email-stack).
 CTA_URL = "https://pro.goaliq.app/checkout?plan=season"
-FREE_URL = "https://goaliq.app/fpl"
+
+# ILMAISPINNAN LINKKI OSOITTAA SIVULLE JOLLA VAITE ON, ei sivulle joka
+# linkittaa sinne. Alkuperainen /fpl mainitsee hinnat mutta ei renderoi
+# yhtaan riser-rivia -> lukija ei loytanyt lukua jonka tarkistettavuudella
+# me myymme. Tasan 10.8:n epaonnistuminen uudelleen (muisti:
+# varoitus-kaukana-luvusta).
+FREE_URL = "https://goaliq.app/fpl/price-changes"
+
+# Julkinen mini-liiga on ainoa ilmaispinta jolta lukija voi verrata itseaan
+# mallin riviin. Jaadytetyn rivin kustannuksella EI ole julkista sivua, joten
+# sita ei saa vaittaa tarkistettavaksi. Verifioitu /fpl/model-xi:sta.
+MINI_LEAGUE_CODE = "jgi6j9"
+
+# Premium-ominaisuuksien nimet ovat SUORAAN landing-copysta. Vapaa muotoilu
+# tuottaa nimen jota tuotteessa ei ole (portti 14.8 kaatoi keksityt
+# "Season pass", "pick of the week" ja "price alerts"). Jos landing muuttuu,
+# tama lista muuttuu — testi pitaa ne synkassa.
+PREMIUM_FEATURES = (
+    "the team manager",
+    "a GW1 to GW6 gameweek planner",
+)
+
+# Ilmaissivun /fpl/expected-points katkaisukohta ("Top 100 by expected points
+# (of 505 players)"). Premium-lupaus on EROTUS, ei koko luku: ostaja ei saa
+# maksaa siita mita han jo nakee ilmaiseksi.
+FREE_XP_TOP_N = 100
 
 # Digest lahetetaan vasta kun deadline on lahella: aikaisemmin lahetetty
 # muistutus ei ole muistutus vaan uutiskirje, ja avausprosentti kertoo sen.
@@ -83,120 +108,112 @@ def next_deadline(events: list[dict], now: _dt.datetime) -> dict | None:
             "hours_left": round((dl - now).total_seconds() / 3600.0, 1)}
 
 
-def fixture_notes(xp_payload: dict, gw: int, limit: int = 3) -> list[dict]:
-    """Joukkueet joilla on tunnistettavin ohjelma tulevalla kierroksella.
-
-    Vastustaja + kentta ovat ilmaissivulla, joten lukija voi tarkistaa taman
-    yhdessa sekunnissa. Mitaan mallin lukua ei liiteta.
-    """
-    seen: dict[str, dict] = {}
-    for p in xp_payload.get("players") or []:
-        team = p.get("team")
-        if not team or team in seen:
-            continue
-        for g in p.get("gameweeks") or []:
-            if g.get("gw") != gw:
-                continue
-            opps = g.get("opponents") or []
-            if opps:
-                seen[team] = {
-                    "team": team,
-                    "opponent": opps[0].get("opp"),
-                    "venue": opps[0].get("venue"),
-                }
-            break
-    return list(seen.values())[:limit]
+# OTTELUBLOKKI POISTETTU TIETOISESTI (portti 14.8). Se otsikoitiin
+# "Fixtures worth a second look", mutta koodi otti kolme ensimmaista ERI
+# joukkuetta xP-jarjestyksessa — eli kolmen parhaan pelaajan seurat. Ne ovat
+# kierroksen ilmeisimmat ottelut, eivat ne joita katsotaan toiseen kertaan.
+# Otsikko vaitti toimituksellista valintaa jota koodi ei tehnyt. Blokki
+# palautetaan vasta kun valinta rakennetaan ilmaisen CS/FDR-taulun luvuista.
 
 
 def price_notes(watch: dict, limit: int = 3) -> dict:
-    """Hinta-watchin karki. Ilmainen pinta -> luvut saa kirjoittaa nakyviin."""
+    """Hinta-watchin karki. Ilmainen pinta -> luvut saa kirjoittaa nakyviin.
+
+    LUKU LUETAAN SAMASTA KENTASTA JA SAMASSA MUODOSSA KUIN ILMAISSIVU:
+    `build_fpl_longtail.py` renderoi `round(confidence * 100)%`. Aiemmin tassa
+    kirjoitettiin `progress_pct` yhdella desimaalilla ("87.0 percent") — sama
+    luku, mutta eri muoto kuin sivulla ("87%"). Lukija joka tarkistaa nakee
+    kaksi eri nakoista lukua, ja se lukee ristiriidalta eika muotoerolta.
+    """
     def rows(key: str) -> list[dict]:
         out = []
         for r in (watch.get(key) or []):
             if r.get("status", "").endswith("_soon") and not r.get(
                     "already_changed_today"):
-                out.append({"name": r.get("web_name"),
-                            "progress_pct": r.get("progress_pct")})
+                out.append({
+                    "name": r.get("web_name"),
+                    "confidence_pct": round(float(r.get("confidence") or 0.0)
+                                            * 100),
+                })
             if len(out) >= limit:
                 break
         return out
     return {"risers": rows("risers"), "fallers": rows("fallers")}
 
 
-def frozen_squad_note(gw: int) -> dict | None:
-    """Mallin lukittu rivi jos se on jo jaadytetty (BTM V2). Julkinen."""
-    path = FROZEN_DIR / f"gw{gw}.json"
-    data = read_json(path)
-    if not data:
-        return None
-    return {"cost_m": data.get("cost"), "frozen_at": data.get("frozen_at")}
-
-
 def build_facts(deadline: dict, xp_payload: dict, watch: dict) -> dict:
     """Kaikki luvut jotka vedos saa sisaltaa. Muut hylataan portissa."""
-    facts = {
+    return {
         "gw": deadline["gw"],
         "hours_left": int(deadline["hours_left"]),
-        "fixtures": fixture_notes(xp_payload, deadline["gw"]),
         "prices": price_notes(watch),
+        "mini_league_code": MINI_LEAGUE_CODE,
+        # Nama kolme ovat tosia ja tarkistettavissa, mutta ne EIVAT tulleet
+        # datasta -> portti kaatoi ne aivan oikein kunnes ne kirjattiin
+        # faktoiksi lahteineen. Portin loysentaminen olisi ollut vaara korjaus.
+        "squad_size": 15,               # FPL:n rungon koko
+        "free_xp_top_n": FREE_XP_TOP_N,  # /fpl/expected-points: "Top 100"
+        # Luetaan DATASTA eika kovakoodata: jos pelaajamaara muuttuu kauden
+        # aikana, vaite korjautuu itsestaan eika vanhene hiljaa.
+        "total_players": len(xp_payload.get("players") or []),
     }
-    frozen = frozen_squad_note(deadline["gw"])
-    if frozen:
-        facts["model_squad"] = frozen
-    return facts
 
 
 def render_markdown(facts: dict) -> str:
     """Vedos tekstina. Ei em dasheja, ei paikallista kelloa, ei premium-lukuja."""
     gw = facts["gw"]
     hours = facts["hours_left"]
+    # Otsikko ja avauslause EIVAT toista toisiaan: sama lause kahdesti
+    # perakkain on koneen tapa kirjoittaa, ja se hukkaa avauksen.
     lines = [
-        f"Subject: GW{gw} deadline in about {hours} hours",
+        f"Subject: GW{gw} deadline, {hours} hours",
         "",
-        f"The GW{gw} deadline is about {hours} hours away. Here is what "
-        "moved since you last looked.",
+        f"{hours} hours to the GW{gw} deadline.",
         "",
     ]
 
     prices = facts.get("prices") or {}
     risers, fallers = prices.get("risers") or [], prices.get("fallers") or []
     if risers or fallers:
-        lines.append("Prices on the move")
+        moves = []
         for r in risers:
-            lines.append(f"* {r['name']} is {r['progress_pct']} percent of "
-                         "the way to a rise")
+            moves.append(f"* {r['name']} is at {r['confidence_pct']}% "
+                         "towards a rise")
         for f in fallers:
-            lines.append(f"* {f['name']} is {f['progress_pct']} percent of "
-                         "the way to a fall")
+            moves.append(f"* {f['name']} is at {f['confidence_pct']}% "
+                         "towards a fall")
+        lines.append("Our price watch tonight:")
+        lines += moves
         lines.append("")
-        lines.append("Those numbers come from transfer velocity, not from "
-                     f"FPL. You can check them yourself at {FREE_URL}.")
+        lines.append("It's an estimate from net transfer velocity, since FPL "
+                     "doesn't publish the real thresholds.")
         lines.append("")
-
-    fixtures = facts.get("fixtures") or []
-    if fixtures:
-        lines.append("Fixtures worth a second look")
-        for f in fixtures:
-            venue = "at home to" if f.get("venue") == "H" else "away at"
-            lines.append(f"* {f['team']} {venue} {f['opponent']}")
+    else:
+        lines.append("Nothing is close to a price change tonight, so there's "
+                     "no rush on that front.")
         lines.append("")
 
-    squad = facts.get("model_squad")
-    if squad and squad.get("cost_m") is not None:
-        lines.append(
-            f"The model's own squad for GW{gw} is locked at "
-            f"{squad['cost_m']} million and logged before kickoff, so you "
-            "can score yourself against it when the round finishes.")
-        lines.append("")
-
+    # ILMAISLINKKI ON AINA MUKANA, myos kun hintablokki on tyhja. Muuten
+    # sahkopostin ainoa URL on maksumuuri, ja se toistuu joka kerta kun kukaan
+    # ei ole lahella hinnanmuutosta.
     lines += [
-        "Members also get the model's pick of the week, expected points for "
-        "every player, and price alerts on their own watchlist.",
+        f"Full price watch, free and no sign-in: {FREE_URL}",
         "",
-        f"Season pass: {CTA_URL}",
+        f"The model's own {facts['squad_size']} for GW{gw} gets locked before "
+        "the deadline and "
+        "graded on official FPL points, same as yours. It plays a public "
+        f"mini-league, code {facts['mini_league_code']}, if you want to beat "
+        "it.",
         "",
-        "You are getting this because you signed up at goaliq.app. "
-        "Unsubscribe any time from the link below.",
+        # Premium-nimet tulevat PREMIUM_FEATURES-listasta joka on landing-copyn
+        # peili. xP mainitaan erotuksena, koska ilmaissivu nayttaa jo top 100:n
+        # eika ostaja saa maksaa siita mita han jo nakee.
+        "Premium is " + " and ".join(PREMIUM_FEATURES)
+        + f", plus expected points for all {facts['total_players']} players "
+          f"instead of the free top {facts['free_xp_top_n']}.",
+        CTA_URL,
+        "",
+        "You signed up at goaliq.app. Unsubscribe below.",
     ]
     return "\n".join(lines)
 
@@ -204,20 +221,49 @@ def render_markdown(facts: dict) -> str:
 def render_html(markdown: str) -> str:
     """Yksinkertainen HTML MailerLiten Drag & drop -editoriin liitettavaksi
     (muisti: Simple editorin alatunniste on lukittu)."""
-    body = []
+    # Listat rakennetaan tilakoneella eika replace(..., 1):lla. Vanha versio
+    # avasi ja sulki <ul>:n TASAN KERRAN, joten toinen lista tuotti orpoja
+    # <li>-elementteja — ja mekaaninen portti palautti silti [] (se katsoi
+    # markdownia, ei HTMLia). Rikkinainen deliverable lapaisi portin tasan
+    # siina tapauksessa joka oikeasti lahetetaan.
+    body: list[str] = []
+    in_list = False
     for line in markdown.split("\n"):
-        if not line.strip():
-            continue
-        if line.startswith("Subject: "):
+        if not line.strip() or line.startswith("Subject: "):
             continue
         if line.startswith("* "):
+            if not in_list:
+                body.append("<ul>")
+                in_list = True
             body.append(f"<li>{line[2:]}</li>")
         else:
+            if in_list:
+                body.append("</ul>")
+                in_list = False
             body.append(f"<p>{line}</p>")
-    html = "\n".join(body).replace("<li>", "<ul><li>", 1)
-    if "<li>" in html:
-        html = html.replace("</li>\n<p>", "</li></ul>\n<p>", 1)
-    return html
+    if in_list:
+        body.append("</ul>")
+    return "\n".join(body)
+
+
+def html_problems(html: str) -> list[str]:
+    """HTMLin rakenteelliset viat. Erillinen funktio, koska markdown-portti
+    on niille rakenteellisesti sokea."""
+    problems = []
+    if html.count("<ul>") != html.count("</ul>"):
+        problems.append("<ul>-tagit eivat tasmaa")
+    if html.count("<li>") != html.count("</li>"):
+        problems.append("<li>-tagit eivat tasmaa")
+    depth = 0
+    for token in html.replace("<", "\n<").split("\n"):
+        if token.startswith("<ul>"):
+            depth += 1
+        elif token.startswith("</ul>"):
+            depth -= 1
+        elif token.startswith("<li>") and depth == 0:
+            problems.append("orpo <li> ilman <ul>:aa")
+            break
+    return problems
 
 
 def draft_problems(markdown: str, facts: dict) -> list[str]:
@@ -240,6 +286,30 @@ def draft_problems(markdown: str, facts: dict) -> list[str]:
             problems.append(f"kielletty sana: {word}")
     if CTA_URL not in markdown:
         problems.append("CTA puuttuu")
+
+    # ILMAISLINKKI ON PAKOLLINEN. Ilman tata vedos jonka hintablokki on tyhja
+    # sisaltaa vain maksumuurin, ja portin 1. kysymys ("voiko lukija
+    # tarkistaa taman") kaatuu ilman etta mikaan huutaa.
+    if FREE_URL not in markdown:
+        problems.append("ilmaispinnan linkki puuttuu")
+
+    # KEKSITYT OMINAISUUSNIMET. Portti kaatoi 14.8 kolme nimea joita
+    # tuotteessa ei ole ("pick of the week", "price alerts", "Season pass").
+    # Nimi joka ei ole landing-copyssa ei saa paatya sahkopostiin.
+    for invented in ("pick of the week", "price alert", "season pass",
+                     "members also get"):
+        if invented in lowered:
+            problems.append(f"ominaisuusnimi ei ole landing-copyssa: "
+                            f"{invented!r}")
+
+    # LYHENTEIDEN PUUTE on kirjatuin AI-tunnusmerkki (muisti:
+    # reddit-ai-teksti-tunnistetaan). Tama ei korvaa agenttia, mutta halvin
+    # osuma kannattaa ottaa koneella.
+    for stiff in ("here is what", "you are getting this", "do not publish"):
+        if stiff in lowered:
+            problems.append(f"lyhentamaton muoto: {stiff!r}")
+
+    problems += html_problems(render_html(markdown))
     return problems
 
 

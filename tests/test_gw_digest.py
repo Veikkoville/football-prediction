@@ -37,7 +37,7 @@ def facts():
             {"gw": 1, "opponents": [{"opp": "IPS", "venue": "A"}]}]},
     ]}
     watch = {"risers": [{"web_name": "Saka", "status": "rising_soon",
-                         "progress_pct": 82.0,
+                         "confidence": 0.82,
                          "already_changed_today": False}],
              "fallers": []}
     return dg.build_facts(deadline, xp, watch)
@@ -101,7 +101,41 @@ def test_premium_number_is_never_written(facts):
     voi tarkistaa sita ilmaispinnalta ja portti 1 kaatuu."""
     md = dg.render_markdown(facts)
     assert "xP" not in md
-    assert "expected points for" in md   # teasataan, ei paljasteta luvulla
+    # Premium-lupaus on EROTUS ilmaiseen: ostaja ei maksa top 100:sta jonka
+    # han jo nakee ilmaiseksi.
+    assert "instead of the free top 100" in md
+
+
+def test_only_real_feature_names_are_used(facts):
+    """PORTTI 14.8 KAATOI KOLME KEKSITTYA NIMEA. Nama ovat landing-copysta."""
+    md = dg.render_markdown(facts)
+    for real in dg.PREMIUM_FEATURES:
+        assert real in md
+    for invented in ("pick of the week", "price alerts", "Season pass",
+                     "Members also get"):
+        assert invented not in md
+        assert dg.draft_problems(md + "\n" + invented + " today.", facts)
+
+
+def test_free_link_is_always_present_even_with_no_price_moves():
+    """Ilman tata vedoksen ainoa URL on maksumuuri aina kun kukaan ei ole
+    lahella hinnanmuutosta — ja se toistuu useimmilla kierroksilla."""
+    facts = dg.build_facts({"gw": 3, "hours_left": 20.0},
+                           {"players": [{"id": 1}]},
+                           {"risers": [], "fallers": []})
+    md = dg.render_markdown(facts)
+    assert dg.FREE_URL in md
+    assert dg.draft_problems(md, facts) == []
+    assert any("ilmaispinnan linkki puuttuu" in p
+               for p in dg.draft_problems(md.replace(dg.FREE_URL, "x"), facts))
+
+
+def test_price_number_matches_the_free_pages_format(facts):
+    """Ilmaissivu renderoi round(confidence*100)%. Sahkopostin on nayttava
+    sama luku samassa muodossa, muuten lukija nakee ristiriidan."""
+    md = dg.render_markdown(facts)
+    assert "82%" in md
+    assert "82.0" not in md
 
 
 def test_invented_number_in_the_draft_is_caught(facts):
@@ -131,11 +165,11 @@ def test_cta_is_the_season_checkout(facts):
 
 def test_price_notes_only_take_imminent_movers():
     watch = {"risers": [
-        {"web_name": "A", "status": "rising_soon", "progress_pct": 90.0,
+        {"web_name": "A", "status": "rising_soon", "confidence": 0.90,
          "already_changed_today": False},
-        {"web_name": "B", "status": "rising_watch", "progress_pct": 50.0,
+        {"web_name": "B", "status": "rising_watch", "confidence": 0.50,
          "already_changed_today": False},
-        {"web_name": "C", "status": "rising_soon", "progress_pct": 95.0,
+        {"web_name": "C", "status": "rising_soon", "confidence": 0.95,
          "already_changed_today": True},
     ], "fallers": []}
     got = dg.price_notes(watch)
@@ -147,3 +181,17 @@ def test_html_render_has_no_subject_line(facts):
     html = dg.render_html(md)
     assert "Subject:" not in html
     assert "<p>" in html and "<li>" in html
+
+
+def test_html_lists_are_balanced_with_two_lists():
+    """LOYTYNYT BUGI: render_html avasi ja sulki <ul>:n replace(..., 1):lla
+    eli TASAN KERRAN -> toinen lista tuotti orpoja <li>-elementteja, ja
+    markdown-portti palautti silti []. Rikkinainen deliverable lapaisi portin
+    tasan siina tapauksessa joka oikeasti lahetetaan."""
+    md = "\n".join(["a", "", "* yksi", "* kaksi", "",
+                    "valilause", "", "* kolme", "", "loppu"])
+    html = dg.render_html(md)
+    assert html.count("<ul>") == 2 and html.count("</ul>") == 2
+    assert dg.html_problems(html) == []
+    # Negatiivinen kontrolli: portti kaataa orvon <li>:n.
+    assert dg.html_problems("<p>x</p>\n<li>orpo</li>")
