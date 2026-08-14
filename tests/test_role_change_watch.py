@@ -146,3 +146,40 @@ def test_bootstrap_failure_is_loud_not_silent(monkeypatch, capsys):
     monkeypatch.setattr("sys.argv", ["x"])
     assert w.main() == 1
     assert "::error::" in capsys.readouterr().out
+
+
+# --------------------------------------------------------------------------
+# Suunta A4 — epäselvä peliaika (Villen kysymys: "siirtyneitä jne")
+# --------------------------------------------------------------------------
+
+def test_a4_flags_owned_player_the_model_is_unsure_about():
+    """Bruno G -luokka: rivi ON (A1 ei nappaa), p_start 0,63 (A2 ei nappaa),
+    ei maalivahti (A3 ei nappaa) — mutta malli itse sanoo `med` ja 10,3 %
+    omistaa. Ilman tata suuntaa seuranvaihtaja putoaa kaikkien lapi."""
+    ours = {1: dict(mine(1, "BrunoG", p_start=0.63, xp6=19.0, owned=10.3,
+                         pos="MID", team="ARS"),
+                    minutes_confidence="med", data_basis="pl_history")}
+    out = w.direction_a4(ours, {}, min_owned=2.0)
+    assert [r["web_name"] for r in out] == ["BrunoG"]
+
+
+def test_a4_silent_when_model_is_confident():
+    """NEGATIIVINEN KONTROLLI. Korkea omistus EI riita — malli on varma."""
+    ours = {1: dict(mine(1, "Nailed", p_start=0.97, owned=60.0),
+                    minutes_confidence="high", data_basis="pl_history")}
+    assert w.direction_a4(ours, {}, min_owned=2.0) == []
+
+
+def test_a4_missing_history_outweighs_medium_confidence():
+    """`no_history` on isompi epavarmuus kuin `med`: tuntematon pelaaja
+    tuntemattomassa roolissa. Painotus lukee mallin OMIA kenttia eika
+    keksi omaa lukua (Villen 14.8 lukitus)."""
+    ours = {
+        1: dict(mine(1, "Unknown", p_start=0.4, owned=10.0),
+                minutes_confidence="high", data_basis="no_history"),
+        2: dict(mine(2, "MediumConf", p_start=0.4, owned=10.0),
+                minutes_confidence="med", data_basis="pl_history"),
+    }
+    out = w.direction_a4(ours, {}, min_owned=2.0)
+    assert out[0]["web_name"] == "Unknown"
+    assert out[0]["mass"] > out[1]["mass"]

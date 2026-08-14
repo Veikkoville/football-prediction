@@ -174,6 +174,56 @@ def direction_a3(ours: dict[int, dict], elements: list[dict],
     return out
 
 
+# Mallin OMA epavarmuus. Nama kentat ovat jo projektiossa — emme keksi uutta
+# lukua vaan luemme sen jonka malli laskee. (Sama linjaus kuin Villen
+# 14.8 lukituksessa: luottamusindikaattori vain mallista johdettuna.)
+_CONF_W = {"low": 1.0, "med": 0.5, "high": 0.0}
+_BASIS_W = {"no_history": 1.0, "limited_history": 0.6, "pl_history": 0.0}
+
+
+def direction_a4(ours: dict[int, dict], overrides: dict,
+                 min_owned: float = 2.0) -> list[dict]:
+    """EPASELVA PELIAIKA: moni omistaa, malli itse on epavarma.
+
+    Villen kysymys 14.8: *"onko muita pelaajia epaselvia? siirtyneita jne
+    peliaika epatietoinen, kuten esim bruno guimaraes?"* — ja Bruno G on
+    tasan tama luokka: rivi ON (joten A1 ei nappaa), p_start 0,63 (joten A2
+    ei nappaa), ei maalivahti (joten A3 ei nappaa), mutta
+    `minutes_confidence: med` ja 10,3 % omistusta.
+
+    Seuranvaihtajaa ei voi tunnistaa suoraan — projektiossa ei ole viime
+    kauden SEURAA. Mutta malli koodaa saman epavarmuuden jo itse:
+    seuranvaihto nakyy `minutes_confidence`ssa ja `data_basis`ssa, koska
+    minuuttipriori on mitattu eri roolissa. Luetaan se eika arvata.
+    """
+    out = []
+    for pid, p in ours.items():
+        owned = float(p.get("owned_pct") or 0.0)
+        if owned < min_owned:
+            continue
+        cw = _CONF_W.get(p.get("minutes_confidence"), 0.0)
+        bw = _BASIS_W.get(p.get("data_basis"), 0.0)
+        unc = max(cw, bw)
+        if unc <= 0.0:
+            continue
+        out.append({
+            "id": pid,
+            "web_name": p.get("web_name"),
+            "pos": p.get("pos"),
+            "team": p.get("team_short"),
+            "owned": owned,
+            "p_start": float(p.get("p_start") or 0.0),
+            "xmins": float(p.get("xmins") or 0.0),
+            "xp6": float(p.get("xp_horizon_total") or 0.0),
+            "conf": p.get("minutes_confidence"),
+            "basis": p.get("data_basis"),
+            "mass": owned * unc,
+            "overridden": pid in overrides,
+        })
+    out.sort(key=lambda r: -r["mass"])
+    return out
+
+
 def direction_b(ours: dict[int, dict], min_xp: float, max_owned: float,
                 overrides: dict) -> list[dict]:
     out = []
@@ -212,6 +262,9 @@ def main() -> int:
                     help="suunta A2: p_start jonka alle liputetaan")
     ap.add_argument("--b-min-xp", type=float, default=12.0)
     ap.add_argument("--b-max-owned", type=float, default=1.0)
+    ap.add_argument("--a4-min-owned", type=float, default=2.0,
+                    help="suunta A4: omistuskynnys %% (oletus 2.0)")
+    ap.add_argument("--top-a4", type=int, default=15)
     ap.add_argument("--top-a2", type=int, default=15,
                     help="montako suunnan A2 nimea listataan")
     ap.add_argument("--top-b", type=int, default=15,
@@ -279,6 +332,21 @@ def main() -> int:
                   f"vs  malli {o['web_name']} (p_start {o['p_start']:.2f}, "
                   f"{o['owned']:.1f} %){mark}")
         print()
+
+    a4 = direction_a4(ours, overrides, args.a4_min_owned)
+    a4_shown = a4[:args.top_a4]
+    print(f"=== SUUNTA A4: omistus >= {args.a4_min_owned} %, MALLI ITSE EPAVARMA ===")
+    print("    (moni omistaa, mutta minutes_confidence low/med tai historia")
+    print("     puuttuu. Seuranvaihtaja nakyy tassa, koska minuuttipriori on")
+    print("     mitattu eri roolissa — Bruno G. on taman luokan tyyppitapaus.)")
+    _print(a4_shown, lambda r: (f"massa {r['mass']:5.1f}  {r['owned']:5.1f} %  "
+                                f"{r['web_name']:<16} {r['pos']} {r['team']:<4} "
+                                f"p_start={r['p_start']:.2f} xmins={r['xmins']:4.0f} "
+                                f"conf={r['conf']:<4} basis={r['basis']}"))
+    if len(a4) > len(a4_shown):
+        print(f"  ...ja {len(a4) - len(a4_shown)} muuta kynnyksen ylittavaa "
+              f"(--top-a4 {len(a4)} nayttaa kaikki)")
+    print()
 
     b = direction_b(ours, args.b_min_xp, args.b_max_owned, overrides)
     shown = b[:args.top_b]
