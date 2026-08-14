@@ -190,3 +190,9 @@ outputs/cards/
 
 # 11.8: generoidut Reels-videot ovat artefakteja, ei lahdekoodia
 outputs/reels/
+# 14.8: GW-digest-vedokset. EI committoida tarkoituksella: vedos generoidaan
+# LAHETYSHETKELLA tuoreesta datasta, ja repossa lojuva viikon vanha vedos on
+# tasan se jonka joku lahettaa vahingossa (muisti: verifiointi
+# postaushetkella, ei valmisteluhetkella).
+outputs/gw_digest/
+
