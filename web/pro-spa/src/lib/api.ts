@@ -93,6 +93,14 @@ export interface LastSeason {
 	[key: string]: unknown;
 }
 
+/** WHY-THIS-PICK -selitys. `drivers` voi olla tyhja: se on lisatieto, ei
+ *  lauseen ehto. */
+export interface XpWhy {
+	sentence: string;
+	drivers: string[];
+	source: 'model' | 'template' | string;
+}
+
 export interface XpPlayer {
 	id: number;
 	web_name: string;
@@ -109,6 +117,13 @@ export interface XpPlayer {
 	gameweeks: XpGameweek[];
 	components?: XpComponents;
 	components_gw?: number;
+	/** WHY-THIS-PICK (14.8): yhden lauseen selitys projektiolle.
+	 *  PREMIUM-ONLY JA VAIN FPL — backend liittaa taman vain maskaamattomaan
+	 *  vastaukseen (`api/main.py:3115`). `source: 'template'` ei ole vika vaan
+	 *  tarkka mutta tylsa lause; UI renderoi molemmat lahteet samalla tavalla,
+	 *  koska valikoiva piilottaminen tekisi provenienssilupauksesta valikoivan.
+	 *  Defensiivinen: vanha payload ei tuo kenttaa. */
+	why?: XpWhy;
 	/** #33f: probabilistinen minuuttimalli (start-% 0-100) — defensiivinen. */
 	predicted_starts?: number;
 	minutes_confidence?: 'low' | 'med' | 'high';

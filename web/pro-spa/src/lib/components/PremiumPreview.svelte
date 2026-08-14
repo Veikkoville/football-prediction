@@ -27,6 +27,10 @@
 		'Where the gap to the model came from: captaincy, bench points and autosubs, round by round',
 		'Which players actually close the gap on your mini-league rival, and whether they already have them',
 		'Per-player xP projections for every gameweek',
+		// WHY-THIS-PICK (14.8): heti xP:n jalkeen, koska se selittaa juuri sen
+		// luvun. Kattavuus (150) on copyssa: premium nakee ~505 pelaajaa, joten
+		// "jokaiselle" olisi kate jota ei ole. Synkattu paywall.bullet_why:hyn.
+		'Why a projection looks the way it does, in one line, for the top 150 by Total xP',
 		'Captain ranker with top picks',
 		'Share as image: post-ready cards from your XI, the captain ranker, the value ranking and leaderboards',
 		'Differential finder: low ownership, high xP',
