@@ -1,0 +1,99 @@
+# WHY-THIS-PICK: "miksi tämä pelaaja" -selitykset (Claude Batches API).
+#
+# MIKSI OMA WORKFLOW EIKÄ STEPPI fpl-data-refreshissä: Batches API on
+# eräajo, jonka valmistuminen kestää tyypillisesti minuutteja mutta saa
+# kestää tunnin. Sama askel data-refreshin sisällä pysäyttäisi projektioiden
+# pushin siksi ajaksi — eli hidastaisi juuri sitä dataa jonka tuoreus on
+# koko refreshin olemassaolon syy (saatavuusliput, Garner-case 25.7).
+#
+# CADENCE: kerran vuorokaudessa riittää. Selitys kertoo miksi mallin luku on
+# sellainen kuin on; se ei liiku 3 h välein vaikka luku liikkuu desimaalin.
+# Skripti diffaa komponenttihashin, joten muuttumattomat rivit eivät maksa
+# mitään ja päivän ajo koskee käytännössä vain liikkuneita pelaajia.
+#
+# TURVA: data-only, ei mallimuutosta. ANTHROPIC_API_KEY:n puuttuminen EI
+# kaada ajoa — skripti kirjoittaa deterministiset mallipohjalauseet ja kirjaa
+# ohituksen näkyvästi (sama linjaus kuin ADMIN_TOKEN grade-decisions-askeleessa).
+
+name: fpl-why-refresh
+
+on:
+  schedule:
+    # 05:30 UTC — projektiot on juuri päivitetty 03:00/06:00-ajojen välissä
+    # ja deadline-aamun ruuhka on vielä edessä.
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+    inputs:
+      top_n:
+        description: "Montako pelaajaa selitetään (xP-järjestys)"
+        required: false
+        default: "150"
+
+concurrency:
+  group: fpl-why-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    # Batch-ajo saa kestää, mutta ei loputtomiin: skriptin oma poll-katto on
+    # 55 min, tämä on karkea varmistin sen ympärillä.
+    timeout-minutes: 75
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Minimaalinen dep-setti: tämä askel ei rakenna projektioita vaan lukee
+      # committatun JSONin, joten pandas/scipy/soccerdata eivät ole tarpeen.
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install "anthropic>=0.68" "requests>=2.31"
+
+      - name: Generate explanations
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python -m scripts.build_fpl_why \
+            --top-n "${{ github.event.inputs.top_n || '150' }}"
+
+      - name: Commit + push to main (Render serves the explanations)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fpl_why.json || {
+            echo "::warning::git add data/fpl_why.json epäonnistui (gitignore?)"
+            exit 0
+          }
+          if git diff --cached --quiet; then
+            echo "Ei muutoksia (selitykset ennallaan) — ohitetaan commit."
+            exit 0
+          fi
+          git commit -m "chore(fpl): why-this-pick explanations refresh [skip ci]"
+          for i in 1 2 3 4 5; do
+            git fetch origin main || true
+            if git rebase origin/main; then
+              if git push origin HEAD:main; then
+                echo "Pushed to main (yritys $i)."
+                exit 0
+              fi
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
+            echo "Push-yritys $i epäonnistui (kilpailu data-cronin kanssa?) — retry."
+            sleep 5
+          done
+          echo "VIRHE: push mainiin epäonnistui 5 yrityksen jälkeen."
+          exit 1

@@ -873,3 +873,70 @@ def load_xp(path: Path = XP_PATH) -> dict:
         if isinstance(p, dict):
             p.setdefault("xp_per_90", None)
     return data
+
+
+WHY_PATH = config.DATA_DIR / "fpl_why.json"
+
+
+def load_why(path: Path = WHY_PATH) -> dict:
+    """WHY-THIS-PICK -selitykset (scripts/build_fpl_why.py). Puuttuu = {}."""
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    entries = data.get("entries")
+    return entries if isinstance(entries, dict) else {}
+
+
+def why_stamp(path: Path = WHY_PATH) -> str:
+    """Selitystiedoston sormenjalki ETagiin.
+
+    ILMAN TATA `why` OLISI NAKYMATON PAIVITYS: selitykset elävät omassa
+    tiedostossaan, joten `generated_at` ei liiku kun ne uusitaan, ja ehdollinen
+    pyyntö validoisi vanhan vastauksen 304:llä. Tiedoston koko + muokkausaika
+    riittää ja on ilmainen (ei sisällön hashausta joka pyynnöllä, Render
+    0.5 vCPU). Deploy vaihtaa mtimen — turha 200 kerran per deploy on halpa.
+    """
+    try:
+        st = path.stat()
+        return f"{st.st_mtime_ns}-{st.st_size}"
+    except OSError:
+        return "0"
+
+
+def attach_why(payload: dict, entries: dict | None = None) -> dict:
+    """Liita selitys jokaiselle riville jolle sellainen on.
+
+    SERVE-TIME eikä putkessa, koska projektio kirjoitetaan uusiksi 3 h välein
+    ja selitykset elävät omassa tiedostossaan: yhdistäminen levyllä pyyhkisi
+    ne joka refreshissä. Sama kaava kuin xp_per_90:llä yllä.
+
+    HUOM ETag: tämä on serve-time-kenttä, joten `generated_at` EI muutu kun
+    selitykset päivittyvät. Endpointin ETag-skeemaversio on nostettava kun
+    tämä kenttäjoukko muuttuu (muisti: serve-time-kenttä ei invalidoi ETagia).
+    """
+    if entries is None:
+        entries = load_why()
+    if not entries:
+        return payload
+    n = 0
+    for p in payload.get("players") or []:
+        if not isinstance(p, dict):
+            continue
+        entry = entries.get(str(p.get("id")))
+        if not entry or not entry.get("sentence"):
+            continue
+        p["why"] = {
+            "sentence": entry["sentence"],
+            "drivers": entry.get("drivers") or [],
+            # Lukija saa tietää kummasta lähteestä lause tuli. "template" ei
+            # ole vika vaan tarkka mutta tylsä lause; sen piilottaminen tekisi
+            # provenienssilupauksesta valikoivan.
+            "source": entry.get("source") or "template",
+        }
+        n += 1
+    if n:
+        payload.setdefault("meta", {})["n_explained"] = n
+    return payload

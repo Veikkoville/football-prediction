@@ -118,6 +118,11 @@ raw_data/
 # (specin kova saanto 5) — sama "logged"-periaate kuin freezeilla yllä.
 !/data/push_state.json
 
+# 14.8 (WHY-THIS-PICK): selitykset per pelaaja. Committoidaan kahdesta syysta:
+# API servaa taman levylta (kuten projektiot), ja cache-hash elaisi muuten
+# vain runnerilla -> jokainen ajo maksaisi taydet Claude-kutsut uudelleen.
+!/data/fpl_why.json
+
 # 1.8: perustajalohkon luvut julkisesta entrysta (build_founder_stats.py).
 # Tama !-poikkeus PUUTTUI shipatessa -> data-refreshin commit-step kaatui
 # "paths are ignored"-virheeseen 4 ajossa (1.-2.8) eika MITAAN dataa pushattu.

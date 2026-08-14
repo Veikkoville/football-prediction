@@ -3085,7 +3085,7 @@ def fantasy_xp(
         vastaa 304:llä eikä 60 kB:tä siirretä uudelleen.
     Mobiili (fetchXp) ja SPA hyötyvät molemmat ilman klienttimuutosta.
     """
-    from src.models.fpl_xp import XP_PATHS, load_xp
+    from src.models.fpl_xp import XP_PATHS, attach_why, load_xp, why_stamp
     # SPL-laajennos (7.8): sama sopimus kuin /api/fantasy — oletus 'fpl' =
     # entinen vastaus, tuntematon avain = 404, ei hiljaista fallbackia.
     lg = (league or "fpl").strip().lower()
@@ -3103,6 +3103,15 @@ def fantasy_xp(
     if lg != "spl" and payload.get("players") and not is_premium_request(request):
         payload = mask_xp_payload(payload)
         masked = True
+    # WHY-THIS-PICK (14.8): selitys on premium-ominaisuus, joten se liitetään
+    # VAIN maskaamattomaan vastaukseen. Maskattu teaser näyttää 10 täyttä
+    # riviä; selityksen antaminen niille myisi featuren ilmaiseksi juuri sillä
+    # pinnalla jolla se on tarkoitus myydä. SPL on kokonaan ilmainen eikä
+    # kanna selityksiä (Villen 7.8 linjaus), joten se rajataan pois nimeltä.
+    why_tag = ""
+    if lg == "fpl" and not masked:
+        payload = attach_why(payload)
+        why_tag = why_stamp()
     # ETag erottaa maskatun ja täyden vastauksen: ilman mask-bittiä free-
     # käyttäjän 304 voisi validoida premium-rivit selaimen välimuistista.
     generated = str(payload.get("meta", {}).get("generated_at") or "0")
@@ -3112,11 +3121,16 @@ def fantasy_xp(
     # ja klientti näyttäisi uuden sarakkeen tyhjänä. Se luetaan rikkinäiseksi
     # ominaisuudeksi, ei vanhaksi välimuistiksi. Löytyi kuvasta, ei portista.
     # Nosta tätä aina kun rivin kenttäjoukko muuttuu ilman uutta projektiota.
-    schema = "s2"
+    # 14.8 s3: `why` on serve-time-kenttä omasta tiedostostaan, joten sen
+    # päivittyminen EI liikuta `generated_at`ia — ilman versionostoa ehdollinen
+    # pyyntö validoisi vanhan vastauksen 304:llä ja selitys jäisi näkymättä.
+    schema = "s3"
     # Liiga-avain ETagiin: ilman sitä fpl- ja spl-vastaukset voisivat
     # 304-validoitua ristiin samasta selainvälimuistista (sama URL-polku,
     # eri query) — sama vikaluokka kuin mask-bitin puuttuminen olisi.
-    etag = 'W/"xp-{}-{}-{}-{}"'.format(lg, generated, "m" if masked else "f", schema)
+    etag = 'W/"xp-{}-{}-{}-{}{}"'.format(
+        lg, generated, "m" if masked else "f", schema,
+        f"-{why_tag}" if why_tag else "")
     cache_control = "private, max-age=300"
     inm = request.headers.get("if-none-match", "")
     if etag in [t.strip() for t in inm.split(",")]:
