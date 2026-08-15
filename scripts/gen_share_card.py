@@ -475,15 +475,20 @@ def card_price_tier(args) -> dict:
         tot = float(p.get("xp_horizon_total") or 0)
         if price <= 0 or tot <= 0:
             continue
-        # --min-mins oletus on 400 (stats-kortin sarakerajaus), mutta xmins on
-        # minuutteja per ottelu -> raaka arvo suodattaisi KAIKKI pois. Sama
-        # vartiointi kuin card_valuessa.
-        floor = args.min_mins if args.min_mins and args.min_mins < 90 else 60
-        if float(p.get("xmins") or 0) < floor:
-            continue
+        # 🔴 EI MINUUTTILATTIAA, ja tama on tietoinen paatos (15.8).
+        # Ensimmainen versio suodatti xmins >= 60 "projisoituihin aloittajiin".
+        # Julkaisutarkistaja loysi etta se pudotti Welbeckin (CHE, 6.0m, 19.1)
+        # jonka xmins on 59 - yhden alle rajan - vaikka kortilla oli Joao Pedro
+        # 62:lla. Lukija joka avaa linkin ja suodattaa hyokkaajat nakee rivin
+        # jota kortilla ei ole, eika kortti selita miksi. Rajan puolustaminen
+        # yhden minuutin tarkkuudella on mahdotonta.
+        #
+        # Sen sijaan saanto on nyt sellainen jonka lukija voi TARKISTAA sivulta:
+        # "jokainen hyokkaaja ilmaisen top 100:n sisalla". xmins nakyy omana
+        # sarakkeenaan, joten rotaatioriski on nakyvissa eika piilotettuna.
         rows.append({"name": p["web_name"], "tag": f"{price:.1f}m",
                      "team": p["team_short"],
-                     "mid": f"{tot:.1f} xP · {tot / price:.2f} per m",
+                     "mid": f"{tot:.1f} xP · {float(p.get('xmins') or 0):.0f} min",
                      "_v": tot, "badges": []})
     if not rows:
         raise SystemExit("Ei rivejä price-tier-kortille.")
@@ -493,9 +498,11 @@ def card_price_tier(args) -> dict:
                  "DEF": "DEFENDERS", "GKP": "GOALKEEPERS"}.get(args.pos, "PLAYERS")
     return {
         "title": f"{pos_label}: PRICE VS POINTS",
-        "subtitle": f"next {n_gw} GW, projected starters only",
+        "subtitle": (f"next {n_gw} GW, every {pos_label.lower()[:-1]} in the "
+                     f"free top {cap}" if args.rank_cap
+                     else f"next {n_gw} GW"),
         "nameLabel": "PLAYER",
-        "midLabel": "TOTAL / PER MILLION",
+        "midLabel": "TOTAL / EXP. MINUTES",
         "valueLabel": "PRICE",
         "footNote": "every row is on goaliq.app/fpl/expected-points, free",
         "footNote2": "model projections, not betting advice",
