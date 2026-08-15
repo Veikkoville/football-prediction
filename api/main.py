@@ -32,7 +32,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import pandas as pd
 import stripe
-from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
@@ -2552,25 +2552,124 @@ def create_guest_checkout_session(
         raise HTTPException(status_code=500, detail=f"Internal error: {e}")
 
 
-@app.post("/api/webhook/stripe")
-async def stripe_webhook(request: Request):
-    """
-    Vastaanottaa Stripen webhookit. Päivittää Supabase profiles.is_premium
-    kun maksu onnistuu / tilaus loppuu.
+def _kasittele_stripe_tapahtuma(event: dict) -> None:
+    """Stripe-webhookin KASITTELY, erotettu vastauspolulta (15.8.2026).
 
-    HUOM: Tama vaatii myöhemmin Supabase service-role-key:n (premium-statuksen
-    päivittäminen edellyttää backend-oikeuksia). Toteutetaan vaiheittain.
+    🔴 MIKSI TAVALLINEN `def` EIKA `async def`. `_update_profile` kayttaa
+    `requests.patch`-kutsua, joka on ESTAVA, ja se ajettiin aiemmin suoraan
+    `async def`-endpointin sisalla 10 sekunnin timeoutilla. Se ei hidastanut
+    vain webhookia vaan pysaytti koko tapahtumasilmukan KAIKILTA kayttajilta
+    siksi ajaksi. Tavallisena funktiona Starlette ajaa taman saikeessa, joten
+    esto ei koske silmukkaa.
+
+    🔴 MITA TAMA MAKSAA, sanottuna suoraan. Kuittaus lahtee Stripelle ENNEN
+    kuin Supabase on kirjoitettu. Jos kirjoitus epaonnistuu, Stripe ei yrita
+    uudelleen, koska sanoimme jo 200. Vaihtokauppa on tietoinen: hidas vastaus
+    saa Stripen merkitsemaan webhookin epaonnistuneeksi ja lopulta poistamaan
+    sen kaytosta, ja se olisi hiljaisempi ja pahempi vika kuin yksittainen
+    menetetty tapahtuma. Epaonnistuminen logataan nakyvasti, ja Stripen
+    dashboardista tapahtuman voi toistaa kasin.
+    """
+    try:
+        event_type = event["type"]
+        obj = event["data"]["object"]
+
+        if event_type == "checkout.session.completed":
+            # Maksu onnistui — aktivoi premium ja nollaa cancel-tiedot
+            user_id = obj.get("client_reference_id") or obj.get("metadata", {}).get("user_id")
+            if user_id:
+                print(f"[Stripe webhook] checkout.session.completed user_id={user_id}")
+                _update_profile(user_id, {
+                    "is_premium": True,
+                    "subscription_cancel_at_period_end": False,
+                    # current_period_end asetetaan kun subscription.updated saapuu
+                })
+            else:
+                print(f"[Stripe webhook] checkout.session.completed but no user_id in payload")
+
+        elif event_type == "customer.subscription.updated":
+            # Subscription muuttui — esim. kayttaja peruutti, mutta access on
+            # voimassa current_period_end -paivaan asti
+            user_id = obj.get("metadata", {}).get("user_id")
+            if user_id:
+                from datetime import datetime, timezone
+
+                # Stripe API:n eri versiot tallentavat cancel-tiedot eri tavoin:
+                # - Vanhempi: cancel_at_period_end (boolean) + current_period_end juuressa
+                # - Uudempi (2026+): cancel_at (timestamp) + current_period_end items[0]:ssa
+                cancel_at_end_bool = obj.get("cancel_at_period_end", False)
+                cancel_at_ts = obj.get("cancel_at")  # uudempi: timestamp tai None
+                is_canceled = bool(cancel_at_end_bool) or bool(cancel_at_ts)
+
+                # period_end: kokeile juurikenttaa, sitten cancel_at-timestampia,
+                # viimeiseksi items[0].current_period_end (uudempi API)
+                period_end_ts = obj.get("current_period_end") or cancel_at_ts
+                if not period_end_ts:
+                    items = obj.get("items") or {}
+                    items_data = items.get("data") if isinstance(items, dict) else None
+                    if items_data:
+                        period_end_ts = items_data[0].get("current_period_end")
+
+                period_end_iso = None
+                if period_end_ts:
+                    period_end_iso = datetime.fromtimestamp(
+                        period_end_ts, tz=timezone.utc
+                    ).isoformat()
+                print(
+                    f"[Stripe webhook] subscription.updated user_id={user_id} "
+                    f"is_canceled={is_canceled} (bool={cancel_at_end_bool} ts={cancel_at_ts}) "
+                    f"period_end={period_end_iso}"
+                )
+                _update_profile(user_id, {
+                    "subscription_cancel_at_period_end": is_canceled,
+                    "subscription_current_period_end": period_end_iso,
+                })
+            else:
+                print(f"[Stripe webhook] subscription.updated no user_id sub_id={obj.get('id')}")
+
+        elif event_type == "customer.subscription.deleted":
+            # Tilaus peruttu/loppui — paivita is_premium=false
+            user_id = obj.get("metadata", {}).get("user_id")
+            if user_id:
+                print(f"[Stripe webhook] subscription.deleted user_id={user_id}")
+                # 🔒 NO-CLOBBER (#7): aktiivinen WEB-tilaus pitää premiumin.
+                if _web_subscription_active(user_id):
+                    print(f"[Stripe webhook] web-sub aktiivinen user_id={user_id} "
+                          f"— is_premium säilyy (no-clobber)")
+                else:
+                    _update_profile(user_id, {
+                        "is_premium": False,
+                        "subscription_cancel_at_period_end": False,
+                        "subscription_current_period_end": None,
+                    })
+            else:
+                print(f"[Stripe webhook] subscription.deleted no user_id in metadata sub_id={obj.get('id')}")
+
+        else:
+            print(f"[Stripe webhook] ignored event_type={event_type}")
+    except Exception as e:  # noqa: BLE001
+        # Nakyvasti lokiin: kuittaus on jo lahtenyt, joten tama on ainoa jalki
+        # siita etta tapahtuma jai kasittelematta.
+        print(f"[Stripe webhook] KASITTELY EPAONNISTUI "
+              f"type={event.get('type')} virhe={e!r}")
+
+
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request, background_tasks: BackgroundTasks):
+    """Vastaanottaa Stripen webhookit.
+
+    Allekirjoituksen tarkistus on SYNKRONINEN eika sita saa siirtaa taustalle:
+    se on turvaportti, ja vaarin allekirjoitettuun pyyntoon on vastattava
+    400:lla. Vasta sen jalkeen kasittely siirtyy taustatehtavaan, jotta
+    kuittaus lahtee Stripelle heti eika vasta Supabase-kirjoituksen jalkeen.
     """
     if not STRIPE_WEBHOOK_SECRET:
-        # Webhook-secret ei vielä konfiguroitu — palauta 200 OK että Stripe
-        # ei yritä uudelleen jatkuvasti
+        # Secret ei viela konfiguroitu -> 200 OK jottei Stripe jaa retry-looppiin.
         return {"received": True, "warning": "STRIPE_WEBHOOK_SECRET not configured"}
 
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature", "")
 
-    # Tarkista allekirjoitus Stripen kirjastolla (ei käytetä paluuarvoa,
-    # koska StripeObject ei tue .get() -metodia natiivisti)
     try:
         stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
     except ValueError:
@@ -2578,86 +2677,8 @@ async def stripe_webhook(request: Request):
     except stripe.error.SignatureVerificationError:
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    # Parsitaan raaka JSON käsittelyä varten — natiivi dict on luotettavampi
-    # kuin Stripen StripeObject-wrapper sisäkkäisten kenttien lukemiseen
     event = json.loads(payload)
-    event_type = event["type"]
-    obj = event["data"]["object"]
-
-    if event_type == "checkout.session.completed":
-        # Maksu onnistui — aktivoi premium ja nollaa cancel-tiedot
-        user_id = obj.get("client_reference_id") or obj.get("metadata", {}).get("user_id")
-        if user_id:
-            print(f"[Stripe webhook] checkout.session.completed user_id={user_id}")
-            _update_profile(user_id, {
-                "is_premium": True,
-                "subscription_cancel_at_period_end": False,
-                # current_period_end asetetaan kun subscription.updated saapuu
-            })
-        else:
-            print(f"[Stripe webhook] checkout.session.completed but no user_id in payload")
-
-    elif event_type == "customer.subscription.updated":
-        # Subscription muuttui — esim. kayttaja peruutti, mutta access on
-        # voimassa current_period_end -paivaan asti
-        user_id = obj.get("metadata", {}).get("user_id")
-        if user_id:
-            from datetime import datetime, timezone
-
-            # Stripe API:n eri versiot tallentavat cancel-tiedot eri tavoin:
-            # - Vanhempi: cancel_at_period_end (boolean) + current_period_end juuressa
-            # - Uudempi (2026+): cancel_at (timestamp) + current_period_end items[0]:ssa
-            cancel_at_end_bool = obj.get("cancel_at_period_end", False)
-            cancel_at_ts = obj.get("cancel_at")  # uudempi: timestamp tai None
-            is_canceled = bool(cancel_at_end_bool) or bool(cancel_at_ts)
-
-            # period_end: kokeile juurikenttaa, sitten cancel_at-timestampia,
-            # viimeiseksi items[0].current_period_end (uudempi API)
-            period_end_ts = obj.get("current_period_end") or cancel_at_ts
-            if not period_end_ts:
-                items = obj.get("items") or {}
-                items_data = items.get("data") if isinstance(items, dict) else None
-                if items_data:
-                    period_end_ts = items_data[0].get("current_period_end")
-
-            period_end_iso = None
-            if period_end_ts:
-                period_end_iso = datetime.fromtimestamp(
-                    period_end_ts, tz=timezone.utc
-                ).isoformat()
-            print(
-                f"[Stripe webhook] subscription.updated user_id={user_id} "
-                f"is_canceled={is_canceled} (bool={cancel_at_end_bool} ts={cancel_at_ts}) "
-                f"period_end={period_end_iso}"
-            )
-            _update_profile(user_id, {
-                "subscription_cancel_at_period_end": is_canceled,
-                "subscription_current_period_end": period_end_iso,
-            })
-        else:
-            print(f"[Stripe webhook] subscription.updated no user_id sub_id={obj.get('id')}")
-
-    elif event_type == "customer.subscription.deleted":
-        # Tilaus peruttu/loppui — paivita is_premium=false
-        user_id = obj.get("metadata", {}).get("user_id")
-        if user_id:
-            print(f"[Stripe webhook] subscription.deleted user_id={user_id}")
-            # 🔒 NO-CLOBBER (#7): aktiivinen WEB-tilaus pitää premiumin.
-            if _web_subscription_active(user_id):
-                print(f"[Stripe webhook] web-sub aktiivinen user_id={user_id} "
-                      f"— is_premium säilyy (no-clobber)")
-            else:
-                _update_profile(user_id, {
-                    "is_premium": False,
-                    "subscription_cancel_at_period_end": False,
-                    "subscription_current_period_end": None,
-                })
-        else:
-            print(f"[Stripe webhook] subscription.deleted no user_id in metadata sub_id={obj.get('id')}")
-
-    else:
-        print(f"[Stripe webhook] ignored event_type={event_type}")
-
+    background_tasks.add_task(_kasittele_stripe_tapahtuma, event)
     return {"received": True}
 
 
