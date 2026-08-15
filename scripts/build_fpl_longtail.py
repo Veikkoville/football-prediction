@@ -170,6 +170,13 @@ footer a{color:var(--teal);}
    + min-width keeps narrow tables at their previous width, centered, and
    only wide ones use the extra room. On a narrow screen min() returns 100%
    -> behavior is exactly what it was. */
+/* Muistioartikkelin typografia (15.8). Pitka artikkeli renderoityi ilman
+   kappalevalia: 19 lohkoa valui yhdeksi seinaksi (mitattu selaimella,
+   margin-bottom 0px). Testit eivat nae tata — sama luokka kuin jakokortin
+   layout-viat, jotka piti verifioida kuvana. */
+.note-body p{margin:0 0 15px;}
+.note-body h3{margin:26px 0 10px;font-size:1.05rem;letter-spacing:.01em;}
+.note-body h3:first-child{margin-top:0;}
 /* Muistioartikkelin datataulukko (15.8). EI .lb-wrapin tayttaa leveytta:
    artikkelin taulukko on nelja kapeaa saraketta ja kuuluu tekstipalstaan,
    kun taas .lb-wrap venyttaa taulukon ruudun levyiseksi ja keskittaa sen
@@ -2629,7 +2636,15 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
     notes = (notes_doc or {}).get("notes") or []
     if not notes:
         return None
-    notes = sorted(notes, key=lambda n: str(n.get("date") or ""), reverse=True)
+    # Sama tasatilanne kuin etusivun nostossa: jarjestysnumero ratkaisee, jotta
+    # saman paivan uudempi muistio on sivulla ylimpana.
+    notes = [
+        n for _, n in sorted(
+            enumerate(notes),
+            key=lambda p: (str(p[1].get("date") or ""), p[0]),
+            reverse=True,
+        )
+    ]
     url = f"{BASE}/fpl/notes"
 
     blocks = []
@@ -2643,7 +2658,7 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
             f'<h2 id="{escape(str(n.get("slug") or ""))}">'
             f'{escape(str(n.get("title") or ""))}</h2>'
             f'<p class="note">{escape(str(n.get("date") or ""))}</p>'
-            f"{paras}"
+            f'<div class="note-body">{paras}</div>'
             f'<p><a href="{escape(check)}">{cta}</a>.</p>'
             + _share_row(str(n.get("title") or ""),
                          f'{url}#{n.get("slug") or ""}')

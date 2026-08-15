@@ -1360,10 +1360,23 @@ def latest_articles_block(notes_doc: dict | None, limit: int = 1) -> str:
     Tyhja tai puuttuva data -> tyhja merkkijono -> koko lohko jaa pois.
     """
     notes = ((notes_doc or {}).get("notes") or [])
-    notes = sorted(notes, key=lambda n: str(n.get("date") or ""), reverse=True)
+    # 🔴 TASATILANNE RATKAISTAAN JARJESTYSNUMEROLLA. Pelkka paivays ei riita:
+    # 15.8 kirjoitettiin kaksi muistiota samalle paivalle, vakaa lajittelu
+    # sailytti alkuperaisen jarjestyksen ja etusivun nosto jai nayttamaan
+    # AAMUN muistiota vaikka uudempi oli jo julkaistu. Mitattu fpl.html:sta.
+    # Myohemmin lisatty voittaa saman paivan sisalla.
+    notes = [
+        n for _, n in sorted(
+            enumerate(notes),
+            key=lambda p: (str(p[1].get("date") or ""), p[0]),
+            reverse=True,
+        )
+    ]
     kortit = []
     for n in notes[:limit]:
-        paras = n.get("paragraphs") or []
+        paras = [x for x in (n.get("paragraphs") or []) if isinstance(x, str)]
+        # Vain merkkijonokappaleet: muistio voi alkaa valiotsikko- tai
+        # taulukkolohkolla, ja niiden str()-esitys olisi Python-dict etusivulla.
         if not paras or not n.get("title"):
             continue
         slug = escape(str(n.get("slug") or ""))
