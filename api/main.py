@@ -2248,6 +2248,31 @@ def push_token_delete(req: PushTokenDeleteRequest, request: Request):
 # ---------------------------------------------------------------------------
 # STRIPE: Checkout-session ja webhook
 # ---------------------------------------------------------------------------
+
+def _auto_promo_discount() -> list[dict] | None:
+    """Esitaytetty tarjouskoodi Checkoutiin, tai None.
+
+    🔴 MITATTU VIKA 15.8. Landing myy "€17.50 first year, enter EARLY30 at
+    checkout", mutta Checkout avautuu 25,00 euroon ja alennus vaatii etta
+    kayttaja klikkaa "Anna tarjouskoodi" ja kirjoittaa koodin itse. Luvattu
+    hinta ei siis ole se joka nakyy maksuhetkella.
+
+    Se osuu tasan siihen kohtaan jossa pudotus on mitattu: 8 web-checkoutia,
+    0 kauppaa, ja 5/6 poistui ENNEN sahkopostikentan tayttamista. Hinta on
+    ensimmainen asia jonka he nakivat.
+
+    ARVO TULEE YMPARISTOSTA, ei koodista: `STRIPE_AUTO_PROMO_CODE` on Stripen
+    promotion_code-ID (`promo_...`). Asettamaton -> entinen kaytos
+    (`allow_promotion_codes=True`), eli muutos ei voi rikkoa mitaan ennen kuin
+    joku tietoisesti kytkee sen paalle. `discounts` ja
+    `allow_promotion_codes` ovat Stripessa toisensa poissulkevia.
+    """
+    code = (os.environ.get("STRIPE_AUTO_PROMO_CODE") or "").strip()
+    if not code.startswith("promo_"):
+        return None
+    return [{"promotion_code": code}]
+
+
 class CheckoutRequest(BaseModel):
     """Pyyntö Stripe Checkout Sessionin luomiseen."""
     user_id: str = Field(..., description="Supabase user UUID")
@@ -2435,7 +2460,10 @@ def create_web_checkout_session(
                       "source": "pro-web"},
             success_url=f"{base}/?checkout=success&session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{base}/?checkout=cancelled",
-            allow_promotion_codes=True,
+            # Esitaytetty alennus jos ympäristö antaa sen, muuten kayttaja
+            # syottaa koodin itse (entinen kaytos). Ks. _auto_promo_discount.
+            **({"discounts": promo} if (promo := _auto_promo_discount())
+               else {"allow_promotion_codes": True}),
         )
         return WebCheckoutResponse(url=session.url or "")
     except stripe.error.StripeError as e:
