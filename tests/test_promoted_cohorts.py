@@ -146,3 +146,56 @@ def test_mallinimet_ovat_football_data_muotoa(joukkue):
     kaikki = set(PROMOTED_BY_SEASON["2627"][ELC][COHORT_UP]) | set(
         PROMOTED_BY_SEASON["2627"][ELC][COHORT_DOWN])
     assert joukkue in kaikki
+
+
+# ---------------------------------------------------------------------------
+# Poimintafunktiot (dict-muoto)
+# ---------------------------------------------------------------------------
+# 🔴 OMA AUKKO PORTISSA (loydetty 15.8 tuotannosta mittaamalla). Testasin
+# `taydenna_nousijat`-injektion mutta EN poimintafunktioita. Ne iteroivat
+# `per_liiga.get(liiga, ())` suoraan, ja dictin yli iterointi antaa KOHORTTIEN
+# NIMET joukkueiden sijaan:
+#
+#     nousijat_aktiiviselta_kaudelta(("ENG-Championship",), ...)
+#     -> {'promoted_from_below', 'relegated_from_above'}
+#
+# /api/teams naytti Championshipille 18 joukkuetta 24:n sijaan. Vika oli
+# NAKYMATON koska kutsuja vartioi listauksen dc.attack-jasenyydella:
+# kohorttinimet eivat ole mallissa -> suodattuivat pois. Vartio muutti
+# rikkinaisen listan hiljaa vajaaksi listaksi.
+#
+# Oppi: kun tietorakenteen MUOTO muuttuu, portin on katettava JOKAINEN sita
+# lukeva funktio, ei vain sita jota oltiin muuttamassa.
+
+def test_nousijapoiminta_palauttaa_joukkueet_eika_kohorttinimia():
+    from src.models.promoted_baseline import nousijat_aktiiviselta_kaudelta
+    got = nousijat_aktiiviselta_kaudelta((ELC,), ("2526", "2627"))
+    assert got == frozenset(
+        set(PROMOTED_BY_SEASON["2627"][ELC][COHORT_UP])
+        | set(PROMOTED_BY_SEASON["2627"][ELC][COHORT_DOWN]))
+    for nimi in (COHORT_UP, COHORT_DOWN):
+        assert nimi not in got, f"kohortin nimi '{nimi}' vuoti joukkuelistaan"
+
+
+def test_pudonneidenpoiminta_kestaa_dict_muodon():
+    """RELEGATED on Championshipille tanaan tuple, mutta normalisointi on
+    molemmissa funktioissa jotta ansa ei jaa odottamaan seuraavaa
+    kohorttilisaysta."""
+    from src.models.promoted_baseline import (
+        _kohortteina, pudonneet_aktiiviselta_kaudelta)
+    got = pudonneet_aktiiviselta_kaudelta((ELC,), ("2526", "2627"))
+    odotettu = set()
+    for j in _kohortteina(
+            __import__("src.models.promoted_baseline", fromlist=["x"])
+            .RELEGATED_BY_SEASON["2627"][ELC]).values():
+        odotettu |= set(j)
+    assert got == frozenset(odotettu)
+    assert "Coventry" in got
+
+
+def test_yhden_kohortin_liigan_poiminta_ennallaan():
+    """NEGATIIVINEN KONTROLLI: tuple-muotoiset liigat eivat saa muuttua."""
+    from src.models.promoted_baseline import nousijat_aktiiviselta_kaudelta
+    pl = "ENG-Premier League"
+    assert nousijat_aktiiviselta_kaudelta((pl,), ("2526", "2627")) == frozenset(
+        PROMOTED_BY_SEASON["2627"][pl])

@@ -167,7 +167,23 @@ def pudonneet_aktiiviselta_kaudelta(
         return frozenset()
     out: set[str] = set()
     for liiga in liigat:
-        out.update(per_liiga.get(liiga, ()))
+        # 🔴 `_kohortteina` on PAKOLLINEN, ei kosmetiikkaa. Liigan arvo voi olla
+        # dict {kohortti: joukkueet} (Championship 15.8 alkaen), ja dictin yli
+        # iterointi antaa KOHORTTIEN NIMET joukkueiden sijaan. Mitattu
+        # tuotannosta: nousijapoiminta palautti {'promoted_from_below',
+        # 'relegated_from_above'} ja /api/teams naytti Championshipille 18
+        # joukkuetta 24:n sijaan.
+        #
+        # Vika oli NAKYMATON koska kutsuja vartioi listauksen `dc.attack`
+        # -jasenyydella: kohorttinimet eivat ole mallissa, joten ne suodattuivat
+        # pois eivatka paatyneet valitsimeen. Vartio muutti rikkinaisen listan
+        # hiljaa vajaaksi listaksi — hyvaa suunnittelua, ja juuri siksi tama oli
+        # loydettava mittaamalla tuotannosta eika lukemalla koodia.
+        #
+        # Sama normalisointi molemmissa funktioissa vaikka RELEGATED on tanaan
+        # tuple: ansa ei saa jaada odottamaan seuraavaa kohorttilisaysta.
+        for joukkueet in _kohortteina(per_liiga.get(liiga, ())).values():
+            out.update(joukkueet)
     return frozenset(out)
 
 def nousijat_aktiiviselta_kaudelta(
@@ -186,7 +202,23 @@ def nousijat_aktiiviselta_kaudelta(
         return frozenset()
     out: set[str] = set()
     for liiga in liigat:
-        out.update(per_liiga.get(liiga, ()))
+        # 🔴 `_kohortteina` on PAKOLLINEN, ei kosmetiikkaa. Liigan arvo voi olla
+        # dict {kohortti: joukkueet} (Championship 15.8 alkaen), ja dictin yli
+        # iterointi antaa KOHORTTIEN NIMET joukkueiden sijaan. Mitattu
+        # tuotannosta: nousijapoiminta palautti {'promoted_from_below',
+        # 'relegated_from_above'} ja /api/teams naytti Championshipille 18
+        # joukkuetta 24:n sijaan.
+        #
+        # Vika oli NAKYMATON koska kutsuja vartioi listauksen `dc.attack`
+        # -jasenyydella: kohorttinimet eivat ole mallissa, joten ne suodattuivat
+        # pois eivatka paatyneet valitsimeen. Vartio muutti rikkinaisen listan
+        # hiljaa vajaaksi listaksi — hyvaa suunnittelua, ja juuri siksi tama oli
+        # loydettava mittaamalla tuotannosta eika lukemalla koodia.
+        #
+        # Sama normalisointi molemmissa funktioissa vaikka RELEGATED on tanaan
+        # tuple: ansa ei saa jaada odottamaan seuraavaa kohorttilisaysta.
+        for joukkueet in _kohortteina(per_liiga.get(liiga, ())).values():
+            out.update(joukkueet)
     return frozenset(out)
 
 
