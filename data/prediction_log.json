@@ -14017,7 +14017,15 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-08-01T09:44:57+00:00",
-      "result": null
+      "result": {
+        "home_score": 3,
+        "away_score": 0,
+        "actual_score": "3-0",
+        "actual_outcome": "home",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-15T21:22:54+00:00"
+      }
     },
     {
       "match_id": "fd-564633",
@@ -45974,7 +45982,15 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T07:11:43+00:00",
-      "result": null
+      "result": {
+        "home_score": 0,
+        "away_score": 1,
+        "actual_score": "0-1",
+        "actual_outcome": "away",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-15T21:22:54+00:00"
+      }
     },
     {
       "match_id": "fd-567274",
@@ -51606,7 +51622,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T09:27:55+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 4,
+        "actual_score": "1-4",
+        "actual_outcome": "away",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-15T21:22:54+00:00"
+      }
     },
     {
       "match_id": "fd-558226",
@@ -51625,7 +51649,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-08-15T09:27:55+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 2,
+        "actual_score": "1-2",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-15T21:22:54+00:00"
+      }
     },
     {
       "match_id": "fd-558227",
@@ -51644,7 +51676,15 @@
       "most_likely_score": "2-0",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T09:27:56+00:00",
-      "result": null
+      "result": {
+        "home_score": 3,
+        "away_score": 1,
+        "actual_score": "3-1",
+        "actual_outcome": "home",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-15T21:22:54+00:00"
+      }
     },
     {
       "match_id": "fd-558228",

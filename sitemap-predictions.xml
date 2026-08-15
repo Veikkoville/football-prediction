@@ -7,18 +7,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://goaliq.app/predictions/brasileirao/atletico-mg-vs-gremio</loc>
-    <lastmod>2026-08-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://goaliq.app/predictions/brasileirao/fluminense-vs-palmeiras</loc>
-    <lastmod>2026-08-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://goaliq.app/predictions/brasileirao/athletico-pr-vs-bragantino</loc>
     <lastmod>2026-08-15</lastmod>
     <changefreq>daily</changefreq>
@@ -557,12 +545,6 @@
     <lastmod>2026-08-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://goaliq.app/predictions/la-liga/sevilla-vs-rayo-vallecano</loc>
-    <lastmod>2026-08-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://goaliq.app/predictions/la-liga/racing-santander-vs-villarreal</loc>
