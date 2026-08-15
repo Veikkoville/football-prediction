@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-08-14T22:37:49",
+    "generated_at": "2026-08-15T09:31:04",
     "season": "2026/27",
     "source": "fpl-api",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -15,7 +15,7 @@
         "Hull",
         "Ipswich"
       ],
-      "manual_overrides": 8,
+      "manual_overrides": 10,
       "note": "Phase 1b: promoted-side home opener attack boost and manual overrides (data/fpl_manual_overrides.csv)"
     },
     "fdr_method": "Model based 1-5: 0.55*rank(1 - win%) + 0.45*rank(expected goals conceded), quintile bucket across every team fixture of the season",
@@ -3094,7 +3094,7 @@
           "def_fdr": 4,
           "att_fdr": 4,
           "tier": "near",
-          "cs_pct": 22.7
+          "cs_pct": 21.7
         },
         {
           "gw": 2,
@@ -3106,7 +3106,7 @@
           "def_fdr": 4,
           "att_fdr": 4,
           "tier": "near",
-          "cs_pct": 23.0
+          "cs_pct": 22.0
         },
         {
           "gw": 3,
@@ -3509,7 +3509,7 @@
           "tier": "far"
         }
       ],
-      "next_avg_cs_pct": 28.5,
+      "next_avg_cs_pct": 28.2,
       "next_avg_fdr": 2.83,
       "next_n": 6
     },
@@ -6991,7 +6991,7 @@
           "def_fdr": 5,
           "att_fdr": 4,
           "tier": "near",
-          "cs_pct": 15.9
+          "cs_pct": 15.3
         },
         {
           "gw": 2,
@@ -7003,7 +7003,7 @@
           "def_fdr": 2,
           "att_fdr": 3,
           "tier": "near",
-          "cs_pct": 36.2
+          "cs_pct": 35.5
         },
         {
           "gw": 3,
@@ -7406,7 +7406,7 @@
           "tier": "far"
         }
       ],
-      "next_avg_cs_pct": 24.2,
+      "next_avg_cs_pct": 24.0,
       "next_avg_fdr": 3.5,
       "next_n": 6
     },
@@ -8835,13 +8835,13 @@
       "away": "Tottenham",
       "home_short": "BRE",
       "away_short": "TOT",
-      "xg_home": 1.842,
+      "xg_home": 1.878,
       "xg_away": 1.128,
-      "p_home_win": 0.5238,
-      "p_draw": 0.2616,
-      "p_away_win": 0.2146,
+      "p_home_win": 0.5324,
+      "p_draw": 0.2579,
+      "p_away_win": 0.2097,
       "cs_home_pct": 32.4,
-      "cs_away_pct": 15.9,
+      "cs_away_pct": 15.3,
       "fdr_home": 2,
       "def_fdr_home": 2,
       "att_fdr_home": 1,
@@ -8858,13 +8858,13 @@
       "away": "Aston Villa",
       "home_short": "BHA",
       "away_short": "AVL",
-      "xg_home": 1.481,
+      "xg_home": 1.526,
       "xg_away": 1.08,
-      "p_home_win": 0.4445,
-      "p_draw": 0.2989,
-      "p_away_win": 0.2566,
+      "p_home_win": 0.4562,
+      "p_draw": 0.2943,
+      "p_away_win": 0.2494,
       "cs_home_pct": 34.0,
-      "cs_away_pct": 22.7,
+      "cs_away_pct": 21.7,
       "fdr_home": 2,
       "def_fdr_home": 2,
       "att_fdr_home": 2,
@@ -9043,11 +9043,11 @@
       "home_short": "TOT",
       "away_short": "NEW",
       "xg_home": 1.379,
-      "xg_away": 1.017,
-      "p_home_win": 0.4317,
-      "p_draw": 0.3116,
-      "p_away_win": 0.2567,
-      "cs_home_pct": 36.2,
+      "xg_away": 1.037,
+      "p_home_win": 0.4269,
+      "p_draw": 0.3109,
+      "p_away_win": 0.2622,
+      "cs_home_pct": 35.5,
       "cs_away_pct": 25.2,
       "fdr_home": 2,
       "def_fdr_home": 2,
@@ -9158,11 +9158,11 @@
       "home_short": "AVL",
       "away_short": "ARS",
       "xg_home": 1.003,
-      "xg_away": 1.47,
-      "p_home_win": 0.2383,
-      "p_draw": 0.3021,
-      "p_away_win": 0.4596,
-      "cs_home_pct": 23.0,
+      "xg_away": 1.514,
+      "p_home_win": 0.2314,
+      "p_draw": 0.2972,
+      "p_away_win": 0.4714,
+      "cs_home_pct": 22.0,
       "cs_away_pct": 36.7,
       "fdr_home": 4,
       "def_fdr_home": 4,

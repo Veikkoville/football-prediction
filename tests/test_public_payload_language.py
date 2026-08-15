@@ -35,12 +35,27 @@ PAYLOADS = [
 # Suomen tunnistin: skandit TAI yleisia sanoja jotka esiintyvat juuri naissa
 # selitteissa. Sanalista on tarkeampi kuin skandit, koska "Pre-season:
 # pelaajabaselinet ..." ei sisalla yhtaan a:ta tai o:ta.
+#
+# 15.8: sanalista paastikin lapi toisen vuodon. `data/fpl_manual_overrides.csv`
+# -rivin vapaa note-teksti paatyy metaan (context_layer.applied_in_horizon) kun
+# rivilla on attack/defence-kerroin, ja MM-vasymysrivin suomenkielinen perustelu
+# ("keskitetty kuorma 1959 min josta 84 % puolustajilla ...") ei osunut yhteenkaan
+# hakusanaan eika sisaltanyt aakkosia. Oppi: aihekohtainen sanalista vanhenee joka
+# kerta kun uusi kentta alkaa kantaa vapaata tekstia -> lisatty RAKENNESANAT
+# (josta/joka/vain/ilman/koska ...), jotka esiintyvat kaytannossa kaikessa
+# suomenkielisessa proosassa aiheesta riippumatta.
 FI_WORDS = re.compile(
     r"\b(pelaaja\w*|kausi|kauden|kaudet|kierro\w*|ennuste\w*|siirto\w*|"
     r"siirtoja|nousija\w*|joukkue\w*|luku|luvut|maalit|syotot|syötöt|"
     r"torjunn\w*|tarkentu\w*|arviolla|hintajarjestykse\w*|"
     r"hintajärjestykse\w*|saatavuus\w*|painon|otos|kentti\w*|"
-    r"klientit|jattaa|jättää|avautuu|tunneta|nayta\w*|näy\w*)\b",
+    r"klientit|jattaa|jättää|avautuu|tunneta|nayta\w*|näy\w*|"
+    # rakennesanat (aiheriippumattomat)
+    r"josta|jossa|joka|jotka|jonka|joilla|jolla|jotta|vain|ilman|"
+    r"koska|mutta|seka|sekä|kun|eika|eikä|jos|"
+    # MM-vasymyskerrosten sanasto
+    r"kuorma\w*|kuormit\w*|kaista\w*|keskitet\w*|puolustaj\w*|"
+    r"hyokkay\w*|hyökkäy\w*|vasymy\w*|väsymy\w*|minuut\w*)\b",
     re.IGNORECASE)
 FI_CHARS = re.compile(r"[äöÄÖ]")
 
@@ -88,8 +103,22 @@ def test_tunnistin_ei_ole_sokea():
     alkuperainen = ("Pre-season: pelaajabaselinet = edellisen kauden "
                     "FPL-historia, minuuttiarvio = kauden lopun rotaatio.")
     assert _finnish_hits(alkuperainen), "tunnistin ei nae alkuperaista vikaa"
+    # 15.8: toinen mitattu vuoto — override-rivin note metan
+    # context_layer.applied_in_horizon-listassa. Ei aakkosia, ei osumaa
+    # alkuperaiseen sanalistaan; taman piti laueta ja se ei lauennut.
+    override_note = ("GW1: override[wc_fatigue] Tottenham vs Brentford (A) "
+                     "att x1.0 def x1.02 (keskitetty kuorma 1959 min josta "
+                     "84 % puolustajilla)")
+    assert _finnish_hits(override_note), "tunnistin ei nae 15.8 override-vuotoa"
     # Ja englanti ei saa laueta.
     englanti = ("Pre-season: player baselines come from last season's FPL "
                 "history, and the minutes estimate comes from end-of-season "
                 "rotation plus FPL availability.")
     assert not _finnish_hits(englanti), f"valhe: {_finnish_hits(englanti)}"
+    # Myos englanniksi kirjoitettu override-note (sama rakenne kuin yllä) on
+    # paastava lapi — muuten portti opettaa sivuuttamaan itsensa.
+    englanti_note = ("GW1: override[wc_fatigue] Aston Villa vs Brighton (A) "
+                     "att x1.0 def x1.03 (World Cup load 2188 min among "
+                     "players over 300 tournament minutes; all of it "
+                     "goalkeeper and defence)")
+    assert not _finnish_hits(englanti_note), f"valhe: {_finnish_hits(englanti_note)}"

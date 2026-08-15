@@ -14,25 +14,44 @@
 #                opponent+venue-kentan; kaytetaan MM-vasymykseen)
 #   note         vapaa selite (nakyy builderin lokissa)
 #
-# MM-2026-VASYMYS (TAYTA ~20.7 FINAALIN JALKEEN): pelaajakohtaisia MM-minuutteja
-# ei ole ilmaisessa datassa -> seura-tason kertoimet kasin. Esimerkkipohja:
-#   wc_fatigue,Manchester City,,,1,3,0.92,1.05,0.90,paljon syvalle edenneita (tayta oikeat luvut)
-#
 # Esimerkki manuaalisesta fixture-korjauksesta:
 #   manual,Hull,Manchester United,H,1,1,1.15,,,tuntuma: avaus kotona kovempaa kuin baseline
 scope,team,opponent,venue,gw_from,gw_to,attack_mult,defence_mult,xmins_mult,note
-# MM-2026-vasymys (#142 OSA B, 20.7): mitoitus KONSERVATIIVINEN 0.95-0.97
-# koska per-pelaaja-minuutteja ei ole ohjelmallisesti (FD-tier ei anna
-# lineupeja, FotMob-API blokattu) -> pohjana scripts/build_wc2026_club_load.py
-# (squad-presence x maan ottelut) ristiintarkistettuna CoS:n 8 maan
-# selainminuuttikartoitukseen. 0.90-0.93-kaista vaatisi aidot minuutit.
-# Ei attack/defence-multeja (kuormituksen painottumista ei voi todentaa).
-# Uusinta-ajo ~15.8 (siirtoikkuna muuttaa seuroja).
-wc_fatigue,Manchester City,,,1,2,,,0.96,19 WC-pelaajaa/exposure 105 (suurin); CoS ~3080 min ml. Rodri 726; 0.95 tuotti Haaland -0.52 > 0.5p-gate -> pehmennetty
-wc_fatigue,Arsenal,,,1,2,,,0.95,12 WC-pelaajaa/exposure 73; CoS-kartoitus ~3087 min (suurin 8 maan otoksessa)
-wc_fatigue,Aston Villa,,,1,2,,,0.95,8 WC-pelaajaa/exposure 47; CoS-kartoitus ~2891 min ml. E.Martinez 810 + Konsa 647 avaajia
-wc_fatigue,Chelsea,,,1,2,,,0.96,9 WC-pelaajaa/exposure 55 ml. finaali; Cucurella 750 + Enzo 660
-wc_fatigue,Manchester United,,,1,2,,,0.96,10 WC-pelaajaa/exposure 56 ml. finalisteja (L.Martinez); CoS ~1122 min
-wc_fatigue,Liverpool,,,1,2,,,0.96,10 WC-pelaajaa/exposure 49 ml. finalisteja; Mac Allister 749 min yksin
-wc_fatigue,Tottenham,,,1,2,,,0.97,6 WC-pelaajaa/exposure 27; CoS-kartoitus ~1685 min
-wc_fatigue,Fulham,,,1,2,,,0.97,5 WC-pelaajaa/exposure 29; CoS-kartoitus ~1657 min (4 lahes lapipelaajaa QF-maista)
+# ---------------------------------------------------------------------------
+# MM-2026-VASYMYS (#142 OSA B, mitoitettu uudelleen 15.8 aidoilla minuuteilla)
+#
+# Lahde: data/wc2026_club_load.csv (15.8-ajo, scripts/build_wc2026_club_load_minutes.py)
+# = per-pelaaja-turnausminuutit x FPL 26/27 -rosteri. 164 pelaajaa / 20 seuraa / 40 669 min.
+# Korvaa 20.7-mitoituksen joka nojasi exposure-proxyyn (squad-jasenyys x maan ottelut).
+#
+# MITOITUSSAANTO (kaksi ehtoa, molemmat sitovia):
+#  1. KUORMAMITTARI = "keskitetty kuorma" = niiden seuran pelaajien MM-minuutit
+#     jotka ylsivat >=300 min (= karkeasti avaajia). Painottaa minuutteja eika
+#     paalukua (CoS-oppi 20.7). Rivi kirjataan vain jos keskitetty kuorma >=1250.
+#     Kaistat: >=3000 -> 0.96 · 1900-2999 -> 0.965 · 1250-1899 -> 0.97.
+#     Ensimmainen POIS jaanyt: Brighton 1174 (ei yhtaan >=600 min pelaajaa).
+#  2. PORTTIMARGINAALI: kerrointa loivennetaan kunnes seuran suurimman xP-liikkeen
+#     itseisarvo on <=0.45 p horisontti-xP:ssa (= 10 % marginaali promptin 0.5 p
+#     -porttiin). Sitoi vain Manchester Unitedin (B.Fernandes GW1+2 = 13.52 xP,
+#     liigan suurin -> 0.965 olisi tuottanut -0.47) -> 0.97.
+# EI attack_multeja: yhdenkaan seuran kuorma ei painotu hyokkayspaahan
+# (suurin FWD-minuuttisumma Man City 791 = 14 % seuran kuormasta).
+# defence_mult vain kahdelle joukkueelle joilla kuorma on GK+DEF-akselilla.
+#
+# !! KIELISAANTO (mitattu 15.8): jos rivilla on attack_mult TAI defence_mult,
+# sen note-teksti paatyy JULKISEEN payloadiin (meta.context_layer.
+# applied_in_horizon -> /api/fantasy/xp, autentikoimaton) -> se on
+# kirjoitettava ENGLANNIKSI. Pelkka xmins_mult-rivi ei tuota julkista notea
+# (fpl_context.fixture_adjustments lisaa noten vain kerroinmuutoksesta), joten
+# niiden note saa olla suomeksi = audit trail builderin lokissa.
+# ---------------------------------------------------------------------------
+wc_fatigue,Manchester City,,,1,2,,,0.96,keskitetty kuorma 4330 min (liigan raskain); 9 pelaajaa >=300 min ja 3 >=600 (Rodri 747 / Guehi 663 / E.Anderson 634)
+wc_fatigue,Arsenal,,,1,2,,,0.96,keskitetty kuorma 3374 min; 8 pelaajaa >=300 min ja 4 >=400 (Rice 559 / Saliba 480 / Odegaard 471 / Gabriel 450); ei yhtaan >=600
+wc_fatigue,Liverpool,,,1,2,,,0.96,keskitetty kuorma 3031 min; 7 pelaajaa >=300 min ml. Mac Allister 750 ja Alisson 450
+wc_fatigue,Chelsea,,,1,2,,,0.965,keskitetty kuorma 2361 min; nousi 20.7-tasosta kun Lacroix 330 ja Barco 19 saapuivat; Enzo 663 finalistina
+wc_fatigue,Crystal Palace,,,1,2,,,0.965,UUSI RIVI: keskitetty kuorma 2298 min / 6 pelaajaa >=300 min (Riad 435 / Solis 412 / Munoz 393 / Sarr 366); 20.7 jatettiin pois paalukuperusteella jota aidot minuutit eivat tue
+wc_fatigue,Aston Villa,,,1,2,,1.03,0.965,World Cup load 2188 min among players over 300 tournament minutes; all of it goalkeeper and defence (E.Martinez 810 / Konsa 647 / Digne 374 / Lindelof 357)
+wc_fatigue,Tottenham,,,1,2,,1.02,0.965,World Cup load 1959 min among players over 300 tournament minutes; 84% of it in defence (C.Romero 611 / Porro 564 / Spence 394 / Van de Ven 390)
+wc_fatigue,Manchester United,,,1,2,,,0.97,keskitetty kuorma 2000 min (kaista 0.965) mutta porttimarginaali sitoi: B.Fernandes GW1+2 = 13.52 xP on liigan suurin; L.Martinez 625 / Mazraoui 477 / Tielemans 475
+wc_fatigue,Fulham,,,1,2,,,0.97,keskitetty kuorma 1308 min; Berge 480 ja Castagne 478 lahes lapipelanneita QF-maista
+wc_fatigue,Sunderland,,,1,2,,,0.97,UUSI RIVI: keskitetty kuorma 1271 min; Xhaka 600 min yksin puolet siita
