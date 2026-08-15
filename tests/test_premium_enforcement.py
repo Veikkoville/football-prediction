@@ -49,7 +49,6 @@ FREE_EXPECTED = {
     "/api/fantasy/rate-team",
     "/api/fantasy/fit",
     "/api/fantasy/model-squad",
-    "/api/fantasy/captain",
     "/api/fantasy/differentials",
     "/api/fantasy/value",
     "/api/fantasy/xg-leaders",
@@ -76,6 +75,17 @@ PARTIAL_EXPECTED = {
     # 13.8: sama kuvio — sija ja piste-ero ovat FPL:n julkista dataa
     # (free), mallin kanta siihen mita erolle pitaisi tehda on premium.
     "/api/fantasy/rival",
+    # 15.8: captain siirtyi FREEsta tanne. Se oli listattu ilmaiseksi ja
+    # palautti autentikoimattomalle `top3` JA `differential` — eli tasan sen
+    # mita premium-paneeli myy ("Captain ranker: top three, a differential
+    # pick"). Portti oli VAIN selaimessa, joten suora API-kutsu sai koko
+    # ominaisuuden.
+    #
+    # Se ei kuulu kumpaankaan binaariseen luokkaan: myyntisivu lupaa ILMAISEKSI
+    # "Rate my team, with a captain pick" eli YHDEN valinnan. Vastaus on siis
+    # ilmainen ydin + premium-erittely, mika on tasan tama kolmas luokka.
+    # Koodi siirtyi vastaamaan copya, ei toisin pain.
+    "/api/fantasy/captain",
 }
 
 # Erittelykentat jotka EIVAT saa nakya ilman premiumia.
@@ -83,6 +93,8 @@ PARTIAL_PREMIUM_KEYS = {
     "/api/fantasy/model-race": (
         "model_captain_id", "model_bench_points", "model_autosubs"),
     "/api/fantasy/rival": ("differentials",),
+    # Differential-kapteeni on nimenomaan myyty premium-riville.
+    "/api/fantasy/captain": ("differential",),
 }
 
 

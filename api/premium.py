@@ -42,6 +42,14 @@ FREE_CHIP_WINDOWS = 3        # /api/fantasy/chip-ev: montako ikkunaa freelle
 FREE_PLAN_CHAINS = 1         # /api/fantasy/plan-chains: montako ketjua freelle
 FREE_EDGE_CAPTAINS = 2       # /api/fantasy/edge: kapteeniriveja freelle
 FREE_EDGE_DIFFERENTIALS = 2
+# 15.8: /api/fantasy/captain oli TAYSIN maskaamaton. Myyntisivu jakaa taman
+# tasan kahtia — FREE "Rate my team, with a captain pick", PREMIUM "Captain
+# ranker: top three, a differential pick and bonus expectation" — mutta API
+# palautti top3:n JA differentialin autentikoimattomalle. Portti oli vain
+# selaimessa (RateTeam.svelte piilotti sen), joten suora API-kutsu sai koko
+# premium-ominaisuuden. Villen paatos: maskaa yhteen valintaan, jolloin raja
+# on tasmalleen se mita copy jo lupaa eika copya tarvitse muuttaa.
+FREE_CAPTAIN_PICKS = 1
 FREE_EDGE_TEMPLATE_RISKS = 1
 
 
@@ -238,6 +246,27 @@ def xp_pool_rows(players: list[dict]) -> list[dict]:
         if p.get("id") is None:
             continue
         out.append({k: p.get(k) for k in XP_POOL_FIELDS})
+    return out
+
+
+def mask_captain_payload(payload: dict) -> dict:
+    """Kapteenivalinta freelle: yksi pick, ei differentialia.
+
+    Differential on nimenomaan myyty premium-riville ("a differential pick"),
+    joten se poistetaan kokonaan eika typisteta. Meta kertoo maskin, jotta
+    klientti voi nayttaa lukon eika tyhjaa kohtaa.
+    """
+    out = dict(payload)
+    top = list(out.get("top3") or [])
+    out["top3"] = top[:FREE_CAPTAIN_PICKS]
+    out["differential"] = None
+    meta = dict(out.get("meta") or {})
+    meta["masked"] = True
+    meta["mask"] = (
+        f"top {FREE_CAPTAIN_PICKS} of {len(top)} captain picks, no "
+        "differential (free preview - GoalIQ Premium unlocks the ranker)"
+    )
+    out["meta"] = meta
     return out
 
 

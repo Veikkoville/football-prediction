@@ -3441,6 +3441,7 @@ def fantasy_plan(
 
 @app.get("/api/fantasy/captain")
 def fantasy_captain(
+    request: Request,
     response: Response,
     entry: int | None = Query(default=None),
     gw: int | None = Query(default=None, ge=1, le=38),
@@ -3478,6 +3479,12 @@ def fantasy_captain(
                     row["set_pieces"] = src["set_pieces"]
     except Exception:
         pass  # enrichment ei koskaan kaada peruspayloadia
+    # 15.8: maskaus VASTA enrichmentin jalkeen, jotta free-rivi saa samat
+    # e_bonus/set_pieces-kentat kuin premium — maski koskee rivien MAARAA,
+    # ei niiden sisaltoa.
+    if not is_premium_request(request):
+        from api.premium import mask_captain_payload
+        payload = mask_captain_payload(payload)
     return payload
 
 
