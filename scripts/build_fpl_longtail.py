@@ -2247,6 +2247,13 @@ def render_club_best(xp: dict, now: datetime) -> str | None:
     body = (
         f"{_kit_defs(all_clubs)}"
         + "".join(sections)
+        + '<p class="note">Every club also has its own page with set-piece '
+          "takers and a predicted XI: "
+          + ", ".join(
+              f'<a href="/fpl/club/{s}">{escape(c)}</a>'
+              for c, s in sorted(
+                  (c, CLUB_SLUGS[c]) for c in set(all_clubs) if c in CLUB_SLUGS))
+          + ".</p>"
         + '<p class="note">The gap is measured against the same club and the '
           "same position, not against the row above. \"No 2nd projected\" "
           "means no other player at that club cleared the projection "
@@ -2542,6 +2549,234 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+
+CLUB_DIR = OUT_DIR / "club"
+
+# FPL:n lyhenne -> URL-slug. Kirjoitettu auki eika johdettu nimesta, koska
+# slug on PYSYVA sopimus: johdettu slug muuttuisi jos seuran nayttonimi
+# muuttuu, ja jokainen ulkoinen linkki katkeaisi hiljaa.
+CLUB_SLUGS = {
+    "ARS": "arsenal", "AVL": "aston-villa", "BOU": "bournemouth",
+    "BRE": "brentford", "BHA": "brighton", "BUR": "burnley",
+    "CHE": "chelsea", "COV": "coventry", "CRY": "crystal-palace",
+    "EVE": "everton", "FUL": "fulham", "HUL": "hull", "IPS": "ipswich",
+    "LEE": "leeds", "LEI": "leicester", "LIV": "liverpool",
+    "MCI": "manchester-city", "MUN": "manchester-united",
+    "NEW": "newcastle", "NFO": "nottingham-forest", "SOU": "southampton",
+    "SUN": "sunderland", "TOT": "tottenham", "WHU": "west-ham",
+    "WOL": "wolves",
+}
+
+_SP_LABELS = (("pens", "Penalties"), ("corners", "Corners"), ("fk", "Free kicks"))
+
+
+def _set_piece_rows(players: list[dict]) -> str:
+    """Erikoistilannevuorot jarjestysnumeron mukaan.
+
+    FPL julkaisee jarjestyksen (1 = ensimmainen vuorossa). Naytetaan vain
+    numerot jotka FPL on antanut — tyhja tarkoittaa ettei jarjestysta ole
+    julkaistu, EI etta pelaaja ei ota niita. Se ero on kerrottava, koska
+    esikaudella tyhjia on paljon.
+    """
+    out = []
+    for avain, otsikko in _SP_LABELS:
+        rivit = [(p, (p.get("set_pieces") or {}).get(avain)) for p in players]
+        rivit = sorted(((p, n) for p, n in rivit if isinstance(n, int)),
+                       key=lambda x: x[1])
+        if not rivit:
+            continue
+        nimet = ", ".join(
+            f'{escape(str(p["web_name"]))} <span class="hi">{n}</span>'
+            for p, n in rivit[:4])
+        out.append(f"<tr><td>{otsikko}</td><td>{nimet}</td></tr>")
+    return "".join(out)
+
+
+def _xi_rows(players: list[dict]) -> tuple[str, int]:
+    """Ennustettu avauskokoonpano: paras 11 aloitustodennakoisyyden mukaan,
+    positiorajoilla 1-4-4-2 -tyyliin taipuen. Palauttaa (rivit, n)."""
+    # 🔴 Kayta JAETTUA POSITIONS-vakiota, ala kovakoodaa. Kirjoitin tahan
+    # ensin {"GK": 1, ...} ja jokaisen 20 seuran "Predicted XI" renderoitui
+    # KYMMENELLA pelaajalla ilman maalivahtia: FPL:n koodi on "GKP" eika "GK",
+    # ja `src.models.fpl_club_best.POSITIONS` tiesi sen jo. Rivi nakyi vaarana
+    # vasta valmiilla sivulla, ei koodia lukemalla.
+    kiintio = dict(zip(POSITIONS, (1, 4, 4, 2)))
+    valitut = []
+    for pos, n in kiintio.items():
+        ryhma = sorted(
+            (p for p in players if p.get("pos") == pos
+             and isinstance(p.get("predicted_starts"), (int, float))),
+            key=lambda p: -p["predicted_starts"])
+        valitut.extend(ryhma[:n])
+    # 🔴 TAYDENNYS 11:een. Kiintio 1-4-4-2 ei tayty jos seuralla ei ole
+    # tarpeeksi pelaajia jossakin positiossa: mitattu Liverpool, jolla on
+    # projektiossa YKSI nimellinen hyokkaaja, jolloin XI jai kymmeneen.
+    # Vajaa "Predicted XI" on nakyva virhe. Taytetaan parhailla jaljella
+    # olevilla aloitustodennakoisyyden mukaan, mika on myos lahempana sita
+    # miten seura oikeasti pelaa kuin tyhja paikka.
+    if len(valitut) < 11:
+        otetut = {id(p) for p in valitut}
+        loput = sorted(
+            (p for p in players
+             if id(p) not in otetut
+             and isinstance(p.get("predicted_starts"), (int, float))),
+            key=lambda p: -p["predicted_starts"])
+        valitut.extend(loput[:11 - len(valitut)])
+    if len(valitut) < 11:
+        return "", 0
+    # Sama kovakoodaus oli myos tassa: "GK" ei osunut, joten maalivahti
+    # sortautui listan HANNILLE. Kentalla se on absurdi jarjestys.
+    jarj = {pos: i for i, pos in enumerate(POSITIONS)}
+    valitut.sort(key=lambda p: (jarj.get(p.get("pos"), 9), -p["predicted_starts"]))
+    rivit = "".join(
+        "<tr>"
+        f'<td>{escape(str(p["web_name"]))}</td>'
+        f'<td class="m-hide">{escape(str(p.get("pos", "")))}</td>'
+        f'<td class="n">{float(p.get("price") or 0):.1f}</td>'
+        f'<td class="n">{p["predicted_starts"]:.0f}%</td>'
+        f'<td class="n hi">{float(p.get("xp_horizon_total") or 0):.1f}</td>'
+        "</tr>"
+        for p in valitut)
+    return rivit, len(valitut)
+
+
+def render_club_page(short: str, players: list[dict], meta: dict,
+                     now: datetime) -> str | None:
+    """Yhden seuran esittelysivu (15.8.2026, Villen tilaus).
+
+    MIKSI TAMA FORMAATTI. Ville antoi esimerkiksi FFScoutin seurakohtaisen
+    ennakon (parhaat pelaajat, erikoistilannevuorot, ennustettu XI). Se on
+    heilla proosaa; meilla se on DATAA, ja siksi se on ainoa artikkelityyppi
+    jonka runko voidaan generoida ilman etta teksti alkaa kuulostaa koneelta.
+    Generoitu taulukko ei teeskentele mielipidetta.
+
+    Kolme osaa vastaavat esimerkin kolmea lupausta:
+      1. Best players    xP-jarjestys, hinta ja omistus rinnalla
+      2. Set-piece takers FPL:n julkaisema jarjestysnumero
+      3. Predicted XI     aloitustodennakoisyys, ei arvaus
+
+    REHELLISYYSRAJAUS joka on koodissa eika vain copyssa: tyhja
+    erikoistilannevuoro tarkoittaa ettei FPL ole julkaissut jarjestysta, EI
+    etta pelaaja ei ota niita. Esikaudella tyhjia on paljon, ja tuon eron
+    piilottaminen tekisi sivusta itsevarmemman kuin data on.
+    """
+    if len(players) < 8:
+        return None
+    slug = CLUB_SLUGS.get(short)
+    if not slug:
+        return None
+    nimi = str(players[0].get("team") or short)
+    url = f"{BASE}/fpl/club/{slug}"
+    n_gw = len(((players[0]).get("gameweeks")) or []) or 6
+    first_gw = (meta or {}).get("next_gameweek")
+    window = f"GW{first_gw}-{first_gw + n_gw - 1}" if first_gw else f"next {n_gw} GWs"
+
+    karki = sorted(players, key=lambda p: -(p.get("xp_horizon_total") or 0))[:8]
+    best_rows = "".join(
+        "<tr>"
+        f'<td class="n">{i + 1}</td>'
+        f'<td>{escape(str(p["web_name"]))}</td>'
+        f'<td class="m-hide">{escape(str(p.get("pos", "")))}</td>'
+        f'<td class="n">{float(p.get("price") or 0):.1f}</td>'
+        f'<td class="n m-hide">{float(p.get("owned_pct") or 0):.1f}%</td>'
+        f'<td class="n hi">{float(p.get("xp_horizon_total") or 0):.1f}</td>'
+        "</tr>"
+        for i, p in enumerate(karki))
+
+    osat = [
+        f'<h2 id="best">{escape(nimi)} best players for {escape(window)}</h2>'
+        '<div class="lb-wrap"><table class="lb">'
+        '<thead><tr><th class="n">#</th><th>Player</th>'
+        '<th class="m-hide">Pos</th><th class="n">Price</th>'
+        '<th class="n m-hide">Owned</th>'
+        f'<th class="n">{n_gw}GW xP</th></tr></thead>'
+        f"<tbody>{best_rows}</tbody></table></div>"
+    ]
+
+    sp = _set_piece_rows(players)
+    if sp:
+        osat.append(
+            '<h2 id="set-pieces">Set-piece takers</h2>'
+            '<div class="lb-wrap"><table class="lb">'
+            "<thead><tr><th>Situation</th><th>Order</th></tr></thead>"
+            f"<tbody>{sp}</tbody></table></div>"
+            '<p class="note">The number is the order FPL publishes, so 1 is '
+            "first in line. An empty situation means FPL has not published an "
+            "order for it, which is not the same as nobody taking them. "
+            "Pre-season there are a lot of blanks.</p>")
+
+    xi, n_xi = _xi_rows(players)
+    if xi:
+        osat.append(
+            '<h2 id="xi">Predicted XI</h2>'
+            '<div class="lb-wrap"><table class="lb">'
+            '<thead><tr><th>Player</th><th class="m-hide">Pos</th>'
+            '<th class="n">Price</th><th class="n">Start</th>'
+            f'<th class="n">{n_gw}GW xP</th></tr></thead>'
+            f"<tbody>{xi}</tbody></table></div>"
+            '<p class="note">Start is our projected chance of starting, not a '
+            "lineup leak. We do not watch press conferences. The shape is the "
+            "highest-probability starter at each position, so it will not "
+            "always match the manager's formation.</p>")
+
+    conf = ((meta or {}).get("team_confidence") or {}).get("teams", {}).get(nimi)
+    if conf and conf.get("note"):
+        osat.append(f'<h2 id="squad">Squad turnover</h2>'
+                    f'<p>{escape(str(conf["note"]))}</p>')
+
+    title = f"{nimi} FPL {escape(window)}: best players, set-piece takers, predicted XI | GoalIQ"
+    lead = karki[0]
+    desc = (
+        f"{nimi}'s best FPL picks for {window} by projected points, who takes "
+        f"their penalties and corners, and our predicted XI with start "
+        f"probabilities. {lead['web_name']} leads on "
+        f"{float(lead.get('xp_horizon_total') or 0):.1f} xP. Free, no sign-in."
+    )
+    hero = (
+        f"<h1>{escape(nimi)}: best players, set pieces and a predicted XI</h1>"
+        f'<p class="lede">Everything on this page comes from our own match '
+        f"model over {escape(window)}. "
+        f"{escape(str(lead['web_name']))} leads the squad on "
+        f"{float(lead.get('xp_horizon_total') or 0):.1f} projected points. "
+        "Free, no sign-in, updated daily.</p>"
+    )
+    body = (
+        f"{_kit_defs([short])}"
+        + "".join(osat)
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
+def render_club_pages(xp: dict, now: datetime) -> list[str]:
+    """Kirjoita jokaisen seuran sivu. Palauttaa kirjoitetut slugit."""
+    meta = xp.get("meta") or {}
+    players = xp.get("players") or []
+    if not meta.get("available") or not players:
+        return []
+    per_club: dict[str, list[dict]] = {}
+    for p in players:
+        s = p.get("team_short")
+        if s:
+            per_club.setdefault(s, []).append(p)
+    CLUB_DIR.mkdir(parents=True, exist_ok=True)
+    tehdyt = []
+    for short, ryhma in sorted(per_club.items()):
+        page = render_club_page(short, ryhma, meta, now)
+        if not page:
+            continue
+        (CLUB_DIR / f"{CLUB_SLUGS[short]}.html").write_text(page, encoding="utf-8")
+        tehdyt.append(CLUB_SLUGS[short])
+    return tehdyt
+
+
 def render_expected_points(xp: dict, now: datetime) -> str | None:
     """Koko xP-lista ilmaiseksi, ilman kirjautumista (9.8.2026).
 
@@ -2705,6 +2940,11 @@ def main() -> int:
             (OUT_DIR / "team-news.html").write_text(page, encoding="utf-8")
             built.append("team-news")
 
+    if xp:
+        clubs = render_club_pages(xp, now)
+        if clubs:
+            built.append(f"club x{len(clubs)}")
+
     notes_doc = _load(NOTES_PATH)
     if notes_doc:
         page = render_notes(notes_doc, now)
@@ -2755,12 +2995,16 @@ def main() -> int:
             built.append("defence")
 
     today = now.strftime("%Y-%m-%d")
-    write_urlset(SITEMAP_FPL_PATH, [
-        (f"{BASE}/fpl/{f.stem}", today, "daily", "0.7")
-        for f in sorted(OUT_DIR.glob("*.html"))
-    ])
+    # Seurasivut ovat alihakemistossa, joten `glob("*.html")` EI nae niita.
+    # Ilman tata 20 sivua olisi olemassa mutta poissa sitemapista — sama
+    # orpous joka mitattiin 15.8 `expected-points`- ja `team-news`-sivuilla.
+    urlit = [(f"{BASE}/fpl/{f.stem}", today, "daily", "0.7")
+             for f in sorted(OUT_DIR.glob("*.html"))]
+    urlit += [(f"{BASE}/fpl/club/{f.stem}", today, "daily", "0.6")
+              for f in sorted(CLUB_DIR.glob("*.html"))]
+    write_urlset(SITEMAP_FPL_PATH, urlit)
     print(f"LONGTAIL: {', '.join(built) or 'ei sivuja (data puuttuu)'} "
-          f"(sitemap-fpl.xml: {len(list(OUT_DIR.glob('*.html')))} URL:ia)")
+          f"(sitemap-fpl.xml: {len(urlit)} URL:ia)")
     return 0
 
 

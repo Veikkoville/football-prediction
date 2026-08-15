@@ -161,3 +161,65 @@ def test_lohko_on_HERON_SISALLA_eika_sen_alla():
     assert hero_alku < marker < hero_loppu, (
         "featured-lohko ei ole heron sisalla -> se putoaa fold-rajan alle")
     assert marker < idx.index("GEN:XP-TABLE-START")
+
+
+# ---------------------------------------------------------------------------
+# Seurasivut
+# ---------------------------------------------------------------------------
+
+def test_seurasivun_XI_alkaa_maalivahdista_ja_on_11():
+    """🔴 MITATTU VIKA. Kirjoitin kiintioon {"GK": 1, ...} vaikka FPL:n koodi
+    on "GKP", ja `src.models.fpl_club_best.POSITIONS` tiesi sen jo. Jokaisen
+    20 seuran "Predicted XI" renderoitui KYMMENELLA pelaajalla ilman
+    maalivahtia, ja korjauksen jalkeen maalivahti sortautui listan hannille
+    koska sama kovakoodaus oli jarjestyksessa. Kumpikin nakyi vasta valmiilla
+    sivulla, ei koodia lukemalla."""
+    import re
+    d = ROOT / "fpl" / "club"
+    if not d.exists():  # pragma: no cover
+        pytest.skip("seurasivuja ei ole rakennettu")
+    sivut = sorted(d.glob("*.html"))
+    assert len(sivut) >= 18, f"seurasivuja vain {len(sivut)}"
+    for f in sivut:
+        h = f.read_text(encoding="utf-8")
+        blk = re.search(r'<h2 id="xi">.*?</table>', h, re.S)
+        if not blk:
+            continue
+        rivit = [r for r in re.findall(r"<tr>(.*?)</tr>", blk.group(0), re.S)
+                 if "<td" in r]
+        assert len(rivit) == 11, f"{f.stem}: XI:ssa {len(rivit)} pelaajaa"
+        eka = re.findall(r"<td[^>]*>(.*?)</td>", rivit[0], re.S)
+        assert "GKP" in re.sub(r"<[^>]+>", "", eka[1]), (
+            f"{f.stem}: XI ei ala maalivahdista")
+
+
+def test_seurasivut_ovat_sitemapissa():
+    """Alihakemisto ei nay `glob('*.html')`-haussa, joten 20 sivua olisi
+    olemassa mutta poissa sitemapista."""
+    sm = (ROOT / "sitemap-fpl.xml").read_text(encoding="utf-8")
+    d = ROOT / "fpl" / "club"
+    if not d.exists():  # pragma: no cover
+        pytest.skip("seurasivuja ei ole")
+    for f in sorted(d.glob("*.html")):
+        assert f"/fpl/club/{f.stem}" in sm, f"{f.stem} puuttuu sitemapista"
+
+
+def test_seurasivuihin_linkitetaan_club_bestista():
+    """Sitemap on hakukoneille. Lukija tarvitsee linkin."""
+    cb = ROOT / "fpl" / "club-best.html"
+    if not cb.exists():  # pragma: no cover
+        pytest.skip("club-best puuttuu")
+    h = cb.read_text(encoding="utf-8")
+    assert h.count("/fpl/club/") >= 15, (
+        "club-best ei linkita seurasivuihin -> ne jaavat orvoiksi")
+
+
+def test_seurasivu_kertoo_mita_tyhja_erikoistilanne_tarkoittaa():
+    """Rehellisyysrajaus koodissa eika vain copyssa: tyhja vuoro tarkoittaa
+    ettei FPL ole julkaissut jarjestysta, EI etta pelaaja ei ota niita."""
+    f = ROOT / "fpl" / "club" / "bournemouth.html"
+    if not f.exists():  # pragma: no cover
+        pytest.skip("sivua ei ole")
+    h = f.read_text(encoding="utf-8")
+    assert "has not published an order" in h
+    assert "not a lineup leak" in h
