@@ -257,6 +257,7 @@ _TOOL_LINKS = [
     ("/fpl/expected-points", "Expected points"),
     ("/fpl/club-best", "Best per club"),
     ("/fpl/team-news", "Team news"),
+    ("/fpl/notes", "Notes"),
     ("/fpl/model-xi", "Model XI"),
     ("/fpl/differentials", "Differentials"),
     ("/fpl/price-changes", "Price changes"),
@@ -2457,6 +2458,83 @@ def render_team_news(xp: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+
+NOTES_PATH = ROOT / "data" / "fpl_notes.json"
+
+
+def render_notes(notes_doc: dict, now: datetime) -> str | None:
+    """Kierrosmuistiot yhdella URLilla (15.8.2026, Villen GO).
+
+    MIKSI YKSI SIVU EIKA SIVU PER MUISTIO. Erillinen sivu per muistio jaisi
+    orvoksi sisaisessa linkityksessa — sama vika joka mitattiin samana paivana
+    kahdesti (`team-news` ja `expected-points` puuttuivat `_TOOL_LINKS`:sta,
+    ja `expected-points` on se sivu johon X-postaukset linkittavat). Yksi
+    kertyva URL keskittaa linkit eika voi vanhentua kuratoidusta listasta.
+
+    MIKSI TEKSTIA EI GENEROIDA. Villen kysymys 15.8 oli voiko naita
+    automatisoida. Julkaisutarkistaja blokkasi ensimmaisen muistion kuudella
+    loydoksella, joista NELJA koski tyylia: nolla lyhennetta 960 merkissa,
+    pilkottu antiteesi, yhteenvetolause. Generaattori tuottaisi tasan ne.
+    Teksti tulee siis `data/fpl_notes.json`:sta ihmisen kirjoittamana ja
+    portin lapaisemana; tama funktio vain lataa sen.
+
+    Automatisoitu on se osa joka petti MEKAANISESTI: `claims`-lista ajetaan
+    `scripts/check_claim_route.py`:lla, joka tarkistaa etta jokainen luku on
+    loydettavissa siita sivusta johon muistio linkittaa. Se on tarpeen koska
+    15.8 kirjoitin vaitteen joka oli TOSI mutta jonka lukija ei olisi voinut
+    tarkistaa.
+    """
+    notes = (notes_doc or {}).get("notes") or []
+    if not notes:
+        return None
+    notes = sorted(notes, key=lambda n: str(n.get("date") or ""), reverse=True)
+    url = f"{BASE}/fpl/notes"
+
+    blocks = []
+    for n in notes:
+        paras = "".join(f"<p>{escape(str(p))}</p>" for p in n.get("paragraphs") or [])
+        if not paras:
+            continue
+        check = str(n.get("check_url") or f"{BASE}/fpl/team-news")
+        cta = escape(str(n.get("cta") or "Check the numbers"))
+        blocks.append(
+            f'<h2 id="{escape(str(n.get("slug") or ""))}">'
+            f'{escape(str(n.get("title") or ""))}</h2>'
+            f'<p class="note">{escape(str(n.get("date") or ""))}</p>'
+            f"{paras}"
+            f'<p><a href="{escape(check)}">{cta}</a>.</p>'
+        )
+    if not blocks:
+        return None
+
+    latest = notes[0]
+    title = "FPL notes from the model | GoalIQ"
+    desc = (
+        "Short gameweek notes where every number comes from our own match "
+        "model and every one of them is on a free page you can open. Latest: "
+        + str(latest.get("title") or "")
+    )
+    hero = (
+        "<h1>Notes from the model</h1>"
+        '<p class="lede">Short notes, one per gameweek, written when the '
+        "numbers say something worth saying. Every figure here is our own "
+        "model output and every one of them sits on a free page you can open "
+        "and check. No sign-in.</p>"
+    )
+    body = (
+        "".join(blocks)
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def render_expected_points(xp: dict, now: datetime) -> str | None:
     """Koko xP-lista ilmaiseksi, ilman kirjautumista (9.8.2026).
 
@@ -2619,6 +2697,13 @@ def main() -> int:
         if page:
             (OUT_DIR / "team-news.html").write_text(page, encoding="utf-8")
             built.append("team-news")
+
+    notes_doc = _load(NOTES_PATH)
+    if notes_doc:
+        page = render_notes(notes_doc, now)
+        if page:
+            (OUT_DIR / "notes.html").write_text(page, encoding="utf-8")
+            built.append("notes")
 
     diff = _fetch_differentials()
     if diff:
