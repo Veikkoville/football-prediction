@@ -77,6 +77,62 @@ MIN_XP_TOTAL = 1.0
 # ---------------------------------------------------------------------------
 # Saatavuus (vain tuotanto — backtestissä ei historiallista statusta)
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Avopeliosuus (15.8.2026) — ks. soveltamiskohdan kommentti build():ssa.
+# ---------------------------------------------------------------------------
+SHOTS_PATH = config.PROJECT_ROOT / "data" / "understat_player_shots_2526.json"
+
+
+def _shot_key(element: dict) -> str:
+    """Normalisoitu nimiavain FPL-elementille laukausdatan yhdistamiseen."""
+    import unicodedata
+    name = (element.get("full_name")
+            or f"{element.get('first_name', '')} {element.get('second_name', '')}")
+    s = unicodedata.normalize("NFKD", str(name))
+    s = "".join(c for c in s if not unicodedata.combining(c)).lower()
+    return " ".join(s.split())
+
+
+def effective_team_mult(t_mult: float, open_play_share: float) -> float:
+    """Joukkuekerroin painotettuna pelaajan avopeliosuudella.
+
+    share 1.0 -> koko joukkuevaikutus (entinen kaytos)
+    share 0.0 -> ei vaikutusta lainkaan (kaikki xG erikoistilanteista)
+    Omana funktiona jotta saanto on testattavissa ilman koko builderia.
+    """
+    return 1.0 + (t_mult - 1.0) * open_play_share
+
+
+def _load_open_play_share() -> dict[str, float]:
+    """{nimiavain: avopeliosuus} Understatin laukausdatasta.
+
+    osuus = 1 - spxg/npxg. Puuttuva tai nolla npxg -> pelaajaa ei kirjata,
+    jolloin kutsuja saa oletuksen 1.0 eli entisen kayttaytymisen.
+    """
+    if not SHOTS_PATH.exists():
+        return {}
+    try:
+        import json as _json
+        doc = _json.loads(SHOTS_PATH.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[str, float] = {}
+    import unicodedata
+    for r in doc.get("players") or []:
+        npxg = float(r.get("npxg") or 0.0)
+        if npxg <= 0:
+            continue
+        spxg = float(r.get("spxg") or 0.0)
+        share = 1.0 - min(spxg / npxg, 1.0)
+        s = unicodedata.normalize("NFKD", str(r.get("name") or ""))
+        key = " ".join("".join(
+            c for c in s if not unicodedata.combining(c)).lower().split())
+        if key:
+            out[key] = share
+    return out
+
+
 def availability_factor(element: dict) -> float:
     """FPL status → minuuttikerroin. a=pelattavissa, d=epävarma (chance-%),
     i/s/u/n = sivussa.
@@ -817,6 +873,34 @@ def main(argv: list[str] | None = None) -> int:
         for t, m in sorted(team_xg_mult.items()):
             print(f"      joukkueen maaliuhkakerroin {t}: xg90 ja xa90 x{m:.2f}")
 
+    # 🔴 AVOPELIPAINOTUS (15.8.2026). Joukkuetason maaliuhkakerroin kuvaa
+    # AVOPELIN hyokkaysvoimaa: se syntyy siirtoikkunasta, valmentajanvaihdosta
+    # ja rungon menetyksesta. Erikoistilannemaali ei skaalaudu sen mukana —
+    # kulmasyoton laatu ja pelaajan ilmapeli eivat katoa silla etta seura
+    # menetti hyokkaajan.
+    #
+    # Kertoimen soveltaminen tasaisesti kaikkiin oli siis mis-spesifioitu, ja
+    # MITTAUS kertoo kuinka paljon: Malick Thiawin ei-rangaistuspotku-xG:sta
+    # 5.90:sta on erikoistilanteista 5.38 eli 91 %. Liigan mediaani on 16 %.
+    # Newcastlen ohitus on juuri se rivi joka on aktiivisena, ja Thiaw pelaa
+    # siella — 10 % joukkueleikkaus olisi vienyt 10 % myos siita 91 %:sta
+    # johon se ei pade.
+    #
+    # Jonorivi sanoi etta kalibrointiluku olisi "toistaiseksi harkinta, koska
+    # set_pieces on tyhja". Se piti paikkansa FPL:n bootstrapista, mutta EI
+    # Understatin laukaisutason artefaktista, jossa `spxg` on ollut koko ajan.
+    # Nyt luku on mitattu per pelaaja eika arvattu kerran kaikille.
+    #
+    # SAANTO: efektiivinen kerroin = 1 + (kerroin - 1) * avopeliosuus.
+    #   avopeliosuus 1.00 (ei erikoistilanteita) -> koko joukkuevaikutus
+    #   avopeliosuus 0.09 (Thiaw)                -> lahes ei vaikutusta
+    # Puuttuva laukausdata (uusi pelaaja PL:ssa) -> osuus 1.0 eli ENTINEN
+    # kaytos. Muutos ei voi siis heikentaa ketaan jolle dataa ei ole.
+    open_play_share = _load_open_play_share()
+    if team_xg_mult and open_play_share:
+        print(f"      avopeliosuus luettu {len(open_play_share)} pelaajalle "
+              f"(joukkuekerroin painotetaan silla)")
+
     players = []
     excluded = []
     for e in boot["elements"]:
@@ -847,7 +931,16 @@ def main(argv: list[str] | None = None) -> int:
         if t_mult != 1.0:
             # Seuran maalimäärän lasku laskee syöttöjä identiteetin nojalla:
             # jokaisella maalilla on korkeintaan yksi syöttö.
-            rates = dict(rates, xg90=rates["xg90"] * t_mult,
+            #
+            # xg90 painotetaan pelaajan AVOPELIOSUUDELLA (ks. ylla). xa90 EI
+            # painoteta: meilla on laukaustason erikoistilannedata (`spxg`)
+            # muttei syottotason vastinetta, joten kulmasyottajan xA:n
+            # painottaminen laukausosuudella olisi luvun soveltamista asiaan
+            # jota se ei mittaa. Taysi joukkuevaikutus on siella
+            # konservatiivisempi valinta kuin keksitty osuus.
+            share = open_play_share.get(_shot_key(e), 1.0)
+            eff = effective_team_mult(t_mult, share)
+            rates = dict(rates, xg90=rates["xg90"] * eff,
                          xa90=rates["xa90"] * t_mult)
         if p_mult != 1.0:
             # Pelaajakerroin EI koske xa90:tä: yksittäisen pelaajan syötöt
