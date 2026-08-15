@@ -1,7 +1,9 @@
 """Portti kierrosmuistioille (/fpl/notes).
 
-TAUSTA (15.8.2026, Villen GO). Muistio on ihmisen kirjoittamaa tekstia joka on
-kaynyt julkaisutarkistajan lapi. Sita EI generoida: portti blokkasi
+TAUSTA (15.8.2026, Villen GO). Muistio kirjoitetaan kasin kierrosta varten ja
+se kay julkaisutarkistajan lapi. Se EI ole "ihmisen kirjoittama" — kirjoitin
+llms.txt:aan sellaisen vaitteen ja se oli valhe, Villen huomio samana paivana.
+Sita EI generoida: portti blokkasi
 ensimmaisen version kuudella loydoksella joista nelja koski tyylia, ja
 generaattori tuottaisi tasan ne.
 
