@@ -1842,6 +1842,19 @@ def update_index(c: dict, xp: dict | None = None) -> bool:
     new = re.sub(
         r"(<!-- GEN:ACC-BYCOMP-START -->).*?(<!-- GEN:ACC-BYCOMP-END -->)",
         lambda m: m.group(1) + bycomp_block + m.group(2), new, flags=re.S)
+    # 15.8: team news paasivulle. Villen havainto: "https://goaliq.app/ en nae
+    # mitaan uutisjuttua ... toi on se meidan paasivu" — olin laittanut lohkon
+    # vain fpl.html:aan. Sama sisalto, sama artefakti, ei kovakoodattuja lukuja.
+    news_block = team_news_block(xp)
+    if news_block:
+        new, n_news = re.subn(
+            r"(<!-- GEN:TEAM-NEWS-START -->).*?(<!-- GEN:TEAM-NEWS-END -->)",
+            lambda m: m.group(1) + news_block + m.group(2), new, flags=re.S)
+        if n_news != 1:
+            raise RuntimeError(
+                f"index.html GEN:TEAM-NEWS: odotettiin 1 markerilohko, "
+                f"loytyi {n_news}")
+
     if new != s:
         INDEX_PATH.write_text(new, encoding="utf-8")
         return True

@@ -291,3 +291,17 @@ def test_sivu_sanoo_etta_ennusteluvut_ovat_omia():
     ), NOW)
     assert "our own number" in html
     assert "fixed historical number" in html
+
+
+def test_paasivulla_on_team_news_markerit():
+    """Villen havainto 15.8: "https://goaliq.app/ en nae mitaan uutisjuttua ...
+    toi on se meidan paasivu". Lohko oli vain fpl.html:ssa.
+
+    index.html on kasin yllapidettya HTML:aa jossa generoitu sisalto elaa
+    markerien valissa. Ilman markereita update_index heittaa, mutta ilman TATA
+    testia markerit voi poistaa index.html:sta eika mikaan huuda ennen
+    seuraavaa buildia."""
+    idx = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert idx.count("<!-- GEN:TEAM-NEWS-START -->") == 1
+    assert idx.count("<!-- GEN:TEAM-NEWS-END -->") == 1
+    assert '/fpl/team-news' in idx, "paasivu ei linkita team news -sivulle"
