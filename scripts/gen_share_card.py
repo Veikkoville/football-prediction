@@ -438,6 +438,73 @@ def card_xp(args) -> dict:
     }
 
 
+def card_price_tier(args) -> dict:
+    """Yhden pelipaikan hinta vs pisteet, VAIN tarkistettavissa olevilla riveilla.
+
+    Villen tilaus 15.8: "joku hintakategorian hyokkaajat tms."
+
+    ALKUPERAINEN KULMA KAATUI MITTAUKSEEN, ja se on syyta lukea ennen kuin
+    tata kayttaa uudelleen: alle 5,0 M£:n hyokkaajia on 14, mutta EI YHDELLA
+    NIISTA ole projisoitua avauspaikkaa (xmins 34, 19, 19, 19, ...). Luvut
+    eivat myoskaan ole projektioita vaan hintaprioria: viidella heista on
+    identtinen 7.3 xP6, koska he ovat `no_history`-pelaajia jotka saavat saman
+    kovakoodatun 38 %:n aloitustodennakoisyyden. Enemmisto on nousijaseuroista,
+    eli "halpaa hyokkaajaa ei ole" olisi kertonut MEIDAN sokeasta pisteesta
+    eika pelista.
+
+    TARKISTETTAVUUS ON SISAANRAKENNETTU: `--rank-cap` pudottaa rivit jotka
+    eivat mahdu ilmaissivun `/fpl/expected-points` top-100:aan. Ilman sita
+    kortti nimeaisi pelaajia joita lukija ei voi tarkistaa mistaan — tasan se
+    vika joka blokkasi kaksi tekstia 14.-15.8.
+    """
+    data = _xp_payload()
+    players = data.get("players") or []
+    n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
+
+    ranked = sorted(players, key=lambda p: -float(p.get("xp_horizon_total") or 0))
+    cap = args.rank_cap or len(ranked)
+    checkable = {p.get("id") or p.get("web_name") for p in ranked[:cap]}
+
+    rows = []
+    for p in ranked:
+        if args.pos and p.get("pos") != args.pos:
+            continue
+        if (p.get("id") or p.get("web_name")) not in checkable:
+            continue
+        price = float(p.get("price") or 0)
+        tot = float(p.get("xp_horizon_total") or 0)
+        if price <= 0 or tot <= 0:
+            continue
+        # --min-mins oletus on 400 (stats-kortin sarakerajaus), mutta xmins on
+        # minuutteja per ottelu -> raaka arvo suodattaisi KAIKKI pois. Sama
+        # vartiointi kuin card_valuessa.
+        floor = args.min_mins if args.min_mins and args.min_mins < 90 else 60
+        if float(p.get("xmins") or 0) < floor:
+            continue
+        rows.append({"name": p["web_name"], "tag": f"{price:.1f}m",
+                     "team": p["team_short"],
+                     "mid": f"{tot:.1f} xP · {tot / price:.2f} per m",
+                     "_v": tot, "badges": []})
+    if not rows:
+        raise SystemExit("Ei rivejä price-tier-kortille.")
+    rows.sort(key=lambda r: r["_v"], reverse=True)
+    rows = rows[:args.top]
+    pos_label = {"FWD": "FORWARDS", "MID": "MIDFIELDERS",
+                 "DEF": "DEFENDERS", "GKP": "GOALKEEPERS"}.get(args.pos, "PLAYERS")
+    return {
+        "title": f"{pos_label}: PRICE VS POINTS",
+        "subtitle": f"next {n_gw} GW, projected starters only",
+        "nameLabel": "PLAYER",
+        "midLabel": "TOTAL / PER MILLION",
+        "valueLabel": "PRICE",
+        "footNote": "every row is on goaliq.app/fpl/expected-points, free",
+        "footNote2": "model projections, not betting advice",
+        "rows": [dict(r, rank=i + 1, value=r["tag"])
+                 for i, r in enumerate(rows)],
+        "file": f"goaliq_pricetier_{(args.pos or 'all').lower()}_{n_gw}gw.png",
+    }
+
+
 def card_value(args) -> dict:
     """xP per miljoona horisontin yli: hinta-tehokkuuskortti.
 
@@ -591,7 +658,8 @@ def card_club_best(args) -> dict:
 
 
 BUILDERS = {"cs": card_cs, "defence": card_defence, "stats": card_stats,
-            "xp": card_xp, "value": card_value, "club-best": card_club_best}
+            "xp": card_xp, "value": card_value, "club-best": card_club_best,
+            "price-tier": card_price_tier}
 GW_CAPABLE = {"cs"}
 
 
@@ -609,6 +677,9 @@ def main() -> int:
                     help="stats: minimiminuutit")
     ap.add_argument("--pos", default=None, help="stats: GKP/DEF/MID/FWD")
     ap.add_argument("--team", default=None, help="stats: joukkuelyhenne (ARS)")
+    ap.add_argument("--rank-cap", type=int, default=None,
+                    help="price-tier: pudota rivit jotka eivat mahdu ilmaissivun "
+                         "top-N:aan (tarkistettavuus). /fpl/expected-points = 100")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
 
