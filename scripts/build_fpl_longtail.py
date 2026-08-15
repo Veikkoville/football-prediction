@@ -226,9 +226,16 @@ font-variant-numeric:tabular-nums;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 .toolnav{margin:34px 0 6px;padding-top:18px;border-top:1px solid var(--line);
-display:flex;flex-direction:column;gap:10px;}
+display:flex;flex-direction:column;gap:10px;justify-content:flex-start;
+align-items:stretch;}
 .navgrp{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;}
+/* 🔴 justify-content ON PAKKO asettaa: rivin 115 PALJAS `nav`-saanto asettaa
+   `space-between` (sivun ylapalkkia varten) ja se peritaan tanne, jolloin
+   viimeinen rivi levisi tasavalein koko leveydelle. Villen havainto 15.8:
+   "paljon tyhjaa tilaa alarivilla joukkueiden valilla". Elementtivalitsin
+   joka osuu myohemmin lisattyyn komponenttiin on hiljainen ansa. */
 .clubnav{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;
+justify-content:flex-start;
 margin:0 0 26px;padding-bottom:14px;border-bottom:1px solid var(--line);}
 .clubnav b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
 color:var(--muted);font-weight:600;margin-right:4px;}
