@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { initAnalytics, capture } from '$lib/analytics';
 	import { initAuth } from '$lib/auth.svelte';
+	import WorkspaceBar from '$lib/components/WorkspaceBar.svelte';
 
 	let { children } = $props();
 
@@ -30,5 +31,10 @@
 		void initAuth();
 	});
 </script>
+
+<!-- Tyotilapalkki ENNEN sisaltoa ja layoutissa eika sivulla: deadline on
+     yhta relevantti jokaisella reitilla, ja sivukohtainen sijoitus olisi
+     tarkoittanut etta uusi reitti unohtaa sen hiljaa. -->
+<WorkspaceBar />
 
 {@render children()}

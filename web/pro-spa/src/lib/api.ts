@@ -242,6 +242,13 @@ export interface FantasyResponse {
 		/** Pakollinen label kaukoriveille — näytetään sellaisenaan. */
 		far_basis_label?: string;
 		next_gameweek?: number | null;
+		/** FPL:n virallinen GW-deadline ISO-muodossa. Tyypitetty 15.8, kun
+		 *  tyotilapalkki alkoi kayttaa sita: se oli ennen vain
+		 *  index-signaturen alla, eli tsc ei olisi huomannut kirjoitusvirhetta
+		 *  kentan nimessa. */
+		deadline_utc?: string | null;
+		/** Milloin projektiodata rakennettiin. Nayttetaan tuoreusleimana. */
+		generated_at?: string | null;
 		[key: string]: unknown;
 	};
 	teams: FantasyTeam[];
