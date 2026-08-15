@@ -361,8 +361,8 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
  // --- Gameweek-ikkuna (Villen pyynto 9.8) --------------------------------
  // "GW1-6" cannot be derived from season totals after the fact, so the
  // per-gameweek rows come from a SEPARATE file and only WHEN the user
- // suodattimeen: se on 551 KB (122 KB gzip) eika sita makseta niiden
- // puolesta jotka eivat sita kayta.
+ // reaches for the filter: it is 551 KB (122 KB gzip), and the readers who
+ // never use it should not pay for it.
  var GW=null,gwFrom=0,gwTo=0,gwLoading=false,gwCache={},GWI=null;
  // Only columns from the official FPL API can be windowed. Shot-level
  // numbers come from Understat with no per-gameweek breakdown, so
@@ -549,8 +549,8 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
  var gwf=document.getElementById('stgwf'),gwt=document.getElementById('stgwt');
  function syncGroups(){
   // Shot-level groups cannot be windowed (Understat, no per-gameweek
-  // breakdown). They lock visibly instead of showing
-  // nollia tai kausisummia ikkunan otsikon alla -- kumpikin valehtelisi.
+  // breakdown). They lock visibly instead of showing zeros or season totals
+  // under a gameweek heading, because either one would lie.
   var on=gwOn(),e=document.getElementById('stg');
   if(!e)return;
   var bs=e.querySelectorAll('.chip'),i;
@@ -578,8 +578,8 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
    GW=j;gwLoading=false;cb&&cb();
   })['catch'](function(){
    gwLoading=false;
-   // A failed load returns the picker to season mode AND says so.
-   // Hiljainen paluu kausisummiin nayttaisi silta etta ikkuna toimii.
+   // A failed load returns the picker to season mode AND says so. Falling
+   // back silently would look exactly like a window that works.
    if(gwf)gwf.value='';
    gwFrom=0;gwTo=0;syncGroups();draw();
    if(cnt)cnt.textContent='Could not load gameweek data. Showing season totals.';
@@ -811,8 +811,7 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
   // Without it a shared card would say "40 players" without saying they
   // are defenders, from one club, or under a price cap -- the reader
   // cannot know what they are looking at. Values are read from the visible
-  // controls, so
-  // ne eivat voi erkaantua ruudusta.
+  // controls, so they cannot drift away from what is on screen.
   function chipOn(id){
    var e=document.getElementById(id);
    if(!e)return '';
@@ -821,8 +820,8 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
   }
   var bits=[];
   // Gameweek window FIRST: it is the strongest scope, and a shared card
-  // without it
-  // vaittaisi kauden lukuja. Arvot luetaan valikoista, eivat muistista.
+  // without it would claim season numbers. Values are read from the pickers,
+  // not from memory.
   var gf=document.getElementById('stgwf'),gt=document.getElementById('stgwt');
   if(gf&&gf.value){
    var a=gf.value,b=(gt&&gt.value)||a;
@@ -850,7 +849,7 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
           nameLabel:'PLAYER',
           valueLabel:label.toUpperCase(),
           // This card is RAW DATA, not a model prediction. The default footer
-          // ("logged before kickoff, graded in public") vaittaisi vaarin.
+          // ("logged before kickoff, graded in public") would be a false claim.
           footNote:'free FPL stats at goaliq.app',
           footNote2:'official FPL API and shot-level data, not betting advice',
           rows:rows,

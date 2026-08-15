@@ -28,7 +28,18 @@ FINNISH = re.compile(
     # tama lista ei nahnyt ("Ottelunimi oli nowrap ... yhdella rivilla").
     # Lisatyt sanat ovat ASCII-suomea joka ei esiinny englannissa.
     r"yhdella|rivilla|puhelimessa|luettavan|ottelunimi|luettavuus|"
-    r"kosketuskohteet|ruudun|oli)\b",
+    r"kosketuskohteet|oli|"
+    # 15.8: julkaisutarkistaja loysi livesta KUUSI suomenkielista
+    # JS-kommenttia joita tama lista EI nahnyt, vaikka se on juuri niita
+    # varten. Syy oli TAIVUTUS: listassa oli `ruudun` muttei `ruudusta`,
+    # eika lainkaan `eivat` tai `vaittaisi`. Tarkka sanamuoto vanhenee
+    # jokaisen uuden lauseen mukana (kirjattu: portin sanalista vanhenee).
+    # Siksi nama ovat VARTALOITA: yksi uusi kirjoitusasu ei enaa riita
+    # ohittamaan porttia.
+    r"eiv[aä]t|eik[aä]|ett[aä]|silt[aä]|siit[aä]|t[aä]st[aä]|niiden|"
+    r"jotka|jonka|joka|sit[aä]|niit[aä]|vain|kun|jos|"
+    r"ruud\w*|v[aä]itt\w*|n[aä]ytt\w*|valehtel\w*|erkaant\w*|"
+    r"kausisumm\w*|muistist\w*|suodatti\w*|k[aä]ytt?[aä]\w*)\b",
     re.I,
 )
 

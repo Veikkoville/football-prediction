@@ -244,11 +244,10 @@ font-variant-numeric:tabular-nums;}
 display:flex;flex-direction:column;gap:10px;justify-content:flex-start;
 align-items:stretch;}
 .navgrp{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;}
-/* 🔴 justify-content ON PAKKO asettaa: rivin 115 PALJAS `nav`-saanto asettaa
-   `space-between` (sivun ylapalkkia varten) ja se peritaan tanne, jolloin
-   viimeinen rivi levisi tasavalein koko leveydelle. Villen havainto 15.8:
-   "paljon tyhjaa tilaa alarivilla joukkueiden valilla". Elementtivalitsin
-   joka osuu myohemmin lisattyyn komponenttiin on hiljainen ansa. */
+/* justify-content MUST be set here. The bare `nav` rule further up sets
+   space-between for the page header, and .clubnav inherits it, which spread
+   the last row of club links evenly across the full width. An element
+   selector that reaches a component added later is a silent trap. */
 .clubnav{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;
 justify-content:flex-start;
 margin:0 0 26px;padding-bottom:14px;border-bottom:1px solid var(--line);}
@@ -989,7 +988,7 @@ XG_JS = """
  var JP='M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 '
   +'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
  function kit(c,lbl){
-  // Viittaa samaan <symbol>-kirjastoon jonka palvelin renderoi kerran.
+  // Points at the same <symbol> library the server renders once.
   return '<svg class="kit" width="26" height="26" aria-hidden="true">'
    +'<use href="#k'+(lbl||'').toUpperCase()+'"/></svg>';
  }
@@ -1096,9 +1095,9 @@ XG_JS = """
         function(){return per90?1:0;},
         function(v){
          var was=per90;per90=!!v;
-         // Per 90:een siirryttaessa oletuskynnys paalle, takaisin per game:een
-         // when navigating away. The user's own choice stays in force if they
-         // sita jo koskenut talla naytolla.
+         // Switching to per 90 turns the default minutes threshold on, and
+         // leaving it turns it back off. The user's own choice stays in force
+         // if they have already touched it on this screen.
          if(!was&&per90&&minm===0)minm=180;
          if(was&&!per90&&minm===180)minm=0;
         });
@@ -1416,8 +1415,8 @@ STATS_JS = """
  // --- Gameweek-ikkuna (Villen pyynto 9.8) --------------------------------
  // "GW1-6" cannot be derived from season totals after the fact, so the
  // per-gameweek rows come from a SEPARATE file and only WHEN the user
- // suodattimeen: se on 551 KB (122 KB gzip) eika sita makseta niiden
- // puolesta jotka eivat sita kayta.
+ // reaches for the filter: it is 551 KB (122 KB gzip), and the readers who
+ // never use it should not pay for it.
  var GW=null,gwFrom=0,gwTo=0,gwLoading=false,gwCache={},GWI=null;
  // Only columns from the official FPL API can be windowed. Shot-level
  // numbers come from Understat with no per-gameweek breakdown, so
@@ -1604,8 +1603,8 @@ STATS_JS = """
  var gwf=document.getElementById('stgwf'),gwt=document.getElementById('stgwt');
  function syncGroups(){
   // Shot-level groups cannot be windowed (Understat, no per-gameweek
-  // breakdown). They lock visibly instead of showing
-  // nollia tai kausisummia ikkunan otsikon alla -- kumpikin valehtelisi.
+  // breakdown). They lock visibly instead of showing zeros or season totals
+  // under a gameweek heading, because either one would lie.
   var on=gwOn(),e=document.getElementById('stg');
   if(!e)return;
   var bs=e.querySelectorAll('.chip'),i;
@@ -1633,8 +1632,8 @@ STATS_JS = """
    GW=j;gwLoading=false;cb&&cb();
   })['catch'](function(){
    gwLoading=false;
-   // A failed load returns the picker to season mode AND says so.
-   // Hiljainen paluu kausisummiin nayttaisi silta etta ikkuna toimii.
+   // A failed load returns the picker to season mode AND says so. Falling
+   // back silently would look exactly like a window that works.
    if(gwf)gwf.value='';
    gwFrom=0;gwTo=0;syncGroups();draw();
    if(cnt)cnt.textContent='Could not load gameweek data. Showing season totals.';
@@ -1716,8 +1715,7 @@ _STATS_SPEC_FN = r"""function(){
   // Without it a shared card would say "40 players" without saying they
   // are defenders, from one club, or under a price cap -- the reader
   // cannot know what they are looking at. Values are read from the visible
-  // controls, so
-  // ne eivat voi erkaantua ruudusta.
+  // controls, so they cannot drift away from what is on screen.
   function chipOn(id){
    var e=document.getElementById(id);
    if(!e)return '';
@@ -1726,8 +1724,8 @@ _STATS_SPEC_FN = r"""function(){
   }
   var bits=[];
   // Gameweek window FIRST: it is the strongest scope, and a shared card
-  // without it
-  // vaittaisi kauden lukuja. Arvot luetaan valikoista, eivat muistista.
+  // without it would claim season numbers. Values are read from the pickers,
+  // not from memory.
   var gf=document.getElementById('stgwf'),gt=document.getElementById('stgwt');
   if(gf&&gf.value){
    var a=gf.value,b=(gt&&gt.value)||a;
@@ -1755,7 +1753,7 @@ _STATS_SPEC_FN = r"""function(){
           nameLabel:'PLAYER',
           valueLabel:label.toUpperCase(),
           // This card is RAW DATA, not a model prediction. The default footer
-          // ("logged before kickoff, graded in public") vaittaisi vaarin.
+          // ("logged before kickoff, graded in public") would be a false claim.
           footNote:'free FPL stats at goaliq.app',
           footNote2:'official FPL API and shot-level data, not betting advice',
           rows:rows,

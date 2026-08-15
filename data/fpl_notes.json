@@ -6,12 +6,26 @@
     "",
     "JOKAINEN merkinta on kaynyt julkaisutarkistajan lapi ENNEN lisaamista, ja",
     "sen luvut on ajettu uudelleen julkaisuhetkella. `claims` on lista niista",
-    "merkkijonoista jotka lukijan on loydettava `check_url`-sivulta —",
+    "merkkijonoista jotka lukijan on loydettava `check_url`-sivulta.",
     "scripts/check_claim_route.py ajaa sen, ja tests/test_fpl_notes.py vaatii",
     "etta kentat ovat olemassa.",
     "",
     "Tekstia EI generoida. 15.8:n portti blokkasi koneelta kuulostavan version",
-    "neljalla tyylitunnusmerkilla; generaattori tuottaisi tasan ne."
+    "neljalla tyylitunnusmerkilla; generaattori tuottaisi tasan ne.",
+    "",
+    "THIAW-POIKKEUS (kirjattu 15.8, julkaisutarkistajan suositus). Villen 10.8:n",
+    "saanto kieltaa Thiawin nostamisen nimena ja suosituksena. Erikoistilanne-",
+    "artikkelin taulukossa han on silti mukana, ja peruste on kolmiosainen:",
+    "1) han ei ole otsikossa eika og-kortissa, 2) vaite on paattynyt",
+    "historiatilasto (5.90 / 5.38) eika projektio, ja 10.8:n vastalause koski",
+    "hanen xG:nsa projisointia eteenpain, 3) han on koko liigan #1 set-piece",
+    "xG:lla, joten hanen poistamisensa olisi tarkistettavissa oleva puute",
+    "sivulla jonka koko lupaus on 'avaa ilmaissivu ja tarkista'.",
+    "",
+    "og_exclude: nimet jotka jatetaan pois JAKOKORTISTA vaikka ne ovat",
+    "artikkelin taulukossa. Kortti on markkinointikuva jossa nimi on nostettu,",
+    "taulukkorivi on dataa jonka lukija tarkistaa. Thiaw on kortissa poissa",
+    "10.8:n saannon takia mutta taulukossa mukana, ks. THIAW-POIKKEUS yllä."
   ],
   "notes": [
     {
@@ -42,7 +56,7 @@
     {
       "slug": "set-piece-xg-is-not-open-play-xg",
       "date": "2026-08-15",
-      "title": "Defender xG comes in two kinds, and the column doesn't say which",
+      "title": "The DEF column hides two different jobs",
       "check_url": "https://goaliq.app/fpl/stats",
       "cta": "Open the stats page and check any of these",
       "claims": [
@@ -70,8 +84,10 @@
         "6.73",
         "Dalot",
         "Gabriel",
+        "Haaland",
         "Hume",
         "Lacroix",
+        "Mbeumo",
         "Muñoz",
         "O'Reilly",
         "Sessegnon",
@@ -81,10 +97,10 @@
         "Van de Ven"
       ],
       "paragraphs": [
-        "Everyone knows a centre-back's goals come from corners. That part isn't interesting. What surprised me is how badly it works as a rule.",
-        "Gabriel finished last season on 4.65 non-penalty xG and 4.50 of it was set pieces. Ninety-seven percent. Sessegnon finished on 2.05 with 0.11 from set pieces. Five percent. Same position, same column, almost nothing in common.",
-        "Take the 23 defenders with at least 2.0 non-penalty xG. Ten are above 80% set pieces, six are below 50%, and the other seven are scattered across the middle. There's no typical number to fall back on, which is the problem: the column gives you one figure and it can mean either thing.",
-        "The best attacking defender in the sample is in the wrong group for the stereotype. O'Reilly has the highest non-penalty xG of any defender, 6.73, and only 22% of it comes from set pieces.",
+        "Everyone knows a centre-back's goals come from corners. That part isn't interesting. What I didn't expect is that the share is sharp enough to tell you which defenders are centre-backs in the first place.",
+        "Take the 23 defenders with at least 2.0 non-penalty xG. Ten are above 80% set pieces, six are below 50%, and the split is the one FPL doesn't draw for you. The ten are centre-backs. The six are full-backs and wing-backs. Nobody at all sits between 40% and 51%.",
+        "The neighbouring column says the same thing. Those ten centre-backs took between 8 and 26 headed shots last season. Five of the six full-backs took seven or fewer.",
+        "The one that breaks the pattern is also the one worth knowing. O'Reilly has the highest non-penalty xG of any defender in the league, 6.73, and only 22% of it is set pieces. The best attacking defender in the DEF column is on the wrong side of the stereotype.",
         {
           "h2": "The set-piece end"
         },
@@ -180,7 +196,7 @@
         {
           "h2": "Why it matters"
         },
-        "xG gets treated as one currency. You compare two players, the higher number wins, and for most of the league that's fine, because both numbers are made of the same stuff.",
+        "xG gets treated as one currency. You compare two players, the higher number wins, and for most of the league that's fine. Haaland's non-penalty xG is 10% set pieces. Mbeumo's is 2%.",
         "For the defenders at the top of that first table the number comes from somewhere else. It depends on how many set pieces the team wins and on who is delivering them. Neither of those moves with the things that normally move a team's attack.",
         "Take a club that sells its main striker. Open-play creation drops and the rating should drop with it. But the number of set pieces barely changes, and the centre-back who scores off them keeps scoring as long as the delivery is still there.",
         {
@@ -191,18 +207,22 @@
         {
           "h2": "What this doesn't show"
         },
-        "The shot data is 2025/26, not the season about to start. Some of the shares sit on thin samples: Van de Ven's 89% comes off 2.45 npxG, which is about two goals' worth of chances, and I wouldn't lean on it the way I'd lean on Gabriel's 4.65.",
-        "Set-piece xG isn't immune to squad change either, it just doesn't respond to the same inputs. A manager who stops loading the box would flatten these numbers quickly.",
-        "Set piece here means corners and free kicks, not corners alone. The column doesn't split them, so I'm not going to guess at the split either.",
-        "And none of it says whether a player is good. Gabriel at 97% is one of the better attacking defenders in the league, and set-piece goals count the same as any other. The problem is that they run on a different engine, so anything that treats the two as one number will be wrong in a direction you can predict.",
-        "Both columns are on our free stats page, no sign-in, but they sit in different views. Easiest route: type the name into \"Search player\", then switch between \"Goal threat\" for npxG and \"Set pieces\" for Set-piece xG. If you want to sort the whole list instead, press \"Show all players\" first, because the table opens on the top 100 and several of the names above sit outside it on npxG. Basis is 2025/26, 400 players in this season's FPL squads.",
+        "The shot data is 2025/26, not the season about to start, and some of the shares sit on thin samples. Van de Ven's 89% comes off 2.45 npxG, about two goals' worth of chances, and I wouldn't lean on it the way I'd lean on Gabriel's 4.65.",
+        "Set piece here means corners and free kicks, not corners alone, and the column doesn't split them. The centre-back and full-back labels are mine, not a column in the data.",
+        "Both columns are on our free stats page, no sign-in, but they sit in different views. Easiest route: type the name into \"Search player\", then switch between \"Goal threat\" for npxG and headed shots and \"Set pieces\" for Set-piece xG. If you want to sort the whole list instead, press \"Show all players\" first, because the table opens on the top 100 and several of the names above sit outside it on npxG. Basis is 2025/26, 400 players in this season's FPL squads.",
         "goaliq.app/fpl/stats"
       ],
       "og_headline": [
-        "One defender is 97%",
-        "set pieces. Another is 5%."
+        "The best attacking defender",
+        "in FPL is 22% set pieces."
       ],
-      "og_sub": "Same position, same column, almost nothing in common."
+      "og_sub": "The DEF column hides two different jobs.",
+      "og_exclude": [
+        "Thiaw"
+      ],
+      "og_pin": [
+        "O'Reilly"
+      ]
     }
   ]
 }

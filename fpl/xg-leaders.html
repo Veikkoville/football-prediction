@@ -280,7 +280,7 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
  var JP='M 33 15 L 43 9 C 46 15 54 15 57 9 L 67 15 L 84 27 L 76 42 L 67 36 '
   +'L 67 86 Q 67 90 63 90 L 37 90 Q 33 90 33 86 L 33 36 L 24 42 L 16 27 Z';
  function kit(c,lbl){
-  // Viittaa samaan <symbol>-kirjastoon jonka palvelin renderoi kerran.
+  // Points at the same <symbol> library the server renders once.
   return '<svg class="kit" width="26" height="26" aria-hidden="true">'
    +'<use href="#k'+(lbl||'').toUpperCase()+'"/></svg>';
  }
@@ -387,9 +387,9 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
         function(){return per90?1:0;},
         function(v){
          var was=per90;per90=!!v;
-         // Per 90:een siirryttaessa oletuskynnys paalle, takaisin per game:een
-         // when navigating away. The user's own choice stays in force if they
-         // sita jo koskenut talla naytolla.
+         // Switching to per 90 turns the default minutes threshold on, and
+         // leaving it turns it back off. The user's own choice stays in force
+         // if they have already touched it on this screen.
          if(!was&&per90&&minm===0)minm=180;
          if(was&&!per90&&minm===180)minm=0;
         });
