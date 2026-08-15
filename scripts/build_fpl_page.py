@@ -1330,7 +1330,7 @@ CSS = """
 NOTES_PATH = ROOT / "data" / "fpl_notes.json"
 
 
-def latest_articles_block(notes_doc: dict | None, limit: int = 3) -> str:
+def latest_articles_block(notes_doc: dict | None, limit: int = 1) -> str:
     """Etusivun "Latest from the model" -lohko (15.8.2026, Villen pyynto).
 
     MIKSI. Ville: FFScoutilla on etusivulla "latest articles" ja "featured
@@ -1338,9 +1338,19 @@ def latest_articles_block(notes_doc: dict | None, limit: int = 3) -> str:
     `/fpl/notes`-osoitteessa johon paasi vain alatunnisteen kautta — eli
     kirjoitettu sisalto oli kaytannossa nakymatonta.
 
-    Lohko on heron JALKEEN ja ennen projektiotaulukkoa, koska se on ainoa
-    sisalto joka muuttuu kirjoittamalla eika ajastetusti. Jos se olisi sivun
-    alalaidassa, sen kirjoittaminen olisi hukkaan heitettya tyota.
+    🔴 SIJAINTI KORJATTU 15.8 SAMANA PAIVANA. Laitoin lohkon ensin heron
+    JALKEEN omaksi sectionikseen. Mitattu selaimella: `y = 1051 px`, eli palkki
+    nakyi juuri ja juuri fold-rajalla ja sisalto ei lainkaan. Villen palaute:
+    "en kylla vielakaan nae mitaan livena tosta" ja "se pitaa olla niin isosti
+    esilla etta sivulle tulija huomaa sen heti".
+
+    Curl nakisi sen, kayttaja ei. Se on ero jota ei voi ratkaista curlilla, ja
+    siksi tama piti katsoa selaimella niin kuin lukija sen nakee.
+
+    Lohko on nyt heron OIKEASSA PALSTASSA track record -kortin alla. Se paikka
+    oli tyhjaa noin 600 px, eli paras mahdollinen kiinteisto oli kaytosta
+    poissa. Yksi kortti, ei kolmea: featured-lohko joka kilpailee itsensa
+    kanssa ei ole featured.
 
     Nayttaa uusimmat `limit` muistiota: otsikko, paivays ja ENSIMMAINEN
     kappale kokonaisena. Ei katkaisua kolmeen pisteeseen — leikattu virke on
@@ -1369,22 +1379,23 @@ def latest_articles_block(notes_doc: dict | None, limit: int = 3) -> str:
     return (
         f'<style>{NOTES_CSS}</style>'
         '<div class="note-list">' + "".join(kortit) + "</div>"
-        '<p class="note-more"><a href="/fpl/notes">All notes from the model</a></p>'
+        '<p class="note-more"><a href="/fpl/notes">'
+        "All notes from the model &#9656;</a></p>"
     )
 
 
 NOTES_CSS = """
-.note-list{display:grid;gap:12px;margin:18px 0 6px}
-@media(min-width:760px){.note-list{grid-template-columns:1fr 1fr}
-.note-list a:first-child{grid-column:1/-1}}
-a.note-card{display:block;padding:14px 16px;border:1px solid var(--line);
+.note-list{display:flex;flex-direction:column;gap:10px}
+a.note-card{display:block;padding:clamp(16px,2.2vw,22px);border:2px solid var(--amber);
 background:var(--panel);text-decoration:none;color:inherit}
-a.note-card:hover{border-color:var(--amber)}
-.note-date{display:block;font-size:.78rem;letter-spacing:.06em;
-text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.note-title{display:block;font-weight:700;line-height:1.3;margin-bottom:8px}
-.note-lede{display:block;font-size:.92rem;line-height:1.5;color:var(--muted)}
-.note-more{margin:4px 0 0;font-size:.9rem}
+a.note-card:hover{background:var(--track)}
+.note-date{display:block;font-size:.72rem;letter-spacing:.10em;
+text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.note-title{display:block;font-size:clamp(19px,2.2vw,25px);font-weight:800;
+line-height:1.25;margin-bottom:10px}
+.note-lede{display:block;font-size:.95rem;line-height:1.55;color:var(--muted)}
+.note-more{margin:2px 0 0;font-size:.85rem;letter-spacing:.04em;
+text-transform:uppercase}
 """
 
 

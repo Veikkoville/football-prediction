@@ -101,15 +101,22 @@ def test_etusivun_lohko_ilman_dataa_on_tyhja():
     assert latest_articles_block({"notes": [{"title": "X", "paragraphs": []}]}) == ""
 
 
-def test_etusivun_lohko_nayttaa_uusimman_ensin():
+def test_etusivun_lohko_nayttaa_VAIN_uusimman():
+    """Featured on YKSI kortti, ei kolme. Lohko joka kilpailee itsensa kanssa
+    ei ole featured, ja se on heron oikeassa palstassa jossa tilaa on yhdelle."""
     from scripts.build_fpl_page import latest_articles_block
-    html = latest_articles_block({"notes": [
+    notes = [
         {"slug": "vanha", "date": "2026-01-01", "title": "Vanha",
          "paragraphs": ["A."]},
         {"slug": "uusi", "date": "2026-08-15", "title": "Uusi",
          "paragraphs": ["B."]},
-    ]})
-    assert html.index("Uusi") < html.index("Vanha")
+    ]
+    html = latest_articles_block({"notes": notes})
+    assert "Uusi" in html
+    assert "Vanha" not in html, "featured-lohkossa on useampi kuin yksi kortti"
+    # Jarjestys on silti uusin ensin, mikä nakyy kun rajaa nostetaan.
+    kaksi = latest_articles_block({"notes": notes}, limit=2)
+    assert kaksi.index("Uusi") < kaksi.index("Vanha")
 
 
 def test_etusivun_lohko_linkittaa_ankkuriin():
@@ -137,9 +144,20 @@ def test_paasivulla_on_latest_articles_markerit():
     assert idx.count("<!-- GEN:LATEST-ARTICLES-END -->") == 1
 
 
-def test_lohko_on_ennen_projektiotaulukkoa():
-    """Sijainti ON osa vaatimusta: alalaidassa oleva lohko ei ole
-    esilletuontia. Jos joku siirtaa sen, tama kaatuu."""
+def test_lohko_on_HERON_SISALLA_eika_sen_alla():
+    """🔴 SIJAINTI ON OSA VAATIMUSTA, ja se mitattiin selaimella.
+
+    Laitoin lohkon ensin heron jalkeen omaksi sectionikseen. Mitattu:
+    y = 1051 px, eli palkki nakyi juuri fold-rajalla ja sisalto ei lainkaan.
+    Villen palaute: "en kylla vielakaan nae mitaan livena tosta". Curl nakisi
+    sen, kayttaja ei.
+
+    Nyt se on heron oikeassa palstassa track record -kortin alla. Jos joku
+    siirtaa sen ulos herosta, tama kaatuu."""
     idx = (ROOT / "index.html").read_text(encoding="utf-8")
-    assert idx.index("GEN:LATEST-ARTICLES-START") < idx.index("GEN:XP-TABLE-START")
-    assert idx.index("GEN:LATEST-ARTICLES-START") < idx.index("GEN:TEAM-NEWS-START")
+    hero_alku = idx.index('<header class="hero">')
+    hero_loppu = idx.index("</header>", hero_alku)
+    marker = idx.index("GEN:LATEST-ARTICLES-START")
+    assert hero_alku < marker < hero_loppu, (
+        "featured-lohko ei ole heron sisalla -> se putoaa fold-rajan alle")
+    assert marker < idx.index("GEN:XP-TABLE-START")
