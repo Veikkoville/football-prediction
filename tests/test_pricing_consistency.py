@@ -204,3 +204,73 @@ def test_luojakuvaus_menee_lapi():
                 continue
             osumat.append(r.pattern)
     assert not osumat, f"tosi luojakuvaus blokattiin: {osumat}"
+
+
+# --- Takuu (15.8, Villen paatos) ---------------------------------------
+
+TAKUU_LYHYT = "30-day money back on web purchases."
+
+# Pinnat joilla lyhyt lupaus on. faq.html ja llms.txt kantavat PITKAN
+# muodon; ne tarkistetaan erikseen, koska lyhyt lupaus ilman rajausta olisi
+# niilla epataydellinen.
+TAKUUPINNAT = ["index.html", "fpl.html", "predictions.html", "faq.html"]
+
+
+@pytest.mark.parametrize("nimi", TAKUUPINNAT)
+def test_takuu_on_jokaisella_myyntipinnalla(nimi):
+    """COPY-SYNC-GATE koodina.
+
+    Takuu on lupaus jonka ostaja lukee yhdelta pinnalta ja lunastaa toiselta.
+    Jos se on vain osalla sivuista, osa ostajista ei tieda sita olevan ja
+    osa luulee sita laajemmaksi kuin se on. Sama sana kaikkialla tai ei
+    missaan.
+    """
+    assert TAKUU_LYHYT in _teksti(nimi), (
+        f"{nimi}: takuulupaus puuttuu tai on eri sanoin. "
+        f"Odotettu tasmalleen: {TAKUU_LYHYT!r}"
+    )
+
+
+@pytest.mark.parametrize("nimi", ["faq.html", "llms.txt"])
+def test_takuun_rajaus_kerrotaan_siella_missa_se_selitetaan(nimi):
+    """Rajaus EI saa jaada pois: emme voi palauttaa App Storen tai Google
+    Playn ostoja, koska Apple ja Google hoitavat ne. Lupaus ilman tata olisi
+    lupaus jota emme voi pitaa."""
+    teksti = _teksti(nimi)
+    assert "30 days" in teksti or "30-day" in teksti
+    assert "hello@goaliq.app" in teksti, f"{nimi}: lunastusreitti puuttuu"
+    for sana in ("App Store", "Google Play"):
+        assert sana in teksti, f"{nimi}: rajaus {sana!r} puuttuu"
+
+
+def test_takuu_ei_lupaa_mobiiliostojen_palautusta():
+    """NEGATIIVINEN KONTROLLI: portti ei saa mennä lapi tekstista joka
+    lupaa palautuksen KAIKISTA ostoista. Juuri se on se lupaus jota emme
+    voi pitaa, koska Apple ja Google omistavat sen paatoksen."""
+    huono = "Money back within 30 days on any purchase, no questions asked."
+    assert TAKUU_LYHYT not in huono
+    assert "App Store" not in huono
+
+
+def test_faq_kertoo_myos_web_tilauksen_peruutuksen():
+    """Peruutusohje puhui vain sovelluskaupasta, vaikka pro.goaliq.app/checkout
+    myy Stripen kautta. Web-ostaja ei loytanyt ohjeestaan mitaan."""
+    t = _teksti("faq.html")
+    # Ankkuri on NAKYVA <summary>, ei pelkka otsikkoteksti: sama otsikko
+    # esiintyy myos JSON-LD-lohkossa aiemmin sivulla, ja osajonohaku osui
+    # siihen. Rakenteinen data oli jo oikein, nakyva ohje ei — eli testi
+    # mittasi vaaraa esiintymaa. Sama ansa kuin luvun 1.4 osuminen lukuun
+    # 1.45 samana paivana.
+    i = t.find("<summary>How do I cancel my Premium subscription?</summary>")
+    assert i > 0, "nakyvaa peruutuslohkoa ei loydy"
+    lohko = t[i:i + 2000]
+    assert "web checkout" in lohko, "nakyva peruutusohje ei mainitse web-tilausta"
+
+
+def test_rakenteinen_data_kertoo_saman():
+    """NEGATIIVINEN KONTROLLI: nakyva teksti ja JSON-LD eivat saa erota.
+    Vastausmoottori lukee jalkimmaista, ihminen edellista."""
+    t = _teksti("faq.html")
+    i = t.find('"name": "How do I cancel my Premium subscription?"')
+    assert i > 0
+    assert "hello@goaliq.app" in t[i:i + 900]

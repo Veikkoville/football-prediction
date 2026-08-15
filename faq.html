@@ -48,6 +48,14 @@
  "mainEntity": [
   {
    "@type": "Question",
+   "name": "Can I get a refund?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. If you bought Premium at our web checkout and it is not what you expected, email hello@goaliq.app within 30 days of the payment and we refund it in full. You do not have to explain why. If you subscribed through the App Store or Google Play, Apple and Google handle refunds under their own policy, so that request goes to them rather than to us."
+   }
+  },
+  {
+   "@type": "Question",
    "name": "What is GoalIQ?",
    "acceptedAnswer": {
     "@type": "Answer",
@@ -459,7 +467,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           (Apple App Store or Google Play) at the price shown in the app, or on
           the web at <a href="https://pro.goaliq.app/checkout?plan=season">pro.goaliq.app</a>
           for 3.99 &euro;/month or 25 &euro;/year (season pass, under 2.10 &euro;/month).
-          Cancel anytime. One subscription covers web, iOS and Android.
+          Cancel anytime. 30-day money back on web purchases. One subscription covers web, iOS and Android.
         </p>
         <p>Premium unlocks:</p>
         <ul>
@@ -478,19 +486,38 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
     </details>
 
     <details>
+      <summary>Can I get a refund?</summary>
+      <div>
+        <p>
+          Yes. If you bought Premium at our web checkout and it is not what
+          you expected, email <a href="mailto:hello@goaliq.app">hello@goaliq.app</a>
+          within 30 days of the payment and we refund it in full. You do not
+          have to explain why.
+        </p>
+        <p>
+          If you subscribed through the App Store or Google Play, Apple and
+          Google handle refunds under their own policy, so that request goes
+          to them rather than to us.
+        </p>
+      </div>
+    </details>
+
+    <details>
       <summary>How do I cancel my Premium subscription?</summary>
       <div>
         <p>
-          GoalIQ Premium is billed through your app store, so you cancel in your
-          device's subscription settings:
+          If you subscribed in the app, GoalIQ Premium is billed through your
+          app store, so you cancel in your device's subscription settings:
         </p>
         <ul>
           <li><strong>iOS:</strong> Settings → your name → Subscriptions → GoalIQ → Cancel.</li>
           <li><strong>Android:</strong> Google Play → Subscriptions → GoalIQ → Cancel.</li>
         </ul>
         <p>
-          You can also tap <strong>Manage subscription</strong> in the app's
-          Profile tab, which opens the same settings. Your Premium access remains
+          If you subscribed at our web checkout instead, email
+          <a href="mailto:hello@goaliq.app">hello@goaliq.app</a> and we cancel
+          it for you. You can also tap <strong>Manage subscription</strong> in
+          the app's Profile tab, which opens the same settings. Your Premium access remains
           active until the end of the current billing period. You will not be
           charged again, and you can re-subscribe at any time.
         </p>
