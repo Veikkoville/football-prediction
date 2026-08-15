@@ -22,6 +22,7 @@ Ajo: python -m scripts.build_fpl_longtail  (accuracy-log.yml, 3 h)
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -399,7 +400,20 @@ def _og_image(canonical: str) -> str:
     """
     slug = canonical.rstrip("/").rsplit("/", 1)[-1]
     rel = f"assets/brand/og/{slug}-1200x630.png"
-    return f"{BASE}/{rel}" if (_FP_ROOT / rel).exists() else SOCIAL_IMAGE
+    polku = _FP_ROOT / rel
+    if not polku.exists():
+        return SOCIAL_IMAGE
+    # 🔴 SISALTOTIIVISTE URLIIN (15.8). Villen havainto: "Linkkikuva edelleen
+    # toi sama?" Palvelimen tiedosto oli jo uusi (live ja lokaali tavulleen
+    # identtiset), mutta X ja Bluesky valimuistittavat esikatselukortin
+    # URL-kohtaisesti. Sama tiedostonimi eri sisallolla = alusta tarjoilee
+    # vanhaa kuvaa, eika ankkuri (#slug) murra sita koska fragmenttia ei
+    # laheteta palvelimelle lainkaan.
+    #
+    # Tiiviste muuttuu vain kun kuva muuttuu, joten tama ei riko
+    # valimuistitusta silloin kun mitaan ei ole muuttunut.
+    tiiviste = hashlib.sha256(polku.read_bytes()).hexdigest()[:8]
+    return f"{BASE}/{rel}?v={tiiviste}"
 
 def _page(title: str, desc: str, canonical: str, hero: str, body: str,
           jsonld: list[dict]) -> str:

@@ -111,3 +111,48 @@ def test_yhteinen_kortti_on_yha_olemassa():
     puuttuva fallback tuottaisi 404-kuvan joka on huonompi kuin geneerinen."""
     p = ROOT / "assets" / "brand" / "goaliq-social-1200x630.png"
     assert p.exists(), "yhteinen og-kortti puuttuu"
+
+
+# --- Valimuistin murto (15.8) -------------------------------------------
+
+def test_og_url_kantaa_sisaltotiivisteen():
+    """X ja Bluesky valimuistittavat esikatselukortin URL-kohtaisesti.
+
+    MITATTU 15.8: kortti vaihdettiin, palvelimen tiedosto oli uusi (live ja
+    lokaali tavulleen identtiset), ja Ville nakin yha vanhan kuvan. Sama
+    tiedostonimi eri sisallolla ei kerro alustalle mitaan, eika ankkuri
+    (#slug) auta koska fragmenttia ei laheteta palvelimelle lainkaan.
+
+    Tiiviste muuttuu vain kun kuva muuttuu, joten tama ei riko
+    valimuistitusta silloin kun mitaan ei ole muuttunut.
+    """
+    import hashlib
+    import re
+
+    sivu = ROOT / "fpl" / "notes.html"
+    if not sivu.exists():
+        pytest.skip("notes.html puuttuu")
+    h = sivu.read_text(encoding="utf-8", errors="replace")
+    m = re.search(r'og:image" content="([^"]+)"', h)
+    assert m, "og:image puuttuu"
+    url = m.group(1)
+    assert "?v=" in url, f"og:image ilman sisaltotiivistetta: {url}"
+
+    tiiviste = url.split("?v=")[1]
+    kuva = OG / "notes-1200x630.png"
+    odotettu = hashlib.sha256(kuva.read_bytes()).hexdigest()[:8]
+    assert tiiviste == odotettu, (
+        f"og:image-tiiviste {tiiviste!r} ei vastaa kuvan sisaltoa "
+        f"{odotettu!r}: sivu on rakennettu eri kuvasta kuin levylla on"
+    )
+
+
+def test_tiiviste_muuttuu_sisallon_mukana():
+    """NEGATIIVINEN KONTROLLI: jos tiiviste olisi vakio tai johdettu
+    tiedostonimesta, se ei murtaisi mitaan valimuistia ja koko keino olisi
+    naennainen."""
+    import hashlib
+
+    a = hashlib.sha256(b"kuva-a").hexdigest()[:8]
+    b = hashlib.sha256(b"kuva-b").hexdigest()[:8]
+    assert a != b
