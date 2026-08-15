@@ -25,7 +25,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.build_fpl_longtail import NOTES_PATH, render_notes  # noqa: E402
+from scripts.build_fpl_longtail import (  # noqa: E402
+    NOTES_PATH,
+    note_plain_text,
+    render_notes,
+)
 
 NOW = datetime(2026, 8, 15, tzinfo=timezone.utc)
 
@@ -57,7 +61,7 @@ def test_jokainen_claim_esiintyy_muistion_tekstissa():
     """Claims-lista ei saa ajautua erilleen tekstista: silloin ajaisimme
     tarkistuksen luvuille joita muistiossa ei ole, ja painvastoin."""
     for n in _doc()["notes"]:
-        teksti = " ".join(n["paragraphs"])
+        teksti = note_plain_text(n)
         puuttuu = [c for c in n["claims"] if c not in teksti]
         assert not puuttuu, f"{n['slug']}: claims joita ei ole tekstissa: {puuttuu}"
 

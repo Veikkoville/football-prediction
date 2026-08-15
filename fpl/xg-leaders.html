@@ -359,9 +359,9 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
   if(hh&&hh[9])hh[9].textContent=(w==='S')?'Starts':'Games';
   var span=(w==='S')?', full season':', last '+w+' games each';
   var rate=per90?', per 90 minutes':((w==='S')?', season totals':', per game');
-  // 15.8: rivi lupasi "400 players" samalla kun taulukko renderoi 100.
-  // Luku joka ei vastaa nakyvaa sisaltoa on sama vika kuin vaite jota lukija
-  // ei loyda: han laskee rivit ja saa eri tuloksen kuin sivu vaittaa.
+  // The count must match what is on screen. Saying "400 players" while the
+  // table renders 100 is the same failure as a claim the reader cannot check:
+  // they count the rows and get a different answer from the page.
   var nn=showAll?r.length:Math.min(LIMIT,r.length);
   if(cnt)cnt.textContent=r.length+' players'+rate+span
    +(minm?', at least '+minm+' minutes played':', no minutes filter')

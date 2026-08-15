@@ -169,18 +169,15 @@ footer a{color:var(--teal);}
    + min-width keeps narrow tables at their previous width, centered, and
    only wide ones use the extra room. On a narrow screen min() returns 100%
    -> behavior is exactly what it was. */
-/* Muistioartikkelin typografia (15.8). Pitka artikkeli renderoityi ilman
-   kappalevalia: 19 lohkoa valui yhdeksi seinaksi (mitattu selaimella,
-   margin-bottom 0px). Testit eivat nae tata — sama luokka kuin jakokortin
-   layout-viat, jotka piti verifioida kuvana. */
+/* Article typography. Long-form notes need paragraph spacing; without it the
+   blocks run together into one wall of text. */
 .note-body p{margin:0 0 15px;}
 .note-body h3{margin:26px 0 10px;font-size:1.05rem;letter-spacing:.01em;}
 .note-body h3:first-child{margin-top:0;}
-/* Muistioartikkelin datataulukko (15.8). EI .lb-wrapin tayttaa leveytta:
-   artikkelin taulukko on nelja kapeaa saraketta ja kuuluu tekstipalstaan,
-   kun taas .lb-wrap venyttaa taulukon ruudun levyiseksi ja keskittaa sen
-   translatella. Oma vieritinsailio silti, jotta kapea ruutu vierittaa
-   taulukkoa eika koko sivua. */
+/* Article data table. Deliberately NOT .lb-wrap: that stretches a table to
+   the full viewport and centres it, which is wrong for a narrow four-column
+   table inside a text column. It still gets its own scroll container so a
+   narrow screen scrolls the table rather than the page. */
 .tblwrap{overflow-x:auto;margin:14px 0;}
 .note-tbl{border-collapse:collapse;font-size:.95rem;min-width:22rem;}
 .note-tbl th,.note-tbl td{padding:5px 14px 5px 0;text-align:left;
@@ -1071,9 +1068,9 @@ XG_JS = """
   if(hh&&hh[9])hh[9].textContent=(w==='S')?'Starts':'Games';
   var span=(w==='S')?', full season':', last '+w+' games each';
   var rate=per90?', per 90 minutes':((w==='S')?', season totals':', per game');
-  // 15.8: rivi lupasi "400 players" samalla kun taulukko renderoi 100.
-  // Luku joka ei vastaa nakyvaa sisaltoa on sama vika kuin vaite jota lukija
-  // ei loyda: han laskee rivit ja saa eri tuloksen kuin sivu vaittaa.
+  // The count must match what is on screen. Saying "400 players" while the
+  // table renders 100 is the same failure as a claim the reader cannot check:
+  // they count the rows and get a different answer from the page.
   var nn=showAll?r.length:Math.min(LIMIT,r.length);
   if(cnt)cnt.textContent=r.length+' players'+rate+span
    +(minm?', at least '+minm+' minutes played':', no minutes filter')
@@ -2564,6 +2561,28 @@ def render_team_news(xp: dict, now: datetime) -> str | None:
 
 
 NOTES_PATH = ROOT / "data" / "fpl_notes.json"
+
+
+def note_plain_text(n: dict) -> str:
+    """Muistion KOKO teksti litteana, taulukon solut mukaan lukien.
+
+    Tarvitaan koska `claims`-portti vertaa vaitteita muistion tekstiin, ja
+    15.8 artikkelin luvut siirtyivat kappaleista datataulukkoon. Pelkka
+    `" ".join(paragraphs)` kaatuu dict-lohkoon eika nakisi taulukon soluja
+    vaikka ne ovat juuri ne luvut jotka lukija tarkistaa.
+    """
+    osat = []
+    for p in n.get("paragraphs") or []:
+        if isinstance(p, str):
+            osat.append(p)
+        elif isinstance(p, dict):
+            if p.get("h2"):
+                osat.append(str(p["h2"]))
+            for solu in (p.get("head") or []):
+                osat.append(str(solu))
+            for rivi in (p.get("rows") or []):
+                osat += [str(c) for c in rivi]
+    return " ".join(osat)
 
 
 def _note_block(p) -> str:
