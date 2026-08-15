@@ -101,8 +101,9 @@ def test_poissaolevalle_ei_nayteta_xp_lukua():
     assert html is not None
     rivit = _rows(html, "out")
     assert len(rivit) == 1
-    assert "113" in rivit[0][-1]
-    assert "last yr" in rivit[0][-1], (
+    # Viime kauden sarake: TOTEUTUNUT FPL-piste, merkittyna faktaksi.
+    assert "113" in rivit[0][-2]
+    assert "last yr" in rivit[0][-2], (
         "viime kauden pisteita ei merkitty -> lukija luulee sita projektioksi")
 
 
@@ -180,3 +181,113 @@ def test_jokainen_fpl_sivu_on_llms_txt_ssa():
     assert not puuttuvat, (
         "generoituja /fpl/-sivuja puuttuu llms.txt:sta: "
         + ", ".join(puuttuvat))
+
+
+def test_jokainen_fpl_sivu_on_ristiinlinkityslistalla():
+    """SISAINEN LINKITYS. `_TOOL_LINKS` on kuratoitu lista, ja se oli itse
+    vanhentunut kahdesti: 15.8 mitattuna siita puuttuivat seka `team-news`
+    etta `expected-points`, joten yksikaan sisarsivu ei osoittanut niihin.
+
+    `expected-points` on se sivu johon X-postaukset linkittavat, eli orvoksi
+    oli jaanyt tarkein ilmaispinta. Listan oma kommentti dokumentoi tasan taman
+    vian jo 28.7 (GSC: "Viittaava sivu: Ei havaittuja"), ja se toistui silti.
+    Kuratoitu lista ilman porttia vanhenee joka lisayksella.
+    """
+    from scripts.build_fpl_longtail import _TOOL_LINKS
+    fpl_dir = ROOT / "fpl"
+    if not fpl_dir.exists():  # pragma: no cover
+        pytest.skip("fpl/-hakemistoa ei ole")
+    listalla = {p for p, _ in _TOOL_LINKS}
+    puuttuvat = [
+        f.stem for f in sorted(fpl_dir.glob("*.html"))
+        if f"/fpl/{f.stem}" not in listalla
+    ]
+    assert not puuttuvat, (
+        "generoituja /fpl/-sivuja puuttuu _TOOL_LINKS-ristiinlinkityksesta "
+        "-> ne jaavat orvoiksi: " + ", ".join(puuttuvat))
+
+
+# ---------------------------------------------------------------------------
+# Etusivun nosto (fpl.html)
+# ---------------------------------------------------------------------------
+
+def test_etusivun_nosto_puuttuvalla_datalla_on_tyhja():
+    """Puuttuva data -> koko lohko pois. Otsikko ilman sisaltoa on pahempi
+    kuin ei otsikkoa: se lupaa tuoretta tietoa jota ei ole."""
+    from scripts.build_fpl_page import team_news_block
+    assert team_news_block(None) == ""
+    assert team_news_block({"players": [], "excluded": []}) == ""
+    # Saatavuustieto ilman uutistekstia ei ole team newsia.
+    assert team_news_block({"players": [{"news": "", "chance_next": 0}]}) == ""
+
+
+def test_etusivun_nosto_laskee_ulkona_ja_epavarmat_erikseen():
+    from scripts.build_fpl_page import team_news_block
+    xp = {"players": [
+        {"web_name": "A", "team_short": "ARS", "news": "Knock",
+         "chance_next": 75, "owned_pct": 30.0},
+        {"web_name": "B", "team_short": "CHE", "news": "Injury",
+         "chance_next": 0, "owned_pct": 5.0},
+        {"web_name": "C", "team_short": "LIV", "news": "Injury",
+         "chance_next": 0, "owned_pct": 1.0},
+    ], "excluded": []}
+    html = team_news_block(xp)
+    assert "2 players are ruled out and 1 are doubtful" in html
+    # Jarjestys omistuksen mukaan, eniten omistettu ensin.
+    assert html.index("A (ARS)") < html.index("B (CHE)")
+    assert '/fpl/team-news' in html
+
+
+def test_etusivun_nosto_ei_lupaa_lehdistotilaisuutta():
+    from scripts.build_fpl_page import team_news_block
+    html = team_news_block({"players": [
+        {"web_name": "A", "team_short": "ARS", "news": "Knock",
+         "chance_next": 75, "owned_pct": 1.0}]})
+    assert "official Fantasy Premier League status feed" in html
+
+
+# ---------------------------------------------------------------------------
+# Villen saanto: ennustepisteet vain omia
+# ---------------------------------------------------------------------------
+# 15.8: "jos team news tms uutisissa on jotain pistedataa tms niin sen tulee
+# olla meidan omaa" — ja tarkennus: "viime kauden fpl pisteet ovat sellasia
+# jotka voi nakya, ne on muuttumattomia" seka "miten meidan viime kauden fpl
+# pisteet muka eroavat niista toteutuneista oikeista?".
+#
+# Raja on siis TOTEUTUNUT vs ENNUSTETTU, ei lahde. Toteutuneesta ei ole
+# olemassa "meidan versiota": silla on yksi arvo. Ennustettu luku sen sijaan
+# on aina jonkun malli, ja sivulla saa esiintya vain meidan.
+
+def test_ruled_out_nayttaa_seka_toteutuneen_etta_OMAN_ennusteen():
+    html = render_team_news(_xp(
+        [_p("Korvaaja", team_short="ARS", pos="MID", xp_horizon_total=26.1)],
+        [_p("Ulkona", team_short="ARS", pos="MID", chance_next=0,
+            news="Knee injury", last_season={"points": 113})],
+    ), NOW)
+    rivit = _rows(html, "out")
+    assert len(rivit) == 1
+    assert "113 last yr" in rivit[0][-2], "toteutunut piste puuttuu"
+    assert "Korvaaja" in rivit[0][-1] and "26.1" in rivit[0][-1], (
+        "oma ennusteemme (kuka korvaa) puuttuu viimeisesta sarakkeesta")
+
+
+def test_korvaajasarake_ei_ehdota_poissaolevaa_itseaan():
+    """Jos seuran paras samassa positiossa ON poissaoleva itse, sarake on
+    tyhja. Muuten sivu neuvoisi korvaamaan pelaajan itsellaan."""
+    html = render_team_news(_xp(
+        [_p("Sama", team_short="ARS", pos="MID", xp_horizon_total=10.0)],
+        [_p("Sama", team_short="ARS", pos="MID", chance_next=0,
+            news="Knee injury")],
+    ), NOW)
+    rivit = _rows(html, "out")
+    assert rivit[0][-1] == "-", f"korvaajaksi ehdotettiin: {rivit[0][-1]}"
+
+
+def test_sivu_sanoo_etta_ennusteluvut_ovat_omia():
+    html = render_team_news(_xp(
+        [_p("K", team_short="ARS", pos="MID", xp_horizon_total=9.0)],
+        [_p("U", team_short="ARS", pos="MID", chance_next=0, news="Injury",
+            last_season={"points": 50})],
+    ), NOW)
+    assert "our own number" in html
+    assert "fixed historical number" in html

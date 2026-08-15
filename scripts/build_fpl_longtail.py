@@ -242,9 +242,21 @@ border-bottom:1px solid var(--line);padding-bottom:1px;}
 # priorisoi sen indeksointia. Mitattu ennen korjausta: fpl.html -> 0 kpl
 # /fpl/*-linkkeja, etusivu -> 1 (model-xi), /predictions -> 0.
 # Naiden sivujen koko olemassaolon syy on FPL-hakuliikenne ennen GW1:ta.
+#
+# 15.8: TAMA LISTA OLI ITSE VANHENTUNUT. Yllaoleva kommentti kuvaa vian, mutta
+# sen jalkeen lisatyt sivut jaivat listalta pois — mitattu 15.8: `expected-
+# points` ja `team-news` eivat olleet siina, joten yksikaan sisarsivu eika
+# etusivu osoittanut niihin. `expected-points` on se sivu johon X-postaukset
+# linkittavat, eli orvoksi oli jaanyt tarkein ilmaispinta.
+#
+# Lista on nyt PORTITETTU (tests/test_fpl_team_news_page.py): jokaisen
+# generoidun /fpl/-sivun on oltava taalla. Kuratoitu lista ilman porttia
+# vanhenee joka kerta kun sivuja lisataan, ja se on tapahtunut nyt kahdesti.
 _TOOL_LINKS = [
     ("/fpl/best-captain", "Captain picks"),
+    ("/fpl/expected-points", "Expected points"),
     ("/fpl/club-best", "Best per club"),
+    ("/fpl/team-news", "Team news"),
     ("/fpl/model-xi", "Model XI"),
     ("/fpl/differentials", "Differentials"),
     ("/fpl/price-changes", "Price changes"),
@@ -2312,6 +2324,29 @@ def render_team_news(xp: dict, now: datetime) -> str | None:
     all_clubs = [r.get("team_short") for r in out_rows + doubt_rows
                  if r.get("team_short")]
 
+    # 15.8, Villen saanto: "jos team news tms uutisissa on jotain pistedataa
+    # tms niin sen tulee olla meidan omaa" — ja tarkennus: viime kauden
+    # FPL-pisteet SAAVAT nakya, koska ne ovat muuttumaton fakta eivatka
+    # johdettu luku. Ne jaavat siis omalle sarakkeelleen.
+    #
+    # Sen RINNALLE tulee oma lukumme, koska pelkka viime kausi ei vastaa siihen
+    # mita lukija oikeasti kysyy ("pitaako minun tehda siirto"): kuka seurassa
+    # korvaa ja mita meidan malli antaa hanelle. Laskenta on jaettu moduuli
+    # club_best_rows, sama jota /fpl/club-best kayttaa, joten luvut eivat voi
+    # ajautua erilleen.
+    cover: dict[tuple[str, str], dict] = {}
+    for _pos in POSITIONS:
+        for _row in club_best_rows(players, _pos):
+            cover[(_row["club"], _pos)] = _row
+
+    def _cover_cell(r):
+        """Seuran paras saatavilla oleva pelaaja samassa positiossa, meidan xP."""
+        c = cover.get((r.get("team_short"), r.get("pos")))
+        if not c or c.get("name") == r.get("web_name"):
+            return "<td>-</td>"
+        return (f'<td>{escape(str(c["name"]))} '
+                f'<span class="hi">{c["xp"]:.1f}</span></td>')
+
     def _xp_cell(r):
         v = r.get("xp_horizon_total")
         if isinstance(v, (int, float)):
@@ -2334,6 +2369,7 @@ def render_team_news(xp: dict, now: datetime) -> str | None:
             f'<td>{escape((r.get("news") or "").strip())}</td>'
             f'<td class="n">{_owned(r):.1f}%</td>'
             + _xp_cell(r)
+            + _cover_cell(r)
             + "</tr>"
             for r in out_rows
         )
@@ -2342,13 +2378,18 @@ def render_team_news(xp: dict, now: datetime) -> str | None:
             '<div class="lb-wrap"><table class="lb">'
             "<thead><tr><th>Player</th><th>Club</th>"
             '<th class="m-hide">Pos</th><th>Status</th>'
-            '<th class="n">Owned</th><th class="n">Points</th>'
+            '<th class="n">Owned</th>'
+            '<th class="n m-hide">Last season</th>'
+            "<th>Who covers (our xP)</th>"
             "</tr></thead>"
             f"<tbody>{trows}</tbody></table></div>"
-            '<p class="note">Points shown for a ruled-out player are last '
-            "season's total, not a projection. The model does not project a "
-            "player it has ruled out, and inventing a number here would be "
-            "the opposite of the point.</p>"
+            '<p class="note">Last season is the player\'s final FPL total, '
+            "a fixed historical number, not a projection. The model does not "
+            "project a player it has ruled out, so the last column is our own "
+            "number instead: the club's best available player in the same "
+            "position and what we project them to score. A dash means no "
+            "other player at that club cleared the projection threshold "
+            "there.</p>"
         )
 
     if doubt_rows:

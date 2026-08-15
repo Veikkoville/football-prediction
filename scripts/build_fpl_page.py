@@ -1325,8 +1325,61 @@ CSS = """
 """ + MOBILE_CSS
 
 
-def render_page(c: dict) -> str:
+
+def team_news_block(xp: dict | None) -> str:
+    """Tiivis team news -nosto fpl.html:aan (15.8.2026, Villen pyynto).
+
+    MIKSI ETUSIVULLE. Ville kysyi kannattaako uutiset nayttaa etusivulla.
+    Kannattaa: se on ainoa pinta joka muuttuu joka paiva deadlinejen valissa,
+    eli ainoa jatkuva syy palata. Muut lohkot (CS%, FDR, track record) liikkuvat
+    kerran kierroksessa tai harvemmin.
+
+    MITA TASSA EI NAYTETA. Vain LUKUMAARAT ja kolme eniten omistettua nimea,
+    ei koko taulukkoa. Perustelu on sama kuin muillakin nostoilla: etusivun
+    tehtava on kertoa etta tieto on olemassa ja tuore, ei korvata sivua jolle
+    se vie. Poissaolevien xP:ta ei nayteta tassakaan.
+
+    Puuttuva tai tyhja data -> tyhja merkkijono, jolloin koko lohko jaa pois
+    eika sivulle jaa otsikkoa ilman sisaltoa.
+    """
+    if not xp:
+        return ""
+    rows = []
+    for r in list(xp.get("players") or []) + list(xp.get("excluded") or []):
+        if (r.get("news") or "").strip() and r.get("chance_next") is not None:
+            rows.append(r)
+    if not rows:
+        return ""
+
+    def owned(r):
+        try:
+            return float(r.get("owned_pct") or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    n_out = sum(1 for r in rows if r.get("chance_next") == 0)
+    n_doubt = len(rows) - n_out
+    top = sorted(rows, key=owned, reverse=True)[:3]
+    names = ", ".join(
+        f'{escape(str(r.get("web_name", "")))} ({escape(str(r.get("team_short", "")))})'
+        for r in top
+    )
+    return (
+        '\n<h2 id="team-news">Team news right now</h2>\n'
+        f'<p><strong>{n_out} players are ruled out and {n_doubt} are doubtful</strong> '
+        "for the next deadline, taken from the official Fantasy Premier League "
+        "status feed. Most owned among them: "
+        f"{names}.</p>\n"
+        '<p>The full list is free and sorted by ownership, and every doubtful '
+        "player carries the model's projected points with the reduced chance of "
+        "playing already priced in, so you can see what the doubt actually costs: "
+        '<a href="/fpl/team-news">FPL team news</a>.</p>\n'
+    )
+
+
+def render_page(c: dict, xp: dict | None = None) -> str:
     faq = build_faq(c)
+    team_news = team_news_block(xp)
     tr = track_record_sentences(c)
     jsonld = jsonld_blocks(c, faq)
     cs_table = cs_table_html(c)
@@ -1461,7 +1514,7 @@ GoalIQ Premium, free: one prize, decided by the mini-league table when the seaso
 log, match by match with every miss included, is published on the
 <a href="/predictions#record">prediction record page</a>.</p>
 
-<h2 id="clean-sheets">Gameweek {c["next_gw"]} clean sheet probabilities</h2>
+{team_news}<h2 id="clean-sheets">Gameweek {c["next_gw"]} clean sheet probabilities</h2>
 <p>Model clean sheet probability for all 20 Premier League teams in
 Gameweek {c["next_gw"]} ({c["gw_label"]}). FDR is GoalIQ's model fixture
 difficulty for that match, 1 easiest to 5 hardest.</p>
@@ -1963,10 +2016,11 @@ def main() -> None:
     fpl, acc = load_data()
     c = build_context(fpl, acc)
     preds = load_log()
-    html_out = render_page(c)
+    xp = _load_json(XP_PATH)
+    html_out = render_page(c, xp)
     OUT_PATH.write_text(html_out, encoding="utf-8")
     sitemap_changed = update_sitemap(c["iso_date"])
-    index_changed = update_index(c, _load_json(XP_PATH))
+    index_changed = update_index(c, xp)
     predictions_changed = update_predictions(c, preds)
     wc_recap_changed = update_wc_recap(acc)
 
