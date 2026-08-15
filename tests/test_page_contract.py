@@ -278,3 +278,43 @@ def test_rate_team_pool_kantaa_saatavuuden():
     assert len(pool) == 1
     assert pool[0]["chance_next"] == 75, "chance_next katosi poolissa"
     assert pool[0]["news"].startswith("Knock"), "news katosi poolissa"
+
+
+# ---------------------------------------------------------------------------
+# Jakaminen
+# ---------------------------------------------------------------------------
+# Villen pyynto 15.8: "noihin artikkeleihin myos jakokortit mukaan tai
+# jakomahdollisuudet".
+
+def test_artikkelisivuilla_on_jakorivi():
+    for nimi in ("notes.html", "club/bournemouth.html", "club/arsenal.html"):
+        f = FPL / nimi
+        if not f.exists():  # pragma: no cover
+            continue
+        h = f.read_text(encoding="utf-8")
+        assert 'class="share"' in h, f"{nimi}: jakorivi puuttuu"
+        assert "twitter.com/intent" in h and "bsky.app/intent" in h, (
+            f"{nimi}: jakolinkit puuttuvat")
+
+
+def test_jaon_esitaytto_on_VAIN_otsikko_ja_linkki():
+    """🔴 TIETOINEN RAJAUS. Jaettu teksti on julkista tekstia. Jos esitaytto
+    sisaltaisi VAITTEEN (luvun, vertailun), se pitaisi ajaa
+    julkaisutarkistajan lapi joka kerta kun sivu regeneroituu — ja sivut
+    regeneroituvat paivittain. Otsikko on jo portitettu sivun mukana.
+
+    Testi kaatuu jos joku lisaa lukuja esitayttoon."""
+    import re
+    import urllib.parse
+    f = FPL / "club" / "bournemouth.html"
+    if not f.exists():  # pragma: no cover
+        pytest.skip("sivua ei ole")
+    h = f.read_text(encoding="utf-8")
+    rivi = re.search(r'<div class="share">.*?</div>', h, re.S).group(0)
+    href = re.search(r'href="(https://twitter[^"]+)"', rivi).group(1)
+    teksti = urllib.parse.unquote(href.split("text=", 1)[1])
+    otsikko, _, loppu = teksti.partition("\n\n")
+    assert loppu.strip().startswith("https://goaliq.app/"), (
+        "esitaytossa on muuta kuin otsikko ja URL")
+    assert "xP" not in loppu and "%" not in loppu, (
+        "esitaytto sisaltaa lukuja -> se olisi portitettava joka regeneroinnilla")

@@ -242,6 +242,13 @@ color:var(--muted);font-weight:600;margin-right:4px;}
 .clubnav a{font-size:14px;color:var(--cream);text-decoration:none;
 border:1px solid var(--line);padding:3px 7px;}
 .clubnav a:hover{border-color:var(--amber);}
+.share{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;
+justify-content:flex-start;margin:26px 0 6px;}
+.share span{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+color:var(--muted);}
+.share a{font-size:14px;color:var(--cream);text-decoration:none;
+border:1px solid var(--line);padding:3px 10px;}
+.share a:hover{border-color:var(--amber);}
 .clubnav b.here{color:var(--amber);border:1px solid var(--amber);
 padding:3px 7px;font-size:14px;letter-spacing:0;text-transform:none;}
 .navgrp b{min-width:88px;}
@@ -2578,6 +2585,8 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
             f'<p class="note">{escape(str(n.get("date") or ""))}</p>'
             f"{paras}"
             f'<p><a href="{escape(check)}">{cta}</a>.</p>'
+            + _share_row(str(n.get("title") or ""),
+                         f'{url}#{n.get("slug") or ""}')
         )
     if not blocks:
         return None
@@ -2631,6 +2640,31 @@ CLUB_SLUGS = {
 _SP_LABELS = (("pens", "Penalties"), ("corners", "Corners"), ("fk", "Free kicks"))
 
 
+
+
+
+def _share_row(title: str, url: str) -> str:
+    """Jakonapit artikkelille (15.8, Villen pyynto).
+
+    ESITAYTETTY TEKSTI ON VAIN OTSIKKO JA LINKKI. Se on tietoinen rajaus:
+    jaettu teksti on julkista tekstia, ja jos se sisaltaisi vaitteen, se
+    pitaisi ajaa julkaisutarkistajan lapi joka kerta kun sivu regeneroituu.
+    Otsikko on jo portitettu sivun mukana, joten se on ainoa turvallinen
+    esitaytto joka ei vanhene lukujen mukana.
+
+    Ei JS:aa: intent-linkit toimivat ilman skriptia, ja sivut ovat staattisia.
+    """
+    from urllib.parse import quote
+    teksti = quote(f"{title}\n\n{url}")
+    x = f"https://twitter.com/intent/tweet?text={teksti}"
+    bsky = f"https://bsky.app/intent/compose?text={teksti}"
+    return (
+        '<div class="share"><span>Share</span>'
+        f'<a href="{x}" rel="noopener nofollow" target="_blank">X</a>'
+        f'<a href="{bsky}" rel="noopener nofollow" target="_blank">Bluesky</a>'
+        f'<a href="{escape(url)}">Link</a>'
+        "</div>"
+    )
 
 
 def _club_switcher(current: str, saatavilla: set[str]) -> str:
@@ -2861,6 +2895,7 @@ def render_club_page(short: str, players: list[dict], meta: dict,
     body = (
         f"{_kit_defs([short])}"
         + _club_switcher(slug, saatavilla or {slug})
+        + _share_row(f"{nimi} FPL {window}: best players, set pieces, XI", url)
         + "".join(osat)
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
