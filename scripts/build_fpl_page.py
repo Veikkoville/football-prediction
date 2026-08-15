@@ -1701,6 +1701,11 @@ one refreshes on the same schedule. No login, no paywall.</p>
   <li><a href="/fpl/notes">Notes from the model</a>: a short note each
   gameweek, only when the numbers say something worth saying, with every
   figure on a free page you can open.</li>
+  <li>A page for every club, with its best players, who takes its penalties
+  and corners, and a predicted XI: <a href="/fpl/club/arsenal">Arsenal</a>,
+  <a href="/fpl/club/liverpool">Liverpool</a>,
+  <a href="/fpl/club/bournemouth">Bournemouth</a> and the rest, linked from
+  <a href="/fpl/club-best">best player at every club</a>.</li>
 </ul>
 
 <h2 id="about">About GoalIQ</h2>
@@ -1743,6 +1748,7 @@ predictions and analytics. Not betting advice.</p>
   <a href="/fpl/club-best">Best per club</a> &middot;
   <a href="/fpl/team-news">Team news</a> &middot;
   <a href="/fpl/notes">Notes</a> &middot;
+  <a href="/fpl/club-best">Club pages</a> &middot;
   <a href="world-cup-2026-predictions.html">World Cup 2026 predictions</a> &middot;
   <a href="faq.html">App FAQ</a> &middot;
   <a href="privacy.html">Privacy</a></p>

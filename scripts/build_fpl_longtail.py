@@ -2570,6 +2570,27 @@ CLUB_SLUGS = {
 _SP_LABELS = (("pens", "Penalties"), ("corners", "Corners"), ("fk", "Free kicks"))
 
 
+
+def _no_history_flag(p: dict) -> str:
+    """Merkinta pelaajalle jolla ei ole Valioliiga-historiaa.
+
+    🔴 MITATTU 15.8, Villen havainto: "araujon projected points 8.7 kuulostaa
+    liian matalalta, han siirtyi juuri barcelonasta". Luku ei ollut vaite
+    laadusta vaan minuuteista: `xmins` 33.5 ja `predicted_starts` 38 %, koska
+    `data_basis` on `no_history` eika minuuttimallilla ole mihin ankkuroida.
+
+    Malli KERTOO taman kahdella kentalla, ja niita on 158/505. Ne saavat myos
+    saman kovakoodatun 38,0 %:n oletuksen, eli luku on sama arvaus kaikille.
+    Ensimmainen versioni seurasivuista pudotti lipun, joten lukija nakisi
+    "8.7" ilman merkkia siita etta se on arvaus. `club-best` naytti taman
+    oikein jo ennestaan — en vain kayttanyt sen konventiota.
+    """
+    if p.get("data_basis") != "no_history":
+        return ""
+    return (' <span class="flag" title="No Premier League games yet, role and '
+            'minutes estimated">?</span>')
+
+
 def _set_piece_rows(players: list[dict]) -> str:
     """Erikoistilannevuorot jarjestysnumeron mukaan.
 
@@ -2630,11 +2651,10 @@ def _xi_rows(players: list[dict]) -> tuple[str, int]:
     valitut.sort(key=lambda p: (jarj.get(p.get("pos"), 9), -p["predicted_starts"]))
     rivit = "".join(
         "<tr>"
-        f'<td>{escape(str(p["web_name"]))}</td>'
+        f'<td>{escape(str(p["web_name"]))}{_no_history_flag(p)}</td>'
         f'<td class="m-hide">{escape(str(p.get("pos", "")))}</td>'
         f'<td class="n">{float(p.get("price") or 0):.1f}</td>'
-        f'<td class="n">{p["predicted_starts"]:.0f}%</td>'
-        f'<td class="n hi">{float(p.get("xp_horizon_total") or 0):.1f}</td>'
+        f'<td class="n hi">{p["predicted_starts"]:.0f}%</td>'
         "</tr>"
         for p in valitut)
     return rivit, len(valitut)
@@ -2675,7 +2695,7 @@ def render_club_page(short: str, players: list[dict], meta: dict,
     best_rows = "".join(
         "<tr>"
         f'<td class="n">{i + 1}</td>'
-        f'<td>{escape(str(p["web_name"]))}</td>'
+        f'<td>{escape(str(p["web_name"]))}{_no_history_flag(p)}</td>'
         f'<td class="m-hide">{escape(str(p.get("pos", "")))}</td>'
         f'<td class="n">{float(p.get("price") or 0):.1f}</td>'
         f'<td class="n m-hide">{float(p.get("owned_pct") or 0):.1f}%</td>'
@@ -2700,6 +2720,10 @@ def render_club_page(short: str, players: list[dict], meta: dict,
             '<div class="lb-wrap"><table class="lb">'
             "<thead><tr><th>Situation</th><th>Order</th></tr></thead>"
             f"<tbody>{sp}</tbody></table></div>"
+            '<p class="note">? = no Premier League games yet, so the role and '
+            "the minutes are estimated rather than measured. Those players all "
+            "start from the same default, which is why several of them show "
+            "the same start probability.</p>"
             '<p class="note">The number is the order FPL publishes, so 1 is '
             "first in line. An empty situation means FPL has not published an "
             "order for it, which is not the same as nobody taking them. "
@@ -2711,10 +2735,12 @@ def render_club_page(short: str, players: list[dict], meta: dict,
             '<h2 id="xi">Predicted XI</h2>'
             '<div class="lb-wrap"><table class="lb">'
             '<thead><tr><th>Player</th><th class="m-hide">Pos</th>'
-            '<th class="n">Price</th><th class="n">Start</th>'
-            f'<th class="n">{n_gw}GW xP</th></tr></thead>'
+            '<th class="n">Price</th><th class="n">Start</th></tr></thead>'
             f"<tbody>{xi}</tbody></table></div>"
-            '<p class="note">Start is our projected chance of starting, not a '
+            '<p class="note">This table answers one question: who starts. '
+            "Projected points for the same players are in GoalIQ Premium, "
+            "along with the tools that use them. "
+            "Start is our projected chance of starting, not a "
             "lineup leak. We do not watch press conferences. The shape is the "
             "highest-probability starter at each position, so it will not "
             "always match the manager's formation.</p>")
