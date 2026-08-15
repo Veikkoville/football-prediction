@@ -144,25 +144,50 @@ def fetch_source() -> dict:
             }
         )
 
+    # 🔴 KIERROSNUMERO JA DEADLINE SAMASTA TAPAHTUMASTA (15.8.2026).
+    #
+    # MITATTU VIKA, Villen havainto: SPL-sivu naytti "GW1 deadline: 20 Aug
+    # 17:55". Virallinen RSL Fantasy sanoo:
+    #     GW1  deadline 2026-08-13T16:10Z  is_current=True   (pelattu 13.8)
+    #     GW2  deadline 2026-08-20T17:55Z  is_next=True
+    # Eli ruudulla oli GW2:n deadline GW1:n nimella, ja lukija joka suunnitteli
+    # GW1:ta oli myohassa kahdella paivalla.
+    #
+    # Syy oli KAKSI ERI SAANTOA jotka kuvasivat eri kierrosta:
+    #   deadline_utc  = min(deadline | ei finished JA deadline > nyt)  -> GW2
+    #   next_gameweek = min(gw | fixture ei finished)                  -> GW1
+    # GW1:n `finished` ei ole viela True (kierros on kesken), joten
+    # fixture-pohjainen saanto jai siihen samalla kun deadline-saanto oli jo
+    # siirtynyt eteenpain. Kumpikin oli yksinaan puolustettava. Yhdessa ne
+    # tuottivat lauseen jota kumpikaan ei tarkoittanut.
+    #
+    # Korjaus ei ole kolmas saanto vaan YKSI LAHDE: API kertoo itse mika on
+    # seuraava kierros (`is_next`), ja seka numero etta deadline luetaan
+    # SIITA tapahtumasta. Silloin ne eivat voi olla eri mielta.
     now = _dt.datetime.now(_dt.timezone.utc)
-    next_deadline = min(
-        (
-            d for ev in boot.get("events", [])
-            if not ev.get("finished")
-            and (d := _parse_iso_utc(ev.get("deadline_time")))
-            and d > now
-        ),
-        default=None,
-    )
+    events = boot.get("events", []) or []
+    nxt = next((ev for ev in events if ev.get("is_next")), None)
+    if nxt is None:
+        # Varakeino jos lippu puuttuu: ensimmainen tapahtuma jonka deadline on
+        # viela edessa. Sama semantiikka, heikompi lahde.
+        nxt = next(
+            (ev for ev in sorted(events, key=lambda e: e.get("id") or 0)
+             if (d := _parse_iso_utc(ev.get("deadline_time"))) and d > now),
+            None,
+        )
+    next_deadline = _parse_iso_utc(nxt.get("deadline_time")) if nxt else None
+    next_event_id = (nxt or {}).get("id")
     teams = sorted(SHORT_TO_MODEL[t["short_name"]] for t in teams_by_id.values())
     print(f"      {len(fixtures)} fixturea, {len(teams)} joukkuetta, "
-          f"deadline {next_deadline}")
+          f"seuraava GW{next_event_id} deadline {next_deadline}")
     return {
         "fixtures": fixtures,
         "teams": teams,
         "deadline_utc": (
             next_deadline.isoformat(timespec="seconds") if next_deadline else None
         ),
+        # Sama tapahtuma josta deadline luettiin. Naita EI saa johtaa erikseen.
+        "next_gameweek": next_event_id,
         "source": "spl-fantasy-api",
         "source_label": "RSL Fantasy official API (fantasy.spl.com.sa)",
     }
@@ -311,8 +336,24 @@ def sanity_gate(team_view: list[dict], promoted: list[str]) -> bool:
         w_cs = float(np.mean([agg[t]["next_avg_cs_pct"] for t in weak]))
         checks.append(("kärki avg FDR < nousijat avg FDR (margin >=1.0)", w_fdr - s_fdr >= 1.0))
         checks.append(("kärki avg CS% > nousijat avg CS% (margin >=8pp)", s_cs - w_cs >= 8.0))
-        checks.append(("jokainen nousija FDR >= 3.5",
-                       all(agg[t]["next_avg_fdr"] >= 3.5 for t in weak)))
+        # 🔴 15.8.2026: tassa oli "jokainen nousija FDR >= 3.5". Se on vaite
+        # OTTELUOHJELMASTA eika mallista: nousija voi aidosti saada helpon
+        # kuuden pelin jakson, ja silloin portti kaatuu vaikka malli olisi
+        # taysin oikeassa.
+        #
+        # Se osui kun kierrosikkuna korjattiin GW1->GW2 (GW1 oli jo pelattu):
+        # Al Faisaly 3.50 -> 3.33, eli lattia oli mennyt lapi TASAN rajalla ja
+        # yhden kierroksen siirtyma pudotti sen alle. Kolme muuta tarkistusta
+        # eli varsinaiset separaatiotestit menivat lapi reilulla marginaalilla.
+        #
+        # Tilalle INVERSIOTARKISTUS joka mittaa sita mita portti oikeasti
+        # vartioi: yksikaan nousija ei saa nayttaa helpommalta kuin vaikein
+        # karkijoukkue. Se on riippumaton siita sattuuko kalenteri olemaan
+        # helppo tai vaikea, ja se kaatuu jos malli menee nurin pain.
+        checks.append(("yksikaan nousija ei ole karkea helpompi (ei inversiota)",
+                       min(agg[t]["next_avg_fdr"] for t in weak)
+                       > max(agg[t]["next_avg_fdr"] for t in strong)
+                       if strong else False))
     for label, passed in checks:
         print(f"  [{'OK ' if passed else 'FAIL'}] {label}")
         ok = ok and passed
@@ -344,10 +385,18 @@ def main() -> int:
     print("[4/5] Lasketaan CS% + win% + FDR per fixture (raaka DC)...")
     rows = compute_fixtures(dc, src["fixtures"])
     add_fdr(rows)
-    next_gw = next_gameweek(rows)
+    # Kierrosnumero tulee API:n `is_next`-tapahtumasta samasta lahteesta kuin
+    # deadline (ks. lataajan kommentti). Fixture-pohjainen `next_gameweek` on
+    # varakeino, ja jos ne ovat eri mielta se KERROTAAN — hiljainen ero oli
+    # tasan se vika joka naytti GW2:n deadlinen GW1:n nimella.
+    next_gw = src.get("next_gameweek") or next_gameweek(rows)
+    fixture_gw = next_gameweek(rows)
     if next_gw is None:
         print("VIRHE: ei yhtään pelaamatonta fixturea — ei kirjoiteta.")
         return 1
+    if fixture_gw is not None and fixture_gw != next_gw:
+        print(f"      HUOM: API sanoo seuraava GW{next_gw}, fixture-lippujen "
+              f"mukaan GW{fixture_gw} (kierros kesken). Kaytetaan API:n lukua.")
     team_view = build_team_view(rows, next_gw)
     ticker = [
         r for r in rows

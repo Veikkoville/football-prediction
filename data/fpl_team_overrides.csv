@@ -72,4 +72,4 @@
 #   kautta käsin. review_by = kuuden kierroksen jälkeen, jolloin 26/27-fitissä
 #   on oikeaa dataa ja tämä rivi kuuluu poistaa.
 team,attack_delta,defence_delta,reason,review_by,attack_mult
-Newcastle United,-0.10,0.05,"Lost Isak, Bruno Guimaraes, Tonali and Gordon plus a manager change. Highest minutes churn in the league at 25.2 percent, the only non-promoted side over the 25 percent threshold. The rating is fitted on results those players produced and cannot see the window",2026-10-05
+Newcastle United,-0.10,0.05,"Lost Bruno Guimaraes, Tonali and Gordon plus a manager change. Highest measured minutes churn at 25.2 percent, the only non-promoted side over the 25 percent threshold. The rating is fitted on results those players produced and cannot see the window",2026-10-05
