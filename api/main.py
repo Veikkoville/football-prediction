@@ -2252,10 +2252,20 @@ def push_token_delete(req: PushTokenDeleteRequest, request: Request):
 def _auto_promo_discount() -> list[dict] | None:
     """Esitaytetty tarjouskoodi Checkoutiin, tai None.
 
-    🔴 MITATTU VIKA 15.8. Landing myy "€17.50 first year, enter EARLY30 at
-    checkout", mutta Checkout avautuu 25,00 euroon ja alennus vaatii etta
+    🔴 MITATTU VIKA 15.8. Landing myi "€17.50 first year, enter EARLY30 at
+    checkout", mutta Checkout avautui 25,00 euroon ja alennus vaati etta
     kayttaja klikkaa "Anna tarjouskoodi" ja kirjoittaa koodin itse. Luvattu
-    hinta ei siis ole se joka nakyy maksuhetkella.
+    hinta ei siis ollut se joka nakyy maksuhetkella.
+
+    RATKAISU EI OLLUT TAMA MEKANISMI. Esitaytto olisi sulkenut
+    `allow_promotion_codes`in, ja luojakoodit (DAZ, WOLFY, ROWAN) syotetaan
+    kasin — se olisi katkaissut kumppanien attribuution hiljaa. Villen paatos
+    oli poistaa EARLY30 kaikilta pinnoilta, jolloin ristiriita katosi
+    poistamalla LUPAUS eika alennusta esitayttamalla. Koodin `times_redeemed`
+    oli 0, eli se ei ollut tuottanut yhtaan kauppaa.
+
+    Mekanismi jaa tanne kaytettavaksi jos joskus halutaan kampanja jossa
+    linkki kantaa koodin. Asettamattomana se on inertti.
 
     Se osuu tasan siihen kohtaan jossa pudotus on mitattu: 8 web-checkoutia,
     0 kauppaa, ja 5/6 poistui ENNEN sahkopostikentan tayttamista. Hinta on

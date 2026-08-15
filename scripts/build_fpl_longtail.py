@@ -67,7 +67,7 @@ UPSELL = (
     'pre-match-logged track record. The full toolkit (captain ranker, all '
     'differentials, transfer planner) is <a '
     'href="https://pro.goaliq.app/?tab=premium">GoalIQ Premium</a>: '
-    '3.99 €/month or 25 €/season. Enter EARLY30 at checkout before the GW1 '
+    '3.99 €/month or 25 €/season. '
     'deadline on Friday 21 August for 30% off the first year (17.50 €, then '
     '25 €). One subscription on web, iOS and Android.</div>'
 )

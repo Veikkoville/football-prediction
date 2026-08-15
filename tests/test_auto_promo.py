@@ -65,3 +65,38 @@ def test_checkout_kayttaa_toisensa_poissulkevia_parametreja():
     assert '"discounts": promo' in lohko
     assert '"allow_promotion_codes": True' in lohko
     assert "else" in lohko, "parametrit eivat ole toisensa poissulkevia"
+
+
+# ---------------------------------------------------------------------------
+# EARLY30 poistettu julkisilta pinnoilta
+# ---------------------------------------------------------------------------
+
+def test_early30_ei_esiinny_yhdellakaan_julkisella_pinnalla():
+    """Villen paatos 15.8: koodi poistettiin kaikkialta, koska se lupasi
+    17,50 euroa ja Checkout avasi 25,00. Koodi on yha Stripessa (luojakoodien
+    kanssa samassa listassa), mutta sita EI mainita missaan.
+
+    Testi kattaa generoidut sivut JA kasin yllapidetyt: 1954 tiedostoa mainitsi
+    sen ennen poistoa, ja generoidut korjautuvat vain jos LAHDE korjataan."""
+    import re
+    osumat = []
+    for pat in ("*.html", "fpl/*.html", "fpl/club/*.html",
+                "predictions/**/*.html", "llms.txt"):
+        for f in ROOT.glob(pat):
+            if "node_modules" in str(f):
+                continue
+            if "EARLY30" in f.read_text(encoding="utf-8", errors="replace"):
+                osumat.append(str(f.relative_to(ROOT)))
+    assert not osumat, "EARLY30 mainitaan yha: " + ", ".join(osumat[:8])
+
+
+def test_early30_ei_esiinny_sivugeneraattoreissa():
+    """Generoidut sivut palaisivat seuraavassa buildissa jos lahde mainitsee
+    koodin. Tama on se portti joka estaa paluun."""
+    for nimi in ("build_fpl_page.py", "build_fpl_longtail.py",
+                 "build_prediction_pages.py"):
+        src = (ROOT / "scripts" / nimi).read_text(encoding="utf-8")
+        assert "EARLY30" not in src, f"{nimi} mainitsee EARLY30:n"
+    spa = (ROOT / "web" / "pro-spa" / "src" / "lib" / "billing.ts").read_text(
+        encoding="utf-8")
+    assert "EARLY30" not in spa, "billing.ts mainitsee EARLY30:n"
