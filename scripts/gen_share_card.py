@@ -438,6 +438,23 @@ def card_xp(args) -> dict:
     }
 
 
+def _tier_subtitle(args, n_gw: int, pos_label: str, cap: int) -> str:
+    """Alaotsikko kertoo TASMALLEEN sen saannon jolla rivit valittiin.
+
+    Jos saantoa ei kirjoiteta nakyviin, lukija ei voi tietaa miksi joku puuttuu
+    - ja juuri se kaatoi ensimmaisen version (Welbeck putosi minuuttilattiaan
+    jota kortilla ei lukenut missaan)."""
+    yksikko = pos_label.lower()[:-1]
+    osat = [f"next {n_gw} GW"]
+    if args.max_price:
+        osat.append(f"every {yksikko} at {args.max_price:.1f}m or less")
+    elif args.rank_cap:
+        osat.append(f"every {yksikko} in the free top {cap}")
+    if args.rank_cap:
+        osat.append(f"free top {cap}")
+    return ", ".join(osat)
+
+
 def card_price_tier(args) -> dict:
     """Yhden pelipaikan hinta vs pisteet, VAIN tarkistettavissa olevilla riveilla.
 
@@ -475,6 +492,15 @@ def card_price_tier(args) -> dict:
         tot = float(p.get("xp_horizon_total") or 0)
         if price <= 0 or tot <= 0:
             continue
+        # Hintakatto tekee kortista YHDEN johdonmukaisen kysymyksen.
+        # Villen havainto 15.8: "sekava etta tutkii 8 milj hyokkaajia ja sit
+        # yhtakkia haaland vain ylempana <- missa asiayhteys? paljon kalliimpi."
+        # Han on oikeassa: ilman kattoa kortti sekoitti kaksi eri kysymysta
+        # (kuka on paras vs kuka on paras rahoilla) ja rivit 1-2 vastasivat eri
+        # kysymykseen kuin rivit 3-9. Katto on myos LUKIJAN tarkistettavissa:
+        # hinta on FPL:n omaa julkista dataa.
+        if args.max_price and price > args.max_price:
+            continue
         # 🔴 EI MINUUTTILATTIAA, ja tama on tietoinen paatos (15.8).
         # Ensimmainen versio suodatti xmins >= 60 "projisoituihin aloittajiin".
         # Julkaisutarkistaja loysi etta se pudotti Welbeckin (CHE, 6.0m, 19.1)
@@ -498,9 +524,7 @@ def card_price_tier(args) -> dict:
                  "DEF": "DEFENDERS", "GKP": "GOALKEEPERS"}.get(args.pos, "PLAYERS")
     return {
         "title": f"{pos_label}: PRICE VS POINTS",
-        "subtitle": (f"next {n_gw} GW, every {pos_label.lower()[:-1]} in the "
-                     f"free top {cap}" if args.rank_cap
-                     else f"next {n_gw} GW"),
+        "subtitle": _tier_subtitle(args, n_gw, pos_label, cap),
         "nameLabel": "PLAYER",
         "midLabel": "TOTAL / EXP. MINUTES",
         "valueLabel": "PRICE",
@@ -684,6 +708,8 @@ def main() -> int:
                     help="stats: minimiminuutit")
     ap.add_argument("--pos", default=None, help="stats: GKP/DEF/MID/FWD")
     ap.add_argument("--team", default=None, help="stats: joukkuelyhenne (ARS)")
+    ap.add_argument("--max-price", type=float, default=None,
+                    help="price-tier: hintakatto miljoonissa (esim. 8.0)")
     ap.add_argument("--rank-cap", type=int, default=None,
                     help="price-tier: pudota rivit jotka eivat mahdu ilmaissivun "
                          "top-N:aan (tarkistettavuus). /fpl/expected-points = 100")

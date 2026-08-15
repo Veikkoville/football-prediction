@@ -209,3 +209,6 @@ outputs/reels/
 # postaushetkella, ei valmisteluhetkella).
 outputs/gw_digest/
 
+
+# wrangler-valimuisti (tilitunnus, ei salaisuus, mutta ei kuulu repoon)
+.wrangler/

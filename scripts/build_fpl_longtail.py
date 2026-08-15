@@ -40,7 +40,16 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.build_fpl_page import ROOT as _FP_ROOT, write_urlset
+# 15.8: analytiikka MYOS longtail-sivuille. Mitattu 15.8: fpl.html sisalsi
+# PostHogin (202 latausta / 14 vrk) mutta /fpl/expected-points ja
+# /fpl/predicted-lineups eivat sisaltaneet sita LAINKAAN -> koko generoitu
+# sisaltopinta oli mittaamaton. Sama vakio kuin paasivuilla eika kopio:
+# kaksi rinnakkaista snippettia eriytyisivat hiljaa.
+from scripts.build_fpl_page import (  # noqa: E402
+    POSTHOG_SNIPPET,
+    ROOT as _FP_ROOT,
+    write_urlset,
+)
 from scripts.mobile_css import MOBILE_COLS_JS, MOBILE_CSS
 from scripts.share_card_js import SHARE_CARD_JS
 
@@ -445,6 +454,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         '<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">\n'
         '<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">\n'
         '<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">\n'
+        + POSTHOG_SNIPPET + "\n" +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
