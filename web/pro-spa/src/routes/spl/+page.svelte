@@ -702,8 +702,13 @@
 			<h2>Compare two players</h2>
 			<div class="cmp-row">
 				{#each [0, 1] as slot (slot)}
+					<!-- `?? ''` on pakollinen: cmpA/cmpB ovat `number | null`, ja null ei vastaa
+					     yhtaan optionia -> selectedIndex = -1 ja kontrolli renderoituu TAYSIN
+					     TYHJANA (mitattu tuotannosta 15.8). Placeholderin arvo on tyhja
+					     merkkijono, joten null pitaa kaantaa siksi jotta "Pick player N…"
+					     nakyy suljetussa kontrollissa. -->
 					<select
-						value={slot === 0 ? cmpA : cmpB}
+						value={(slot === 0 ? cmpA : cmpB) ?? ''}
 						onchange={(e) => {
 							const v = Number((e.target as HTMLSelectElement).value) || null;
 							if (slot === 0) cmpA = v;
