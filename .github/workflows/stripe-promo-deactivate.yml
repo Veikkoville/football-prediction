@@ -1,0 +1,83 @@
+# Kertakayttoinen Stripe-promokoodin sammutus (15.8.2026, Villen GO).
+#
+# MIKSI CI EIKA PAIKALLINEN AJO. Kehityskoneella on vain `rk_`-alkuinen
+# read-only-avain (`.env: STRIPE_RO_KEY`, lisatty 12.8) ja kirjoitukset on
+# tehty kertakayttoavaimilla. `STRIPE_SECRET_KEY` on jo GitHub-salaisuutena ja
+# `affiliate-attrib-watch.yml` kayttaa sita, joten tama ei paljasta uutta
+# salaisuutta uuteen paikkaan.
+#
+# 🔴 TAMA TIEDOSTO POISTETAAN AJON JALKEEN. Pysyva workflow joka voi muuttaa
+# laskutusta on pysyva vipu, ja billing-live-kytkenta on aina GO-REQUIRED.
+# Kertaluontoinen tyo ei ansaitse pysyvaa oikeutta.
+#
+# RAJATTU TARKOITUKSELLA: asettaa nimetyn promotion coden `active=false`.
+# Ei poista kuponkeja. Syy on mitattu: DAZ, WOLFY ja ROWAN ovat aktiivisia
+# luoja-koodeja ja nojaavat samaan 30 %:n kuponkijoukkoon, joten kupongin
+# poisto kaataisi ne. Deaktivointi on myos peruttavissa, poisto ei.
+name: stripe-promo-deactivate
+
+on:
+  workflow_dispatch:
+    inputs:
+      promo_id:
+        description: "Promotion code id (promo_...)"
+        required: true
+      expect_code:
+        description: "Odotettu koodi, esim. EARLY30 (turvatarkistus)"
+        required: true
+
+jobs:
+  deactivate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Deactivate promotion code
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          PROMO_ID: ${{ inputs.promo_id }}
+          EXPECT_CODE: ${{ inputs.expect_code }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+
+          key = os.environ["STRIPE_SECRET_KEY"]
+          pid = os.environ["PROMO_ID"]
+          odotettu = os.environ["EXPECT_CODE"]
+
+          def call(path, data=None):
+              req = urllib.request.Request(
+                  f"https://api.stripe.com/v1/{path}",
+                  data=urllib.parse.urlencode(data).encode() if data else None,
+                  headers={"Authorization": f"Bearer {key}",
+                           # Oletusversio hylkaa osan promo-parametreista.
+                           "Stripe-Version": "2024-06-20"})
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return json.load(r)
+
+          # Turvatarkistus ENNEN kirjoitusta: id yksin on merkkijono jota ei voi
+          # lukea, ja vaara id sammuttaisi luoja-koodin hiljaa.
+          nyt = call(f"promotion_codes/{pid}")
+          if nyt["code"] != odotettu:
+              raise SystemExit(
+                  f"PYSAYTETTY: {pid} on koodi {nyt['code']}, odotettiin {odotettu}")
+          print(f"kohde: {nyt['code']} active={nyt['active']} "
+                f"lunastettu={nyt.get('times_redeemed')}")
+
+          if not nyt["active"]:
+              print("oli jo pois paalta, ei muutosta")
+          else:
+              uusi = call(f"promotion_codes/{pid}", {"active": "false"})
+              print(f"jalkeen: {uusi['code']} active={uusi['active']}")
+              if uusi["active"]:
+                  raise SystemExit("EPAONNISTUI: koodi on yha aktiivinen")
+
+          # Negatiivinen kontrolli: luoja-koodien on oltava koskemattomia.
+          muut = call("promotion_codes?limit=30")
+          for pc in muut["data"]:
+              if pc["code"] in {"DAZ", "WOLFY", "ROWAN"}:
+                  print(f"  luoja-koodi {pc['code']}: active={pc['active']}")
+                  if not pc["active"]:
+                      raise SystemExit(f"HALYTYS: {pc['code']} sammui vahingossa")
+          PY
