@@ -1638,7 +1638,7 @@ the top three of every leaderboard are free.</p>
   <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start Premium, &euro;25 a year</a>
 </div>
 <p class="price-note">€25 a year, which is under €2.10 a month, or €3.99 a month.
-One subscription covers web, iOS and Android. Cancel anytime.</p>
+One subscription covers web, iOS and Android. Cancel anytime. 30-day money back on web purchases.</p>
 </aside>
 
 <!-- Career card discoverability. This is a free distribution tool, so the teal

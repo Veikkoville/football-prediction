@@ -42,51 +42,52 @@
     {
       "slug": "set-piece-xg-is-not-open-play-xg",
       "date": "2026-08-15",
-      "title": "Most centre-back xG is set-piece xG, and the column won't tell you",
+      "title": "Defender xG comes in two kinds, and the column doesn't say which",
       "check_url": "https://goaliq.app/fpl/stats",
       "cta": "Open the stats page and check any of these",
       "claims": [
-        "Gabriel",
-        "4.65",
-        "4.50",
-        "Lacroix",
-        "3.01",
-        "2.86",
-        "Thiaw",
-        "5.90",
-        "5.38",
-        "Tarkowski",
-        "2.87",
-        "2.61",
-        "Van de Ven",
-        "2.45",
+        "0.11",
+        "0.31",
+        "0.61",
+        "0.87",
+        "1.45",
+        "2.05",
         "2.17",
-        "Struijk",
-        "2.97",
+        "2.19",
+        "2.45",
+        "2.61",
         "2.62",
-        "Collins",
-        "2.92",
-        "2.46",
-        "Van Hecke",
-        "3.36",
-        "2.82",
-        "Virgil",
-        "4.89",
-        "3.97",
-        "Van den Berg",
-        "3.33",
-        "2.70",
-        "O'Reilly",
+        "2.71",
+        "2.86",
+        "2.87",
+        "2.97",
+        "3.01",
+        "3.15",
+        "4.50",
+        "4.65",
+        "5.38",
+        "5.90",
         "6.73",
-        "Haaland",
-        "Mbeumo"
+        "Dalot",
+        "Gabriel",
+        "Hume",
+        "Lacroix",
+        "Muñoz",
+        "O'Reilly",
+        "Sessegnon",
+        "Struijk",
+        "Tarkowski",
+        "Thiaw",
+        "Van de Ven"
       ],
       "paragraphs": [
-        "Gabriel finished last season on 4.65 non-penalty xG. 4.50 of it came from set pieces. Ninety-seven percent, the highest share of anyone in the sample.",
-        "He's not a quirk. Lacroix was at 95%, Thiaw at 91%, and ten players cleared 80%.",
-        "The rest of the league looks nothing like that. Across the 142 players with at least 2.0 non-penalty xG, the median set-piece share is 15%. Haaland sits at 10%, Mbeumo at 2%. There's no gentle slope running from strikers down to defenders. Two different things are sharing a column heading.",
-        "Being a defender isn't enough on its own, either. O'Reilly has the highest non-penalty xG of any defender in the sample, 6.73, and 22% of it is set pieces.",
-        "The clearest cases, with non-penalty xG and the set-piece part of it:",
+        "Everyone knows a centre-back's goals come from corners. That part isn't interesting. What surprised me is how badly it works as a rule.",
+        "Gabriel finished last season on 4.65 non-penalty xG and 4.50 of it was set pieces. Ninety-seven percent. Sessegnon finished on 2.05 with 0.11 from set pieces. Five percent. Same position, same column, almost nothing in common.",
+        "Take the 23 defenders with at least 2.0 non-penalty xG. Ten are above 80% set pieces, six are below 50%, and the other seven are scattered across the middle. There's no typical number to fall back on, which is the problem: the column gives you one figure and it can mean either thing.",
+        "The best attacking defender in the sample is in the wrong group for the stereotype. O'Reilly has the highest non-penalty xG of any defender, 6.73, and only 22% of it comes from set pieces.",
+        {
+          "h2": "The set-piece end"
+        },
         {
           "head": [
             "Player",
@@ -130,30 +131,49 @@
               "2.97",
               "2.62",
               "88%"
+            ]
+          ]
+        },
+        {
+          "h2": "The open-play end"
+        },
+        {
+          "head": [
+            "Player",
+            "npxG",
+            "Set-piece xG",
+            "Share"
+          ],
+          "rows": [
+            [
+              "Dalot",
+              "2.19",
+              "0.87",
+              "40%"
             ],
             [
-              "Collins",
-              "2.92",
-              "2.46",
-              "84%"
+              "O'Reilly",
+              "6.73",
+              "1.45",
+              "22%"
             ],
             [
-              "Van Hecke",
-              "3.36",
-              "2.82",
-              "84%"
+              "Muñoz",
+              "3.15",
+              "0.61",
+              "19%"
             ],
             [
-              "Virgil",
-              "4.89",
-              "3.97",
-              "81%"
+              "Hume",
+              "2.71",
+              "0.31",
+              "11%"
             ],
             [
-              "Van den Berg",
-              "3.33",
-              "2.70",
-              "81%"
+              "Sessegnon",
+              "2.05",
+              "0.11",
+              "5%"
             ]
           ]
         },
@@ -161,7 +181,7 @@
           "h2": "Why it matters"
         },
         "xG gets treated as one currency. You compare two players, the higher number wins, and for most of the league that's fine, because both numbers are made of the same stuff.",
-        "For the defenders above the number comes from somewhere else. It depends on how many set pieces the team wins and on who is delivering them. Neither of those moves with the things that normally move a team's attack.",
+        "For the defenders at the top of that first table the number comes from somewhere else. It depends on how many set pieces the team wins and on who is delivering them. Neither of those moves with the things that normally move a team's attack.",
         "Take a club that sells its main striker. Open-play creation drops and the rating should drop with it. But the number of set pieces barely changes, and the centre-back who scores off them keeps scoring as long as the delivery is still there.",
         {
           "h2": "How I'd use it"
@@ -175,13 +195,14 @@
         "Set-piece xG isn't immune to squad change either, it just doesn't respond to the same inputs. A manager who stops loading the box would flatten these numbers quickly.",
         "Set piece here means corners and free kicks, not corners alone. The column doesn't split them, so I'm not going to guess at the split either.",
         "And none of it says whether a player is good. Gabriel at 97% is one of the better attacking defenders in the league, and set-piece goals count the same as any other. The problem is that they run on a different engine, so anything that treats the two as one number will be wrong in a direction you can predict.",
-        "Both columns are on our free stats page, no sign-in, but they sit in different views. Easiest route: type the name into \"Search player\", then switch between \"Goal threat\" for npxG and \"Set pieces\" for Set-piece xG. If you want to sort the whole list instead, press \"Show all players\" first, because the table opens on the top 100 and four of the names above sit outside it on npxG. Basis is 2025/26, 400 players in this season's FPL squads."
+        "Both columns are on our free stats page, no sign-in, but they sit in different views. Easiest route: type the name into \"Search player\", then switch between \"Goal threat\" for npxG and \"Set pieces\" for Set-piece xG. If you want to sort the whole list instead, press \"Show all players\" first, because the table opens on the top 100 and several of the names above sit outside it on npxG. Basis is 2025/26, 400 players in this season's FPL squads.",
+        "goaliq.app/fpl/stats"
       ],
       "og_headline": [
-        "97% of Gabriel's xG",
-        "came from set pieces."
+        "One defender is 97%",
+        "set pieces. Another is 5%."
       ],
-      "og_sub": "Ten defenders clear 80%. The column won't tell you which."
+      "og_sub": "Same position, same column, almost nothing in common."
     }
   ]
 }
