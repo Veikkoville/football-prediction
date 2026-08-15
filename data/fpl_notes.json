@@ -176,7 +176,12 @@
         "Set piece here means corners and free kicks, not corners alone. The column doesn't split them, so I'm not going to guess at the split either.",
         "And none of it says whether a player is good. Gabriel at 97% is one of the better attacking defenders in the league, and set-piece goals count the same as any other. The problem is that they run on a different engine, so anything that treats the two as one number will be wrong in a direction you can predict.",
         "Both columns are on our free stats page, no sign-in, but they sit in different views. Easiest route: type the name into \"Search player\", then switch between \"Goal threat\" for npxG and \"Set pieces\" for Set-piece xG. If you want to sort the whole list instead, press \"Show all players\" first, because the table opens on the top 100 and four of the names above sit outside it on npxG. Basis is 2025/26, 400 players in this season's FPL squads."
-      ]
+      ],
+      "og_headline": [
+        "97% of Gabriel's xG",
+        "came from set pieces."
+      ],
+      "og_sub": "Ten defenders clear 80%. The column won't tell you which."
     }
   ]
 }
