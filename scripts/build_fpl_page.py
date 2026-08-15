@@ -1326,6 +1326,68 @@ CSS = """
 
 
 
+
+NOTES_PATH = ROOT / "data" / "fpl_notes.json"
+
+
+def latest_articles_block(notes_doc: dict | None, limit: int = 3) -> str:
+    """Etusivun "Latest from the model" -lohko (15.8.2026, Villen pyynto).
+
+    MIKSI. Ville: FFScoutilla on etusivulla "latest articles" ja "featured
+    article" jotka nakyvat heti kun saavut sivulle. Meilla muistiot olivat
+    `/fpl/notes`-osoitteessa johon paasi vain alatunnisteen kautta — eli
+    kirjoitettu sisalto oli kaytannossa nakymatonta.
+
+    Lohko on heron JALKEEN ja ennen projektiotaulukkoa, koska se on ainoa
+    sisalto joka muuttuu kirjoittamalla eika ajastetusti. Jos se olisi sivun
+    alalaidassa, sen kirjoittaminen olisi hukkaan heitettya tyota.
+
+    Nayttaa uusimmat `limit` muistiota: otsikko, paivays ja ENSIMMAINEN
+    kappale kokonaisena. Ei katkaisua kolmeen pisteeseen — leikattu virke on
+    lupaus jota lohko ei pida, ja ensimmainen kappale on kirjoitettu
+    kantamaan itsenaisesti.
+
+    Tyhja tai puuttuva data -> tyhja merkkijono -> koko lohko jaa pois.
+    """
+    notes = ((notes_doc or {}).get("notes") or [])
+    notes = sorted(notes, key=lambda n: str(n.get("date") or ""), reverse=True)
+    kortit = []
+    for n in notes[:limit]:
+        paras = n.get("paragraphs") or []
+        if not paras or not n.get("title"):
+            continue
+        slug = escape(str(n.get("slug") or ""))
+        kortit.append(
+            '<a class="note-card" href="/fpl/notes#' + slug + '">'
+            f'<span class="note-date">{escape(str(n.get("date") or ""))}</span>'
+            f'<span class="note-title">{escape(str(n["title"]))}</span>'
+            f'<span class="note-lede">{escape(str(paras[0]))}</span>'
+            "</a>"
+        )
+    if not kortit:
+        return ""
+    return (
+        f'<style>{NOTES_CSS}</style>'
+        '<div class="note-list">' + "".join(kortit) + "</div>"
+        '<p class="note-more"><a href="/fpl/notes">All notes from the model</a></p>'
+    )
+
+
+NOTES_CSS = """
+.note-list{display:grid;gap:12px;margin:18px 0 6px}
+@media(min-width:760px){.note-list{grid-template-columns:1fr 1fr}
+.note-list a:first-child{grid-column:1/-1}}
+a.note-card{display:block;padding:14px 16px;border:1px solid var(--line);
+background:var(--panel);text-decoration:none;color:inherit}
+a.note-card:hover{border-color:var(--amber)}
+.note-date{display:block;font-size:.78rem;letter-spacing:.06em;
+text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.note-title{display:block;font-weight:700;line-height:1.3;margin-bottom:8px}
+.note-lede{display:block;font-size:.92rem;line-height:1.5;color:var(--muted)}
+.note-more{margin:4px 0 0;font-size:.9rem}
+"""
+
+
 def team_news_block(xp: dict | None) -> str:
     """Tiivis team news -nosto fpl.html:aan (15.8.2026, Villen pyynto).
 
@@ -1849,6 +1911,16 @@ def update_index(c: dict, xp: dict | None = None) -> bool:
     # 15.8: team news paasivulle. Villen havainto: "https://goaliq.app/ en nae
     # mitaan uutisjuttua ... toi on se meidan paasivu" — olin laittanut lohkon
     # vain fpl.html:aan. Sama sisalto, sama artefakti, ei kovakoodattuja lukuja.
+    articles_block = latest_articles_block(_load_json(NOTES_PATH))
+    if articles_block:
+        new, n_art = re.subn(
+            r"(<!-- GEN:LATEST-ARTICLES-START -->).*?(<!-- GEN:LATEST-ARTICLES-END -->)",
+            lambda m: m.group(1) + articles_block + m.group(2), new, flags=re.S)
+        if n_art != 1:
+            raise RuntimeError(
+                f"index.html GEN:LATEST-ARTICLES: odotettiin 1 markerilohko, "
+                f"loytyi {n_art}")
+
     news_block = team_news_block(xp)
     if news_block:
         new, n_news = re.subn(

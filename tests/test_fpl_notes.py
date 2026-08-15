@@ -84,3 +84,62 @@ def test_muistio_linkittaa_tarkistussivulle():
     html = render_notes(_doc(), NOW)
     for n in _doc()["notes"]:
         assert n["check_url"] in html, f"{n['slug']}: check_url ei ole sivulla"
+
+
+# ---------------------------------------------------------------------------
+# Etusivun esilletuonti
+# ---------------------------------------------------------------------------
+# Villen pyynto 15.8: FFScoutilla on etusivulla "latest articles" joka nakyy
+# heti kun saavut sivulle. Meilla muistiot olivat /fpl/notes-osoitteessa johon
+# paasi vain alatunnisteen kautta — kirjoitettu sisalto oli kaytannossa
+# nakymatonta, eli sen kirjoittaminen oli hukkaan heitettya tyota.
+
+def test_etusivun_lohko_ilman_dataa_on_tyhja():
+    from scripts.build_fpl_page import latest_articles_block
+    assert latest_articles_block(None) == ""
+    assert latest_articles_block({"notes": []}) == ""
+    assert latest_articles_block({"notes": [{"title": "X", "paragraphs": []}]}) == ""
+
+
+def test_etusivun_lohko_nayttaa_uusimman_ensin():
+    from scripts.build_fpl_page import latest_articles_block
+    html = latest_articles_block({"notes": [
+        {"slug": "vanha", "date": "2026-01-01", "title": "Vanha",
+         "paragraphs": ["A."]},
+        {"slug": "uusi", "date": "2026-08-15", "title": "Uusi",
+         "paragraphs": ["B."]},
+    ]})
+    assert html.index("Uusi") < html.index("Vanha")
+
+
+def test_etusivun_lohko_linkittaa_ankkuriin():
+    """Kortin on vietava SIIHEN muistioon eika vain sivun ylaosaan."""
+    from scripts.build_fpl_page import latest_articles_block
+    html = latest_articles_block({"notes": [
+        {"slug": "abc", "date": "2026-08-15", "title": "T", "paragraphs": ["A."]}]})
+    assert 'href="/fpl/notes#abc"' in html
+
+
+def test_etusivun_lohko_ei_katkaise_ledea():
+    """Kolme pistetta on lupaus jota lohko ei pida. Ensimmainen kappale on
+    kirjoitettu kantamaan itsenaisesti, joten se nayteta kokonaan."""
+    from scripts.build_fpl_page import latest_articles_block
+    lede = "Ensimmainen kappale joka on tarkoituksella melko pitka jotta katkaisu nakyisi."
+    html = latest_articles_block({"notes": [
+        {"slug": "a", "date": "2026-08-15", "title": "T", "paragraphs": [lede]}]})
+    assert lede in html
+    assert "…" not in html and "..." not in html
+
+
+def test_paasivulla_on_latest_articles_markerit():
+    idx = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert idx.count("<!-- GEN:LATEST-ARTICLES-START -->") == 1
+    assert idx.count("<!-- GEN:LATEST-ARTICLES-END -->") == 1
+
+
+def test_lohko_on_ennen_projektiotaulukkoa():
+    """Sijainti ON osa vaatimusta: alalaidassa oleva lohko ei ole
+    esilletuontia. Jos joku siirtaa sen, tama kaatuu."""
+    idx = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert idx.index("GEN:LATEST-ARTICLES-START") < idx.index("GEN:XP-TABLE-START")
+    assert idx.index("GEN:LATEST-ARTICLES-START") < idx.index("GEN:TEAM-NEWS-START")
