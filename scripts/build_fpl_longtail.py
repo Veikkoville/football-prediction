@@ -170,6 +170,18 @@ footer a{color:var(--teal);}
    + min-width keeps narrow tables at their previous width, centered, and
    only wide ones use the extra room. On a narrow screen min() returns 100%
    -> behavior is exactly what it was. */
+/* Muistioartikkelin datataulukko (15.8). EI .lb-wrapin tayttaa leveytta:
+   artikkelin taulukko on nelja kapeaa saraketta ja kuuluu tekstipalstaan,
+   kun taas .lb-wrap venyttaa taulukon ruudun levyiseksi ja keskittaa sen
+   translatella. Oma vieritinsailio silti, jotta kapea ruutu vierittaa
+   taulukkoa eika koko sivua. */
+.tblwrap{overflow-x:auto;margin:14px 0;}
+.note-tbl{border-collapse:collapse;font-size:.95rem;min-width:22rem;}
+.note-tbl th,.note-tbl td{padding:5px 14px 5px 0;text-align:left;
+white-space:nowrap;}
+.note-tbl th{border-bottom:1px solid var(--line-strong);font-weight:600;}
+.note-tbl td:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums;}
+.note-tbl tbody tr+tr td{border-top:1px solid var(--line);}
 .lb-wrap{overflow-x:auto;margin:14px 0;
 width:min(96vw,1560px);margin-left:50%;transform:translateX(-50%);}
 /* 820px was .wrap's max-width INCLUDING PADDING, but the text column is
@@ -1053,8 +1065,13 @@ XG_JS = """
   if(hh&&hh[9])hh[9].textContent=(w==='S')?'Starts':'Games';
   var span=(w==='S')?', full season':', last '+w+' games each';
   var rate=per90?', per 90 minutes':((w==='S')?', season totals':', per game');
+  // 15.8: rivi lupasi "400 players" samalla kun taulukko renderoi 100.
+  // Luku joka ei vastaa nakyvaa sisaltoa on sama vika kuin vaite jota lukija
+  // ei loyda: han laskee rivit ja saa eri tuloksen kuin sivu vaittaa.
+  var nn=showAll?r.length:Math.min(LIMIT,r.length);
   if(cnt)cnt.textContent=r.length+' players'+rate+span
-   +(minm?', at least '+minm+' minutes played':', no minutes filter');
+   +(minm?', at least '+minm+' minutes played':', no minutes filter')
+   +((nn<r.length)?'. Showing '+nn:'');
  }
  function chips(id,vals,cur,set){
   var e=document.getElementById(id);if(!e)return;
@@ -1880,7 +1897,7 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         '<button type="button" class="chip" id="sharecard">Share as image</button>'
         "</div>"
         f'<p class="note" id="stc">{len(rows)} players, season totals. '
-        "Click a column to sort.</p>"
+        "Showing 100. Click a column to sort, or press Show all players.</p>"
     )
     table = (
         '<div class="lb-wrap"><table class="lb">'
@@ -1915,7 +1932,13 @@ def render_stats(stats: dict, now: datetime) -> str | None:
         "we do not call them Opta. In box means the shot was taken inside the "
         "penalty area. The xG 0.3+ column counts chances worth at least 0.3 "
         "expected goals, which is our own threshold and not anyone else's "
-        "definition of a big chance. Our DefCon tracker (hit rate, thresholds, "
+        # 15.8: portti blokkasi erikoistilanne-artikkelin koska teksti sanoi
+        # "corner" ja sarake tarkoittaa laajempaa joukkoa. Sarakkeen sisalto
+        # oli sivulla maarittelematta, joten lukija ei voinut ratkaista eroa
+        # miltaan pinnalta. Maaritelma kuuluu sinne missa luku on.
+        "definition of a big chance. Set-piece xG counts shots from corners, "
+        "free kicks and other dead-ball situations, not corners alone, and the "
+        "column does not split them. Our DefCon tracker (hit rate, thresholds, "
         "projected points) is a model output rather than a raw stat, so it "
         "lives in the app and the DefCon column here is the raw count. A dash "
         "means we have no data for that player, not zero.</p>"
@@ -2537,6 +2560,43 @@ def render_team_news(xp: dict, now: datetime) -> str | None:
 NOTES_PATH = ROOT / "data" / "fpl_notes.json"
 
 
+def _note_block(p) -> str:
+    """Yksi muistiolohko: merkkijono = kappale, dict = valiotsikko tai taulukko.
+
+    MIKSI LAAJENNUS (15.8). Ensimmainen muistio oli neljan kappaleen mittainen
+    ja litteä lista riitti. Villen pyytama LAAJA analyyttinen artikkeli (malli
+    FFScoutin seuraennakot) ei mahdu siihen muotoon: siina on valiotsikot ja
+    datataulukko, ja taulukon puristaminen kappaleeksi tekisi juuri sen mita
+    artikkeli kritisoi — lukujen esittamisen muodossa jota ei voi lukea.
+
+    Taaksepain yhteensopiva: merkkijono kayttaytyy tasan kuten ennen, joten
+    olemassa oleva muistio renderoityy muuttumattomana.
+    """
+    if isinstance(p, str):
+        return f"<p>{escape(p)}</p>"
+    if isinstance(p, dict):
+        if p.get("h2"):
+            return f"<h3>{escape(str(p['h2']))}</h3>"
+        rows = p.get("rows") or []
+        if rows:
+            head = p.get("head") or []
+            th = (
+                "<thead><tr>"
+                + "".join(f"<th>{escape(str(c))}</th>" for c in head)
+                + "</tr></thead>"
+                if head
+                else ""
+            )
+            body = "".join(
+                "<tr>" + "".join(f"<td>{escape(str(c))}</td>" for c in r) + "</tr>"
+                for r in rows
+            )
+            # Taulukko kaaritaan omaan vieritinsailioonsa: leveä sisalto ei saa
+            # panna koko sivua vaakavieritykseen kapealla ruudulla.
+            return f'<div class="tblwrap"><table class="note-tbl">{th}<tbody>{body}</tbody></table></div>'
+    return ""
+
+
 def render_notes(notes_doc: dict, now: datetime) -> str | None:
     """Kierrosmuistiot yhdella URLilla (15.8.2026, Villen GO).
 
@@ -2574,7 +2634,7 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
 
     blocks = []
     for n in notes:
-        paras = "".join(f"<p>{escape(str(p))}</p>" for p in n.get("paragraphs") or [])
+        paras = "".join(_note_block(p) for p in n.get("paragraphs") or [])
         if not paras:
             continue
         check = str(n.get("check_url") or f"{BASE}/fpl/team-news")

@@ -62,6 +62,13 @@ raw_data/
 !/data/fpl_prev_baselines_2526.json
 # FPL Phase 1b: manuaaliset konteksti-yliajot (versioitu input, builderit lukevat).
 !/data/fpl_manual_overrides.csv
+# 15.8: KIERROSMUISTIOT JA ARTIKKELIT. Poikkeus PUUTTUI kun tiedosto luotiin
+# samana paivana -> molemmat muistiot elivat vain kehityskoneella. Sivu
+# `fpl/notes.html` on generoitu tasta, joten CI:n uudelleenajo olisi
+# rakentanut sivun TYHJASTA lahteesta ja poistanut artikkelit hiljaa. Sama
+# vika kuin 27.7 pelaajayliajoissa kaksi riviä alempana, ja sama luokka kuin
+# "gitignoroitu korjaus = hiljainen regressio".
+!/data/fpl_notes.json
 # 28.7: PELAAJATASON minuuttiohitukset. Tama poikkeus PUUTTUI kun tiedosto
 # luotiin 27.7 -> se jai vain kehityskoneelle, CI-runnerilla sita ei ollut, ja
 # load_player_overrides() palautti hiljaa tyhjan dictin. Seuraus: 27.7 korjattu

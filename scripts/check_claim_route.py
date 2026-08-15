@@ -76,26 +76,78 @@ def _visible_text(doc: str) -> str:
     return re.sub(r"\s+", " ", _html.unescape(doc))
 
 
+def _numerot(doc: str) -> set[float]:
+    """Kaikki dokumentin numeeriset tokenit floatteina.
+
+    Tarvitaan koska client-renderoity sivu kantaa RAAKOJA floatteja ja
+    muotoilee solun vasta selaimessa: payloadissa on `4.5`, taulukossa lukee
+    `4.50`. Merkkijonohaku antoi siksi EI-LOYDY luvuille jotka lukija nakee.
+
+    🔴 EI SUBSTRING-NORMALISOINTIA. Houkutus olisi vertailla `4.5` osajonona,
+    mutta se osuisi myos lukuun `14.55` ja keksisi vaitteelle katteen jota ei
+    ole. Portin oma normalisointi on reika (kirjattu). Siksi tokenit poimitaan
+    rajoineen ja verrataan numeroina.
+    """
+    out = set()
+    for m in re.findall(r"-?\d+\.\d+|-?\d+", doc):
+        try:
+            out.add(float(m))
+        except ValueError:
+            pass
+    return out
+
+
 def check(url: str, claims: list[str]) -> list[tuple[str, str]]:
     """Palauta [(vaite, tulos)] jokaiselle vaitteelle.
 
     Tulokset:
-      OK           loytyy myos mobiilissa nakyvasta sisallosta
+      OK            loytyy palvelimen renderoimasta nakyvasta tekstista
       VAIN-TYOPOYTA loytyy, mutta vain m-hide-sarakkeesta
-      EI-LOYDY     ei ole sivulla lainkaan
+      VAIN-DATASSA  loytyy sivun datasta muttei renderoidusta tekstista
+      EI-LOYDY      ei ole sivulla lainkaan
+
+    🔴 `VAIN-DATASSA` LISATTIIN 15.8 KOSKA TYOKALU ANTOI VAARAN HALYTYKSEN.
+    Ajoin sen `/fpl/stats`-sivulle ja se vaitti etta "Struijk" ja "4.65" eivat
+    ole sivulla. Ne OVAT: sivu kantaa taulukkonsa JSONina script-lohkossa ja
+    renderoi sen selaimessa. Riisun script-lohkot tarkoituksella (lukija ei
+    nae niita), ja se teki client-renderoidusta sivusta nakymattoman.
+
+    Vaara halytys on PAHEMPI kuin puuttuva tyokalu: portti joka huutaa
+    turhaan opitaan ohittamaan, ja silloin se ei estä sita oikeaa virhetta
+    jota varten se rakennettiin. Kolmas tila kertoo eron sen sijaan etta
+    valehtelisi kumpaankin suuntaan.
     """
     doc = fetch(url)
     full = _visible_text(doc)
     mobile = _visible_text(_strip_hidden(doc))
+    luvut = _numerot(doc)
     out = []
     for c in claims:
         needle = c.strip()
         if not needle:
             continue
+        try:
+            arvo = float(needle)
+        except ValueError:
+            arvo = None
+
         if needle in mobile:
             out.append((needle, "OK"))
         elif needle in full:
             out.append((needle, "VAIN-TYOPOYTA"))
+        elif arvo is not None:
+            # 🔴 NUMEERINEN VAITE EI KAYTA OSAJONOHAKUA RAAKADOKUMENTTIIN.
+            # Mitattu 15.8 omalla negatiivisella kontrollilla: vaite "1.4"
+            # osui osajonona datassa olevaan lukuun "1.45" ja sai katteen jota
+            # sivu ei tue. Sama sokeus kuin aiemmin kirjattu substring-osuma.
+            # Numerot verrataan siis TOKENEINA, ei merkkijonoina.
+            #
+            # Tulos on VAIN-DATASSA eika OK: luku on payloadissa (esim. `4.5`)
+            # ja renderoituu soluun muodossa `4.50`, mutta se ero on juuri se
+            # mita kolmas tila on olemassa kertomaan.
+            out.append((needle, "VAIN-DATASSA" if arvo in luvut else "EI-LOYDY"))
+        elif needle in doc:
+            out.append((needle, "VAIN-DATASSA"))
         else:
             out.append((needle, "EI-LOYDY"))
     return out
@@ -122,12 +174,19 @@ def main(argv: list[str] | None = None) -> int:
     leveys = max(len(c) for c, _ in rows)
     print(f"Tarkistusreitti: {a.url}\n")
     for c, tulos in rows:
-        merkki = {"OK": "  ", "VAIN-TYOPOYTA": "! ", "EI-LOYDY": "X "}[tulos]
+        merkki = {"OK": "  ", "VAIN-TYOPOYTA": "! ",
+                  "VAIN-DATASSA": "~ ", "EI-LOYDY": "X "}[tulos]
         print(f"  {merkki}{c:<{leveys}}  {tulos}")
 
     puuttuu = [c for c, t in rows if t == "EI-LOYDY"]
     vain_tp = [c for c, t in rows if t == "VAIN-TYOPOYTA"]
+    vain_data = [c for c, t in rows if t == "VAIN-DATASSA"]
     print()
+    if vain_data:
+        print(f"~ {len(vain_data)} vaitetta on sivun DATASSA muttei "
+              f"palvelimen renderoimassa tekstissa: {', '.join(vain_data)}")
+        print("  Sivu renderoi ne selaimessa. Lukija nakee ne, mutta TAMA "
+              "tyokalu ei voi todistaa sita — avaa sivu ja katso.")
     if vain_tp:
         print(f"! {len(vain_tp)} vaitetta nakyy VAIN tyopoydalla "
               f"(m-hide-sarake): {', '.join(vain_tp)}")
