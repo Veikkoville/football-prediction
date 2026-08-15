@@ -23,8 +23,32 @@ import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Julkiset myyntipinnat. Nama ovat kasin yllapidettyja, eivat generoituja.
+# Julkiset myyntipinnat, kasin yllapidetyt.
 MYYNTIPINNAT = ["index.html", "predictions.html", "fpl.html", "faq.html"]
+
+
+def _generoidut() -> list[str]:
+    """Generoidut sivut mukaan skannaukseen.
+
+    🔴 TAMA PUUTTUI ENSIMMAISESTA VERSIOSTA JA SE OLI SE AUKKO. Portti
+    rakennettiin 15.8 estamaan lunastamaton alennuslupaus, mutta se skannasi
+    vain kasin yllapidetyt sivut. Samana paivana julkaisutarkistaja loysi
+    livesta rikkinaisen orpolauseen JOKAISEN longtail- ja ennustesivun
+    footerista:
+
+        "... 25 €/season. deadline on Friday 21 August for 30% off the
+         first year (17.50 €, then 25 €)."
+
+    Sama vaara hintalupaus, kymmenilla sivuilla, ja oma porttini oli sokea
+    silla juuri se lahde on generaattorissa eika HTML:ssa. Portti joka
+    kattaa vain sen pinnan jolta vika loytyi ensin ei ole portti vaan
+    korjauksen muistiinpano.
+    """
+    ulos = []
+    for kuvio in ("fpl/*.html", "fpl/club/*.html", "predictions/*/index.html"):
+        ulos += [str(x.relative_to(ROOT)).replace("\\", "/")
+                 for x in sorted(ROOT.glob(kuvio))]
+    return ulos
 
 # Sivu jolla alennushinta on TOSI: luoja-koodit ovat aktiivisia Stripessa
 # (verifioitu 15.8: DAZ, WOLFY, ROWAN active=true) ja sivu nimeaa ne.
@@ -58,6 +82,41 @@ def _teksti(nimi: str) -> str:
     if not p.exists():
         pytest.skip(f"{nimi} puuttuu")
     return p.read_text(encoding="utf-8", errors="replace")
+
+
+def _alennusosumat(t: str) -> list[str]:
+    osumat = []
+    for r in ALENNUSSIGNAALIT:
+        for m in r.finditer(t):
+            ymparys = t[max(0, m.start() - KONTEKSTI_MERKKIA):
+                        m.end() + KONTEKSTI_MERKKIA]
+            if LUOJAKONTEKSTI.search(ymparys):
+                continue
+            osumat.append(f"{r.pattern} @ {m.group(0)!r}")
+    return osumat
+
+
+def test_generoidut_sivut_eivat_lupaa_lunastamatonta_alennusta():
+    """Kaikki generoidut sivut kerralla: vika oli identtinen kymmenilla."""
+    rikki = {}
+    for nimi in _generoidut():
+        osumat = _alennusosumat((ROOT / nimi).read_text(encoding="utf-8",
+                                                        errors="replace"))
+        if osumat:
+            rikki[nimi] = osumat
+    assert not rikki, (
+        f"{len(rikki)} generoitua sivua lupaa lunastamattoman alennuksen. "
+        f"Korjaa GENERAATTORI, ei tulostetta. Esimerkki: "
+        f"{list(rikki.items())[:2]}"
+    )
+
+
+def test_generoituja_sivuja_loytyy():
+    """NEGATIIVINEN KONTROLLI: tyhja lista tekisi ylemmasta testista
+    ikuisesti vihrean eika se mittaisi mitaan."""
+    assert len(_generoidut()) >= 20, (
+        f"vain {len(_generoidut())} generoitua sivua loytyi; kuvio on rikki"
+    )
 
 
 @pytest.mark.parametrize("nimi", MYYNTIPINNAT)
