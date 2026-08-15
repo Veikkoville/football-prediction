@@ -110,6 +110,25 @@ RELEGATED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
         "GER-Bundesliga-FD": (
             "1. FC Heidenheim 1846", "FC St. Pauli 1910", "VfL Wolfsburg",
         ),
+        # 15.8.2026: kolme liigaa lisattiin track recordiin (Villen
+        # toimeksianto), ja samalla paljastui etta niiden VALITSIN tarjosi
+        # joukkueita jotka eivat pelaa kautta 26/27 lainkaan.
+        #
+        # MITATTU eika arvattu: FD:n todelliset 26/27-osallistujat
+        # (/api/fixtures, 45 vrk) resolvoituna mallinimiin, ja erotus mallin
+        # /api/teams-listaan. Lahde on tallennettu:
+        # tests/fixtures/fd_participants_2026-08-15.json
+        #
+        # Championshipissa poistuvat kahta eri reittia — Coventry, Hull ja
+        # Ipswich nousivat PL:aan (ne ovat jo PROMOTED-listalla PL:n puolella),
+        # Leicester, Oxford ja Sheffield Weds putosivat League Oneen. Molemmat
+        # tarkoittavat samaa asiaa tälle listalle: eivat pelaa Championshipia.
+        "ENG-Championship": (
+            "Coventry", "Hull", "Ipswich", "Leicester", "Oxford",
+            "Sheffield Weds",
+        ),
+        "NED-Eredivisie": ("Heracles", "NAC Breda", "Volendam"),
+        "POR-Primeira Liga": ("AVS", "Tondela"),
     },
 }
 
