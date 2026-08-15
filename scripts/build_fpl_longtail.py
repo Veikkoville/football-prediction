@@ -305,6 +305,7 @@ _TOOL_LINKS = [
     ("/fpl/defcon", "DefCon leaders"),
     ("/fpl/stats", "Player stats"),
     ("/fpl/defence", "Defence profiles"),
+    ("/fpl/predicted-lineups", "Predicted XI"),
 ]
 
 
@@ -320,7 +321,8 @@ _TOOL_LINKS = [
 _NAV_GROUPS: list[tuple[str, tuple[str, ...]]] = [
     ("Picks", ("/fpl/best-captain", "/fpl/model-xi", "/fpl/differentials",
                "/fpl/expected-points")),
-    ("Teams", ("/fpl/club-best", "/fpl/defence", "/fpl/team-news")),
+    ("Teams", ("/fpl/club-best", "/fpl/defence", "/fpl/team-news",
+               "/fpl/predicted-lineups")),
     ("Numbers", ("/fpl/stats", "/fpl/xg-leaders", "/fpl/defcon",
                  "/fpl/price-changes")),
     ("Reading", ("/fpl/notes",)),
@@ -3082,6 +3084,91 @@ def render_club_page(short: str, players: list[dict], meta: dict,
     return _page(title, desc, url, hero, body, jsonld)
 
 
+def render_predicted_lineups(xp: dict, now: datetime) -> str | None:
+    """Kaikkien seurojen Model Predicted XI yhdella sivulla.
+
+    MIKSI (15.8.2026, Villen tilaus). Kilpailijalla on yksi "Predicted
+    Lineups" -tyokalu; meilla sama data oli olemassa mutta hajallaan 20
+    seurasivulla, eli sita ei voinut selata eika loytaa yhdesta paikasta.
+
+    🔴 NIMI ON "MODEL PREDICTED XI" EIKA "PREDICTED LINEUPS". Ero ei ole
+    kosmeettinen. FFScoutin ja Roguen kokoonpanot nojaavat IHMISIIN:
+    lehdistotilaisuudet, toimittajat, viime hetken tiedot. Meidan XI on
+    mallin arvio aloitustodennakoisyyksista. Jos kutsuisimme sita samalla
+    nimella, lupaisimme scout-tason tietoa jota meilla ei ole — ja se on
+    tasan se virhe joka on tanaan jo kahdesti maksanut julkaisun.
+
+    Vastineeksi annamme sen luvun jota HEILLA ei ole rivilla: kunkin
+    pelaajan aloitustodennakoisyys prosenttina. Arvaus ilman lukua on
+    mielipide; luku on tarkistettavissa jalkikateen.
+    """
+    meta = xp.get("meta") or {}
+    players = xp.get("players") or []
+    if not meta.get("available") or not players:
+        return None
+    per_club: dict[str, list[dict]] = {}
+    for pl in players:
+        s = pl.get("team_short")
+        if s:
+            per_club.setdefault(s, []).append(pl)
+
+    lohkot = []
+    n_klubia = 0
+    for short, ryhma in sorted(per_club.items()):
+        if short not in CLUB_SLUGS or len(ryhma) < 8:
+            continue
+        rivit, n = _xi_rows(ryhma)
+        if not rivit:
+            continue
+        n_klubia += 1
+        slug = CLUB_SLUGS[short]
+        lohkot.append(
+            f'<h2 id="{slug}">{escape(str(ryhma[0].get("team") or short))}</h2>'
+            '<div class="lb-wrap"><table class="lb">'
+            '<thead><tr><th>Player</th><th class="m-hide">Pos</th>'
+            '<th class="n">Price</th><th class="n">Start</th></tr></thead>'
+            f"<tbody>{rivit}</tbody></table></div>"
+            f'<p class="note"><a href="/fpl/club/{slug}">'
+            f"{escape(str(ryhma[0].get("team") or short))} club page &#9656;</a></p>"
+        )
+    if not lohkot:
+        return None
+
+    url = f"{BASE}/fpl/predicted-lineups"
+    title = "Model Predicted XI for every Premier League club | GoalIQ"
+    desc = (
+        "The eleven our model expects to start for all 20 Premier League "
+        "clubs, with each player's chance of starting. Not a lineup leak: "
+        "these are projections from minutes history, not press conferences. "
+        "Free, no sign-in."
+    )
+    hero = (
+        "<h1>Model Predicted XI</h1>"
+        '<p class="lede">The eleven our model expects to start at every club, '
+        "with each player's projected chance of starting next to his name. "
+        "This is a projection from minutes history, not a lineup leak. We do "
+        "not watch press conferences, and when a manager surprises everyone "
+        "this table will be wrong with him.</p>"
+    )
+    body = (
+        f'<p class="note"><strong>{n_klubia} clubs</strong>. Start is the '
+        "model's projected chance that the player is in the starting eleven, "
+        "shown as a percentage so you can weigh it yourself. The shape is the "
+        "highest-probability starter at each position, so it will not always "
+        "match the manager's formation.</p>"
+        + "".join(lohkot)
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def render_club_pages(xp: dict, now: datetime) -> list[str]:
     """Kirjoita jokaisen seuran sivu. Palauttaa kirjoitetut slugit."""
     meta = xp.get("meta") or {}
@@ -3277,6 +3364,10 @@ def main() -> int:
         clubs = render_club_pages(xp, now)
         if clubs:
             built.append(f"club x{len(clubs)}")
+        sivu = render_predicted_lineups(xp, now)
+        if sivu:
+            (OUT_DIR / "predicted-lineups.html").write_text(sivu, encoding="utf-8")
+            built.append("predicted-lineups")
 
     notes_doc = _load(NOTES_PATH)
     if notes_doc:

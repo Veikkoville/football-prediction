@@ -38,7 +38,7 @@ NOTES = ROOT / "data" / "fpl_notes.json"
 OMA_KORTTI = [
     "stats", "defence", "xg-leaders", "model-xi", "best-captain",
     "differentials", "price-changes", "defcon", "notes", "team-news",
-    "club-best", "expected-points",
+    "club-best", "expected-points", "predicted-lineups",
 ]
 
 
