@@ -2684,9 +2684,14 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
             continue
         check = str(n.get("check_url") or f"{BASE}/fpl/team-news")
         cta = escape(str(n.get("cta") or "Check the numbers"))
+        # Otsikko linkittaa artikkelin omaan URLiin. Ilman tata kokoomasivu
+        # olisi ainoa reitti, ja ulkoiset linkit osoittaisivat sivulle jonka
+        # sisalto vaihtuu seuraavan muistion myota.
+        slug_ = escape(str(n.get("slug") or ""))
         blocks.append(
-            f'<h2 id="{escape(str(n.get("slug") or ""))}">'
-            f'{escape(str(n.get("title") or ""))}</h2>'
+            f'<h2 id="{slug_}">'
+            f'<a href="/fpl/note/{slug_}">'
+            f'{escape(str(n.get("title") or ""))}</a></h2>'
             f'<p class="note">{escape(str(n.get("date") or ""))}</p>'
             f'<div class="note-body">{paras}</div>'
             f'<p><a href="{escape(check)}">{cta}</a>.</p>'
@@ -2723,6 +2728,69 @@ def render_notes(notes_doc: dict, now: datetime) -> str | None:
     }]
     return _page(title, desc, url, hero, body, jsonld)
 
+
+
+NOTE_DIR = OUT_DIR / "note"
+
+
+def render_note_page(n: dict, now: datetime) -> str | None:
+    """Yksi artikkeli omalla URLillaan: /fpl/note/<slug>.
+
+    🔴 MIKSI TAMA LISATTIIN 15.8, vaikka `render_notes` valittiin nimenomaan
+    YHDEKSI kertyvaksi URLiksi. Kaksi mitattua syyta, kumpikaan ei ollut
+    tiedossa silloin:
+
+    1. Alustan valimuisti. X tallentaa esikatselukortin sivukohtaisesti ja
+       yhdistaa variantit `og:url`:n kautta, joten utm-parametri ei murra
+       sita. Mitattu 15.8: `/fpl/stats` naytti X:ssa GENEERISTA korttia
+       vaikka silla on ollut oma 8.8 lahtien, ja `/fpl/notes` naytti kortin
+       ilman kuvaa lainkaan. Osoite jota alusta ei ole nahnyt haetaan
+       tuoreena.
+    2. Linkin hauraus. Kokoomasivulle osoittava linkki nayttaa sen artikkelin
+       joka sattuu olemaan ylimpana. Uusi muistio tyontaa edellisen alemmas
+       ilman etta mikaan huutaa, eli eilen jaettu linkki vie tanaan eri
+       tekstiin.
+
+    Kokoomasivu JAA paikalleen ja linkittaa naihin, joten alkuperainen
+    orpoushuoli ei palaa: jokainen artikkeli on kahden sisaisen linkin paassa.
+
+    og:image loytyy automaattisesti, koska kortti on nimetty artikkelin
+    slugilla ja `_og_image()` johtaa nimen canonicalista.
+    """
+    slug = str(n.get("slug") or "").strip()
+    otsikko = str(n.get("title") or "").strip()
+    if not slug or not otsikko:
+        return None
+    paras = "".join(_note_block(x) for x in n.get("paragraphs") or [])
+    if not paras:
+        return None
+
+    url = f"{BASE}/fpl/note/{slug}"
+    tekstit = [x for x in (n.get("paragraphs") or []) if isinstance(x, str)]
+    desc = (tekstit[0] if tekstit else otsikko)[:300]
+    check = str(n.get("check_url") or f"{BASE}/fpl/stats")
+    cta = escape(str(n.get("cta") or "Check the numbers"))
+
+    body = (
+        f'<p class="note">{escape(str(n.get("date") or ""))}</p>'
+        f'<div class="note-body">{paras}</div>'
+        f'<p><a href="{escape(check)}">{cta}</a>.</p>'
+        + _share_row(otsikko, url)
+        + '<p class="note-more"><a href="/fpl/notes">'
+        "All notes from the model &#9656;</a></p>"
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "Article",
+        "headline": otsikko, "url": url, "description": desc,
+        "datePublished": str(n.get("date") or ""),
+        "dateModified": now.strftime("%Y-%m-%d"),
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "mainEntityOfPage": {"@type": "WebPage", "@id": url},
+    }]
+    return _page(f"{otsikko} | GoalIQ", desc, url,
+                 f"<h1>{escape(otsikko)}</h1>", body, jsonld)
 
 
 CLUB_DIR = OUT_DIR / "club"
@@ -3216,6 +3284,16 @@ def main() -> int:
         if page:
             (OUT_DIR / "notes.html").write_text(page, encoding="utf-8")
             built.append("notes")
+        NOTE_DIR.mkdir(parents=True, exist_ok=True)
+        n_art = 0
+        for muistio in notes_doc.get("notes") or []:
+            sivu = render_note_page(muistio, now)
+            if sivu:
+                (NOTE_DIR / f"{muistio['slug']}.html").write_text(
+                    sivu, encoding="utf-8")
+                n_art += 1
+        if n_art:
+            built.append(f"note x{n_art}")
 
     diff = _fetch_differentials()
     if diff:
@@ -3267,6 +3345,10 @@ def main() -> int:
              for f in sorted(OUT_DIR.glob("*.html"))]
     urlit += [(f"{BASE}/fpl/club/{f.stem}", today, "daily", "0.6")
               for f in sorted(CLUB_DIR.glob("*.html"))]
+    # Artikkelisivut ovat myos alihakemistossa: sama orpousansa kuin
+    # seurasivuilla, ja juuri niihin ulkoiset linkit osoittavat.
+    urlit += [(f"{BASE}/fpl/note/{f.stem}", today, "weekly", "0.7")
+              for f in sorted(NOTE_DIR.glob("*.html"))]
     write_urlset(SITEMAP_FPL_PATH, urlit)
     print(f"LONGTAIL: {', '.join(built) or 'ei sivuja (data puuttuu)'} "
           f"(sitemap-fpl.xml: {len(urlit)} URL:ia)")
