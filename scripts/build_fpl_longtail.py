@@ -2250,6 +2250,172 @@ def render_club_best(xp: dict, now: datetime) -> str | None:
     return _page(title, desc, url, hero, body, jsonld)
 
 
+
+def render_team_news(xp: dict, now: datetime) -> str | None:
+    """Team news, mutta KAANTEISENA: mita poissaolo maksaa pisteina (15.8.2026).
+
+    MIKSI TAMA SIVU ON OLEMASSA. Villen kysymys 15.8: saisiko meille FFScoutin
+    kaltaisen team news -pinnan, ja vaatiiko se toimittajan lehdistotilaisuuteen.
+
+    Ei vaadi. Mittasin FPL:n bootstrapista samana paivana: 76 pelaajaa 587:sta
+    kantaa VIRALLISTA news-tekstia aikaleimoineen (news, news_added,
+    chance_of_playing_next_round). Se on sama pohja jolta FFScout lahtee, ja se
+    on jo committoidussa artefaktissamme — tama sivu ei tee yhtaan uutta hakua.
+
+    ERO KILPAILIJAAN ON KULMA, EI DATA. FFScout kertoo KUKA on ulkona. Me
+    kerromme MITA SE MAKSAA: epavarmalla pelaajalla on xP-luku horisontille ja
+    omistusprosentti, eli lukija nakee seka riskin etta sen laajuuden. Sita
+    lukua ei voi kirjoittaa ilman mallia, joten sivua ei voi kopioida
+    uutisvirrasta.
+
+    EI TEKOALYARTIKKELEITA. Tama on generoitu taulukko mallin omista luvuista
+    eika teeskentele journalismia. Peruste on mitattu: 9.-10.8 nelja
+    Reddit-kayttajaa tunnisti tekstimme koneen kirjoittamaksi, ja ainoa
+    puolustettava omaisuutemme on julkinen track record.
+
+    JARJESTYS on omistusprosentti laskevasti eika xP: sivun kysymys on
+    "koskeeko tama minua", ja omistus on FPL:n oma julkinen luku johon lukija
+    voi verrata omaa joukkuettaan.
+    """
+    meta = xp.get("meta") or {}
+    players = xp.get("players") or []
+    excluded = xp.get("excluded") or []
+    if not meta.get("available") or not players:
+        return None
+
+    n_gw = len(((players[0] if players else {}).get("gameweeks")) or []) or 6
+    first_gw = meta.get("next_gameweek")
+    window = f"GW{first_gw}-{first_gw + n_gw - 1}" if first_gw else f"next {n_gw} GWs"
+    url = f"{BASE}/fpl/team-news"
+
+    def _owned(r):
+        try:
+            return float(r.get("owned_pct") or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    # Ulkona = chance 0 kummastakin listasta. `excluded` sisaltaa myos
+    # below_min_xp -rivit joilla ei ole uutista lainkaan -> ne EIVAT ole team
+    # newsia ja ne rajautuvat pois uutistekstin olemassaololla.
+    out_rows, doubt_rows = [], []
+    for r in list(players) + list(excluded):
+        news = (r.get("news") or "").strip()
+        chance = r.get("chance_next")
+        if not news or chance is None:
+            continue
+        (out_rows if chance == 0 else doubt_rows).append(r)
+    out_rows.sort(key=_owned, reverse=True)
+    doubt_rows.sort(key=_owned, reverse=True)
+    if not out_rows and not doubt_rows:
+        return None
+
+    all_clubs = [r.get("team_short") for r in out_rows + doubt_rows
+                 if r.get("team_short")]
+
+    def _xp_cell(r):
+        v = r.get("xp_horizon_total")
+        if isinstance(v, (int, float)):
+            return f'<td class="n hi">{v:.1f}</td>'
+        # Poissaolevalla ei ole projektiota. Viime kauden pisteet kertovat mika
+        # on poissa, ilman etta keksitaan xP:ta jota ei laskettu.
+        ls = (r.get("last_season") or {}).get("points")
+        if isinstance(ls, (int, float)):
+            return f'<td class="n">{ls:.0f}<span class="m-hide"> last yr</span></td>'
+        return '<td class="n">-</td>'
+
+    sections = []
+    if out_rows:
+        trows = "".join(
+            "<tr>"
+            f'<td>{escape(str(r.get("web_name", "")))}</td>'
+            f'<td class="tm">{_kit_svg(r.get("team_short", ""))}'
+            f'<span>{escape(str(r.get("team_short", "")))}</span></td>'
+            f'<td class="m-hide">{escape(str(r.get("pos", "")))}</td>'
+            f'<td>{escape((r.get("news") or "").strip())}</td>'
+            f'<td class="n">{_owned(r):.1f}%</td>'
+            + _xp_cell(r)
+            + "</tr>"
+            for r in out_rows
+        )
+        sections.append(
+            '<h2 id="out">Ruled out</h2>'
+            '<div class="lb-wrap"><table class="lb">'
+            "<thead><tr><th>Player</th><th>Club</th>"
+            '<th class="m-hide">Pos</th><th>Status</th>'
+            '<th class="n">Owned</th><th class="n">Points</th>'
+            "</tr></thead>"
+            f"<tbody>{trows}</tbody></table></div>"
+            '<p class="note">Points shown for a ruled-out player are last '
+            "season's total, not a projection. The model does not project a "
+            "player it has ruled out, and inventing a number here would be "
+            "the opposite of the point.</p>"
+        )
+
+    if doubt_rows:
+        trows = "".join(
+            "<tr>"
+            f'<td>{escape(str(r.get("web_name", "")))}</td>'
+            f'<td class="tm">{_kit_svg(r.get("team_short", ""))}'
+            f'<span>{escape(str(r.get("team_short", "")))}</span></td>'
+            f'<td class="m-hide">{escape(str(r.get("pos", "")))}</td>'
+            f'<td>{escape((r.get("news") or "").strip())}</td>'
+            f'<td class="n">{int(r.get("chance_next") or 0)}%</td>'
+            f'<td class="n">{_owned(r):.1f}%</td>'
+            + _xp_cell(r)
+            + "</tr>"
+            for r in doubt_rows
+        )
+        sections.append(
+            '<h2 id="doubtful">Doubtful</h2>'
+            '<div class="lb-wrap"><table class="lb">'
+            "<thead><tr><th>Player</th><th>Club</th>"
+            '<th class="m-hide">Pos</th><th>Status</th>'
+            '<th class="n">Chance</th><th class="n">Owned</th>'
+            f'<th class="n">{n_gw}GW xP</th>'
+            "</tr></thead>"
+            f"<tbody>{trows}</tbody></table></div>"
+            '<p class="note">The xP column already carries the flag: a '
+            "reduced chance of playing lowers projected minutes, so the "
+            "number you see is what the model expects including the doubt, "
+            "not what the player would score if fully fit.</p>"
+        )
+
+    n_out, n_doubt = len(out_rows), len(doubt_rows)
+    title = f"FPL Team News: Injuries and Suspensions ({window}) | GoalIQ"
+    desc = (
+        f"Every Premier League player currently ruled out or doubtful for "
+        f"{window}, with ownership and what the model projects them to score. "
+        f"{n_out} out, {n_doubt} doubtful. Free, no sign-in."
+    )
+    hero = (
+        "<h1>Team news, with the points cost attached</h1>"
+        '<p class="lede">Official FPL status for every ruled-out and doubtful '
+        "player, sorted by how many managers own them. The difference from a "
+        "team news list is the last column: our match model projects what each "
+        f"doubtful player is still worth over {escape(window)}, with the "
+        "reduced chance of playing already priced in. "
+        f"{n_out} out, {n_doubt} doubtful. Updated daily, no sign-in.</p>"
+    )
+    body = (
+        f"{_kit_defs(all_clubs)}"
+        + "".join(sections)
+        + '<p class="note">Status text comes from the official Fantasy '
+          "Premier League feed, which is what clubs report. It is not a press "
+          "conference summary: if a manager says a player trained today but "
+          "the official status has not changed, this page will not know it "
+          "yet.</p>"
+        + f"{UPSELL}{_cta()}"
+        + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
+    )
+    jsonld = [{
+        "@context": "https://schema.org", "@type": "WebPage",
+        "name": title, "url": url, "description": desc,
+        "isPartOf": {"@id": f"{BASE}/#organization"},
+        "dateModified": now.strftime("%Y-%m-%d"),
+    }]
+    return _page(title, desc, url, hero, body, jsonld)
+
+
 def render_expected_points(xp: dict, now: datetime) -> str | None:
     """Koko xP-lista ilmaiseksi, ilman kirjautumista (9.8.2026).
 
@@ -2407,6 +2573,11 @@ def main() -> int:
         if page:
             (OUT_DIR / "club-best.html").write_text(page, encoding="utf-8")
             built.append("club-best")
+        # 15.8: team news kaanteisena - ks. render_team_news-docstring.
+        page = render_team_news(xp, now)
+        if page:
+            (OUT_DIR / "team-news.html").write_text(page, encoding="utf-8")
+            built.append("team-news")
 
     diff = _fetch_differentials()
     if diff:
