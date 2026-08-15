@@ -85,6 +85,32 @@ DOMESTIC_COMPETITIONS: dict[str, dict] = {
     "SA":  {"league": "ITA-Serie A-FD", "overrides": {}},
     "FL1": {"league": "FRA-Ligue 1-FD", "overrides": {}},
     "CL":  {"league": "INT-Champions League", "overrides": {}},
+    # 15.8.2026 (Villen toimeksianto): Championship alkoi 14.8, ja nämä kolme
+    # olivat mobiilin liigavalitsimessa mutta EIVÄT track recordissa lainkaan.
+    #
+    # Overridet on MITATTU eikä arvattu: ajoin resolve_domestic_name()-funktion
+    # live-/api/fixtures-nimiä vasten live-/api/teams-listalla. Big-5 ja BSA
+    # resolvoituivat täysin (0 puuttuvaa), nämä kolme eivät.
+    #
+    # HUOM ELC: kuusi nimeä EI ole tässä, koska niille ei ole mallinimeä johon
+    # osoittaa — Bolton, Burnley, Cardiff, Lincoln, West Ham ja Wolves eivät ole
+    # mallin Championship-joukkueissa (nousseet tai pudonneet 26/27:ään, ja
+    # E1-data kaudelta 2627 on vasta kertymässä). Ne ohitetaan varoituksella
+    # kunnes data kattaa ne. Väärä override olisi PAHEMPI kuin puuttuva: se
+    # logaisi julkiseen track recordiin väärän joukkueen ennusteen.
+    "ELC": {"league": "ENG-Championship", "overrides": {
+        "Queens Park Rangers FC": "QPR",
+        "West Bromwich Albion FC": "West Brom",
+    }},
+    "DED": {"league": "NED-Eredivisie", "overrides": {
+        "Fortuna Sittard": "For Sittard",
+        "NEC": "Nijmegen",
+    }},
+    "PPL": {"league": "POR-Primeira Liga", "overrides": {
+        "Sporting Clube de Braga": "Sp Braga",
+        "Sporting Clube de Portugal": "Sp Lisbon",
+        "Vitória SC": "Guimaraes",
+    }},
 }
 
 # Live-API jonka julkaistua ennustetta logataan (= sama malli jonka käyttäjät
