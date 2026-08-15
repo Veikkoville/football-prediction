@@ -1078,10 +1078,22 @@ class TeamsResponse(BaseModel):
 # ---------------------------------------------------------------------------
 @app.get("/")
 def root():
-    """Health check."""
+    """Health check.
+
+    🔴 `commit` LISATTIIN 15.8.2026 KOSKA "ONKO SE LIVENA" EI OLLUT
+    VASTATTAVISSA. Deployasin maksupolun korjauksen ja huomasin etten voi
+    todistaa mika commit ajossa on: deploy-hookin vihrea kertoo etta hook
+    laukesi, ei etta uusi koodi vastaa. Sama vikaluokka kuin aiemmin kirjattu
+    Renderin "Save only", joka nayttaa tallennetulta muttei ota mitaan
+    kayttoon — ja sama korjaus: tee tila LUETTAVAKSI.
+
+    `RENDER_GIT_COMMIT` tulee Renderin ymparistosta automaattisesti. Paikallisesti
+    se puuttuu, jolloin kentta on null eika valehtele.
+    """
     return {
         "service": "GoalIQ API",
         "version": "0.1.0",
+        "commit": os.getenv("RENDER_GIT_COMMIT") or None,
         "status": "ok",
         "docs": "/docs",
         "endpoints": ["/api/leagues", "/api/teams", "/api/predict"],
