@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -235,19 +236,39 @@ def _fetch_matches(comp_code: str, season: str | None = None) -> list[dict] | No
     if not api_key:
         print("VAROITUS: FOOTBALL_DATA_API_KEY puuttuu — ohitetaan FD-haku.")
         return None
-    _await_rate_limit()
     url = f"{BASE}/competitions/{comp_code}/matches"
     if season:
         url += f"?season={season}"
-    try:
-        r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=20)
-    except Exception as e:
-        print(f"VAROITUS: FD-haku ({comp_code}) epäonnistui: {type(e).__name__}: {e}")
-        return None
-    if r.status_code != 200:
-        print(f"VAROITUS: FD ({comp_code}) palautti {r.status_code}: {r.text[:160]}")
-        return None
-    return r.json().get("matches", [])
+
+    # 429-uusinta (15.8.2026). Kolmen liigan lisays nosti kilpailumaaran
+    # seitsemasta kymmeneen ja FD:n minuuttiraja alkoi osua: mitattu ajossa
+    # 31871111836, jossa DED sai 429:n ja PUTOSI POIS KOKONAAN — ei LOG[DED]
+    # -rivia lainkaan, vain yksi varoitus 245 muun varoituksen seassa. Yhden
+    # liigan hiljainen katoaminen on tasan se vikaluokka jota track recordissa
+    # ei saa olla, ja se kavisi vain pahemmaksi jokaisesta lisatysta liigasta.
+    #
+    # FD kertoo odotusajan itse ("Wait 1 seconds") — luetaan se vastauksesta
+    # eika arvata. Yla-raja on kova, jotta rikkinainen kiintio ei jumita ajoa.
+    for yritys in range(4):
+        try:
+            _await_rate_limit()
+            r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=20)
+        except Exception as e:
+            print(f"VAROITUS: FD-haku ({comp_code}) epäonnistui: "
+                  f"{type(e).__name__}: {e}")
+            return None
+        if r.status_code == 200:
+            return r.json().get("matches", [])
+        if r.status_code != 429 or yritys == 3:
+            print(f"VAROITUS: FD ({comp_code}) palautti {r.status_code}: "
+                  f"{r.text[:160]}")
+            return None
+        m = re.search(r"Wait (\d+) second", r.text)
+        odota = min(int(m.group(1)) + 1, 30) if m else 6
+        print(f"FD ({comp_code}) 429 — odotetaan {odota} s "
+              f"(yritys {yritys + 1}/3).")
+        time.sleep(odota)
+    return None  # pragma: no cover — silmukka palauttaa aina yllä
 
 
 def _fetch_wc_matches() -> list[dict] | None:

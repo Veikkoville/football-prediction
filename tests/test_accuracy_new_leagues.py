@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import scripts.accuracy_pipeline as ap  # noqa: E402
 from scripts.accuracy_pipeline import (  # noqa: E402
     DOMESTIC_COMPETITIONS,
     resolve_domestic_name,
@@ -153,3 +154,76 @@ def test_no_override_maps_a_name_onto_itself(code):
     """
     for fd_name, model_name in DOMESTIC_COMPETITIONS[code]["overrides"].items():
         assert fd_name != model_name, f"{code}: no-op override '{fd_name}'"
+
+
+# ---------------------------------------------------------------------------
+# 429-uusinta
+# ---------------------------------------------------------------------------
+# MITATTU VIKA (ajo 31871111836, 15.8.2026): kolmen liigan lisays nosti
+# kilpailumaaran 7 -> 10 ja FD:n minuuttiraja alkoi osua. DED sai 429:n ja
+# PUTOSI POIS KOKONAAN — lokissa ei ollut LOG[DED]-rivia lainkaan, vain yksi
+# varoitus 245 muun varoituksen seassa. Yhden liigan hiljainen katoaminen
+# track recordista on juuri se mita talta putkelta ei saa tapahtua.
+
+
+class _Resp:
+    def __init__(self, status_code, text="", payload=None):
+        self.status_code = status_code
+        self.text = text
+        self._payload = payload or {}
+
+    def json(self):
+        return self._payload
+
+
+@pytest.fixture
+def _no_sleep(monkeypatch):
+    import src.data.football_data_org as fdo
+    monkeypatch.setattr(ap.time, "sleep", lambda s: None)
+    monkeypatch.setattr(fdo, "_await_rate_limit", lambda: None)
+    monkeypatch.setattr(fdo, "_api_key", lambda: "test-key")
+
+
+def test_429_is_retried_and_succeeds(_no_sleep, monkeypatch):
+    import requests
+    calls = []
+
+    def fake_get(url, **kw):
+        calls.append(url)
+        if len(calls) < 3:
+            return _Resp(429, '{"message":"You reached your request limit. '
+                              'Wait 1 seconds.","errorCode":429}')
+        return _Resp(200, payload={"matches": [{"id": 1}]})
+
+    monkeypatch.setattr(requests, "get", fake_get)
+    got = ap._fetch_matches("DED")
+    assert got == [{"id": 1}], "429 piti uusia, ei pudottaa liigaa"
+    assert len(calls) == 3
+
+
+def test_429_gives_up_after_bounded_retries(_no_sleep, monkeypatch):
+    """Rikkinainen kiintio ei saa jumittaa ajoa loputtomiin."""
+    import requests
+    calls = []
+
+    def fake_get(url, **kw):
+        calls.append(url)
+        return _Resp(429, "Wait 1 seconds")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+    assert ap._fetch_matches("DED") is None
+    assert len(calls) == 4, f"yrityksia oli {len(calls)}, odotettu 4"
+
+
+def test_non_429_error_is_not_retried(_no_sleep, monkeypatch):
+    """403/404 ei parane odottamalla — uusinta olisi vain hukkakutsuja."""
+    import requests
+    calls = []
+
+    def fake_get(url, **kw):
+        calls.append(url)
+        return _Resp(403, "forbidden")
+
+    monkeypatch.setattr(requests, "get", fake_get)
+    assert ap._fetch_matches("DED") is None
+    assert len(calls) == 1
