@@ -52,6 +52,7 @@ from scripts.build_fpl_page import (  # noqa: E402
 )
 from scripts.mobile_css import MOBILE_COLS_JS, MOBILE_CSS
 from scripts.share_card_js import SHARE_CARD_JS
+from scripts.table_tools import TABLE_TOOLS_JS  # noqa: E402
 
 # #119b: long-tail-sivut omaan lapsi-sitemapiin (sitemap.xml-index listaa).
 # Wholesale OUT_DIR-globista → entry jokaiselle olemassa olevalle sivulle,
@@ -455,6 +456,7 @@ def _page(title: str, desc: str, canonical: str, hero: str, body: str,
         '<link rel="icon" type="image/png" sizes="48x48" href="/assets/brand/goaliq-favicon-48.png">\n'
         '<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/goaliq-apple-touch-180.png">\n'
         + POSTHOG_SNIPPET + "\n" +
+        TABLE_TOOLS_JS + "\n" +
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         # 26.7 PERF: preload+onload, ei render-blocking stylesheetiä — FCP ei
@@ -3262,8 +3264,11 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         f'<td>{escape(r["web_name"])}</td>'
         f'<td class="tm">{_kit_svg(r["team_short"])}'
         f'<span>{escape(r["team_short"])}</span>{_tflag_html(r)}</td>'
-        f'<td class="m-hide">{escape(r["pos"])}</td>'
-        f'<td class="n m-hide">{r["price"]:.1f}</td>'
+        # 15.8: pos ja price ilman m-hidea, kuten otsikotkin. Suodatin lukee
+        # naita soluja, joten piilotettuina se suodattaisi nakymattomalla
+        # perusteella.
+        f'<td>{escape(r["pos"])}</td>'
+        f'<td class="n">{r["price"]:.1f}</td>'
         f'<td class="n hi">{r["xp_horizon_total"]:.1f}</td>'
         f'<td class="n m-hide">{(r.get("xp_per_gw") or 0):.2f}</td>'
         f'<td class="n">{(r.get("xp_per_90") or 0):.2f}</td>'
@@ -3280,7 +3285,11 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         '<div class="lb-wrap"><table class="lb">'
         "<thead><tr>"
         '<th class="n">#</th><th>Player</th><th>Team</th>'
-        '<th class="m-hide">Pos</th><th class="n m-hide">Price</th>'
+        # 15.8: Pos ja Price EIVAT ole enaa m-hide. Ne ovat suodattimen
+        # kaksi ulottuvuutta, ja piilotettuina suodatin olisi sokea juuri
+        # silla laitteella jolla suurin osa lukijoista tulee. Sama puute
+        # esti julkaisutarkistajaa verifioimasta hintavaitetta puhelimella.
+        '<th>Pos</th><th class="n">Price</th>'
         f'<th class="n">{n_gw}GW xP</th>'
         '<th class="n m-hide">xP/GW</th><th class="n">xP/90</th>'
         '<th class="n">Start%</th>'

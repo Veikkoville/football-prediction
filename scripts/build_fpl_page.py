@@ -1842,6 +1842,135 @@ def xp_table_rows(xp: dict, n: int = 4) -> str:
     return "\n" + "\n".join(out + [foot]) + "\n      "
 
 
+# ---------------------------------------------------------------------------
+# "Every match that matters" -liigalohko (Villen havainto 15.8):
+#   "goaliq.app sivuilla nayttaa brasileiro live now mutta ei esim
+#    championship, la liga, eredivisie jotka kans live."
+#
+# Lohko oli KASIN kirjoitettua HTML:aa: `live-chip` oli kovakoodattu
+# Brasileiroon ja saateteksti sanoi Championshipista, Eredivisiesta ja
+# Primeira Ligasta "with their seasons kicking off in August" - lause joka oli
+# tosi kun se kirjoitettiin ja vanhentui itsestaan sina paivana kun ne alkoivat.
+#
+# Tama on SAMA VIKALUOKKA kuin mobiilin etusivulla samana paivana: kovakoodattu
+# liigalista jonka paivittaminen jaa ihmisen muistin varaan. Korjaus on sama:
+# tila johdetaan datasta joka ajossa.
+#
+# FAIL-SOFT ON TAHALLINEN: jos fixture-haku ei onnistu (CI ilman verkkoa,
+# API alhaalla), lohkoa EI kirjoiteta uusiksi. Vanha oikea teksti on parempi
+# kuin uusi vaara, ja hiljainen "ei yhtaan live-liigaa" olisi vaara vaite.
+# ---------------------------------------------------------------------------
+
+LEAGUE_CHIPS = [
+    ("ENG-Premier League", "Premier League"),
+    ("ESP-La Liga-FD", "La Liga"),
+    ("GER-Bundesliga-FD", "Bundesliga"),
+    ("ITA-Serie A-FD", "Serie A"),
+    ("FRA-Ligue 1-FD", "Ligue 1"),
+    ("INT-Champions League", "Champions League"),
+    ("BRA-Serie A", "Brasileirão"),
+    ("ENG-Championship", "Championship"),
+    ("NED-Eredivisie", "Eredivisie"),
+    ("POR-Primeira Liga", "Primeira Liga"),
+]
+
+# Liiga on "live now" jos silla on ottelu talla ikkunalla.
+#
+# 🔴 IKKUNA ON KAPEA TAHALLAAN. Ensimmainen versio kaytti +7 vrk ja merkitsi
+# Valioliigan liveksi 15.8, vaikka GW1 on 21.8 - kuuden paivan paassa. "Live
+# now" on silloin valhe, ja se on tasan se vika joka tassa korjataan: lukija
+# klikkaisi liigaa jolla ei ole yhtaan ottelua. 3 vrk taaksepain kattaa
+# viikonlopun josta on jo pelattu, 2 eteenpain taman viikon kierroksen.
+LIVE_BACK_DAYS = 3
+LIVE_FWD_DAYS = 2
+
+
+def _league_live_map(api_base: str = "https://api.goaliq.app") -> dict | None:
+    """{liigakoodi: bool} tai None jos dataa ei saatu. None = ala koske lohkoon."""
+    import datetime as _dt
+    import json as _json
+    import urllib.parse as _up
+    import urllib.request as _ur
+
+    today = _dt.date.today()
+    lo = today - _dt.timedelta(days=LIVE_BACK_DAYS)
+    hi = today + _dt.timedelta(days=LIVE_FWD_DAYS)
+    out = {}
+    for code, _ in LEAGUE_CHIPS:
+        url = f"{api_base}/api/fixtures?league={_up.quote(code)}"
+        # User-Agent on PAKOLLINEN: api.goaliq.app on Cloudflaren proxyn
+        # takana ja se palauttaa Pythonin oletus-UA:lle 403. Sama vikaluokka
+        # kuin ESPN-haussa (kirjattu muistiin: python-clientit torjutaan).
+        req = _ur.Request(url, headers={"User-Agent": "goaliq-build/1.0"})
+        try:
+            with _ur.urlopen(req, timeout=25) as r:
+                data = _json.loads(r.read().decode("utf-8"))
+        except Exception:
+            return None
+        fx = data.get("fixtures") if isinstance(data, dict) else data
+        live = False
+        for f in (fx or []):
+            d = str(f.get("date") or "")[:10]
+            try:
+                dd = _dt.date.fromisoformat(d)
+            except ValueError:
+                continue
+            if lo <= dd <= hi:
+                live = True
+                break
+        out[code] = live
+    return out
+
+
+def _leagues_block(live: dict) -> tuple[str, str]:
+    """Palauta (grid_html, note_html) mitatusta live-tilasta."""
+    chips = []
+    live_names = []
+    for code, name in LEAGUE_CHIPS:
+        if live.get(code):
+            live_names.append(name)
+            chips.append(
+                f'<div class="league-chip live-chip">{name} &middot; live now</div>')
+        else:
+            chips.append(f'<div class="league-chip">{name}</div>')
+    grid = "".join(chips)
+
+    if not live_names:
+        note = ("Every league below is supported. None of them has a fixture "
+                "in the next week.")
+    elif len(live_names) == 1:
+        note = f"{live_names[0]} is playing right now. The rest are supported and waiting on their next round."
+    else:
+        head = ", ".join(live_names[:-1])
+        note = (f"{head} and {live_names[-1]} are playing right now. "
+                "The rest are supported and waiting on their next round.")
+    return grid, f'<p class="league-note">{note}</p>'
+
+
+def update_index_leagues(api_base: str = "https://api.goaliq.app") -> bool:
+    """Kirjoita liigaruudukko ja saateteksti mitatusta tilasta. False = ei muutosta."""
+    if not INDEX_PATH.exists():
+        return False
+    live = _league_live_map(api_base)
+    if live is None:
+        print("      [liigat] fixture-hakua ei saatu -> lohko jatetaan ennalleen")
+        return False
+    grid, note = _leagues_block(live)
+    s = INDEX_PATH.read_text(encoding="utf-8")
+    new = re.sub(
+        r"(<!-- GEN:LEAGUES-START -->).*?(<!-- GEN:LEAGUES-END -->)",
+        lambda m: m.group(1) + grid + m.group(2), s, flags=re.S)
+    new = re.sub(
+        r"(<!-- GEN:LEAGUE-NOTE-START -->).*?(<!-- GEN:LEAGUE-NOTE-END -->)",
+        lambda m: m.group(1) + note + m.group(2), new, flags=re.S)
+    if new == s:
+        return False
+    INDEX_PATH.write_text(new, encoding="utf-8")
+    n = sum(1 for v in live.values() if v)
+    print(f"      [liigat] {n}/{len(LEAGUE_CHIPS)} liigaa live -> index.html")
+    return True
+
+
 def update_index(c: dict, xp: dict | None = None) -> bool:
     """Täytä index.html:n GEN:ACC-markerit tuoreilla accuracy-luvuilla.
     Sama lähde ja refresh-tahti kuin fpl.html (ei staleja kovakoodauksia)."""
@@ -2139,6 +2268,10 @@ def main() -> None:
     OUT_PATH.write_text(html_out, encoding="utf-8")
     sitemap_changed = update_sitemap(c["iso_date"])
     index_changed = update_index(c, xp)
+    # Liigalohko samaan ajoon: "live now" johdetaan fixtureista joka kerta,
+    # eika jaa ihmisen muistin varaan (Villen havainto 15.8). Fail-soft:
+    # epaonnistunut haku EI kirjoita lohkoa, jolloin vanha oikea teksti jaa.
+    index_changed = update_index_leagues() or index_changed
     predictions_changed = update_predictions(c, preds)
     wc_recap_changed = update_wc_recap(acc)
 
