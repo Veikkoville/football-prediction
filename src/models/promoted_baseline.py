@@ -59,7 +59,12 @@ from src.models.dixon_coles import DixonColesModel
 #
 # Nimet ovat MALLINIMIÄ (Understat/football-data), eivät FD:n täysnimiä.
 # ---------------------------------------------------------------------------
-PROMOTED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
+# Kohorttitunnisteet. Liigalla voi olla yksi nimeton kohortti (tuple, entinen
+# muoto) tai useita nimettyja (dict) — ks. REFERENCE_BY_LEAGUE:n kommentti.
+COHORT_UP = "promoted_from_below"
+COHORT_DOWN = "relegated_from_above"
+
+PROMOTED_BY_SEASON: dict[str, dict[str, tuple[str, ...] | dict[str, tuple[str, ...]]]] = {
     "2627": {
         "ENG-Premier League": ("Coventry", "Hull", "Ipswich"),
         # 1.8 laajennus (TASKS 4d, Villen GO "samanlainen laajennus kuin
@@ -76,6 +81,19 @@ PROMOTED_BY_SEASON: dict[str, dict[str, tuple[str, ...]]] = {
         "GER-Bundesliga-FD": (
             "FC Schalke 04", "SC Paderborn 07", "SV 07 Elversberg",
         ),
+        # 15.8 (Villen GO): Championshipin kuusi tulokasta KAHTENA kohorttina.
+        # Perustelu ja mittaustapa: ks. REFERENCE_BY_LEAGUE yllä.
+        #
+        # Nimet ovat football-data.co.uk:n E-sarjojen mallinimia ja ne on
+        # VERIFIOITU lähdetiedostoista eikä muistettu: 'West Ham' ja 'Wolves'
+        # löytyvät E0 24/25:stä, 'Burnley' E0 25/26:sta (se pelasi 24/25:n
+        # Championshipissa), ja 'Bolton', 'Cardiff', 'Lincoln' E2 25/26:sta.
+        # Väärä nimi ei kaataisi mitään — se injektoisi avaimen jota kukaan ei
+        # hae, ja joukkue jäisi silti puuttumaan.
+        "ENG-Championship": {
+            COHORT_UP: ("Bolton", "Cardiff", "Lincoln"),
+            COHORT_DOWN: ("Burnley", "West Ham", "Wolves"),
+        },
     },
 }
 
@@ -186,12 +204,47 @@ REFERENCE_TRIO: tuple[str, ...] = ("Ipswich", "Leicester", "Southampton")
 #   FL1/BL1: vain 2 nimeä (nousu 2 suoraa + karsinta) — keskiarvo 2:sta
 #   on silti mitattu luku, ei arvaus.
 # ---------------------------------------------------------------------------
-REFERENCE_BY_LEAGUE: dict[str, tuple[str, ...]] = {
+# ---------------------------------------------------------------------------
+# KAKSI KOHORTTIA, EI YHTÄ (15.8.2026, Villen GO)
+#
+# Ylimmällä sarjalla tulokkaat tulevat vain yhdestä suunnasta: alhaalta. Siksi
+# yksi viiteryhmä riitti PL:lle ja muille big-5-liigoille.
+#
+# CHAMPIONSHIP ON ERI: sinne tullaan MOLEMMISTA suunnista. Kaudelle 26/27
+# tulokkaita on kuusi, ja ne jakautuvat kahteen täysin eri voimaluokkaan:
+#     League Onesta nousseet   Bolton, Cardiff, Lincoln
+#     PL:stä pudonneet         Burnley, West Ham, Wolves
+#
+# Yhden baselinen antaminen kaikille kuudelle tekisi West Hamista yhtä heikon
+# kuin Lincolnista. Se ei olisi konservatiivinen arvio vaan mitattavasti väärä,
+# ja se näkyisi julkisissa ennusteissa heti ensimmäisestä kierroksesta.
+#
+# Siksi sekä PROMOTED_BY_SEASON että REFERENCE_BY_LEAGUE hyväksyvät nyt
+# tuplen SIJASTA myös dictin {kohortti: joukkueet}. Vanha tuple-muoto toimii
+# ennallaan (= yksi kohortti), joten big-5-liigojen käytös on bittitarkasti
+# entinen.
+#
+# Championshipin viiteryhmät on MITATTU kausidiffistä eikä muistettu:
+#     E1 25/26 miinus E1 24/25          -> uudet: Birmingham, Charlton,
+#                                          Ipswich, Leicester, Southampton,
+#                                          Wrexham
+#     joista E0 24/25:ssä                -> PL:stä pudonneet: Ipswich,
+#                                          Leicester, Southampton
+#     loput                              -> League Onesta nousseet: Birmingham,
+#                                          Charlton, Wrexham
+# Molemmat kuusikot ovat nykyisessä fitissä, joten kumpikin baseline on
+# `source: measured` eikä jäädytetty.
+# ---------------------------------------------------------------------------
+REFERENCE_BY_LEAGUE: dict[str, tuple[str, ...] | dict[str, tuple[str, ...]]] = {
     "ENG-Premier League": REFERENCE_TRIO,
     "ESP-La Liga-FD": ("Elche CF", "Levante UD", "Real Oviedo"),
     "ITA-Serie A-FD": ("AC Pisa 1909", "US Cremonese", "US Sassuolo Calcio"),
     "FRA-Ligue 1-FD": ("FC Lorient", "FC Metz", "Paris FC"),
     "GER-Bundesliga-FD": ("1. FC Köln", "Hamburger SV"),
+    "ENG-Championship": {
+        COHORT_UP: ("Birmingham", "Charlton", "Wrexham"),
+        COHORT_DOWN: ("Ipswich", "Leicester", "Southampton"),
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -288,6 +341,19 @@ def add_promoted_baseline(
     }
 
 
+def _kohortteina(
+    arvo: tuple[str, ...] | dict[str, tuple[str, ...]]
+) -> dict[str, tuple[str, ...]]:
+    """Normalisoi tuple TAI dict samaan {kohortti: joukkueet} -muotoon.
+
+    Vanha tuple-muoto = yksi nimeton kohortti, jolloin big-5-liigojen polku on
+    bittitarkasti entinen. Tyhja arvo -> tyhja dict, ei kohorttia.
+    """
+    if isinstance(arvo, dict):
+        return arvo
+    return {"": tuple(arvo)} if arvo else {}
+
+
 def taydenna_nousijat(
     dc: DixonColesModel,
     liigat: tuple[str, ...] | list[str],
@@ -312,21 +378,36 @@ def taydenna_nousijat(
     # applied_to/trio_used aggregoituvat jos pyydetään useita liigoja.
     yhdiste: dict = {"applied_to": []}
     for liiga in liigat:
-        needed = [t for t in per_liiga.get(liiga, ()) if t not in dc.attack]
-        if not needed:
-            continue
-        info = add_promoted_baseline(
-            dc, needed,
-            reference=REFERENCE_BY_LEAGUE.get(liiga, ()),
-            allow_frozen=(liiga == "ENG-Premier League"),
-        )
-        if info.get("applied_to"):
-            yhdiste["applied_to"] = yhdiste["applied_to"] + info["applied_to"]
-            # Yksiliigapyynnössä (normaalitapaus) muut kentät suoraan lokiin.
-            for k in ("trio_used", "attack", "defence", "home_gamma",
-                      "source", "provenance"):
-                if k in info:
-                    yhdiste[k] = info[k]
-        if info.get("skipped"):
-            yhdiste.setdefault("skipped", []).extend(info["skipped"])
+        # 15.8: liigalla voi olla YKSI kohortti (tuple, entinen muoto) tai
+        # USEITA (dict). Championship on jalkimmainen: sinne tullaan seka
+        # ylhaalta etta alhaalta, ja niilla on eri voimaluokka. Normalisoidaan
+        # molemmat samaan muotoon, jolloin silmukka on yksi.
+        ryhmat = _kohortteina(per_liiga.get(liiga, ()))
+        viitteet = _kohortteina(REFERENCE_BY_LEAGUE.get(liiga, ()))
+        for nimi, joukkueet in ryhmat.items():
+            needed = [t for t in joukkueet if t not in dc.attack]
+            if not needed:
+                continue
+            info = add_promoted_baseline(
+                dc, needed,
+                reference=viitteet.get(nimi, ()),
+                allow_frozen=(liiga == "ENG-Premier League"),
+            )
+            if info.get("applied_to"):
+                yhdiste["applied_to"] = yhdiste["applied_to"] + info["applied_to"]
+                # Yksi kohortti + yksi liiga (normaalitapaus) -> kentat suoraan
+                # lokiin. Useammalla kohortilla ne kirjataan lisaksi nimettyina,
+                # jotta jalkikateen nakee KUMPI baseline mihinkin osui.
+                for k in ("trio_used", "attack", "defence", "home_gamma",
+                          "source", "provenance"):
+                    if k in info:
+                        yhdiste[k] = info[k]
+                if len(ryhmat) > 1:
+                    yhdiste.setdefault("cohorts", {})[nimi] = {
+                        k: info[k] for k in
+                        ("trio_used", "applied_to", "attack", "defence",
+                         "home_gamma", "source") if k in info
+                    }
+            if info.get("skipped"):
+                yhdiste.setdefault("skipped", []).extend(info["skipped"])
     return yhdiste
