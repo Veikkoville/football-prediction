@@ -226,7 +226,9 @@ font-variant-numeric:tabular-nums;}
 @media (max-width:520px){.cta-row{flex-direction:column;align-items:stretch;}
 .btn{text-align:center;}}
 .toolnav{margin:34px 0 6px;padding-top:18px;border-top:1px solid var(--line);
-display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;}
+display:flex;flex-direction:column;gap:10px;}
+.navgrp{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;}
+.navgrp b{min-width:88px;}
 .toolnav b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
 color:var(--muted);font-weight:600;margin-right:2px;}
 .toolnav a{font-size:15px;color:var(--cream);text-decoration:none;
@@ -268,21 +270,56 @@ _TOOL_LINKS = [
 ]
 
 
+# Valikon ryhmittely (15.8.2026, Villen vaatimus: "jos sivuja alkaa olla
+# paljon niin sitten menut pystyyn").
+#
+# Sivuja on nyt 32 ja tasainen linkkirivi on lukukelvoton siina koossa: se on
+# 30 sanaa perakkain ilman hierarkiaa, eika lukija loyda siita mitaan. Ryhmat
+# vastaavat kysymykseen jota lukija kysyy, eivat sita miten sivut syntyivat.
+#
+# Ryhma per rivi, otsikko lihavoituna. Nykyinen sivu jaa pois omasta
+# ryhmastaan mutta ryhma sailyy — muuten valikko hyppii sivulta toiselle.
+_NAV_GROUPS: list[tuple[str, tuple[str, ...]]] = [
+    ("Picks", ("/fpl/best-captain", "/fpl/model-xi", "/fpl/differentials",
+               "/fpl/expected-points")),
+    ("Teams", ("/fpl/club-best", "/fpl/defence", "/fpl/team-news")),
+    ("Numbers", ("/fpl/stats", "/fpl/xg-leaders", "/fpl/defcon",
+                 "/fpl/price-changes")),
+    ("Reading", ("/fpl/notes",)),
+]
+
+
 def _tool_nav(canonical: str) -> str:
-    """Ristiinlinkitys muihin longtail-sivuihin, nykyinen sivu pois.
+    """Ristiinlinkitys ryhmiteltyna, nykyinen sivu pois.
 
     Renderoidaan <nav>-elementtina eika pelkkana linkkilistana, jotta
     sivun oma navigointirakenne on koneluettava.
+
+    Jokainen `_TOOL_LINKS`-polku kuuluu johonkin ryhmaan; ryhmittelemattomat
+    paatyvat "More"-ryhmaan, jottei uusi sivu voi kadota valikosta hiljaa.
+    Sivusopimus (tests/test_page_contract.py) vaatii sisaantulevan linkin, ja
+    tama on se paikka josta se yleensa tulee.
     """
     here = canonical.rstrip("/").replace(BASE, "")
-    items = "".join(
-        f'<a href="{href}">{escape(label)}</a>'
-        for href, label in _TOOL_LINKS
-        if href != here
-    )
+    labels = dict(_TOOL_LINKS)
+    ryhmitellyt = {h for _, hs in _NAV_GROUPS for h in hs}
+    ryhmat = list(_NAV_GROUPS)
+    loput = tuple(h for h, _ in _TOOL_LINKS if h not in ryhmitellyt)
+    if loput:
+        ryhmat.append(("More", loput))
+
+    osat = []
+    for otsikko, polut in ryhmat:
+        linkit = "".join(
+            f'<a href="{h}">{escape(labels.get(h, h))}</a>'
+            for h in polut if h != here and h in labels
+        )
+        if linkit:
+            osat.append(f'<span class="navgrp"><b>{otsikko}</b>{linkit}</span>')
     return (
         '<nav class="toolnav" aria-label="More free FPL tools">'
-        f'<b>More free FPL tools</b>{items}</nav>\n'
+        + "".join(osat)
+        + "</nav>\n"
     )
 
 
