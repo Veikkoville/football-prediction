@@ -228,6 +228,15 @@ font-variant-numeric:tabular-nums;}
 .toolnav{margin:34px 0 6px;padding-top:18px;border-top:1px solid var(--line);
 display:flex;flex-direction:column;gap:10px;}
 .navgrp{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;}
+.clubnav{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;
+margin:0 0 26px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+.clubnav b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+color:var(--muted);font-weight:600;margin-right:4px;}
+.clubnav a{font-size:14px;color:var(--cream);text-decoration:none;
+border:1px solid var(--line);padding:3px 7px;}
+.clubnav a:hover{border-color:var(--amber);}
+.clubnav b.here{color:var(--amber);border:1px solid var(--amber);
+padding:3px 7px;font-size:14px;letter-spacing:0;text-transform:none;}
 .navgrp b{min-width:88px;}
 .toolnav b{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
 color:var(--muted);font-weight:600;margin-right:2px;}
@@ -2284,13 +2293,21 @@ def render_club_best(xp: dict, now: datetime) -> str | None:
     body = (
         f"{_kit_defs(all_clubs)}"
         + "".join(sections)
-        + '<p class="note">Every club also has its own page with set-piece '
-          "takers and a predicted XI: "
-          + ", ".join(
-              f'<a href="/fpl/club/{s}">{escape(c)}</a>'
-              for c, s in sorted(
-                  (c, CLUB_SLUGS[c]) for c in set(all_clubs) if c in CLUB_SLUGS))
-          + ".</p>"
+        # 🔴 15.8, Villen havainto: "aika huonosti erottee tuolta noi seurojen
+        # omat sivut tosta club-best sivulta". Nama olivat pienessa harmaassa
+        # alaviitteessa kahdenkymmenen nimen pilkkuluettelona, eli 20 sivua
+        # piiloutui yhteen virkkeeseen. Nyt oma otsikko ja sama chip-tyyli
+        # kuin seurasivujen valitsimessa: sama asia nayttaa samalta.
+        + '<h2 id="club-pages">Every club has its own page</h2>'
+        + '<p>Set-piece takers with the order FPL publishes, a predicted XI '
+          "with start probabilities, and that club's best players in one "
+          "place.</p>"
+        + '<nav class="clubnav" aria-label="Club pages"><b>Clubs</b>'
+        + "".join(
+            f'<a href="/fpl/club/{s}">{escape(c)}</a>'
+            for c, s in sorted(
+                (c, CLUB_SLUGS[c]) for c in set(all_clubs) if c in CLUB_SLUGS))
+        + "</nav>"
         + '<p class="note">The gap is measured against the same club and the '
           "same position, not against the row above. \"No 2nd projected\" "
           "means no other player at that club cleared the projection "
@@ -2608,6 +2625,37 @@ _SP_LABELS = (("pens", "Penalties"), ("corners", "Corners"), ("fk", "Free kicks"
 
 
 
+
+def _club_switcher(current: str, saatavilla: set[str]) -> str:
+    """Kaikki 20 seuraa linkkeina, nykyinen korostettuna.
+
+    🔴 MITATTU 15.8: seurasivulta linkitettiin NOLLAAN toiseen seurasivuun.
+    Sisaantulo oli kunnossa (club-best linkitti kaikkiin 20), mutta lukija
+    joka oli Bournemouthin sivulla ei paassyt Arsenaliin ilman paluuta.
+    Kahdenkymmenen sisarsivun setti ilman keskinaista linkitysta on
+    kaksikymmenta umpikujaa.
+
+    Sivuvaikutus joka on itse asiassa paavaikutus: jokainen sivu saa 19 uutta
+    sisaantulevaa linkkia, mika on tasan se signaali jota GSC kaipasi 28.7.
+    """
+    # VAIN sivut jotka oikeasti kirjoitetaan. CLUB_SLUGS kattaa 24 seuraa
+    # (nousijat ja putoajat mukana), mutta sivuja syntyy vain niille joilla on
+    # projektio: ensimmainen versio linkitti neljaan 404:aan (BUR, LEI, SOU,
+    # WOL). Kuollut linkki on pahempi kuin puuttuva.
+    rivit = []
+    for short, slug in sorted(CLUB_SLUGS.items(), key=lambda x: x[1]):
+        if slug not in saatavilla:
+            continue
+        if slug == current:
+            rivit.append(f'<b class="here">{escape(short)}</b>')
+        else:
+            rivit.append(f'<a href="/fpl/club/{slug}">{escape(short)}</a>')
+    return (
+        '<nav class="clubnav" aria-label="Other clubs">'
+        "<b>Clubs</b>" + "".join(rivit) + "</nav>"
+    )
+
+
 def _no_history_flag(p: dict) -> str:
     """Merkinta pelaajalle jolla ei ole Valioliiga-historiaa.
 
@@ -2698,7 +2746,7 @@ def _xi_rows(players: list[dict]) -> tuple[str, int]:
 
 
 def render_club_page(short: str, players: list[dict], meta: dict,
-                     now: datetime) -> str | None:
+                     now: datetime, saatavilla: set[str] | None = None) -> str | None:
     """Yhden seuran esittelysivu (15.8.2026, Villen tilaus).
 
     MIKSI TAMA FORMAATTI. Ville antoi esimerkiksi FFScoutin seurakohtaisen
@@ -2805,6 +2853,7 @@ def render_club_page(short: str, players: list[dict], meta: dict,
     )
     body = (
         f"{_kit_defs([short])}"
+        + _club_switcher(slug, saatavilla or {slug})
         + "".join(osat)
         + f"{UPSELL}{_cta()}"
         + f'<p class="note">Updated {now.strftime("%d %b %Y")} · {DISCLAIMER}</p>'
@@ -2830,9 +2879,15 @@ def render_club_pages(xp: dict, now: datetime) -> list[str]:
         if s:
             per_club.setdefault(s, []).append(p)
     CLUB_DIR.mkdir(parents=True, exist_ok=True)
+    # Laske ensin MITKA sivut syntyvat, jotta valitsin voi linkittaa vain
+    # niihin. Sama kynnys kuin renderoijassa (alle 8 pelaajaa -> ei sivua).
+    saatavilla = {
+        CLUB_SLUGS[s] for s, g in per_club.items()
+        if s in CLUB_SLUGS and len(g) >= 8
+    }
     tehdyt = []
     for short, ryhma in sorted(per_club.items()):
-        page = render_club_page(short, ryhma, meta, now)
+        page = render_club_page(short, ryhma, meta, now, saatavilla)
         if not page:
             continue
         (CLUB_DIR / f"{CLUB_SLUGS[short]}.html").write_text(page, encoding="utf-8")

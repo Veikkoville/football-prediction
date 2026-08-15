@@ -203,3 +203,48 @@ def test_valikko_on_ryhmitelty_eika_tasainen():
     nav = _tool_nav("https://goaliq.app/fpl/notes")
     assert nav.count('class="navgrp"') >= 3, (
         "valikko ei ole ryhmitelty -> 30 linkkia perakkain")
+
+
+# ---------------------------------------------------------------------------
+# Seurasivujen keskinainen linkitys
+# ---------------------------------------------------------------------------
+
+def test_seurasivut_linkittavat_toisiinsa():
+    """🔴 MITATTU 15.8: seurasivulta linkitettiin NOLLAAN toiseen seurasivuun.
+    Sisaantulo oli kunnossa mutta 20 sisarsivua ilman keskinaista linkitysta
+    on 20 umpikujaa. Sivuvaikutus joka on paavaikutus: jokainen sivu saa 19
+    uutta sisaantulevaa linkkia."""
+    d = FPL / "club"
+    if not d.exists():  # pragma: no cover
+        pytest.skip("seurasivuja ei ole")
+    sivut = sorted(d.glob("*.html"))
+    for f in sivut:
+        h = f.read_text(encoding="utf-8")
+        muut = set(re.findall(r'href="/fpl/club/([a-z-]+)"', h))
+        assert len(muut) >= len(sivut) - 1, (
+            f"{f.stem}: linkittaa vain {len(muut)} sisarsivuun")
+
+
+def test_seuravalitsin_ei_linkita_olemattomiin_sivuihin():
+    """CLUB_SLUGS kattaa 24 seuraa (nousijat ja putoajat), sivuja syntyy 20.
+    Ensimmainen versio linkitti neljaan 404:aan. Kuollut linkki on pahempi
+    kuin puuttuva."""
+    d = FPL / "club"
+    if not d.exists():  # pragma: no cover
+        pytest.skip("seurasivuja ei ole")
+    olemassa = {f.stem for f in d.glob("*.html")}
+    for f in sorted(d.glob("*.html")):
+        h = f.read_text(encoding="utf-8")
+        kuolleet = set(re.findall(r'href="/fpl/club/([a-z-]+)"', h)) - olemassa
+        assert not kuolleet, f"{f.stem}: kuolleet linkit {sorted(kuolleet)}"
+
+
+def test_club_best_nostaa_seurasivut_omaksi_lohkokseen():
+    """Villen havainto: linkit olivat pienessa harmaassa alaviitteessa
+    pilkkuluettelona, eli 20 sivua piiloutui yhteen virkkeeseen."""
+    f = FPL / "club-best.html"
+    if not f.exists():  # pragma: no cover
+        pytest.skip("club-best puuttuu")
+    h = f.read_text(encoding="utf-8")
+    assert '<h2 id="club-pages">' in h, "seurasivuilla ei ole omaa otsikkoa"
+    assert 'class="clubnav"' in h, "linkit eivat ole chip-lohkona"
