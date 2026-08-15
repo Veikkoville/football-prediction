@@ -55,6 +55,9 @@ export interface RatedPlayer {
 	gameweeks?: RatedPlayerGw[];
 	in_xi: boolean;
 	is_captain: boolean;
+	/** 15.8: FPL:n saatavuuslippu. null = ei liputettu, EI "100 % varma". */
+	chance_next?: number | null;
+	news?: string | null;
 }
 
 export interface CaptainPick {

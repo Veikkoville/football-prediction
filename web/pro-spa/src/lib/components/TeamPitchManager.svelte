@@ -326,7 +326,16 @@
 <svelte:window bind:innerWidth={winW} />
 
 {#if players.length > 0}
-	<div class="pitch-block">
+	<!--
+	🔴 SAATAVUUS KENTALLE (15.8, Villen tilaus pitch-nakyman parantamisesta).
+	Aiemmin epavarma pelaaja nayttti kentalla TASAN samalta kuin terve, vaikka
+	juuri se on syy avata naytto deadlinen alla. Luku oli projektiossa jo,
+	mutta se ei kulkenut rate-teamin riveille.
+
+	null = FPL ei ole liputtanut. Se EI ole sama kuin "100 % varma", ja siksi
+	lippu naytetaan vain kun luku on olemassa ja alle 100.
+-->
+<div class="pitch-block">
 		{#if premium}
 			{#if gwsAvailable.length > 1}
 				<p class="label">Gameweek</p>
@@ -423,6 +432,13 @@
 								{#if effCaptain !== p.id && effVice === p.id}<span class="badge vice">V</span>{/if}
 							</span>
 							<span class="pname">{p.web_name}</span>
+							{#if typeof p.chance_next === 'number' && p.chance_next < 100}
+								<span
+									class="doubt"
+									class:out={p.chance_next === 0}
+									title={p.news ?? ''}
+								>{p.chance_next === 0 ? 'OUT' : `${p.chance_next}%`}</span>
+							{/if}
 							<span class="pxp">{xpOf(p).toFixed(1)}</span>
 							{#if oppOf(p)}
 								<span class="popp">{oppOf(p)}</span>
@@ -543,7 +559,22 @@
 		.popp {
 			max-width: 88px;
 		}
-		.pname {
+		.doubt {
+		display: inline-block;
+		margin: 1px 0 0;
+		padding: 0 4px;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		color: var(--ink);
+		background: var(--amber);
+		line-height: 1.5;
+	}
+	.doubt.out {
+		background: var(--negative, #ff8a5c);
+	}
+
+	.pname {
 			font-size: 11.5px;
 		}
 		.popp {

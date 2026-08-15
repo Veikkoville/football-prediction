@@ -1331,6 +1331,13 @@ def rate_team(entry: int | None = None, gw: int | None = None,
                 "gameweeks": _player_gameweeks(p),
                 "in_xi": p["id"] in xi_ids,
                 "is_captain": p["id"] == effective_captain,
+                # 15.8: saatavuus kentalle asti. Luvut olivat projektiossa jo,
+                # mutta ne EIVAT kulkeneet manageriin, joten kentalla epavarma
+                # pelaaja nayttti tasan samalta kuin terve. Se on se tieto
+                # jonka takia kayttaja avaa naytön deadlinen alla.
+                # None = FPL ei ole liputtanut, ei "100 % varma".
+                "chance_next": p.get("chance_next"),
+                "news": (p.get("news") or "").strip()[:120] or None,
             } for p in squad],
             "missing_ids": missing,
             "bank": round(bank_tenths / 10.0, 1),
