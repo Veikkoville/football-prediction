@@ -248,3 +248,33 @@ def test_club_best_nostaa_seurasivut_omaksi_lohkokseen():
     h = f.read_text(encoding="utf-8")
     assert '<h2 id="club-pages">' in h, "seurasivuilla ei ole omaa otsikkoa"
     assert 'class="clubnav"' in h, "linkit eivat ole chip-lohkona"
+
+
+# ---------------------------------------------------------------------------
+# Saatavuus kentalle (rate-team pool)
+# ---------------------------------------------------------------------------
+
+def test_rate_team_pool_kantaa_saatavuuden():
+    """🔴 MITATTU 15.8. Lisasin `chance_next`/`news` vain VASTAUSRIVIIN ja
+    tuotannossa arvo oli None, koska `_projection_pool` muotoilee rivin
+    uusiksi: kentta joka ei ole sen listassa katoaa aanettomasti. Tiedostossa
+    on 5.8 kirjoitettu kommentti joka varoittaa tasan tasta ansasta, ja kavelin
+    siihen silti.
+
+    Testi kulkee POOLIN lapi eika vastausrivin, koska se on se kohta joka
+    pudottaa kentat."""
+    import sys
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from src.models.fpl_rate_team import _projection_pool
+    xp = {"players": [{
+        "id": 1, "web_name": "Testi", "team_short": "ARS", "pos": "DEF",
+        "xp_per_gw": 1.0, "xp_horizon_total": 6.0,
+        "chance_next": 75, "news": "Knock - 75% chance of playing",
+    }]}
+    price = {1: {"element_type": 2, "team": 1, "now_cost": 50,
+                 "selected_by_percent": "1.0"}}
+    pool = _projection_pool(xp, price)
+    assert len(pool) == 1
+    assert pool[0]["chance_next"] == 75, "chance_next katosi poolissa"
+    assert pool[0]["news"].startswith("Knock"), "news katosi poolissa"

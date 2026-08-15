@@ -1071,6 +1071,13 @@ def _projection_pool(xp_data: dict, price_by_id: dict[int, dict]) -> list[dict]:
             # laski vauhdin uudestaan value-listalla (ja laski sen vaarin).
             "predicted_starts": p.get("predicted_starts"),
             "minutes_confidence": p.get("minutes_confidence"),
+            # 15.8: saatavuus kentalle. Lisasin nama ensin VAIN vastausriviin
+            # ja arvo oli `None` tuotannossa — tasan se ansa jota yllaoleva
+            # 5.8:n kommentti varoittaa: pool muotoilee rivin uusiksi, joten
+            # kentta joka ei ole TASSA listassa katoaa aanettomasti. Luin
+            # varoituksen ja tein sen silti.
+            "chance_next": p.get("chance_next"),
+            "news": p.get("news"),
             "components": p.get("components"),
             "components_gw": p.get("components_gw"),
             # 6.8 compare-V2: xG/xA-raakastatit tulevat last_season-lohkosta ja
