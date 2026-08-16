@@ -26,6 +26,9 @@ on:
     branches: [main]
     paths:
       - '*.html'
+      # 16.8: ref-bridge.js. Ilman tata pelkkaa siltaa koskeva muutos ei
+      # laukaisisi deployta, ja korjaus jaisi elamaan vain repoon.
+      - '*.js'
       - 'fpl/**'
       - 'predictions/**'
       - 'assets/**'
