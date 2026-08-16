@@ -1161,7 +1161,7 @@ def main(argv: list[str] | None = None) -> int:
     tc_meta = attach_team_confidence(players)
     out = {
         "meta": {
-            "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
+            "product": "GoalIQ Fantasy Phase 1: expected points (xP)",
             "available": True,
             "team_confidence": tc_meta,
             "phase": 1,

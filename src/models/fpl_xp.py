@@ -843,7 +843,7 @@ def empty_xp() -> dict:
     """Runko kun projektiota ei ole committattu — appi näyttää tyhjän tilan."""
     return {
         "meta": {
-            "product": "GoalIQ Fantasy Phase 1 — expected points (xP)",
+            "product": "GoalIQ Fantasy Phase 1: expected points (xP)",
             "available": False,
             "phase": 1,
             "season": None,
