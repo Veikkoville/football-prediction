@@ -8,6 +8,7 @@
 import { supabase } from './supabase';
 import { capture, identifyUser, resetAnalytics } from './analytics';
 import { invalidateProfileRow } from './profileRow';
+import { storedRef } from './billing';
 
 export interface GiqUser {
 	id: string;
@@ -150,9 +151,28 @@ export async function signIn(email: string, password: string): Promise<string | 
 }
 
 export async function signUp(email: string, password: string): Promise<string | null> {
-	const { data, error } = await supabase.auth.signUp({ email, password });
+	// 🔴 Ref kiinnitetaan TILIIN, ei pelkastaan selaimeen (Villen havainto
+	// 16.8: "kaikkihan avaa sen x:sta suoraan").
+	//
+	// X avaa linkit omassa sisaisessa selaimessaan, jonka muisti on eri kuin
+	// Safarin tai Chromen. Pelkka localStorage tarkoitti etta luojan katsoja
+	// klikkaa linkkia X:ssa, ref tallentuu siihen webviewiin, ja nelja
+	// viikkoa myohemmin han maksaa oikealla selaimella - jolloin yhteys on
+	// poikki. Selaimen muisti on vaara paikka nelja viikkoa kestavalle
+	// attribuutiolle.
+	//
+	// Tili on oikea paikka, ja ajoitus osuu: GW1-GW3 ikkunan koko tarkoitus
+	// on saada ihminen luomaan tili SAMASSA sessiossa jossa han klikkaa.
+	// `options.data` kirjoittaa Supabasen `raw_user_meta_data`an, joten
+	// uutta saraketta eika tuotantomigraatiota ei tarvita.
+	const ref = storedRef();
+	const { data, error } = await supabase.auth.signUp({
+		email,
+		password,
+		...(ref ? { options: { data: { ref } } } : {})
+	});
 	if (error) return error.message;
-	if (data.user) capture('signup_completed', undefined, 'signup');
+	if (data.user) capture('signup_completed', ref ? { ref } : undefined, 'signup');
 	return null;
 }
 

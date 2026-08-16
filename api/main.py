@@ -340,7 +340,48 @@ def _affiliate_code_from_session(obj: dict) -> Optional[str]:
         ref = _clean_affiliate_ref(meta.get("ref"))
         if ref:
             return ref
+
+    # 4. TILIN REF (16.8, Villen havainto: "kaikkihan avaa sen x:sta suoraan").
+    #
+    #    Kohta 3 nojaa selaimeen sailottuun refiin, ja X avaa linkit omassa
+    #    sisaisessa selaimessaan jonka muisti on eri kuin Safarin tai
+    #    Chromen. Katsoja klikkaa X:ssa, ref tallentuu siihen webviewiin, ja
+    #    nelja viikkoa myohemmin han maksaa oikealla selaimella -> kohta 3
+    #    palauttaa Nonen. Se on luojaliikenteen TAVALLISIN polku, ei
+    #    reunatapaus.
+    #
+    #    Rekisteroityessa ref kirjoitetaan tilin metadataan, ja tili kulkee
+    #    laitteesta toiseen. Tama on siksi kestavin naista neljasta.
+    uid = obj.get("client_reference_id")
+    if uid and isinstance(uid, str):
+        ref = _account_affiliate_ref(uid)
+        if ref:
+            return ref
     return None
+
+
+def _account_affiliate_ref(user_id: str) -> Optional[str]:
+    """Tilin metadataan rekisteroityessa kirjattu luojan ref.
+
+    Fail-soft: attribuution puuttuminen ei saa kaataa fulfillmentia.
+    Asiakas on jo maksanut ja premium on aktivoitava.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return None
+    key = SUPABASE_SERVICE_ROLE_KEY
+    try:
+        r = requests.get(
+            f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
+            headers={"apikey": key, "Authorization": f"Bearer {key}"},
+            timeout=10)
+        if r.status_code != 200:
+            return None
+        meta = (r.json() or {}).get("user_metadata") or {}
+        return _clean_affiliate_ref(meta.get("ref"))
+    except Exception as e:
+        print(f"[affiliate] tilin ref-haku epaonnistui {user_id}: "
+              f"{type(e).__name__}: {e}")
+        return None
 
 
 # Sallitut merkit affiliate-refissä. Arvo päätyy Stripe-metadataan ja

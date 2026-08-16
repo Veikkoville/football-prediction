@@ -132,3 +132,60 @@ def test_junk_ref_is_not_written_to_metadata(client, monkeypatch):
                           "ref": "not a code!!"})
     assert r.status_code == 200, r.text
     assert "ref" not in seen["metadata"], seen.get("metadata")
+
+
+# --- tilin ref: kestaa X:n sisaisen selaimen ------------------------------
+#
+# Villen havainto 16.8: "kaikkihan avaa sen x:sta suoraan". X avaa linkit
+# omassa webviewissaan jonka muisti on eri kuin Safarin tai Chromen, joten
+# selaimeen sailottu ref katoaa ennen maksua. Se on luojaliikenteen
+# TAVALLISIN polku, ei reunatapaus. Tili kulkee laitteesta toiseen.
+
+def test_account_ref_attributes_when_browser_ref_is_gone(monkeypatch):
+    """🔴 Tama on se X-webview-tapaus. Ei koodia, ei selain-refia, mutta
+    tili muistaa kuka toi kayttajan."""
+    monkeypatch.setattr(m, "_account_affiliate_ref",
+                        lambda uid: "DAZ" if uid == "u1" else None)
+    session = {"discounts": [], "subscription": None, "metadata": {},
+               "client_reference_id": "u1"}
+    assert m._affiliate_code_from_session(session) == "DAZ"
+
+
+def test_browser_ref_wins_over_account_ref(monkeypatch):
+    """Tuore klikkaus on vahvempi todiste kuin vanha tilileima."""
+    monkeypatch.setattr(m, "_account_affiliate_ref", lambda uid: "WOLFY")
+    session = {"discounts": [], "subscription": None,
+               "metadata": {"ref": "DAZ"}, "client_reference_id": "u1"}
+    assert m._affiliate_code_from_session(session) == "DAZ"
+
+
+def test_guest_checkout_without_account_does_not_crash(monkeypatch):
+    """Guest-polulla ei ole client_reference_id:ta. Ei saa kaatua."""
+    monkeypatch.setattr(m, "_account_affiliate_ref",
+                        lambda uid: pytest.fail("ei saa kysya ilman uid:ta"))
+    session = {"discounts": [], "subscription": None, "metadata": {}}
+    assert m._affiliate_code_from_session(session) is None
+
+
+def test_account_lookup_failure_is_fail_soft(monkeypatch):
+    """Attribuution puuttuminen ei saa kaataa fulfillmentia: asiakas on jo
+    maksanut ja premium on aktivoitava."""
+    def boom(url, headers=None, timeout=None):
+        raise RuntimeError("supabase alhaalla")
+    monkeypatch.setattr(m.requests, "get", boom)
+    monkeypatch.setattr(m, "SUPABASE_URL", "https://x.test")
+    monkeypatch.setattr(m, "SUPABASE_SERVICE_ROLE_KEY", "k")
+    assert m._account_affiliate_ref("u1") is None
+
+
+def test_account_ref_is_validated_like_every_other_ref(monkeypatch):
+    class _R:
+        status_code = 200
+
+        def json(self):
+            return {"user_metadata": {"ref": "not a code!!"}}
+
+    monkeypatch.setattr(m.requests, "get", lambda *a, **kw: _R())
+    monkeypatch.setattr(m, "SUPABASE_URL", "https://x.test")
+    monkeypatch.setattr(m, "SUPABASE_SERVICE_ROLE_KEY", "k")
+    assert m._account_affiliate_ref("u1") is None
