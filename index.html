@@ -710,14 +710,19 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         and player compare. Every number comes from the model behind our public,
         pre-match-logged prediction record. <a href="/predictions">Football predictions for
         the top leagues too</a>.</p>
+      <!-- The notice sits ABOVE the button row on purpose. The first version
+           put it underneath, so the page offered a paid button directly above
+           the sentence saying you do not need to pay yet. The notice changes
+           what the buttons mean, so it has to be read first.
+           REMOVE THIS BLOCK AFTER 2026-09-12 12:30 UTC. -->
+      <p class="free-window">Premium is free on the web until the GW4 deadline on 12 September,
+        so GW1 to GW3. Create a free account and it's on. No card, nothing to cancel.</p>
       <div class="cta-row" id="get">
-        <a class="btn btn-primary" href="fpl.html" data-cta="hero-free">Try the free tools &#9656;</a>
-        <!-- #101: hinta-CTA suoraan Stripe Checkoutiin -->
-        <a class="btn btn-ghost" href="https://pro.goaliq.app/checkout?plan=season" data-cta="hero">Premium, &euro;25/year</a>
+        <a class="btn btn-primary" href="https://pro.goaliq.app/" data-cta="hero-freewindow">Get Premium free &#9656;</a>
+        <a class="btn btn-ghost" href="fpl.html" data-cta="hero-free">Try the free tools</a>
       </div>
-      <p class="free-window">Premium is free until the GW4 deadline on 12 September, so GW1 to GW3.
-        Sign in with a free account on the web and it's on. No card, nothing to cancel,
-        &euro;3.99 a month after that.</p>
+      <p class="cta-note">After 12 September it is &euro;3.99 a month or
+        <a href="https://pro.goaliq.app/checkout?plan=season" data-cta="hero">&euro;25 a year</a>.</p>
       <p class="cta-note">Free download on <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google Play</a> and the <a href="https://apps.apple.com/app/id6780047163">App Store</a>. One subscription covers web, iOS and Android.</p>
       <!-- #72: GW-deadline-countdown. Fallback = GW1-avaus pe 21.8.2026; JS
            vaihtaa viralliseen GW-deadlineen /api/fantasy metasta. -->
@@ -773,10 +778,10 @@ text-transform:uppercase}
       <div class="table-inner">
         <div class="mock-row head"><span>Team</span><span>Player</span><span>Price</span><span>Owned</span><span class="mock-xp">Total xP</span></div>
         <!-- GEN:XP-TABLE-START -->
-        <div class="mock-row"><span class="mock-team">MUN</span><span><span class="mock-name">B.Fernandes</span> <span class="mock-meta">&middot; MID</span></span><span>&pound;12.0</span><span>48.0%</span><span class="mock-xp">34.9</span></div>
+        <div class="mock-row"><span class="mock-team">MUN</span><span><span class="mock-name">B.Fernandes</span> <span class="mock-meta">&middot; MID</span></span><span>&pound;12.0</span><span>47.8%</span><span class="mock-xp">34.9</span></div>
         <div class="mock-row"><span class="mock-team">MCI</span><span><span class="mock-name">Haaland</span> <span class="mock-meta">&middot; FWD</span></span><span>&pound;15.5</span><span>73.3%</span><span class="mock-xp">32.5</span></div>
-        <div class="mock-row"><span class="mock-team">ARS</span><span><span class="mock-name">Gabriel</span> <span class="mock-meta">&middot; DEF</span></span><span>&pound;8.0</span><span>27.3%</span><span class="mock-xp">31.0</span></div>
-        <div class="mock-row"><span class="mock-team">BRE</span><span><span class="mock-name">Thiago</span> <span class="mock-meta">&middot; FWD</span></span><span>&pound;8.0</span><span>16.2%</span><span class="mock-xp">28.9</span></div>
+        <div class="mock-row"><span class="mock-team">ARS</span><span><span class="mock-name">Gabriel</span> <span class="mock-meta">&middot; DEF</span></span><span>&pound;8.0</span><span>27.4%</span><span class="mock-xp">31.0</span></div>
+        <div class="mock-row"><span class="mock-team">BRE</span><span><span class="mock-name">Thiago</span> <span class="mock-meta">&middot; FWD</span></span><span>&pound;8.0</span><span>16.4%</span><span class="mock-xp">28.9</span></div>
         <div class="mock-foot">Model projections, next 6 gameweeks &middot; <strong>live numbers, not a mock season</strong></div>
       <!-- GEN:XP-TABLE-END -->
       </div>
@@ -791,7 +796,7 @@ text-transform:uppercase}
     <div class="bar bar-amber"><span>&#9612; Team news &middot; updated daily</span><span>P108</span></div>
     <!-- GEN:TEAM-NEWS-START -->
 <h2 id="team-news">Team news right now</h2>
-<p><strong>66 players are ruled out and 23 are doubtful</strong> for the next deadline, taken from the official Fantasy Premier League status feed. Most owned among them: Mukiele (SUN), Kroupi.Jr (BOU), Šeško (MUN).</p>
+<p><strong>68 players are ruled out and 25 are doubtful</strong> for the next deadline, taken from the official Fantasy Premier League status feed. Most owned among them: Mukiele (SUN), Kroupi.Jr (BOU), Šeško (MUN).</p>
 <p>The full list is free and sorted by ownership, and every doubtful player carries the model's projected points with the reduced chance of playing already priced in, so you can see what the doubt actually costs: <a href="/fpl/team-news">FPL team news</a>.</p>
 <!-- GEN:TEAM-NEWS-END -->
   </div>
@@ -838,7 +843,14 @@ text-transform:uppercase}
       <div class="panel premium-p">
         <div class="bar bar-amber"><span>GoalIQ Premium</span><span>P103</span></div>
         <div class="panel-body">
-          <h3><span class="price-tag">&euro;25<span> / year</span></span> <span class="price-alt">or &euro;3.99 / month</span></h3>
+          <!-- REMOVE the free-until part after 2026-09-12 12:30 UTC; the
+               original price tag stays.
+               THE PRICES MUST STAY VISIBLE, not be replaced by the notice.
+               Partners are told to check their own commission against this
+               page, so the numbers have to remain readable here without an
+               account. An earlier draft of this change replaced them outright,
+               which would have broken exactly that. -->
+          <h3><span class="price-tag">Free<span> until 12 Sept</span></span> <span class="price-alt">then &euro;25 / year or &euro;3.99 / month</span></h3>
           <ul class="tool-list">
             <li>Interactive team manager + rolling six-gameweek planner</li>
             <li>Player xP with ownership, minutes outlook, the per 90 minute rate and CSV export</li>

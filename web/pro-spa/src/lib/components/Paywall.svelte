@@ -3,6 +3,7 @@
 	import { PLANS, planApprox, startCheckout, type PlanKey } from '$lib/billing';
 	import { capture } from '$lib/analytics';
 	import { fetchXp, gwXp, type XpResponse } from '$lib/api';
+	import { freePremiumWindowActive } from '$lib/auth.svelte';
 
 	let error = $state<string | null>(null);
 	let busy = $state<PlanKey | null>(null);
@@ -71,6 +72,16 @@
 			</div>
 		{/each}
 	</div>
+{/if}
+
+<!-- 16.8: puolustava rivi. Ikkunan aikana kirjautunut kayttaja ei normaalisti
+     paady tanne lainkaan (auth.sub on tosi), mutta jos han paatyy, hanelle ei
+     saa myyda hintaan sita mika on juuri nyt ilmaista.
+     🔴 POISTA 12.9.2026 12:30 UTC jalkeen. -->
+{#if freePremiumWindowActive()}
+	<p class="banner success">
+		Premium is free until the GW4 deadline on 12 September. You do not need to pay yet.
+	</p>
 {/if}
 
 <div class="plans">

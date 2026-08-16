@@ -304,20 +304,57 @@ def _affiliate_code_from_session(obj: dict) -> Optional[str]:
         if code:
             return code
 
+    # 🔴 EI aikaista returnia taalla. Ref-fallback (kohta 3) on VIIMEINEN
+    # sana kaikilla poluilla, myos silloin kun tilausta ei ole tai sen haku
+    # kaatuu. Ensimmainen versio palautti tassa Nonen ja ref jai lukematta -
+    # portti nappasi sen.
     sub_id = obj.get("subscription")
-    if not sub_id or not isinstance(sub_id, str):
-        return None
-    try:
-        sub = stripe.Subscription.retrieve(sub_id)
-    except Exception as e:
-        print(f"[affiliate] Subscription.retrieve epäonnistui {sub_id}: {e}")
-        return None
-    discount = (sub or {}).get("discount") or {}
-    if isinstance(discount, dict):
-        code = _promo_code_string(discount.get("promotion_code"))
-        if code:
-            return code
+    if sub_id and isinstance(sub_id, str):
+        try:
+            sub = stripe.Subscription.retrieve(sub_id)
+        except Exception as e:
+            print(f"[affiliate] Subscription.retrieve epäonnistui {sub_id}: {e}")
+            sub = None
+        discount = ((sub or {}).get("discount") or {}) if sub else {}
+        if isinstance(discount, dict):
+            code = _promo_code_string(discount.get("promotion_code"))
+            if code:
+                return code
+
+    # 3. REF-FALLBACK (16.8). Kaksi ensimmäistä polkua lukevat KÄYTETYN
+    #    promokoodin, eli ne toimivat vain jos asiakas maksoi alennuksella.
+    #
+    #    GW1-GW3 ilmaisikkuna rikkoi tämän: luojan katsoja tulee ikkunan
+    #    aikana, luo ilmaisen tilin, käyttää tuotetta neljä viikkoa ja maksaa
+    #    12.9. jälkeen TÄYTTÄ HINTAA ilman koodia. Molemmat polut palauttavat
+    #    silloin None, ja luoja jää ilman provisiota vaikka toi asiakkaan.
+    #    Provisio on luvattu "for as long as they keep the subscription"
+    #    (DM 12.8), joten se lupaus ei saa katketa siihen että tarjosimme
+    #    tuotetta ilmaiseksi.
+    #
+    #    Ref matkustaa checkout-session metadatassa: SPA poimii `?ref=` ja
+    #    säilöö sen selaimeen, ja lähettää sen checkout-kutsussa. Ei uutta
+    #    kantasaraketta, joten ei migraatiota tuotantoon.
+    meta = obj.get("metadata") or {}
+    if isinstance(meta, dict):
+        ref = _clean_affiliate_ref(meta.get("ref"))
+        if ref:
+            return ref
     return None
+
+
+# Sallitut merkit affiliate-refissä. Arvo päätyy Stripe-metadataan ja
+# payout-täsmäytykseen, joten se normalisoidaan tiukasti eikä luoteta
+# siihen mitä URLissa sattui olemaan.
+_REF_RE = re.compile(r"^[A-Z0-9_-]{2,32}$")
+
+
+def _clean_affiliate_ref(value) -> Optional[str]:
+    """Normalisoi ja validoi affiliate-ref. Kelvoton -> None."""
+    if not isinstance(value, str):
+        return None
+    v = value.strip().upper()
+    return v if _REF_RE.match(v) else None
 
 
 def _stamp_affiliate(subscription_id: str, code: str) -> bool:
@@ -2473,6 +2510,11 @@ class WebCheckoutRequest(BaseModel):
     origin: str = Field(
         "", description="SPA:n origin success/cancel-redirecteille "
                         "(validoidaan allowlistia vasten)")
+    # 16.8: luojan ref (?ref=DAZ). Kulkee checkout-session metadataan, jotta
+    # affiliate-attribuutio toimii myos silloin kun asiakas EI kayta koodia -
+    # esim. kun han tuli GW1-GW3 ilmaisikkunan aikana ja maksaa vasta 12.9.
+    # jalkeen taytta hintaa. Ks. _affiliate_code_from_session kohta 3.
+    ref: str = Field("", description="Luojan ref-tunnus, esim. 'DAZ'")
 
     @field_validator("plan")
     @classmethod
@@ -2538,7 +2580,9 @@ def create_web_checkout_session(
             customer_email=supa_user.get("email"),
             client_reference_id=supa_user["id"],
             metadata={"user_id": supa_user["id"], "plan": req.plan,
-                      "source": "pro-web"},
+                      "source": "pro-web",
+                      **({"ref": ref} if (ref := _clean_affiliate_ref(req.ref))
+                         else {})},
             success_url=f"{base}/?checkout=success&session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{base}/?checkout=cancelled",
             # Esitaytetty alennus jos ympäristö antaa sen, muuten kayttaja
@@ -2610,7 +2654,9 @@ def create_guest_checkout_session(
             line_items=[{"price": price_id, "quantity": 1}],
             # EI customer_email/client_reference_id — Stripe kerää emailin,
             # webhook provisioi tilin sillä (account-after-payment).
-            metadata={"plan": req.plan, "source": "pro-web-guest"},
+            metadata={"plan": req.plan, "source": "pro-web-guest",
+                      **({"ref": ref} if (ref := _clean_affiliate_ref(req.ref))
+                         else {})},
             success_url=f"{base}/?checkout=success&guest=1&session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{base}/?checkout=cancelled",
             allow_promotion_codes=True,

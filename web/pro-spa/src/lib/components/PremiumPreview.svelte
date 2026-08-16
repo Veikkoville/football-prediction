@@ -5,6 +5,7 @@
 	import { PLANS, planApprox, startCheckout, type PlanKey } from '$lib/billing';
 	import Provenance from './Provenance.svelte';
 	import { preferredStore, appCtaLabel, STORE_URL } from '$lib/appHandoff';
+	import { freePremiumWindowActive } from '$lib/auth.svelte';
 
 	// #95: login-seinä myy ennen lomaketta — sama arvolupaus kuin mobiilin
 	// UpgradeCard-paywallissa. Copy 1:1 paywall.bullet_* -en-avaimista
@@ -80,6 +81,18 @@
 
 <section class="preview card" aria-label="What GoalIQ Premium includes">
 	<h3>What Premium unlocks</h3>
+
+	<!-- 16.8: tama on ANONYYMIN kavijan nakyma, eli se ainoa paikka jossa
+	     ikkunasta voi kertoa jollekulle joka ei ole viela kirjautunut. Ilman
+	     tata koko ilmaisikkuna oli nakyvissa vasta sille joka oli jo saanut
+	     sen. Ilmoitus on hintojen YLAPUOLELLA tarkoituksella.
+	     🔴 POISTA 12.9.2026 12:30 UTC jalkeen. -->
+	{#if freePremiumWindowActive()}
+		<p class="banner success">
+			Premium is free until the GW4 deadline on 12 September, so GW1 to GW3. Create a free
+			account below and it's on. No card, nothing to cancel.
+		</p>
+	{/if}
 	<ul class="bullets">
 		{#each BULLETS as b (b)}
 			<li>{b}</li>

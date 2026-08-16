@@ -687,11 +687,17 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <div class="wrap">
     <div class="premium-card">
       <span class="badge">GoalIQ Premium</span>
-      <div class="price">€25<span> / year</span></div>
-      <p style="border-left:3px solid var(--amber);padding-left:10px;">Premium is free until the
-        GW4 deadline on 12 September, so GW1 to GW3. Sign in with a free account on the web and it's on.
+      <!-- REMOVE the free-until presentation after 2026-09-12 12:30 UTC: the
+           price goes back on top and this paragraph goes away. The notice sits
+           above the price on purpose; the other way round the page showed a
+           price tag directly above the sentence saying you do not need to pay
+           yet. -->
+      <div class="price">Free<span> until 12 Sept</span></div>
+      <p style="border-left:3px solid var(--amber);padding-left:10px;">Premium is free on the web
+        until the GW4 deadline on 12 September, so GW1 to GW3. Create a free account and it's on.
         No card, nothing to cancel.</p>
-      <p style="color:var(--muted);">Or €3.99 a month. Go deeper on every prediction.</p>
+      <p style="color:var(--muted);">After that it is €25 a year or €3.99 a month.
+        Go deeper on every prediction.</p>
       <ul class="premium-list">
         <li>Top-10 most likely scorelines for any match</li>
         <li>Form &amp; momentum and full head-to-head breakdowns</li>

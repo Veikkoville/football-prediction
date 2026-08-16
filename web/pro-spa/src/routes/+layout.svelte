@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { initAnalytics, capture } from '$lib/analytics';
 	import { initAuth } from '$lib/auth.svelte';
+	import { captureRef } from '$lib/billing';
 	import WorkspaceBar from '$lib/components/WorkspaceBar.svelte';
 
 	let { children } = $props();
@@ -10,6 +11,11 @@
 	onMount(() => {
 		// 2.8 PERF: app.html:n boot-runko pois heti kun oikea sisältö on DOM:issa.
 		document.getElementById('boot')?.remove();
+		// 16.8: luojan ref talteen ENNEN mitään muuta. Se on poimittava heti
+		// laskeutumisella, koska GW1-GW3 ilmaisikkunan aikana käyttäjä
+		// rekisteröityy nyt ja maksaa vasta neljä viikkoa myöhemmin - siihen
+		// asti tämä on ainoa jäljellä oleva yhteys luojaan.
+		captureRef(window.location.search);
 		initAnalytics();
 		// Web-funnel (#12-pariteetti): sivulataus kerran per lataus.
 		// 2.8.2026: src/srcp = landingin CTA-lahdetagi (ks. staattisten sivujen

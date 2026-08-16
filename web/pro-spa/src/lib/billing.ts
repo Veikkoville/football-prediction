@@ -72,7 +72,11 @@ export async function startCheckout(plan: PlanKey, source = 'pro_web'): Promise<
 		const r = await fetch(`${API_BASE}${endpoint}`, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify({ plan, origin: window.location.origin })
+			body: JSON.stringify({
+				plan,
+				origin: window.location.origin,
+				...(storedRef() ? { ref: storedRef() } : {})
+			})
 		});
 		if (!r.ok) {
 			const detail = (await r.json().catch(() => null))?.detail;
@@ -91,5 +95,50 @@ export async function startCheckout(plan: PlanKey, source = 'pro_web'): Promise<
 		return null;
 	} catch (e) {
 		return `Checkout failed: ${e instanceof Error ? e.message : e}`;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Luojan ref (16.8.2026)
+//
+// Affiliate-attribuutio luki aiemmin vain KAYTETYN promokoodin, eli se toimi
+// vain jos asiakas maksoi alennuksella. GW1-GW3 ilmaisikkuna rikkoi sen:
+// luojan katsoja tulee ikkunan aikana, luo ilmaisen tilin, kayttaa tuotetta
+// nelja viikkoa ja maksaa 12.9. jalkeen TAYTTA HINTAA ilman koodia. Luoja jai
+// silloin ilman provisiota vaikka toi asiakkaan, ja provisio on luvattu
+// sanoilla "for as long as they keep the subscription".
+//
+// Ref sailotaan selaimeen, koska se on ainoa paikka joka kestaa nelja viikkoa
+// rekisteroinnin ja maksun valissa ILMAN uutta kantasaraketta (ja siten ilman
+// tuotantomigraatiota). Rajoite sanottava aaneen: se ei kesta laitteen
+// vaihtoa eika selaimen tyhjennysta.
+const REF_KEY = 'giq:ref';
+const REF_RE = /^[A-Z0-9_-]{2,32}$/;
+
+/** Normalisoi ja validoi. Sama saanto kuin backendin `_clean_affiliate_ref`. */
+export function cleanRef(value: string | null | undefined): string | null {
+	if (typeof value !== 'string') return null;
+	const v = value.trim().toUpperCase();
+	return REF_RE.test(v) ? v : null;
+}
+
+/** Poimii `?ref=` URLista ja sailoo sen. Kutsutaan bootissa. */
+export function captureRef(search = ''): string | null {
+	try {
+		const found = cleanRef(new URLSearchParams(search).get('ref'));
+		// EI ylikirjoiteta olemassa olevaa: ensimmainen luoja joka toi
+		// kayttajan saa attribuution, eika myohempi linkki vie sita.
+		if (found && !localStorage.getItem(REF_KEY)) localStorage.setItem(REF_KEY, found);
+		return storedRef();
+	} catch {
+		return null;
+	}
+}
+
+export function storedRef(): string | null {
+	try {
+		return cleanRef(localStorage.getItem(REF_KEY));
+	} catch {
+		return null;
 	}
 }

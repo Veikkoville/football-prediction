@@ -1634,13 +1634,18 @@ differential picks, player compare for up to four players and predicted
   starting minutes, from the
 same match model as this page. Rate my team, a captain pick, price watch and
 the top three of every leaderboard are free.</p>
+<!-- REMOVE the free window after 2026-09-12 12:30 UTC: the CTA goes back to
+     checkout and the first price note goes away. The notice sits above the CTA
+     on purpose; the other way round the page offered a buy button directly
+     above the sentence saying you do not need to pay yet. -->
+<p class="price-note"><b>Premium is free on the web until the GW4 deadline on 12 September,
+so GW1 to GW3. Create a free account and it's on. No card, nothing to cancel.</b></p>
 <div class="cta-row">
-  <a class="cta" href="{PRO_CHECKOUT_SEASON_URL}" data-cta="fpl">Start Premium, &euro;25 a year</a>
+  <a class="cta" href="{PRO_URL}" data-cta="fpl-freewindow">Get Premium free</a>
 </div>
-<p class="price-note"><b>Premium is free until the GW4 deadline on 12 September, so GW1 to GW3.
-Sign in with a free account on the web and it's on. No card, nothing to cancel.</b></p>
-<p class="price-note">€25 a year, which is under €2.10 a month, or €3.99 a month.
-One subscription covers web, iOS and Android. Cancel anytime. 30-day money back on web purchases.</p>
+<p class="price-note">After 12 September it is €25 a year, which is under €2.10 a month, or
+€3.99 a month. One subscription covers web, iOS and Android. Cancel anytime.
+30-day money back on web purchases.</p>
 </aside>
 
 <!-- Career card discoverability. This is a free distribution tool, so the teal
