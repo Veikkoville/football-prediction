@@ -51743,7 +51743,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-08-15T09:27:56+00:00",
-      "result": null
+      "result": {
+        "home_score": 1,
+        "away_score": 4,
+        "actual_score": "1-4",
+        "actual_outcome": "away",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-16T12:40:32+00:00"
+      }
     },
     {
       "match_id": "fd-558229",

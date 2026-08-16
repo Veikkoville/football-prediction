@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-08-16T09:28:55+00:00",
+  "updated_at": "2026-08-16T12:40:32+00:00",
   "logged_total": 3152,
-  "pending": 2989,
+  "pending": 2988,
   "voided": 4,
   "all_time": {
-    "n": 159,
-    "correct_1x2": 84,
-    "pct_1x2": 0.5283,
-    "decisive_n": 110,
-    "decisive_correct": 84,
-    "pct_decisive": 0.7636,
-    "exact_n": 111,
+    "n": 160,
+    "correct_1x2": 85,
+    "pct_1x2": 0.5312,
+    "decisive_n": 111,
+    "decisive_correct": 85,
+    "pct_decisive": 0.7658,
+    "exact_n": 112,
     "exact_correct": 18,
-    "pct_exact": 0.1622,
-    "brier": 0.5821,
-    "brier_n": 111
+    "pct_exact": 0.1607,
+    "brier": 0.5826,
+    "brier_n": 112
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 48,
-    "pct_1x2": 0.48,
-    "decisive_n": 66,
-    "decisive_correct": 48,
-    "pct_decisive": 0.7273,
+    "correct_1x2": 49,
+    "pct_1x2": 0.49,
+    "decisive_n": 67,
+    "decisive_correct": 49,
+    "pct_decisive": 0.7313,
     "exact_n": 100,
-    "exact_correct": 18,
-    "pct_exact": 0.18,
-    "brier": 0.5919,
+    "exact_correct": 17,
+    "pct_exact": 0.17,
+    "brier": 0.5916,
     "brier_n": 100,
     "window": 100
   },
@@ -45,17 +45,17 @@
       "brier_n": 39
     },
     "DED": {
-      "n": 4,
-      "correct_1x2": 3,
-      "pct_1x2": 0.75,
-      "decisive_n": 4,
-      "decisive_correct": 3,
-      "pct_decisive": 0.75,
-      "exact_n": 4,
+      "n": 5,
+      "correct_1x2": 4,
+      "pct_1x2": 0.8,
+      "decisive_n": 5,
+      "decisive_correct": 4,
+      "pct_decisive": 0.8,
+      "exact_n": 5,
       "exact_correct": 0,
       "pct_exact": null,
       "brier": null,
-      "brier_n": 4
+      "brier_n": 5
     },
     "ELC": {
       "n": 7,
@@ -130,10 +130,10 @@
       "n": 134
     },
     {
-      "bin_mid": 0.3354,
-      "predicted": 0.3354,
-      "actual": 0.3409,
-      "n": 44
+      "bin_mid": 0.3352,
+      "predicted": 0.3352,
+      "actual": 0.3404,
+      "n": 47
     },
     {
       "bin_mid": 0.4515,
@@ -167,6 +167,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-08-16",
+      "home_team": "Den Haag",
+      "away_team": "Groningen",
+      "predicted_winner": "away",
+      "p_winner": 0.3455,
+      "most_likely_score": "1-1",
+      "actual_score": "1-4",
+      "actual_outcome": "away",
+      "hit_1x2": true,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-08-16",
       "home_team": "Sao Paulo",
@@ -430,20 +444,6 @@
       "actual_outcome": "home",
       "hit_1x2": false,
       "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-08-09",
-      "home_team": "Flamengo RJ",
-      "away_team": "Vitoria",
-      "predicted_winner": "home",
-      "p_winner": 0.7392,
-      "most_likely_score": "2-0",
-      "actual_score": "2-0",
-      "actual_outcome": "home",
-      "hit_1x2": true,
-      "exact_hit": true,
       "duration": null,
       "regular_score": null
     }
