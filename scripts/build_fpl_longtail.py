@@ -3141,7 +3141,12 @@ def render_predicted_lineups(xp: dict, now: datetime) -> str | None:
             '<th class="n">Price</th><th class="n">Start</th></tr></thead>'
             f"<tbody>{rivit}</tbody></table></div>"
             f'<p class="note"><a href="/fpl/club/{slug}">'
-            f"{escape(str(ryhma[0].get("team") or short))} club page &#9656;</a></p>"
+            # Sisempi lainausmerkki on HIPSU, ei kaksoislainaus. Sama merkki
+            # f-stringin sisalla on laillinen vasta 3.12:sta (PEP 701), ja
+            # CI ajaa 3.11:ta -> tama oli SyntaxError joka kaatoi KOKO
+            # tests.yml-ajon 15.8 asti. Paikallisesti se ei nakynyt, koska
+            # tama kone ajaa 3.14:aa.
+            f"{escape(str(ryhma[0].get('team') or short))} club page &#9656;</a></p>"
         )
     if not lohkot:
         return None
