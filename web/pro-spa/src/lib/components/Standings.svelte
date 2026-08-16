@@ -38,12 +38,24 @@
 		const se = season;
 		loading = true;
 		error = null;
+		// 16.8: vanhentuneen vastauksen vahti (pinta-pariteetti mobiilin kanssa).
+		// Ilman tata kaksi nopeaa liiganvaihtoa ratkeaa saapumisjarjestyksessa:
+		// hitaampi VANHEMPI vastaus kirjoittaa rivit viimeisena ja taulukko
+		// nayttaa eri liigaa kuin valitsin. Mobiilissa tama nakyi niin etta
+		// jokainen liiga naytti Valioliigaa (Villen havainto 16.8).
+		//
+		// Ehto on "onko tama viela valittu liiga ja kausi", EI juokseva numero:
+		// numerovahti hylkaisi myos paallekkaiset haut samalle liigalle, ja
+		// hylatty vastaus jattaisi edellisen liigan rivit ruudulle.
+		const isCurrent = () => lg === league && se === season;
 		fetchStandings(lg, se).then(
 			(d) => {
+				if (!isCurrent()) return;
 				rows = d.rows ?? [];
 				loading = false;
 			},
 			() => {
+				if (!isCurrent()) return;
 				rows = [];
 				error = 'Could not load the table right now. Please try again shortly.';
 				loading = false;

@@ -33,12 +33,19 @@
 		const lg = league;
 		loading = true;
 		error = null;
+		// 16.8: vanhentuneen vastauksen vahti, sama kuin Standingsissa ja
+		// mobiilissa. Ehto on "onko tama viela valittu liiga", EI juokseva
+		// numero: numerovahti hylkaisi myos paallekkaiset haut samalle
+		// liigalle ja jattaisi edellisen liigan ottelut ruudulle.
+		const isCurrent = () => lg === league;
 		fetchFixtures(lg, DAYS).then(
 			(d) => {
+				if (!isCurrent()) return;
 				all = d.fixtures ?? [];
 				loading = false;
 			},
 			(e) => {
+				if (!isCurrent()) return;
 				all = [];
 				// 28.7 REHELLISYYS: aiempi copy sanoi kaikille virheille "please try
 				// again shortly". Mitattu: 24 liigasta vain 5 palauttaa dataa, joten
