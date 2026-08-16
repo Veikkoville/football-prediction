@@ -136,6 +136,57 @@ def scan(path: Path) -> list[tuple[int, str]]:
     return hits
 
 
+# 16.8: mallilupausportti. Copy vaitti viidella pinnalla "Dixon-Coles +
+# LightGBM ensemble", vaikka /api/predict importoi vain DixonColesModelin
+# (api/main.py:43) ja fittaa pelkilla maaleilla (:975, xg_weight jaa 0.0).
+# Repo on julkinen, eli vaite oli tarkistettavissa ja kaatui tarkistuksessa.
+#
+# Loysin sen kasin NELJASSA eri sanamuodossa perakkain, joka kerta luullen
+# edellista viimeiseksi: "machine learning" -> "expected-goals ensemble" ->
+# lyhenne "+ ML" -> "AI model". Jokainen greppi oli sokea seuraavalle. Tama
+# lista on olemassa siksi ettei viidetta etsita taas kasin.
+#
+# EI kiella sanaa AI yleisesti: llms.txt:n "Drafted with AI assistance" on
+# tosi ja se JAA (AI-kayttoa ei kiisteta). Kielletty on vain vaite ETTA
+# ENNUSTEET tulevat jostain muusta kuin Dixon-Colesista.
+#
+# Jos ensemble joskus kytketaan tuotantopolkuun, tama lista paivitetaan
+# SAMASSA committissa jossa se kytketaan, ei aiemmin.
+MODEL_CLAIM_PATTERNS = [
+    (re.compile(r"machine[- ]learning", re.I), "machine learning"),
+    (re.compile(r"\bLightGBM\b", re.I), "LightGBM"),
+    (re.compile(r"\bensemble\b", re.I), "ensemble"),
+    (re.compile(r"\+\s*ML\b"), "+ ML"),
+    (re.compile(r"\bML[- ](model|ensemble)\b", re.I), "ML model"),
+    (re.compile(r"\bAI[- ](model|powered|driven)\b"), "AI model / AI-powered"),
+]
+
+# Julkiset pinnat joilla mallilupaus voi esiintya. api/main.py on mukana koska
+# sen OpenAPI-kuvaus servataan osoitteessa api.goaliq.app/openapi.json ja
+# linkitetaan juuresta (/docs) - se oli yksi neljasta sokeasta pisteesta.
+MODEL_CLAIM_EXTRA = ["llms.txt", "api/main.py"]
+
+
+def scan_model_claims(path: Path) -> list[tuple[int, str, str]]:
+    """Palauta (rivinumero, osunut_kuvio, rivi) jokaiselle mallilupaukselle."""
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return []
+    if path.suffix.lower() == ".html":
+        masked = _mask_non_copy(raw)
+    else:
+        masked = raw
+    raw_lines = raw.split("\n")
+    hits: list[tuple[int, str, str]] = []
+    for i, line in enumerate(masked.split("\n")):
+        for pattern, nimi in MODEL_CLAIM_PATTERNS:
+            if pattern.search(line):
+                hits.append((i + 1, nimi, raw_lines[i].strip()[:200]))
+                break
+    return hits
+
+
 def main() -> int:
     targets: list[Path] = []
     for g in HTML_GLOBS:
@@ -148,8 +199,34 @@ def main() -> int:
 
     all_hits = [(p, n, t) for p in targets for n, t in scan(p)]
 
+    # Mallilupaus: samat HTML-pinnat + llms.txt + API:n OpenAPI-kuvaus.
+    claim_targets = [p for p in targets if p.suffix.lower() == ".html"]
+    claim_targets += [ROOT / c for c in MODEL_CLAIM_EXTRA if (ROOT / c).exists()]
+    claim_hits = [
+        (p, n, nimi, t) for p in claim_targets for n, nimi, t in scan_model_claims(p)
+    ]
+
+    if claim_hits:
+        print(
+            f"check_copy_style FAIL - {len(claim_hits)} mallilupausta jotka "
+            f"tuotannon ennustepolku ei kata:\n"
+        )
+        for path, line_no, nimi, text in claim_hits:
+            print(f"  {path.relative_to(ROOT)}:{line_no}  [{nimi}]\n    {text}\n")
+        print(
+            "/api/predict ajaa vain Dixon-Colesin (api/main.py:43 importoi vain "
+            "DixonColesModelin, :975 fittaa maaleilla). Repo on julkinen, joten "
+            "vaite ensemblesta tai ML:sta on tarkistettavissa ja kaatuu. Kuvaa "
+            "se mika on katetta: tau-korjaus, aikapainotus, Bayes-kutistus, "
+            "kilpailupainot, ja julkinen ennakkoon lokattu track record."
+        )
+        return 1
+
     if not all_hits:
-        print(f"check_copy_style OK - 0 em dashia copyssa ({len(targets)} tiedostoa)")
+        print(
+            f"check_copy_style OK - 0 em dashia copyssa ({len(targets)} tiedostoa), "
+            f"0 kattamatonta mallilupausta ({len(claim_targets)} pintaa)"
+        )
         return 0
 
     print(

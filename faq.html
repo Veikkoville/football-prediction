@@ -31,7 +31,7 @@
  "name": "GoalIQ",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "url": "https://goaliq.app/",
- "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, a player lookup with availability news, rate my team with a captain pick, a mini-league view and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, player value (xP per million) for the top 50 with position and team filters, showing the scoring rate per 90 minutes and expected minutes separately so a high rate on low minutes reads as a bench risk and not a bargain, a DefCon tracker, differentials, player compare for up to four players and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles + machine-learning match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
+ "description": "GoalIQ makes FPL (Fantasy Premier League) tools - clean sheet probability and fixture difficulty, a player lookup with availability news, rate my team with a captain pick, a mini-league view and price watch free, plus an interactive team manager with a gameweek planner, player expected points (xP), the captain ranker, chip timing, transfer plan chains, player value (xP per million) for the top 50 with position and team filters, showing the scoring rate per 90 minutes and expected minutes separately so a high rate on low minutes reads as a bench risk and not a bargain, a DefCon tracker, differentials, player compare for up to four players and transfer suggestions with apply on GoalIQ Premium - powered by a Dixon-Coles match model with a public, pre-match-logged prediction track record. Built by an independent developer in Finland. Analytics, not betting.",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
   "https://apps.apple.com/app/id6780047163",
@@ -59,7 +59,7 @@
    "name": "What is GoalIQ?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "GoalIQ is a free FPL assistant and football prediction tool, in the app stores as GoalIQ: FPL Assistant. Free FPL tools: clean sheet probability and fixture difficulty with separate attack and defence views, a player lookup with official availability news, start chance, set-piece roles, price and ownership, rate my team with a captain pick, a mini-league view with head-to-head win probability, a fit checker and pre-season draft rater with saved drafts, price watch, a watchlist for the players you are deciding on (three on the free plan), Beat the model (log your captain and transfer calls before the deadline and see them graded against the model's every gameweek), the season race against the model's own squad, which is locked before every deadline and scored with official FPL points, Catch your rival: pick anyone in your mini-league and see how likely you are to close the gap with the gameweeks that are left, xG/xA/xGI leaders for every player with data, and a filterable player stats table (shots, shots on target, shots in the box, headed attempts, non-penalty xG, key passes, tackles, clearances, recoveries, set-piece order) with per 90 and per start views and CSV export. GoalIQ Premium adds an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook, the scoring rate per 90 minutes shown separately from expected minutes and CSV export (web), the captain ranker, chip timing, transfer plan chains, an edge mode for your mini-league, transfer suggestions, player value, a DefCon tracker, differentials, a 50-player watchlist, goalkeeper rotation pairs, a round-by-round breakdown of where the gap to the model came from (captaincy, bench points and autosubs) with a decision journal of the calls you made differently, which players actually close the gap on your mini-league rival, and whether they already have them, and player compare for up to four players. On the web it also shows upcoming fixtures and league tables. It also predicts any match with a Dixon-Coles + machine-learning model. Analytics, not betting."
+    "text": "GoalIQ is a free FPL assistant and football prediction tool, in the app stores as GoalIQ: FPL Assistant. Free FPL tools: clean sheet probability and fixture difficulty with separate attack and defence views, a player lookup with official availability news, start chance, set-piece roles, price and ownership, rate my team with a captain pick, a mini-league view with head-to-head win probability, a fit checker and pre-season draft rater with saved drafts, price watch, a watchlist for the players you are deciding on (three on the free plan), Beat the model (log your captain and transfer calls before the deadline and see them graded against the model's every gameweek), the season race against the model's own squad, which is locked before every deadline and scored with official FPL points, Catch your rival: pick anyone in your mini-league and see how likely you are to close the gap with the gameweeks that are left, xG/xA/xGI leaders for every player with data, and a filterable player stats table (shots, shots on target, shots in the box, headed attempts, non-penalty xG, key passes, tackles, clearances, recoveries, set-piece order) with per 90 and per start views and CSV export. GoalIQ Premium adds an interactive team manager with a rolling six-gameweek planner, player expected points (xP) with ownership, minutes outlook, the scoring rate per 90 minutes shown separately from expected minutes and CSV export (web), the captain ranker, chip timing, transfer plan chains, an edge mode for your mini-league, transfer suggestions, player value, a DefCon tracker, differentials, a 50-player watchlist, goalkeeper rotation pairs, a round-by-round breakdown of where the gap to the model came from (captaincy, bench points and autosubs) with a decision journal of the calls you made differently, which players actually close the gap on your mini-league rival, and whether they already have them, and player compare for up to four players. On the web it also shows upcoming fixtures and league tables. It also predicts any match with a Dixon-Coles model. Analytics, not betting."
    }
   },
   {
@@ -432,7 +432,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           suggestions, player value, a DefCon tracker with a
           gameweek-by-gameweek breakdown, a 50-player
           watchlist and differentials. It can also predict any match: the app
-          uses machine learning models (Dixon-Coles + LightGBM ensemble) to
+          uses a Dixon-Coles statistical model to
           estimate match outcomes, expected goals (xG), and likely
           scorelines.
         </p>
@@ -578,9 +578,9 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
           match will be a home win.
         </p>
         <p>
-          The underlying models are trained on historical match data (results,
-          xG, recent form) and validated against past seasons. We tune the
-          model continuously as more data arrives.
+          The underlying model is fitted on historical match results and
+          validated against past seasons. We tune it continuously as more
+          data arrives.
         </p>
       </div>
     </details>

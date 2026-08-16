@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Football Match Predictions: Win Probability, xG &amp; Scorelines | GoalIQ</title>
-<meta name="description" content="GoalIQ predicts any football match: win probability for each side, expected goals (xG) and the most likely scorelines, from a Dixon-Coles + ML model with a published, pre-match-logged track record. Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Champions League and Brasileirao. Not betting." />
+<meta name="description" content="GoalIQ predicts any football match: win probability for each side, expected goals (xG) and the most likely scorelines, from a Dixon-Coles model with a published, pre-match-logged track record. Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Champions League and Brasileirao. Not betting." />
 <link rel="canonical" href="https://goaliq.app/predictions" />
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/goaliq-favicon-32.png">
@@ -41,7 +41,7 @@
  "name": "GoalIQ",
  "logo": "https://goaliq.app/assets/brand/goaliq-appicon-512.png",
  "url": "https://goaliq.app/",
- "description": "GoalIQ predicts football matches - win probability, expected goals (xG) and the most likely scorelines - with a Dixon-Coles + machine-learning match model and a public, pre-match-logged prediction track record. It also makes FPL (Fantasy Premier League) tools powered by the same model. Built by an independent developer in Finland. Analytics, not betting.",
+ "description": "GoalIQ predicts football matches - win probability, expected goals (xG) and the most likely scorelines - with a Dixon-Coles match model and a public, pre-match-logged prediction track record. It also makes FPL (Fantasy Premier League) tools powered by the same model. Built by an independent developer in Finland. Analytics, not betting.",
  "sameAs": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
   "https://apps.apple.com/app/id6780047163",
@@ -59,7 +59,7 @@
  "operatingSystem": "Android, iOS, Web",
  "identifier": "com.veikkoville.goaliq",
  "applicationCategory": "SportsApplication",
- "description": "Football prediction app: pick any two teams and get win probability for each side, expected goals (xG) and the most likely scorelines from a Dixon-Coles model with a machine-learning expected-goals ensemble. Covers the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Brasileirao, the Championship, Eredivisie and Primeira Liga. Every model prediction is logged before kick-off and publicly tracked. Analytics, not betting.",
+ "description": "Football prediction app: pick any two teams and get win probability for each side, expected goals (xG) and the most likely scorelines from a Dixon-Coles statistical model. Covers the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, the Champions League, Brasileirao, the Championship, Eredivisie and Primeira Liga. Every model prediction is logged before kick-off and publicly tracked. Analytics, not betting.",
  "url": "https://goaliq.app/predictions",
  "downloadUrl": [
   "https://play.google.com/store/apps/details?id=com.veikkoville.goaliq",
@@ -110,7 +110,7 @@
    "name": "How does GoalIQ predict football matches?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "GoalIQ uses a Dixon-Coles statistical model combined with a machine-learning expected-goals (xG) ensemble, trained on thousands of real club and international matches. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines."
+    "text": "GoalIQ uses a Dixon-Coles statistical model with the tau correction for low scores, time decay so recent matches count more, and shrinkage toward the league mean. For a club fixture it is fitted on that league's own results, last full season plus the current one as it plays. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines."
    }
   },
   {
@@ -558,7 +558,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   <header class="hero">
     <span class="badge">Every prediction logged before kick-off, publicly tracked</span>
     <h1>Football match predictions, <span class="accent">from a model that shows its record</span></h1>
-    <p class="sub">GoalIQ predicts any football match: win probability for each side, from a Dixon-Coles + machine-learning model. Pick two teams and the model does the rest. Free on the web and in the app. Expected goals and the top-10 scoreline table are part of GoalIQ Premium.</p>
+    <p class="sub">GoalIQ predicts any football match: win probability for each side, from a Dixon-Coles model. Pick two teams and the model does the rest. Free on the web and in the app. Expected goals and the top-10 scoreline table are part of GoalIQ Premium.</p>
     <div class="cta-row" id="get">
       <a class="btn-primary" href="https://pro.goaliq.app/" data-cta="predictions-hero">Predict a match on the web</a>
       <span class="ghost-group" aria-label="Get the app">
@@ -619,7 +619,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="step">
         <div class="n">2</div>
         <h3>Let the model run</h3>
-        <p>A Dixon-Coles and machine-learning xG ensemble, trained on thousands of real matches, computes the outcome in seconds.</p>
+        <p>A Dixon-Coles model, fitted on the league's own recent results, computes the outcome in seconds.</p>
       </div>
       <div class="step">
         <div class="n">3</div>
@@ -725,7 +725,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <dt>How accurate are GoalIQ football predictions?</dt>
       <dd>GoalIQ publishes its full prediction track record: every prediction is logged before kick-off and graded against the final result afterwards, hits and misses included, with no edits. The current accuracy numbers are shown on this page and refreshed after every round, and the raw log is available as machine-readable JSON.</dd>
       <dt>How does GoalIQ predict football matches?</dt>
-      <dd>GoalIQ uses a Dixon-Coles statistical model combined with a machine-learning expected-goals (xG) ensemble, trained on thousands of real club and international matches. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines.</dd>
+      <dd>GoalIQ uses a Dixon-Coles statistical model with the tau correction for low scores, time decay so recent matches count more, and shrinkage toward the league mean. For a club fixture it is fitted on that league's own results, last full season plus the current one as it plays. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines.</dd>
       <dt>Is GoalIQ a betting app?</dt>
       <dd>No. GoalIQ is an analytics tool, not a gambling service. It has no bookmaker links and gives no betting advice. Predictions are statistical estimates for fun, analysis and fantasy football planning.</dd>
     </dl>

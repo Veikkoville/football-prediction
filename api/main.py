@@ -704,7 +704,7 @@ def _delete_supabase_user(user_id: str) -> bool:
 # ---------------------------------------------------------------------------
 app = FastAPI(
     title="GoalIQ API",
-    description="Football match predictions from a statistical model (Dixon-Coles + LightGBM ensemble)",
+    description="Football match predictions from a statistical model (Dixon-Coles)",
     version="0.1.0",
 )
 

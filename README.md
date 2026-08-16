@@ -1,5 +1,13 @@
 # AI-powered Football Prediction Model
 
+> **What the public API actually serves:** Dixon-Coles only. `/api/predict`
+> imports `DixonColesModel` and nothing else (`api/main.py`), fits on goals
+> with the tau correction, time decay, Bayesian shrinkage and per-team home
+> advantage, and leaves `xg_weight` at 0. The gradient-boosting code in this
+> repo (`src/models/outcome_model.py`, `pages/3_Ensemble.py`) is research and
+> backtesting. It is not in the prediction path, and goaliq.app does not claim
+> it is.
+
 A comprehensive Python project that combines several open data sources and trains a
 prediction model for match outcomes (1X2), total goals (Over/Under), exact scores
 (xG-based) and player-level metrics.

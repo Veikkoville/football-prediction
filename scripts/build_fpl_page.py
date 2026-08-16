@@ -1082,7 +1082,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "ranker, player value, a DefCon tracker, "
             "differentials, player compare for up to four players and transfer "
             "suggestions with apply on GoalIQ "
-            "Premium - powered by a Dixon-Coles + machine-learning match model "
+            "Premium - powered by a Dixon-Coles match model "
             "with a public, pre-match-logged prediction track record. Built by "
             "an independent developer in Finland. Analytics, not betting."
         ),
@@ -1113,8 +1113,7 @@ def jsonld_blocks(c: dict, faq: list[tuple[str, str]]) -> str:
             "differentials and transfer suggestions with apply. On the web it "
             "also shows upcoming fixtures and league tables. Also predicts "
             "any match - win probability, expected goals (xG) and the most "
-            "likely score - using a Dixon-Coles model with an expected-goals "
-            "ensemble. Analytics, not betting."
+            "likely score - using a Dixon-Coles model. Analytics, not betting."
         ),
         "url": BASE + "/",
         "downloadUrl": [PLAY_URL, APPSTORE_URL],
