@@ -91,6 +91,9 @@ def test_foreground_does_not_retry_on_429(client, monkeypatch):
     "Server is having trouble" ja pull-to-refresh toimii heti."""
     calls = _mock_get(monkeypatch, [_Resp(429, text="Too many requests"),
                                     _Resp(200, STANDINGS_BODY)])
+    # Taustahaku mykistetaan: se SAA uusia, ja tama testi mittaa vain
+    # pyyntopolkua.
+    monkeypatch.setattr(m, "_fd_kick_refresh", lambda *a, **kw: None)
     r = client.get("/api/standings?league=ENG-Premier League-FD")
     assert r.status_code == 503
     assert calls["n"] == 1, "pyyntopolku saa tehda tasan yhden yrityksen"

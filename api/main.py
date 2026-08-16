@@ -734,6 +734,12 @@ def _warmup_default_models():
             except Exception as e:
                 print(f"[Warmup] {liigat[0]} {kaudet} failed: {type(e).__name__}: {e}")
 
+    # FD-cachen lammitin omassa saikeessaan: se ei saa viivyttaa
+    # mallien warmupia eika toisin pain. Daemon -> ei esta sammutusta.
+    threading.Thread(target=_fd_warm_loop, daemon=True,
+                     name="fd-warm").start()
+    print("[fd-warm] lammitin kaynnistetty")
+
     def _fit_all():
         warmed = tuple(config.current_season_pair())
         _fit_seasons(warmed)
@@ -1431,8 +1437,87 @@ def _fd_get_cached(url: str, api_key: str,
     if data is not None:
         _FD_HTTP_CACHE[key] = (time.time(), data)
         return data, False
-    raise HTTPException(status_code=503,
-                        detail="football-data.org unavailable right now")
+
+    # 🔴 Kylma polku ei saa jaada tyhjaksi. Ensimmainen versio tasta
+    # korjauksesta poisti odotuksen mutta ei laittanut mitaan tilalle:
+    # jos upstream oli juuri silla hetkella tukossa, kayttaja sai 503:n
+    # eika mikaan yrittanyt uudelleen. Mitattu 16.8 iltana: Eredivisie,
+    # Ligue 1 ja Primeira palauttivat 503:n peraakkain, koska niilla ei
+    # ollut cache-riviä ja Renderin IP oli hetkellisesti rajoitettu.
+    # Taustahaku tekee uusinnat, joten seuraava napautus onnistuu.
+    _fd_kick_refresh(url, api_key, key)
+    raise HTTPException(
+        status_code=503,
+        detail="football-data.org did not answer in time. Refreshing in the "
+               "background, try again in a moment.")
+
+
+# ---------------------------------------------------------------------------
+# FD-CACHEN LAMMITIN (16.8 ilta)
+#
+# Kaikki kaytto nojaa nyt siihen etta cachessa on jotain: tuore osuma
+# palautuu heti, vanhentunut palautuu heti ja virkistyy taustalla, ja VAIN
+# tyhja avain voi tuottaa kayttajalle virheen. Lammitin tekee tyhjasta
+# avaimesta harvinaisen.
+#
+# Tahdistus on tarkoituksellinen: FD:n ilmaistaso on pyyntoa/minuutissa, ja
+# 16.8 mitattiin etta rajan ylitys estaa KOKO avaimen hetkeksi. Lammitin ei
+# saa olla se joka aiheuttaa saman ongelman jota se korjaa.
+FD_WARM_INTERVAL_SEC = 7.0      # kutsujen vali
+FD_WARM_ROUND_SEC = 2400        # kierros ~40 min valein
+
+
+def _fd_warm_targets() -> list[tuple[str, str, str]]:
+    """(url, cache_key, nimi) kaikille pinnoille joita kayttaja avaa."""
+    from src.data.football_data_org import (
+        FIXTURE_STANDINGS_CODES, _LIVE_TOURNAMENT_CODES, _kausi_to_year)
+    from datetime import date, timedelta
+
+    season = config.current_season()
+    out: list[tuple[str, str, str]] = []
+    today = date.today()
+    for league, code in FIXTURE_STANDINGS_CODES.items():
+        if code in _LIVE_TOURNAMENT_CODES:
+            url = f"https://api.football-data.org/v4/competitions/{code}/standings"
+        else:
+            url = (f"https://api.football-data.org/v4/competitions/{code}"
+                   f"/standings?season={_kausi_to_year(season)}")
+        out.append((url, f"standings:{code}:{season}", f"{league} standings"))
+        for days in (7, 35):
+            to = today + timedelta(days=days)
+            out.append((
+                f"https://api.football-data.org/v4/competitions/{code}/matches"
+                f"?status=SCHEDULED,TIMED&dateFrom={today.isoformat()}"
+                f"&dateTo={to.isoformat()}",
+                f"fixtures:{code}:{days}", f"{league} fixtures {days}d"))
+    return out
+
+
+def _fd_warm_loop() -> None:
+    from src.data.football_data_org import _api_key
+    while True:
+        key = _api_key()
+        if not key:
+            time.sleep(FD_WARM_ROUND_SEC)
+            continue
+        warmed = failed = 0
+        for url, ck, name in _fd_warm_targets():
+            hit = _FD_HTTP_CACHE.get(ck)
+            # Vain tyhja tai selvasti vanhentunut haetaan: lammitin ei
+            # kilpaile kayttajan kanssa samasta minuuttikiintiosta.
+            if hit and time.time() - hit[0] < FD_HTTP_TTL_SEC * 0.8:
+                continue
+            data = _fd_fetch_once(url, key, FD_BG_TIMEOUT_SEC)
+            if data is not None:
+                _FD_HTTP_CACHE[ck] = (time.time(), data)
+                warmed += 1
+            else:
+                failed += 1
+            time.sleep(FD_WARM_INTERVAL_SEC)
+        if warmed or failed:
+            print(f"[fd-warm] {warmed} lammitetty, {failed} epaonnistui, "
+                  f"{len(_FD_HTTP_CACHE)} avainta cachessa")
+        time.sleep(FD_WARM_ROUND_SEC)
 
 
 @app.get("/api/standings")

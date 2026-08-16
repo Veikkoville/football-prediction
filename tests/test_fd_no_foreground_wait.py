@@ -81,6 +81,9 @@ def test_foreground_makes_at_most_one_attempt(monkeypatch):
         raise RuntimeError("nope")
 
     monkeypatch.setattr(m.requests, "get", counting)
+    # Taustahaku mykistetaan: se SAA uusia, ja tama testi mittaa vain
+    # pyyntopolkua. Ilman tata laskuri nayttaisi taustasaikeen yritykset.
+    monkeypatch.setattr(m, "_fd_kick_refresh", lambda *a, **kw: None)
     with pytest.raises(m.HTTPException):
         m._fd_get_cached("http://x", "key", cache_key="c2")
     assert calls["n"] == 1, f"pyyntopolku teki {calls['n']} yritysta"
@@ -110,3 +113,60 @@ def test_stale_hit_kicks_exactly_one_background_refresh(monkeypatch):
     for _ in range(25):
         m._fd_get_cached("http://x", "key", ttl_sec=1, cache_key="k")
     assert started["n"] == 1, f"kaynnistettiin {started['n']} taustahakua"
+
+
+# --- lammitin: tyhjasta avaimesta harvinainen -----------------------------
+
+def test_failed_cold_request_kicks_a_background_refresh(monkeypatch):
+    """🔴 Ensimmainen versio taman paivan korjauksesta poisti odotuksen
+    muttei laittanut mitaan tilalle: jos upstream oli juuri silla hetkella
+    tukossa, kayttaja sai 503:n eika mikaan yrittanyt uudelleen. Mitattu
+    16.8 iltana: Eredivisie, Ligue 1 ja Primeira palauttivat 503:n
+    peraakkain, koska niilla ei ollut cache-riviä.
+
+    Nyt epaonnistunut kylma pyynto kaynnistaa taustahaun, joten seuraava
+    napautus onnistuu."""
+    kicked = []
+    monkeypatch.setattr(m, "_fd_kick_refresh",
+                        lambda url, key, k: kicked.append(k))
+    monkeypatch.setattr(m, "_fd_fetch_once", lambda *a, **kw: None)
+    with pytest.raises(m.HTTPException):
+        m._fd_get_cached("http://x", "key", cache_key="cold2")
+    assert kicked == ["cold2"], "epaonnistunut kylma haku ei kaynnistanyt uusintaa"
+
+
+def test_warmer_covers_every_league_the_app_can_open():
+    """Lammittimen kattavuus johdetaan SAMASTA lahteesta kuin endpointit.
+    Kovakoodattu lista olisi tasan se vika joka 15.8 jatti kolme liigaa
+    pois etusivulta."""
+    from src.data.football_data_org import FIXTURE_STANDINGS_CODES
+
+    targets = m._fd_warm_targets()
+    keys = {t[1] for t in targets}
+    for code in FIXTURE_STANDINGS_CODES.values():
+        assert any(k.startswith(f"standings:{code}:") for k in keys), code
+        assert f"fixtures:{code}:7" in keys, code
+
+
+def test_warmer_pacing_stays_under_upstream_limit():
+    """Lammitin ei saa aiheuttaa sita ongelmaa jota se korjaa. FD:n raja on
+    ~10 pyyntoa/min; 7 s vali on ~8,6/min."""
+    assert m.FD_WARM_INTERVAL_SEC >= 6.0
+    per_min = 60.0 / m.FD_WARM_INTERVAL_SEC
+    assert per_min <= 10, f"{per_min:.1f} pyyntoa/min on liikaa"
+
+
+def test_warmer_skips_still_fresh_keys(monkeypatch):
+    """Lammitin ei kilpaile kayttajan kanssa samasta minuuttikiintiosta."""
+    calls = []
+    monkeypatch.setattr(m, "_fd_fetch_once",
+                        lambda url, k, t: calls.append(url) or {"ok": 1})
+    for _, ck, _ in m._fd_warm_targets():
+        m._FD_HTTP_CACHE[ck] = (time.time(), {"cached": 1})
+    # simuloi yksi kierros ilman nukkumista
+    for url, ck, _ in m._fd_warm_targets():
+        hit = m._FD_HTTP_CACHE.get(ck)
+        if hit and time.time() - hit[0] < m.FD_HTTP_TTL_SEC * 0.8:
+            continue
+        m._fd_fetch_once(url, "k", 1)
+    assert calls == [], "tuoreita avaimia ei saa hakea uudelleen"
