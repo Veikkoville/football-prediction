@@ -53,7 +53,7 @@
 # tasan yhtä haitallinen kuin vanhentunut joukkueleikkaus: molemmat alkavat
 # taistella mallia vastaan silloin kun mallilla on vihdoin oikeaa 26/27-dataa.
 # Vanhentunut rivi ohitetaan ÄÄNEKKÄÄSTI (::warning:: + lokirivi).
-player_id,web_name,p_start,reason,review_by,xg_mult
+player_id,web_name,p_start,reason,review_by,xg_mult,until_available
 379,Isak,0.85,"Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",2026-09-20
 #
 # HARKITTU JA HYLÄTTY — Havertz (ARS, 7.5M, p_start 0.25, xmins 15.5), 27.7:

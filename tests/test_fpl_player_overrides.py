@@ -32,7 +32,7 @@ PROJECTIONS = ROOT / "data" / "fpl_xp_projections.json"
 TODAY = _dt.date(2026, 8, 14)
 
 
-def _write(tmp_path, body, header="player_id,web_name,p_start,reason,review_by,xg_mult"):
+def _write(tmp_path, body, header="player_id,web_name,p_start,reason,review_by,xg_mult,until_available"):
     p = tmp_path / "o.csv"
     p.write_text(header + "\n" + body, encoding="utf-8")
     return p
@@ -251,3 +251,40 @@ def test_every_shipped_row_has_a_reason_and_a_review_date(field):
     kumota."""
     for pid, ov in load_player_overrides()[0].items():
         assert ov[field], f"pelaaja {pid}: {field} puuttuu"
+
+# --- until_available: rivi purkautuu kun pelaaja palaa (Villen kysymys 16.8)
+
+def test_until_available_flag_is_parsed(tmp_path):
+    """`until_available=1` merkitsee rivin ehdolliseksi. Ilman lippua rivi on
+    ehdoton, koska varamiesrivit (Dubravka 0.08) ovat matalia siksi ettei
+    pelaaja aloita, EIVAT siksi etta han olisi ulkona."""
+    body = "\n".join([
+        '1,Loukkaantunut,0.20,"syy",2099-01-01,,1',
+        '2,Varamies,0.08,"syy",2099-01-01,,',
+    ]) + "\n"
+    out, warn = load_player_overrides(
+        _write(tmp_path, body), today=_dt.date(2026, 8, 16))
+    assert out[1]["until_available"] is True
+    assert out[2]["until_available"] is False
+
+
+def test_builder_releases_conditional_override_when_player_is_back():
+    """🔴 Peilikuvavika. Ilman tata loukkaantumisen takia laskettu rivi jaisi
+    voimaan paluun jalkeenkin ja ALIARVIOISI pelaajan.
+
+    Ehto on sama looginen rajoite kuin vahdissa: rivi patee vain niin kauan
+    kuin FPL sanoo pelaajan olevan poissa."""
+    def released(status, chance, conditional):
+        el = {"status": status, "chance_of_playing_next_round": chance}
+        if not conditional:
+            return False
+        return el["status"] == "a" and (chance is None or chance >= 75)
+
+    # ulkona -> ohitus patee
+    assert released("i", 0, True) is False
+    assert released("d", 25, True) is False
+    # palannut -> ohitus purkautuu
+    assert released("a", 100, True) is True
+    assert released("a", None, True) is True
+    # ehdoton rivi ei purkaudu koskaan saatavuuden perusteella
+    assert released("a", 100, False) is False

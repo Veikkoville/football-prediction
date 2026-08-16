@@ -799,6 +799,23 @@ def main(argv: list[str] | None = None) -> int:
         if pid not in mm_by_player:
             print(f"[Overrides] pelaaja {pid} ei ole bootstrapissa — rivi ohitettu")
             continue
+        # 🔴 Ehdollinen rivi purkautuu ITSESTAAN kun pelaaja on taas
+        # saatavilla (Villen kysymys 16.8: "kun pelaaja palaa pelikuntoon
+        # niin xmins yms ymmärtää sen?"). Ilman tätä loukkaantumisen takia
+        # laskettu rivi jäisi voimaan paluun jälkeenkin ja ALIARVIOISI
+        # pelaajan, eli tekisi peilikuvan siitä viasta jonka se korjasi.
+        # Saatavuus luetaan FPL:n omasta syötteestä joka pyörii joka
+        # tapauksessa, joten mitään uutta lähdettä ei tarvita.
+        if ov.get("until_available"):
+            el = next((e for e in boot["elements"] if e["id"] == pid), {})
+            chance = el.get("chance_of_playing_next_round")
+            back = (el.get("status") == "a"
+                    and (chance is None or chance >= 75))
+            if back:
+                print(f"[Overrides] {pid}: pelaaja on taas saatavilla "
+                      f"(status {el.get('status')}, chance {chance}) — "
+                      f"ehdollista ohitusta EI sovelleta")
+                continue
         override_applied[pid] = ov
         # `p_start` on nyt VALINNAINEN: rivi voi säätää pelkkää maaliuhkaa
         # (xg_mult) koskematta minuutteihin.

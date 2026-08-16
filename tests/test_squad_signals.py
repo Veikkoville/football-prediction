@@ -94,24 +94,54 @@ def test_chance_change_without_disagreement_is_not_flagged():
     assert diff_signals(prev, curr, proj) == []
 
 
-def test_chance_change_with_disagreement_is_flagged():
-    """Kinsky-tapaus 14.8: FPL 100 %, meilla 0.38."""
-    prev = _snap([_el(2, "Kinsky", chance=None)])
-    curr = _snap([_el(2, "Kinsky", chance=100)])
-    proj = _proj([{"id": 2, "predicted_starts": 38.0, "owned_pct": 19.5}])
-    flags = diff_signals(prev, curr, proj)
-    assert [f.trigger for f in flags] == [TRIGGER_CHANCE_CONFLICT]
-    assert flags[0].our_p_start == 0.38
-    assert flags[0].owned_pct == 19.5
+def test_our_number_exceeding_availability_is_flagged():
+    """Joelinton 16.8, mitattu tuotannosta: FPL 100 -> 0 ja
+    "Unspecified injury - Unknown return date", meidan p_start 0.54.
+    Aloitusluku ylittaa saatavuuden 0.54:lla — looginen mahdottomuus."""
+    prev = _snap([_el(2, "Joelinton", chance=100)])
+    curr = _snap([_el(2, "Joelinton", chance=0)])
+    proj = _proj([{"id": 2, "predicted_starts": 54.0, "owned_pct": 0.1}])
+    flags = [f for f in diff_signals(prev, curr, proj)
+             if f.trigger == TRIGGER_CHANCE_CONFLICT]
+    assert len(flags) == 1
+    assert flags[0].our_p_start == 0.54
 
 
-def test_threshold_calibration_keeps_routine_rotation_quiet():
-    """Kynnys on kalibroitu tunnettuihin tapauksiin eika valittu pyoreana
-    lukuna. Tavallinen rotaatioepavarmuus ei saa liputtua."""
-    prev = _snap([_el(2, "Rotator", chance=None)])
-    curr = _snap([_el(2, "Rotator", chance=75)])
-    proj = _proj([{"id": 2, "predicted_starts": 50.0, "owned_pct": 5.0}])
-    assert abs(0.75 - 0.50) < CHANCE_CONFLICT_THRESHOLD
+def test_available_backup_is_not_a_disagreement():
+    """🔴 Tama on se vaarapositiivi joka loytyi ensimmaisesta oikeasta
+    ajosta. Meunier 16.8: FPL "Knock - 75% chance of playing", meilla 0.10.
+
+    `chance_of_playing` on SAATAVUUS, `p_start` on ALOITUSTODENNAKOISYYS.
+    Varamies voi olla 75 % saatavilla ja aloittaa 10 %:ssa peleista, eika
+    siina ole mitaan ristiriitaa. Symmetrinen vertailu liputti sen."""
+    prev = _snap([_el(2, "Meunier", chance=None)])
+    curr = _snap([_el(2, "Meunier", chance=75)])
+    proj = _proj([{"id": 2, "predicted_starts": 10.0, "owned_pct": 0.5}])
+    assert [f for f in diff_signals(prev, curr, proj)
+            if f.trigger == TRIGGER_CHANCE_CONFLICT] == []
+
+
+def test_fully_available_bench_player_never_flags_however_low_our_number():
+    """Negatiivinen kontrolli aariarvolla: 100 % saatavilla, meidan luku 0.
+    Symmetrisella vertailulla tama olisi ollut suurin mahdollinen ero (1.00)
+    ja siis aanekkain liputus. Yksisuuntaisella se on nolla.
+
+    Vastasuunta kuuluu markkinaerimielisyys-laukaisimille 6 ja 7 (omistus vs.
+    meidan luku), joita ei ole viela rakennettu. Kinsky-tapaus 14.8 oli tasan
+    sita lajia eika tata laukaisinta."""
+    prev = _snap([_el(2, "Varamies", chance=None)])
+    curr = _snap([_el(2, "Varamies", chance=100)])
+    proj = _proj([{"id": 2, "predicted_starts": 0.0, "owned_pct": 19.5}])
+    assert diff_signals(prev, curr, proj) == []
+
+
+def test_threshold_calibration_keeps_routine_doubt_quiet():
+    """Lievasti epavarma aloittaja ei saa liputtua: FPL 75 %, meilla 0.85 ->
+    ylitys 0.10, alle kynnyksen."""
+    prev = _snap([_el(2, "Aloittaja", chance=None)])
+    curr = _snap([_el(2, "Aloittaja", chance=75)])
+    proj = _proj([{"id": 2, "predicted_starts": 85.0, "owned_pct": 5.0}])
+    assert 0.85 - 0.75 < CHANCE_CONFLICT_THRESHOLD
     assert diff_signals(prev, curr, proj) == []
 
 
@@ -216,3 +246,37 @@ def test_report_states_blind_spots_and_asks_nothing():
         assert "Esikauden muoto" in r
         assert "?" not in r.split("Mita tama vahti EI nae")[1], (
             "vahti ei saa esittaa kysymyksia Villelle")
+
+# --- laukaisin 8: vanhentunut ohitus (Villen kysymys 16.8) ---------------
+
+def test_upward_override_on_injured_player_is_flagged():
+    """Ohitus ajetaan saatavuusportin JALKEEN, joten se on viimeinen sana.
+    Kasin ylos nostettu aloittaja jaa korkeaksi vaikka han loukkaantuisi."""
+    from src.models.squad_signals import stale_override_flags, TRIGGER_STALE_OVERRIDE
+
+    curr = _snap([_el(110, "Rushworth", status="i", chance=0)])
+    flags = stale_override_flags(curr, {110: (0.90, False)})
+    assert [f.trigger for f in flags] == [TRIGGER_STALE_OVERRIDE]
+
+
+def test_backup_override_is_never_flagged_by_availability():
+    """🔴 Tama on vaarapositiivi jonka ensimmainen versio tuotti: Dubravka
+    (0.08) ja Mamardashvili (0.15) liputtuivat "taas saatavilla" -syylla.
+
+    Ne ovat matalia koska he EIVAT ALOITA, eivat koska he olisivat ulkona.
+    Alaspain painava rivi purkautuu vain jos se on merkitty ehdolliseksi."""
+    from src.models.squad_signals import stale_override_flags
+
+    curr = _snap([_el(497, "Dubravka", status="a", chance=None)])
+    assert stale_override_flags(curr, {497: (0.08, False)}) == []
+
+
+def test_conditional_override_is_flagged_when_player_is_back():
+    from src.models.squad_signals import stale_override_flags, TRIGGER_STALE_OVERRIDE
+
+    curr = _snap([_el(458, "Palannut", status="a", chance=100)])
+    flags = stale_override_flags(curr, {458: (0.20, True)})
+    assert [f.trigger for f in flags] == [TRIGGER_STALE_OVERRIDE]
+    # ...eika liputu niin kauan kuin han on yha ulkona
+    out = _snap([_el(458, "Palannut", status="i", chance=0)])
+    assert stale_override_flags(out, {458: (0.20, True)}) == []

@@ -130,11 +130,35 @@ def load_player_overrides(path: Path | None = None,
                     f"sovelleta. Poista rivi tai paivita paiva.")
                 continue
 
+            # 🔴 `until_available` (16.8, Villen kysymys "kun pelaaja palaa
+            # pelikuntoon niin xmins yms ymmartaa sen?").
+            #
+            # Ei ymmartanyt. Loukkaantumisen takia laskettu rivi on ratchet:
+            # kun pelaaja palaa, FPL kaantyy takaisin mutta rivi pakottaa yha
+            # matalaa lukua ja malli ALIARVIOI hanet. `review_by` rajaa sen
+            # kalenteriin, mutta kalenteri ei tieda milloin han palaa - se voi
+            # purkautua liian aikaisin tai liian myohaan.
+            #
+            # Rivi kertoo nyt itse ehtonsa. `until_available=1` tarkoittaa
+            # "voimassa vain niin kauan kuin han on ULKONA", ja saatavuus
+            # luetaan FPL:n omasta syotteesta joka pyorii joka tapauksessa.
+            # Silloin paluu pelikuntoon purkaa ohituksen ITSESTAAN.
+            #
+            # Oletus on POIS paalta: varamiesrivit (Dubravka 0.08,
+            # Mamardashvili 0.15) ovat matalia koska he eivat aloita, EIVAT
+            # koska he olisivat ulkona. Niiden ei pida purkautua koskaan
+            # saatavuuden perusteella. Sekoitin nama kaksi kertaa saman
+            # paivan aikana; ero on se etta saatavuus ja aloittaminen ovat
+            # eri suure.
+            until_available = (r.get("until_available") or "").strip().lower()
+            conditional = until_available in {"1", "true", "yes", "kylla"}
+
             out[pid] = {
                 "p_start": ps,
                 "xg_mult": mult,
                 "reason": (r.get("reason") or "").strip(),
                 "review_by": review,
+                "until_available": conditional,
             }
     except Exception as e:  # pragma: no cover — luku ei saa kaataa ajoa
         return {}, [f"luku epaonnistui, jatketaan ilman: {type(e).__name__}: {e}"]

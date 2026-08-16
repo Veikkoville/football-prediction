@@ -33,6 +33,7 @@ from src.models.squad_signals import (  # noqa: E402
     Flag,
     Snapshot,
     diff_signals,
+    stale_override_flags,
     summarise,
     team_name_map,
 )
@@ -43,6 +44,7 @@ FLAG_LOG_PATH = ROOT / "data" / "watch_flags.json"
 # aina siella, koska CoS ei nae tata repoa).
 HUB_WATCH_DIR = Path(r"C:\Users\vvsaa\Documents\goaliq-app\cos-reports\watch")
 PROJECTIONS_PATH = ROOT / "data" / "fpl_xp_projections.json"
+OVERRIDES_PATH = ROOT / "data" / "fpl_player_overrides.csv"
 
 TRIGGER_LABELS = {
     "status": "Saatavuus",
@@ -50,6 +52,7 @@ TRIGGER_LABELS = {
     "set_piece_order": "Erikoistilannejarjestys",
     "transfer": "Siirto",
     "new_player": "Uusi pelaaja",
+    "stale_override": "Vanhentunut ohitus",
 }
 
 
@@ -60,6 +63,27 @@ def _load_json(path: Path) -> dict | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
+
+
+
+def _read_overrides() -> dict[int, tuple[float, bool]]:
+    """Lukee {player_id: (p_start, until_available)} ohitus-CSV:sta."""
+    import csv
+
+    out: dict[int, tuple[float, bool]] = {}
+    if not OVERRIDES_PATH.exists():
+        return out
+    lines = [ln for ln in OVERRIDES_PATH.read_text(encoding="utf-8").splitlines()
+             if ln and not ln.lstrip().startswith("#")]
+    for row in csv.DictReader(lines):
+        try:
+            cond = (row.get("until_available") or "").strip().lower()
+            out[int(row["player_id"])] = (
+                float(row["p_start"]),
+                cond in {"1", "true", "yes", "kylla"})
+        except (KeyError, TypeError, ValueError):
+            continue
+    return out
 
 
 def _fmt(v) -> str:
@@ -183,11 +207,16 @@ def main() -> int:
     prev_raw = _load_json(SNAPSHOT_PATH)
     prev = Snapshot.from_dict(prev_raw) if prev_raw else None
 
+    projections = _load_json(PROJECTIONS_PATH)
     flags = diff_signals(
         prev, curr,
-        projections=_load_json(PROJECTIONS_PATH),
+        projections=projections,
         team_names=team_name_map(bootstrap),
     )
+    # Laukaisin 8: omat ohituksemme ovat syote siina missa muutkin.
+    # Ajetaan JOKA KERTA eika vain muutoksesta: vanhentunut ohitus ei ole
+    # muutos vaan tila, ja se on tasan se mika jaa huomaamatta.
+    flags += stale_override_flags(curr, _read_overrides(), projections)
 
     report = render_report(
         flags, prev.taken_at if prev else None, taken_at, len(curr.players))

@@ -3330,6 +3330,17 @@ def render_expected_points(xp: dict, now: datetime) -> str | None:
         "than we said, and players we projected at the bottom came in a "
         "little higher. The order of this list is unchanged by that, and the "
         "gap closes as 2026/27 results arrive.</p>"
+        # 16.8: sokea piste sanottu ääneen. Villen päätös oli ettei vahti
+        # kysy esikaudesta, joten rajoite kirjataan näkyviin siellä missä
+        # luku esitetään. Laukaiseva tapaus 15.8: João Pedro teki kaksi
+        # esikauden maalia eikä lukumme liikkunut lainkaan, ja olin
+        # kirjoittamassa siitä X-vastausta.
+        '<p class="note"><strong>Start% does not read pre-season.</strong> '
+        "It comes from last season's minutes and FPL's own availability "
+        "flags, and for players with no Premier League history yet, from how "
+        "they are priced in the squad. A player who has looked like a new "
+        "first choice in friendlies will not move this number until league "
+        "minutes arrive.</p>"
         '<p class="note">This ranking is free and needs no account. The tools '
         "built on top of it, rate my team, the transfer planner, the captain "
         "ranker and your watchlist, are part of GoalIQ Premium.</p>"

@@ -29,6 +29,23 @@ TRIGGER_CHANCE_CONFLICT = "chance_conflict"
 TRIGGER_SET_PIECE = "set_piece_order"
 TRIGGER_TRANSFER = "transfer"
 TRIGGER_NEW_PLAYER = "new_player"
+# 🔴 Laukaisin 8, Villen kysymys 16.8: "kun pelaaja palaa pelikuntoon niin
+# xmins yms ymmartaa sen?"
+#
+# MALLI YMMARTAA: `apply_availability` (`fpl_xp.py`) lukee FPL:n statuksen
+# joka buildissa ja palauttaa pelaajan omaan lukuunsa heti kun status on
+# taas 'a'. Vastasin taman ensin vaarin ja kirjoitin turhan ohitusrivin,
+# joka NOSTI ulkona olevan pelaajan takaisin 0.20:een saatavuusportin jo
+# nollattua hanet. Rivi poistettu.
+#
+# OHITUS EI YMMARRA, ja se on oikea vaara: ohitus ajetaan saatavuusportin
+# JALKEEN, joten se on viimeinen sana. Kasin ylos nostettu aloittaja
+# (Rushworth 0.90) jaa 0.90:aan vaikka han loukkaantuisi. `review_by` rajaa
+# sen kalenteriin, mutta kalenteri ei tieda milloin kukaan loukkaantuu.
+#
+# Vahdin tehtava on etsia kohtia joissa SYOTTEEMME on vanhentunut. Oma
+# ohituksemme on syote siina missa muutkin.
+TRIGGER_STALE_OVERRIDE = "stale_override"
 
 SET_PIECE_FIELDS = (
     "penalties_order",
@@ -36,14 +53,34 @@ SET_PIECE_FIELDS = (
     "corners_and_indirect_freekicks_order",
 )
 
-# Kuinka paljon FPL:n ilmoittama pelitodennakoisyys ja meidan p_start saavat
-# poiketa ennen kuin se on erimielisyys. FPL ilmoittaa prosentteina (0-100),
-# meidan luku on 0-1.
+# 🔴 EHTO ON YKSISUUNTAINEN, ja se korjattiin 16.8 ensimmaisen oikean ajon
+# jalkeen. FPL:n `chance_of_playing` on SAATAVUUS; meidan `p_start` on
+# ALOITUSTODENNAKOISYYS. Ne eivat ole sama suure, joten symmetrinen vertailu
+# tuottaa kohinaa toiseen suuntaan: varamies voi olla 100 % saatavilla ja
+# silti aloittaa 10 %:ssa peleista, eika siina ole mitaan ristiriitaa.
 #
-# 0.35 on kalibroitu tunnettuihin tapauksiin eika valittu pyoreana lukuna:
-# Kinsky (FPL 100 %, meilla 0.38) ja Dubravka jaavat kiinni, mutta tavallinen
-# rotaatioepavarmuus (FPL 75 %, meilla 0.50) ei liputu. Jos tama nostetaan,
-# aja `tests/test_squad_signals.py`:n kalibrointitesti uudelleen.
+# Mitattu 16.8 ensimmaisella oikealla ajolla: Meunier (FPL "Knock - 75 %
+# chance of playing", meilla 0.10) liputtui, vaikka luvut ovat tasmalleen
+# yhteensopivat. Joelinton (FPL 0 % ja "Unspecified injury", meilla 0.54)
+# liputtui oikeutetusti.
+#
+# Aito ristiriita on LOOGINEN RAJOITE: pelaaja ei voi aloittaa useammin kuin
+# han on saatavilla. Liputetaan siis vain kun `p_start` YLITTAA saatavuuden.
+#
+# 🔴 MITA TAMA OIKEASTI MITTAA (tarkennettu 16.8): `apply_availability`
+# (`fpl_xp.py`) lukee saatavuuden JOKA BUILDISSA ja nollaa i/s/u/n-pelaajat,
+# joten malli EI ole eri mielta FPL:n kanssa pitkaan. Tama laukaisin
+# vertaa live-saatavuutta VIIMEKSI RAKENNETTUUN artefaktiin, eli se kertoo
+# etta julkaistu luku on vanhentunut suhteessa uutiseen ja builderi pitaa
+# ajaa. Se on hyodyllinen signaali, mutta se ei ole mallivirhe. Luulin
+# ensin etta saatavuus ei syota minuuttimallia lainkaan; se oli vaarin
+# koodia vasten, ja ehdin kirjoittaa sen ohitusrivin perusteluun.
+#
+# Vastasuunta (FPL korkea, meidan p_start matala) EI ole ristiriita vaan
+# tavallinen varamies. Se kuuluu markkinaerimielisyys-laukaisimille 6 ja 7
+# (omistus vs. meidan luku), joita ei ole viela rakennettu. Kinsky-tapaus
+# 14.8 oli tasan sita lajia — 19,5 %:n omistus ja matala p_start — eika
+# tata laukaisinta, ja se oli aiemmin merkitty tanne vaarin.
 CHANCE_CONFLICT_THRESHOLD = 0.35
 
 
@@ -247,21 +284,22 @@ def diff_signals(
                 owned_pct=owned, our_p_start=p_start,
                 note="uusi uutinen, status ennallaan"))
 
-        # Laukaisin 2: FPL:n pelitodennakoisyys muuttui JA on eri mielta kuin
-        # me. Pelkka muutos ei riita: FPL heiluttaa lukua rutiinilla, ja
-        # ilman erimielisyysehtoa tama olisi vahdin aanekkain ja hyodyttomin
-        # laukaisin.
+        # Laukaisin 2: FPL:n saatavuus muuttui JA meidan aloitusluku ylittaa
+        # sen. Kaksi ehtoa, molemmat tarpeen:
+        #   - pelkka muutos ei riita (FPL heiluttaa lukua rutiinilla)
+        #   - vertailu on YKSISUUNTAINEN, ks. CHANCE_CONFLICT_THRESHOLD
         if now.chance_next != before.chance_next and now.chance_next is not None:
             if p_start is not None:
-                gap = abs(now.chance_next / 100.0 - p_start)
-                if gap >= CHANCE_CONFLICT_THRESHOLD:
+                excess = p_start - now.chance_next / 100.0
+                if excess >= CHANCE_CONFLICT_THRESHOLD:
                     flags.append(Flag(
                         player_id=pid, web_name=now.web_name,
                         trigger=TRIGGER_CHANCE_CONFLICT,
                         field="chance_of_playing_next_round",
                         before=before.chance_next, after=now.chance_next,
                         owned_pct=owned, our_p_start=p_start,
-                        note=f"ero meidan lukuun {gap:.2f}"))
+                        note=f"julkaistu aloitusluku ylittaa saatavuuden "
+                             f"{excess:.2f}:lla; aja builderi"))
 
         # Laukaisin 3: erikoistilannejarjestys. Jokainen liike on suoraan
         # pisteita, joten tassa EI ole omistus- tai kynnyssuodatinta.
@@ -286,6 +324,66 @@ def diff_signals(
 
     flags.sort(key=lambda f: (-(f.owned_pct or 0.0), f.web_name, f.trigger))
     return flags
+
+
+def stale_override_flags(
+    curr: Snapshot,
+    overrides: dict[int, tuple[float, bool]],
+    projections: dict | None = None,
+) -> list[Flag]:
+    """Ohitukset jotka nykytieto on ohittanut.
+
+    `overrides` on {player_id: (p_start, until_available)} CSV:sta.
+
+    Kaksi suuntaa, ja MOLEMMAT ovat ratchetteja jos niita ei valvota:
+
+    - **Ehdollinen alaspain painava rivi, mutta pelaaja on taas saatavilla.**
+      Vain `until_available`-riveille: varamiesrivi (Dubravka 0.08) on matala
+      koska han ei aloita, EI koska han olisi ulkona, eika se saa purkautua
+      saatavuuden perusteella. Liputin ne kerran vaarin.
+    - **Ohitus nostaa ylos, mutta pelaaja on ulkona.** Peilikuva: kasin
+      nostettu aloittaja joka loukkaantuu jaa yliarvioiduksi.
+
+    Tama EI vertaa ohitusta malliin vaan ohitusta SAATAVUUTEEN. Ohituksen
+    koko tarkoitus on olla eri mielta kuin malli, joten mallivertailu
+    liputtaisi jokaisen rivin joka paiva.
+    """
+    proj = _projection_index(projections)
+    out: list[Flag] = []
+    for pid, (forced, conditional) in overrides.items():
+        now = curr.players.get(pid)
+        if now is None:
+            continue
+        row = proj.get(pid)
+        owned = None
+        if row is not None:
+            try:
+                owned = float(row.get("owned_pct"))
+            except (TypeError, ValueError):
+                owned = None
+        available = now.status == "a" and (
+            now.chance_next is None or now.chance_next >= 75)
+        unavailable = now.status in {"i", "s", "u"} or (
+            now.chance_next is not None and now.chance_next <= 25)
+
+        if conditional and forced <= 0.35 and available:
+            out.append(Flag(
+                player_id=pid, web_name=now.web_name,
+                trigger=TRIGGER_STALE_OVERRIDE, field="p_start_override",
+                before=forced, after="available",
+                owned_pct=owned, our_p_start=forced,
+                note="ohitus painaa alas mutta pelaaja on taas saatavilla; "
+                     "poista tai nosta rivi"))
+        elif forced >= 0.65 and unavailable:
+            out.append(Flag(
+                player_id=pid, web_name=now.web_name,
+                trigger=TRIGGER_STALE_OVERRIDE, field="p_start_override",
+                before=forced, after=f"status {now.status}/{now.chance_next}",
+                owned_pct=owned, our_p_start=forced,
+                note="ohitus nostaa ylos mutta pelaaja on ulkona; "
+                     "laske tai poista rivi"))
+    out.sort(key=lambda f: (-(f.owned_pct or 0.0), f.web_name))
+    return out
 
 
 def team_name_map(bootstrap: dict) -> dict[int, str]:
