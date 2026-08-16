@@ -47,6 +47,7 @@ import requests
 # Edge-sprint P0: admin-portti + PREMIUM_ENFORCE-maskit (default off — kun
 # flagi on pois, is_premium_request palauttaa aina True eika mikaan muutu).
 from api.premium import (
+    FREE_PREMIUM_UNTIL_DEFAULT, free_premium_window_active,
     is_premium_request, mask_plan_payload, mask_xp_payload, xp_pool_rows,
     premium_enforce_on, require_admin,
 )
@@ -377,13 +378,15 @@ def _affiliate_code_from_session(obj: dict) -> Optional[tuple[str, str]]:
     return None
 
 
-def _account_affiliate_ref(user_id: str) -> Optional[str]:
-    """Tilin metadataan rekisteroityessa kirjattu luojan ref.
+def _account_user_metadata(user_id: str) -> Optional[dict]:
+    """Tilin `raw_user_meta_data` Supabasen admin-API:sta.
 
-    Fail-soft: attribuution puuttuminen ei saa kaataa fulfillmentia.
-    Asiakas on jo maksanut ja premium on aktivoitava.
+    None = EI TIETOA (config puuttuu, verkkovirhe, tuntematon tili) — eri
+    asia kuin `{}` joka tarkoittaa "tili on, metadata on tyhja". Kutsujan on
+    erotettava nama: creator-raportti nayttaisi muuten verkkovirheen
+    "et ole luoja" -viestina.
     """
-    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY or not user_id:
         return None
     key = SUPABASE_SERVICE_ROLE_KEY
     try:
@@ -393,12 +396,37 @@ def _account_affiliate_ref(user_id: str) -> Optional[str]:
             timeout=10)
         if r.status_code != 200:
             return None
-        meta = (r.json() or {}).get("user_metadata") or {}
-        return _clean_affiliate_ref(meta.get("ref"))
+        return (r.json() or {}).get("user_metadata") or {}
     except Exception as e:
-        print(f"[affiliate] tilin ref-haku epaonnistui {user_id}: "
+        print(f"[affiliate] tilin metadata-haku epaonnistui {user_id}: "
               f"{type(e).__name__}: {e}")
         return None
+
+
+def _account_affiliate_ref(user_id: str) -> Optional[str]:
+    """Tilin metadataan rekisteroityessa kirjattu luojan ref.
+
+    Fail-soft: attribuution puuttuminen ei saa kaataa fulfillmentia.
+    Asiakas on jo maksanut ja premium on aktivoitava.
+    """
+    meta = _account_user_metadata(user_id)
+    if meta is None:
+        return None
+    return _clean_affiliate_ref(meta.get("ref"))
+
+
+def _account_creator_code(user_id: str) -> Optional[str]:
+    """Luojan OMA koodi tilin metadatassa (`creator_code`).
+
+    Eri kentta kuin `ref`: `ref` kertoo KENEN kautta tama tili tuli, ja
+    `creator_code` kertoo etta tama tili SAA nahda yhden koodin luvut. Sama
+    ihminen voi olla molempia (luoja joka tuli toisen luojan linkista), joten
+    kenttien yhdistaminen antaisi hanelle paasyn vaaran koodin lukuihin.
+    """
+    meta = _account_user_metadata(user_id)
+    if meta is None:
+        return None
+    return _clean_affiliate_ref(meta.get("creator_code"))
 
 
 # Sallitut merkit affiliate-refissä. Arvo päätyy Stripe-metadataan ja
@@ -515,6 +543,12 @@ def _send_magic_link(email: str, redirect_to: str = "https://pro.goaliq.app") ->
     except Exception as e:
         print(f"[Supabase] magic link EXCEPTION: {e}")
         return False
+
+
+def _bearer_from_request(request: Request) -> str:
+    """`Authorization: Bearer <token>` -> token, muuten "" ."""
+    auth = request.headers.get("authorization", "")
+    return auth[7:].strip() if auth.lower().startswith("bearer ") else ""
 
 
 def _verify_supabase_token(access_token: str) -> Optional[str]:
@@ -2450,6 +2484,119 @@ def clear_cache(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# Affiliate-laskenta (jaettu admin-raportin ja luojan oman nakyman kesken)
+# ---------------------------------------------------------------------------
+AFFILIATE_CAVEAT = (
+    "signups is a floor, not a measurement: the ref is read from the "
+    "browser at sign-up, so a click in one browser and a sign-up in "
+    "another is not counted, and the mobile app does not write a ref "
+    "at all. stamped is the number commission is calculated from."
+)
+
+# Laskenta kayttaa koko tililistan sivutuksen JA Stripen tilauslistauksen, eli
+# se on kallein reitti mita meilla on. Luojanakyma on sivu jonka ihminen
+# lataa uudelleen kun mikaan ei liiku, joten ilman valimuistia yksi kartynyt
+# selain riittaisi tekemaan siita jatkuvan taustakuorman.
+_AFFILIATE_TALLY_TTL = 60.0
+_AFFILIATE_TALLY_CACHE: dict[str, tuple[float, dict]] = {}
+_AFFILIATE_TALLY_LOCK = threading.Lock()
+
+
+def _affiliate_tally(only: Optional[str] = None, fresh: bool = False) -> dict:
+    """Per koodi: `signups` (Supabase) + `stamped` (Stripe).
+
+    `only` rajaa TULOKSEN yhteen koodiin. Se ei tee hausta halvempaa (koko
+    tililista on kaytava lapi joka tapauksessa), mutta se estaa toisen luojan
+    lukujen paatymisen samaan vastausolioon jota luojanakyma kasittelee.
+
+    🔴 EPAONNISTUNUTTA HAKUA EI CACHETA. Jos Supabase on nurin, tulos on
+    "0 signupia" — ja 60 sekunnin cache jaadyttaisi sen nollan nakymaan joka
+    kertoo luojalle ettei kukaan ole tullut. Lahdeliput kulkevat vastauksessa
+    mukana, ja kutsujan on luettava ne.
+    """
+    key = only or "*"
+    now = time.time()
+    if not fresh:
+        with _AFFILIATE_TALLY_LOCK:
+            hit = _AFFILIATE_TALLY_CACHE.get(key)
+            if hit and now - hit[0] < _AFFILIATE_TALLY_TTL:
+                return hit[1]
+
+    out: dict[str, dict] = {}
+    if only:
+        out[only] = {"signups": 0, "stamped": 0}
+
+    def _bucket(code: str) -> Optional[dict]:
+        """None = tama koodi ei kuulu vastaukseen (`only`-rajaus)."""
+        if only and code != only:
+            return None
+        return out.setdefault(code, {"signups": 0, "stamped": 0})
+
+    # 1) Rekisteroityneet tilit Supabasen admin-API:sta. Sivutetaan, koska
+    #    oletus on 50 kayttajaa/sivu ja hiljainen katkaisu antaisi liian
+    #    pienen luvun juuri silloin kun kayttajia alkaa olla.
+    supa_ok = False
+    total_users = 0
+    if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
+        headers = {
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        }
+        page = 1
+        try:
+            while page <= 40:  # 40 x 200 = 8000 tilia, katto ettei jumita
+                r = requests.get(
+                    f"{SUPABASE_URL}/auth/v1/admin/users",
+                    params={"page": page, "per_page": 200},
+                    headers=headers, timeout=15,
+                )
+                if r.status_code != 200:
+                    break
+                users = (r.json() or {}).get("users") or []
+                if not users:
+                    break
+                total_users += len(users)
+                for u in users:
+                    ref = _clean_affiliate_ref(
+                        (u.get("user_metadata") or {}).get("ref"))
+                    bucket = _bucket(ref) if ref else None
+                    if bucket is not None:
+                        bucket["signups"] += 1
+                if len(users) < 200:
+                    break
+                page += 1
+            supa_ok = True
+        except Exception as e:
+            print(f"[affiliate-report] Supabase-haku epaonnistui: {e}")
+
+    # 2) Leimatut tilaukset Stripesta.
+    stripe_ok = False
+    try:
+        subs = stripe.Subscription.list(limit=100, status="all")
+        for s in subs.auto_paging_iter():
+            code = _clean_affiliate_ref((s.get("metadata") or {}).get("affiliate"))
+            bucket = _bucket(code) if code else None
+            if bucket is not None:
+                bucket["stamped"] += 1
+                bucket.setdefault("statuses", {})
+                st = s.get("status") or "unknown"
+                bucket["statuses"][st] = bucket["statuses"].get(st, 0) + 1
+        stripe_ok = True
+    except Exception as e:
+        print(f"[affiliate-report] Stripe-haku epaonnistui: {e}")
+
+    result = {
+        "codes": out,
+        "total_accounts_scanned": total_users,
+        "sources_ok": {"supabase": supa_ok, "stripe": stripe_ok},
+    }
+    if supa_ok and stripe_ok:
+        with _AFFILIATE_TALLY_LOCK:
+            _AFFILIATE_TALLY_CACHE[key] = (now, result)
+    return result
+
+
+# ---------------------------------------------------------------------------
 # ENDPOINT: affiliate-raportti (admin)
 # ---------------------------------------------------------------------------
 @app.get("/api/admin/affiliate-report")
@@ -2481,73 +2628,160 @@ def affiliate_report(request: Request):
     ADMIN_TOKEN-portin takana kuten muutkin admin-reitit.
     """
     require_admin(request)
-    out: dict[str, dict] = {}
+    fresh = (request.query_params.get("fresh") or "").lower() in ("1", "true", "yes")
+    tally = _affiliate_tally(fresh=fresh)
+    return {
+        "codes": tally["codes"],
+        "total_accounts_scanned": tally["total_accounts_scanned"],
+        "sources_ok": tally["sources_ok"],
+        "caveat": AFFILIATE_CAVEAT,
+    }
 
-    # 1) Rekisteroityneet tilit Supabasen admin-API:sta. Sivutetaan, koska
-    #    oletus on 50 kayttajaa/sivu ja hiljainen katkaisu antaisi liian
-    #    pienen luvun juuri silloin kun kayttajia alkaa olla.
-    supa_ok = False
-    if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
-        headers = {
-            "apikey": SUPABASE_SERVICE_ROLE_KEY,
-            "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
-        }
-        page, total_users = 1, 0
-        try:
-            while page <= 40:  # 40 x 200 = 8000 tilia, katto ettei jumita
-                r = requests.get(
-                    f"{SUPABASE_URL}/auth/v1/admin/users",
-                    params={"page": page, "per_page": 200},
-                    headers=headers, timeout=15,
-                )
-                if r.status_code != 200:
-                    break
-                users = (r.json() or {}).get("users") or []
-                if not users:
-                    break
-                total_users += len(users)
-                for u in users:
-                    ref = _clean_affiliate_ref(
-                        (u.get("user_metadata") or {}).get("ref"))
-                    if ref:
-                        out.setdefault(ref, {"signups": 0, "stamped": 0})
-                        out[ref]["signups"] += 1
-                if len(users) < 200:
-                    break
-                page += 1
-            supa_ok = True
-        except Exception as e:
-            print(f"[affiliate-report] Supabase-haku epaonnistui: {e}")
-    else:
-        total_users = 0
 
-    # 2) Leimatut tilaukset Stripesta.
-    stripe_ok = False
-    try:
-        subs = stripe.Subscription.list(limit=100, status="all")
-        for s in subs.auto_paging_iter():
-            code = _clean_affiliate_ref((s.get("metadata") or {}).get("affiliate"))
-            if code:
-                out.setdefault(code, {"signups": 0, "stamped": 0})
-                out[code]["stamped"] += 1
-                out[code].setdefault("statuses", {})
-                st = s.get("status") or "unknown"
-                out[code]["statuses"][st] = out[code]["statuses"].get(st, 0) + 1
-        stripe_ok = True
-    except Exception as e:
-        print(f"[affiliate-report] Stripe-haku epaonnistui: {e}")
+# ---------------------------------------------------------------------------
+# ENDPOINT: luojan oma raportti (luojan omalla tokenilla)
+# ---------------------------------------------------------------------------
+@app.get("/api/creator/report")
+def creator_report(request: Request):
+    """Yhden luojakoodin luvut sille tilille jolle koodi on annettu.
+
+    🔴 MIKSI TAMA ON ERI ENDPOINT KUIN ADMIN-RAPORTTI. Wolfy kysyi 16.8:
+    "how would i know if someone has come from me or not? Will it show on my
+    account?" Vastaus oli EI. Admin-raportti vastaa samaan kysymykseen mutta
+    palauttaa KAIKKI koodit, eli sita ei voi antaa yhdellekaan luojalle:
+    yksi luoja nakisi toisen luojan luvut. Tama reitti lukee koodin
+    KUTSUJAN OMASTA tilista, joten kutsuja ei voi valita mita katsoo.
+
+    Paasyn ehto on `raw_user_meta_data.creator_code`, joka asetetaan kasin
+    (POST /api/admin/creator-code). Ei uutta saraketta eika migraatiota.
+
+    EI KOSKAAN asiakkaiden sahkoposteja, nimia eika yksittaisia tilauksia -
+    vain summia. Luojalle riittaa "montako", eika meilla ole oikeutta antaa
+    asiakkaan henkilotietoja kolmannelle osapuolelle.
+
+    🔴 LUKU VOI OLLA `null`, EIKA SE OLE SAMA KUIN NOLLA. Jos Supabase- tai
+    Stripe-haku epaonnistuu, palautamme null emmeka 0:aa. Nolla on vaite
+    ("kukaan ei tullut"), null on rehellinen ("emme saaneet luettua").
+    """
+    token = _bearer_from_request(request)
+    user_id = _verify_supabase_token(token) if token else None
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Sign in to view this page.")
+
+    code = _account_creator_code(user_id)
+    if not code:
+        raise HTTPException(
+            status_code=403,
+            detail="This account is not linked to a creator code. Email "
+                   "hello@goaliq.app and we will link it.")
+
+    tally = _affiliate_tally(only=code)
+    counts = tally["codes"].get(code) or {}
+    supa_ok = tally["sources_ok"]["supabase"]
+    stripe_ok = tally["sources_ok"]["stripe"]
 
     return {
-        "codes": out,
-        "total_accounts_scanned": total_users,
-        "sources_ok": {"supabase": supa_ok, "stripe": stripe_ok},
-        "caveat": (
-            "signups is a floor, not a measurement: the ref is read from the "
-            "browser at sign-up, so a click in one browser and a sign-up in "
-            "another is not counted, and the mobile app does not write a ref "
-            "at all. stamped is the number commission is calculated from."
-        ),
+        "code": code,
+        # null = lukua ei saatu luettua. Klientti EI saa renderoida sita 0:na.
+        "signups": (counts.get("signups", 0) if supa_ok else None),
+        "stamped": (counts.get("stamped", 0) if stripe_ok else None),
+        "statuses": (counts.get("statuses") or {}) if stripe_ok else None,
+        "sources_ok": tally["sources_ok"],
+        "commission_pct": 30,
+        # Ikkunan aikana kukaan ei maksa, eli `stamped` EI VOI liikkua ennen
+        # tata paivaa. Ilman tata riviä nolla nayttaisi epaonnistumiselta.
+        "free_window": {
+            "active": free_premium_window_active(),
+            "ends_utc": FREE_PREMIUM_UNTIL_DEFAULT,
+        },
+        "caveat": AFFILIATE_CAVEAT,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+# ---------------------------------------------------------------------------
+# ENDPOINT: luojakoodin kytkeminen tiliin (admin)
+# ---------------------------------------------------------------------------
+class CreatorCodeRequest(BaseModel):
+    email: str
+    # null / "" = irrota koodi tililta (luoja lopettaa, ks. creators.html
+    # "Either of us can stop").
+    code: Optional[str] = None
+
+
+@app.post("/api/admin/creator-code")
+def set_creator_code(req: CreatorCodeRequest, request: Request):
+    """Kytke luojakoodi tiliin sahkopostin perusteella (ADMIN_TOKEN).
+
+    Ilman tata koodin asettaminen olisi kasityota Supabasen dashboardissa,
+    ja `raw_user_meta_data`n kasin editointi ylikirjoittaa herkasti `ref`in -
+    eli luojan oma attribuutio katoaisi sina hetkena kun hanet tehdaan
+    luojaksi. Tama polku LUKEE metadatan, muuttaa yhden avaimen ja kirjoittaa
+    kokonaisuuden takaisin.
+    """
+    require_admin(request)
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        raise HTTPException(status_code=503, detail="Supabase is not configured.")
+
+    email = (req.email or "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="email is required")
+    code = _clean_affiliate_ref(req.code) if req.code else None
+    if req.code and not code:
+        raise HTTPException(
+            status_code=400,
+            detail="code must be 2-32 chars of A-Z, 0-9, _ or - (it is "
+                   "uppercased and must match the Stripe promotion code)")
+
+    key = SUPABASE_SERVICE_ROLE_KEY
+    headers = {"apikey": key, "Authorization": f"Bearer {key}",
+               "Content-Type": "application/json"}
+
+    user = None
+    page = 1
+    while page <= 40:
+        r = requests.get(f"{SUPABASE_URL}/auth/v1/admin/users",
+                         params={"page": page, "per_page": 200},
+                         headers=headers, timeout=15)
+        if r.status_code != 200:
+            raise HTTPException(status_code=502,
+                                detail=f"Supabase lookup failed ({r.status_code})")
+        users = (r.json() or {}).get("users") or []
+        if not users:
+            break
+        for u in users:
+            if (u.get("email") or "").strip().lower() == email:
+                user = u
+                break
+        if user or len(users) < 200:
+            break
+        page += 1
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="No account with that email. The creator has to create an "
+                   "account at pro.goaliq.app first.")
+
+    meta = dict(user.get("user_metadata") or {})
+    previous = _clean_affiliate_ref(meta.get("creator_code"))
+    if code:
+        meta["creator_code"] = code
+    else:
+        meta.pop("creator_code", None)
+
+    r2 = requests.put(f"{SUPABASE_URL}/auth/v1/admin/users/{user['id']}",
+                      json={"user_metadata": meta}, headers=headers, timeout=15)
+    if r2.status_code not in (200, 201):
+        raise HTTPException(status_code=502,
+                            detail=f"Supabase update failed ({r2.status_code}): "
+                                   f"{r2.text[:200]}")
+    _AFFILIATE_TALLY_CACHE.clear()
+    print(f"[creator] {email} creator_code {previous!r} -> {code!r}")
+    return {"email": email, "user_id": user["id"],
+            "creator_code": code, "previous": previous,
+            # Ref-kentta on eri asia; palautetaan todisteeksi ettei se katosi.
+            "ref": _clean_affiliate_ref(meta.get("ref"))}
 
 
 # ---------------------------------------------------------------------------

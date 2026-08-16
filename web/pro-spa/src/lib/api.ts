@@ -738,6 +738,58 @@ export interface RivalResponse {
 	rival: { entry: number; team_name: string | null; xi_xp: number; players_matched: number };
 }
 
+// ---------------------------------------------------------------------------
+// CREATOR-VIEW (16.8): luojan omat luvut omalla tokenilla. Wolfy kysyi
+// "Will it show on my account?" ja vastaus oli EI. Backend rajaa vastauksen
+// KUTSUJAN omaan koodiin (`raw_user_meta_data.creator_code`), joten tama
+// klientti ei valitse mita se katsoo eika voi valita.
+// ---------------------------------------------------------------------------
+
+/** 🔴 `signups` ja `stamped` ovat `null` kun lukua EI SAATU LUETTUA. Se ei
+ *  ole nolla: nolla on vaite "kukaan ei tullut linkistasi". Alaa renderoi
+ *  nullia nollana missaan. */
+export interface CreatorReport {
+	code: string;
+	signups: number | null;
+	stamped: number | null;
+	statuses: Record<string, number> | null;
+	sources_ok: { supabase: boolean; stripe: boolean };
+	commission_pct: number;
+	free_window: { active: boolean; ends_utc: string };
+	caveat: string;
+	generated_at: string;
+}
+
+/** Kirjautunut, mutta tilia ei ole kytketty yhteenkaan koodiin. Oma luokkansa
+ *  siksi etta se on ohje eika virhe: 403 on tassa normaali tila jokaiselle
+ *  muulle kayttajalle kuin kolmelle luojalle. */
+export class NotACreatorError extends Error {
+	notCreator = true;
+}
+
+/** Ei kirjautunut (tai token vanhentunut). */
+export class CreatorSignInRequiredError extends Error {
+	signInRequired = true;
+}
+
+export async function fetchCreatorReport(): Promise<CreatorReport> {
+	const headers = await authHeaders();
+	if (!('Authorization' in headers)) throw new CreatorSignInRequiredError('sign in');
+	const r = await fetch(`${API_BASE}/api/creator/report`, {
+		headers,
+		// Luvut ovat pieni luottamuksellinen taulukko jota luoja paivittaa
+		// odottaessaan liiketta. Cachetettu vastaus nayttaisi pysahtyneelta.
+		cache: 'no-store'
+	});
+	if (r.status === 401) throw new CreatorSignInRequiredError('sign in');
+	if (r.status === 403) {
+		const detail = (await r.json().catch(() => null))?.detail;
+		throw new NotACreatorError(typeof detail === 'string' ? detail : 'not a creator account');
+	}
+	if (!r.ok) throw new Error(`/api/creator/report -> HTTP ${r.status}`);
+	return r.json() as Promise<CreatorReport>;
+}
+
 export async function fetchRival(
 	entry: number,
 	rival: number,
