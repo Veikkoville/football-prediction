@@ -28,6 +28,43 @@ export interface GiqSub {
 // tapauksessa, UI-lukot ovat vain esitystapa.
 const SUB_CACHE_KEY = 'giq:sub:v1';
 
+// ---------------------------------------------------------------------------
+// GW1-GW3 ILMAINEN IKKUNA (Villen paatos 16.8.2026)
+//
+// Ikkuna paattyy GW4:n deadlineen 12.9.2026 12:30 UTC (luettu FPL:n
+// bootstrapista 16.8). Sama paivamaara elaa backendissa (api/premium.py) ja
+// mobiilissa (lib/freePremiumWindow.ts).
+//
+// 🔴 Kaksi asiaa joita EI saa muuttaa:
+//
+// 1. Ikkuna ei kirjoita mitaan. Se ei aseta profiles.is_premiumia eika
+//    luo web_subscriptions-rivia. 14.8:n arvio mittasi etta lipun
+//    kaantaminen tekisi kayttajasta PYSYVAN premiumin: purkaminen on 100 %
+//    webhook-riippuvaista, eika ilmaisikkunasta synny webhookia.
+// 2. Ikkunan synteettinen sub EI saa paatya localStorage-cacheen. Cache
+//    elaa ikkunan yli, joten cachetettu synteettinen tilaus nayttaisi
+//    premiumia viela ikkunan sulkeuduttua. writeSubCache saa siksi nahda
+//    VAIN todellisen tilauksen; ikkuna lisataan vasta muistiin.
+export const FREE_PREMIUM_UNTIL = '2026-09-12T12:30:00Z';
+const FREE_PREMIUM_UNTIL_MS = Date.parse(FREE_PREMIUM_UNTIL);
+
+export function freePremiumWindowActive(now: Date = new Date()): boolean {
+	if (Number.isNaN(FREE_PREMIUM_UNTIL_MS)) return false;
+	return now.getTime() < FREE_PREMIUM_UNTIL_MS;
+}
+
+/** Ikkunan aikainen entitlement. `plan` on oma arvonsa, jotta UI voi kertoa
+ *  rehellisesti mista oikeus tulee eika vaita ostettua tilausta. */
+export function freeWindowSub(): GiqSub {
+	return { status: 'active', plan: 'gw1-3-free', current_period_end: FREE_PREMIUM_UNTIL };
+}
+
+/** Todellinen tilaus voittaa; ikkuna taydentaa vain jos tilausta ei ole. */
+function withFreeWindow(sub: GiqSub | null | undefined): GiqSub | null | undefined {
+	if (sub) return sub;
+	return freePremiumWindowActive() ? freeWindowSub() : sub;
+}
+
 function readSubCache(userId: string): GiqSub | null | undefined {
 	try {
 		const raw = localStorage.getItem(SUB_CACHE_KEY);
@@ -98,7 +135,7 @@ function applySession(u: { id: string; email?: string | null } | null): void {
 		// P1-UX 6.8: cache-osuma renderöi entitlementin heti (premium-lohkot
 		// auki / paywall ilman "Checking subscription…" -odotusta); verkkohaku
 		// ajaa silti aina ja korjaa taustalla jos tila muuttui.
-		auth.sub = readSubCache(u.id);
+		auth.sub = withFreeWindow(readSubCache(u.id));
 		void refreshSubscription();
 	}
 	if (!u) {
@@ -177,17 +214,18 @@ export async function refreshSubscription(): Promise<void> {
 			// Cross-platform (#7): mobiilitilaajan profiles.is_premium honoroituu
 			supabase.from('profiles').select('is_premium').eq('id', user.id).limit(1)
 		]);
-		if (rows && rows.length > 0) {
-			auth.sub = rows[0] as GiqSub;
-		} else {
-			auth.sub =
-				prof && prof.length > 0 && prof[0].is_premium
+		const realSub: GiqSub | null =
+			rows && rows.length > 0
+				? (rows[0] as GiqSub)
+				: prof && prof.length > 0 && prof[0].is_premium
 					? { status: 'active', plan: 'app', current_period_end: null }
 					: null;
-		}
 		// Vain onnistunut haku päivittää cachen — virhepolku ei saa jäädyttää
 		// väärää tilaa levylle (#51-F2-periaate ulottuu cacheen).
-		writeSubCache(user.id, auth.sub ?? null);
+		// 16.8: cacheen VAIN todellinen tilaus. Ikkunan synteettinen sub elaisi
+		// cachessa ikkunan yli ja nayttaisi premiumia viela sen sulkeuduttua.
+		writeSubCache(user.id, realSub);
+		auth.sub = withFreeWindow(realSub);
 	} catch {
 		// #51-F2: transientti verkko/Supabase-virhe EI saa nollata premium-tilaa
 		// (maksaja näkisi hetkellisen väärän paywallin, Hub 2,0 -tähden

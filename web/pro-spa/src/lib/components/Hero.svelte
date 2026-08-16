@@ -71,7 +71,12 @@
 	</div>
 	{#if auth.user}
 		<div class="session">
-			{#if auth.sub}
+			{#if auth.sub?.plan === 'gw1-3-free'}
+				<!-- 16.8: ikkunan aikana badge ei saa vaittaa ostettua tilausta,
+				     ja sen on pysyttava ostopolkuna: ikkuna piilottaa paywallit,
+				     joten tama on kirjautuneen ainoa nakyva reitti ostaa. -->
+				<button class="plan premium" onclick={upgrade}>Premium · free</button>
+			{:else if auth.sub}
 				<span class="plan premium">Premium</span>
 			{:else if auth.sub === null}
 				<button class="plan free" onclick={upgrade}>Free · Upgrade</button>
@@ -89,8 +94,14 @@
 				<div class="menu" role="dialog" aria-label="Account">
 					<div class="menu-email">{auth.user.email}</div>
 					<div class="menu-plan">
-						Plan: {auth.sub ? 'Premium' : auth.sub === null ? 'Free' : 'checking…'}
-						{#if auth.sub === null}
+						Plan: {auth.sub?.plan === 'gw1-3-free'
+							? 'Premium, free until 12 September'
+							: auth.sub
+								? 'Premium'
+								: auth.sub === null
+									? 'Free'
+									: 'checking…'}
+						{#if auth.sub === null || auth.sub?.plan === 'gw1-3-free'}
 							· <button type="button" class="linklike" onclick={upgrade}>Upgrade</button>
 						{/if}
 					</div>

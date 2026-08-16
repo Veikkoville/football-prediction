@@ -256,7 +256,20 @@
 	{/if}
 {:else}
 	{#if auth.sub}
-		{#if auth.sub.plan === 'app'}
+		{#if auth.sub.plan === 'gw1-3-free'}
+			<!-- 16.8: ilmainen ikkuna EI saa nayttaa ostetulta tilaukselta.
+			     Vanha else-haara olisi sanonut "thank you for the support"
+			     kayttajalle joka ei ole maksanut, ja tarjonnut SetPasswordin
+			     jota ei ole ostettu. Ja koska ikkuna piilottaa paywallin,
+			     ostopolun on oltava tassa - muuten kukaan ei voi ostaa
+			     ikkunan aikana vaikka haluaisi. -->
+			<p class="banner success">
+				Premium is open to everyone until the GW4 deadline, 12 September. Nothing to pay
+				and nothing to cancel. <button type="button" class="linklike" onclick={goUpgrade}
+					>Keep it after that</button
+				>
+			</p>
+		{:else if auth.sub.plan === 'app'}
 			<p class="banner success">Your GoalIQ app subscription is active here too. Welcome.</p>
 		{:else}
 			<p class="muted">GoalIQ Premium active ({auth.sub.plan}) · thank you for the support!</p>

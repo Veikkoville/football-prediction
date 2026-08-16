@@ -53,8 +53,62 @@ FREE_CAPTAIN_PICKS = 1
 FREE_EDGE_TEMPLATE_RISKS = 1
 
 
+# ---------------------------------------------------------------------------
+# GW1-GW3 ILMAINEN IKKUNA (Villen paatos 16.8.2026)
+#
+# Ikkuna paattyy GW4:n deadlineen 12.9.2026 12:30 UTC (luettu FPL:n
+# bootstrapista 16.8, ei arvattu).
+#
+# 🔴 TOTEUTUSTAPA ON EI-NEUVOTELTAVA, ja syy on mitattu 14.8:
+# tama on VAIN LUKUOPERAATIO. Se ei kirjoita `profiles.is_premium`ia
+# kenellekaan, eika saa alkaa kirjoittaa.
+#
+# Miksi: `profiles.subscription_current_period_end` on kirjoitus-only kentta.
+# Sen ainoa lukija palvelee oikeuden SAILYTTAMISTA web-peruutuksessa, ei
+# koskaan purkamista. Ajastettua vanhentumissweeppia ei ole yhdessakaan
+# workflow'ssa, eika DB-triggeria tai RLS-ehtoa joka katsoisi paivamaaraa.
+# Purkaminen on 100 % webhook-riippuvaista. Jos ilmaisikkuna asettaisi
+# `is_premium=true`, mitaan webhookia ei syntyisi (tilausta ei ole) ->
+# **kokeilijasta tulisi PYSYVA premium**. Kellopohjainen ikkuna sen sijaan
+# sulkeutuu itsestaan ilman yhtaan kirjoitusta, webhookia tai cronia.
+#
+# Ikkuna vaatii KIRJAUTUMISEN (ilmainen tili). Se on tarkoituksellista:
+# tarkoitus on kerata yleiso jota meilla ei ole, ja anonyymi avaus antaisi
+# premium-payloadit ilman yhtaan kontaktia ja ilman jalkea.
+FREE_PREMIUM_UNTIL_DEFAULT = "2026-09-12T12:30:00+00:00"
+
+
 def _env(name: str) -> str:
     return (os.getenv(name) or "").strip()
+
+
+def free_premium_window_end() -> datetime | None:
+    """Ikkunan paattymishetki, tai None jos ikkuna on kytketty pois.
+
+    `FREE_PREMIUM_UNTIL`-env voittaa vakion (tyhja merkkijono "off" tai
+    "none" = pois paalta). Kelvoton arvo -> ikkuna POIS, ei vakioon
+    palaamista: virheellinen konfiguraatio ei saa hiljaa avata premiumia.
+    """
+    raw = _env("FREE_PREMIUM_UNTIL")
+    if raw.lower() in {"off", "none", "0", "false"}:
+        return None
+    if not raw:
+        raw = FREE_PREMIUM_UNTIL_DEFAULT
+    try:
+        end = datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=timezone.utc)
+    return end
+
+
+def free_premium_window_active(now: datetime | None = None) -> bool:
+    """True kun premium on auki jokaiselle kirjautuneelle kayttajalle."""
+    end = free_premium_window_end()
+    if end is None:
+        return False
+    return (now or datetime.now(timezone.utc)) < end
 
 
 def premium_enforce_on() -> bool:
@@ -172,6 +226,12 @@ def is_premium_request(request: Request) -> bool:
         user_id = _verify_token_user_id(token)
         if not user_id:
             result = False
+        elif free_premium_window_active():
+            # GW1-GW3 ilmainen ikkuna. Tarkoituksella TASSA eika ennen
+            # token-tarkistusta: ikkuna koskee kirjautuneita, ei anonyymia
+            # API-kutsujaa. Ja tarkoituksella ilman Supabase-hakua — se on
+            # myos ikkunan ainoa sivuhyoty, kutsu on nopeampi.
+            result = True
         else:
             result = _profile_is_premium(user_id) or \
                 _web_subscription_active(user_id)
