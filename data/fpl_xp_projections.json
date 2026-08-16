@@ -134,9 +134,9 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-16T19:38:20",
+    "generated_at": "2026-08-16T20:33:00",
     "season": "2026/27",
-    "overrides_applied": 9,
+    "overrides_applied": 10,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + frozen 25/26 baseline artifact (data/fpl_prev_baselines_2526.json, element code mapping)",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2526', '2627'] (sama fit-config kuin /api/predict)",
@@ -15118,6 +15118,129 @@
       },
       "components_gw": 1,
       "team_flag": "promoted"
+    },
+    {
+      "id": 391,
+      "web_name": "Gvardiol",
+      "full_name": "Joško Gvardiol",
+      "team": "Manchester City",
+      "team_short": "MCI",
+      "pos": "DEF",
+      "xmins": 58.4,
+      "predicted_starts": 75.0,
+      "minutes_confidence": "med",
+      "minutes_source": "override",
+      "minutes_override_reason": "He started the Community Shield against Arsenal on 16 August at left back, which is a competitive match and not a friendly. The model had him on 0.22 from 1370 minutes last season, a spell cut short by a leg fracture, and the minutes prior cannot tell an injury from a benching. Manchester City signed him to a new deal to 2031 in July. Held at 0.75 rather than higher because Maresca is a new manager and his rotation is not known yet",
+      "data_basis": "pl_history",
+      "owned_pct": 13.4,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 2,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1370,
+        "starts": 16,
+        "goals": 2,
+        "assists": 2,
+        "xg": 2.25,
+        "xa": 0.7,
+        "cs": 6,
+        "points": 79,
+        "per90": {
+          "goals": 0.13,
+          "assists": 0.13,
+          "xgi": 0.19
+        }
+      },
+      "p_start": 0.75,
+      "p_cameo": 0.0331,
+      "p_bench": 0.2169,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.14,
+      "xp_per_gw": 2.77,
+      "xp_per_90": 4.74,
+      "xp_horizon_total": 16.59,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "BOU",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.72
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CRY",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.72
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.62
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.11
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.09
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "LIV",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.32
+        }
+      ],
+      "components": {
+        "appearance": 1.25,
+        "goals": 0.53,
+        "assists": 0.1,
+        "clean_sheet": 0.74,
+        "conceded": -0.17,
+        "saves": 0.0,
+        "defensive_contribution": 0.23,
+        "yellows": -0.09,
+        "bonus": 0.15
+      },
+      "components_gw": 1
     },
     {
       "id": 265,
@@ -42296,128 +42419,6 @@
         "defensive_contribution": 0.09,
         "yellows": -0.06,
         "bonus": 0.07
-      },
-      "components_gw": 1,
-      "minutes_basis_flag": "short_season"
-    },
-    {
-      "id": 391,
-      "web_name": "Gvardiol",
-      "full_name": "Joško Gvardiol",
-      "team": "Manchester City",
-      "team_short": "MCI",
-      "pos": "DEF",
-      "xmins": 16.6,
-      "predicted_starts": 22.2,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 13.4,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 2,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1370,
-        "starts": 16,
-        "goals": 2,
-        "assists": 2,
-        "xg": 2.25,
-        "xa": 0.7,
-        "cs": 6,
-        "points": 79,
-        "per90": {
-          "goals": 0.13,
-          "assists": 0.13,
-          "xgi": 0.19
-        }
-      },
-      "p_start": 0.2224,
-      "p_cameo": 0.103,
-      "p_bench": 0.6746,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.04,
-      "xp_per_gw": 0.82,
-      "xp_per_90": 4.74,
-      "xp_horizon_total": 4.91,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "BOU",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.81
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CRY",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.8
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.05
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.64
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.91
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "LIV",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.7
-        }
-      ],
-      "components": {
-        "appearance": 0.41,
-        "goals": 0.15,
-        "assists": 0.03,
-        "clean_sheet": 0.19,
-        "conceded": -0.05,
-        "saves": 0.0,
-        "defensive_contribution": 0.06,
-        "yellows": -0.03,
-        "bonus": 0.04
       },
       "components_gw": 1,
       "minutes_basis_flag": "short_season"
