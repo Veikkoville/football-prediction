@@ -85,17 +85,21 @@ def _env(name: str) -> str:
 def free_premium_window_end() -> datetime | None:
     """Ikkunan paattymishetki, tai None jos ikkuna on kytketty pois.
 
-    `FREE_PREMIUM_UNTIL`-env voittaa vakion (tyhja merkkijono "off" tai
-    "none" = pois paalta). Kelvoton arvo -> ikkuna POIS, ei vakioon
-    palaamista: virheellinen konfiguraatio ei saa hiljaa avata premiumia.
+    🔴 `FREE_PREMIUM_UNTIL` on PELKKA KATKAISIN, ei paivamaara. Se voi vain
+    sulkea ikkunan ("off"/"none"/"0"/"false"), ei siirtaa sita.
+
+    Syy: sama paivamaara elaa kolmella pinnalla (tama, mobiilin
+    `lib/freePremiumWindow.ts`, web-SPA:n `auth.svelte.ts`) ja se on
+    KIRJOITETTU AUKI julkiseen copyyn ("12 September"). Jos env voisi
+    siirtaa paivaa, backend antaisi premiumin eri paivaan asti kuin mita
+    sivut lupaavat, eika kumpikaan pinta tietaisi siita. Julkaisutarkistaja
+    loysi taman 16.8. Paivan siirtaminen on koodimuutos joka koskee kaikkia
+    kolmea pintaa ja copya, ja niin sen kuuluukin olla.
     """
-    raw = _env("FREE_PREMIUM_UNTIL")
-    if raw.lower() in {"off", "none", "0", "false"}:
+    if _env("FREE_PREMIUM_UNTIL").lower() in {"off", "none", "0", "false"}:
         return None
-    if not raw:
-        raw = FREE_PREMIUM_UNTIL_DEFAULT
     try:
-        end = datetime.fromisoformat(raw)
+        end = datetime.fromisoformat(FREE_PREMIUM_UNTIL_DEFAULT)
     except ValueError:
         return None
     if end.tzinfo is None:

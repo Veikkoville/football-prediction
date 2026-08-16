@@ -59,19 +59,18 @@ def test_window_can_be_switched_off_by_env(monkeypatch):
     assert prem.free_premium_window_active() is False
 
 
-def test_invalid_env_closes_window_rather_than_falling_back(monkeypatch):
-    """Kelvoton konfiguraatio EI saa palata vakioon: virheellinen arvo ei saa
-    hiljaa avata premiumia. Negatiivinen kontrolli oletukselle."""
+def test_env_cannot_move_the_date_only_switch_it_off(monkeypatch):
+    """🔴 Env on PELKKA KATKAISIN. Sama paivamaara elaa kolmella pinnalla ja
+    se on kirjoitettu auki julkiseen copyyn ("12 September"). Jos env voisi
+    siirtaa paivaa, backend antaisi premiumin eri paivaan asti kuin mita
+    sivut lupaavat, eika kumpikaan pinta tietaisi siita. Julkaisutarkistaja
+    loysi taman 16.8."""
+    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "2099-01-01T00:00:00+00:00")
+    assert prem.free_premium_window_end() == datetime(
+        2026, 9, 12, 12, 30, tzinfo=timezone.utc), "env ei saa siirtaa paivaa"
     monkeypatch.setenv("FREE_PREMIUM_UNTIL", "ensi viikolla")
-    assert prem.free_premium_window_end() is None
-    assert prem.free_premium_window_active() is False
-
-
-def test_naive_datetime_is_read_as_utc(monkeypatch):
-    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "2099-01-01T00:00:00")
-    end = prem.free_premium_window_end()
-    assert end is not None and end.tzinfo is not None
-    assert prem.free_premium_window_active() is True
+    assert prem.free_premium_window_end() == datetime(
+        2026, 9, 12, 12, 30, tzinfo=timezone.utc), "roska ei saa siirtaa paivaa"
 
 
 # --- portti ---------------------------------------------------------------
@@ -84,7 +83,7 @@ def _enforce_on(monkeypatch):
 
 def test_signed_in_user_is_premium_during_window(monkeypatch):
     _enforce_on(monkeypatch)
-    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "2099-01-01T00:00:00+00:00")
+    monkeypatch.delenv("FREE_PREMIUM_UNTIL", raising=False)
     monkeypatch.setattr(prem, "_verify_token_user_id", lambda t: "user-1")
 
     # 🔴 Stubit palauttavat False, EIVAT heita. Ensimmainen versio nostti
@@ -108,13 +107,13 @@ def test_anonymous_caller_is_not_premium_during_window(monkeypatch):
     """Ikkuna koskee kirjautuneita. Anonyymi API-kutsuja ei saa premiumia
     edes ikkunan aikana — muuten payload vuotaisi ilman yhtaan kontaktia."""
     _enforce_on(monkeypatch)
-    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "2099-01-01T00:00:00+00:00")
+    monkeypatch.delenv("FREE_PREMIUM_UNTIL", raising=False)
     assert prem.is_premium_request(_Req(token=None)) is False
 
 
 def test_invalid_token_is_not_premium_during_window(monkeypatch):
     _enforce_on(monkeypatch)
-    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "2099-01-01T00:00:00+00:00")
+    monkeypatch.delenv("FREE_PREMIUM_UNTIL", raising=False)
     monkeypatch.setattr(prem, "_verify_token_user_id", lambda t: None)
     assert prem.is_premium_request(_Req()) is False
 
@@ -122,7 +121,7 @@ def test_invalid_token_is_not_premium_during_window(monkeypatch):
 def test_after_window_normal_gate_decides(monkeypatch):
     """Negatiivinen kontrolli: ikkunan sulkeuduttua portti palaa ennalleen."""
     _enforce_on(monkeypatch)
-    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "2000-01-01T00:00:00+00:00")
+    monkeypatch.setenv("FREE_PREMIUM_UNTIL", "off")
     monkeypatch.setattr(prem, "_verify_token_user_id", lambda t: "user-1")
     monkeypatch.setattr(prem, "_profile_is_premium", lambda uid: False)
     monkeypatch.setattr(prem, "_web_subscription_active", lambda uid: False)
