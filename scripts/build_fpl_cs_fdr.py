@@ -49,6 +49,28 @@ from src.models.dixon_coles import DixonColesModel
 # ---------------------------------------------------------------------------
 PULSE_HEADERS = {"User-Agent": "Mozilla/5.0", "Origin": "https://www.premierleague.com"}
 COMPSEASON_2627 = 841  # premierleague.com -kausi-id 2026/27
+# 🔴 Kausi-ID on KOVAKOODATTU eika sitä voi johtaa. Ilman tätä porttia
+# elokuussa 2027 tämä hakisi hiljaa 26/27:n otteluita: pulselive palauttaa
+# vanhalle kaudelle yhä 200 OK ja täyden listan, joten mikään ei näyttäisi
+# rikkoutuneen. Puhdas ottelulista väärältä kaudelta on pahin mahdollinen
+# hiljainen vika, koska se näyttää oikealta.
+#
+# Portti sitoo ID:n siihen kauteen jonka MUU järjestelmä uskoo olevan
+# meneillään (`config.current_season()`), ja kaatuu äänekkäästi kun ne
+# eriävät. Korjaus on yksi rivi: uusi ID ja uusi kausi.
+COMPSEASON_BY_SEASON = {"2627": 841}
+
+
+def _compseason_for_current() -> int:
+    season = config.current_season()
+    cid = COMPSEASON_BY_SEASON.get(season)
+    if cid is None:
+        raise SystemExit(
+            f"[cs_fdr] premierleague.com-kausi-ID puuttuu kaudelle {season}. "
+            f"Lisaa se COMPSEASON_BY_SEASON-karttaan. Tunnetut: "
+            f"{sorted(COMPSEASON_BY_SEASON)}. ILMAN TATA ajo hakisi edellisen "
+            f"kauden ottelut ja nayttaisi onnistuneelta.")
+    return cid
 OUT_PATH = config.PROJECT_ROOT / "data" / "fpl_cs_fdr.json"
 
 # Tuotannon /api/predict -fit-parametrit (_saa_malli-defaultit) — pidä synkassa.
@@ -84,7 +106,7 @@ def fetch_fixtures() -> list[dict]:
     while True:
         url = (
             "https://footballapi.pulselive.com/football/fixtures"
-            f"?comps=1&compSeasons={COMPSEASON_2627}"
+            f"?comps=1&compSeasons={_compseason_for_current()}"
             f"&page={page}&pageSize=40&sort=asc&statuses=U,L,C"
         )
         r = requests.get(url, headers=PULSE_HEADERS, timeout=30)
@@ -114,7 +136,8 @@ def fetch_fixtures() -> list[dict]:
 
 
 def fetch_teams() -> list[str]:
-    url = f"https://footballapi.pulselive.com/football/compseasons/{COMPSEASON_2627}/teams"
+    url = (f"https://footballapi.pulselive.com/football/compseasons/"
+           f"{_compseason_for_current()}/teams")
     r = requests.get(url, headers=PULSE_HEADERS, timeout=30)
     r.raise_for_status()
     return sorted(t["name"] for t in r.json())
