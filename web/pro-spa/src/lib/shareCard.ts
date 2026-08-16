@@ -970,3 +970,197 @@ export async function shareCard(spec: CardSpec): Promise<ShareOutcome> {
 	const blob = await renderCard(spec);
 	return deliver(blob, spec.fileName);
 }
+
+/* ---------- 16.8: roast-kortti (Villen tilaus) ----------
+ *
+ * "laitetaas tohon roast my teamiin jakokortti missa joku aiheeseen
+ * liittyva hassunhauska kuva sekä toi teksti"
+ *
+ * 🔴 KUVA PIIRRETAAN ITSE. Meemi tai valokuva olisi tekijanoikeusongelma
+ * kortissa jonka koko tarkoitus on levita muiden ihmisten feedeihin, ja se
+ * riski on meidan eika jakajan. Liekki ja naama ovat canvas-primitiiveja
+ * brandin vareissa, joten kortti on jaettavissa ilman lisenssikysymysta.
+ *
+ * Kuva seuraa roastin tasoa (`roastTier`), ei omaa logiikkaansa: sama
+ * joukkue ei saa tekstia "annoyingly competent" ja kuvaa jossa se palaa.
+ */
+
+export interface RoastCardSpec {
+	/** 'singed' | 'toasted' | 'cremated' */
+	tier: string;
+	score: number;
+	headline: string;
+	lines: string[];
+	fileName: string;
+}
+
+/** Yksi liekki. Bezier-parit, ei kuvatiedostoa. */
+function drawFlame(ctx: CanvasRenderingContext2D, x: number, y: number, h: number) {
+	const w = h * 0.62;
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+	ctx.bezierCurveTo(x + w * 0.55, y - h * 0.34, x + w * 0.2, y - h * 0.66, x + w * 0.3, y - h);
+	ctx.bezierCurveTo(x + w * 0.02, y - h * 0.78, x - w * 0.34, y - h * 0.72, x - w * 0.28, y - h * 0.3);
+	ctx.bezierCurveTo(x - w * 0.5, y - h * 0.36, x - w * 0.5, y - h * 0.1, x, y);
+	ctx.closePath();
+	const g = ctx.createLinearGradient(x, y, x, y - h);
+	g.addColorStop(0, '#ff8a5c');
+	g.addColorStop(1, '#f5c542');
+	ctx.fillStyle = g;
+	ctx.fill();
+	// Sisaliekki: pelkka yksivarinen liekki luki logolta, ei kuvalta.
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+	ctx.bezierCurveTo(x + w * 0.2, y - h * 0.22, x + w * 0.06, y - h * 0.4, x + w * 0.1, y - h * 0.55);
+	ctx.bezierCurveTo(x - w * 0.12, y - h * 0.42, x - w * 0.2, y - h * 0.2, x, y);
+	ctx.closePath();
+	ctx.fillStyle = INK;
+	ctx.globalAlpha = 0.35;
+	ctx.fill();
+	ctx.globalAlpha = 1;
+}
+
+/** Naama joka reagoi. Ilme vaihtuu tason mukaan, ei satunnaisesti. */
+function drawFace(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, tier: string) {
+	ctx.beginPath();
+	ctx.arc(cx, cy, r, 0, Math.PI * 2);
+	ctx.fillStyle = AMBER;
+	ctx.fill();
+
+	ctx.fillStyle = INK;
+	const ex = r * 0.36;
+	const ey = cy - r * 0.18;
+	if (tier === 'cremated') {
+		// Isot ymmyrkaiset silmat + auki oleva suu.
+		for (const s of [-1, 1]) {
+			ctx.beginPath();
+			ctx.arc(cx + s * ex, ey, r * 0.15, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		ctx.beginPath();
+		ctx.ellipse(cx, cy + r * 0.34, r * 0.26, r * 0.32, 0, 0, Math.PI * 2);
+		ctx.fill();
+	} else if (tier === 'toasted') {
+		// Sirristetyt silmat + vino suu.
+		ctx.lineWidth = r * 0.11;
+		ctx.strokeStyle = INK;
+		ctx.lineCap = 'round';
+		for (const s of [-1, 1]) {
+			ctx.beginPath();
+			ctx.moveTo(cx + s * ex - r * 0.14, ey);
+			ctx.lineTo(cx + s * ex + r * 0.14, ey + s * r * 0.07);
+			ctx.stroke();
+		}
+		ctx.beginPath();
+		ctx.moveTo(cx - r * 0.3, cy + r * 0.42);
+		ctx.quadraticCurveTo(cx, cy + r * 0.26, cx + r * 0.32, cy + r * 0.46);
+		ctx.stroke();
+	} else {
+		// Tyytyvainen: pienet silmat, leve hymy.
+		for (const s of [-1, 1]) {
+			ctx.beginPath();
+			ctx.arc(cx + s * ex, ey, r * 0.11, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		ctx.lineWidth = r * 0.11;
+		ctx.strokeStyle = INK;
+		ctx.lineCap = 'round';
+		ctx.beginPath();
+		ctx.arc(cx, cy + r * 0.1, r * 0.42, 0.2 * Math.PI, 0.8 * Math.PI);
+		ctx.stroke();
+	}
+}
+
+export async function renderRoastCard(spec: RoastCardSpec): Promise<Blob> {
+	await Promise.all([
+		document.fonts.load(bold(60)),
+		document.fonts.load(bold(30)),
+		document.fonts.load(med(28))
+	]);
+
+	const probe = document.createElement('canvas').getContext('2d')!;
+	const maxW = W - 2 * MX;
+	// Kolme riviä riittää: neljäs vie kortin puhelimen esikatselussa niin
+	// pieneksi ettei sitä lue kukaan.
+	const body = spec.lines.slice(0, 3);
+	const wrapped = body.map((l) => wrapLines(probe, l, med(28), maxW));
+	const bodyH = wrapped.reduce((n, ls) => n + ls.length * 40 + 26, 0);
+
+	const ART_H = 300;
+	const HEAD_H = 250;
+	const H = HEAD_H + ART_H + bodyH + FOOT_H;
+
+	const canvas = document.createElement('canvas');
+	canvas.width = W;
+	canvas.height = H;
+	const ctx = canvas.getContext('2d')!;
+	ctx.textBaseline = 'top';
+
+	ctx.fillStyle = INK;
+	ctx.fillRect(0, 0, W, H);
+	ctx.fillStyle = INK2;
+	ctx.fillRect(0, HEAD_H, W, ART_H);
+
+	ctx.font = bold(30);
+	ctx.fillStyle = AMBER;
+	ctx.fillText('ROAST MY TEAM', MX, 56);
+	ctx.font = bold(72);
+	ctx.fillStyle = CREAM;
+	ctx.fillText(spec.headline, MX, 108);
+	ctx.font = med(28);
+	ctx.fillStyle = MUTED;
+	ctx.fillText(`${spec.score}/100 by the model`, MX, 196);
+
+	// Ryhma keskitetaan LASKEMALLA sen leveys. Ensimmainen versio kiinnitti
+	// naaman ja liekit prosenttiosuuksiin (0.34 / 0.58), jolloin yhden
+	// liekin kortissa oikea kolmannes oli tyhja ja kolmen liekin kortissa
+	// ryhma valui oikealle. Sama kortti eri tasoilla nayttaa nyt samalta.
+	const cy = HEAD_H + ART_H / 2;
+	const R = 96;
+	const flames = spec.tier === 'cremated' ? 3 : spec.tier === 'toasted' ? 2 : 1;
+	const FLAME_STEP = 118;
+	const FLAME_W = 120;
+	const GAP = 64;
+	const groupW = R * 2 + GAP + (flames - 1) * FLAME_STEP + FLAME_W;
+	const left = (W - groupW) / 2;
+	drawFace(ctx, left + R, cy, R, spec.tier);
+	for (let i = 0; i < flames; i++) {
+		const h = 150 + i * 34;
+		drawFlame(ctx, left + R * 2 + GAP + FLAME_W / 2 + i * FLAME_STEP, cy + 110, h);
+	}
+
+	ctx.fillStyle = LINE;
+	ctx.fillRect(MX, HEAD_H + ART_H, W - 2 * MX, 2);
+
+	let y = HEAD_H + ART_H + 34;
+	ctx.font = med(28);
+	for (const ls of wrapped) {
+		ctx.fillStyle = CREAM;
+		for (const line of ls) {
+			ctx.fillText(line, MX, y);
+			y += 40;
+		}
+		y += 26;
+	}
+
+	ctx.font = med(20);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('roasted by the GoalIQ match model', MX, H - 88);
+	ctx.font = bold(20);
+	ctx.fillStyle = AMBER;
+	ctx.fillText('@goaliqapp', W - MX - ctx.measureText('@goaliqapp').width, H - 88);
+	ctx.font = med(17);
+	ctx.fillStyle = MUTED;
+	ctx.fillText('model projections, not betting advice', MX, H - 54);
+	ctx.fillStyle = AMBER;
+	ctx.fillRect(0, H - 8, W, 8);
+
+	return new Promise<Blob>((resolve, reject) => {
+		canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('canvas toBlob failed'))), 'image/png');
+	});
+}
+
+export async function shareRoastCard(spec: RoastCardSpec): Promise<ShareOutcome> {
+	const blob = await renderRoastCard(spec);
+	return deliver(blob, spec.fileName);
+}

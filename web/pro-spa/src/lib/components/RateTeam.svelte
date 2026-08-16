@@ -8,7 +8,8 @@
 		type TransferSuggestion
 	} from '$lib/fantasyTools';
 	import { draftPool, fetchXp, type XpPoolPlayer } from '$lib/api';
-	import { buildRoast } from '$lib/roast';
+	import { buildRoast, roastTier, roastHeadline } from '$lib/roast';
+	import { shareRoastCard } from '$lib/shareCard';
 	import { capture } from '$lib/analytics';
 	import { auth } from '$lib/auth.svelte';
 	import {
@@ -72,6 +73,7 @@
 	// Roast my team (7.8): toggle + kopiointikuittaus.
 	let roastOpen = $state(false);
 	let roastCopied = $state(false);
+	let roastSharing = $state(false);
 	let data = $state<RateTeamResponse | null>(null);
 
 	// --- FM-silmukka: mallin suositukset kirjattaviksi päätöksiksi ----------
@@ -1104,17 +1106,48 @@
 				{#each roastLines as line, i (i)}
 					<p>{line}</p>
 				{/each}
+				<div class="roast-actions">
+					<button
+						class="roast-copy"
+						onclick={() => {
+							navigator.clipboard?.writeText(
+								roastLines.join('\n\n') + '\n\nGet roasted: goaliq.app/fpl'
+							);
+							roastCopied = true;
+							capture('roast_copied');
+							setTimeout(() => (roastCopied = false), 2000);
+						}}>{roastCopied ? 'Copied' : 'Copy roast for sharing'}</button
+					>
+				<!-- 16.8 (Villen tilaus): kuvakortti. Tiedostossa luki 7.8 asti
+				     "kuvakortti = jatkotyo"; teksti yksin ei jaa yhta hyvin kuin
+				     kuva, ja korttipostaus mitattiin 11.8 nelinkertaiseksi tekstiin
+				     nahden (4100 vs 210 nayttoa). Taso tulee samasta roastTier-
+				     funktiosta kuin teksti, jottei kortti sano eri asiaa kuin
+				     rivit sen yllä. -->
 				<button
 					class="roast-copy"
-					onclick={() => {
-						navigator.clipboard?.writeText(
-							roastLines.join('\n\n') + '\n\nGet roasted: goaliq.app/fpl'
-						);
-						roastCopied = true;
-						capture('roast_copied');
-						setTimeout(() => (roastCopied = false), 2000);
-					}}>{roastCopied ? 'Copied' : 'Copy roast for sharing'}</button
+					disabled={roastSharing}
+					onclick={async () => {
+						// Narrowing katoaa async-nuolifunktioon: `data` on nullable
+						// komponentin tasolla vaikka lohko renderoityy vain kun se on.
+						if (!data) return;
+						roastSharing = true;
+						try {
+							const { tier, score } = roastTier(data);
+							capture('roast_card_shared', { tier, score });
+							await shareRoastCard({
+								tier,
+								score,
+								headline: roastHeadline(tier),
+								lines: roastLines,
+								fileName: `goaliq-roast-${tier}.png`
+							});
+						} finally {
+							roastSharing = false;
+						}
+					}}>{roastSharing ? 'Building...' : 'Share as image'}</button
 				>
+				</div>
 			</div>
 		{/if}
 
@@ -1906,6 +1939,11 @@
 		margin-top: var(--s-2);
 	}
 	.roast-toggle,
+	.roast-actions {
+		display: flex;
+		gap: var(--s-2);
+		flex-wrap: wrap;
+	}
 	.roast-copy {
 		background: none;
 		border: 1px solid var(--border);
@@ -1914,6 +1952,10 @@
 		cursor: pointer;
 		color: inherit;
 		font: inherit;
+	}
+	.roast-copy:disabled {
+		opacity: 0.6;
+		cursor: default;
 	}
 	.roast-toggle:hover,
 	.roast-copy:hover {

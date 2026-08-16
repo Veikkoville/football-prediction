@@ -97,3 +97,27 @@ export function buildRoast(data: RateTeamResponse): string[] {
 	);
 	return lines;
 }
+
+/** Roastin taso: kortti ja teksti johdetaan SAMASTA luvusta.
+ *
+ * 🔴 Miksi tama on funktio eika kortin oma if-ketju: jos kortti laskisi
+ * tason itse, sama joukkue voisi saada tekstin "annoyingly competent" ja
+ * kuvan jossa se palaa. Yksi lahde, kaksi pintaa. Sama syy kuin sille
+ * ettei klientti laske pisteita Beat the Modelissa.
+ */
+export type RoastTier = 'singed' | 'toasted' | 'cremated';
+
+export function roastTier(data: RateTeamResponse): { tier: RoastTier; score: number } {
+	const r = data.rating;
+	const score = r.rating ?? Math.round(r.percentile ?? 0);
+	if (r.beats_benchmark || score >= 70) return { tier: 'singed', score };
+	if (score >= 50) return { tier: 'toasted', score };
+	return { tier: 'cremated', score };
+}
+
+/** Kortin ja jaon kuvateksti. Yksi rivi, koska kortti kantaa loput. */
+export function roastHeadline(tier: RoastTier): string {
+	if (tier === 'singed') return 'BARELY SINGED';
+	if (tier === 'toasted') return 'TOASTED';
+	return 'CREMATED';
+}
