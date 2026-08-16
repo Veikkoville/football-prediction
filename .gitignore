@@ -38,6 +38,13 @@ raw_data/
 !/data/accuracy.json
 # FPL Phase 0 -projektio: ajastettu refresh ylläpitää, Render lukee gitistä (/api/fantasy).
 !/data/fpl_projections_phase0.json
+# Ilmaisikkunan ja luojakohortin seurantasarjat (16.8): free-window-watch
+# kirjoittaa yhden rivin per vuorokausi. 🔴 Ilman naita poikkeuksia
+# `/data/*` nielaisee ne ja workflow kaatuu committiin joka yo klo 05:10 -
+# eli hiljaa, koska kukaan ei katso vihreaa workflowta. Loytyi ajamalla se
+# kerran kasin.
+!/data/free_window_log.jsonl
+!/data/affiliate_cohort_log.jsonl
 # SPL-fantasy Phase 0 (7.8): vendoroitu tuloshistoria (ESPN, DC-priorifitti)
 # + baked output. Sama !-kuvio kuin FPL:ssä — ilman näitä builderi toimisi
 # vain kehityskoneella ja endpoint 503:aisi tuotannossa.
