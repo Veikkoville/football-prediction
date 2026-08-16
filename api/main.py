@@ -2730,6 +2730,125 @@ def _supabase_users() -> Optional[list[dict]]:
         return None
 
 
+def _paid_user_ids(user_ids: list[str]) -> Optional[dict[str, set[str]]]:
+    """Ketka annetuista tileista maksavat, ja mita kautta.
+
+    Palauttaa {"web": {...}, "app": {...}} tai None jos haku epaonnistui.
+    `app` = `profiles.is_premium` ILMAN web-tilausta, eli store-osto.
+
+    🔴 MIKSI NAMA EROTELLAAN. Luojan provisio maksetaan vain sivulla
+    tehdyista ostoista: store-ostot eivat kulje meidan checkoutimme kautta
+    eika niissa ole mitaan mista attribuution voisi lukea. Jos ne
+    laskettaisiin samaan lukuun, raportti nayttaisi luojalle tuloa jota
+    han ei saa, ja meille konversion joka ei ole hanen ansiotaan
+    laskutettavissa. Ero on siis rahaa eika kosmetiikkaa.
+    """
+    if not user_ids or not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return {"web": set(), "app": set()}
+    key = SUPABASE_SERVICE_ROLE_KEY
+    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+    web: set[str] = set()
+    prem: set[str] = set()
+    try:
+        # PostgREST `in.()` menee URLiin, joten lista pilkotaan. 100 id:ta
+        # per kutsu pitaa URLin selvasti alle palvelinten rajojen.
+        for i in range(0, len(user_ids), 100):
+            chunk = user_ids[i:i + 100]
+            ids = ",".join(chunk)
+            r = requests.get(
+                f"{SUPABASE_URL}/rest/v1/web_subscriptions"
+                f"?user_id=in.({ids})&select=user_id,status",
+                headers=headers, timeout=20)
+            if r.status_code != 200:
+                print(f"[cohort] web_subscriptions -> {r.status_code}")
+                return None
+            for row in r.json() or []:
+                if row.get("user_id"):
+                    web.add(row["user_id"])
+            r2 = requests.get(
+                f"{SUPABASE_URL}/rest/v1/profiles"
+                f"?id=in.({ids})&is_premium=is.true&select=id",
+                headers=headers, timeout=20)
+            if r2.status_code != 200:
+                print(f"[cohort] profiles -> {r2.status_code}")
+                return None
+            for row in r2.json() or []:
+                if row.get("id"):
+                    prem.add(row["id"])
+        return {"web": web, "app": prem - web}
+    except Exception as e:
+        print(f"[cohort] haku epaonnistui: {e}")
+        return None
+
+
+@app.get("/api/admin/affiliate-cohort")
+def affiliate_cohort(request: Request):
+    """Luojan linkista tullut tili -> ostiko han myohemmin. (admin)
+
+    🔴 MIKSI TAMA ON ERI RAPORTTI KUIN `affiliate-report`. Siella `signups`
+    ja `stamped` ovat kaksi ERI POPULAATIOTA eivatka sama joukko kahdessa
+    vaiheessa: ihminen voi olla `stamped`issa olematta koskaan
+    `signups`issa (nappaili koodin checkoutissa ilman etta ref-tagia
+    koskaan kirjoitettiin) ja painvastoin. Niiden jakaminen keskenaan
+    antaisi konversioprosentin joka ei tarkoita mitaan.
+
+    Tama laskee sen ketjun jota ilmaisikkuna varten tarvitaan: tili jolla
+    ON luojan ref, ja onko sama tili sittemmin maksanut.
+
+    Store-ostot eritellaan omaksi luvukseen. Ne EIVAT ole luojalle
+    maksettavia (ehdot: web-maksut), mutta ne kertovat paljonko konversiota
+    valuu attribuution ulkopuolelle.
+    """
+    require_admin(request)
+    users = _supabase_users()
+    if users is None:
+        raise HTTPException(status_code=503,
+                            detail="Could not read the account list just now. "
+                                   "This is not zero accounts.")
+
+    by_code: dict[str, list[str]] = {}
+    for u in users:
+        ref = _clean_affiliate_ref((u.get("user_metadata") or {}).get("ref"))
+        if ref and u.get("id"):
+            by_code.setdefault(ref, []).append(u["id"])
+
+    everyone = [uid for ids in by_code.values() for uid in ids]
+    paid = _paid_user_ids(everyone)
+    if paid is None:
+        raise HTTPException(status_code=503,
+                            detail="Could not read subscriptions just now. "
+                                   "This is not zero paid accounts.")
+
+    codes = {}
+    for code, ids in sorted(by_code.items()):
+        w = sum(1 for i in ids if i in paid["web"])
+        a = sum(1 for i in ids if i in paid["app"])
+        codes[code] = {
+            "signups": len(ids),
+            "signups_paid_on_web": w,
+            "signups_paid_in_app_only": a,
+            # Konversio lasketaan VAIN sivumaksuista, koska vain ne ovat
+            # attribuoitavissa ja vain niista maksetaan provisio.
+            "conversion_pct": round(100 * w / len(ids), 1) if ids else None,
+        }
+
+    return {
+        "window": {"opened": FREE_WINDOW_OPENED,
+                   "ends_utc": FREE_PREMIUM_UNTIL_DEFAULT,
+                   "active": free_premium_window_active()},
+        "codes": codes,
+        "caveat": (
+            "This is the sign-up cohort, not the same thing as the stamped "
+            "count in the affiliate report: a reader who typed the code at "
+            "checkout without ever carrying the tag is not in here. "
+            "signups_paid_in_app_only is not payable to the creator, because "
+            "store purchases do not go through our checkout and carry no "
+            "attribution. Nobody is expected to appear in the paid columns "
+            "before the free window closes."
+        ),
+    }
+
+
 @app.get("/api/admin/free-window-report")
 def free_window_report(request: Request):
     """Montako tilia on luotu ilmaisikkunan aikana, ja palasiko kukaan.
