@@ -56,8 +56,27 @@ def _delim(fstring_start: str) -> str | None:
     return None
 
 
+# 🔴 `tokenize.FSTRING_START` lisattiin vasta 3.12:ssa. Ensimmainen versio
+# tasta portista kaatui CI:lla AttributeErroriin - eli CI-yhteensopivuutta
+# vahtiva portti ei itse ollut CI-yhteensopiva. Sama vikaluokka kolmatta
+# kertaa saman paivan aikana.
+#
+# Kun ajamme 3.11:lla EI TARVITA detektoria lainkaan: tulkki itse on
+# auktoriteetti, ja `compile()` nostaa saman SyntaxErrorin jota vastaan
+# tama portti suojaa. Detektoria tarvitaan vain uudemmalla tulkilla, joka
+# hyvaksyy syntaksin jota CI ei hyvaksy.
+_HAS_FSTRING_TOKENS = hasattr(tokenize, "FSTRING_START")
+
+
 def same_quote_lines(src: str) -> list[int]:
     """Rivit joilla f-stringin SISALLA on sen oma yhden merkin delimiter."""
+    if not _HAS_FSTRING_TOKENS:
+        # Tulkki on jo CI:n ikainen -> compile() nappaa asian suoraan.
+        try:
+            compile(src, "<gate>", "exec")
+            return []
+        except SyntaxError as e:
+            return [e.lineno or 0]
     out: list[int] = []
     stack: list[str | None] = []
     try:
@@ -90,6 +109,11 @@ def test_detector_controls_both_directions():
     """🔴 Ilman naita portti nayttaisi valppaalta ja olisi kohinaa. Kolme
     ensimmaista detektoriversiota lapaisi tasan tallaisen tarkistuksen
     puutteen takia."""
+    if not _HAS_FSTRING_TOKENS:
+        # 3.11:lla aito tapaus on SyntaxError jo compile()-vaiheessa, ja
+        # tulkki on silloin itse portti. Riittaa todistaa etta se nappaa.
+        assert same_quote_lines('x = f"{r.get("team")}"') == [1]
+        return
     assert same_quote_lines('x = f"{r.get("team")} page"') == [1], \
         "aito tapaus jai loytymatta"
     assert same_quote_lines('x = f"""a {c["k"]} b"""') == [], \
