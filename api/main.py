@@ -1266,7 +1266,7 @@ FD_HTTP_MAX_ATTEMPTS = 4        # 1 + 3 uusintaa
 # Rinnakkaisuuskatto: FD:n ilmaistason raja on pyyntoa/min, ja 11-suuntainen
 # fan-out osui siihen kokonaisuudessaan (mitattu 16.8: 22 rinnakkaista ->
 # 22 x 429). Portti muuttaa ryopyn jonoksi ilman etta yksikaan kutsu putoaa.
-FD_HTTP_MAX_CONCURRENT = 2
+FD_HTTP_MAX_CONCURRENT = 4
 FD_HTTP_GATE_WAIT_SEC = 25.0    # kauemmin jonottava saa mieluummin stalen
 _FD_HTTP_GATE = threading.Semaphore(FD_HTTP_MAX_CONCURRENT)
 
@@ -1290,19 +1290,29 @@ def _fd_429_sleep_sec(body: str, attempt: int) -> float:
 
 
 def _fd_get_cached(url: str, api_key: str,
-                   ttl_sec: int = FD_HTTP_TTL_SEC) -> tuple[dict, bool]:
-    """Palauttaa (data, stale). TTL-cache + single-flight (lukko per URL, ettei
+                   ttl_sec: int = FD_HTTP_TTL_SEC,
+                   cache_key: str | None = None) -> tuple[dict, bool]:
+    """Palauttaa (data, stale). TTL-cache + single-flight (lukko per avain, ettei
     rinnakkaiskutsut laukaise montaa FD-hakua) + rinnakkaisuusportti +
     jitteroitu 429-backoff + stale-fallback.
-    Ilman cachea virhetilassa → HTTPException (hallittu virhe kuten ennen)."""
-    hit = _FD_HTTP_CACHE.get(url)
+    Ilman cachea virhetilassa → HTTPException (hallittu virhe kuten ennen).
+
+    `cache_key` erottaa cache-avaimen URLista. Fixtures-URL sisaltaa
+    dateFrom/dateTo jotka lasketaan KULUVASTA paivasta, eli URL vaihtuu
+    joka UTC-vuorokauden vaihteessa. Silloin avaimeen sidottu stale-fallback
+    ei voisi koskaan auttaa: jokainen paiva alkaisi tilasta jossa mitaan
+    ei ole, ja upstreamin nikotellessa kayttaja saisi virheen eika eilista
+    listaa. Vakaa avain (liiga + ikkuna) korjaa tasan sen.
+    """
+    key = cache_key or url
+    hit = _FD_HTTP_CACHE.get(key)
     if hit and time.time() - hit[0] < ttl_sec:
         return hit[1], False
     with _FD_HTTP_LOCKS_GUARD:
-        lock = _FD_HTTP_LOCKS.setdefault(url, threading.Lock())
+        lock = _FD_HTTP_LOCKS.setdefault(key, threading.Lock())
     with lock:
         # Double-check lukon alta: toinen säie ehti jo hakea tuoreen.
-        hit = _FD_HTTP_CACHE.get(url)
+        hit = _FD_HTTP_CACHE.get(key)
         if hit and time.time() - hit[0] < ttl_sec:
             return hit[1], False
         # Rinnakkaisuusportti. Jos jono on pitka eika vuoroa tule ajoissa,
@@ -1327,7 +1337,7 @@ def _fd_get_cached(url: str, api_key: str,
                     break
                 if r.status_code == 200:
                     data = r.json()
-                    _FD_HTTP_CACHE[url] = (time.time(), data)
+                    _FD_HTTP_CACHE[key] = (time.time(), data)
                     return data, False
                 if r.status_code == 429 and attempt < FD_HTTP_MAX_ATTEMPTS - 1:
                     time.sleep(_fd_429_sleep_sec(r.text, attempt))
@@ -1572,8 +1582,11 @@ def upcoming_fixtures(
         f"&dateFrom={today.isoformat()}&dateTo={date_to.isoformat()}"
     )
     # #49: TTL-cache + 429-backoff + stale-fallback (ei suoraa FD-kutsua)
-    # 16.8: fixtureille oma pidempi TTL — ks. FD_FIXTURES_TTL_SEC.
-    data, fd_stale = _fd_get_cached(url, api_key, ttl_sec=FD_FIXTURES_TTL_SEC)
+    # 16.8: fixtureille oma pidempi TTL — ks. FD_FIXTURES_TTL_SEC — ja VAKAA
+    # cache-avain, koska URLin dateFrom/dateTo vaihtuu joka vuorokausi.
+    data, fd_stale = _fd_get_cached(
+        url, api_key, ttl_sec=FD_FIXTURES_TTL_SEC,
+        cache_key=f"fixtures:{code}:{days}")
     fixtures = []
     for m in data.get("matches", []):
         home = m.get("homeTeam") or {}

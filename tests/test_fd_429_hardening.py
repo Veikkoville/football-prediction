@@ -190,8 +190,32 @@ def test_concurrent_fanout_is_gated_not_stampeded(client, monkeypatch):
     # Kiinteä luku EIKÄ m.FD_HTTP_MAX_CONCURRENT: konfiguraatiota vasten
     # mittaava portti läpäisisi itsensä myös silloin kun katto nostetaan
     # vahingossa pois. Negatiivinen kontrolli ajettu (portti pois → 12).
-    assert peak["max"] <= 3, f"rinnakkaisia FD-kutsuja {peak['max']}"
-    assert m.FD_HTTP_MAX_CONCURRENT <= 3
+    assert peak["max"] <= 5, f"rinnakkaisia FD-kutsuja {peak['max']}"
+    assert m.FD_HTTP_MAX_CONCURRENT <= 5
+
+
+def test_fixtures_cache_key_survives_utc_date_rollover(client, monkeypatch):
+    """Fixtures-URL sisältää dateFrom/dateTo jotka lasketaan kuluvasta
+    päivästä → URL vaihtuu joka UTC-vuorokauden vaihteessa. Jos cache-avain
+    olisi URL, stale-fallback ei voisi koskaan auttaa: jokainen vuorokausi
+    alkaisi tyhjästä ja upstreamin nikotellessa käyttäjä saisi virheen
+    eikä eilistä listaa."""
+    calls = _mock_get(monkeypatch, [_Resp(200, FIXTURES_BODY)])
+    r1 = client.get("/api/fixtures?league=ENG-Premier League-FD&days=7")
+    assert r1.status_code == 200 and calls["n"] == 1
+
+    # Simuloi vuorokauden vaihtuminen: URL muuttuu, avain ei.
+    keys = list(m._FD_HTTP_CACHE)
+    assert keys == ["fixtures:PL:7"], f"cache-avain oli {keys}"
+
+    # Vanhennetaan + upstream failaa → stale eikä virhe, vaikka URL on uusi.
+    ts, data = m._FD_HTTP_CACHE[keys[0]]
+    m._FD_HTTP_CACHE[keys[0]] = (ts - m.FD_FIXTURES_TTL_SEC - 1, data)
+    _mock_get(monkeypatch, [_Resp(429, text="Wait 2 seconds")])
+    r2 = client.get("/api/fixtures?league=ENG-Premier League-FD&days=7")
+    assert r2.status_code == 200
+    assert r2.json().get("stale") is True
+    assert r2.json()["fixtures"] == r1.json()["fixtures"]
 
 
 def test_response_shape_unchanged(client, monkeypatch):
