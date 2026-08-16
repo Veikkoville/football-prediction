@@ -9,6 +9,7 @@ import { supabase } from './supabase';
 import { capture, identifyUser, resetAnalytics } from './analytics';
 import { invalidateProfileRow } from './profileRow';
 import { storedRef } from './billing';
+import { clearDraft } from './draft';
 
 export interface GiqUser {
 	id: string;
@@ -172,6 +173,11 @@ export async function signUp(email: string, password: string): Promise<string | 
 		...(ref ? { options: { data: { ref } } } : {})
 	});
 	if (error) return error.message;
+	// 🔴 Uusi tili aloittaa TYHJÄNÄ. Ilman tätä `syncDraft` työntää selaimeen
+	// jääneen kokeilun tuoreelle tilille, koska tilillä ei ole vielä omaa
+	// draftia — ja viikkosilmukka alkaa neuvoa kapteenia joukkueeseen jota
+	// käyttäjä ei ole valinnut. Havaittu 16.8 oikealla rekisteröitymisellä.
+	clearDraft();
 	if (data.user) capture('signup_completed', ref ? { ref } : undefined, 'signup');
 	return null;
 }

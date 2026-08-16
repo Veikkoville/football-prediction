@@ -321,8 +321,22 @@
      already dark, and a solid panel would pull attention off the CTA row,
      which is the buying path. The window closes on 12 September and this
      line goes with it. */
-  .free-window { margin-top: 16px; padding: 10px 14px; border-left: 3px solid var(--amber);
-    background: rgba(255,255,255,.03); color: var(--text); font-size: 14.5px; max-width: 56ch; }
+  /* The first version of this was a bordered paragraph inside the hero, and it
+     read as fine print: the one thing a visitor skips. A solid amber band is
+     the loudest surface this palette has without adding a colour, and it sits
+     above everything else on the page. */
+  .free-band { background: var(--amber); color: var(--ink); border-bottom: 2px solid var(--ink); }
+  .free-band-in { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 15px 0; }
+  .free-band-txt { margin: 0; flex: 1 1 340px; display: flex; flex-direction: column; gap: 4px; }
+  .free-band-txt strong { font-size: clamp(17px, 3.3vw, 26px); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.12; text-transform: uppercase; }
+  .free-band-txt span { font-size: 14px; opacity: .8; letter-spacing: .01em; }
+  .btn-band { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; background: var(--ink); color: var(--amber); font-weight: 700; font-size: 13.5px;
+    letter-spacing: .1em; text-transform: uppercase; padding: 13px 20px; white-space: nowrap;
+    border: 2px solid var(--ink); }
+  .btn-band:hover { background: transparent; color: var(--ink); }
+  @media (max-width: 620px) { .btn-band { width: 100%; text-align: center; } }
   .cta-note a { color: var(--cream); border-bottom: 1px solid var(--line); }
 
   /* Track record -chip herossa: GEN:ACC-CHIP elaa taalla (.num/.lbl) */
@@ -675,6 +689,19 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </div>
 
+<!-- ILMAISIKKUNA. Sits directly under the nav, above the ticker and the hero,
+     so it is the first thing on the page rather than a line inside the copy.
+     REMOVE THIS BLOCK AFTER 2026-09-12 12:30 UTC. -->
+<div class="free-band">
+  <div class="wrap free-band-in">
+    <p class="free-band-txt">
+      <strong>Premium is free until the 12 September deadline</strong>
+      <span>That is GW1 to GW3. Create a free account and it is on. No card, nothing to cancel.</span>
+    </p>
+    <a class="btn-band" href="https://pro.goaliq.app/" data-cta="band-freewindow">Get Premium free &#9656;</a>
+  </div>
+</div>
+
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track">
     <span class="ticker-set">
@@ -710,13 +737,6 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
         and player compare. Every number comes from the model behind our public,
         pre-match-logged prediction record. <a href="/predictions">Football predictions for
         the top leagues too</a>.</p>
-      <!-- The notice sits ABOVE the button row on purpose. The first version
-           put it underneath, so the page offered a paid button directly above
-           the sentence saying you do not need to pay yet. The notice changes
-           what the buttons mean, so it has to be read first.
-           REMOVE THIS BLOCK AFTER 2026-09-12 12:30 UTC. -->
-      <p class="free-window">Premium is free on the web until the GW4 deadline on 12 September,
-        so GW1 to GW3. Create a free account and it's on. No card, nothing to cancel.</p>
       <div class="cta-row" id="get">
         <a class="btn btn-primary" href="https://pro.goaliq.app/" data-cta="hero-freewindow">Get Premium free &#9656;</a>
         <a class="btn btn-ghost" href="fpl.html" data-cta="hero-free">Try the free tools</a>

@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { signIn, signUp, sendMagicLink } from '$lib/auth.svelte';
+	import { signIn, signUp, sendMagicLink, freePremiumWindowActive } from '$lib/auth.svelte';
 
-	let mode = $state<'in' | 'up'>('in');
+	// 🔴 Villen havainto 16.8: "missa ohjeistus". Tama lomake avautui aina
+	// tilassa 'in' otsikolla "Already have an account?", eli ilmaisen ikkunan
+	// ainoa sisaankaynti ohjasi uuden kayttajan kirjautumislomakkeelle jolle
+	// hanella ei ole tunnuksia. Ikkunan ajan oletus on tilin LUONTI; sen
+	// jalkeen vanha oletus on taas oikea, koska osto ei vaadi tilia.
+	const windowOpen = freePremiumWindowActive();
+	let mode = $state<'in' | 'up'>(windowOpen ? 'up' : 'in');
 	let email = $state('');
 	let password = $state('');
 	let error = $state<string | null>(null);
@@ -38,11 +44,21 @@
 
 <!-- #101: osto ei enää vaadi tiliä (napit PremiumPreview'ssä yllä) →
      tämä lomake palvelee OLEMASSA OLEVIA tilejä, ei portita ostoa. -->
-<h3>Already have an account? Sign in</h3>
-<p class="muted">
-	Subscribed in the GoalIQ app, bought Premium here earlier, or want to use an existing
-	account? Sign in and Premium is active here too.
-</p>
+{#if windowOpen}
+	<!-- 🔴 POISTA 12.9.2026 12:30 UTC jalkeen: palauta alla oleva sign-in-otsikko. -->
+	<h3>Create your free account</h3>
+	<p class="muted">
+		Email and a password, that is all it takes. Premium switches on straight away and stays on
+		until the GW4 deadline on 12 September. No card, nothing to cancel. Already have an
+		account? Use Sign in below and Premium is on there too.
+	</p>
+{:else}
+	<h3>Already have an account? Sign in</h3>
+	<p class="muted">
+		Subscribed in the GoalIQ app, bought Premium here earlier, or want to use an existing
+		account? Sign in and Premium is active here too.
+	</p>
+{/if}
 
 <div class="modes" role="tablist" aria-label="Sign in or create account">
 	<button

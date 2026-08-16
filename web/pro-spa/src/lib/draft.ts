@@ -89,6 +89,29 @@ export function loadDraftUpdatedAt(): string | null {
 	}
 }
 
+/**
+ * Tyhjentää selaimeen jääneen draftin.
+ *
+ * 🔴 Villen havainto 16.8: uusi tili näytti valmiin joukkueen jota käyttäjä ei
+ * ollut koskaan valinnut (halvin laillinen 15, Fit checkerin muotoinen XI +
+ * penkki). Syy on `syncDraft`issa: tilillä ei ole draftia → lokaali työnnetään
+ * sinne. Selaimeen jäänyt kokeilu muuttui siis rekisteröityessä "sinun
+ * joukkueeksesi" ja seurasi tiliä puhelimeen asti.
+ *
+ * Tyhjä tili on ainoa puolustettava aloitustila: viikkosilmukka neuvoo
+ * kapteenia ja siirtoja, ja neuvo joukkueesta jota kukaan ei ole valinnut on
+ * pahempi kuin ei neuvoa lainkaan.
+ */
+export function clearDraft(): void {
+	try {
+		localStorage.removeItem(DRAFT_LS_KEY);
+		localStorage.removeItem(DRAFT_TS_KEY);
+		localStorage.removeItem(CAP_LS_KEY);
+	} catch {
+		/* fail-safe */
+	}
+}
+
 /** Palauttaa true jos tallennus onnistui (false = storage estetty/täynnä). */
 export function saveDraftIds(ids: number[], stamp = new Date().toISOString()): boolean {
 	try {

@@ -165,29 +165,55 @@
 		</p>
 	{/if}
 
-	<div class="plans">
-		{#each Object.entries(PLANS) as [key, plan] (key)}
-			{@const approx = planApprox(key as PlanKey)}
-			<div class="plan">
-				<!-- 31.7: UK/US-kävijälle valuuttalikiarvo (Adaptive Pricing hoitaa
-				     checkoutin tarkan summan kävijän valuutassa) -->
-				<span class="muted">{plan.hint}{approx ? ` · ${approx}` : ''}</span>
-				<button
-					class={key === 'season' ? 'primary' : 'secondary'}
-					disabled={busy !== null}
-					onclick={() => void buy(key as PlanKey)}
-				>
-					{busy === key ? 'Opening checkout…' : `Get Premium: ${plan.label}`}
-				</button>
-			</div>
-		{/each}
-	</div>
+	<!-- 🔴 Villen havainto 16.8: "heti alkuun ihminen menee pro sivuille niin
+	     matkastaan premium 25 EUR naamaan". Ikkunan aikana ensimmainen nappi
+	     oli "Get Premium: 25 EUR / year", eli sivu pyysi rahaa asiasta joka on
+	     juuri nyt ilmainen. Ostopolku ei saa kadota - joku haluaa maksaa heti
+	     ja pitaa sen - mutta se ei ole ikkunan aikana ensisijainen teko.
+	     🔴 POISTA WRAPPER 12.9.2026 12:30 UTC jalkeen (jata .plans-lohko). -->
+	{#snippet planButtons(forceSecondary: boolean)}
+		<div class="plans">
+			{#each Object.entries(PLANS) as [key, plan] (key)}
+				{@const approx = planApprox(key as PlanKey)}
+				<div class="plan">
+					<!-- 31.7: UK/US-kävijälle valuuttalikiarvo (Adaptive Pricing hoitaa
+					     checkoutin tarkan summan kävijän valuutassa) -->
+					<span class="muted">{plan.hint}{approx ? ` · ${approx}` : ''}</span>
+					<button
+						class={!forceSecondary && key === 'season' ? 'primary' : 'secondary'}
+						disabled={busy !== null}
+						onclick={() => void buy(key as PlanKey)}
+					>
+						{busy === key ? 'Opening checkout…' : `Get Premium: ${plan.label}`}
+					</button>
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+
+	{#if freePremiumWindowActive()}
+		<details class="pay-later">
+			<summary>Rather pay now and keep Premium after 12 September?</summary>
+			{@render planButtons(true)}
+		</details>
+	{:else}
+		{@render planButtons(false)}
+	{/if}
 	<!-- #102: rehellinen copy — tili LUODAAN oston jälkeen (webhook provisioi),
 	     joten "No account needed" oli faktavirhe. -->
-	<p class="muted no-account">
-		Skip the signup: pay with Stripe and we'll set up your account and email you a sign-in
-		link. Cancel anytime. One subscription covers web, iOS and Android.
-	</p>
+	{#if freePremiumWindowActive()}
+		<!-- Ikkunan aikana "skip the signup" on suoraan vastakkainen ohje kuin
+		     se jonka haluamme: tili ON se polku. 🔴 POISTA 12.9.2026 12:30 UTC. -->
+		<p class="muted no-account">
+			After 12 September it is {PLANS.monthly.label} or {PLANS.season.label}. One subscription
+			covers web, iOS and Android, and you can cancel anytime.
+		</p>
+	{:else}
+		<p class="muted no-account">
+			Skip the signup: pay with Stripe and we'll set up your account and email you a sign-in
+			link. Cancel anytime. One subscription covers web, iOS and Android.
+		</p>
+	{/if}
 	{#if buyError}
 		<p class="banner error">{buyError}</p>
 	{/if}

@@ -247,11 +247,20 @@
      olisi laskeutunut sivulle joka ei kerro tarjouksesta.
      🔴 POISTA 12.9.2026 12:30 UTC jalkeen. -->
 {#if freePremiumWindowActive() && !auth.user}
-	<p class="banner success">
-		Premium is free until the GW4 deadline on 12 September, so GW1 to GW3.
-		Create a free account and it's on. No card, nothing to cancel.
-		<button type="button" class="linklike" onclick={goUpgrade}>Get started</button>
-	</p>
+	<!-- 🔴 Villen havainto 16.8: "missa ohjeistus". Tama oli kappale jonka
+	     sisassa sisaankaynti oli tekstilinkkina, eli sivun tarkein teko nakyi
+	     samankokoisena kuin sen ymparilla oleva selitys. -->
+	<div class="free-card">
+		<h2>Premium is free until 12 September</h2>
+		<p>
+			That is GW1 to GW3. Create a free account and every Premium tool switches on straight
+			away. No card, nothing to cancel, and nothing happens when the window closes unless you
+			decide to keep it.
+		</p>
+		<button type="button" class="free-card-cta" onclick={goUpgrade}>
+			Create a free account
+		</button>
+	</div>
 {/if}
 
 {#if upgradeOpen && !premium}
@@ -263,8 +272,18 @@
 	{#if !auth.sessionResolved}
 		<p class="muted">Checking session…</p>
 	{:else if !auth.user}
-		<PremiumPreview />
-		<LoginBox />
+		<!-- 🔴 Ikkunan aikana lomake ENNEN ominaisuuslistaa: teko ensin, myynti
+		     perassa. Normaalisti jarjestys on oikein pain, koska silloin
+		     kavijan pitaa vakuuttua ennen kuin tili on hanelle mitaan arvoinen
+		     - ikkunan aikana tili on ilmainen eika vakuuttelua tarvita.
+		     🔴 PALAUTA ALKUPERAINEN JARJESTYS 12.9.2026 12:30 UTC jalkeen. -->
+		{#if freePremiumWindowActive()}
+			<LoginBox />
+			<PremiumPreview />
+		{:else}
+			<PremiumPreview />
+			<LoginBox />
+		{/if}
 	{:else if auth.subLoading && auth.sub === undefined}
 		<p class="muted">Checking subscription…</p>
 	{:else}
@@ -464,6 +483,37 @@
 {/if}
 
 <style>
+	/* 🔴 POISTA 12.9.2026 12:30 UTC jalkeen yhdessa .free-card-lohkon kanssa. */
+	.free-card {
+		border: 2px solid var(--accent);
+		border-radius: var(--radius);
+		background: var(--surface);
+		padding: var(--s-3);
+		margin-bottom: var(--s-4);
+	}
+	.free-card h2 {
+		margin: 0 0 var(--s-2);
+		font-size: var(--step-2);
+		line-height: 1.15;
+	}
+	.free-card p {
+		margin: 0 0 var(--s-3);
+		max-width: 60ch;
+	}
+	.free-card-cta {
+		background: var(--accent);
+		border: 2px solid var(--accent);
+		border-radius: var(--radius);
+		color: var(--surface);
+		font: inherit;
+		font-weight: 700;
+		padding: 12px 22px;
+		cursor: pointer;
+	}
+	.free-card-cta:hover {
+		background: transparent;
+		color: var(--accent);
+	}
 	.back-link {
 		background: none;
 		border: none;
