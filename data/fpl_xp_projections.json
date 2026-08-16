@@ -134,7 +134,7 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-16T18:32:08",
+    "generated_at": "2026-08-16T18:54:28",
     "season": "2026/27",
     "overrides_applied": 7,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -20218,7 +20218,7 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "low",
       "minutes_source": "override",
-      "minutes_override_reason": "Arsenal signed him from Club Brugge this summer and Trossard left for Besiktas, so the left wing is vacant rather than contested. He started all four pre-season friendlies and played 77 minutes against Borussia Dortmund with two assists and a won penalty. Arteta 8/2026: 'he looks fit, he looks confident, he looks sharp. His work rate is unbelievable so far'. Fantasy Football Scout 10/8/2026: he 'could well be a starter against Coventry City in Gameweek 1'. The model had him on 0.096, which is the same number it gives Fabio Vieira and every other player with no Premier League minutes, so it is a default and not a reading of his role. Held at 0.55 rather than higher because Arteta rotates the front line heavily, and this model has Saka and Eze on 0.62",
+      "minutes_override_reason": "Arsenal signed him from Club Brugge in July and he started the Community Shield against Manchester City at left wing on 16 August. His 0.096 was the model bottom tier for a player with no Premier League minutes, set by price rank inside the squad rather than by anything measured about him. Held at 0.55 and no higher because Martinelli started ahead of him against Como on 12 August",
       "data_basis": "no_history",
       "owned_pct": 5.0,
       "status": "a",

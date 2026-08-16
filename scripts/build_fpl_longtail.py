@@ -3033,10 +3033,16 @@ def render_club_page(short: str, players: list[dict], meta: dict,
             '<div class="lb-wrap"><table class="lb">'
             "<thead><tr><th>Situation</th><th>Order</th></tr></thead>"
             f"<tbody>{sp}</tbody></table></div>"
-            '<p class="note">? = no Premier League games yet, so the role and '
-            "the minutes are estimated rather than measured. Those players all "
-            "start from the same default, which is why several of them show "
-            "the same start probability.</p>"
+            # 🔴 16.8: edellinen versio sanoi etta nama pelaajat "all start
+            # from the same default". Se on epatosi: PROMOTED_PRIOR_TIERS
+            # antaa kolme eri arvoa (0.38 / 0.16 / 0.096) sen mukaan monesko
+            # kallein pelaaja on klubinsa positioryhmassa. Lause selitti
+            # samat luvut vaaralla syylla ja piilotti sen etta luku ON
+            # roolin luenta, karkea mutta mitattu (Brier +13,8 %).
+            '<p class="note">? = no Premier League games yet, so the start '
+            "probability comes from where the player sits in his club's price "
+            "order rather than from anything he has done here. Players on the "
+            "same rung get the same number.</p>"
             '<p class="note">The number is the order FPL publishes, so 1 is '
             "first in line. An empty situation means FPL has not published an "
             "order for it, which is not the same as nobody taking them. "
