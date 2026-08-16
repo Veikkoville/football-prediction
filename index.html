@@ -339,7 +339,7 @@
   @media (max-width: 620px) { .btn-band { width: 100%; text-align: center; } }
   .cta-note a { color: var(--cream); border-bottom: 1px solid var(--line); }
 
-  /* Track record -chip herossa: GEN:ACC-CHIP elaa taalla (.num/.lbl) */
+  /* Track record -chip herossa: GEN:ACC-CHIP writes here (.num/.lbl) */
   .hero-side { display: flex; flex-direction: column; gap: clamp(16px, 2vw, 22px); }
   .record-chip { border: 2px solid var(--teal); background: var(--panel); margin-top: 0; }
   .record-chip .chip-head { display: flex; justify-content: space-between; background: var(--teal); color: var(--ink);
@@ -353,7 +353,7 @@
   .record-chip .tr-links a.alt { color: var(--amber); }
   .record-chip .tr-links a.alt:hover { background: var(--amber); color: var(--ink); }
 
-  /* #72: GW-deadline-countdown */
+  /* #72: GW deadline countdown */
   .countdown { display: flex; flex-direction: column; gap: 8px; margin-top: 22px; }
   .cd-label { font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
   .cd-clock { display: flex; align-items: stretch; gap: 4px; }
@@ -689,7 +689,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </div>
 
-<!-- ILMAISIKKUNA. Sits directly under the nav, above the ticker and the hero,
+<!-- FREE WINDOW. Sits directly under the nav, above the ticker and the hero,
      so it is the first thing on the page rather than a line inside the copy.
      REMOVE THIS BLOCK AFTER 2026-09-12 12:30 UTC. -->
 <div class="free-band">
@@ -744,8 +744,8 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <p class="cta-note">After 12 September it is &euro;3.99 a month or
         <a href="https://pro.goaliq.app/checkout?plan=season" data-cta="hero">&euro;25 a year</a>.</p>
       <p class="cta-note">Free download on <a href="https://play.google.com/store/apps/details?id=com.veikkoville.goaliq">Google Play</a> and the <a href="https://apps.apple.com/app/id6780047163">App Store</a>. One subscription covers web, iOS and Android.</p>
-      <!-- #72: GW-deadline-countdown. Fallback = GW1-avaus pe 21.8.2026; JS
-           vaihtaa viralliseen GW-deadlineen /api/fantasy metasta. -->
+      <!-- #72: GW deadline countdown. Fallback = GW1 opening Fri 21 Aug 2026; JS
+           swaps in the official GW deadline from the /api/fantasy meta. -->
       <div class="countdown" id="gw-countdown" hidden>
         <span class="cd-label" id="cd-label">Season starts · GW1 (Fri 21 Aug)</span>
         <div class="cd-clock" aria-hidden="true">

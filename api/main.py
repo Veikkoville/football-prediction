@@ -1820,6 +1820,91 @@ def upcoming_fixtures(
 
 
 # ---------------------------------------------------------------------------
+# ENDPOINT: kaikki ottelut yhtena paivana, yli liigojen
+# ---------------------------------------------------------------------------
+@app.get("/api/fixtures/by-date")
+def fixtures_by_date(
+    date: str = Query(..., description="UTC-paiva YYYY-MM-DD"),
+):
+    """Kaikki ottelut annettuna UTC-paivana, ryhmiteltyna liigoittain.
+
+    🔴 EI TEE YHTAAN UPSTREAM-KUTSUA. Lukee vain sen mita lammitin on jo
+    hakenut (`fixtures:{code}:35`, kaikille liigoille, 35 vrk eteenpain).
+
+    Tama on suunnittelupaatos eika optimointi. Naiivi toteutus hakisi
+    jokaisen liigan erikseen pyyntopolulla, eli yksi sivunavaus = ~14
+    ulospain lahtevaa kutsua. football-data.orgin ilmaiskiintio on ~10/min
+    per avain, joten se ei ole hidas vaan RIKKI: 16.8 aamulla sama kaava
+    tuotti 429-ryopyn ja 38 sekunnin jumin kayttajalle. Kayttajan pyynto ei
+    odota upstreamia, piste.
+
+    Seuraus jonka on nakyttava vastauksessa: paiva jota lammitin ei ole
+    ehtinyt kattaa palauttaa tyhjan listan, ei virhetta. `covered` kertoo
+    kuinka monta liigaa oli valimuistissa, jotta klientti voi erottaa
+    "ei otteluita" tilasta "ei viela tiedossa".
+    """
+    from datetime import datetime as _dt
+    from src.data.football_data_org import FIXTURE_STANDINGS_CODES
+
+    try:
+        want = _dt.strptime(date, "%Y-%m-%d").date().isoformat()
+    except ValueError:
+        raise HTTPException(status_code=400,
+                            detail="date must be YYYY-MM-DD")
+
+    # Kaanteinen kartta koodista liigan nimeen: cache-avaimessa on koodi,
+    # mutta klientti puhuu liiganimilla (sama sanasto kuin /api/fixtures).
+    code_to_league: dict[str, str] = {}
+    for league_name, code in FIXTURE_STANDINGS_CODES.items():
+        code_to_league.setdefault(code, league_name)
+
+    leagues: list[dict] = []
+    covered = 0
+    total = 0
+    for code, league_name in sorted(code_to_league.items(),
+                                    key=lambda kv: kv[1]):
+        hit = _FD_HTTP_CACHE.get(f"fixtures:{code}:35")
+        if not hit:
+            continue
+        covered += 1
+        rows = []
+        for m in (hit[1] or {}).get("matches", []):
+            if (m.get("utcDate") or "")[:10] != want:
+                continue
+            home = m.get("homeTeam") or {}
+            away = m.get("awayTeam") or {}
+            # Sama ohitus kuin /api/fixtures: CL-karsinnoissa vastustaja voi
+            # olla viela ratkeamatta, jolloin nimi on None.
+            if not home.get("name") or not away.get("name"):
+                continue
+            rows.append({
+                "date": want,
+                "datetime": m.get("utcDate"),
+                "home_team": home.get("name"),
+                "away_team": away.get("name"),
+                "home_team_short_name": home.get("shortName"),
+                "away_team_short_name": away.get("shortName"),
+                "matchday": m.get("matchday"),
+            })
+        if not rows:
+            continue
+        rows.sort(key=lambda f: f["datetime"] or "")
+        total += len(rows)
+        leagues.append({"league": league_name, "code": code,
+                        "fixtures": rows})
+
+    # Liigat aikajarjestykseen paivan sisalla: ensin alkava liiga ylos.
+    leagues.sort(key=lambda g: g["fixtures"][0]["datetime"] or "")
+    return {
+        "date": want,
+        "leagues": leagues,
+        "total": total,
+        "leagues_covered": covered,
+        "leagues_known": len(code_to_league),
+    }
+
+
+# ---------------------------------------------------------------------------
 # T7-apufunktiot: premium-H2H-jakauma + joukkueen muoto-trendi
 # ---------------------------------------------------------------------------
 def _h2h_summary(h2h_all: pd.DataFrame, home_team: str, away_team: str) -> dict:
