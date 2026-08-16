@@ -59,11 +59,23 @@ def test_upgrade_view_is_not_gated_by_the_bare_premium_flag():
     assert render.group(1) == "paidPremium", (
         f"renderointiehto katsoo lippua '{render.group(1)}', ei paidPremiumia")
 
-    close = re.search(r"if \((\w+) && upgradeOpen\) upgradeOpen = false;", src)
-    assert close, "upgrade-nakyman sulkevaa efektia ei loydy"
-    assert close.group(1) == "paidPremium", (
-        f"sulkeva efekti katsoo lippua '{close.group(1)}', ei paidPremiumia. "
-        f"Nakyma aukeaa ja sulkeutuu samassa hetkessa.")
+    # Sulkeva efekti on AIKEEN mukainen. 16.8 iltapaivalla tama korjattiin
+    # kahdesti: ensin 'premium' tappoi Keep-napin, sitten pelkka 'paidPremium'
+    # jatti juuri rekisteroityneen jumiin upgrade-sivulle. Molemmat haarat
+    # tarvitaan, ja kumpikin katsoo ERI lippua.
+    gate = re.search(
+        r"upgradeIntent === 'gate' && (\w+)\) upgradeOpen = false;", src)
+    assert gate, "gate-aikeen sulkevaa haaraa ei loydy"
+    assert gate.group(1) == "premium", (
+        f"gate-haara katsoo lippua '{gate.group(1)}', ei premiumia. "
+        f"Ikkunan kautta rekisteroitynyt jaa jumiin upgrade-sivulle.")
+
+    keep = re.search(
+        r"upgradeIntent === 'keep' && (\w+)\) upgradeOpen = false;", src)
+    assert keep, "keep-aikeen sulkevaa haaraa ei loydy"
+    assert keep.group(1) == "paidPremium", (
+        f"keep-haara katsoo lippua '{keep.group(1)}', ei paidPremiumia. "
+        f"\"Keep it after that\" sulkisi itsensa heti.")
 
 
 def test_tools_stay_open_during_the_window():
@@ -79,9 +91,10 @@ def test_tools_stay_open_during_the_window():
 def test_negative_control_mutation_is_caught():
     """Palauta vanha vika -> porttien PITAA kaatua."""
     mutated = _src().replace(
-        "if (paidPremium && upgradeOpen) upgradeOpen = false;",
-        "if (premium && upgradeOpen) upgradeOpen = false;")
-    close = re.search(r"if \((\w+) && upgradeOpen\) upgradeOpen = false;", mutated)
-    assert close and close.group(1) == "premium", (
+        "upgradeIntent === 'keep' && paidPremium",
+        "upgradeIntent === 'keep' && premium")
+    keep = re.search(
+        r"upgradeIntent === 'keep' && (\w+)\) upgradeOpen = false;", mutated)
+    assert keep and keep.group(1) == "premium", (
         "negatiivinen kontrolli ei purrut: en saanut vanhaa vikaa takaisin, "
         "joten portti ei mittaa sita mita luulen sen mittaavan")

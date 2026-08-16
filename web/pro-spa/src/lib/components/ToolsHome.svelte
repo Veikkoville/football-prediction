@@ -153,11 +153,37 @@
 		forcePremium || (!!auth.sub && auth.sub.plan !== 'gw1-3-free')
 	);
 
-	function goUpgrade() {
+	/**
+	 * Miksi nakyma avattiin. Ratkaisee saako se sulkeutua itsestaan.
+	 *
+	 * 🔴 Kaksi vaatimusta jotka ovat suoraan ristiriidassa, ja siksi pelkka
+	 * lippu ei riita (mitattu: molemmat rikkoutuivat vuorollaan 16.8):
+	 *   'gate' = kayttaja tormasi lukkoon -> kun oikeus aukeaa, nakyman ON
+	 *            sulkeuduttava, muuten rekisteroitynyt jaa jumiin
+	 *            upgrade-sivulle ja joutuu etsimaan "Back to the tools".
+	 *   'keep' = kayttajalla ON jo oikeus ja han tuli ostamaan sen jatkoksi
+	 *            ("Keep it after that") -> nakyma EI saa sulkeutua, muuten
+	 *            nappi sulkee itsensa samassa hetkessa kun se aukeaa.
+	 */
+	let upgradeIntent = $state<'gate' | 'keep'>('gate');
+
+	function openUpgrade(intent: 'gate' | 'keep') {
+		upgradeIntent = intent;
 		upgradeOpen = true;
 		requestAnimationFrame(() => {
 			document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
 		});
+	}
+	// 🔴 Nama kaksi eivat ota parametria. Ensimmainen versio oli
+	// `goUpgrade(intent = 'gate')`, ja `onclick={goUpgrade}` syotti sille
+	// MouseEventin: aie ei ollut kumpikaan arvo, joten sulkeva efekti ei
+	// laukennut koskaan ja korjaus oli nakymaton. svelte-check nappasi sen
+	// tyyppivirheena, mutta vika oli toiminnallinen.
+	function goUpgrade() {
+		openUpgrade('gate');
+	}
+	function goKeepPremium() {
+		openUpgrade('keep');
 	}
 
 	// Hero-badge → upgrade-näkymä (signaali +page.sveltestä).
@@ -171,9 +197,11 @@
 
 	// Tilauksen aktivoituminen sulkee upgrade-näkymän itsestään.
 	$effect(() => {
-		// Vain oikea, maksettu tilaus sulkee nakyman. Ikkunatilaus ei, muuten
-		// "Keep it after that" sulkisi itsensa heti.
-		if (paidPremium && upgradeOpen) upgradeOpen = false;
+		// Oikeuden aukeaminen sulkee nakyman VAIN jos kayttaja tuli tanne
+		// lukon takia. 'keep'-aikeella tullut on jo premium, ja sulkeminen
+		// tappaisi juuri sen napin jota han painoi.
+		if (upgradeOpen && upgradeIntent === 'gate' && premium) upgradeOpen = false;
+		if (upgradeOpen && upgradeIntent === 'keep' && paidPremium) upgradeOpen = false;
 	});
 
 	onMount(() => {
@@ -318,7 +346,7 @@
 			     ikkunan aikana vaikka haluaisi. -->
 			<p class="banner success">
 				Premium is open to every account until the GW4 deadline on 12 September. Nothing to pay
-				and nothing to cancel. <button type="button" class="linklike" onclick={goUpgrade}
+				and nothing to cancel. <button type="button" class="linklike" onclick={goKeepPremium}
 					>Keep it after that</button
 				>
 			</p>
