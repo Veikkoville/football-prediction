@@ -46,7 +46,7 @@ def test_promo_code_still_wins_over_ref(monkeypatch):
         "discounts": [{"promotion_code": "promo_x"}],
         "metadata": {"ref": "DAZ"},
     }
-    assert m._affiliate_code_from_session(session) == "WOLFY"
+    assert m._affiliate_code_from_session(session) == ("WOLFY", "promo")
 
 
 def test_ref_attributes_when_no_code_was_used():
@@ -54,7 +54,7 @@ def test_ref_attributes_when_no_code_was_used():
     tama palauttaa None ja luoja jaa ilman provisiota."""
     session = {"discounts": [], "subscription": None,
                "metadata": {"ref": "daz", "plan": "season"}}
-    assert m._affiliate_code_from_session(session) == "DAZ"
+    assert m._affiliate_code_from_session(session) == ("DAZ", "ref")
 
 
 def test_no_code_and_no_ref_is_still_none():
@@ -148,7 +148,7 @@ def test_account_ref_attributes_when_browser_ref_is_gone(monkeypatch):
                         lambda uid: "DAZ" if uid == "u1" else None)
     session = {"discounts": [], "subscription": None, "metadata": {},
                "client_reference_id": "u1"}
-    assert m._affiliate_code_from_session(session) == "DAZ"
+    assert m._affiliate_code_from_session(session) == ("DAZ", "ref")
 
 
 def test_browser_ref_wins_over_account_ref(monkeypatch):
@@ -156,7 +156,7 @@ def test_browser_ref_wins_over_account_ref(monkeypatch):
     monkeypatch.setattr(m, "_account_affiliate_ref", lambda uid: "WOLFY")
     session = {"discounts": [], "subscription": None,
                "metadata": {"ref": "DAZ"}, "client_reference_id": "u1"}
-    assert m._affiliate_code_from_session(session) == "DAZ"
+    assert m._affiliate_code_from_session(session) == ("DAZ", "ref")
 
 
 def test_guest_checkout_without_account_does_not_crash(monkeypatch):

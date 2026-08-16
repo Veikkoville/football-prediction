@@ -282,8 +282,25 @@ def _promo_code_string(promo) -> Optional[str]:
     return None
 
 
-def _affiliate_code_from_session(obj: dict) -> Optional[str]:
-    """Checkout-sessiosta käytetty promokoodi affiliate-leimaksi.
+def _affiliate_code_from_session(obj: dict) -> Optional[tuple[str, str]]:
+    """Checkout-sessiosta luettu affiliate-koodi JA sen lahde.
+
+    Palauttaa `(koodi, lahde)` jossa lahde on "promo" tai "ref".
+
+    🔴 LAHDE ON PAKKO TALLENTAA LEIMAUSHETKELLA. Leima naytti aiemmin
+    samalta kummastakin polusta, eika sita voi paatella jalkikateen:
+    kupongit ovat `duration: once`, joten alennus irtoaa ensimmaisen laskun
+    jalkeen eika tilauksesta enaa nae kaytettiinko koodia. Ilman lahdetta
+    kirjoitettu leima jaa pysyvasti tulkinnanvaraiseksi, ja GW19:n payout
+    perustuisi arvaukseen.
+
+    Konkreettinen seuraus jos tama unohtuu: `check_affiliate_attribution.py`
+    vertaa leimoja Stripen `times_redeemed`-laskuriin ja kutsuu tilaa
+    `stamped > redeemed` MAHDOTTOMAKSI. Ref-polku tuottaa tasan sellaisia
+    leimoja - lunastusta ei tapahdu - joten ensimmainen ref-attribuoitu
+    maksu tekisi vahdista punaisen tilanteessa jossa kaikki toimi oikein.
+    Vaara halytys on pahempi kuin puuttuva: se opettaa lakkaamaan lukemasta
+    vahtia juuri ennen kuin provisioita aletaan maksaa.
 
     AFF-ATTRIB (11.8): affiliate-kupongit ovat `duration: once`, joten alennus
     IRTOAA tilaukselta ensimmäisen laskun jälkeen eikä Stripe enää kerro että
@@ -302,7 +319,7 @@ def _affiliate_code_from_session(obj: dict) -> Optional[str]:
             continue
         code = _promo_code_string(d.get("promotion_code"))
         if code:
-            return code
+            return code, "promo"
 
     # 🔴 EI aikaista returnia taalla. Ref-fallback (kohta 3) on VIIMEINEN
     # sana kaikilla poluilla, myos silloin kun tilausta ei ole tai sen haku
@@ -319,7 +336,7 @@ def _affiliate_code_from_session(obj: dict) -> Optional[str]:
         if isinstance(discount, dict):
             code = _promo_code_string(discount.get("promotion_code"))
             if code:
-                return code
+                return code, "promo"
 
     # 3. REF-FALLBACK (16.8). Kaksi ensimmäistä polkua lukevat KÄYTETYN
     #    promokoodin, eli ne toimivat vain jos asiakas maksoi alennuksella.
@@ -339,7 +356,7 @@ def _affiliate_code_from_session(obj: dict) -> Optional[str]:
     if isinstance(meta, dict):
         ref = _clean_affiliate_ref(meta.get("ref"))
         if ref:
-            return ref
+            return ref, "ref"
 
     # 4. TILIN REF (16.8, Villen havainto: "kaikkihan avaa sen x:sta suoraan").
     #
@@ -356,7 +373,7 @@ def _affiliate_code_from_session(obj: dict) -> Optional[str]:
     if uid and isinstance(uid, str):
         ref = _account_affiliate_ref(uid)
         if ref:
-            return ref
+            return ref, "ref"
     return None
 
 
@@ -398,7 +415,7 @@ def _clean_affiliate_ref(value) -> Optional[str]:
     return v if _REF_RE.match(v) else None
 
 
-def _stamp_affiliate(subscription_id: str, code: str) -> bool:
+def _stamp_affiliate(subscription_id: str, code: str, source: str) -> bool:
     """Leimaa affiliate-koodi tilauksen metadataan (pysyvä, ei vanhene).
 
     Tilauksen metadata säilyy vaikka alennus irtoaa, joten uusiutumislaskut
@@ -410,9 +427,10 @@ def _stamp_affiliate(subscription_id: str, code: str) -> bool:
     premium ei ole.
     """
     try:
-        stripe.Subscription.modify(subscription_id,
-                                   metadata={"affiliate": code})
-        print(f"[affiliate] leimattu {subscription_id} <- {code}")
+        stripe.Subscription.modify(
+            subscription_id,
+            metadata={"affiliate": code, "affiliate_source": source})
+        print(f"[affiliate] leimattu {subscription_id} <- {code} ({source})")
         return True
     except Exception as e:
         print(f"[affiliate] leimaus EPÄONNISTUI {subscription_id} <- {code}: {e}")
@@ -3440,7 +3458,8 @@ async def stripe_web_webhook(request: Request):
         if obj.get("subscription"):
             _affiliate = _affiliate_code_from_session(obj)
             if _affiliate:
-                _stamp_affiliate(obj["subscription"], _affiliate)
+                _code, _source = _affiliate
+                _stamp_affiliate(obj["subscription"], _code, _source)
         # Cross-platform (#7): web-tilaus avaa myös MOBIILIAPPIN premiumin —
         # appi gateaa profiles.is_premium-kentällä ensisijaisesti.
         profile_fields = {"is_premium": True,

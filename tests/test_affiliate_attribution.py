@@ -56,8 +56,13 @@ def _harness(monkeypatch):
                         lambda fields, match=None: True)
     monkeypatch.setattr(m, "_update_profile", lambda uid, fields: True)
     stamps: list[tuple[str, str]] = []
-    monkeypatch.setattr(m, "_stamp_affiliate",
-                        lambda sub_id, code: stamps.append((sub_id, code)) or True)
+    # 16.8: leimaus kirjaa myos LAHTEEN ("promo" / "ref"). Talteen otetaan
+    # kaikki kolme, jotta testi nakee jos lahde katoaa tai menee vaarin -
+    # ilman sita `check_affiliate_attribution.py` ei voi erottaa ref-leimoja
+    # kuponkilunastuksista ja menee punaiseksi oikeasta toiminnasta.
+    monkeypatch.setattr(
+        m, "_stamp_affiliate",
+        lambda sub_id, code, source: stamps.append((sub_id, code, source)) or True)
     return stamps
 
 
@@ -69,7 +74,7 @@ def test_promo_code_expanded_object_is_stamped(client, monkeypatch):
     r = client.post("/api/webhook/stripe-web", content=body,
                     headers={"stripe-signature": sig})
     assert r.status_code == 200
-    assert stamps == [("sub_test", "ROWAN")]
+    assert stamps == [("sub_test", "ROWAN", "promo")]
 
 
 def test_promo_code_as_id_is_resolved_and_stamped(client, monkeypatch):
@@ -86,7 +91,7 @@ def test_promo_code_as_id_is_resolved_and_stamped(client, monkeypatch):
     r = client.post("/api/webhook/stripe-web", content=body,
                     headers={"stripe-signature": sig})
     assert r.status_code == 200
-    assert stamps == [("sub_test", "ROWAN")]
+    assert stamps == [("sub_test", "ROWAN", "promo")]
 
 
 def test_falls_back_to_subscription_discount(client, monkeypatch):
@@ -105,7 +110,7 @@ def test_falls_back_to_subscription_discount(client, monkeypatch):
     r = client.post("/api/webhook/stripe-web", content=body,
                     headers={"stripe-signature": sig})
     assert r.status_code == 200
-    assert stamps == [("sub_test", "ROWAN")]
+    assert stamps == [("sub_test", "ROWAN", "promo")]
 
 
 def test_organic_purchase_is_not_stamped(client, monkeypatch):

@@ -60,13 +60,42 @@ def _fetch_promotion_codes() -> list[dict]:
     return out
 
 
-def _count_stamped(code: str) -> int:
-    """Montako tilausta kantaa `metadata.affiliate == code`."""
-    n = 0
+def _count_stamped(code: str) -> tuple[int, int, int]:
+    """Leimatut tilaukset lahteen mukaan: (promo, ref, tuntematon).
+
+    🔴 LAHDE-EROTTELU ON TAMAN VAHDIN EHTO TOIMIA (16.8.2026).
+
+    Vahti vertaa leimoja Stripen `times_redeemed`-laskuriin. Se oli oikein
+    niin kauan kuin leima saattoi syntya VAIN kupongin kaytosta: yksi
+    lunastus, yksi leima.
+
+    16.8 rakennettu ref-polku rikkoo tuon suhteen. Luojan katsoja tulee
+    linkista, luo ilmaisen tilin GW1-GW3-ikkunan aikana ja maksaa 12.9.
+    jalkeen TAYTTA HINTAA ilman koodia. Leima syntyy, lunastusta ei tapahdu.
+    Ilman erottelua ensimmainen sellainen maksu tuottaisi `stamped >
+    redeemed` eli tilan jota tama skripti kutsuu MAHDOTTOMAKSI - punainen
+    hälytys tilanteessa jossa kaikki toimi tasan oikein.
+
+    Vaara halytys on pahempi kuin puuttuva: se opettaa lakkaamaan lukemasta
+    vahtia, ja sitten oikea vuoto piiloutuu sen taakse. Juuri ennen GW19:n
+    ensimmaista payoutia se olisi kallein mahdollinen hetki.
+
+    `tuntematon` = ennen 16.8 kirjoitetut leimat, joissa ei ole
+    `affiliate_source`-kenttaa. Niita EI voi luokitella jalkikateen, koska
+    kupongit ovat `duration: once` ja alennus on jo irronnut. Ne lasketaan
+    promo-puolelle, koska ref-polkua ei ollut olemassa kun ne syntyivat.
+    """
+    promo = ref = unknown = 0
     query = f"metadata['affiliate']:'{code}'"
-    for _ in stripe.Subscription.search(query=query, limit=100).auto_paging_iter():
-        n += 1
-    return n
+    for sub in stripe.Subscription.search(query=query, limit=100).auto_paging_iter():
+        src = ((sub.get("metadata") or {}).get("affiliate_source") or "").strip()
+        if src == "ref":
+            ref += 1
+        elif src == "promo":
+            promo += 1
+        else:
+            unknown += 1
+    return promo, ref, unknown
 
 
 def main() -> int:
@@ -93,22 +122,27 @@ def main() -> int:
         code = pc["code"]
         redeemed = int(pc.get("times_redeemed") or 0)
         try:
-            stamped = _count_stamped(code)
+            promo, ref, unknown = _count_stamped(code)
         except Exception as e:
             print(f"{code:14} {redeemed:>12} {'?':>11}  EI MITATTAVISSA "
                   f"({type(e).__name__}: {e})")
             problems.append(f"{code}: leimattujen haku epäonnistui")
             continue
 
-        if stamped == redeemed:
+        # Vain kuponkilahteiset leimat ovat vertailukelpoisia lunastuslukuun.
+        # Ref-leimat raportoidaan, ei verrata: niille ei ole lunastusta.
+        comparable = promo + unknown
+        if comparable == redeemed:
             tila = "OK"
-        elif stamped < redeemed:
-            tila = f"VUOTO: {redeemed - stamped} lunastusta ilman leimaa"
+        elif comparable < redeemed:
+            tila = f"VUOTO: {redeemed - comparable} lunastusta ilman leimaa"
             problems.append(f"{code}: {tila}")
         else:
-            tila = f"MAHDOTON: {stamped - redeemed} ylimääräistä leimaa"
+            tila = f"MAHDOTON: {comparable - redeemed} ylimääräistä koodileimaa"
             problems.append(f"{code}: {tila}")
-        print(f"{code:14} {redeemed:>12} {stamped:>11}  {tila}")
+        if ref:
+            tila += f" · {ref} linkkiattribuutiota (ei lunastusta, ei vertailua)"
+        print(f"{code:14} {redeemed:>12} {comparable:>11}  {tila}")
 
     if problems:
         print()
