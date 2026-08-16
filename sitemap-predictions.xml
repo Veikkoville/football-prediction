@@ -7,12 +7,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://goaliq.app/predictions/brasileirao/vasco-vs-santos</loc>
-    <lastmod>2026-08-16</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://goaliq.app/predictions/brasileirao/mirassol-vs-flamengo-rj</loc>
     <lastmod>2026-08-16</lastmod>
     <changefreq>daily</changefreq>
@@ -527,12 +521,6 @@
     <lastmod>2026-08-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://goaliq.app/predictions/la-liga/celta-vigo-vs-osasuna</loc>
-    <lastmod>2026-08-16</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://goaliq.app/predictions/la-liga/deportivo-la-coruna-vs-elche</loc>
