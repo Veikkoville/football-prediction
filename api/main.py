@@ -2347,6 +2347,107 @@ def clear_cache(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# ENDPOINT: affiliate-raportti (admin)
+# ---------------------------------------------------------------------------
+@app.get("/api/admin/affiliate-report")
+def affiliate_report(request: Request):
+    """Per luojakoodi: rekisteroityneet tilit + leimatut tilaukset.
+
+    🔴 MIKSI. Wolfy kysyi 16.8: "how would i know if someone has come from me
+    or not? Will it show on my account?" Vastaus oli EI: attribuutio elaa
+    Stripen tilausmetadatassa, luojilla ei ole tilia meilla, eika mitaan
+    luojanakymaa ole. Lupasimme kolmelle luojalle 30 % provision ja annoimme
+    heille linkin, mutta emme mitaan tapaa nahda tuloksia - eika Villellakaan
+    ollut muuta keinoa kuin selata Stripea kasin.
+
+    Kaksi lukua, ja ne mittaavat ERI asioita:
+
+      signups  = tilit joilla raw_user_meta_data.ref == koodi. Syntyy
+                 rekisteroitymishetkella. Ilmaisen ikkunan aikana TAMA on
+                 ainoa luku joka liikkuu, koska kukaan ei maksa.
+      stamped  = Stripe-tilaukset joilla metadata.affiliate == koodi. Tama on
+                 se luku josta provisio lasketaan.
+
+    🔴 signups on SYSTEMAATTISESTI ALAKANTTIIN eika sita saa esittaa
+    "linkin klikkauksina". Ref luetaan selaimen localStoragesta
+    rekisteroitymishetkella, joten jos joku klikkaa X:n webviewissa ja luo
+    tilin Chromessa, han ei nay tassa lainkaan vaikka tuli luojalta. Luku on
+    siis alaraja, ei mittaus. Sama koskee mobiilia: appin signUp ei kirjoita
+    refia ollenkaan.
+
+    ADMIN_TOKEN-portin takana kuten muutkin admin-reitit.
+    """
+    require_admin(request)
+    out: dict[str, dict] = {}
+
+    # 1) Rekisteroityneet tilit Supabasen admin-API:sta. Sivutetaan, koska
+    #    oletus on 50 kayttajaa/sivu ja hiljainen katkaisu antaisi liian
+    #    pienen luvun juuri silloin kun kayttajia alkaa olla.
+    supa_ok = False
+    if SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
+        headers = {
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        }
+        page, total_users = 1, 0
+        try:
+            while page <= 40:  # 40 x 200 = 8000 tilia, katto ettei jumita
+                r = requests.get(
+                    f"{SUPABASE_URL}/auth/v1/admin/users",
+                    params={"page": page, "per_page": 200},
+                    headers=headers, timeout=15,
+                )
+                if r.status_code != 200:
+                    break
+                users = (r.json() or {}).get("users") or []
+                if not users:
+                    break
+                total_users += len(users)
+                for u in users:
+                    ref = _clean_affiliate_ref(
+                        (u.get("user_metadata") or {}).get("ref"))
+                    if ref:
+                        out.setdefault(ref, {"signups": 0, "stamped": 0})
+                        out[ref]["signups"] += 1
+                if len(users) < 200:
+                    break
+                page += 1
+            supa_ok = True
+        except Exception as e:
+            print(f"[affiliate-report] Supabase-haku epaonnistui: {e}")
+    else:
+        total_users = 0
+
+    # 2) Leimatut tilaukset Stripesta.
+    stripe_ok = False
+    try:
+        subs = stripe.Subscription.list(limit=100, status="all")
+        for s in subs.auto_paging_iter():
+            code = _clean_affiliate_ref((s.get("metadata") or {}).get("affiliate"))
+            if code:
+                out.setdefault(code, {"signups": 0, "stamped": 0})
+                out[code]["stamped"] += 1
+                out[code].setdefault("statuses", {})
+                st = s.get("status") or "unknown"
+                out[code]["statuses"][st] = out[code]["statuses"].get(st, 0) + 1
+        stripe_ok = True
+    except Exception as e:
+        print(f"[affiliate-report] Stripe-haku epaonnistui: {e}")
+
+    return {
+        "codes": out,
+        "total_accounts_scanned": total_users,
+        "sources_ok": {"supabase": supa_ok, "stripe": stripe_ok},
+        "caveat": (
+            "signups is a floor, not a measurement: the ref is read from the "
+            "browser at sign-up, so a click in one browser and a sign-up in "
+            "another is not counted, and the mobile app does not write a ref "
+            "at all. stamped is the number commission is calculated from."
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
 # ENDPOINT: Beat the model — päätösten gradaus (admin-eräajo)
 # ---------------------------------------------------------------------------
 @app.post("/api/admin/grade-decisions")
