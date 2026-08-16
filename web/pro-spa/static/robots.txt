@@ -1,3 +1,10 @@
 # allow crawling everything by default
 User-agent: *
 Disallow:
+
+# 16.8.2026: luojan oma raporttisivu. Sisalto on tokenin takana eika sivu voi
+# vuotaa lukuja indeksiin, mutta se on kolmen ihmisen tyokalu eika hakutulos:
+# indeksoituna se olisi "GoalIQ creator dashboard" -osuma joka vie kenet
+# tahansa kirjautumislomakkeelle. `<meta name="robots">` on sivulla myos,
+# mutta se renderoityy vasta JS:n ajettua.
+Disallow: /creator

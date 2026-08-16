@@ -263,6 +263,38 @@ def _upsert_web_subscription(fields: dict, match: dict | None = None) -> bool:
         return False
 
 
+def _stripe_field(obj, key, default=None):
+    """Kentta joko Stripe-objektista TAI tavallisesta dictista.
+
+    🔴 MITATTU TUOTANNOSTA 16.8. `stripe`-kirjaston 15.x-sarjassa
+    `Subscription`, `PromotionCode` ja `metadata` EIVAT ole dict-alaluokkia
+    eika niilla ole `.get()`-metodia: `sub.get("discount")` heittaa
+    `AttributeError: get`. Webhookin oma payload sen sijaan on
+    `json.loads`-dict, jossa `.get` toimii - eli sama koodirivi kasittelee
+    kahta eri tyyppia sen mukaan tuliko arvo eventista vai API-haulla.
+
+    Ero ei nakynyt testeissa, koska jokainen testikaksoisolento oli dict.
+    Se nakyi tuotannossa kahdella tavalla: affiliate-raportin Stripe-puoli
+    palautti hiljaa `sources_ok.stripe = false`, ja
+    `_affiliate_code_from_session` heitti poikkeuksen KESKELLA
+    web-checkoutin fulfillmentia (tilausrivi kirjoitettu, `is_premium`
+    kirjoittamatta).
+    """
+    if obj is None:
+        return default
+    if isinstance(obj, dict):
+        value = obj.get(key, default)
+    else:
+        try:
+            value = obj[key]
+        except Exception:
+            value = getattr(obj, key, default)
+    # Eksplisiittinen None kohdellaan puuttuvana molemmilla poluilla: Stripe
+    # palauttaa `discount: null` yhta usein kuin jattaa kentan pois, ja
+    # kutsupaikat ketjuttavat naita (`_stripe_field(discount, ...)`).
+    return default if value is None else value
+
+
 def _promo_code_string(promo) -> Optional[str]:
     """Promokoodi-viitteestä sen näkyvä merkkijono (esim. "ROWAN").
 
@@ -271,16 +303,17 @@ def _promo_code_string(promo) -> Optional[str]:
     tapaus on käsiteltävä, koska väärä oletus näkyy vasta tuotannossa
     puuttuvana leimana — eikä silloin ole enää mitään mistä leimata.
     """
-    if isinstance(promo, dict):
-        return promo.get("code") or None
-    if isinstance(promo, str) and promo.startswith("promo_"):
+    if isinstance(promo, str):
+        if not promo.startswith("promo_"):
+            return None
         try:
             obj = stripe.PromotionCode.retrieve(promo)
-            return (obj or {}).get("code") or None
+            return _stripe_field(obj, "code") or None
         except Exception as e:
             print(f"[affiliate] PromotionCode.retrieve epäonnistui {promo}: {e}")
             return None
-    return None
+    # Laajennettu viite: webhookin payloadissa dict, API-haussa StripeObject.
+    return _stripe_field(promo, "code") or None
 
 
 def _affiliate_code_from_session(obj: dict) -> Optional[tuple[str, str]]:
@@ -333,11 +366,15 @@ def _affiliate_code_from_session(obj: dict) -> Optional[tuple[str, str]]:
         except Exception as e:
             print(f"[affiliate] Subscription.retrieve epäonnistui {sub_id}: {e}")
             sub = None
-        discount = ((sub or {}).get("discount") or {}) if sub else {}
-        if isinstance(discount, dict):
-            code = _promo_code_string(discount.get("promotion_code"))
-            if code:
-                return code, "promo"
+        # 🔴 EI `sub.get(...)`: `stripe.Subscription` ei ole dict eika sillä
+        # ole `.get`-metodia (ks. `_stripe_field`). Tama rivi heitti
+        # `AttributeError`in KESKELLA fulfillmentia, kutsupaikassa jossa ei
+        # ole try-lohkoa - eli web_subscriptions oli jo kirjoitettu mutta
+        # `profiles.is_premium` ei, ja guest-ostaja jai ilman magic linkkia.
+        discount = _stripe_field(sub, "discount") or {}
+        code = _promo_code_string(_stripe_field(discount, "promotion_code"))
+        if code:
+            return code, "promo"
 
     # 3. REF-FALLBACK (16.8). Kaksi ensimmäistä polkua lukevat KÄYTETYN
     #    promokoodin, eli ne toimivat vain jos asiakas maksoi alennuksella.
@@ -2574,12 +2611,14 @@ def _affiliate_tally(only: Optional[str] = None, fresh: bool = False) -> dict:
     try:
         subs = stripe.Subscription.list(limit=100, status="all")
         for s in subs.auto_paging_iter():
-            code = _clean_affiliate_ref((s.get("metadata") or {}).get("affiliate"))
+            # `s` on StripeObject eika dict: `.get` heittaisi (ks. _stripe_field).
+            meta = _stripe_field(s, "metadata")
+            code = _clean_affiliate_ref(_stripe_field(meta, "affiliate"))
             bucket = _bucket(code) if code else None
             if bucket is not None:
                 bucket["stamped"] += 1
                 bucket.setdefault("statuses", {})
-                st = s.get("status") or "unknown"
+                st = _stripe_field(s, "status") or "unknown"
                 bucket["statuses"][st] = bucket["statuses"].get(st, 0) + 1
         stripe_ok = True
     except Exception as e:
