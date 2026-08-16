@@ -264,7 +264,7 @@
 			     ostopolun on oltava tassa - muuten kukaan ei voi ostaa
 			     ikkunan aikana vaikka haluaisi. -->
 			<p class="banner success">
-				Premium is open to everyone until the GW4 deadline, 12 September. Nothing to pay
+				Premium is open to every account until the GW4 deadline on 12 September. Nothing to pay
 				and nothing to cancel. <button type="button" class="linklike" onclick={goUpgrade}
 					>Keep it after that</button
 				>
