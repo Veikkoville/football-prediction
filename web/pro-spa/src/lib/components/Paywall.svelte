@@ -32,7 +32,20 @@
 	});
 </script>
 
-<h3>Unlock GoalIQ Premium</h3>
+<!-- 🔴 Ikkunan aikana talle sivulle tullaan "Keep it after that" -napista, eli
+     kayttajalla ON jo Premium. "Unlock" olisi vaara verbi ja lukisi silta etta
+     jotain on kiinni. 🔴 POISTA HAARA 12.9.2026 12:30 UTC jalkeen. -->
+{#if freePremiumWindowActive()}
+	<h3>Keep Premium after 12 September</h3>
+	<p class="muted">
+		Nothing is locked right now, so there is no rush. Worth saying plainly: paying today
+		starts the subscription today, it does not wait for 12 September, so you would be
+		paying for weeks you already have for free. Coming back after the window is the
+		cheaper move, and this is only here for anyone who would rather deal with it now.
+	</p>
+{:else}
+	<h3>Unlock GoalIQ Premium</h3>
+{/if}
 <!--
 	4.8 (Villen paatos): molemmat pinnat olivat puolikkaita. Mobiilin
 	scoreline-lukko myi VAIN ottelusisaltoa ja tama sivu VAIN FPL:aa, vaikka

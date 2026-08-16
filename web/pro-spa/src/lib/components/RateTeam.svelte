@@ -25,6 +25,7 @@
 		pushRemoteDraftSoon,
 		loadCaptaincy,
 		saveCaptaincy,
+		DRAFT_CLEARED_EVENT,
 		type Captaincy
 	} from '$lib/draft';
 	import HoldVerdictCard from './HoldVerdictCard.svelte';
@@ -342,6 +343,41 @@
 	function removePick(id: number) {
 		picks = picks.filter((p) => p.id !== id);
 	}
+	/**
+	 * Tyhjenna koko draft kerralla.
+	 *
+	 * `picks = []` riittaa: persistointi-efekti kirjoittaa uuden allekirjoituksen
+	 * localStorageen ja tyontaa tyhjan listan myos tilille, koska
+	 * `draftEverHadPicks` on talla sivulatauksella jo tosi. Tulos nollataan
+	 * kasin, muuten nakyma jaisi nayttamaan edellisen arvion joukkueelle jota ei
+	 * enaa ole.
+	 */
+	function clearAllPicks() {
+		picks = [];
+		data = null;
+		error = null;
+	}
+	/**
+	 * 🔴 Rekisteroityminen tyhjentaa draftin (uusi tili aloittaa tyhjana), ja
+	 * sen on nakyttava TASSA nakymassa saman tien. Ilman tata storage on tyhja
+	 * mutta ruudulla on yha edellinen joukkue, ja persistointi-efekti kirjoittaa
+	 * sen takaisin ensimmaisesta muutoksesta. Mitattu: Ville loi uuden tilin
+	 * pelkan storage-tyhjennyksen jalkeen ja sai yha saman kokoonpanon.
+	 */
+	$effect(() => {
+		const onCleared = () => {
+			picks = [];
+			savedDraftIds = null;
+			// `captaincy` on const-olio (mutatoidaan paikallaan muuallakin).
+			captaincy.captain_id = null;
+			captaincy.vice_id = null;
+			data = null;
+			error = null;
+			autoDraftPending = false;
+		};
+		window.addEventListener(DRAFT_CLEARED_EVENT, onCleared);
+		return () => window.removeEventListener(DRAFT_CLEARED_EVENT, onCleared);
+	});
 	async function submitDraft(auto = false) {
 		if (!draftReady) return;
 		loading = true;
@@ -851,6 +887,15 @@
 			<p class="muted hint">
 				{picks.length} / 15 picked · GK {posCount.GKP}/2 · DEF {posCount.DEF}/5 · MID
 				{posCount.MID}/5 · FWD {posCount.FWD}/3
+				{#if picks.length > 0}
+					<!-- 🔴 Villen havainto 16.8. Ennen tata ainoa tapa paasta eroon
+					     draftista oli poistaa 15 pelaajaa yksitellen. Se on kohtuuton
+					     kenelle tahansa, ja erityisen kohtuuton niille joiden tilille
+					     oli adoptoitu joukkue jota he eivat olleet valinneet. -->
+					· <button type="button" class="clear-draft" onclick={clearAllPicks}>
+						Clear squad
+					</button>
+				{/if}
 			</p>
 			{#if picks.length < 15}
 				<!-- UX-palaute-erä kohdat 2+6: jaettu combobox — hinta + owned%
@@ -1657,6 +1702,15 @@
 		flex-wrap: wrap;
 		gap: var(--s-2);
 		margin-bottom: var(--s-2);
+	}
+	.clear-draft {
+		background: none;
+		border: none;
+		padding: 0;
+		font: inherit;
+		color: var(--giq-rust);
+		text-decoration: underline;
+		cursor: pointer;
 	}
 	.draft-chip {
 		display: inline-flex;

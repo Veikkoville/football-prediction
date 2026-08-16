@@ -102,6 +102,8 @@ export function loadDraftUpdatedAt(): string | null {
  * kapteenia ja siirtoja, ja neuvo joukkueesta jota kukaan ei ole valinnut on
  * pahempi kuin ei neuvoa lainkaan.
  */
+export const DRAFT_CLEARED_EVENT = 'goaliq:draft-cleared';
+
 export function clearDraft(): void {
 	try {
 		localStorage.removeItem(DRAFT_LS_KEY);
@@ -109,6 +111,17 @@ export function clearDraft(): void {
 		localStorage.removeItem(CAP_LS_KEY);
 	} catch {
 		/* fail-safe */
+	}
+	// 🔴 Pelkka storagen tyhjennys EI riita, ja tama on mitattu: Ville loi
+	// uuden tilin korjauksen jalkeen ja sai yha saman joukkueen. Draft
+	// hydratoidaan KERRAN sivulatauksella, joten `picks` jaa komponentin
+	// muistiin senkin jalkeen kun storage on tyhja - ja persistointi-efekti
+	// kirjoittaa ne sielta takaisin seka localStorageen etta tilille.
+	// Tyhjennys on siis kaksiosainen: levy ja nakyma.
+	try {
+		window.dispatchEvent(new CustomEvent(DRAFT_CLEARED_EVENT));
+	} catch {
+		/* fail-safe (SSR / ei window) */
 	}
 }
 

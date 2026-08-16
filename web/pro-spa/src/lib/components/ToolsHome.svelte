@@ -136,6 +136,22 @@
 	}
 
 	const premium = $derived(forcePremium || !!auth.sub);
+	/**
+	 * 🔴 Villen havainto 16.8: "keep it after that -buttoni ei ohjaa mihinkään".
+	 *
+	 * `premium` avaa työkalut, ja ilmaisikkunan synteettinen tilaus tekee siitä
+	 * toden. Upgrade-näkymä ei kuitenkaan saa käyttää samaa lippua: se sulkeutui
+	 * heti auettuaan (efekti alla) eikä renderöitynyt koskaan, koska ikkunan
+	 * käyttäjä lasketaan premiumiksi. Nappi nosti lipun ja efekti laski sen
+	 * samassa hetkessä.
+	 *
+	 * Seuraus oli tulonmenetys eikä kosmeettinen vika: ikkuna piilottaa
+	 * paywallin, joten tämä oli AINOA ostopolku ikkunan aikana. Kukaan ei ole
+	 * voinut ostaa siitä hetkestä kun ikkuna avattiin.
+	 */
+	const paidPremium = $derived(
+		forcePremium || (!!auth.sub && auth.sub.plan !== 'gw1-3-free')
+	);
 
 	function goUpgrade() {
 		upgradeOpen = true;
@@ -155,7 +171,9 @@
 
 	// Tilauksen aktivoituminen sulkee upgrade-näkymän itsestään.
 	$effect(() => {
-		if (premium && upgradeOpen) upgradeOpen = false;
+		// Vain oikea, maksettu tilaus sulkee nakyman. Ikkunatilaus ei, muuten
+		// "Keep it after that" sulkisi itsensa heti.
+		if (paidPremium && upgradeOpen) upgradeOpen = false;
 	});
 
 	onMount(() => {
@@ -263,7 +281,7 @@
 	</div>
 {/if}
 
-{#if upgradeOpen && !premium}
+{#if upgradeOpen && !paidPremium}
 	<!-- Upgrade-näkymä: ei enää oma ylätabi vaan päällekkäinen tila, josta
 	     pääsee takaisin työkaluihin yhdellä klikillä. -->
 	<button type="button" class="back-link" onclick={() => (upgradeOpen = false)}>
