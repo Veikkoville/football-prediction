@@ -81,13 +81,19 @@ def test_rapid_league_browse_no_user_429(client, monkeypatch):
     assert calls["n"] == len(leagues)
 
 
-def test_429_backoff_then_success(client, monkeypatch):
+def test_foreground_does_not_retry_on_429(client, monkeypatch):
+    """🔴 KAANNETTY 16.8 illalla. Tama testi vaati aiemmin uusintaa
+    pyyntopolussa. Se uusinta oli juuri se joka teki /api/standings:sta
+    38 sekunnin jumin (mitattu tuotannosta), koska kylma pyynto ketjutti
+    nelja yritysta backoffeineen. Uusinnat ovat nyt taustasaikeessa.
+
+    Kylma 429 on siis nopea 503 eika hidas 200. Klientti nayttaa
+    "Server is having trouble" ja pull-to-refresh toimii heti."""
     calls = _mock_get(monkeypatch, [_Resp(429, text="Too many requests"),
                                     _Resp(200, STANDINGS_BODY)])
     r = client.get("/api/standings?league=ENG-Premier League-FD")
-    assert r.status_code == 200
-    assert calls["n"] == 2, "429 → backoff → uusinta"
-    assert "stale" not in r.json()
+    assert r.status_code == 503
+    assert calls["n"] == 1, "pyyntopolku saa tehda tasan yhden yrityksen"
 
 
 def test_persistent_429_serves_stale_after_ttl(client, monkeypatch):
@@ -105,11 +111,13 @@ def test_persistent_429_serves_stale_after_ttl(client, monkeypatch):
     assert r2.json()["rows"] == r1.json()["rows"]
 
 
-def test_persistent_429_without_cache_is_handled_error(client, monkeypatch):
+def test_persistent_failure_without_cache_is_fast_503(client, monkeypatch):
+    """Ilman cachea: nopea, hallittu virhe. Status on 503 eika 429, koska
+    vika ei ole kayttajan pyyntotahdissa vaan siina ettei upstream vastaa
+    juuri nyt. Klientti mappaa 5xx:n uudelleenyritettavaksi."""
     _mock_get(monkeypatch, [_Resp(429, text="Too many requests")])
     r = client.get("/api/standings?league=ENG-Premier League-FD")
-    assert r.status_code == 429
-    assert "429" in r.json()["detail"]
+    assert r.status_code == 503
 
 
 def test_fixtures_share_cache_and_stale_flag(client, monkeypatch):
@@ -122,17 +130,20 @@ def test_fixtures_share_cache_and_stale_flag(client, monkeypatch):
     assert r2.json() == r1.json()
 
 
-def test_429_retries_more_than_once_before_giving_up(client, monkeypatch):
-    """16.8: yksi uusinta ei riittänyt. FD:n ilmaistason raja on per minuutti
-    ja kotinäkymän fan-out osui siihen kokonaisuudessaan → yksi 2 s backoff
-    heräsi yhä saman rajan sisään. Nyt uusintoja on useampi."""
-    calls = _mock_get(monkeypatch, [_Resp(429, text="Wait 2 seconds"),
-                                    _Resp(429, text="Wait 2 seconds"),
-                                    _Resp(429, text="Wait 2 seconds"),
-                                    _Resp(200, STANDINGS_BODY)])
-    r = client.get("/api/standings?league=ENG-Premier League-FD")
-    assert r.status_code == 200
-    assert calls["n"] == 4
+def test_stale_cache_is_served_instead_of_waiting(client, monkeypatch):
+    """Se mita aamun uusintaketju YRITTI saavuttaa, saadaan nyt ilman etta
+    kukaan odottaa: vanha vastaus heti + virkistys taustalla."""
+    _mock_get(monkeypatch, [_Resp(200, STANDINGS_BODY)])
+    r1 = client.get("/api/standings?league=ENG-Premier League-FD")
+    assert r1.status_code == 200
+    for k in list(m._FD_HTTP_CACHE):
+        ts, data = m._FD_HTTP_CACHE[k]
+        m._FD_HTTP_CACHE[k] = (ts - m.FD_HTTP_TTL_SEC - 1, data)
+    _mock_get(monkeypatch, [_Resp(429, text="Too many requests")])
+    r2 = client.get("/api/standings?league=ENG-Premier League-FD")
+    assert r2.status_code == 200, "stale, EI virhetta eika odotusta"
+    assert r2.json().get("stale") is True
+    assert r2.json()["rows"] == r1.json()["rows"]
 
 
 def test_429_sleep_honours_fd_hint_and_adds_jitter():
@@ -146,10 +157,11 @@ def test_429_sleep_honours_fd_hint_and_adds_jitter():
     assert m._fd_429_sleep_sec("", 2) > m._fd_429_sleep_sec("", 0) - 1.5
 
 
-def test_fixtures_ttl_is_longer_than_standings_ttl():
-    """Kotinäkymä hakee KAIKKI liigat rinnakkain joka avauksella. 10 min TTL
-    teki jokaisesta >10 min avauksesta täysin kylmän."""
-    assert m.FD_FIXTURES_TTL_SEC > m.FD_HTTP_TTL_SEC
+def test_both_ttls_are_long_enough_to_keep_cold_rare():
+    """Molemmat pintaa saivat pitkan TTL:n. Standings oli 10 minuutissa, ja
+    ~65 latauksella/vrk se tarkoitti etta lahes jokainen avaus oli kylma.
+    Tuoreus ei karsi, koska vanhentunut osuma virkistyy taustalla."""
+    assert m.FD_HTTP_TTL_SEC >= 1800
     assert m.FD_FIXTURES_TTL_SEC >= 1800
 
 
