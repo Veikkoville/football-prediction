@@ -2527,7 +2527,9 @@ AFFILIATE_CAVEAT = (
     "signups is a floor, not a measurement: the ref is read from the "
     "browser at sign-up, so a click in one browser and a sign-up in "
     "another is not counted, and the mobile app does not write a ref "
-    "at all. stamped is the number commission is calculated from."
+    "at all. stamped counts subscriptions carrying the code, and "
+    "commission is 30 percent of every payment they make, so stamped is "
+    "a count of subscriptions and not a euro figure."
 )
 
 # Laskenta kayttaa koko tililistan sivutuksen JA Stripen tilauslistauksen, eli
@@ -2588,7 +2590,14 @@ def _affiliate_tally(only: Optional[str] = None, fresh: bool = False) -> dict:
                     headers=headers, timeout=15,
                 )
                 if r.status_code != 200:
-                    break
+                    # 🔴 EI `break` ilman lipun laskua. Ensimmainen versio
+                    # asetti `supa_ok = True` silmukan JALKEEN, joten 401
+                    # (avaimen rotaatio), 429 tai 500 tuotti "signups: 0,
+                    # supabase: true" - eli tasan sen valheellisen nollan
+                    # jonka koko null-erottelu on rakennettu estamaan.
+                    print("[affiliate-report] Supabase-sivu "
+                          f"{page} -> HTTP {r.status_code}")
+                    raise RuntimeError(f"supabase HTTP {r.status_code}")
                 users = (r.json() or {}).get("users") or []
                 if not users:
                     break
@@ -2602,6 +2611,10 @@ def _affiliate_tally(only: Optional[str] = None, fresh: bool = False) -> dict:
                 if len(users) < 200:
                     break
                 page += 1
+            else:
+                # Sivutuskatto tayteen: lista jatkuu mutta lopetimme kesken,
+                # eli luku on vaillinainen. Sekin on "ei tietoa" eika luku.
+                raise RuntimeError("supabase pagination cap reached")
             supa_ok = True
         except Exception as e:
             print(f"[affiliate-report] Supabase-haku epaonnistui: {e}")

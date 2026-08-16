@@ -50,14 +50,31 @@
 		report ? `${target}${target.includes('?') ? '&' : '?'}ref=${report.code}` : ''
 	);
 
+	// 🔴 UTC eika katsojan vyohyke. Ikkuna paattyy 12.9. 12:30 UTC, ja
+	// UTC+13:ssa paikallinen muotoilu sanoisi "13 September" samalla kun
+	// jokainen julkinen sivu sanoo 12 September.
 	const windowEnds = $derived(
 		report
-			? new Date(report.free_window.ends_utc).toLocaleString(undefined, {
-					dateStyle: 'medium',
-					timeStyle: 'short'
+			? new Date(report.free_window.ends_utc).toLocaleDateString('en-GB', {
+					day: 'numeric',
+					month: 'long',
+					timeZone: 'UTC'
 				})
 			: ''
 	);
+
+	// Stripen raa'at statukset ovat sisainen sanasto. Luoja ei ole
+	// integraatiokehittaja, ja "incomplete_expired" ei kerro hanelle mitaan.
+	const STATUS_LABEL: Record<string, string> = {
+		active: 'active',
+		trialing: 'on trial',
+		past_due: 'payment overdue',
+		unpaid: 'unpaid',
+		canceled: 'cancelled',
+		paused: 'paused',
+		incomplete: 'never completed',
+		incomplete_expired: 'never completed'
+	};
 
 	const checkedAt = $derived(
 		report ? new Date(report.generated_at).toLocaleTimeString(undefined, { timeStyle: 'short' }) : ''
@@ -119,7 +136,7 @@
 	<header>
 		<h1>Creator dashboard</h1>
 		<p class="muted">
-			Your own numbers for your own code. Nobody else can see them here and you cannot see
+			Your own numbers for your own code. Nobody else can see them here, and you can't see
 			anyone else's.
 		</p>
 	</header>
@@ -129,8 +146,9 @@
 	{:else if view === 'signin'}
 		<div class="card">
 			<p>
-				Sign in with the account you told us about. If you have not made one yet, create it
-				with the same email you applied with and we will link your code to it.
+				Sign in with the account you told us about. If you haven't made one yet, create it
+				with the email you applied with, then email hello@goaliq.app so we can link your
+				code to it. Nothing here links itself; a person does it.
 			</p>
 			<LoginBox />
 		</div>
@@ -139,7 +157,7 @@
 			<h2>This account has no creator code</h2>
 			<p>{message}</p>
 			<p class="muted">
-				Signed in as {auth.user?.email}. If that is the wrong account, sign out and use the
+				Signed in as {auth.user?.email}. If that's the wrong account, sign out and use the
 				one you applied with. The terms and the application form are on the
 				<a href="https://goaliq.app/creators">creator program page</a>.
 			</p>
@@ -155,9 +173,8 @@
 
 		{#if report.free_window.active}
 			<div class="banner window">
-				Premium is free for everyone until {windowEnds}, so nobody is paying yet and paid
-				subscriptions cannot move before then. Sign-ups are the only number that can change
-				this month.
+				Premium is free for everyone until {windowEnds}, so hardly anyone has a reason to
+				pay yet. Sign-ups are the number to watch until then.
 			</div>
 		{/if}
 
@@ -167,16 +184,16 @@
 				{#if report.signups === null}
 					<b class="unknown">not available</b>
 					<span class="muted">
-						We could not read this just now. It is not zero, we simply did not get an
-						answer. Reload in a minute.
+						We couldn't read this just now. It isn't zero, we just didn't get an answer.
+						Reload in a minute.
 					</span>
 				{:else}
 					<b>{report.signups}</b>
 					<span class="muted">
-						This is a floor, not a count of your clicks. The tag is read from the browser
-						the link was opened in, so someone who opens it in the X app and signs up in
-						Chrome is not in this number, and the mobile app does not carry it at all.
-						The real figure is higher than this.
+						Read this as at least this many. The tag is read from the browser the link was
+						opened in, so someone who opens it in the X app and signs up in Chrome isn't in
+						here, and the mobile app doesn't carry the tag at all. The real number can only
+						be higher, never lower.
 					</span>
 				{/if}
 			</div>
@@ -186,14 +203,16 @@
 				{#if report.stamped === null}
 					<b class="unknown">not available</b>
 					<span class="muted">
-						We could not read this just now. It is not zero. Reload in a minute.
+						We couldn't read this just now. It isn't zero, we just didn't get an answer.
+						Reload in a minute.
 					</span>
 				{:else}
 					<b>{report.stamped}</b>
 					<span class="muted">
-						This is the number commission is calculated from. It counts subscriptions
-						carrying your code, whether the reader used the code at checkout or arrived
-						through your link and paid full price later.
+						Subscriptions carrying your code. Your commission is 30 percent of each payment
+						they make, so this isn't the euro figure, it's the number of subscriptions
+						behind it. A reader counts here whether they typed your code at checkout or
+						came through your link and paid full price later.
 					</span>
 				{/if}
 			</div>
@@ -207,14 +226,14 @@
 						<thead><tr><th>Status</th><th>Count</th></tr></thead>
 						<tbody>
 							{#each Object.entries(report.statuses) as [status, n] (status)}
-								<tr><td>{status}</td><td>{n}</td></tr>
+								<tr><td>{STATUS_LABEL[status] ?? status}</td><td>{n}</td></tr>
 							{/each}
 						</tbody>
 					</table>
 				</div>
 				<p class="muted">
 					Commission follows completed payments. A refunded or charged back subscription
-					does not stand, so a cancelled row here is not automatically money.
+					doesn't stand, so a cancelled row here isn't automatically money.
 				</p>
 			</div>
 		{/if}
@@ -240,7 +259,7 @@
 			<p class="muted">
 				Your discount code <strong>{report.code}</strong> is a second, separate way in: a
 				reader who types it at checkout is credited to you even if they never touched your
-				link. Say it is an affiliate link, whatever your platform calls it.
+				link. Say it's an affiliate link, whatever your platform calls it.
 			</p>
 		</div>
 
@@ -248,24 +267,24 @@
 			<h2>What this page cannot see</h2>
 			<ul>
 				<li>
-					<strong>Clicks.</strong> We do not track them. The first thing we can see is an
+					<strong>Clicks.</strong> We don't track them. The first thing we can see is an
 					account being created.
 				</li>
 				<li>
 					<strong>A reader who switches browser.</strong> Opened in one, signed up in
-					another, and the two are not connected. That reader is missing from the sign-up
+					another, and the two aren't connected. That reader is missing from the sign-up
 					number even though your code brought them.
 				</li>
 				<li>
-					<strong>App Store and Google Play.</strong> Those purchases do not go through our
-					checkout, so we cannot see where they came from. Send people to the site.
+					<strong>App Store and Google Play.</strong> Those purchases don't go through our
+					checkout, so we can't see where they came from. Send people to the site.
 				</li>
 				<li>
 					<strong>Who they are.</strong> By design. You get totals, never emails or names.
 				</li>
 			</ul>
 			<p class="muted">
-				If you think someone is missing, tell us and we will check it by hand. The
+				If you think someone's missing, tell us and we'll check it by hand. The
 				<a href="https://goaliq.app/creators">full terms</a> cover payouts: commission builds
 				up from your first referral and the first payouts go out at gameweek 19, against your
 				invoice.

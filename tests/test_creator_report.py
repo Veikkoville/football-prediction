@@ -64,7 +64,7 @@ def _isolate(monkeypatch):
 
 
 def _wire(monkeypatch, *, users, tokens, subs=(), supabase_fails=False,
-          stripe_fails=False):
+          supabase_status=200, stripe_fails=False):
     """Yksi valefiksaus koko polulle: token-verify, tilihaku ja listaus.
 
     Testit ajavat oikean koodipolun (`_verify_supabase_token` ->
@@ -85,6 +85,11 @@ def _wire(monkeypatch, *, users, tokens, subs=(), supabase_fails=False,
         if url.endswith("/auth/v1/admin/users"):
             if supabase_fails:
                 raise RuntimeError("supabase down")
+            if supabase_status != 200:
+                # 🔴 Toinen virhemuoto kuin poikkeus, ja se oli se rikki
+                # oleva: Supabase vastaa 401/429/500 ilman etta requests
+                # heittaa mitaan.
+                return _Resp({"msg": "nope"}, supabase_status)
             page = (params or {}).get("page", 1)
             return _Resp({"users": users if page == 1 else []})
         raise AssertionError(f"odottamaton URL: {url}")
@@ -207,6 +212,42 @@ def test_supabase_failure_reports_null_not_zero(monkeypatch):
     assert d["sources_ok"]["supabase"] is False
     # Stripe-puoli toimii yha, eika sita saa piilottaa Supabasen mukana.
     assert d["stamped"] == 1
+
+
+@pytest.mark.parametrize("status", [401, 429, 500])
+def test_supabase_http_error_also_reports_null(monkeypatch, status):
+    """🔴 Julkaisutarkistaja loysi taman 16.8, ja se oli oikeassa.
+
+    Ensimmainen versio nosti `supa_ok = True` sivutussilmukan JALKEEN, ja
+    non-200 poistui silmukasta `break`illa - eli avaimen rotaatio tai 429
+    tuotti "signups: 0, supabase: true". Poikkeuspolku oli testattu ja tama
+    ei, vaikka tama on se muoto jossa Supabase oikeasti epaonnistuu:
+    HTTP-vastaus tulee perille eika `requests` heita mitaan.
+    """
+    c = _wire(monkeypatch, users=ALL_USERS, tokens=TOKENS,
+              subs=[_sub("WOLFY")], supabase_status=status)
+    d = _get(c, "tok-wolfy").json()
+    assert d["signups"] is None, f"HTTP {status} raportoitiin nollana"
+    assert d["sources_ok"]["supabase"] is False
+
+
+def test_pagination_cap_is_not_a_number(monkeypatch):
+    """Jos tililista jatkuu yli sivutuskaton, luku on vaillinainen. Sekin on
+    "ei tietoa" eika pienempi luku."""
+    def endless(url, params=None, headers=None, timeout=None):
+        if url.endswith("/auth/v1/user"):
+            return _Resp({"id": "u-wolfy"})
+        if "/auth/v1/admin/users/" in url:
+            return _Resp(WOLFY)
+        return _Resp({"users": [dict(FAN_W, id=f"u-{(params or {}).get('page')}-{i}")
+                                for i in range(200)]})
+    monkeypatch.setattr(m.requests, "get", endless)
+    monkeypatch.setattr(m.stripe, "Subscription",
+                        type("S", (), {"list": staticmethod(
+                            lambda **kw: _Subs([]))}))
+    d = _get(TestClient(m.app), "tok-wolfy").json()
+    assert d["signups"] is None
+    assert d["sources_ok"]["supabase"] is False
 
 
 def test_stripe_failure_reports_null_stamped(monkeypatch):
