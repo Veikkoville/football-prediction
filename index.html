@@ -1133,7 +1133,7 @@ document.addEventListener('click', function (e) {
       label.textContent = 'GW' + (gw || '') + ' deadline';
       tick();
     })
-    .catch(function () { /* fallback-kohde jää voimaan */ });
+    .catch(function () { /* keep the fallback target */ });
 })();
 </script>
 

@@ -657,9 +657,10 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
   </div>
 </section>
 
-<!-- FULL RECORD (#117): koko per-ottelu-loki nakyvana tauluna. Sisallon bakee
-     scripts/build_fpl_page.py (update_predictions) data/prediction_log.json:sta
-     3 h valein (accuracy-log.yml) - ala kasin muokkaa markerien valia. -->
+<!-- FULL RECORD (#117): the complete per-match log as a visible table. The
+     content is baked in by
+     scripts/build_fpl_page.py (update_predictions) from data/prediction_log.json
+     every 3 hours (accuracy-log.yml). Do not hand-edit between the markers. -->
 <section id="record">
   <div class="wrap">
     <div class="section-head">

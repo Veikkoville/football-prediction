@@ -15,7 +15,7 @@
 	 * osto- ja checkout-paluulogiikka siirtyi ProView'sta tänne sellaisenaan.
 	 */
 	import { onMount } from 'svelte';
-	import { auth, refreshSubscription } from '$lib/auth.svelte';
+	import { auth, refreshSubscription, freePremiumWindowActive } from '$lib/auth.svelte';
 	import { fetchXp, type XpResponse } from '$lib/api';
 	import { capture } from '$lib/analytics';
 	import DefConLive from './DefConLive.svelte';
@@ -236,6 +236,22 @@
 			(iOS and Android). Just sign in with the same account on your phone.
 		</p>
 	{/if}
+{/if}
+
+<!-- 🔴 IKKUNAILMOITUS LASKEUTUMISNAKYMAAN (16.8, portin loydos).
+     Ilmoitus oli vain `PremiumPreview`-komponentissa, joka renderoityy
+     VASTA kun `upgradeOpen` on tosi eli `?tab=premium`-parametrilla tai
+     Upgrade-klikilla. Kirjautumaton kavija joka tuli suoraan
+     pro.goaliq.appiin ei nahnyt ikkunasta mitaan - ja juuri se on se URL
+     jonka annoimme luojille heidan ref-linkkiinsa. Heidan liikenteensa
+     olisi laskeutunut sivulle joka ei kerro tarjouksesta.
+     🔴 POISTA 12.9.2026 12:30 UTC jalkeen. -->
+{#if freePremiumWindowActive() && !auth.user}
+	<p class="banner success">
+		Premium is free until the GW4 deadline on 12 September, so GW1 to GW3.
+		Create a free account and it's on. No card, nothing to cancel.
+		<button type="button" class="linklike" onclick={goUpgrade}>Get started</button>
+	</p>
 {/if}
 
 {#if upgradeOpen && !premium}
