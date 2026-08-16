@@ -23,7 +23,7 @@ import re
 import sys
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Literal, Optional
 
@@ -2687,6 +2687,120 @@ def affiliate_report(request: Request):
         "total_accounts_scanned": tally["total_accounts_scanned"],
         "sources_ok": tally["sources_ok"],
         "caveat": AFFILIATE_CAVEAT,
+    }
+
+
+# ---------------------------------------------------------------------------
+# ENDPOINT: ilmaisikkunan seuranta (admin)
+# ---------------------------------------------------------------------------
+# Ikkuna avattiin tuotantoon 16.8.2026. Paiva on kovakoodattu tarkoituksella:
+# se on HISTORIAN kirjaus eika konfiguraatio, ja jos se olisi env, sen
+# siirtaminen muuttaisi jalkikateen sita mita "ikkunan aikana" tarkoittaa.
+FREE_WINDOW_OPENED = "2026-08-16"
+
+
+def _supabase_users() -> Optional[list[dict]]:
+    """Kaikki tilit Supabasen admin-API:sta, tai None jos haku ei onnistunut.
+
+    🔴 None EI OLE tyhja lista. Sama oppi kuin `_affiliate_tally`ssa:
+    epaonnistunut haku nayttaisi "nolla kayttajaa" ja se on vaite eika
+    lukuvirhe. Sivutuskaton tayttyminen on myos "ei tietoa", koska luku
+    olisi silloin vaillinainen.
+    """
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return None
+    headers = {"apikey": SUPABASE_SERVICE_ROLE_KEY,
+               "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}"}
+    out: list[dict] = []
+    try:
+        for page in range(1, 41):  # 40 x 200 = 8000 tilia
+            r = requests.get(f"{SUPABASE_URL}/auth/v1/admin/users",
+                             params={"page": page, "per_page": 200},
+                             headers=headers, timeout=15)
+            if r.status_code != 200:
+                print(f"[free-window] Supabase sivu {page} -> {r.status_code}")
+                return None
+            users = (r.json() or {}).get("users") or []
+            out.extend(users)
+            if len(users) < 200:
+                return out
+        return None  # katto tayteen: luku olisi vaillinainen
+    except Exception as e:
+        print(f"[free-window] Supabase-haku epaonnistui: {e}")
+        return None
+
+
+@app.get("/api/admin/free-window-report")
+def free_window_report(request: Request):
+    """Montako tilia on luotu ilmaisikkunan aikana, ja palasiko kukaan.
+
+    🔴 MITA TAMA MITTAA JA MITA EI. Ikkuna ei kirjoita mitaan: se on puhdas
+    lukuoperaatio kolmessa portissa eika `is_premium`-lippua kaanneta.
+    Siksi "lunastusta" ei ole olemassa tapahtumana jota voisi laskea.
+    Lahin mitattava asia on TILIN LUONTI, koska tilin tekeminen on ainoa
+    asia jonka premiumin saaminen taman ikkunan aikana vaatii.
+
+    `returned` on paras kaytettavissa oleva merkki siita etta joku myos
+    KAYTTI sita: hän kirjautui uudelleen luontinsa jalkeen. Se ei ole
+    todiste premium-nakymän avaamisesta - sita emme logita per kayttaja
+    emmeka ala logittamaan, koska se olisi uusi henkilotietovirta yhden
+    luvun vuoksi.
+
+    Vertailukohta on `baseline_per_day`: ikkunaa EDELTAVIEN 14 vuorokauden
+    mediaani. Ilman sita "4 tilia tanaan" ei kerro yhtaan mitaan.
+    """
+    require_admin(request)
+    users = _supabase_users()
+    if users is None:
+        raise HTTPException(status_code=503,
+                            detail="Could not read the account list just now. "
+                                   "This is not zero accounts.")
+
+    daily: dict[str, int] = {}
+    for u in users:
+        day = (u.get("created_at") or "")[:10]
+        if day:
+            daily[day] = daily.get(day, 0) + 1
+
+    opened = FREE_WINDOW_OPENED
+    since = [u for u in users if (u.get("created_at") or "") >= opened]
+    returned = [u for u in since
+                if u.get("last_sign_in_at")
+                and u["last_sign_in_at"] > (u.get("created_at") or "")]
+
+    # Baseline: 14 vrk ennen ikkunaa. Nollapaivat lasketaan mukaan, koska
+    # niiden pudottaminen nostaisi vertailutasoa ja piilottaisi nousun.
+    start = (datetime.fromisoformat(opened) - timedelta(days=14)).date()
+    end = datetime.fromisoformat(opened).date()
+    before = []
+    d = start
+    while d < end:
+        before.append(daily.get(d.isoformat(), 0))
+        d += timedelta(days=1)
+    before.sort()
+    n = len(before)
+    baseline = (before[n // 2] if n % 2 else (before[n // 2 - 1] + before[n // 2]) / 2) if n else None
+
+    return {
+        "window": {
+            "opened": opened,
+            "ends_utc": FREE_PREMIUM_UNTIL_DEFAULT,
+            "active": free_premium_window_active(),
+        },
+        "total_accounts": len(users),
+        "accounts_since_window": len(since),
+        "returned_since_window": len(returned),
+        "with_creator_ref": sum(
+            1 for u in since if (u.get("user_metadata") or {}).get("ref")),
+        "baseline_per_day_before_window": baseline,
+        "daily": dict(sorted(daily.items())[-30:]),
+        "caveat": (
+            "The window writes nothing, so there is no claim event to count. "
+            "accounts_since_window counts sign-ups, which is the only thing "
+            "getting premium requires right now. returned_since_window is a "
+            "proxy for actually using it: the account signed in again after "
+            "it was created. Neither number proves a premium view was opened."
+        ),
     }
 
 

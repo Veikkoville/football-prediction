@@ -1,0 +1,101 @@
+# Ilmaisikkunan seuranta (16.8.2026, Villen pyynto: "pystyta joku seuranta
+# etta kuinka moni 'lunastaa' nyt free premiumin").
+#
+# 🔴 MIKSI TAMA ON WORKFLOW EIKA PELKKA ENDPOINT. Endpoint jota kukaan ei
+# kutsu ei ole seurantaa. Ilman paivittaista kirjausta ainoa tapa nahda
+# liikutko yli normaalin tahdin on pyytaa joku ajamaan kutsu, ja silloin
+# sarjaa ei ole olemassa: nakisimme vain sen hetken luvun.
+#
+# Kirjoittaa yhden rivin per vuorokausi tiedostoon data/free_window_log.jsonl.
+# Sarja on se tuote, ei yksittainen luku.
+#
+# 🔴 Ikkuna EI kirjoita mitaan (puhdas lukuoperaatio), joten "lunastusta" ei
+# ole tapahtumana. Mitattava asia on tilin luonti, koska se on ainoa mita
+# premiumin saaminen taman ikkunan aikana vaatii. Endpointin oma `caveat`
+# sanoo saman, ja se kulkee lokiriville mukana.
+name: free-window-watch
+
+on:
+  schedule:
+    # 05:10 UTC: data-refreshin ja accuracy-lokin jalkeen, jotta paivan
+    # ensimmainen commit ei tormaa naihin rebase-kierrokseen.
+    - cron: "10 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: free-window-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the window report
+        id: read
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          if [ -z "$ADMIN_TOKEN" ]; then
+            echo "::error::ADMIN_TOKEN-secret puuttuu - seuranta ei aja."
+            exit 1
+          fi
+          resp=$(curl -s -w "\n%{http_code}" \
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            https://api.goaliq.app/api/admin/free-window-report)
+          body=$(echo "$resp" | head -n -1); code=$(echo "$resp" | tail -1)
+          if [ "$code" != "200" ]; then
+            # 🔴 EI hiljaista nollaa. 503 tarkoittaa ettei tililistaa saatu
+            # luettua, ja rivi jossa lukee 0 olisi vaite eika lukuvirhe.
+            echo "::error::free-window-report HTTP $code: $body"
+            exit 1
+          fi
+          echo "$body" > /tmp/report.json
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          d = json.loads(pathlib.Path("/tmp/report.json").read_text())
+          base = d.get("baseline_per_day_before_window")
+          print("## Ilmaisikkuna\n")
+          print(f"- tileja yhteensa: **{d['total_accounts']}**")
+          print(f"- ikkunan aikana luotuja: **{d['accounts_since_window']}**")
+          print(f"- niista palannut kirjautumaan: **{d['returned_since_window']}**")
+          print(f"- luojan refilla: **{d['with_creator_ref']}**")
+          print(f"- vertailutaso ennen ikkunaa: **{base}** tilia/vrk")
+          print("\n| paiva | tileja |\n|---|---|")
+          for day, n in list(d.get("daily", {}).items())[-14:]:
+              print(f"| {day} | {n} |")
+          PY
+
+      - name: Append one line to the log
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          d = json.loads(pathlib.Path("/tmp/report.json").read_text())
+          row = {k: d[k] for k in ("total_accounts", "accounts_since_window",
+                                   "returned_since_window", "with_creator_ref",
+                                   "baseline_per_day_before_window")}
+          row["daily"] = d.get("daily", {})
+          p = pathlib.Path("data/free_window_log.jsonl")
+          p.parent.mkdir(exist_ok=True)
+          with p.open("a", encoding="utf-8") as f:
+              f.write(json.dumps(row, ensure_ascii=False) + "\n")
+          PY
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/free_window_log.jsonl
+          if git diff --cached --quiet; then
+            echo "ei muutosta"; exit 0
+          fi
+          git commit -m "chore(free-window): paivan seurantarivi [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main && git push origin main && exit 0
+            sleep 5
+          done
+          echo "::error::push epaonnistui kolmesti"; exit 1
