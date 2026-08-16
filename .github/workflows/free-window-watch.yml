@@ -6,13 +6,15 @@
 # liikutko yli normaalin tahdin on pyytaa joku ajamaan kutsu, ja silloin
 # sarjaa ei ole olemassa: nakisimme vain sen hetken luvun.
 #
-# Kirjoittaa yhden rivin per vuorokausi tiedostoon data/free_window_log.jsonl.
-# Sarja on se tuote, ei yksittainen luku.
+# Kaksi sarjaa, kaksi tiedostoa:
+#   data/free_window_log.jsonl      tilien luonti vs vertailutaso
+#   data/affiliate_cohort_log.jsonl luojan linkista tullut -> maksoiko
+# Erikseen, koska luvut ovat eri populaatiosta eivatka saa sekoittua
+# samaan riviin.
 #
 # 🔴 Ikkuna EI kirjoita mitaan (puhdas lukuoperaatio), joten "lunastusta" ei
 # ole tapahtumana. Mitattava asia on tilin luonti, koska se on ainoa mita
-# premiumin saaminen taman ikkunan aikana vaatii. Endpointin oma `caveat`
-# sanoo saman, ja se kulkee lokiriville mukana.
+# premiumin saaminen taman ikkunan aikana vaatii.
 name: free-window-watch
 
 on:
@@ -35,8 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Read the window report
-        id: read
+      - name: Read both reports
         env:
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
@@ -44,52 +45,66 @@ jobs:
             echo "::error::ADMIN_TOKEN-secret puuttuu - seuranta ei aja."
             exit 1
           fi
-          resp=$(curl -s -w "\n%{http_code}" \
-            -H "X-Admin-Token: $ADMIN_TOKEN" \
-            https://api.goaliq.app/api/admin/free-window-report)
-          body=$(echo "$resp" | head -n -1); code=$(echo "$resp" | tail -1)
-          if [ "$code" != "200" ]; then
-            # 🔴 EI hiljaista nollaa. 503 tarkoittaa ettei tililistaa saatu
-            # luettua, ja rivi jossa lukee 0 olisi vaite eika lukuvirhe.
-            echo "::error::free-window-report HTTP $code: $body"
-            exit 1
-          fi
-          echo "$body" > /tmp/report.json
-          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import json, pathlib
-          d = json.loads(pathlib.Path("/tmp/report.json").read_text())
-          base = d.get("baseline_per_day_before_window")
-          print("## Ilmaisikkuna\n")
-          print(f"- tileja yhteensa: **{d['total_accounts']}**")
-          print(f"- ikkunan aikana luotuja: **{d['accounts_since_window']}**")
-          print(f"- niista palannut kirjautumaan: **{d['returned_since_window']}**")
-          print(f"- luojan refilla: **{d['with_creator_ref']}**")
-          print(f"- vertailutaso ennen ikkunaa: **{base}** tilia/vrk")
-          print("\n| paiva | tileja |\n|---|---|")
-          for day, n in list(d.get("daily", {}).items())[-14:]:
-              print(f"| {day} | {n} |")
-          PY
+          fetch () {
+            resp=$(curl -s -w "\n%{http_code}" -H "X-Admin-Token: $ADMIN_TOKEN" "$1")
+            body=$(echo "$resp" | head -n -1); code=$(echo "$resp" | tail -1)
+            if [ "$code" != "200" ]; then
+              # 🔴 EI hiljaista nollaa. 503 tarkoittaa ettei lahdetta saatu
+              # luettua, ja rivi jossa lukee 0 olisi vaite eika lukuvirhe.
+              echo "::error::$1 HTTP $code: $body"
+              return 1
+            fi
+            echo "$body" > "$2"
+          }
+          fetch https://api.goaliq.app/api/admin/free-window-report /tmp/report.json
+          fetch https://api.goaliq.app/api/admin/affiliate-cohort /tmp/cohort.json
 
-      - name: Append one line to the log
+      - name: Summary and log
         run: |
           python - <<'PY'
           import json, pathlib
           d = json.loads(pathlib.Path("/tmp/report.json").read_text())
+          c = json.loads(pathlib.Path("/tmp/cohort.json").read_text())
+          out = []
+          out.append("## Ilmaisikkuna\n")
+          out.append(f"- tileja yhteensa: **{d['total_accounts']}**")
+          out.append(f"- ikkunan aikana luotuja: **{d['accounts_since_window']}**")
+          out.append(f"- niista palannut kirjautumaan: **{d['returned_since_window']}**")
+          out.append(f"- luojan refilla: **{d['with_creator_ref']}**")
+          out.append(f"- vertailutaso ennen ikkunaa: **{d['baseline_per_day_before_window']}** tilia/vrk")
+          out.append("\n| paiva | tileja |\n|---|---|")
+          for day, n in list(d.get("daily", {}).items())[-14:]:
+              out.append(f"| {day} | {n} |")
+          out.append("\n## Luojakohortti\n")
+          codes = c.get("codes") or {}
+          if not codes:
+              out.append("Yksikaan tili ei viela kanna luojan refia.")
+          else:
+              out.append("| koodi | tileja | maksoi sivulla | vain storessa | konversio |")
+              out.append("|---|---|---|---|---|")
+              for code, v in codes.items():
+                  out.append(f"| {code} | {v['signups']} | {v['signups_paid_on_web']} "
+                             f"| {v['signups_paid_in_app_only']} | {v['conversion_pct']}% |")
+          summary = pathlib.Path(__import__("os").environ["GITHUB_STEP_SUMMARY"])
+          summary.write_text("\n".join(out) + "\n", encoding="utf-8")
+
           row = {k: d[k] for k in ("total_accounts", "accounts_since_window",
                                    "returned_since_window", "with_creator_ref",
                                    "baseline_per_day_before_window")}
           row["daily"] = d.get("daily", {})
-          p = pathlib.Path("data/free_window_log.jsonl")
-          p.parent.mkdir(exist_ok=True)
-          with p.open("a", encoding="utf-8") as f:
+          data = pathlib.Path("data")
+          data.mkdir(exist_ok=True)
+          with (data / "free_window_log.jsonl").open("a", encoding="utf-8") as f:
               f.write(json.dumps(row, ensure_ascii=False) + "\n")
+          with (data / "affiliate_cohort_log.jsonl").open("a", encoding="utf-8") as f:
+              f.write(json.dumps(codes, ensure_ascii=False) + "\n")
           PY
 
       - name: Commit
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/free_window_log.jsonl
+          git add data/free_window_log.jsonl data/affiliate_cohort_log.jsonl
           if git diff --cached --quiet; then
             echo "ei muutosta"; exit 0
           fi
