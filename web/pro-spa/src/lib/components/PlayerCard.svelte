@@ -564,6 +564,20 @@
 								{player.minutes_override_reason}.
 							</p>
 						{/if}
+						<!-- 16.8: minuuttipriori nojaa katkenneeseen kauteen. Villen
+						     havainto: Arsenalin ennustetussa XI:ssä ei ole Ødegaardia.
+						     Mitattu korrelaatio(viime kauden avaukset / 38, p_start) =
+						     0,785 (n=285), eli priori ei kysy MIKSI minuutit puuttuivat.
+						     EI suuntaväitettä: katkennut kausi voi tarkoittaa
+						     loukkaantunutta tähteä tai pelaajaa joka ei kelvannut, eikä
+						     minuuttiluku erota niitä. Sama rajaus kuin team_flagilla. -->
+						{#if player.minutes_basis_flag === 'short_season'}
+							<p class="muted">
+								He played {player.last_season?.minutes} minutes last season, so this
+								estimate rests on a short spell rather than a full one. That does not
+								say which way it is off.
+							</p>
+						{/if}
 						{#if premium}
 							{@const tot = player.xp_horizon_total}
 							{@const per = player.xp_per_gw}

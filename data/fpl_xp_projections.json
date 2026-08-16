@@ -134,9 +134,9 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-16T18:54:28",
+    "generated_at": "2026-08-16T19:38:20",
     "season": "2026/27",
-    "overrides_applied": 7,
+    "overrides_applied": 9,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
     "player_source": "FPL official API bootstrap (26/27) + frozen 25/26 baseline artifact (data/fpl_prev_baselines_2526.json, element code mapping)",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2526', '2627'] (sama fit-config kuin /api/predict)",
@@ -232,7 +232,7 @@
       "predicted_starts": 87.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 47.8,
+      "owned_pct": 48.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -353,7 +353,7 @@
       "predicted_starts": 81.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 73.2,
+      "owned_pct": 72.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -474,7 +474,7 @@
       "predicted_starts": 84.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 27.5,
+      "owned_pct": 27.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -595,7 +595,7 @@
       "predicted_starts": 92.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 16.5,
+      "owned_pct": 16.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -837,7 +837,7 @@
       "predicted_starts": 93.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 10.7,
+      "owned_pct": 10.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -958,7 +958,7 @@
       "predicted_starts": 85.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 22.0,
+      "owned_pct": 21.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1200,7 +1200,7 @@
       "predicted_starts": 84.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 21.2,
+      "owned_pct": 21.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1927,7 +1927,7 @@
       "predicted_starts": 97.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 28.3,
+      "owned_pct": 27.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2169,7 +2169,7 @@
       "predicted_starts": 89.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 41.8,
+      "owned_pct": 41.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2411,7 +2411,7 @@
       "predicted_starts": 100.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.1,
+      "owned_pct": 17.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2532,7 +2532,7 @@
       "predicted_starts": 74.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 28.1,
+      "owned_pct": 28.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2895,7 +2895,7 @@
       "predicted_starts": 83.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 12.4,
+      "owned_pct": 12.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3258,7 +3258,7 @@
       "predicted_starts": 84.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 31.6,
+      "owned_pct": 31.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3379,7 +3379,7 @@
       "predicted_starts": 78.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 25.8,
+      "owned_pct": 25.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3500,7 +3500,7 @@
       "predicted_starts": 100.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 11.5,
+      "owned_pct": 11.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3621,7 +3621,7 @@
       "predicted_starts": 73.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 22.2,
+      "owned_pct": 22.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4105,7 +4105,7 @@
       "predicted_starts": 90.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 11.0,
+      "owned_pct": 10.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5073,7 +5073,7 @@
       "predicted_starts": 82.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 12.6,
+      "owned_pct": 12.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5302,7 +5302,8 @@
         "yellows": -0.12,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 60,
@@ -5557,7 +5558,7 @@
       "predicted_starts": 83.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 4.4,
+      "owned_pct": 4.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6283,7 +6284,7 @@
       "predicted_starts": 82.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 7.7,
+      "owned_pct": 7.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6525,7 +6526,7 @@
       "predicted_starts": 86.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 26.5,
+      "owned_pct": 26.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6767,7 +6768,7 @@
       "predicted_starts": 62.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.5,
+      "owned_pct": 10.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7130,7 +7131,7 @@
       "predicted_starts": 83.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.8,
+      "owned_pct": 8.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7856,7 +7857,7 @@
       "predicted_starts": 64.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 57.5,
+      "owned_pct": 57.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7977,7 +7978,7 @@
       "predicted_starts": 49.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 8.6,
+      "owned_pct": 8.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8341,7 +8342,7 @@
       "predicted_starts": 92.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 23.7,
+      "owned_pct": 23.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8462,7 +8463,7 @@
       "predicted_starts": 65.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 7.2,
+      "owned_pct": 7.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9054,7 +9055,8 @@
         "yellows": -0.11,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 159,
@@ -9067,7 +9069,7 @@
       "predicted_starts": 85.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 4.1,
+      "owned_pct": 4.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9551,7 +9553,7 @@
       "predicted_starts": 62.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.2,
+      "owned_pct": 10.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10159,7 +10161,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",
       "data_basis": "pl_history",
-      "owned_pct": 14.2,
+      "owned_pct": 14.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -10886,7 +10888,7 @@
       "predicted_starts": 93.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.5,
+      "owned_pct": 8.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11250,7 +11252,7 @@
       "predicted_starts": 62.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.5,
+      "owned_pct": 3.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11721,7 +11723,8 @@
         "yellows": -0.18,
         "bonus": 0.29
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 417,
@@ -12568,7 +12571,8 @@
         "yellows": -0.14,
         "bonus": 0.21
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 491,
@@ -12944,7 +12948,7 @@
       "predicted_starts": 75.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.0,
+      "owned_pct": 4.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13186,7 +13190,7 @@
       "predicted_starts": 53.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 12.5,
+      "owned_pct": 12.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13549,7 +13553,7 @@
       "predicted_starts": 64.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.8,
+      "owned_pct": 10.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13914,7 +13918,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "De Zerbi named him Tottenham first choice for 26/27 and Vicario was placed on the transfer market (multiple reports 6/2026, incl. TeamTalk new contract + TribalFootball). Last season 630 min / 7 starts reflects Vicario being the incumbent, not Kinsky role now. He was excluded from the projection entirely at 19.5 percent owned",
       "data_basis": "pl_history",
-      "owned_pct": 19.9,
+      "owned_pct": 19.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14400,7 +14404,7 @@
       "predicted_starts": 67.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.7,
+      "owned_pct": 3.6,
       "status": "d",
       "news": "Knock - 75% chance of playing",
       "chance_next": 75,
@@ -15476,7 +15480,8 @@
         "yellows": -0.12,
         "bonus": 0.21
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 398,
@@ -15489,7 +15494,7 @@
       "predicted_starts": 46.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.9,
+      "owned_pct": 5.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -15963,7 +15968,8 @@
         "bonus": 0.57
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 86,
@@ -16204,6 +16210,252 @@
         "defensive_contribution": 0.51,
         "yellows": -0.13,
         "bonus": 0.15
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 11,
+      "web_name": "Mosquera",
+      "full_name": "Cristhian Mosquera",
+      "team": "Arsenal",
+      "team_short": "ARS",
+      "pos": "DEF",
+      "xmins": 53.1,
+      "predicted_starts": 60.0,
+      "minutes_confidence": "med",
+      "minutes_source": "override",
+      "minutes_override_reason": "He started the Community Shield against Manchester City on 16 August in a back four with White, Gabriel and Calafiori, and Hincapie did not start. The model had him on 0.39 from 986 minutes last season, his first at the club. Held at 0.60 because one competitive match is thin evidence for a centre back pairing that Arteta rotates",
+      "data_basis": "pl_history",
+      "owned_pct": 12.7,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 4,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 986,
+        "starts": 9,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.1,
+        "xa": 0.63,
+        "cs": 3,
+        "points": 40,
+        "per90": {
+          "goals": 0.0,
+          "assists": 0.0,
+          "xgi": 0.07
+        }
+      },
+      "p_start": 0.6,
+      "p_cameo": 0.1785,
+      "p_bench": 0.2215,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.09,
+      "xp_per_gw": 2.68,
+      "xp_per_90": 4.46,
+      "xp_horizon_total": 16.06,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.07
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.26
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.66
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.7
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.47
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.89
+        }
+      ],
+      "components": {
+        "appearance": 1.28,
+        "goals": 0.13,
+        "assists": 0.15,
+        "clean_sheet": 1.3,
+        "conceded": -0.05,
+        "saves": 0.0,
+        "defensive_contribution": 0.28,
+        "yellows": -0.16,
+        "bonus": 0.13
+      },
+      "components_gw": 1
+    },
+    {
+      "id": 15,
+      "web_name": "Ødegaard",
+      "full_name": "Martin Ødegaard",
+      "team": "Arsenal",
+      "team_short": "ARS",
+      "pos": "MID",
+      "xmins": 58.9,
+      "predicted_starts": 70.0,
+      "minutes_confidence": "med",
+      "minutes_source": "override",
+      "minutes_override_reason": "He started the Community Shield against Manchester City on 16 August as club captain, which is a competitive start rather than a friendly. The model had him on 0.428 because he played 1363 minutes and 16 starts last season, and the minutes prior cannot tell an injury from a benching. Held at 0.70 and not higher because Arsenal have been cautious with his return: he was left out of the Real Betis friendly after coming back from the World Cup",
+      "data_basis": "pl_history",
+      "owned_pct": 3.3,
+      "status": "a",
+      "news": "",
+      "chance_next": null,
+      "yellows": 0,
+      "price": 6.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1363,
+        "starts": 16,
+        "goals": 1,
+        "assists": 7,
+        "xg": 1.25,
+        "xa": 3.65,
+        "cs": 6,
+        "points": 74,
+        "per90": {
+          "goals": 0.07,
+          "assists": 0.46,
+          "xgi": 0.32
+        }
+      },
+      "p_start": 0.7,
+      "p_cameo": 0.1029,
+      "p_bench": 0.1971,
+      "set_pieces": {
+        "pens": 3,
+        "corners": 4,
+        "fk": null
+      },
+      "e_bonus": 0.22,
+      "xp_per_gw": 2.66,
+      "xp_per_90": 4.14,
+      "xp_horizon_total": 15.99,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "H"
+            }
+          ],
+          "xp": 3.11
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.37
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.81
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.49
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "BHA",
+              "venue": "A"
+            }
+          ],
+          "xp": 2.39
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 2.82
+        }
+      ],
+      "components": {
+        "appearance": 1.31,
+        "goals": 0.48,
+        "assists": 0.61,
+        "clean_sheet": 0.33,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.13,
+        "yellows": -0.05,
+        "bonus": 0.3
       },
       "components_gw": 1
     },
@@ -16581,7 +16833,7 @@
       "predicted_starts": 69.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 23.1,
+      "owned_pct": 23.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -18145,7 +18397,8 @@
         "bonus": 0.19
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 156,
@@ -18643,7 +18896,7 @@
       "predicted_starts": 42.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.6,
+      "owned_pct": 6.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -18764,7 +19017,7 @@
       "predicted_starts": 56.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 19.9,
+      "owned_pct": 20.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19356,7 +19609,8 @@
         "yellows": -0.06,
         "bonus": 0.1
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 369,
@@ -19479,7 +19733,8 @@
         "yellows": -0.05,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 87,
@@ -19721,7 +19976,8 @@
         "yellows": -0.07,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 115,
@@ -19842,7 +20098,8 @@
         "yellows": -0.07,
         "bonus": 0.22
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 393,
@@ -19963,7 +20220,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 213,
@@ -20220,7 +20478,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Arsenal signed him from Club Brugge in July and he started the Community Shield against Manchester City at left wing on 16 August. His 0.096 was the model bottom tier for a player with no Premier League minutes, set by price rank inside the squad rather than by anything measured about him. Held at 0.55 and no higher because Martinelli started ahead of him against Como on 12 August",
       "data_basis": "no_history",
-      "owned_pct": 5.0,
+      "owned_pct": 6.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20568,7 +20826,7 @@
       "predicted_starts": 55.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 4.3,
+      "owned_pct": 4.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20797,7 +21055,8 @@
         "yellows": -0.05,
         "bonus": 0.16
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 347,
@@ -20918,7 +21177,8 @@
         "yellows": -0.02,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 129,
@@ -21161,7 +21421,8 @@
         "bonus": 0.19
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 108,
@@ -21282,7 +21543,8 @@
         "yellows": -0.04,
         "bonus": 0.28
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 470,
@@ -21403,7 +21665,8 @@
         "yellows": -0.13,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 336,
@@ -21539,7 +21802,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 1.5,
+      "owned_pct": 1.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21757,7 +22020,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 3.3,
+      "owned_pct": 3.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21865,7 +22128,8 @@
         "yellows": -0.05,
         "bonus": 0.3
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 230,
@@ -21988,7 +22252,8 @@
         "yellows": -0.07,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 125,
@@ -22472,7 +22737,8 @@
         "yellows": -0.05,
         "bonus": 0.1
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 527,
@@ -22485,7 +22751,7 @@
       "predicted_starts": 29.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.2,
+      "owned_pct": 2.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -22730,7 +22996,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 1.5,
+      "owned_pct": 1.6,
       "status": "a",
       "news": "",
       "chance_next": 100,
@@ -22838,7 +23104,8 @@
         "yellows": -0.04,
         "bonus": 0.16
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 439,
@@ -23407,7 +23674,8 @@
         "yellows": -0.03,
         "bonus": 0.29
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 569,
@@ -23636,7 +23904,8 @@
         "yellows": -0.15,
         "bonus": 0.17
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 516,
@@ -23880,7 +24149,8 @@
         "yellows": -0.03,
         "bonus": 0.17
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 492,
@@ -24003,7 +24273,8 @@
         "yellows": -0.07,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 357,
@@ -24124,7 +24395,8 @@
         "yellows": -0.06,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 501,
@@ -24245,7 +24517,8 @@
         "yellows": -0.16,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 162,
@@ -24366,7 +24639,8 @@
         "yellows": -0.1,
         "bonus": 0.12
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 166,
@@ -24485,248 +24759,6 @@
         "defensive_contribution": 0.0,
         "yellows": -0.05,
         "bonus": 0.21
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 11,
-      "web_name": "Mosquera",
-      "full_name": "Cristhian Mosquera",
-      "team": "Arsenal",
-      "team_short": "ARS",
-      "pos": "DEF",
-      "xmins": 36.1,
-      "predicted_starts": 39.0,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 12.7,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 4,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 986,
-        "starts": 9,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.1,
-        "xa": 0.63,
-        "cs": 3,
-        "points": 40,
-        "per90": {
-          "goals": 0.0,
-          "assists": 0.0,
-          "xgi": 0.07
-        }
-      },
-      "p_start": 0.3896,
-      "p_cameo": 0.2724,
-      "p_bench": 0.338,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.06,
-      "xp_per_gw": 1.75,
-      "xp_per_90": 4.46,
-      "xp_horizon_total": 10.51,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.99
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.5
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.75
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.76
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.63
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.88
-        }
-      ],
-      "components": {
-        "appearance": 0.93,
-        "goals": 0.09,
-        "assists": 0.1,
-        "clean_sheet": 0.76,
-        "conceded": -0.04,
-        "saves": 0.0,
-        "defensive_contribution": 0.16,
-        "yellows": -0.11,
-        "bonus": 0.09
-      },
-      "components_gw": 1
-    },
-    {
-      "id": 15,
-      "web_name": "Ødegaard",
-      "full_name": "Martin Ødegaard",
-      "team": "Arsenal",
-      "team_short": "ARS",
-      "pos": "MID",
-      "xmins": 37.9,
-      "predicted_starts": 42.8,
-      "minutes_confidence": "med",
-      "data_basis": "pl_history",
-      "owned_pct": 2.9,
-      "status": "a",
-      "news": "",
-      "chance_next": null,
-      "yellows": 0,
-      "price": 6.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 1363,
-        "starts": 16,
-        "goals": 1,
-        "assists": 7,
-        "xg": 1.25,
-        "xa": 3.65,
-        "cs": 6,
-        "points": 74,
-        "per90": {
-          "goals": 0.07,
-          "assists": 0.46,
-          "xgi": 0.32
-        }
-      },
-      "p_start": 0.428,
-      "p_cameo": 0.1961,
-      "p_bench": 0.3759,
-      "set_pieces": {
-        "pens": 3,
-        "corners": 4,
-        "fk": null
-      },
-      "e_bonus": 0.14,
-      "xp_per_gw": 1.75,
-      "xp_per_90": 4.14,
-      "xp_horizon_total": 10.47,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "H"
-            }
-          ],
-          "xp": 2.03
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.56
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.84
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.63
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "BHA",
-              "venue": "A"
-            }
-          ],
-          "xp": 1.57
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 1.84
-        }
-      ],
-      "components": {
-        "appearance": 0.9,
-        "goals": 0.31,
-        "assists": 0.4,
-        "clean_sheet": 0.19,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.07,
-        "yellows": -0.03,
-        "bonus": 0.19
       },
       "components_gw": 1
     },
@@ -24970,7 +25002,8 @@
         "yellows": -0.03,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 420,
@@ -25212,7 +25245,8 @@
         "yellows": -0.05,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 241,
@@ -25333,7 +25367,8 @@
         "yellows": -0.05,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 18,
@@ -25454,7 +25489,8 @@
         "yellows": -0.08,
         "bonus": 0.14
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 478,
@@ -25701,7 +25737,8 @@
         "bonus": 0.14
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 460,
@@ -25823,7 +25860,8 @@
         "bonus": 0.09
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 98,
@@ -25944,7 +25982,8 @@
         "yellows": -0.16,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 454,
@@ -26066,7 +26105,8 @@
         "bonus": 0.06
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 160,
@@ -26187,7 +26227,8 @@
         "yellows": -0.06,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 487,
@@ -26308,7 +26349,8 @@
         "yellows": -0.09,
         "bonus": 0.1
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 120,
@@ -27225,7 +27267,8 @@
         "yellows": -0.06,
         "bonus": 0.2
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 461,
@@ -27577,7 +27620,8 @@
         "bonus": 0.04
       },
       "components_gw": 1,
-      "team_flag": "promoted"
+      "team_flag": "promoted",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 403,
@@ -27700,7 +27744,8 @@
         "yellows": -0.07,
         "bonus": 0.08
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 581,
@@ -27715,7 +27760,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.3,
+      "owned_pct": 0.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -28583,7 +28628,8 @@
         "yellows": -0.04,
         "bonus": 0.12
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 377,
@@ -28812,7 +28858,8 @@
         "yellows": -0.05,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 268,
@@ -28933,7 +28980,8 @@
         "yellows": -0.08,
         "bonus": 0.1
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 37,
@@ -29054,7 +29102,8 @@
         "yellows": -0.04,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 404,
@@ -29404,7 +29453,8 @@
         "yellows": -0.09,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 422,
@@ -29525,7 +29575,8 @@
         "yellows": -0.08,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 212,
@@ -29538,7 +29589,7 @@
       "predicted_starts": 55.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 11.2,
+      "owned_pct": 11.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29998,7 +30049,8 @@
         "yellows": -0.06,
         "bonus": 0.18
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 551,
@@ -30244,7 +30296,8 @@
         "yellows": -0.07,
         "bonus": 0.19
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 114,
@@ -30367,7 +30420,8 @@
         "yellows": -0.07,
         "bonus": 0.11
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 35,
@@ -30488,7 +30542,8 @@
         "yellows": -0.13,
         "bonus": 0.1
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 300,
@@ -30826,7 +30881,8 @@
         "yellows": -0.09,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 81,
@@ -31057,7 +31113,8 @@
         "yellows": -0.06,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 138,
@@ -31193,7 +31250,7 @@
       "predicted_starts": 32.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.3,
+      "owned_pct": 5.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -31422,7 +31479,8 @@
         "yellows": -0.06,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 415,
@@ -31543,7 +31601,8 @@
         "yellows": -0.07,
         "bonus": 0.17
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 522,
@@ -31664,7 +31723,8 @@
         "yellows": -0.09,
         "bonus": 0.12
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 277,
@@ -32439,7 +32499,8 @@
         "yellows": -0.05,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 173,
@@ -32454,7 +32515,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 8.2,
+      "owned_pct": 8.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -32998,7 +33059,8 @@
         "yellows": -0.1,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 167,
@@ -33119,7 +33181,8 @@
         "yellows": -0.05,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 553,
@@ -33132,7 +33195,7 @@
       "predicted_starts": 18.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.2,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -33240,7 +33303,8 @@
         "yellows": -0.02,
         "bonus": 0.15
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 27,
@@ -33609,7 +33673,8 @@
         "yellows": -0.08,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 242,
@@ -33855,7 +33920,8 @@
         "yellows": -0.05,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 186,
@@ -34887,7 +34953,8 @@
         "yellows": -0.04,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 148,
@@ -35008,7 +35075,8 @@
         "yellows": -0.14,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 405,
@@ -35250,7 +35318,8 @@
         "yellows": -0.04,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 215,
@@ -35371,7 +35440,8 @@
         "yellows": -0.03,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 548,
@@ -35494,7 +35564,8 @@
         "yellows": -0.04,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 486,
@@ -35738,7 +35809,8 @@
         "yellows": -0.05,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 56,
@@ -35982,7 +36054,8 @@
         "yellows": -0.09,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 502,
@@ -35995,7 +36068,7 @@
       "predicted_starts": 25.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.6,
+      "owned_pct": 2.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -36103,7 +36176,8 @@
         "yellows": -0.02,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 518,
@@ -36224,7 +36298,8 @@
         "yellows": -0.05,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 263,
@@ -36345,7 +36420,8 @@
         "yellows": -0.04,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 296,
@@ -37035,7 +37111,8 @@
         "yellows": -0.03,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 227,
@@ -37744,7 +37821,8 @@
         "yellows": -0.02,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 443,
@@ -38335,7 +38413,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 90,
@@ -38458,7 +38537,8 @@
         "yellows": -0.03,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 343,
@@ -38581,7 +38661,8 @@
         "yellows": -0.02,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 489,
@@ -38702,7 +38783,8 @@
         "yellows": -0.06,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 555,
@@ -39874,7 +39956,8 @@
         "yellows": -0.08,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 339,
@@ -39995,7 +40078,8 @@
         "yellows": -0.03,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 495,
@@ -40456,7 +40540,8 @@
         "yellows": -0.06,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 157,
@@ -40471,7 +40556,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 1.6,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -40579,7 +40664,8 @@
         "yellows": -0.05,
         "bonus": 0.06
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 566,
@@ -40808,7 +40894,8 @@
         "yellows": -0.02,
         "bonus": 0.1
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 70,
@@ -40929,7 +41016,8 @@
         "yellows": -0.07,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 234,
@@ -41065,7 +41153,7 @@
       "predicted_starts": 26.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 18.4,
+      "owned_pct": 18.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -41174,7 +41262,8 @@
         "bonus": 0.09
       },
       "components_gw": 1,
-      "team_flag": "promoted"
+      "team_flag": "promoted",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 282,
@@ -41760,7 +41849,7 @@
       "predicted_starts": 20.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.0,
+      "owned_pct": 1.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -41868,7 +41957,8 @@
         "yellows": -0.02,
         "bonus": 0.09
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 177,
@@ -42207,7 +42297,8 @@
         "yellows": -0.06,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 391,
@@ -42220,7 +42311,7 @@
       "predicted_starts": 22.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 13.7,
+      "owned_pct": 13.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -42328,7 +42419,8 @@
         "yellows": -0.03,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 531,
@@ -42572,7 +42664,8 @@
         "yellows": -0.02,
         "bonus": 0.05
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 101,
@@ -43045,7 +43138,8 @@
         "bonus": 0.06
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 245,
@@ -43412,7 +43506,8 @@
         "yellows": -0.04,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 348,
@@ -44265,7 +44360,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 62,
@@ -44386,7 +44482,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 63,
@@ -44741,7 +44838,8 @@
         "yellows": -0.03,
         "bonus": 0.03
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 151,
@@ -44864,7 +44962,8 @@
         "yellows": -0.02,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 430,
@@ -44985,7 +45084,8 @@
         "yellows": -0.02,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 247,
@@ -45216,7 +45316,8 @@
         "yellows": -0.03,
         "bonus": 0.07
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 558,
@@ -45459,7 +45560,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.5,
+      "owned_pct": 0.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -45677,7 +45778,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 2.4,
+      "owned_pct": 2.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -46698,7 +46799,8 @@
         "bonus": 0.02
       },
       "components_gw": 1,
-      "team_flag": "high_turnover"
+      "team_flag": "high_turnover",
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 462,
@@ -50896,7 +50998,8 @@
         "yellows": -0.05,
         "bonus": 0.04
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 444,
@@ -52428,7 +52531,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 5.6,
+      "owned_pct": 5.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -55141,7 +55244,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.1,
+      "owned_pct": 0.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -55947,7 +56050,8 @@
         "yellows": -0.02,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 220,
@@ -56558,7 +56662,8 @@
         "yellows": -0.01,
         "bonus": 0.02
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 541,
@@ -56573,7 +56678,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.5,
+      "owned_pct": 0.4,
       "status": "d",
       "news": "Knock - 75% chance of playing",
       "chance_next": 75,
@@ -57509,7 +57614,8 @@
         "yellows": -0.01,
         "bonus": 0.01
       },
-      "components_gw": 1
+      "components_gw": 1,
+      "minutes_basis_flag": "short_season"
     },
     {
       "id": 497,
@@ -59276,28 +59382,6 @@
       "excluded_reason": "below_min_xp"
     },
     {
-      "id": 582,
-      "web_name": "Madjo",
-      "full_name": "Brian Madjo",
-      "team": "Aston Villa",
-      "team_short": "AVL",
-      "pos": "FWD",
-      "price": 5.5,
-      "owned_pct": 1.4,
-      "status": "i",
-      "news": "Unspecified injury - Unknown return date",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 53,
       "web_name": "Manzambi",
       "full_name": "Johan Manzambi",
@@ -59320,6 +59404,28 @@
       "excluded_reason": "unavailable"
     },
     {
+      "id": 582,
+      "web_name": "Madjo",
+      "full_name": "Brian Madjo",
+      "team": "Aston Villa",
+      "team_short": "AVL",
+      "pos": "FWD",
+      "price": 5.5,
+      "owned_pct": 1.3,
+      "status": "i",
+      "news": "Unspecified injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
       "id": 193,
       "web_name": "Wright",
       "full_name": "Haji Wright",
@@ -59327,7 +59433,7 @@
       "team_short": "COV",
       "pos": "FWD",
       "price": 5.5,
-      "owned_pct": 1.2,
+      "owned_pct": 1.1,
       "status": "i",
       "news": "Thigh injury - Unknown return date",
       "chance_next": 0,

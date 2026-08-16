@@ -242,6 +242,56 @@ def sanity_gate(players: list[dict], boot: dict, coverable_teams: set[str],
 # R^2 0,000, puolustus vaara merkki), joten lippu kertoo MIKA on muuttunut,
 # ei mita siita seuraa. Sama sitova rajaus kuin muilla pinnoilla.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# MINUUTTIPRIORIN REHELLISYYSLIPPU (16.8.2026, Villen paatos)
+#
+# 🔴 MIKSI. Ville huomasi ettei Arsenalin ennustetussa XI:ssa ole Odegaardia.
+# Mitattu: korrelaatio(viime kauden avaukset / 38, p_start) = 0,785 (n=285),
+# eli priori on kaytannossa viime kauden avauskertojen kopio EIKA se kysy
+# miksi minuutit puuttuivat. Odegaard 1363 min / 16 avausta -> p_start 0,428,
+# ja sama mies aloitti Community Shieldin kapteenina.
+#
+# Sama sokeus jonka takia data/fpl_player_overrides.csv on olemassa:
+#   "ei pelannut koska ei ollut tarpeeksi hyva"       -> matala p_start OIKEIN
+#   "ei pelannut koska oli loukkaantunut / lainalla"  -> matala p_start VAARIN
+# Malli nakee vain minuuttiluvun, ei syyta.
+#
+# Tama lippu EI korjaa lukua. Se lopettaa luvun esittamisen mittauksena.
+# Oikea korjaus on hintapriori myos pl_history-riveille, ja se vaatii
+# walk-forward-backtestin (jonorivi PREDICTED-XI-PRIORI).
+#
+# 🔴 EI SUUNTAVAITETTA, sama sitova rajaus kuin team_flagilla: lippu kertoo
+# etta arvio nojaa lyhyeen otokseen, ei sita kumpaan suuntaan luku on
+# vaarassa. Katkennut kausi voi tarkoittaa loukkaantunutta tahtea TAI
+# pelaajaa joka ei kelvannut, eika minuuttiluku erota niita.
+# ---------------------------------------------------------------------------
+# 1500 min = noin 17 ottelua taydelta 38 ottelun kaudelta. Kynnys on
+# kalibroitu siihen tapaukseen josta tama alkoi: Odegaard (1363) osuu,
+# Doku ja Cherki (1773) eivat. Heidan kohdallaan kyse on eri asiasta,
+# XI-rungon muodosta, eika lippu saa vaittaa muuta.
+SHORT_SEASON_MINUTES = 1500
+
+
+def attach_minutes_basis_flag(players: list[dict]) -> int:
+    """Merkitsee rivit joiden minuuttipriori nojaa katkenneeseen kauteen."""
+    n = 0
+    for row in players:
+        # Ohitettu rivi on ihmisen paatos eika priorin tuotos -> lippu
+        # valehtelisi siita mihin luku nojaa.
+        if row.get("minutes_source") == "override":
+            continue
+        # no_history-rivit kantavat jo oman lippunsa (data_basis) eika
+        # niilla ole viime kauden minuutteja joihin viitata.
+        if row.get("data_basis") != "pl_history":
+            continue
+        mins = (row.get("last_season") or {}).get("minutes")
+        if mins is None or mins >= SHORT_SEASON_MINUTES:
+            continue
+        row["minutes_basis_flag"] = "short_season"
+        n += 1
+    return n
+
+
 def attach_team_confidence(players: list[dict]) -> dict:
     """Merkitsee liputetut joukkueet xP-riveille ja palauttaa meta-lohkon.
 
@@ -1176,6 +1226,9 @@ def main(argv: list[str] | None = None) -> int:
             "played."
         )
     tc_meta = attach_team_confidence(players)
+    n_short = attach_minutes_basis_flag(players)
+    print(f"      minuuttipriorin lippu: {n_short}/{len(players)} rivia nojaa "
+          f"alle {SHORT_SEASON_MINUTES} minuutin kauteen")
     out = {
         "meta": {
             "product": "GoalIQ Fantasy Phase 1: expected points (xP)",

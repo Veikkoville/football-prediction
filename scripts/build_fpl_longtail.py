@@ -2897,11 +2897,28 @@ def _no_history_flag(p: dict) -> str:
     Ensimmainen versioni seurasivuista pudotti lipun, joten lukija nakisi
     "8.7" ilman merkkia siita etta se on arvaus. `club-best` naytti taman
     oikein jo ennestaan — en vain kayttanyt sen konventiota.
+
+    🔴 TOINEN LIPPU 16.8, Villen havainto: "arsenalilla ei edes ole
+    odegaardia laitettu alotuksee". Odegaard EI ole `no_history` vaan
+    tavallinen `pl_history`-rivi, joten yllakuvattu lippu ei koskenut hanta
+    lainkaan. Mitattu: korrelaatio(viime kauden avaukset / 38, `p_start`) =
+    0,785 (n=285), eli katkennut kausi painaa priorin alas ilman etta
+    mikaan kertoo sita lukijalle. 1363 minuuttia ja 16 avausta luetaan
+    rotaatiopelaajaksi.
+
+    Lippu ei korjaa lukua eika kerro suuntaa. Se kertoo etta arvio nojaa
+    lyhyeen otokseen.
     """
-    if p.get("data_basis") != "no_history":
-        return ""
-    return (' <span class="flag" title="No Premier League games yet, role and '
-            'minutes estimated">?</span>')
+    if p.get("data_basis") == "no_history":
+        return (' <span class="flag" title="No Premier League games yet, role '
+                'and minutes estimated">?</span>')
+    if p.get("minutes_basis_flag") == "short_season":
+        mins = (p.get("last_season") or {}).get("minutes")
+        return (' <span class="flag" title="Only '
+                f'{mins} minutes last season, so this player&#x27;s minutes '
+                'estimate rests on a short spell rather than a full one. It '
+                'does not say which way the number is off">!</span>')
+    return ""
 
 
 def _set_piece_rows(players: list[dict]) -> str:
@@ -2926,7 +2943,7 @@ def _set_piece_rows(players: list[dict]) -> str:
     return "".join(out)
 
 
-def _xi_rows(players: list[dict]) -> tuple[str, int]:
+def _xi_rows(players: list[dict]) -> tuple[str, int, list[dict]]:
     """Ennustettu avauskokoonpano: paras 11 aloitustodennakoisyyden mukaan,
     positiorajoilla 1-4-4-2 -tyyliin taipuen. Palauttaa (rivit, n)."""
     # 🔴 Kayta JAETTUA POSITIONS-vakiota, ala kovakoodaa. Kirjoitin tahan
@@ -2957,7 +2974,7 @@ def _xi_rows(players: list[dict]) -> tuple[str, int]:
             key=lambda p: -p["predicted_starts"])
         valitut.extend(loput[:11 - len(valitut)])
     if len(valitut) < 11:
-        return "", 0
+        return "", 0, []
     # Sama kovakoodaus oli myos tassa: "GK" ei osunut, joten maalivahti
     # sortautui listan HANNILLE. Kentalla se on absurdi jarjestys.
     jarj = {pos: i for i, pos in enumerate(POSITIONS)}
@@ -2970,7 +2987,38 @@ def _xi_rows(players: list[dict]) -> tuple[str, int]:
         f'<td class="n hi">{p["predicted_starts"]:.0f}%</td>'
         "</tr>"
         for p in valitut)
-    return rivit, len(valitut)
+    return rivit, len(valitut), valitut
+
+
+def _xi_omissions(players: list[dict], valitut: list[dict]) -> str:
+    """Liputetut pelaajat jotka JAIVAT ulos ennustetusta XI:sta.
+
+    🔴 MIKSI TAMA ON ERI ASIA KUIN RIVIN LIPPU. Ville huomasi 16.8 ettei
+    Arsenalin XI:ssa ole Odegaardia. Rivikohtainen "!" ei auta hanta
+    lainkaan, koska Odegaard ei ole sivulla: hanta ei renderoida XI:hin
+    eika kahdeksan parhaan listaan. Lippu nakyy vain niille jotka ovat jo
+    nakyvissa, ja valitus koski nimenomaan puuttuvaa nimea.
+
+    Tama rivi vastaa siihen kysymykseen suoraan: kuka jai ulos ja mihin
+    lukuun se nojaa. Ei suuntavaitetta.
+    """
+    otetut = {id(p) for p in valitut}
+    ulkona = [p for p in players
+              if id(p) not in otetut
+              and p.get("minutes_basis_flag") == "short_season"
+              and isinstance(p.get("predicted_starts"), (int, float))]
+    if not ulkona:
+        return ""
+    ulkona.sort(key=lambda p: -(p.get("price") or 0))
+    osat = []
+    for p in ulkona[:4]:
+        mins = (p.get("last_season") or {}).get("minutes")
+        osat.append(f'{escape(str(p["web_name"]))} '
+                    f'({p["predicted_starts"]:.0f}%, {mins} min)')
+    return ('<p class="note">Missing from that eleven, and the reason is the '
+            "same in each case: they played a short season, so the estimate "
+            "reads them as rotation. "
+            + ", ".join(osat) + ".</p>")
 
 
 def render_club_page(short: str, players: list[dict], meta: dict,
@@ -3048,7 +3096,7 @@ def render_club_page(short: str, players: list[dict], meta: dict,
             "order for it, which is not the same as nobody taking them. "
             "Pre-season there are a lot of blanks.</p>")
 
-    xi, n_xi = _xi_rows(players)
+    xi, n_xi, xi_valitut = _xi_rows(players)
     if xi:
         osat.append(
             '<h2 id="xi">Predicted XI</h2>'
@@ -3062,7 +3110,18 @@ def render_club_page(short: str, players: list[dict], meta: dict,
             "Start is our projected chance of starting, not a "
             "lineup leak. We do not watch press conferences. The shape is the "
             "highest-probability starter at each position, so it will not "
-            "always match the manager's formation.</p>")
+            "always match the manager's formation.</p>"
+            # 🔴 16.8: kaksi rajoitetta jotka lukija nakee ITSE sivulta, joten
+            # ne on parempi sanoa kuin antaa hanen loytaa. Kumpikaan ei
+            # kerro suuntaa: emme tieda kumpaan suuntaan luku on vaarassa.
+            '<p class="note">Two things this table gets wrong in a way worth '
+            "knowing. A player who missed most of last season is read as a "
+            "rotation player, because the estimate leans on the minutes he "
+            "actually played and it cannot tell an injury from a benching. "
+            "Those names carry a ! here. And the shape is fixed, so a club "
+            "that plays five in midfield will always have one real starter "
+            "pushed out of this eleven.</p>"
+            + _xi_omissions(players, xi_valitut))
 
     conf = ((meta or {}).get("team_confidence") or {}).get("teams", {}).get(nimi)
     if conf and conf.get("note"):
@@ -3135,7 +3194,7 @@ def render_predicted_lineups(xp: dict, now: datetime) -> str | None:
     for short, ryhma in sorted(per_club.items()):
         if short not in CLUB_SLUGS or len(ryhma) < 8:
             continue
-        rivit, n = _xi_rows(ryhma)
+        rivit, n, _ = _xi_rows(ryhma)
         if not rivit:
             continue
         n_klubia += 1

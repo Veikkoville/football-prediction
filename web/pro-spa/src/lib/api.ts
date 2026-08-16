@@ -137,6 +137,11 @@ export interface XpPlayer {
 	minutes_override_reason?: string;
 	/** #147: koko nimi VAIN hakua varten — defensiivinen (vanha payload ei tuo). */
 	full_name?: string;
+	/** 16.8: minuuttipriori nojaa katkenneeseen kauteen (alle 1500 min viime
+	 *  kaudella). KUVAILEVA: kertoo että arvio nojaa lyhyeen otokseen, EI
+	 *  kumpaan suuntaan luku on väärässä. Kenttä on rivillä VAIN kun lippu on
+	 *  päällä; defensiivinen, vanha payload ei tuo. */
+	minutes_basis_flag?: 'short_season';
 	/** 10.8: joukkueen luottamuslippu. Kenttä on rivillä VAIN kun joukkue on
 	 *  liputettu (nousija tai poikkeuksellinen kausivaihtuvuus) — pelkkä
 	 *  vaihtuvuusluku kuuluu työkalutaulukoihin, ei jokaisen rivin viereen.
