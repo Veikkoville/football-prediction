@@ -82,3 +82,53 @@ def test_checkout_request_accepts_and_defaults_ref():
     r = m.WebCheckoutRequest(plan="season")
     assert r.ref == "", "ref on valinnainen; vanha klientti ei saa kaatua"
     assert m.WebCheckoutRequest(plan="season", ref="daz").ref == "daz"
+
+
+# --- ref paatyy oikeasti checkout-sessioon --------------------------------
+#
+# Ilman tata testi todistaisi vain etta pyynto ei kaadu. Sen ero on iso:
+# 16.8 tuotantoajo palautti Stripe-URLin ref-kentalla, mika ei kerro
+# yhtaan mitaan siita paatyiko ref metadataan. Talla se on pinnattu.
+
+def _capture_session(monkeypatch):
+    seen = {}
+
+    class _S:
+        url = "https://checkout.stripe.com/test"
+
+    def fake_create(**kw):
+        seen.update(kw)
+        return _S()
+
+    monkeypatch.setattr(m.stripe.checkout.Session, "create", fake_create)
+    monkeypatch.setattr(m, "STRIPE_PRICE_SEASON_ID", "price_test")
+    monkeypatch.setattr(m.stripe, "api_key", "sk_test")
+    return seen
+
+
+def test_guest_checkout_puts_ref_in_metadata(client, monkeypatch):
+    seen = _capture_session(monkeypatch)
+    r = client.post("/api/web/checkout/guest",
+                    json={"plan": "season", "origin": "https://pro.goaliq.app",
+                          "ref": "daz"})
+    assert r.status_code == 200, r.text
+    assert seen["metadata"]["ref"] == "DAZ", seen.get("metadata")
+
+
+def test_guest_checkout_without_ref_has_no_ref_key(client, monkeypatch):
+    """Negatiivinen kontrolli: tyhja ref ei saa luoda avainta. Orpo
+    'ref': '' metadatassa nayttaisi attribuutiolta jota ei ole."""
+    seen = _capture_session(monkeypatch)
+    r = client.post("/api/web/checkout/guest",
+                    json={"plan": "season", "origin": "https://pro.goaliq.app"})
+    assert r.status_code == 200, r.text
+    assert "ref" not in seen["metadata"], seen.get("metadata")
+
+
+def test_junk_ref_is_not_written_to_metadata(client, monkeypatch):
+    seen = _capture_session(monkeypatch)
+    r = client.post("/api/web/checkout/guest",
+                    json={"plan": "season", "origin": "https://pro.goaliq.app",
+                          "ref": "not a code!!"})
+    assert r.status_code == 200, r.text
+    assert "ref" not in seen["metadata"], seen.get("metadata")
