@@ -18,6 +18,8 @@ from __future__ import annotations
 import copy
 import json
 import os
+import random
+import re
 import sys
 import threading
 import time
@@ -1253,14 +1255,45 @@ def _fd_standings_row(row: dict) -> dict:
 _FD_HTTP_CACHE: dict[str, tuple[float, dict]] = {}
 _FD_HTTP_LOCKS: dict[str, threading.Lock] = {}
 _FD_HTTP_LOCKS_GUARD = threading.Lock()
-FD_HTTP_TTL_SEC = 600           # 10 min — standings/fixtures muuttuvat harvoin
-FD_HTTP_429_BACKOFF_SEC = 2.0   # lyhyt backoff + 1 uusinta
+FD_HTTP_TTL_SEC = 600           # 10 min — standings (1 kutsu kerrallaan)
+# 16.8: fixtures erikseen ja pidempaan. Kotinakyma hakee KAIKKI liigat
+# rinnakkain joka avauksella, joten 10 min TTL tarkoitti etta jokainen
+# avaus >10 min edellisesta oli taysin kylma -> 11 samanaikaista FD-kutsua.
+# SCHEDULED/TIMED-lista ei muutu 45 minuutissa kayttajalle merkittavasti.
+FD_FIXTURES_TTL_SEC = 2700      # 45 min
+FD_HTTP_429_BACKOFF_SEC = 2.0   # pohja-backoff, FD:n oma vihje voittaa
+FD_HTTP_MAX_ATTEMPTS = 4        # 1 + 3 uusintaa
+# Rinnakkaisuuskatto: FD:n ilmaistason raja on pyyntoa/min, ja 11-suuntainen
+# fan-out osui siihen kokonaisuudessaan (mitattu 16.8: 22 rinnakkaista ->
+# 22 x 429). Portti muuttaa ryopyn jonoksi ilman etta yksikaan kutsu putoaa.
+FD_HTTP_MAX_CONCURRENT = 2
+FD_HTTP_GATE_WAIT_SEC = 25.0    # kauemmin jonottava saa mieluummin stalen
+_FD_HTTP_GATE = threading.Semaphore(FD_HTTP_MAX_CONCURRENT)
+
+_FD_WAIT_HINT_RE = re.compile(r"[Ww]ait\s+(\d+)\s*second", re.ASCII)
+
+
+def _fd_429_sleep_sec(body: str, attempt: int) -> float:
+    """FD kertoo 429-bodyssa kauanko odottaa ("Wait 2 seconds"). Luetaan se
+    vihje ja lisataan JITTER: ilman jitteria kaikki rinnakkaiset saikeet
+    heraavat samalla sekunnilla ja tormaavat uudelleen (thundering herd —
+    tasan se mika 16.8 kaatoi kaikki 22 kutsua yhta aikaa)."""
+    hinted = 0.0
+    m = _FD_WAIT_HINT_RE.search(body or "")
+    if m:
+        try:
+            hinted = float(m.group(1))
+        except ValueError:
+            hinted = 0.0
+    base = max(hinted, FD_HTTP_429_BACKOFF_SEC * (attempt + 1))
+    return min(base, 20.0) + random.uniform(0.2, 1.5)
 
 
 def _fd_get_cached(url: str, api_key: str,
                    ttl_sec: int = FD_HTTP_TTL_SEC) -> tuple[dict, bool]:
     """Palauttaa (data, stale). TTL-cache + single-flight (lukko per URL, ettei
-    rinnakkaiskutsut laukaise montaa FD-hakua) + 429-backoff + stale-fallback.
+    rinnakkaiskutsut laukaise montaa FD-hakua) + rinnakkaisuusportti +
+    jitteroitu 429-backoff + stale-fallback.
     Ilman cachea virhetilassa → HTTPException (hallittu virhe kuten ennen)."""
     hit = _FD_HTTP_CACHE.get(url)
     if hit and time.time() - hit[0] < ttl_sec:
@@ -1272,27 +1305,39 @@ def _fd_get_cached(url: str, api_key: str,
         hit = _FD_HTTP_CACHE.get(url)
         if hit and time.time() - hit[0] < ttl_sec:
             return hit[1], False
-        last_error: HTTPException | None = None
-        for attempt in range(2):
-            try:
-                r = requests.get(url, headers={"X-Auth-Token": api_key}, timeout=15)
-            except Exception as e:
+        # Rinnakkaisuusportti. Jos jono on pitka eika vuoroa tule ajoissa,
+        # stale on parempi vastaus kuin odotuttaa kayttajaa loputtomiin.
+        if not _FD_HTTP_GATE.acquire(timeout=FD_HTTP_GATE_WAIT_SEC):
+            if hit:
+                return hit[1], True
+            raise HTTPException(
+                status_code=503,
+                detail="football-data.org upstream busy, try again shortly")
+        try:
+            last_error: HTTPException | None = None
+            for attempt in range(FD_HTTP_MAX_ATTEMPTS):
+                try:
+                    r = requests.get(url, headers={"X-Auth-Token": api_key},
+                                     timeout=15)
+                except Exception as e:
+                    last_error = HTTPException(
+                        status_code=502,
+                        detail=f"Upstream error contacting football-data.org: "
+                               f"{type(e).__name__}: {e}")
+                    break
+                if r.status_code == 200:
+                    data = r.json()
+                    _FD_HTTP_CACHE[url] = (time.time(), data)
+                    return data, False
+                if r.status_code == 429 and attempt < FD_HTTP_MAX_ATTEMPTS - 1:
+                    time.sleep(_fd_429_sleep_sec(r.text, attempt))
+                    continue
                 last_error = HTTPException(
-                    status_code=502,
-                    detail=f"Upstream error contacting football-data.org: "
-                           f"{type(e).__name__}: {e}")
+                    status_code=r.status_code,
+                    detail=f"football-data.org returned {r.status_code}: {r.text[:200]}")
                 break
-            if r.status_code == 200:
-                data = r.json()
-                _FD_HTTP_CACHE[url] = (time.time(), data)
-                return data, False
-            if r.status_code == 429 and attempt == 0:
-                time.sleep(FD_HTTP_429_BACKOFF_SEC)
-                continue
-            last_error = HTTPException(
-                status_code=r.status_code,
-                detail=f"football-data.org returned {r.status_code}: {r.text[:200]}")
-            break
+        finally:
+            _FD_HTTP_GATE.release()
         if hit:
             # TTL vanhentunut mutta data olemassa → parempi stale kuin virhe.
             return hit[1], True
@@ -1527,7 +1572,8 @@ def upcoming_fixtures(
         f"&dateFrom={today.isoformat()}&dateTo={date_to.isoformat()}"
     )
     # #49: TTL-cache + 429-backoff + stale-fallback (ei suoraa FD-kutsua)
-    data, fd_stale = _fd_get_cached(url, api_key)
+    # 16.8: fixtureille oma pidempi TTL — ks. FD_FIXTURES_TTL_SEC.
+    data, fd_stale = _fd_get_cached(url, api_key, ttl_sec=FD_FIXTURES_TTL_SEC)
     fixtures = []
     for m in data.get("matches", []):
         home = m.get("homeTeam") or {}

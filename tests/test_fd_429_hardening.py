@@ -122,6 +122,78 @@ def test_fixtures_share_cache_and_stale_flag(client, monkeypatch):
     assert r2.json() == r1.json()
 
 
+def test_429_retries_more_than_once_before_giving_up(client, monkeypatch):
+    """16.8: yksi uusinta ei riittänyt. FD:n ilmaistason raja on per minuutti
+    ja kotinäkymän fan-out osui siihen kokonaisuudessaan → yksi 2 s backoff
+    heräsi yhä saman rajan sisään. Nyt uusintoja on useampi."""
+    calls = _mock_get(monkeypatch, [_Resp(429, text="Wait 2 seconds"),
+                                    _Resp(429, text="Wait 2 seconds"),
+                                    _Resp(429, text="Wait 2 seconds"),
+                                    _Resp(200, STANDINGS_BODY)])
+    r = client.get("/api/standings?league=ENG-Premier League-FD")
+    assert r.status_code == 200
+    assert calls["n"] == 4
+
+
+def test_429_sleep_honours_fd_hint_and_adds_jitter():
+    """FD kertoo bodyssa kauanko odottaa. Ilman jitteriä rinnakkaiset säikeet
+    heräävät samalla sekunnilla ja törmäävät uudelleen."""
+    body = '{"message":"You reached your request limit. Wait 7 seconds.","errorCode":429}'
+    samples = [m._fd_429_sleep_sec(body, 0) for _ in range(20)]
+    assert all(s >= 7.0 for s in samples), "FD:n vihjettä on noudatettava"
+    assert len(set(samples)) > 1, "jitterin pitää hajauttaa herätykset"
+    # Negatiivinen kontrolli: ilman vihjettä pohja-backoff kasvaa yritysten mukana
+    assert m._fd_429_sleep_sec("", 2) > m._fd_429_sleep_sec("", 0) - 1.5
+
+
+def test_fixtures_ttl_is_longer_than_standings_ttl():
+    """Kotinäkymä hakee KAIKKI liigat rinnakkain joka avauksella. 10 min TTL
+    teki jokaisesta >10 min avauksesta täysin kylmän."""
+    assert m.FD_FIXTURES_TTL_SEC > m.FD_HTTP_TTL_SEC
+    assert m.FD_FIXTURES_TTL_SEC >= 1800
+
+
+def test_concurrent_fanout_is_gated_not_stampeded(client, monkeypatch):
+    """Mitattu vika 16.8: 22 rinnakkaista pyyntöä → 22 × 429, koska jokainen
+    URL meni omana FD-kutsunaan yhtä aikaa. Portti rajaa yhtäaikaiset."""
+    import threading as _th
+
+    peak = {"now": 0, "max": 0}
+    guard = _th.Lock()
+
+    def fake_get(url, headers=None, timeout=None):
+        with guard:
+            peak["now"] += 1
+            peak["max"] = max(peak["max"], peak["now"])
+        # Event.wait EIKÄ time.sleep: autouse-fixture monkeypatchaa m.time.sleep
+        # nollaksi (ja m.time ON time-moduuli), joten sleep ei pitäisi ikkunaa
+        # auki eikä mittaus näkisi päällekkäisyyttä.
+        _th.Event().wait(0.05)
+        with guard:
+            peak["now"] -= 1
+        return _Resp(200, FIXTURES_BODY)
+
+    monkeypatch.setattr(m.requests, "get", fake_get)
+
+    codes: list[int] = []
+    threads = [
+        _th.Thread(target=lambda i=i: codes.append(
+            client.get(f"/api/fixtures?league=ENG-Premier League-FD&days={30 + i}")
+            .status_code))
+        for i in range(12)
+    ]
+    for t_ in threads:
+        t_.start()
+    for t_ in threads:
+        t_.join()
+    assert codes == [200] * 12
+    # Kiinteä luku EIKÄ m.FD_HTTP_MAX_CONCURRENT: konfiguraatiota vasten
+    # mittaava portti läpäisisi itsensä myös silloin kun katto nostetaan
+    # vahingossa pois. Negatiivinen kontrolli ajettu (portti pois → 12).
+    assert peak["max"] <= 3, f"rinnakkaisia FD-kutsuja {peak['max']}"
+    assert m.FD_HTTP_MAX_CONCURRENT <= 3
+
+
 def test_response_shape_unchanged(client, monkeypatch):
     _mock_get(monkeypatch, [_Resp(200, STANDINGS_BODY)])
     r = client.get("/api/standings?league=ENG-Premier League-FD")
