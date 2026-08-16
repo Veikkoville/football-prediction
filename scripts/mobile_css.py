@@ -263,3 +263,21 @@ MOBILE_COLS_JS = COLS_JS_BEGIN + """
 })();
 </script>
 """ + COLS_JS_END + "\n"
+
+# ---------------------------------------------------------------------------
+# Luojan ref-silta (16.8.2026)
+# ---------------------------------------------------------------------------
+# Miksi TAMA tiedosto, vaikka silta ei liity mobiili-CSS:aan: jokainen
+# sivugeneraattori emittoi jo `MOBILE_COLS_JS`:n juuri ennen </body>:a. Kun
+# silta menee samaan merkkijonoon, uusi generaattori ei voi unohtaa sita.
+#
+# Vaihtoehto oli lisata `<script>` neljaan generaattoriin kasin, ja tasan se
+# unohtui: silta lisattiin 16.8 hub-sivuille ja `build_fpl_page.py`:hyn, mutta
+# `build_fpl_longtail.py` (12 /fpl/-alasivua) ja `build_prediction_pages.py`
+# (16 world-cup-sivua) jaivat ilman. Ne ovat juuri niita sivuja joita
+# FPL-luoja linkkaa, ja `/fpl/best-captain` sisaltaa upsell-linkin
+# pro.goaliq.appiin - eli attribuutio katosi tarkalleen siella missa se
+# eniten merkitsi. Portti ei nahnyt sita, koska se katsoi vain juuren
+# *.html-sivuja.
+REF_BRIDGE_TAG = '<script defer src="/ref-bridge.js"></script>\n'
+MOBILE_COLS_JS = MOBILE_COLS_JS + REF_BRIDGE_TAG

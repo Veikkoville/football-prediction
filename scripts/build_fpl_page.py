@@ -1780,7 +1780,6 @@ predictions and analytics. Not betting advice.</p>
 
 {CTA_TRACK_SNIPPET}
 {MOBILE_COLS_JS}
-<script defer src="/ref-bridge.js"></script>
 </body>
 </html>
 """
