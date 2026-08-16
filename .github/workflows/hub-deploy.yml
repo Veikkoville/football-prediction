@@ -1,0 +1,124 @@
+# goaliq.app-hubin deploy Cloudflare Pagesiin.
+#
+# MIKSI TAMA ON OLEMASSA (mitattu 16.8.2026):
+# Hub siirrettiin 15.8 GitHub Pagesista Cloudflare Pagesiin. GH Pages
+# deployasi jokaisen main-pushin itsestaan; CF Pagesin `goaliq-hub` on
+# **direct upload** -projekti (Git Provider: No), eika sille jaanyt yhtaan
+# deploy-polkua. Seuraus: 12 tuntia cutoverin jalkeen goaliq.app tarjoili
+# yha 15.8 sisaltoa. Etusivu sanoi "149 completed matches / 53% correct"
+# kun repossa oli 159 / 52,8 %.
+#
+# Se ei ollut kosmeettinen: julkaistu osumatarkkuus on ainoa vaite jota
+# kilpailijat eivat esita, ja botti paivittaa sen joka paiva
+# (`accuracy-log.yml`, `fpl-page-refresh.yml`, `render-daily-deploy`).
+# Ilman tata workflow'ta jokainen niista kirjoittaa gitiin ja ei mihinkaan.
+#
+# 🔴 NEGATIIVINEN KONTROLLI ON PAKOLLINEN OSA. Ensimmainen kasin koottu
+# tiedostolista sisalsi `pages/*.py` (Streamlit-sivut) ja
+# `assets/brand/gen_classic_favicon.py`, eli lahdekoodia olisi mennyt
+# julkiselle sivustolle. Portti alla kaataa ajon jos staging-hakemistoon
+# paatyy lahdekoodia tai konfiguraatiota.
+
+name: hub-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'fpl/**'
+      - 'predictions/**'
+      - 'assets/**'
+      - '*.xml'
+      - 'llms.txt'
+      - 'robots.txt'
+      - 'favicon.ico'
+  workflow_dispatch: {}
+
+concurrency:
+  group: hub-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Staging kootaan gitin seuratuista tiedostoista, EI hakemistokopiona:
+      # tyopuussa on venv, node_modules ja data/, ja niiden poissulkeminen
+      # negatiivisella listalla on virhealtista. Positiivinen lista on se
+      # mika sivustolle kuuluu.
+      - name: Kokoa staging
+        run: |
+          set -euo pipefail
+          git ls-files -z | tr '\0' '\n' \
+            | grep -vE '^(src/|tests/|scripts/|notebooks/|web/|data/|outputs/|logs/|docs/|api/|supabase/|pages/|\.github/|\.devcontainer/)' \
+            | grep -vE '(\.py|\.sql|\.yml|\.yaml|\.toml|\.cfg|\.ini|\.lock)$' \
+            | grep -vE '^(\.gitignore|\.gitattributes|CNAME|render\.yaml|requirements.*|README.*|DEPLOY\.md|CLAUDE\.md|app\.py|config\.py|bt\.log)$' \
+            > hubfiles.txt
+          mkdir -p _hub
+          while IFS= read -r f; do
+            mkdir -p "_hub/$(dirname "$f")"
+            cp "$f" "_hub/$f"
+          done < hubfiles.txt
+          echo "staging: $(find _hub -type f | wc -l) tiedostoa"
+
+      # Portti 1: julkiselle sivustolle ei saa paatya lahdekoodia.
+      - name: Portti - ei lahdekoodia stagingissa
+        run: |
+          set -euo pipefail
+          FOUND=$(find _hub -type f \( -name '*.py' -o -name '*.sql' -o -name '*.ts' \
+            -o -name '*.yml' -o -name '*.yaml' -o -name '*.env*' -o -name '*.toml' \) | head -20)
+          if [ -n "$FOUND" ]; then
+            echo "::error::Lahdekoodia stagingissa:"; echo "$FOUND"; exit 1
+          fi
+          echo "OK: ei lahdekoodia"
+
+      # Portti 2: jokainen sitemapissa luvattu URL on olemassa. Tama on se
+      # portti joka olisi napannut vajaan latauksen ennen kuin kayttaja
+      # nakee 404:n.
+      - name: Portti - sitemapin URLit ovat olemassa
+        run: |
+          python3 - <<'PY'
+          import glob, os, re, sys
+          urls = set()
+          for sm in glob.glob('_hub/sitemap*.xml'):
+              urls |= set(re.findall(r'<loc>https://goaliq\.app/([^<]*)</loc>',
+                                     open(sm, encoding='utf-8').read()))
+          missing = []
+          for u in sorted(urls):
+              if not u or u.endswith('.xml'):
+                  continue
+              p = os.path.join('_hub', u)
+              if os.path.exists(p) or os.path.exists(p + '.html'):
+                  continue
+              missing.append(u)
+          print(f'sitemap-URLeja {len(urls)}, puuttuu {len(missing)}')
+          if missing:
+              print('\n'.join(missing[:20]))
+              sys.exit(1)
+          PY
+
+      - name: Deploy Cloudflare Pagesiin
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy _hub --project-name=goaliq-hub --branch=main --commit-dirty=true
+
+      # Portti 3: verifioi TUOTANNOSTA eika deployn statuksesta. Vihrea
+      # deploy ei todista etta domain tarjoilee uuden sisallon; CF:n
+      # propagaatio on mitattu minuuteissa, ja cutover-paivana ensimmaiset
+      # ~3 min palauttivat 522.
+      - name: Verifioi domainilta
+        run: |
+          set -euo pipefail
+          EXPECT=$(grep -oE '<b>[0-9]+ completed matches</b>' index.html | head -1)
+          echo "odotetaan: $EXPECT"
+          for i in $(seq 1 20); do
+            LIVE=$(curl -sS --max-time 20 https://goaliq.app/ | grep -oE '<b>[0-9]+ completed matches</b>' | head -1 || true)
+            if [ "$LIVE" = "$EXPECT" ]; then echo "OK ($i. yritys): $LIVE"; exit 0; fi
+            echo "$i: live=$LIVE, odotetaan 15 s"; sleep 15
+          done
+          echo "::error::goaliq.app ei tarjoile uutta sisaltoa 5 min jalkeen"; exit 1
