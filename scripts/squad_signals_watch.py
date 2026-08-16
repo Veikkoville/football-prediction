@@ -90,6 +90,9 @@ def render_report(flags: list[Flag], prev_taken_at: str | None,
         lines.append("Ei muutoksia. **Tama on validi tulos** eika merkki "
                      "rikkinaisesta vahdista.")
         lines.append("")
+        # Sokeat pisteet myos tyhjaan raporttiin — nimenomaan silloin
+        # hiljaisuus luettaisiin todennakoisimmin "kaikki ennallaan".
+        lines.append(_blind_spot_note())
         return "\n".join(lines)
 
     counts = summarise(flags)
@@ -118,7 +121,39 @@ def render_report(flags: list[Flag], prev_taken_at: str | None,
                  "uusintatarkistuksen. Vahti ei arvioi kuka aloittaa — se "
                  "kertoo missa syotteemme on vanhentunut.")
     lines.append("")
+    lines.append(_blind_spot_note())
     return "\n".join(lines)
+
+
+def _blind_spot_note() -> str:
+    """Villen paatos 16.8: **vahti ei kysy.**
+
+    Speksin ulottuvuus 5 (esikauden muoto) ehdotti etta ensimmainen versio
+    kysyisi Villelta sen sijaan etta arvaisi. Ville: ei kysy. Rajoite
+    kirjataan siis nakyviin sen sijaan etta se muuttuisi kysymykseksi.
+
+    Tama ei ole kohteliaisuusteksti vaan portti lukijalle: ilman sita
+    raportin hiljaisuus jostain pelaajasta luettaisiin "ei muutosta", kun
+    oikea luenta on "ei kanavaa". Tasan se ero kaatoi Joao Pedro -kulman
+    15.8.
+    """
+    return "\n".join([
+        "## Mita tama vahti EI nae",
+        "",
+        "Nama eivat ole hiljaisuutta vaan sokeita pisteita. Jos pelaaja ei",
+        "esiinny ylla, se EI tarkoita etta hanen tilanteensa on ennallaan.",
+        "",
+        "- **Esikauden muoto.** Ystavyysotteluille ei ole ilmaista",
+        "  rakenteista lahdetta, eika minuuttimalli syota niita lainkaan.",
+        "  Aloitustodennakoisyys on johdettu VIIME KAUDEN minuuteista.",
+        "  (15.8: Joao Pedro teki kaksi esikauden maalia eika lukumme",
+        "  liikkunut lainkaan.)",
+        "- **Pelityylit ja -tavat.** Rooliosuus on johdettavissa Understatin",
+        "  laukaisutasosta, mutta se on viime kauden rooli eika taman.",
+        "- **Hintaliike ilman xP-liiketta** (laukaisin 5). Vaatii",
+        "  xP-historian, jota ei viela kerata.",
+        "",
+    ])
 
 
 def append_flag_log(flags: list[Flag], taken_at: str) -> None:

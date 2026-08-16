@@ -195,3 +195,24 @@ def test_snapshot_roundtrip_is_lossless_for_watched_fields():
     back = Snapshot.from_dict(snap.as_dict())
     assert diff_signals(snap, back) == []
     assert back.taken_at == snap.taken_at
+
+# --- raportti: vahti ei kysy (Villen paatos 16.8) ------------------------
+
+def test_report_states_blind_spots_and_asks_nothing():
+    """Villen paatos 16.8: **vahti ei kysy.** Speksin ulottuvuus 5 ehdotti
+    etta ensimmainen versio kysyisi Villelta esikaudesta; vastaus oli ei.
+    Rajoite kirjataan siis nakyviin sen sijaan etta se muuttuisi
+    kysymykseksi.
+
+    Ja se on portti lukijalle eika kohteliaisuustekstia: ilman sita
+    raportin hiljaisuus luettaisiin "ei muutosta" kun oikea luenta on
+    "ei kanavaa"."""
+    from scripts.squad_signals_watch import render_report
+
+    for flags in ([], diff_signals(_snap([_el(1, "A", status="a")]),
+                                   _snap([_el(1, "A", status="i")]))):
+        r = render_report(flags, "2026-08-15", "2026-08-16T09:00:00+00:00", 587)
+        assert "Mita tama vahti EI nae" in r, "sokeat pisteet puuttuvat"
+        assert "Esikauden muoto" in r
+        assert "?" not in r.split("Mita tama vahti EI nae")[1], (
+            "vahti ei saa esittaa kysymyksia Villelle")
