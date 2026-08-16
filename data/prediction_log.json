@@ -3857,7 +3857,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-07-17T08:11:48+00:00",
-      "result": null
+      "result": {
+        "home_score": 3,
+        "away_score": 3,
+        "actual_score": "3-3",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-16T18:30:51+00:00"
+      }
     },
     {
       "match_id": "fd-554968",
@@ -32943,7 +32951,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "away",
       "logged_at": "2026-08-01T10:14:36+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 2,
+        "actual_score": "2-2",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-16T18:30:51+00:00"
+      }
     },
     {
       "match_id": "fd-564635",
@@ -46076,7 +46092,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T07:11:43+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 0,
+        "actual_score": "2-0",
+        "actual_outcome": "home",
+        "hit_1x2": true,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-16T18:30:51+00:00"
+      }
     },
     {
       "match_id": "fd-567272",
@@ -46133,7 +46157,9 @@
       "most_likely_score": "1-0",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T07:11:44+00:00",
-      "result": null
+      "result": null,
+      "void": "POSTPONED",
+      "void_at": "2026-08-16T18:30:51+00:00"
     },
     {
       "match_id": "fd-567267",
@@ -51832,7 +51858,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T09:27:56+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 2,
+        "actual_score": "2-2",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-16T18:30:51+00:00"
+      }
     },
     {
       "match_id": "fd-558232",
@@ -57331,7 +57365,15 @@
       "most_likely_score": "1-1",
       "predicted_winner": "home",
       "logged_at": "2026-08-15T12:39:16+00:00",
-      "result": null
+      "result": {
+        "home_score": 2,
+        "away_score": 2,
+        "actual_score": "2-2",
+        "actual_outcome": "draw",
+        "hit_1x2": false,
+        "exact_hit": false,
+        "reconciled_at": "2026-08-16T18:30:51+00:00"
+      }
     },
     {
       "match_id": "fd-561772",
