@@ -110,7 +110,7 @@
    "name": "How does GoalIQ predict football matches?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "GoalIQ uses a Dixon-Coles statistical model with the tau correction for low scores, time decay so recent matches count more, and shrinkage toward the league mean. For a club fixture it is fitted on that league's own results, last full season plus the current one as it plays. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines."
+    "text": "GoalIQ uses a Dixon-Coles statistical model with the tau correction for low scores, time decay so recent matches count more, and shrinkage toward the league mean. For a club fixture it is fitted on that league's own results, last full season plus the current one as it plays, weighted on both goals and the xG those matches produced where an xG feed exists. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines."
    }
   },
   {
@@ -619,7 +619,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <div class="step">
         <div class="n">2</div>
         <h3>Let the model run</h3>
-        <p>A Dixon-Coles model, fitted on the league's own recent results, computes the outcome in seconds.</p>
+        <p>A Dixon-Coles model, fitted on the league's own recent results and xG, computes the outcome in seconds.</p>
       </div>
       <div class="step">
         <div class="n">3</div>
@@ -725,7 +725,7 @@ posthog.capture('web_landing_viewed',{page:location.pathname});
       <dt>How accurate are GoalIQ football predictions?</dt>
       <dd>GoalIQ publishes its full prediction track record: every prediction is logged before kick-off and graded against the final result afterwards, hits and misses included, with no edits. The current accuracy numbers are shown on this page and refreshed after every round, and the raw log is available as machine-readable JSON.</dd>
       <dt>How does GoalIQ predict football matches?</dt>
-      <dd>GoalIQ uses a Dixon-Coles statistical model with the tau correction for low scores, time decay so recent matches count more, and shrinkage toward the league mean. For a club fixture it is fitted on that league's own results, last full season plus the current one as it plays. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines.</dd>
+      <dd>GoalIQ uses a Dixon-Coles statistical model with the tau correction for low scores, time decay so recent matches count more, and shrinkage toward the league mean. For a club fixture it is fitted on that league's own results, last full season plus the current one as it plays, weighted on both goals and the xG those matches produced where an xG feed exists. For any fixture it estimates the win probability for each side and the draw, expected goals for both teams, and the probability of the most likely scorelines.</dd>
       <dt>Is GoalIQ a betting app?</dt>
       <dd>No. GoalIQ is an analytics tool, not a gambling service. It has no bookmaker links and gives no betting advice. Predictions are statistical estimates for fun, analysis and fantasy football planning.</dd>
     </dl>

@@ -979,6 +979,12 @@ def _fit_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
             decay=decay, date_col="date",
             l2_attack_defence=bayes_shrinkage,
             shrink_defence_to_mean=shrink_defence_to_mean,
+            # 17.8 (Villen GO): xG-painotettu likelihood. Arvo tulee configista,
+            # jotta /api/predict ja FPL-putki eivat voi ajautua erilleen.
+            # Inertti liigoille joilla ei ole xG-dataa (guard fitissa).
+            home_xg_col=config.DIXON_COLES_XG_COLS[0],
+            away_xg_col=config.DIXON_COLES_XG_COLS[1],
+            xg_weight=config.DIXON_COLES_XG_WEIGHT,
             **fit_kwargs,
         )
     except Exception as e:

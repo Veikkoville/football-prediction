@@ -1,12 +1,25 @@
 # Dixon-Coles Football Prediction Model
 
 > **What the public API actually serves:** Dixon-Coles only. `/api/predict`
-> imports `DixonColesModel` and nothing else (`api/main.py`), fits on goals
-> with the tau correction, time decay, Bayesian shrinkage and per-team home
-> advantage, and leaves `xg_weight` at 0. The gradient-boosting code in this
-> repo (`src/models/outcome_model.py`, `pages/3_Ensemble.py`) is research and
-> backtesting. It is not in the prediction path, and goaliq.app does not claim
-> it is.
+> imports `DixonColesModel` and nothing else (`api/main.py`), and fits it with
+> the tau correction, time decay, Bayesian shrinkage and per-team home
+> advantage.
+>
+> Since 17 August 2026 the fit is weighted on goals **and** match xG
+> (`xg_weight = 0.5`, set in `config.py`): the likelihood carries an extra
+> penalty for the model's goal expectation drifting from the xG a team actually
+> generated. That is a squared-error term in the same likelihood, not a second
+> model and not a learned component. It is inert for leagues with no per-match
+> xG feed, which keep fitting on goals alone.
+>
+> The weight was chosen by walk-forward measurement, not by taste: log loss
+> 0.99588 to 0.98672 and 1X2 accuracy 51.15% to 51.95% over 4,641 predictions,
+> improving in all five leagues tested. 0.5 and 0.7 scored the same, so the
+> lower one was taken.
+>
+> The gradient-boosting code in this repo (`src/models/outcome_model.py`,
+> `pages/3_Ensemble.py`) is research and backtesting. It is not in the
+> prediction path, and goaliq.app does not claim it is.
 
 A comprehensive Python project that combines several open data sources and trains a
 prediction model for match outcomes (1X2), total goals (Over/Under), exact scores

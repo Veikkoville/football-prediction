@@ -138,8 +138,16 @@ def scan(path: Path) -> list[tuple[int, str]]:
 
 # 16.8: mallilupausportti. Copy vaitti viidella pinnalla "Dixon-Coles +
 # LightGBM ensemble", vaikka /api/predict importoi vain DixonColesModelin
-# (api/main.py:43) ja fittaa pelkilla maaleilla (:975, xg_weight jaa 0.0).
-# Repo on julkinen, eli vaite oli tarkistettavissa ja kaatui tarkistuksessa.
+# (api/main.py:43). Repo on julkinen, eli vaite oli tarkistettavissa ja kaatui
+# tarkistuksessa.
+#
+# 17.8. PAIVITYS: tuotanto fittaa nyt maaleilla JA xG:lla
+# (config.DIXON_COLES_XG_WEIGHT = 0.5, mitattu walk-forwardilla). Se ei muuta
+# tata listaa yhtaan: xG-painotus on neliöity sakko SAMASSA Dixon-Colesin
+# uskottavuusfunktiossa, ei toinen malli eika oppiva komponentti. "Ensemble",
+# "machine learning" ja "AI model" ovat siis yha yhta vaaria kuin ennenkin.
+# Muuttunut vaite koskee DATASYOTETTA ("fitted on goals" -> "goals and xG"),
+# ja se korjattiin samassa committissa jossa kytkenta tehtiin.
 #
 # Loysin sen kasin NELJASSA eri sanamuodossa perakkain, joka kerta luullen
 # edellista viimeiseksi: "machine learning" -> "expected-goals ensemble" ->
@@ -251,7 +259,8 @@ def main() -> int:
             print(f"  {path.relative_to(ROOT)}:{line_no}  [{nimi}]\n    {text}\n")
         print(
             "/api/predict ajaa vain Dixon-Colesin (api/main.py:43 importoi vain "
-            "DixonColesModelin, :975 fittaa maaleilla). Repo on julkinen, joten "
+            "DixonColesModelin; :975 fittaa maaleilla ja xG:lla, xg_weight 0.5, "
+            "mika on yha SAMA malli eika ensemble). Repo on julkinen, joten "
             "vaite ensemblesta tai ML:sta on tarkistettavissa ja kaatuu. Kuvaa "
             "se mika on katetta: tau-korjaus, aikapainotus, Bayes-kutistus, "
             "kilpailupainot, ja julkinen ennakkoon lokattu track record."

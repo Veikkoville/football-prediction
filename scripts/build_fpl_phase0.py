@@ -302,6 +302,12 @@ def fit_model() -> tuple[DixonColesModel, list[str]]:
         decay=FIT_DECAY,
         date_col="date",
         l2_attack_defence=FIT_BAYES,
+        # 17.8: sama xG-painotus kuin /api/predict. Talla rivilla on merkitysta:
+        # alempana luvataan tekstissa "sama fit-config kuin /api/predict", ja
+        # jos xG kytkettaisiin vain toiseen, sama ottelu saisi kaksi eri lukua.
+        home_xg_col=config.DIXON_COLES_XG_COLS[0],
+        away_xg_col=config.DIXON_COLES_XG_COLS[1],
+        xg_weight=config.DIXON_COLES_XG_WEIGHT,
     )
     return dc, seasons
 

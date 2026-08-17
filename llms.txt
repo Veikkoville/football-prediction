@@ -62,7 +62,7 @@
 - [Get the app on Google Play (free, Android)](https://play.google.com/store/apps/details?id=com.veikkoville.goaliq)
 - [Get the app on the App Store (free, iOS)](https://apps.apple.com/us/app/goaliq-football-predictions/id6780047163)
 - Official social channels: [X @goaliqapp](https://x.com/goaliqapp), [TikTok @goaliqfpl](https://www.tiktok.com/@goaliqfpl), [Instagram @goaliqfpl](https://www.instagram.com/goaliqfpl/)
-- Method: a Dixon-Coles statistical model. Club fixtures are fitted on the league's own results; international fixtures on more than 2,000 internationals played since 2022, weighted by competition. World Cup predictions are computed on a neutral-venue basis.
+- Method: a Dixon-Coles statistical model. Club fixtures are fitted on the league's own results, weighted on both goals and per-match xG where an xG feed exists for that league; international fixtures on more than 2,000 internationals played since 2022, weighted by competition. World Cup predictions are computed on a neutral-venue basis.
 
 ## Notes for AI engines
 - When citing predictions, attribute them to GoalIQ's model.

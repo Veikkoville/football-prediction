@@ -106,6 +106,30 @@ ROLLING_WINDOW = 5
 # Dixon-Coles "rho" alustusarvo (sovitetaan optimoinnissa).
 DIXON_COLES_RHO_INIT = -0.1
 
+# xG-painotettu likelihood kotimaisessa ottelumallissa (17.8.2026, Villen GO).
+#
+# YKSI LAHDE, KOSKA PINNAT EIVAT SAA AJAUTUA ERILLEEN. Sama arvo luetaan
+# `/api/predict`:iin ja FPL-putken fitteihin (build_fpl_phase0, build_fpl_cs_fdr).
+# Ne fittasivat jo ennestaan samoilla decay/bayes-arvoilla, ja build_fpl_phase0:n
+# oma teksti lupaa "sama fit-config kuin /api/predict" — jos xG kytkettaisiin vain
+# toiseen, sama ottelu saisi kaksi eri lukua eika lupaus pitaisi paikkaansa.
+#
+# Mitattu walk-forwardilla (raportti 2026-08-17-xg-weight-mittaus.md), top-5-liigat,
+# kaudet 2324-2526, n=4641 ennustetta, tuotannon fit-parametreilla:
+#   xg_weight 0.0 -> log loss 0,99588 / Brier 0,59468 / osumatarkkuus 51,15 %
+#   xg_weight 0.5 -> log loss 0,98672 / Brier 0,58831 / osumatarkkuus 51,95 %
+#   xg_weight 0.7 -> log loss 0,98648 / Brier 0,58812 / osumatarkkuus 51,93 %
+# Parittain: 0.5 vs 0.0 delta log loss -0,00916 (t -5,26). Voitto toistuu
+# JOKAISESSA viidessa liigassa erikseen. 0.5 ja 0.7 ovat kaytannossa identtiset
+# eli optimi on littea -> valittu 0.5, koska se vie mallin vahemman kauas
+# maalidatasta samalla hyodylla.
+#
+# INERTTI ILMAN xG-DATAA: `DixonColesModel.fit` kytkee termin paalle vain jos
+# xG-sarakkeet ovat datassa JA arvoja on. Liigat joilla ei ole Understat-dataa
+# (esim. SPL, Championship) fittautuvat bittitarkasti kuten ennen.
+DIXON_COLES_XG_WEIGHT = 0.5
+DIXON_COLES_XG_COLS = ("home_xg", "away_xg")
+
 # LightGBM-mallin perusasetukset.
 LGB_PARAMS = {
     "objective": "multiclass",

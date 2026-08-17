@@ -1681,7 +1681,8 @@ it. Everything on this page stays free to quote with or without it.</p>
 </div>
 
 <h2 id="methodology">Methodology</h2>
-<p>A Dixon-Coles style match model, tau corrected, trained on recent results.
+<p>A Dixon-Coles style match model, tau corrected, fitted on recent results
+and the xG those matches produced.
 Clean sheet probability comes from the score matrix: the chance the opponent
 scores zero. Fixture difficulty is derived from win and clean sheet
 probabilities, ranked across every team fixture of the season and bucketed
