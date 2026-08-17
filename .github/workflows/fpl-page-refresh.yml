@@ -98,9 +98,23 @@ jobs:
           want_fpl=$(md5sum fpl.html | cut -d' ' -f1)
           want_idx=$(md5sum index.html | cut -d' ' -f1)
           echo "Odotetut hashit: fpl=$want_fpl index=$want_idx"
+          # Cloudflare injektoi challenge-platform-skriptin juuri ennen </body>,
+          # ja siina on PER-PYYNTO vaihtuva tunniste (__CF$cv$params r:'...').
+          # Siksi koko tiedoston md5 ei voi koskaan tasmata, ei edes onnistuneen
+          # deployn jalkeen. Riisutaan injektio ennen vertailua.
+          # Verifioitu 17.8: riisuttu live == repon tiedosto bittitarkasti, sed ei
+          # muuta repon tiedostoa, ja injektoitu sisaltomuutos jaa yha kiinni.
+          CF_STRIP='s|<script>(function(){function c(){var b=a\.contentDocument.*</script>||'
+
+          # 17.8: -L ON PAKOLLINEN. Hub siirtyi 15.8 Cloudflare Pagesiin, joka
+          # 308-ohjaa .html-URLit puhtaisiin polkuihin. Ilman -L curl palauttaa
+          # TYHJAN bodyn, jonka md5 on d41d8cd98f00b204e9800998ecf8427e - eli
+          # tama askel vertasi HEADia tyhjaan merkkijonoon ja epaonnistui joka
+          # ajolla siirron jalkeen. Vika nayttaytyi "Pages-deploy failasi"
+          # -virheena, mika osoitti vaaraan suuntaan.
           for i in $(seq 1 24); do
-            got_fpl=$(curl -sf --max-time 20 "https://goaliq.app/fpl.html"   | md5sum | cut -d' ' -f1 || echo "fetch-fail")
-            got_idx=$(curl -sf --max-time 20 "https://goaliq.app/index.html" | md5sum | cut -d' ' -f1 || echo "fetch-fail")
+            got_fpl=$(curl -sfL --max-time 20 "https://goaliq.app/fpl.html"   | sed "$CF_STRIP" | md5sum | cut -d' ' -f1 || echo "fetch-fail")
+            got_idx=$(curl -sfL --max-time 20 "https://goaliq.app/index.html" | sed "$CF_STRIP" | md5sum | cut -d' ' -f1 || echo "fetch-fail")
             if [ "$got_fpl" = "$want_fpl" ] && [ "$got_idx" = "$want_idx" ]; then
               echo "OK (yritys $i): live-sisältö = HEAD. Deploy verifioitu."
               exit 0
