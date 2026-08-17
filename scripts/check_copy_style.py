@@ -160,6 +160,13 @@ def scan(path: Path) -> list[tuple[int, str]]:
 #
 # Jos ensemble joskus kytketaan tuotantopolkuun, tama lista paivitetaan
 # SAMASSA committissa jossa se kytketaan, ei aiemmin.
+# PORTTI ON SOKEA KIELTOLAUSEELLE, ja se on tietoinen valinta (17.8).
+# Se osui lauseeseen joka KIISTI ML:n ("It is not a machine-learning model"),
+# eli oikeaan asiaan vaarasta syysta. Negaatiotunnistusta ei lisatty: se olisi
+# hauras ja huijattavissa ("not just a machine-learning model"), ja portin arvo
+# on nimenomaan siina ettei sita voi selittaa ohi. Kaytannon seuraus: jos
+# haluat SANOA ettei ennuste tule ML:sta, sano se ilman naita sanoja
+# ("no second model in the prediction path"). Ks. llms.txt "Notes for AI engines".
 MODEL_CLAIM_PATTERNS = [
     (re.compile(r"machine[- ]learning", re.I), "machine learning"),
     (re.compile(r"\bLightGBM\b", re.I), "LightGBM"),
