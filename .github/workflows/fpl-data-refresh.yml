@@ -114,6 +114,58 @@ jobs:
             "statsmodels>=0.14" "requests>=2.31" "soccerdata>=1.8" \
             "python-dotenv>=1.0" "tqdm>=4.66"
 
+      # 17.8: PAATTYNEEN 25/26-KAUDEN ARKISTO RUNNERILLE.
+      #
+      # MIKSI: kolme cronin askelta lukee `data/raw/fpl/`-hakemistosta jota EI
+      # ole runnerilla — se on gitignorattu (`/data/*`) eika FPL:n API tarjoile
+      # paattyneita kausia, joten sita ei voi hakea uudelleen kuten
+      # kuluvan kauden bootstrapin:
+      #   * build_team_confidence      -> bootstrap_static_2526.archive.json
+      #   * build_fpl_defcon_gw        -> archive + summary_2526/
+      #   * build_fpl_player_gw        -> archive + summary_2526/ (niin kauan
+      #     kuin stats-basis on 25/26 eli kunnes GW1 on pelattu 21.8)
+      #
+      # 14.8 lisatyt askeleet (`build_team_confidence`, `build_fpl_defcon_gw`)
+      # kaatuivat tahan JOKA ajossa: `FileNotFoundError:
+      # .../bootstrap_static_2526.archive.json`. Kaatuminen tapahtui step 11:ssa
+      # eli ENNEN commit-steppia, joten koko ajo skippasi loput 17 askelta ->
+      # projektiot, hinnat, xP-freeze, mallirivin freeze ja push_dispatch olivat
+      # jaassa 14.8 10:15 UTC lahtien (~29 punaista ajoa putkeen). Sama
+      # juurisyyluokka kuin #19:ssa, kolmas kerta.
+      #
+      # Purku on ENNEN kaikkia buildereita eika vain kaatuvan askeleen edessa:
+      # naita kuluttajia on kolme ja tulee lisaa, ja jarjestysriippuvuus olisi
+      # tasan se ansa johon 14.8 astuttiin.
+      #
+      # --skip-old-files: lokaalilla koneella hakemisto on jo olemassa eika
+      # purku saa koskaan ylikirjoittaa oikeaa raakadataa.
+      - name: Unpack frozen 2025/26 FPL archive
+        if: steps.guard.outputs.proceed == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw/fpl
+          tar xzf data/fpl_2526_archive.tar.gz -C data/raw/fpl --skip-old-files
+          n=$(find data/raw/fpl/summary_2526 -name 'element_*.json' | wc -l)
+          echo "summary_2526: $n tiedostoa"
+          # 841 = koko 25/26-pelaajalista. Vajaa purku ei saa mennä lapi
+          # hiljaa: se nakyisi vasta liputusten ja DefCon-rivien puuttumisena.
+          if [ "$n" -lt 800 ]; then
+            echo "::error::summary_2526 vajaa ($n < 800) — arkisto rikki."
+            exit 1
+          fi
+          python - <<'PY'
+          import json, pathlib, sys
+          p = pathlib.Path("data/raw/fpl/bootstrap_static_2526.archive.json")
+          boot = json.loads(p.read_text(encoding="utf-8"))
+          dl = boot["events"][0]["deadline_time"]
+          # Sama tarkistus jonka build_fpl_defcon_gw tekee itse: vaara kausi
+          # tuottaisi oikean nakoista mutta valheellista historiaa.
+          if not dl.startswith("2025-"):
+              sys.exit(f"VIRHE: arkistobootstrap ei ole 25/26-kautta ({dl})")
+          print(f"arkistobootstrap OK: GW1-deadline {dl}, "
+                f"{len(boot['elements'])} pelaajaa")
+          PY
+
       # Sanity-gatet fail-safena: exit 2 → step fail → ei committia,
       # vanha data jää voimaan, workflow punainen (näkyvä signaali).
       - name: Build Phase 0 projections (CS% + FDR)

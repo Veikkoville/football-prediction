@@ -108,6 +108,16 @@ raw_data/
 # tuottaisi sivun tyhjästä datasta — sama vikaluokka kuin fpl_defcon_gw.
 !/data/fpl_player_stats.json
 
+# 17.8: JAADYTETTY 25/26-ARKISTO (bootstrap-arkisto + summary_2526/, 842
+# tiedostoa, 30 Mt raakana -> 2,0 Mt pakattuna). Miksi repoon:
+# `build_team_confidence`, `build_fpl_defcon_gw` ja `build_fpl_player_gw`
+# lukevat kaikki data/raw/fpl/:sta, joka on gitignorattu eika paady runnerille.
+# 14.8 lisatyt cron-askeleet kaatuivat siihen JOKA ajossa (~29 punaista putkeen)
+# ja koko fpl-data-refresh kuoli step 11:een. FPL:n API ei tarjoile paattyneita
+# kausia, joten dataa ei voi hakea uudelleen — se on haettava mukana.
+# Kausi on PAATTYNYT eli tiedosto on immutable: committoidaan kerran, ei kasva.
+!/data/fpl_2526_archive.tar.gz
+
 # 30.7: per-GW DefCon -matriisi (committattu → Render servaa levyltä).
 # HUOM: ilman tätä !-poikkeusta endpoint 503:aa tuotannossa vaikka kaikki
 # muu on pushattu — gitignoroitu-korjaus-vikaluokka.
