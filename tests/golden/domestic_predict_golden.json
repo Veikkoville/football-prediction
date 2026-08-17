@@ -1,73 +1,73 @@
 {
  "ENG-Premier League|Arsenal-Liverpool": {
-  "expected_goals_home": 1.915,
-  "expected_goals_away": 0.946,
-  "p_home_win": 0.5882,
-  "p_draw": 0.243,
-  "p_away_win": 0.1688,
-  "fair_odds_home": 1.7,
-  "fair_odds_draw": 4.12,
-  "fair_odds_away": 5.92,
-  "p_over_2_5": 0.5448,
-  "p_under_2_5": 0.4552,
-  "p_btts_yes": 0.5337,
-  "p_btts_no": 0.4663,
+  "expected_goals_home": 1.872,
+  "expected_goals_away": 1.071,
+  "p_home_win": 0.5485,
+  "p_draw": 0.2493,
+  "p_away_win": 0.2022,
+  "fair_odds_home": 1.82,
+  "fair_odds_draw": 4.01,
+  "fair_odds_away": 4.95,
+  "p_over_2_5": 0.564,
+  "p_under_2_5": 0.436,
+  "p_btts_yes": 0.5686,
+  "p_btts_no": 0.4314,
   "top_scores": [
    [
     "1-1",
-    0.1159
-   ],
-   [
-    "2-0",
-    0.1049
+    0.1179
    ],
    [
     "2-1",
-    0.0992
+    0.0989
+   ],
+   [
+    "2-0",
+    0.0923
    ],
    [
     "1-0",
-    0.0973
+    0.0864
    ],
    [
     "0-0",
-    0.0695
+    0.0649
    ]
   ]
  },
  "ENG-Premier League|Manchester City-Tottenham": {
-  "expected_goals_home": 2.581,
-  "expected_goals_away": 0.879,
-  "p_home_win": 0.7314,
-  "p_draw": 0.1718,
-  "p_away_win": 0.0967,
-  "fair_odds_home": 1.37,
-  "fair_odds_draw": 5.82,
-  "fair_odds_away": 10.34,
-  "p_over_2_5": 0.6716,
-  "p_under_2_5": 0.3284,
-  "p_btts_yes": 0.5489,
-  "p_btts_no": 0.4511,
+  "expected_goals_home": 2.322,
+  "expected_goals_away": 0.965,
+  "p_home_win": 0.6675,
+  "p_draw": 0.2009,
+  "p_away_win": 0.1316,
+  "fair_odds_home": 1.5,
+  "fair_odds_draw": 4.98,
+  "fair_odds_away": 7.6,
+  "p_over_2_5": 0.6378,
+  "p_under_2_5": 0.3622,
+  "p_btts_yes": 0.5678,
+  "p_btts_no": 0.4322,
   "top_scores": [
    [
     "2-0",
-    0.1047
+    0.1008
    ],
    [
     "2-1",
-    0.092
-   ],
-   [
-    "3-0",
-    0.0901
+    0.0972
    ],
    [
     "1-1",
-    0.0797
+    0.0935
    ],
    [
-    "3-1",
-    0.0792
+    "3-0",
+    0.078
+   ],
+   [
+    "1-0",
+    0.0771
    ]
   ]
  },
