@@ -4,7 +4,7 @@
  "method": "share of last season's minutes played by players no longer at the club; ratings are fitted on results and cannot see the transfer window",
  "high_turnover_threshold_pct": 25.0,
  "historical_median_pct": 13.0,
- "season_median_pct": 13.3,
+ "season_median_pct": 13.5,
  "promoted": [
   "Coventry City",
   "Hull City",
@@ -77,17 +77,17 @@
    "team": "Crystal Palace",
    "model_team": "Crystal Palace",
    "is_promoted": false,
-   "minutes_churn_pct": 12.0,
+   "minutes_churn_pct": 14.1,
    "flag": null,
-   "note": "12% of last season's minutes have left the club."
+   "note": "14% of last season's minutes have left the club."
   },
   {
    "team": "Everton",
    "model_team": "Everton",
    "is_promoted": false,
-   "minutes_churn_pct": 10.0,
+   "minutes_churn_pct": 13.0,
    "flag": null,
-   "note": "10% of last season's minutes have left the club."
+   "note": "13% of last season's minutes have left the club."
   },
   {
    "team": "Fulham",
