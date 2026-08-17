@@ -448,10 +448,16 @@ def _tier_subtitle(args, n_gw: int, pos_label: str, cap: int) -> str:
     osat = [f"next {n_gw} GW"]
     if args.max_price:
         osat.append(f"every {yksikko} at {args.max_price:.1f}m or less")
+        # Hintakaton kanssa rank-cap on ERI rajaus ja se on sanottava erikseen.
+        if args.rank_cap:
+            osat.append(f"free top {cap}")
     elif args.rank_cap:
+        # 17.8: tama haara sanoi saannon jo itse, ja alla ollut erillinen
+        # `if args.rank_cap` lisasi sen TOISEN KERRAN. Kortille renderoityi
+        # "every forward in the free top 100, free top 100". Loytyi vasta kun
+        # kortti katsottiin kuvana - koodista se ei nay, koska kumpikin haara
+        # on erikseen oikein.
         osat.append(f"every {yksikko} in the free top {cap}")
-    if args.rank_cap:
-        osat.append(f"free top {cap}")
     return ", ".join(osat)
 
 
