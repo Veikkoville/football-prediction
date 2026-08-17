@@ -29,6 +29,12 @@ def walk_forward_dixon_coles(
     refit_every_days: int = 7,
     decay: float = 0.0065,
     progress_callback=None,
+    home_xg_col: str | None = None,
+    away_xg_col: str | None = None,
+    xg_weight: float = 0.0,
+    l2_attack_defence: float = 2.0,
+    per_team_home_adv: bool = True,
+    shrink_defence_to_mean: bool = False,
 ) -> pd.DataFrame:
     """
     Aja walk-forward -backtest.
@@ -42,6 +48,15 @@ def walk_forward_dixon_coles(
         (joka päivä = liian hidas, viikon välein on hyvä kompromissi).
     progress_callback : callable, optional
         Kutsutaan etenemispalkkia varten: cb(current, total).
+    home_xg_col, away_xg_col, xg_weight
+        xG-painotettu likelihood, ks. ``DixonColesModel.fit``. Oletus 0.0 =
+        malli sovitetaan pelkkiin maaleihin, eli sama polku jota
+        ``/api/predict`` ajaa. **Nämä puuttuivat 16.8. asti kokonaan**, joten
+        xG-painotuksen hyötyä ei ollut mahdollista mitata walk-forwardilla.
+    l2_attack_defence, per_team_home_adv, shrink_defence_to_mean
+        Fit-parametrit jotka tuotanto asettaa itse (``api/main.py``:
+        2.0 / True / False). Oletukset vastaavat tuotantoa, jotta backtest
+        mittaa samaa mallia kuin mitä shipataan.
 
     Palauttaa DataFramen, jossa jokaiselle ennustetulle ottelulle:
       ``date``, ``home_team``, ``away_team``, ``home_score``, ``away_score``,
@@ -65,7 +80,7 @@ def walk_forward_dixon_coles(
             or last_fit_date is None
             or (ottelu[date_col] - last_fit_date).days >= refit_every_days
         ):
-            malli = DixonColesModel().fit(
+            malli = DixonColesModel(per_team_home_adv=per_team_home_adv).fit(
                 train,
                 home_team_col=home_team_col,
                 away_team_col=away_team_col,
@@ -73,6 +88,11 @@ def walk_forward_dixon_coles(
                 away_goals_col=away_goals_col,
                 decay=decay,
                 date_col=date_col,
+                l2_attack_defence=l2_attack_defence,
+                shrink_defence_to_mean=shrink_defence_to_mean,
+                home_xg_col=home_xg_col,
+                away_xg_col=away_xg_col,
+                xg_weight=xg_weight,
             )
             last_fit_date = ottelu[date_col]
 
@@ -96,6 +116,10 @@ def walk_forward_dixon_coles(
             "p_draw": p["draw"],
             "p_away": p["away"],
             "actual_1x2": actual,
+            # Konvergoiko se sovitus jolla TAMA rivi ennustettiin. Ilman tata
+            # hajonneen sovituksen tuottamat rivit eivat erotu mitenkaan
+            # onnistuneista, ja backtestin keskiarvo peittaa ne alleen.
+            "fit_converged": bool(getattr(malli, "fit_success_", True)),
         })
 
         if progress_callback is not None:

@@ -26,6 +26,14 @@ class DixonColesModel:
     teams_: list = field(default_factory=list)
     per_team_home_adv: bool = True        # True = sovita joukkuekohtainen kotietu
     model_type_: str = "dc"               # "dc" tai "bivariate_poisson"
+    # 17.8: optimoinnin lopputila. `fit` ottaa `result.x`:n riippumatta siita
+    # onnistuiko SLSQP, joten hajonnut sovitus paatyi malliin ilman etta sita
+    # pystyi jalkikateen huomaamaan. Nama kentat EIVAT muuta yhtaan lukua;
+    # ne tekevat tilan luettavaksi (sama korjausmuoto kuin juuriendpointin
+    # commit-kentta: tee tila luettavaksi ennen kuin arvailet).
+    fit_success_: bool = True
+    fit_message_: str = ""
+    fit_nit_: int = 0
 
     def fit(self, matches, home_team_col="home_team", away_team_col="away_team",
             home_goals_col="home_score", away_goals_col="away_score",
@@ -265,6 +273,9 @@ class DixonColesModel:
         result = minimize(neg_log_lik, x0, constraints=constraints,
                           method="SLSQP", options={"maxiter": 300, "disp": False})
         params = result.x
+        self.fit_success_ = bool(result.success)
+        self.fit_message_ = str(getattr(result, "message", ""))
+        self.fit_nit_ = int(getattr(result, "nit", 0))
         self.attack = {t: params[i] for t, i in idx.items()}
         self.defence = {t: params[n + i] for t, i in idx.items()}
         if self.per_team_home_adv:
