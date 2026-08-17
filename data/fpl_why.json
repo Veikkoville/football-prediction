@@ -3,7 +3,7 @@
   "1": {
    "drivers": [],
    "gw": 1,
-   "hash": "3e9860f6ff1434d3",
+   "hash": "9b88babd4f002783",
    "sentence": "Most of this comes from about 84 minutes a game, with COV (H), AVL (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 84 minutes a game, with COV (H), AVL (A) to come.",
@@ -57,7 +57,7 @@
   "106": {
    "drivers": [],
    "gw": 1,
-   "hash": "4e1fbecd8b8aee11",
+   "hash": "9408da476dffd8c6",
    "sentence": "Most of this comes from about 89 minutes a game, 0.62 expected goal involvements per 90 last season and set piece duties, with TOT (H), LEE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 89 minutes a game, 0.62 expected goal involvements per 90 last season and set piece duties, with TOT (H), LEE (A) to come.",
@@ -75,12 +75,30 @@
   "109": {
    "drivers": [],
    "gw": 1,
-   "hash": "8d92125fbb3b09b1",
+   "hash": "0661dae2cd299064",
    "sentence": "Most of this comes from about 90 minutes a game, with AVL (H), CHE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 90 minutes a game, with AVL (H), CHE (A) to come.",
     "es": "La mayor parte viene de unos 90 minutos por partido, con AVL (H), CHE (A) por delante.",
     "pt": "A maior parte vem de cerca de 90 minutos por jogo, com AVL (H), CHE (A) pela frente."
+   },
+   "source": "template",
+   "sources": {
+    "en": "template",
+    "es": "template",
+    "pt": "template"
+   },
+   "tpl": 3
+  },
+  "11": {
+   "drivers": [],
+   "gw": 1,
+   "hash": "f78f16270d4499f5",
+   "sentence": "This one rests on about 53 minutes a game, with COV (H), AVL (A), CHE (H) to come.",
+   "sentences": {
+    "en": "This one rests on about 53 minutes a game, with COV (H), AVL (A), CHE (H) to come.",
+    "es": "Esta se sostiene en unos 53 minutos por partido, con COV (H), AVL (A), CHE (H) por delante.",
+    "pt": "Esta se sustenta em cerca de 53 minutos por jogo, com COV (H), AVL (A), CHE (H) pela frente."
    },
    "source": "template",
    "sources": {
@@ -111,7 +129,7 @@
   "112": {
    "drivers": [],
    "gw": 1,
-   "hash": "4e0fb73fe9fb4ff9",
+   "hash": "1718a5c483fb5b66",
    "sentence": "Most of this comes from about 82 minutes a game, with BRE (A), NEW (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 82 minutes a game, with BRE (A), NEW (H) to come.",
@@ -129,7 +147,7 @@
   "113": {
    "drivers": [],
    "gw": 1,
-   "hash": "42b9e9c3f3a7d791",
+   "hash": "e2c0456d43b71c0d",
    "sentence": "This one rests on about 89 minutes a game, 0.15 expected goal involvements per 90 last season and set piece duties, with AVL (H), CHE (A), LEE (H) to come.",
    "sentences": {
     "en": "This one rests on about 89 minutes a game, 0.15 expected goal involvements per 90 last season and set piece duties, with AVL (H), CHE (A), LEE (H) to come.",
@@ -147,12 +165,12 @@
   "116": {
    "drivers": [],
    "gw": 1,
-   "hash": "a47dc295529a20d0",
-   "sentence": "This one rests on about 75 minutes a game and set piece duties, with AVL (H), CHE (A), LEE (H) to come.",
+   "hash": "d654f6b79e7b6de4",
+   "sentence": "This one rests on about 80 minutes a game and set piece duties, with AVL (H), CHE (A), LEE (H) to come.",
    "sentences": {
-    "en": "This one rests on about 75 minutes a game and set piece duties, with AVL (H), CHE (A), LEE (H) to come.",
-    "es": "Esta se sostiene en unos 75 minutos por partido y los balones parados, con AVL (H), CHE (A), LEE (H) por delante.",
-    "pt": "Esta se sustenta em cerca de 75 minutos por jogo e as bolas paradas, com AVL (H), CHE (A), LEE (H) pela frente."
+    "en": "This one rests on about 80 minutes a game and set piece duties, with AVL (H), CHE (A), LEE (H) to come.",
+    "es": "Esta se sostiene en unos 80 minutos por partido y los balones parados, con AVL (H), CHE (A), LEE (H) por delante.",
+    "pt": "Esta se sustenta em cerca de 80 minutos por jogo e as bolas paradas, com AVL (H), CHE (A), LEE (H) pela frente."
    },
    "source": "template",
    "sources": {
@@ -165,7 +183,7 @@
   "12": {
    "drivers": [],
    "gw": 1,
-   "hash": "a55adc2a4dced665",
+   "hash": "fdb5c6a640d6ef40",
    "sentence": "The projection leans on about 56 minutes a game, 0.6 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
    "sentences": {
     "en": "The projection leans on about 56 minutes a game, 0.6 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
@@ -183,7 +201,7 @@
   "123": {
    "drivers": [],
    "gw": 1,
-   "hash": "4af3b955c1548292",
+   "hash": "140d5722fcc88642",
    "sentence": "The projection leans on about 73 minutes a game and 0.38 expected goal involvements per 90 last season, with AVL (H), CHE (A), LEE (H) to come.",
    "sentences": {
     "en": "The projection leans on about 73 minutes a game and 0.38 expected goal involvements per 90 last season, with AVL (H), CHE (A), LEE (H) to come.",
@@ -201,7 +219,7 @@
   "124": {
    "drivers": [],
    "gw": 1,
-   "hash": "5ece164ebff22853",
+   "hash": "324b42b936621a28",
    "sentence": "Most of this comes from about 90 minutes a game, 0.29 expected goal involvements per 90 last season and set piece duties, with AVL (H), CHE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 90 minutes a game, 0.29 expected goal involvements per 90 last season and set piece duties, with AVL (H), CHE (A) to come.",
@@ -219,7 +237,7 @@
   "127": {
    "drivers": [],
    "gw": 1,
-   "hash": "c1a9ddb218f93be9",
+   "hash": "47c4fbf6544e4856",
    "sentence": "Most of this comes from about 63 minutes a game, 0.34 expected goal involvements per 90 last season and set piece duties, with AVL (H), CHE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 63 minutes a game, 0.34 expected goal involvements per 90 last season and set piece duties, with AVL (H), CHE (A) to come.",
@@ -237,7 +255,7 @@
   "13": {
    "drivers": [],
    "gw": 1,
-   "hash": "d3fd35752c9eb826",
+   "hash": "142fc631bd603419",
    "sentence": "Most of this comes from about 81 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 81 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A) to come.",
@@ -255,12 +273,12 @@
   "130": {
    "drivers": [],
    "gw": 1,
-   "hash": "50a1c8338d0639a7",
-   "sentence": "Most of this comes from about 52 minutes a game and 0.18 expected goal involvements per 90 last season, with AVL (H), CHE (A) to come.",
+   "hash": "819b9c9af05fda35",
+   "sentence": "Most of this comes from about 55 minutes a game and 0.18 expected goal involvements per 90 last season, with AVL (H), CHE (A) to come.",
    "sentences": {
-    "en": "Most of this comes from about 52 minutes a game and 0.18 expected goal involvements per 90 last season, with AVL (H), CHE (A) to come.",
-    "es": "La mayor parte viene de unos 52 minutos por partido y 0.18 participaciones de gol esperadas por 90 la temporada pasada, con AVL (H), CHE (A) por delante.",
-    "pt": "A maior parte vem de cerca de 52 minutos por jogo e 0.18 participações em gols esperadas por 90 na temporada passada, com AVL (H), CHE (A) pela frente."
+    "en": "Most of this comes from about 55 minutes a game and 0.18 expected goal involvements per 90 last season, with AVL (H), CHE (A) to come.",
+    "es": "La mayor parte viene de unos 55 minutos por partido y 0.18 participaciones de gol esperadas por 90 la temporada pasada, con AVL (H), CHE (A) por delante.",
+    "pt": "A maior parte vem de cerca de 55 minutos por jogo e 0.18 participações em gols esperadas por 90 na temporada passada, com AVL (H), CHE (A) pela frente."
    },
    "source": "template",
    "sources": {
@@ -291,7 +309,7 @@
   "14": {
    "drivers": [],
    "gw": 1,
-   "hash": "6faa101ee836e03d",
+   "hash": "bd9fd41fa7ba711c",
    "sentence": "This one rests on about 54 minutes a game, 0.37 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
    "sentences": {
     "en": "This one rests on about 54 minutes a game, 0.37 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
@@ -324,15 +342,15 @@
    },
    "tpl": 3
   },
-  "144": {
+  "15": {
    "drivers": [],
    "gw": 1,
-   "hash": "fbc788765d44e1cb",
-   "sentence": "The projection leans on about 61 minutes a game and 0.18 expected goal involvements per 90 last season, with FUL (A), BHA (H), ARS (A) to come.",
+   "hash": "bbc420148bc59418",
+   "sentence": "The projection leans on about 59 minutes a game, 0.32 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
    "sentences": {
-    "en": "The projection leans on about 61 minutes a game and 0.18 expected goal involvements per 90 last season, with FUL (A), BHA (H), ARS (A) to come.",
-    "es": "La proyección se apoya en unos 61 minutos por partido y 0.18 participaciones de gol esperadas por 90 la temporada pasada, con FUL (A), BHA (H), ARS (A) por delante.",
-    "pt": "A projeção se apoia em cerca de 61 minutos por jogo e 0.18 participações em gols esperadas por 90 na temporada passada, com FUL (A), BHA (H), ARS (A) pela frente."
+    "en": "The projection leans on about 59 minutes a game, 0.32 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
+    "es": "La proyección se apoya en unos 59 minutos por partido, 0.32 participaciones de gol esperadas por 90 la temporada pasada y los balones parados, con COV (H), AVL (A), CHE (H) por delante.",
+    "pt": "A projeção se apoia em cerca de 59 minutos por jogo, 0.32 participações em gols esperadas por 90 na temporada passada e as bolas paradas, com COV (H), AVL (A), CHE (H) pela frente."
    },
    "source": "template",
    "sources": {
@@ -363,7 +381,7 @@
   "154": {
    "drivers": [],
    "gw": 1,
-   "hash": "e01bec4d0683dca2",
+   "hash": "020c7caf56ab63d1",
    "sentence": "Most of this comes from about 74 minutes a game, 0.6 expected goal involvements per 90 last season and set piece duties, with FUL (A), BHA (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 74 minutes a game, 0.6 expected goal involvements per 90 last season and set piece duties, with FUL (A), BHA (H) to come.",
@@ -396,28 +414,10 @@
    },
    "tpl": 3
   },
-  "156": {
-   "drivers": [],
-   "gw": 1,
-   "hash": "06f1b092bbd5fdbe",
-   "sentence": "The projection leans on about 52 minutes a game, 0.39 expected goal involvements per 90 last season and set piece duties, with FUL (A), BHA (H), ARS (A) to come.",
-   "sentences": {
-    "en": "The projection leans on about 52 minutes a game, 0.39 expected goal involvements per 90 last season and set piece duties, with FUL (A), BHA (H), ARS (A) to come.",
-    "es": "La proyección se apoya en unos 52 minutos por partido, 0.39 participaciones de gol esperadas por 90 la temporada pasada y los balones parados, con FUL (A), BHA (H), ARS (A) por delante.",
-    "pt": "A projeção se apoia em cerca de 52 minutos por jogo, 0.39 participações em gols esperadas por 90 na temporada passada e as bolas paradas, com FUL (A), BHA (H), ARS (A) pela frente."
-   },
-   "source": "template",
-   "sources": {
-    "en": "template",
-    "es": "template",
-    "pt": "template"
-   },
-   "tpl": 3
-  },
   "159": {
    "drivers": [],
    "gw": 1,
-   "hash": "bf561a05f169f9de",
+   "hash": "4f8b73252dcef9ce",
    "sentence": "The projection leans on about 80 minutes a game, with FUL (A), BHA (H), ARS (A) to come.",
    "sentences": {
     "en": "The projection leans on about 80 minutes a game, with FUL (A), BHA (H), ARS (A) to come.",
@@ -435,7 +435,7 @@
   "165": {
    "drivers": [],
    "gw": 1,
-   "hash": "82e00c156adf2f54",
+   "hash": "c9ebe4ef5a1e4532",
    "sentence": "The projection leans on about 62 minutes a game and 0.57 expected goal involvements per 90 last season, with FUL (A), BHA (H), ARS (A) to come.",
    "sentences": {
     "en": "The projection leans on about 62 minutes a game and 0.57 expected goal involvements per 90 last season, with FUL (A), BHA (H), ARS (A) to come.",
@@ -489,7 +489,7 @@
   "200": {
    "drivers": [],
    "gw": 1,
-   "hash": "9b720e73fb11439c",
+   "hash": "4af27b910cb1c215",
    "sentence": "This one rests on about 80 minutes a game, with FUL (A), BHA (H), ARS (A) to come.",
    "sentences": {
     "en": "This one rests on about 80 minutes a game, with FUL (A), BHA (H), ARS (A) to come.",
@@ -507,7 +507,7 @@
   "201": {
    "drivers": [],
    "gw": 1,
-   "hash": "a604b36fa2fbb28e",
+   "hash": "5ff178fe317fe1f5",
    "sentence": "The projection leans on about 64 minutes a game and 0.24 expected goal involvements per 90 last season, with EVE (A), MCI (H), FUL (A) to come.",
    "sentences": {
     "en": "The projection leans on about 64 minutes a game and 0.24 expected goal involvements per 90 last season, with EVE (A), MCI (H), FUL (A) to come.",
@@ -579,7 +579,7 @@
   "208": {
    "drivers": [],
    "gw": 1,
-   "hash": "0e03f8b815521e78",
+   "hash": "d4031b3c813bcefd",
    "sentence": "Most of this comes from about 63 minutes a game, 0.5 expected goal involvements per 90 last season and set piece duties, with EVE (A), MCI (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 63 minutes a game, 0.5 expected goal involvements per 90 last season and set piece duties, with EVE (A), MCI (H) to come.",
@@ -651,7 +651,7 @@
   "223": {
    "drivers": [],
    "gw": 1,
-   "hash": "f5ffb8c7f01771d9",
+   "hash": "0b37286ce88d6882",
    "sentence": "Most of this comes from about 50 minutes a game, 0.64 expected goal involvements per 90 last season and set piece duties, with EVE (A), MCI (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 50 minutes a game, 0.64 expected goal involvements per 90 last season and set piece duties, with EVE (A), MCI (H) to come.",
@@ -687,7 +687,7 @@
   "229": {
    "drivers": [],
    "gw": 1,
-   "hash": "351fde6352181755",
+   "hash": "bbca6cd9fdb5182f",
    "sentence": "Most of this comes from about 90 minutes a game, with CRY (H), BOU (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 90 minutes a game, with CRY (H), BOU (A) to come.",
@@ -705,7 +705,7 @@
   "231": {
    "drivers": [],
    "gw": 1,
-   "hash": "de65043c41a3fdeb",
+   "hash": "3b18594a4b536f48",
    "sentence": "The projection leans on about 69 minutes a game, with CRY (H), BOU (A), MUN (H) to come.",
    "sentences": {
     "en": "The projection leans on about 69 minutes a game, with CRY (H), BOU (A), MUN (H) to come.",
@@ -741,7 +741,7 @@
   "233": {
    "drivers": [],
    "gw": 1,
-   "hash": "cff823e89ad8c1e1",
+   "hash": "1888c2e3951d03c7",
    "sentence": "This one rests on about 89 minutes a game, with CRY (H), BOU (A), MUN (H) to come.",
    "sentences": {
     "en": "This one rests on about 89 minutes a game, with CRY (H), BOU (A), MUN (H) to come.",
@@ -777,7 +777,7 @@
   "237": {
    "drivers": [],
    "gw": 1,
-   "hash": "8b9eb20822f7c7e7",
+   "hash": "7468f1a8da4df539",
    "sentence": "The projection leans on about 89 minutes a game, 0.36 expected goal involvements per 90 last season and set piece duties, with CRY (H), BOU (A), MUN (H) to come.",
    "sentences": {
     "en": "The projection leans on about 89 minutes a game, 0.36 expected goal involvements per 90 last season and set piece duties, with CRY (H), BOU (A), MUN (H) to come.",
@@ -795,7 +795,7 @@
   "248": {
    "drivers": [],
    "gw": 1,
-   "hash": "c2e46de63c9a9122",
+   "hash": "079432ed24266fb9",
    "sentence": "This one rests on about 46 minutes a game, 0.53 expected goal involvements per 90 last season and set piece duties, with CRY (H), BOU (A), MUN (H) to come.",
    "sentences": {
     "en": "This one rests on about 46 minutes a game, 0.53 expected goal involvements per 90 last season and set piece duties, with CRY (H), BOU (A), MUN (H) to come.",
@@ -813,7 +813,7 @@
   "249": {
    "drivers": [],
    "gw": 1,
-   "hash": "eeb7f0eb821c2e85",
+   "hash": "f4174560db568595",
    "sentence": "The projection leans on about 50 minutes a game, 0.41 expected goal involvements per 90 last season and set piece duties, with CRY (H), BOU (A), MUN (H) to come.",
    "sentences": {
     "en": "The projection leans on about 50 minutes a game, 0.41 expected goal involvements per 90 last season and set piece duties, with CRY (H), BOU (A), MUN (H) to come.",
@@ -831,7 +831,7 @@
   "25": {
    "drivers": [],
    "gw": 1,
-   "hash": "6781dde63999fd6d",
+   "hash": "ad72c0ff75476f93",
    "sentence": "Most of this comes from about 52 minutes a game, 0.58 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 52 minutes a game, 0.58 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A) to come.",
@@ -867,7 +867,7 @@
   "254": {
    "drivers": [],
    "gw": 1,
-   "hash": "6deb7a81835e2643",
+   "hash": "73edb5ffe6771d28",
    "sentence": "This one rests on about 64 minutes a game, 0.16 expected goal involvements per 90 last season and set piece duties, with CHE (H), SUN (A), CRY (H) to come.",
    "sentences": {
     "en": "This one rests on about 64 minutes a game, 0.16 expected goal involvements per 90 last season and set piece duties, with CHE (H), SUN (A), CRY (H) to come.",
@@ -921,7 +921,7 @@
   "260": {
    "drivers": [],
    "gw": 1,
-   "hash": "b84aa996c659c4c8",
+   "hash": "c8740fa32b66f938",
    "sentence": "This one rests on about 73 minutes a game, 0.36 expected goal involvements per 90 last season and set piece duties, with NFO (A), BRE (H), BHA (A) to come.",
    "sentences": {
     "en": "This one rests on about 73 minutes a game, 0.36 expected goal involvements per 90 last season and set piece duties, with NFO (A), BRE (H), BHA (A) to come.",
@@ -1011,7 +1011,7 @@
   "31": {
    "drivers": [],
    "gw": 1,
-   "hash": "7636f6ea08bcef20",
+   "hash": "5d942ce036a70f8a",
    "sentence": "Most of this comes from about 89 minutes a game, with BHA (A), ARS (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 89 minutes a game, with BHA (A), ARS (H) to come.",
@@ -1029,7 +1029,7 @@
   "32": {
    "drivers": [],
    "gw": 1,
-   "hash": "5abe18a19a25b19b",
+   "hash": "46cf3256b6f73bd5",
    "sentence": "This one rests on about 87 minutes a game and set piece duties, with BHA (A), ARS (H), HUL (A) to come.",
    "sentences": {
     "en": "This one rests on about 87 minutes a game and set piece duties, with BHA (A), ARS (H), HUL (A) to come.",
@@ -1065,12 +1065,12 @@
   "328": {
    "drivers": [],
    "gw": 1,
-   "hash": "e723312afa9edc41",
-   "sentence": "Most of this comes from about 82 minutes a game, with AVL (H), CHE (A) to come.",
+   "hash": "fff329ed885da5b9",
+   "sentence": "Most of this comes from about 65 minutes a game, with AVL (H), CHE (A) to come.",
    "sentences": {
-    "en": "Most of this comes from about 82 minutes a game, with AVL (H), CHE (A) to come.",
-    "es": "La mayor parte viene de unos 82 minutos por partido, con AVL (H), CHE (A) por delante.",
-    "pt": "A maior parte vem de cerca de 82 minutos por jogo, com AVL (H), CHE (A) pela frente."
+    "en": "Most of this comes from about 65 minutes a game, with AVL (H), CHE (A) to come.",
+    "es": "La mayor parte viene de unos 65 minutos por partido, con AVL (H), CHE (A) por delante.",
+    "pt": "A maior parte vem de cerca de 65 minutos por jogo, com AVL (H), CHE (A) pela frente."
    },
    "source": "template",
    "sources": {
@@ -1083,7 +1083,7 @@
   "329": {
    "drivers": [],
    "gw": 1,
-   "hash": "407de412f31e2d4e",
+   "hash": "4ccee63fecce292d",
    "sentence": "This one rests on about 84 minutes a game, with NFO (A), BRE (H), BHA (A) to come.",
    "sentences": {
     "en": "This one rests on about 84 minutes a game, with NFO (A), BRE (H), BHA (A) to come.",
@@ -1191,7 +1191,7 @@
   "346": {
    "drivers": [],
    "gw": 1,
-   "hash": "5bf1436af5a4e48a",
+   "hash": "f520ec8008be87a0",
    "sentence": "Most of this comes from about 77 minutes a game, 0.55 expected goal involvements per 90 last season and set piece duties, with NFO (A), BRE (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 77 minutes a game, 0.55 expected goal involvements per 90 last season and set piece duties, with NFO (A), BRE (H) to come.",
@@ -1209,7 +1209,7 @@
   "350": {
    "drivers": [],
    "gw": 1,
-   "hash": "55e4523173c23bc9",
+   "hash": "934e5b6c44827d61",
    "sentence": "This one rests on about 72 minutes a game, with NEW (A), NFO (H), IPS (A) to come.",
    "sentences": {
     "en": "This one rests on about 72 minutes a game, with NEW (A), NFO (H), IPS (A) to come.",
@@ -1227,30 +1227,12 @@
   "356": {
    "drivers": [],
    "gw": 1,
-   "hash": "1b37826cdee0aa8b",
+   "hash": "22cc5824fd5c3776",
    "sentence": "This one rests on about 90 minutes a game, with NEW (A), NFO (H), IPS (A) to come.",
    "sentences": {
     "en": "This one rests on about 90 minutes a game, with NEW (A), NFO (H), IPS (A) to come.",
     "es": "Esta se sostiene en unos 90 minutos por partido, con NEW (A), NFO (H), IPS (A) por delante.",
     "pt": "Esta se sustenta em cerca de 90 minutos por jogo, com NEW (A), NFO (H), IPS (A) pela frente."
-   },
-   "source": "template",
-   "sources": {
-    "en": "template",
-    "es": "template",
-    "pt": "template"
-   },
-   "tpl": 3
-  },
-  "358": {
-   "drivers": [],
-   "gw": 1,
-   "hash": "0881fb1eec8ac33e",
-   "sentence": "Most of this comes from about 61 minutes a game, with NEW (A), NFO (H) to come.",
-   "sentences": {
-    "en": "Most of this comes from about 61 minutes a game, with NEW (A), NFO (H) to come.",
-    "es": "La mayor parte viene de unos 61 minutos por partido, con NEW (A), NFO (H) por delante.",
-    "pt": "A maior parte vem de cerca de 61 minutos por jogo, com NEW (A), NFO (H) pela frente."
    },
    "source": "template",
    "sources": {
@@ -1281,7 +1263,7 @@
   "366": {
    "drivers": [],
    "gw": 1,
-   "hash": "37c5e36c19733a05",
+   "hash": "a5649d3d4a5d329b",
    "sentence": "The projection leans on about 59 minutes a game, 0.45 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H), IPS (A) to come.",
    "sentences": {
     "en": "The projection leans on about 59 minutes a game, 0.45 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H), IPS (A) to come.",
@@ -1299,7 +1281,7 @@
   "367": {
    "drivers": [],
    "gw": 1,
-   "hash": "3a402a7e856a1323",
+   "hash": "2d005474d9895ef1",
    "sentence": "Most of this comes from about 79 minutes a game, 0.43 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 79 minutes a game, 0.43 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H) to come.",
@@ -1317,7 +1299,7 @@
   "368": {
    "drivers": [],
    "gw": 1,
-   "hash": "1e13b75048af41b8",
+   "hash": "f90f24a71680ca9c",
    "sentence": "This one rests on about 89 minutes a game, 0.32 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H), IPS (A) to come.",
    "sentences": {
     "en": "This one rests on about 89 minutes a game, 0.32 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H), IPS (A) to come.",
@@ -1389,7 +1371,7 @@
   "379": {
    "drivers": [],
    "gw": 1,
-   "hash": "b321417a1856bfb4",
+   "hash": "788f3f2d1f940a51",
    "sentence": "Most of this comes from about 64 minutes a game, 0.35 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 64 minutes a game, 0.35 expected goal involvements per 90 last season and set piece duties, with NEW (A), NFO (H) to come.",
@@ -1407,7 +1389,7 @@
   "384": {
    "drivers": [],
    "gw": 1,
-   "hash": "af867131a5a77528",
+   "hash": "e979300daced11ca",
    "sentence": "The projection leans on about 90 minutes a game, with BOU (H), CRY (A), COV (H) to come.",
    "sentences": {
     "en": "The projection leans on about 90 minutes a game, with BOU (H), CRY (A), COV (H) to come.",
@@ -1425,7 +1407,7 @@
   "387": {
    "drivers": [],
    "gw": 1,
-   "hash": "811c3802ad29eb13",
+   "hash": "8c51b94ff1ace587",
    "sentence": "The projection leans on about 70 minutes a game and 0.3 expected goal involvements per 90 last season, with BOU (H), CRY (A), COV (H) to come.",
    "sentences": {
     "en": "The projection leans on about 70 minutes a game and 0.3 expected goal involvements per 90 last season, with BOU (H), CRY (A), COV (H) to come.",
@@ -1443,7 +1425,7 @@
   "388": {
    "drivers": [],
    "gw": 1,
-   "hash": "b9b4adba0f7c96d1",
+   "hash": "9e3eb21cca52501d",
    "sentence": "Most of this comes from about 84 minutes a game and 0.18 expected goal involvements per 90 last season, with BOU (H), CRY (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 84 minutes a game and 0.18 expected goal involvements per 90 last season, with BOU (H), CRY (A) to come.",
@@ -1461,7 +1443,7 @@
   "389": {
    "drivers": [],
    "gw": 1,
-   "hash": "2683bdf8eb9797cf",
+   "hash": "c23884eee39d06a8",
    "sentence": "This one rests on about 81 minutes a game and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
    "sentences": {
     "en": "This one rests on about 81 minutes a game and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
@@ -1476,10 +1458,28 @@
    },
    "tpl": 3
   },
+  "391": {
+   "drivers": [],
+   "gw": 1,
+   "hash": "19f9a55795ca4666",
+   "sentence": "Most of this comes from about 58 minutes a game and 0.19 expected goal involvements per 90 last season, with BOU (H), CRY (A) to come.",
+   "sentences": {
+    "en": "Most of this comes from about 58 minutes a game and 0.19 expected goal involvements per 90 last season, with BOU (H), CRY (A) to come.",
+    "es": "La mayor parte viene de unos 58 minutos por partido y 0.19 participaciones de gol esperadas por 90 la temporada pasada, con BOU (H), CRY (A) por delante.",
+    "pt": "A maior parte vem de cerca de 58 minutos por jogo e 0.19 participações em gols esperadas por 90 na temporada passada, com BOU (H), CRY (A) pela frente."
+   },
+   "source": "template",
+   "sources": {
+    "en": "template",
+    "es": "template",
+    "pt": "template"
+   },
+   "tpl": 3
+  },
   "397": {
    "drivers": [],
    "gw": 1,
-   "hash": "bd3a68402c27c73c",
+   "hash": "44dea5f833362dd4",
    "sentence": "Most of this comes from about 83 minutes a game, 0.4 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 83 minutes a game, 0.4 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A) to come.",
@@ -1497,7 +1497,7 @@
   "398": {
    "drivers": [],
    "gw": 1,
-   "hash": "91b4546f55c8c983",
+   "hash": "1c0f3db4c2f10517",
    "sentence": "This one rests on about 46 minutes a game, 0.47 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
    "sentences": {
     "en": "This one rests on about 46 minutes a game, 0.47 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
@@ -1515,7 +1515,7 @@
   "399": {
    "drivers": [],
    "gw": 1,
-   "hash": "e67c5232af98993c",
+   "hash": "41100efc64f7c149",
    "sentence": "The projection leans on about 52 minutes a game, 0.67 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
    "sentences": {
     "en": "The projection leans on about 52 minutes a game, 0.67 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
@@ -1533,7 +1533,7 @@
   "4": {
    "drivers": [],
    "gw": 1,
-   "hash": "3f0e235f1fa4e3c3",
+   "hash": "71043dbe7c1a6e72",
    "sentence": "Most of this comes from about 83 minutes a game and 0.15 expected goal involvements per 90 last season, with COV (H), AVL (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 83 minutes a game and 0.15 expected goal involvements per 90 last season, with COV (H), AVL (A) to come.",
@@ -1551,7 +1551,7 @@
   "40": {
    "drivers": [],
    "gw": 1,
-   "hash": "d01f08429904f6cc",
+   "hash": "a3ace805914d901c",
    "sentence": "Most of this comes from about 84 minutes a game, 0.31 expected goal involvements per 90 last season and set piece duties, with FUL (A), BHA (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 84 minutes a game, 0.31 expected goal involvements per 90 last season and set piece duties, with FUL (A), BHA (H) to come.",
@@ -1587,7 +1587,7 @@
   "411": {
    "drivers": [],
    "gw": 1,
-   "hash": "232f35941e76c057",
+   "hash": "abf548e6cec6c5d8",
    "sentence": "The projection leans on about 77 minutes a game, 0.86 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
    "sentences": {
     "en": "The projection leans on about 77 minutes a game, 0.86 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A), COV (H) to come.",
@@ -1605,7 +1605,7 @@
   "412": {
    "drivers": [],
    "gw": 1,
-   "hash": "1e6d0ab6a5329c23",
+   "hash": "23bf6265b6c6c019",
    "sentence": "Most of this comes from about 89 minutes a game, with HUL (A), IPS (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 89 minutes a game, with HUL (A), IPS (H) to come.",
@@ -1623,12 +1623,12 @@
   "417": {
    "drivers": [],
    "gw": 1,
-   "hash": "6dc4574b39f82be0",
-   "sentence": "The projection leans on about 70 minutes a game and 0.16 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
+   "hash": "0697ca656ece5b28",
+   "sentence": "The projection leans on about 68 minutes a game and 0.16 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
    "sentences": {
-    "en": "The projection leans on about 70 minutes a game and 0.16 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
-    "es": "La proyección se apoya en unos 70 minutos por partido y 0.16 participaciones de gol esperadas por 90 la temporada pasada, con HUL (A), IPS (H), EVE (A) por delante.",
-    "pt": "A projeção se apoia em cerca de 70 minutos por jogo e 0.16 participações em gols esperadas por 90 na temporada passada, com HUL (A), IPS (H), EVE (A) pela frente."
+    "en": "The projection leans on about 68 minutes a game and 0.16 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
+    "es": "La proyección se apoya en unos 68 minutos por partido y 0.16 participaciones de gol esperadas por 90 la temporada pasada, con HUL (A), IPS (H), EVE (A) por delante.",
+    "pt": "A projeção se apoia em cerca de 68 minutos por jogo e 0.16 participações em gols esperadas por 90 na temporada passada, com HUL (A), IPS (H), EVE (A) pela frente."
    },
    "source": "template",
    "sources": {
@@ -1641,12 +1641,12 @@
   "418": {
    "drivers": [],
    "gw": 1,
-   "hash": "58e5016a4fc7ec6b",
-   "sentence": "Most of this comes from about 62 minutes a game, with HUL (A), IPS (H) to come.",
+   "hash": "58ff6ae03a851144",
+   "sentence": "Most of this comes from about 60 minutes a game, with HUL (A), IPS (H) to come.",
    "sentences": {
-    "en": "Most of this comes from about 62 minutes a game, with HUL (A), IPS (H) to come.",
-    "es": "La mayor parte viene de unos 62 minutos por partido, con HUL (A), IPS (H) por delante.",
-    "pt": "A maior parte vem de cerca de 62 minutos por jogo, com HUL (A), IPS (H) pela frente."
+    "en": "Most of this comes from about 60 minutes a game, with HUL (A), IPS (H) to come.",
+    "es": "La mayor parte viene de unos 60 minutos por partido, con HUL (A), IPS (H) por delante.",
+    "pt": "A maior parte vem de cerca de 60 minutos por jogo, com HUL (A), IPS (H) pela frente."
    },
    "source": "template",
    "sources": {
@@ -1659,7 +1659,7 @@
   "423": {
    "drivers": [],
    "gw": 1,
-   "hash": "d709a6b262401c8d",
+   "hash": "c5d3eb01d43abae7",
    "sentence": "The projection leans on about 84 minutes a game and set piece duties, with HUL (A), IPS (H), EVE (A) to come.",
    "sentences": {
     "en": "The projection leans on about 84 minutes a game and set piece duties, with HUL (A), IPS (H), EVE (A) to come.",
@@ -1695,7 +1695,7 @@
   "427": {
    "drivers": [],
    "gw": 1,
-   "hash": "09aa46dc05dbd7b2",
+   "hash": "010666cb60c5e733",
    "sentence": "Most of this comes from about 66 minutes a game, 0.58 expected goal involvements per 90 last season and set piece duties, with HUL (A), IPS (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 66 minutes a game, 0.58 expected goal involvements per 90 last season and set piece duties, with HUL (A), IPS (H) to come.",
@@ -1713,12 +1713,12 @@
   "428": {
    "drivers": [],
    "gw": 1,
-   "hash": "29f909119dab82a8",
-   "sentence": "This one rests on about 68 minutes a game and 0.37 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
+   "hash": "35b4a503d304b45d",
+   "sentence": "This one rests on about 67 minutes a game and 0.37 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
    "sentences": {
-    "en": "This one rests on about 68 minutes a game and 0.37 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
-    "es": "Esta se sostiene en unos 68 minutos por partido y 0.37 participaciones de gol esperadas por 90 la temporada pasada, con HUL (A), IPS (H), EVE (A) por delante.",
-    "pt": "Esta se sustenta em cerca de 68 minutos por jogo e 0.37 participações em gols esperadas por 90 na temporada passada, com HUL (A), IPS (H), EVE (A) pela frente."
+    "en": "This one rests on about 67 minutes a game and 0.37 expected goal involvements per 90 last season, with HUL (A), IPS (H), EVE (A) to come.",
+    "es": "Esta se sostiene en unos 67 minutos por partido y 0.37 participaciones de gol esperadas por 90 la temporada pasada, con HUL (A), IPS (H), EVE (A) por delante.",
+    "pt": "Esta se sustenta em cerca de 67 minutos por jogo e 0.37 participações em gols esperadas por 90 na temporada passada, com HUL (A), IPS (H), EVE (A) pela frente."
    },
    "source": "template",
    "sources": {
@@ -1749,7 +1749,7 @@
   "432": {
    "drivers": [],
    "gw": 1,
-   "hash": "622659561ffc0b59",
+   "hash": "beb95d809f4306a2",
    "sentence": "The projection leans on about 65 minutes a game, with HUL (A), IPS (H), EVE (A) to come.",
    "sentences": {
     "en": "The projection leans on about 65 minutes a game, with HUL (A), IPS (H), EVE (A) to come.",
@@ -1767,7 +1767,7 @@
   "442": {
    "drivers": [],
    "gw": 1,
-   "hash": "6f38b6e0991ab99f",
+   "hash": "1e56e13383a24243",
    "sentence": "Most of this comes from about 70 minutes a game, with LIV (H), TOT (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 70 minutes a game, with LIV (H), TOT (A) to come.",
@@ -1839,7 +1839,7 @@
   "449": {
    "drivers": [],
    "gw": 1,
-   "hash": "006b413827e89146",
+   "hash": "a69dff77ad961120",
    "sentence": "This one rests on about 75 minutes a game, 0.16 expected goal involvements per 90 last season and set piece duties, with LIV (H), TOT (A), BOU (H) to come.",
    "sentences": {
     "en": "This one rests on about 75 minutes a game, 0.16 expected goal involvements per 90 last season and set piece duties, with LIV (H), TOT (A), BOU (H) to come.",
@@ -1857,7 +1857,7 @@
   "45": {
    "drivers": [],
    "gw": 1,
-   "hash": "b2bf332daaeea7b5",
+   "hash": "942819a456178475",
    "sentence": "The projection leans on about 58 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with BHA (A), ARS (H), HUL (A) to come.",
    "sentences": {
     "en": "The projection leans on about 58 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with BHA (A), ARS (H), HUL (A) to come.",
@@ -1875,7 +1875,7 @@
   "452": {
    "drivers": [],
    "gw": 1,
-   "hash": "5306a305b93abbc6",
+   "hash": "77072c53be1d7e49",
    "sentence": "This one rests on about 58 minutes a game, 0.39 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
    "sentences": {
     "en": "This one rests on about 58 minutes a game, 0.39 expected goal involvements per 90 last season and set piece duties, with COV (H), AVL (A), CHE (H) to come.",
@@ -1893,12 +1893,12 @@
   "453": {
    "drivers": [],
    "gw": 1,
-   "hash": "2efe50a7f0638e48",
-   "sentence": "The projection leans on about 54 minutes a game and 0.44 expected goal involvements per 90 last season, with LIV (H), TOT (A), BOU (H) to come.",
+   "hash": "5b906d50e2733a47",
+   "sentence": "The projection leans on about 58 minutes a game and 0.44 expected goal involvements per 90 last season, with LIV (H), TOT (A), BOU (H) to come.",
    "sentences": {
-    "en": "The projection leans on about 54 minutes a game and 0.44 expected goal involvements per 90 last season, with LIV (H), TOT (A), BOU (H) to come.",
-    "es": "La proyección se apoya en unos 54 minutos por partido y 0.44 participaciones de gol esperadas por 90 la temporada pasada, con LIV (H), TOT (A), BOU (H) por delante.",
-    "pt": "A projeção se apoia em cerca de 54 minutos por jogo e 0.44 participações em gols esperadas por 90 na temporada passada, com LIV (H), TOT (A), BOU (H) pela frente."
+    "en": "The projection leans on about 58 minutes a game and 0.44 expected goal involvements per 90 last season, with LIV (H), TOT (A), BOU (H) to come.",
+    "es": "La proyección se apoya en unos 58 minutos por partido y 0.44 participaciones de gol esperadas por 90 la temporada pasada, con LIV (H), TOT (A), BOU (H) por delante.",
+    "pt": "A projeção se apoia em cerca de 58 minutos por jogo e 0.44 participações em gols esperadas por 90 na temporada passada, com LIV (H), TOT (A), BOU (H) pela frente."
    },
    "source": "template",
    "sources": {
@@ -1947,7 +1947,7 @@
   "465": {
    "drivers": [],
    "gw": 1,
-   "hash": "dbeb480183eec0e3",
+   "hash": "b0e4725be542df09",
    "sentence": "The projection leans on about 40 minutes a game, 0.55 expected goal involvements per 90 last season and set piece duties, with LIV (H), TOT (A), BOU (H) to come.",
    "sentences": {
     "en": "The projection leans on about 40 minutes a game, 0.55 expected goal involvements per 90 last season and set piece duties, with LIV (H), TOT (A), BOU (H) to come.",
@@ -1965,7 +1965,7 @@
   "467": {
    "drivers": [],
    "gw": 1,
-   "hash": "c73d07259f4d3fe2",
+   "hash": "6bb9b89a822bce59",
    "sentence": "This one rests on about 72 minutes a game, with LEE (H), LIV (A), TOT (H) to come.",
    "sentences": {
     "en": "This one rests on about 72 minutes a game, with LEE (H), LIV (A), TOT (H) to come.",
@@ -1983,7 +1983,7 @@
   "469": {
    "drivers": [],
    "gw": 1,
-   "hash": "de7b98e8aa819ec8",
+   "hash": "b919a555f3dbb23f",
    "sentence": "Most of this comes from about 84 minutes a game, 0.17 expected goal involvements per 90 last season and set piece duties, with LEE (H), LIV (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 84 minutes a game, 0.17 expected goal involvements per 90 last season and set piece duties, with LEE (H), LIV (A) to come.",
@@ -2037,7 +2037,7 @@
   "481": {
    "drivers": [],
    "gw": 1,
-   "hash": "b20d8705847ed3e9",
+   "hash": "75ca93eff7590d42",
    "sentence": "Most of this comes from about 87 minutes a game, 0.21 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 87 minutes a game, 0.21 expected goal involvements per 90 last season and set piece duties, with BOU (H), CRY (A) to come.",
@@ -2073,7 +2073,7 @@
   "488": {
    "drivers": [],
    "gw": 1,
-   "hash": "1be23faefcf8750d",
+   "hash": "0445dd5c882000d4",
    "sentence": "This one rests on about 60 minutes a game, with LEE (H), LIV (A), TOT (H) to come.",
    "sentences": {
     "en": "This one rests on about 60 minutes a game, with LEE (H), LIV (A), TOT (H) to come.",
@@ -2091,7 +2091,7 @@
   "491": {
    "drivers": [],
    "gw": 1,
-   "hash": "2824690132ab1f69",
+   "hash": "328657a274f209c6",
    "sentence": "This one rests on about 64 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with LEE (H), LIV (A), TOT (H) to come.",
    "sentences": {
     "en": "This one rests on about 64 minutes a game, 0.3 expected goal involvements per 90 last season and set piece duties, with LEE (H), LIV (A), TOT (H) to come.",
@@ -2109,7 +2109,7 @@
   "496": {
    "drivers": [],
    "gw": 1,
-   "hash": "497ac51c78730f04",
+   "hash": "61e806058308f51e",
    "sentence": "Most of this comes from about 81 minutes a game, with BRE (A), NEW (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 81 minutes a game, with BRE (A), NEW (H) to come.",
@@ -2127,7 +2127,7 @@
   "498": {
    "drivers": [],
    "gw": 1,
-   "hash": "bead1a967eac7afb",
+   "hash": "0df4088632238fab",
    "sentence": "The projection leans on about 86 minutes a game and 0.17 expected goal involvements per 90 last season, with BRE (A), NEW (H), NFO (A) to come.",
    "sentences": {
     "en": "The projection leans on about 86 minutes a game and 0.17 expected goal involvements per 90 last season, with BRE (A), NEW (H), NFO (A) to come.",
@@ -2145,7 +2145,7 @@
   "499": {
    "drivers": [],
    "gw": 1,
-   "hash": "0196bf4c916eb9f9",
+   "hash": "aa3477dec10e3ebc",
    "sentence": "Most of this comes from about 66 minutes a game, 0.17 expected goal involvements per 90 last season and set piece duties, with BRE (A), NEW (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 66 minutes a game, 0.17 expected goal involvements per 90 last season and set piece duties, with BRE (A), NEW (H) to come.",
@@ -2199,7 +2199,7 @@
   "525": {
    "drivers": [],
    "gw": 1,
-   "hash": "c016690ae55b50c4",
+   "hash": "13862a0876fd1f5a",
    "sentence": "The projection leans on about 88 minutes a game and 0.15 expected goal involvements per 90 last season, with BRE (A), NEW (H), NFO (A) to come.",
    "sentences": {
     "en": "The projection leans on about 88 minutes a game and 0.15 expected goal involvements per 90 last season, with BRE (A), NEW (H), NFO (A) to come.",
@@ -2253,7 +2253,7 @@
   "533": {
    "drivers": [],
    "gw": 1,
-   "hash": "0c16990aeee369e7",
+   "hash": "250e697ac1a6d3a0",
    "sentence": "This one rests on about 63 minutes a game, with IPS (A), FUL (H), BRE (A) to come.",
    "sentences": {
     "en": "This one rests on about 63 minutes a game, with IPS (A), FUL (H), BRE (A) to come.",
@@ -2271,7 +2271,7 @@
   "534": {
    "drivers": [],
    "gw": 1,
-   "hash": "3b510f1b94a91076",
+   "hash": "5a28f86101e632ce",
    "sentence": "The projection leans on about 85 minutes a game and set piece duties, with IPS (A), FUL (H), BRE (A) to come.",
    "sentences": {
     "en": "The projection leans on about 85 minutes a game and set piece duties, with IPS (A), FUL (H), BRE (A) to come.",
@@ -2289,7 +2289,7 @@
   "535": {
    "drivers": [],
    "gw": 1,
-   "hash": "57dcaee5312b1e96",
+   "hash": "145c6dc27ddfc905",
    "sentence": "Most of this comes from about 64 minutes a game, with IPS (A), FUL (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 64 minutes a game, with IPS (A), FUL (H) to come.",
@@ -2307,7 +2307,7 @@
   "542": {
    "drivers": [],
    "gw": 1,
-   "hash": "95af5d67bd980a8f",
+   "hash": "f5d23fc3a3514f3b",
    "sentence": "This one rests on about 81 minutes a game, 0.34 expected goal involvements per 90 last season and set piece duties, with IPS (A), FUL (H), BRE (A) to come.",
    "sentences": {
     "en": "This one rests on about 81 minutes a game, 0.34 expected goal involvements per 90 last season and set piece duties, with IPS (A), FUL (H), BRE (A) to come.",
@@ -2325,7 +2325,7 @@
   "544": {
    "drivers": [],
    "gw": 1,
-   "hash": "645d26af8c2f5c71",
+   "hash": "e84e605553504ea8",
    "sentence": "Most of this comes from about 75 minutes a game, 0.15 expected goal involvements per 90 last season and set piece duties, with IPS (A), FUL (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 75 minutes a game, 0.15 expected goal involvements per 90 last season and set piece duties, with IPS (A), FUL (H) to come.",
@@ -2379,7 +2379,7 @@
   "552": {
    "drivers": [],
    "gw": 1,
-   "hash": "c4e9a251462361f7",
+   "hash": "2f75f6bdb0fc9a45",
    "sentence": "The projection leans on about 66 minutes a game and 0.31 expected goal involvements per 90 last season, with IPS (A), FUL (H), BRE (A) to come.",
    "sentences": {
     "en": "The projection leans on about 66 minutes a game and 0.31 expected goal involvements per 90 last season, with IPS (A), FUL (H), BRE (A) to come.",
@@ -2469,7 +2469,7 @@
   "67": {
    "drivers": [],
    "gw": 1,
-   "hash": "19d5221846d24fd0",
+   "hash": "383cad182d177b5a",
    "sentence": "Most of this comes from about 82 minutes a game and 0.37 expected goal involvements per 90 last season, with MCI (A), EVE (H) to come.",
    "sentences": {
     "en": "Most of this comes from about 82 minutes a game and 0.37 expected goal involvements per 90 last season, with MCI (A), EVE (H) to come.",
@@ -2541,7 +2541,7 @@
   "82": {
    "drivers": [],
    "gw": 1,
-   "hash": "cb805c6724a88d5e",
+   "hash": "bc928c7d7028ee7e",
    "sentence": "Most of this comes from about 87 minutes a game, with TOT (H), LEE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 87 minutes a game, with TOT (H), LEE (A) to come.",
@@ -2595,7 +2595,7 @@
   "88": {
    "drivers": [],
    "gw": 1,
-   "hash": "ed8b5597c73cfba3",
+   "hash": "c1b4a55674bcec50",
    "sentence": "Most of this comes from about 89 minutes a game, with TOT (H), LEE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 89 minutes a game, with TOT (H), LEE (A) to come.",
@@ -2613,7 +2613,7 @@
   "9": {
    "drivers": [],
    "gw": 1,
-   "hash": "4d8e9a5c3a5323ae",
+   "hash": "3affe0dc2eebb227",
    "sentence": "The projection leans on about 58 minutes a game, with COV (H), AVL (A), CHE (H) to come.",
    "sentences": {
     "en": "The projection leans on about 58 minutes a game, with COV (H), AVL (A), CHE (H) to come.",
@@ -2631,7 +2631,7 @@
   "94": {
    "drivers": [],
    "gw": 1,
-   "hash": "0ce18a7ed2a60fa8",
+   "hash": "32364d19f040b82e",
    "sentence": "Most of this comes from about 67 minutes a game, 0.46 expected goal involvements per 90 last season and set piece duties, with TOT (H), LEE (A) to come.",
    "sentences": {
     "en": "Most of this comes from about 67 minutes a game, 0.46 expected goal involvements per 90 last season and set piece duties, with TOT (H), LEE (A) to come.",
@@ -2702,7 +2702,7 @@
   }
  },
  "meta": {
-  "generated_from": "2026-08-15T21:34:00",
+  "generated_from": "2026-08-16T20:33:00",
   "gw": 1,
   "model": "claude-opus-5",
   "n_entries": 150,
