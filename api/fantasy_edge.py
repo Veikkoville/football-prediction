@@ -376,7 +376,8 @@ def fantasy_xp_csv(
 # GET /api/fantasy/chip-ev — chip-ajoituksen EV-ikkunat
 # ---------------------------------------------------------------------------
 
-@router.get("/api/fantasy/chip-ev")
+@router.get("/api/fantasy/chip-ev",
+            description="Expected value of each chip for every remaining gameweek. The response states which basis each number rests on.")
 def fantasy_chip_ev(
     request: Request, response: Response,
     entry: int | None = Query(default=None,
@@ -738,7 +739,8 @@ def fantasy_plan_chains(
 # GET /api/fantasy/league/{league_id} — classic-liigan standings-proxy
 # ---------------------------------------------------------------------------
 
-@router.get("/api/fantasy/league/{league_id}")
+@router.get("/api/fantasy/league/{league_id}",
+            description="Proxy for FPL classic league standings, first page only. Public data, no auth.")
 def fantasy_league(league_id: int, response: Response):
     """FPL leagues-classic standings -proxy (vain julkista dataa, max
     ensimmainen sivu, 10 min TTL _fetch_fpl-cachen kautta). Ei authia —
@@ -812,7 +814,8 @@ def _entry_xi_xp(entry: int, gw_picks: int, gw_xp_target: int, pool_by_id):
     return mu, var, matched, missing, root.get("name")
 
 
-@router.get("/api/fantasy/h2h")
+@router.get("/api/fantasy/h2h",
+            description="Win probability between two entries for one gameweek. It assumes the two squads are independent, and the response says so.")
 def fantasy_h2h(
     response: Response,
     entry_a: int = Query(...), entry_b: int = Query(...),
@@ -866,7 +869,8 @@ def fantasy_h2h(
 # GET /api/fantasy/rival — "Catch your rival" (MINI-LEAGUE-RIVAL, 13.8)
 # ---------------------------------------------------------------------------
 
-@router.get("/api/fantasy/rival")
+@router.get("/api/fantasy/rival",
+            description="What catching a rival would take. The gap, the gameweeks left and the probability are free; the differential list is premium.")
 def fantasy_rival(
     request: Request,
     response: Response,

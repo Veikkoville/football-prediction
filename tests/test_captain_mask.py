@@ -76,8 +76,11 @@ def test_alkuperaista_payloadia_ei_mutatoida():
 def test_endpoint_kutsuu_maskia():
     """Funktio yksin ei riita: 15.8:n vika oli ETTA SITA EI KUTSUTTU."""
     src = (ROOT / "api" / "main.py").read_text(encoding="utf-8")
-    i = src.index('@app.get("/api/fantasy/captain")')
-    j = src.index('@app.get("/api/fantasy/differentials")', i)
+    # Etsi dekoraattorin ALKU, ei koko rivia: 17.8. reiteille lisattiin
+    # `description=`-parametri samalle riville (openapi.json:n suomivuoto), ja
+    # tasmalleen-rivi-vertailu hajosi siita vaikka maski oli tallella.
+    i = src.index('@app.get("/api/fantasy/captain"')
+    j = src.index('@app.get("/api/fantasy/differentials"', i)
     lohko = src[i:j]
     assert "mask_captain_payload" in lohko, "endpoint ei maskaa"
     assert "is_premium_request" in lohko, "endpoint ei tarkista premiumia"

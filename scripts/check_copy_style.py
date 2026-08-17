@@ -187,6 +187,42 @@ def scan_model_claims(path: Path) -> list[tuple[int, str, str]]:
     return hits
 
 
+def scan_openapi() -> list[tuple[str, str]]:
+    """Palauta (polku_spekissa, teksti) jokaiselle vuotaneelle merkkijonolle.
+
+    16.8. mitattiin etta `api.goaliq.app/openapi.json` sisalsi 44 em dashia ja
+    126 suomenkielista sanamuotoa englanninkielisella JULKISELLA pinnalla.
+    Portilla oli oma sokea piste: se skannasi `api/main.py`:n mallilupausten
+    varalta, muttei koskaan sita mita FastAPI generoi docstringeista ja
+    Field-kuvauksista. Docstring paatyy spekkiin, koodikommentti ei, joten
+    kohde on nimenomaan generoitu spekki eika lahdetiedoston teksti.
+
+    Fail-closed: jos spekkia ei saada generoitua, se on portin virhe eika
+    lupa jatkaa (poikkeus on huono todiste "ei vuotoja").
+    """
+    import json
+
+    sys.path.insert(0, str(ROOT))
+    from api.main import app  # noqa: E402  (raskas import, vain portin ajossa)
+
+    spec = app.openapi()
+    osumat: list[tuple[str, str]] = []
+
+    def walk(o, polku: str = "") -> None:
+        if isinstance(o, dict):
+            for k, v in o.items():
+                walk(v, f"{polku}/{k}")
+        elif isinstance(o, list):
+            for i, v in enumerate(o):
+                walk(v, f"{polku}/{i}")
+        elif isinstance(o, str):
+            if any(d in o for d in DASHES) or re.search(r"[äöåÄÖÅ]", o):
+                osumat.append((polku, " ".join(o.split())[:160]))
+
+    walk(spec)
+    return osumat
+
+
 def main() -> int:
     targets: list[Path] = []
     for g in HTML_GLOBS:
@@ -222,10 +258,34 @@ def main() -> int:
         )
         return 1
 
+    try:
+        openapi_hits = scan_openapi()
+    except Exception as e:  # fail-closed, ks. scan_openapi-docstring
+        print(f"check_copy_style FAIL - openapi-spekkia ei saatu generoitua: "
+              f"{type(e).__name__}: {e}")
+        return 1
+
+    if openapi_hits:
+        print(
+            f"check_copy_style FAIL - {len(openapi_hits)} em dashia tai "
+            f"suomenkielista merkkijonoa openapi.jsonissa:\n"
+        )
+        for polku, teksti in openapi_hits:
+            print(f"  {polku}\n    {teksti}\n")
+        print(
+            "api.goaliq.app/openapi.json on JULKINEN englanninkielinen pinta. "
+            "FastAPI kopioi sinne endpointin docstringin ja Field-kuvaukset. "
+            "Korjaus: anna reitille `description=\"...\"` dekoraattorissa "
+            "(se korvaa docstringin spekissa) tai kirjoita kuvaus englanniksi. "
+            "Sisainen suomenkielinen selitys kuuluu #-kommenttiin, joka ei vuoda."
+        )
+        return 1
+
     if not all_hits:
         print(
             f"check_copy_style OK - 0 em dashia copyssa ({len(targets)} tiedostoa), "
-            f"0 kattamatonta mallilupausta ({len(claim_targets)} pintaa)"
+            f"0 kattamatonta mallilupausta ({len(claim_targets)} pintaa), "
+            f"0 vuotoa openapi.jsonissa"
         )
         return 0
 

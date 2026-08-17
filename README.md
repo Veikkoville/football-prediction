@@ -1,4 +1,4 @@
-# AI-powered Football Prediction Model
+# Dixon-Coles Football Prediction Model
 
 > **What the public API actually serves:** Dixon-Coles only. `/api/predict`
 > imports `DixonColesModel` and nothing else (`api/main.py`), fits on goals

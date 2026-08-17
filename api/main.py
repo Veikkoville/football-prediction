@@ -1099,7 +1099,7 @@ def _saa_malli(liigat: tuple[str, ...], kaudet: tuple[str, ...],
 # Pydantic-mallit (request/response -tyypit)
 # ---------------------------------------------------------------------------
 class PredictionRequest(BaseModel):
-    """Ennustepyyntö."""
+    """Prediction request."""
     home_team: str = Field(..., description="Home team name", examples=["Arsenal"])
     away_team: str = Field(..., description="Away team name", examples=["Liverpool"])
     leagues: list[str] = Field(
@@ -1126,26 +1126,23 @@ class PredictionRequest(BaseModel):
 
 
 class PredictWCRequest(BaseModel):
-    """
-    WC-ennustepyyntö — kansainväliset joukkueet, ei seurajoukkueet.
+    """World Cup prediction request: international sides, not clubs.
 
-    Defaults:
-      - leagues: ["INT-World Cup"]
-      - seasons: ["2018", "2022", "2026"] — 4-digit year format, normalisoidaan
-        sisäisesti 2-digit-formaattiin loader-yhteensopivuuden vuoksi
-        (football_data_org._kausi_to_year tulkitsee "2018" → "2020", joten
-        meidän on muunnettava ne "18", "22", "26" ennen lähetystä).
-
-    Datalähde: football-data.org / ML Pack Light -tier
-      (avaa "10 seasons of history" → WC 2018, 2022 FINISHED-ottelut).
+    Seasons are given as four digit years, for example ["2018", "2022", "2026"].
     """
+    # Sisainen huomio (ei vuoda openapi.jsoniin, koska tama on kommentti eika
+    # docstring): nelinumeroiset vuodet normalisoidaan sisaisesti kaksinumeroisiksi
+    # loader-yhteensopivuuden vuoksi. football_data_org._kausi_to_year tulkitsee
+    # "2018" -> "2020", joten ne on muunnettava "18", "22", "26" ennen lahetysta.
+    # Datalahde: football-data.org / ML Pack Light -tier (avaa "10 seasons of
+    # history" -> WC 2018 ja 2022 FINISHED-ottelut).
     home_team: str = Field(..., description="Home team (e.g., 'Argentina')",
                             examples=["Argentina"])
     away_team: str = Field(..., description="Away team (e.g., 'France')",
                             examples=["France"])
     leagues: list[str] = Field(
         default=["INT-World Cup"],
-        description="Käytä oletusta — WC-endpoint tukee vain tätä koodia",
+        description="Leave as the default. This endpoint supports only this code.",
     )
     seasons: list[str] = Field(
         default=["2018", "2022", "2026"],
@@ -1251,7 +1248,7 @@ class TeamsResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # ENDPOINT: tervehdys
 # ---------------------------------------------------------------------------
-@app.get("/")
+@app.get("/", description="Health check. Returns the commit that is actually running, so you can tell which build is live.")
 def root():
     """Health check.
 
@@ -1320,7 +1317,8 @@ def list_leagues():
 # ---------------------------------------------------------------------------
 # ENDPOINT: joukkueet liigassa
 # ---------------------------------------------------------------------------
-@app.get("/api/teams", response_model=TeamsResponse)
+@app.get("/api/teams", response_model=TeamsResponse,
+         description="Teams the model knows about for a given league and season.")
 def list_teams(
     leagues: list[str] = Query(default=["ENG-Premier League"]),
     seasons: list[str] | None = Query(default=None,
@@ -1650,10 +1648,11 @@ def _fd_warm_loop() -> None:
         time.sleep(FD_WARM_ROUND_SEC)
 
 
-@app.get("/api/standings")
+@app.get("/api/standings",
+         description="League table from football-data.org. Tournaments return group stages instead of one flat table.")
 def league_standings(
     league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
-    season: str | None = Query(default=None, description="Kausi YYMM-muodossa (esim. '2526' → 2025). Default: aktiivinen kausi (dynaaminen). Turnaukset (WC) ignoroivat tämän."),
+    season: str | None = Query(default=None, description="Season in YYMM form, for example '2526'. Defaults to the active season. Tournaments ignore it."),
 ):
     """
     Liigan tabletti suoraan football-data.org:n /competitions/{id}/standings:ista.
@@ -1744,7 +1743,8 @@ def league_standings(
 # ---------------------------------------------------------------------------
 # ENDPOINT: joukkue-detail (T1)
 # ---------------------------------------------------------------------------
-@app.get("/api/team/{team_name}")
+@app.get("/api/team/{team_name}",
+         description="Team detail from the data the model trains on: last five matches, form, and home and away averages.")
 def team_detail(
     team_name: str,
     leagues: list[str] = Query(default=["ENG-Premier League"]),
@@ -1835,10 +1835,11 @@ def team_detail(
 # ---------------------------------------------------------------------------
 # ENDPOINT: tulevat ottelut (T4)
 # ---------------------------------------------------------------------------
-@app.get("/api/fixtures")
+@app.get("/api/fixtures",
+         description="Upcoming fixtures for a league, from today up to `days` ahead. An empty list at the end of a season is normal and not an error.")
 def upcoming_fixtures(
     league: str = Query(..., description="Liiga-koodi (esim. 'ENG-Premier League' tai 'ESP-La Liga-FD')"),
-    days: int = Query(default=7, ge=1, le=60, description="Montako päivää eteenpäin haetaan (turnauksilla laajempi ikkuna)"),
+    days: int = Query(default=7, ge=1, le=60, description="How many days ahead to fetch (tournaments use a wider window)"),
 ):
     """
     Tulevat ottelut football-data.org:n /competitions/{id}/matches:ista.
@@ -2210,7 +2211,8 @@ def _wc_seasons_to_loader_format(seasons: list[str]) -> list[str]:
     return out
 
 
-@app.post("/api/predict-wc", response_model=PredictionResponse)
+@app.post("/api/predict-wc", response_model=PredictionResponse,
+          description="1X2, over/under 2.5 and both teams to score for international sides, from a prebuilt Dixon-Coles model fitted on national team results.")
 def predict_wc(req: PredictWCRequest):
     """
     Tee 1X2, O/U 2.5, BTTS -ennuste kansainvälisten joukkueiden välille.
@@ -2362,7 +2364,7 @@ def predict_wc(req: PredictWCRequest):
 # -funktioihin ei kosketa (domestic bit-exact, regressiosuite vahtii).
 # ---------------------------------------------------------------------------
 class ParlayLeg(BaseModel):
-    """Yksi parlay-valinta: ottelu + käyttäjän 1/X/2-pick."""
+    """One parlay leg: a match and the 1/X/2 pick for it."""
     home_team: str = Field(..., examples=["Arsenal"])
     away_team: str = Field(..., examples=["Liverpool"])
     leagues: list[str] = Field(default=["ENG-Premier League"])
@@ -2458,7 +2460,8 @@ def _parlay_leg_1x2(leg: ParlayLeg, idx: int) -> dict:
     return dc.predict_1x2(leg.home_team, leg.away_team)
 
 
-@app.post("/api/parlay", response_model=ParlayResponse)
+@app.post("/api/parlay", response_model=ParlayResponse,
+          description="Model-implied probability that every selected result comes in. It assumes the matches are independent, and the response says so.")
 def parlay(req: ParlayRequest):
     """
     Model-implied probability that all N predictions are correct.
@@ -2494,7 +2497,8 @@ def parlay(req: ParlayRequest):
 # ---------------------------------------------------------------------------
 # ENDPOINT: tyhjennä mallin välimuisti (debug-tarkoitukseen)
 # ---------------------------------------------------------------------------
-@app.post("/api/admin/clear-cache")
+@app.post("/api/admin/clear-cache",
+          description="Clear the model cache and force a refit. Requires an admin token.")
 def clear_cache(request: Request):
     """Tyhjennä mallin välimuisti — pakottaa uudelleen-sovituksen.
 
@@ -2849,7 +2853,8 @@ def affiliate_cohort(request: Request):
     }
 
 
-@app.get("/api/admin/free-window-report")
+@app.get("/api/admin/free-window-report",
+         description="Accounts created during the free window, measured against the daily median of the fourteen days before it. Requires an admin token.")
 def free_window_report(request: Request):
     """Montako tilia on luotu ilmaisikkunan aikana, ja palasiko kukaan.
 
@@ -3072,7 +3077,8 @@ def set_creator_code(req: CreatorCodeRequest, request: Request):
 # ---------------------------------------------------------------------------
 # ENDPOINT: Beat the model — päätösten gradaus (admin-eräajo)
 # ---------------------------------------------------------------------------
-@app.post("/api/admin/grade-decisions")
+@app.post("/api/admin/grade-decisions",
+          description="Grade locked predictions from finished gameweeks. Idempotent. Requires an admin token.")
 def grade_decisions(request: Request):
     """Gradaa lukitut päätökset valmiilta kierroksilta (Beat the model V1).
 
@@ -3171,7 +3177,8 @@ class PushTokenDeleteRequest(BaseModel):
     token: str = Field(min_length=10, max_length=255)
 
 
-@app.get("/api/admin/push-targets")
+@app.get("/api/admin/push-targets",
+         description="Push tokens with premium flag and watchlist attached. Requires an admin token.")
 def push_targets(request: Request):
     """Push-tokenit premium-lipulla ja watchlistilla liitettynä.
 
@@ -3226,7 +3233,8 @@ def push_targets(request: Request):
     return {"targets": targets, "n": len(targets)}
 
 
-@app.post("/api/admin/push-token-delete")
+@app.post("/api/admin/push-token-delete",
+          description="Delete a push token that Expo reported as unregistered. Idempotent. Requires an admin token.")
 def push_token_delete(req: PushTokenDeleteRequest, request: Request):
     """Poista token (Expon DeviceNotRegistered). Idempotentti.
 
@@ -3287,9 +3295,9 @@ def _auto_promo_discount() -> list[dict] | None:
 
 
 class CheckoutRequest(BaseModel):
-    """Pyyntö Stripe Checkout Sessionin luomiseen."""
+    """Request for creating a Stripe Checkout session."""
     user_id: str = Field(..., description="Supabase user UUID")
-    email: str = Field(..., description="Käyttäjän sähköposti (Stripe lähettää kuitin)")
+    email: str = Field(..., description="User email. Stripe sends the receipt here.")
 
 
 class CheckoutResponse(BaseModel):
@@ -3297,7 +3305,8 @@ class CheckoutResponse(BaseModel):
     session_id: str
 
 
-@app.post("/api/checkout", response_model=CheckoutResponse)
+@app.post("/api/checkout", response_model=CheckoutResponse,
+          description="Create a Stripe Checkout session for a premium subscription started in the mobile app.")
 def create_checkout_session(req: CheckoutRequest):
     """
     Luo Stripe Checkout Session premium-tilaukselle.
@@ -3353,14 +3362,15 @@ def create_checkout_session(req: CheckoutRequest):
 
 
 class PortalRequest(BaseModel):
-    email: str = Field(..., description="Käyttäjän sähköposti (löytää Stripe-customerin)")
+    email: str = Field(..., description="User email, used to find the Stripe customer.")
 
 
 class PortalResponse(BaseModel):
     portal_url: str
 
 
-@app.post("/api/customer-portal", response_model=PortalResponse)
+@app.post("/api/customer-portal", response_model=PortalResponse,
+          description="Create a Stripe Customer Portal session where a subscriber can cancel, update a card or read invoices.")
 def create_portal_session(req: PortalRequest):
     """
     Luo Stripe Customer Portal -session jossa kayttaja voi peruuttaa
@@ -3400,7 +3410,7 @@ def create_portal_session(req: PortalRequest):
 
 
 class WebCheckoutRequest(BaseModel):
-    """GoalIQ Pro SPA:n checkout-pyyntö (QUEUE #14)."""
+    """Checkout request from the GoalIQ Pro web app."""
     plan: str = Field(..., description="'monthly' tai 'season'")
     origin: str = Field(
         "", description="SPA:n origin success/cancel-redirecteille "
@@ -3437,7 +3447,8 @@ def _web_checkout_base_url(origin: str) -> str:
     return "https://pro.goaliq.app"
 
 
-@app.post("/api/web/checkout", response_model=WebCheckoutResponse)
+@app.post("/api/web/checkout", response_model=WebCheckoutResponse,
+          description="Create a Stripe Checkout session for a signed-in web user. Identity comes from the Supabase token, never from the request body.")
 def create_web_checkout_session(
     req: WebCheckoutRequest, request: Request
 ) -> WebCheckoutResponse:
@@ -3513,7 +3524,8 @@ def _guest_checkout_rate_ok(ip: str) -> bool:
     return True
 
 
-@app.post("/api/web/checkout/guest", response_model=WebCheckoutResponse)
+@app.post("/api/web/checkout/guest", response_model=WebCheckoutResponse,
+          description="Create a Stripe Checkout session without an account. Stripe collects the email, and the account is created after payment.")
 def create_guest_checkout_session(
     req: WebCheckoutRequest, request: Request
 ) -> WebCheckoutResponse:
@@ -3694,7 +3706,8 @@ async def stripe_webhook(request: Request, background_tasks: BackgroundTasks):
     return {"received": True}
 
 
-@app.post("/api/revenuecat/webhook")
+@app.post("/api/revenuecat/webhook",
+          description="RevenueCat webhook for Google Play subscriptions.")
 async def revenuecat_webhook(request: Request):
     """
     Vastaanottaa RevenueCat-webhookit (Google Play Billing). Paivittaa
@@ -3860,7 +3873,8 @@ def revenuecat_config():
     }
 
 
-@app.get("/api/accuracy")
+@app.get("/api/accuracy",
+         description="The public accuracy record. Every prediction is logged before kick-off and graded once the match has been played, misses included.")
 def model_accuracy(
     response: Response,
     include: str | None = Query(default=None, pattern="^(pending)$"),
@@ -3894,7 +3908,8 @@ def model_accuracy(
     return agg
 
 
-@app.post("/api/webhook/stripe-web")
+@app.post("/api/webhook/stripe-web",
+          description="Stripe webhook for checkouts made on the web.")
 async def stripe_web_webhook(request: Request):
     """GoalIQ Pro (web/pro, pro.goaliq.app) -Checkoutin webhook.
 
@@ -4045,12 +4060,13 @@ async def stripe_web_webhook(request: Request):
     return {"received": True}
 
 
-@app.get("/api/fantasy")
+@app.get("/api/fantasy",
+         description="Clean sheet probability and a model based fixture difficulty rating for every Premier League club.")
 def fantasy_phase0(
     response: Response,
     horizon: str = Query(
         default="6",
-        description="Montako GW:tä teams[].fixtures sisältää: 1-38 tai 'all'.",
+        description="How many gameweeks teams[].fixtures covers: 1-38, or 'all'.",
     ),
     league: str = Query(
         default="fpl",
@@ -4129,7 +4145,8 @@ def fantasy_phase0(
     }
 
 
-@app.get("/api/fantasy/xp")
+@app.get("/api/fantasy/xp",
+         description="Expected points per player per gameweek. Callers without premium get a capped list.")
 def fantasy_xp(
     request: Request,
     response: Response,
@@ -4139,10 +4156,11 @@ def fantasy_xp(
     ),
     lang: str = Query(
         default="en",
+        # Tuntematon arvo putoaa hiljaa englantiin: kieli ei ole resurssin
+        # olemassaolo, joten 404 olisi vaara vastaus (vrt. `league`).
         description=(
-            "WHY-selitysten kieli: 'en' (oletus), 'es' tai 'pt'. Tuntematon "
-            "arvo putoaa hiljaa englantiin — kieli ei ole resurssin "
-            "olemassaolo, joten 404 olisi vaara vastaus (vrt. `league`)."
+            "Language for the WHY explanations: 'en' (default), 'es' or 'pt'. "
+            "An unknown value falls back to English."
         ),
     ),
 ):
@@ -4266,7 +4284,8 @@ def fantasy_xp(
     return payload
 
 
-@app.get("/api/fantasy/price-watch")
+@app.get("/api/fantasy/price-watch",
+         description="Price change forecast for FPL players, rising and falling.")
 def fantasy_price_watch(response: Response):
     """FPL price watch (#43) — hinnanmuutosennuste (rising/falling) per pelaaja.
 
@@ -4304,14 +4323,15 @@ def fantasy_price_watch(response: Response):
     return payload
 
 
-@app.get("/api/fantasy/rate-team")
+@app.get("/api/fantasy/rate-team",
+         description="Rate an FPL squad from its public entry ID and suggest transfers.")
 def fantasy_rate_team(
     response: Response,
     entry: int | None = Query(default=None, description="Julkinen FPL entry-ID"),
     gw: int | None = Query(default=None, ge=1, le=38),
     players: str | None = Query(
         default=None,
-        description="Esikausifallback: 15 FPL element-ID:tä pilkuilla"),
+        description="Pre-season fallback: 15 FPL element IDs, comma separated"),
     captain: int | None = Query(default=None),
     bank: float | None = Query(default=None, ge=0, le=100,
                                description="Pankki miljoonina (manual-moodi)"),
@@ -4378,10 +4398,11 @@ def _parse_id_csv(raw: str, label: str) -> list[int]:
                             detail=f"{label} must be comma-separated integers")
 
 
-@app.get("/api/fantasy/fit")
+@app.get("/api/fantasy/fit",
+         description="Lock one to three players and get the best squad that still fits the budget and the FPL squad rules, plus the gap to the model own pick.")
 def fantasy_fit(
     response: Response,
-    locked: str = Query(..., description="1-3 FPL element-ID:tä pilkuilla"),
+    locked: str = Query(..., description="One to three FPL element IDs, comma separated"),
 ):
     """#155 Fit checker: lukitse 1-3 pakkopelaajaa → paras laillinen runko
     niiden ympärille (horisontti-xP, sama ahne heuristiikka kuin #50-optimi)
@@ -4397,7 +4418,8 @@ def fantasy_fit(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/model-squad")
+@app.get("/api/fantasy/model-squad",
+         description="The squad the model would pick, used to prefill the comparison slot. Same source as the fit checker, so the numbers cannot drift apart.")
 def fantasy_model_squad(response: Response):
     """1.8: Joukkue 2 -vertailuslotin "mallin runko" -esitäyttö (mobiili+web).
     Palauttaa SAMAN vapaan optimirungon jota rate-teamin benchmark, fit checker
@@ -4431,7 +4453,8 @@ def fantasy_model_squad(response: Response):
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/model-race")
+@app.get("/api/fantasy/model-race",
+         description="Season race: the model locked squad against yours. The model figures are graded from FPL own scores, not recomputed on request.")
 def fantasy_model_race(
     request: Request,
     response: Response,
@@ -4481,7 +4504,8 @@ def fantasy_model_race(
     return build_race(log, history, premium=is_premium_request(request))
 
 
-@app.get("/api/fantasy/plan")
+@app.get("/api/fantasy/plan",
+         description="Transfer plan across several gameweeks for an existing squad. A documented heuristic rather than a global optimum.")
 def fantasy_plan(
     request: Request,
     response: Response,
@@ -4511,7 +4535,8 @@ def fantasy_plan(
     return payload
 
 
-@app.get("/api/fantasy/captain")
+@app.get("/api/fantasy/captain",
+         description="Captain picks: the top three in your XI by gameweek expected points, plus a differential option.")
 def fantasy_captain(
     request: Request,
     response: Response,
@@ -4577,7 +4602,8 @@ def fantasy_differentials(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/value")
+@app.get("/api/fantasy/value",
+         description="Expected points per million, fixture swing, and the best pair of goalkeepers to rotate.")
 def fantasy_value(
     response: Response,
     top_n: int = Query(default=20, ge=1, le=100),
@@ -4595,7 +4621,8 @@ def fantasy_value(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/xg-leaders")
+@app.get("/api/fantasy/xg-leaders",
+         description="Top xG scorers over a rolling window. The response names the season the numbers come from.")
 def fantasy_xg_leaders(
     response: Response,
     window: int = Query(default=5, ge=3, le=10),
@@ -4619,7 +4646,8 @@ def fantasy_xg_leaders(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/defcon-leaders")
+@app.get("/api/fantasy/defcon-leaders",
+         description="Defensive contribution leaders: actions per game, hit rate and points over a rolling window.")
 def fantasy_defcon_leaders(
     response: Response,
     window: int = Query(default=5, ge=3, le=10),
@@ -4650,7 +4678,8 @@ def fantasy_defcon_leaders(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/defcon-gw")
+@app.get("/api/fantasy/defcon-gw",
+         description="Defensive contribution gameweek by gameweek for the season.")
 def fantasy_defcon_gw(request: Request, response: Response):
     """Per-GW DefCon -matriisi (30.7): koko 25/26-kauden kierroskohtaiset
     DefCon-rivit nykykauden pelaajille (code-mappaus arkistoon). Builderi
@@ -4724,7 +4753,7 @@ def fantasy_defcon_live(
 @app.get("/api/fantasy/compare")
 def fantasy_compare(
     response: Response,
-    players: str = Query(..., description="2-4 FPL element-ID:tä pilkuilla"),
+    players: str = Query(..., description="Two to four FPL element IDs, comma separated"),
 ):
     """FPL pelaajavertailu (#35): 2-4 pelaajan xP-komponenttierittely +
     hinta/EO/predicted minutes + suora kanta xP-erolla."""
@@ -4737,7 +4766,8 @@ def fantasy_compare(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/fantasy/career")
+@app.get("/api/fantasy/career",
+         description="Season by season FPL history for a public entry ID. Free, no paywall.")
 def fantasy_career(
     response: Response,
     entry: int = Query(..., description="Julkinen FPL entry-ID"),
@@ -4760,7 +4790,8 @@ def fantasy_career(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@app.get("/api/debug/seasons")
+@app.get("/api/debug/seasons",
+         description="Debug: the season formats the data source recognises for a league.")
 def debug_seasons(league: str = Query(default="INT-World Cup")):
     """
     Listaa kaikki seasonit jotka soccerdata FBref tunnistaa annetulle liigalle.
@@ -4789,7 +4820,8 @@ def debug_seasons(league: str = Query(default="INT-World Cup")):
         return {"error": f"{type(e).__name__}: {str(e)[:500]}"}
 
 
-@app.get("/api/debug/load")
+@app.get("/api/debug/load",
+         description="Debug: try to load match data and return the exact error from each source.")
 def debug_load(
     leagues: list[str] = Query(default=["INT-World Cup"]),
     seasons: list[str] = Query(default=["2022"]),
@@ -4810,7 +4842,8 @@ def debug_load(
     }
 
 
-@app.get("/api/stripe-config")
+@app.get("/api/stripe-config",
+         description="Diagnostics: whether Stripe is configured. Never returns keys.")
 def stripe_config():
     """Diagnostiikka: tarkista että Stripe on konfiguroitu (älä paljasta avaimia)."""
     return {
