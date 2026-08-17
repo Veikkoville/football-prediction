@@ -518,7 +518,14 @@ def card_price_tier(args) -> dict:
         # Sen sijaan saanto on nyt sellainen jonka lukija voi TARKISTAA sivulta:
         # "jokainen hyokkaaja ilmaisen top 100:n sisalla". xmins nakyy omana
         # sarakkeenaan, joten rotaatioriski on nakyvissa eika piilotettuna.
-        rows.append({"name": p["web_name"], "tag": f"{price:.1f}m",
+        # 17.8: `tag` on TYHJA tarkoituksella. Se piirtyy merkkina nimen
+        # viereen (ks. rivi ~150), ja aiemmin tassa oli hinta - joka menee
+        # samalla `value`ksi oikean reunan PRICE-sarakkeeseen. Kortille
+        # renderoityi siis hinta KAHDESTI joka rivilla ("Haaland [15.5m] MCI
+        # ... 15.5m"). Muut korttityypit kayttavat `tag`ia pelipaikalle, joten
+        # tama oli ainoa jossa sama arvo tuli kahteen kenttaan. Loytyi kuvasta,
+        # ei koodista.
+        rows.append({"name": p["web_name"], "tag": "", "_price": f"{price:.1f}m",
                      "team": p["team_short"],
                      "mid": f"{tot:.1f} xP · {float(p.get('xmins') or 0):.0f} min",
                      "_v": tot, "badges": []})
@@ -536,7 +543,7 @@ def card_price_tier(args) -> dict:
         "valueLabel": "PRICE",
         "footNote": "every row is on goaliq.app/fpl/expected-points, free",
         "footNote2": "model projections, not betting advice",
-        "rows": [dict(r, rank=i + 1, value=r["tag"])
+        "rows": [dict(r, rank=i + 1, value=r["_price"])
                  for i, r in enumerate(rows)],
         "file": f"goaliq_pricetier_{(args.pos or 'all').lower()}_{n_gw}gw.png",
     }
