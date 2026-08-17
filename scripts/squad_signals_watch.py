@@ -43,6 +43,7 @@ FLAG_LOG_PATH = ROOT / "data" / "watch_flags.json"
 # Raportit elavat goaliq-app-hubissa (CLAUDE.md: QUEUE, promptit ja raportit
 # aina siella, koska CoS ei nae tata repoa).
 HUB_WATCH_DIR = Path(r"C:\Users\vvsaa\Documents\goaliq-app\cos-reports\watch")
+HUB_ROOT = HUB_WATCH_DIR.parents[1]
 PROJECTIONS_PATH = ROOT / "data" / "fpl_xp_projections.json"
 OVERRIDES_PATH = ROOT / "data" / "fpl_player_overrides.csv"
 
@@ -194,11 +195,72 @@ def append_flag_log(flags: list[Flag], taken_at: str) -> None:
         json.dumps(log, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+def commit_report(out: Path) -> str:
+    """Committaa vahtiraportti hub-repoon. Palauttaa tilarivin tulostettavaksi.
+
+    Villen paatos 17.8: naita ei kysyta erikseen joka kerta. Vahti ajetaan
+    Task Schedulerista kahdesti paivassa, joten raportit jaivat kertymaan
+    committaamattomina ja nakyivat vain seuraavan session `git status`issa.
+
+    KOLME VAROTOIMEA, koska tama kirjoittaa gittiin valvomatta:
+
+    1. `git commit --only <polku>` eika `git add -A`. Jos hub-repossa on
+       samaan aikaan kesken toisen ajon tai ihmisen tyota, se EI paady
+       tahan committiin. Tama on se konkreettinen kilpa-ajo jota vastaan
+       varaudutaan, ei teoreettinen.
+    2. Kesken oleva merge tai rebase -> ei kirjoiteta mitaan. Puolivalmis
+       tila on huonoin hetki automaattiselle commitille.
+    3. Pushia EI yriteta uudelleen eika rebasoida. Jos push ei mene lapi
+       (esim. origin edella), commit jaa paikalliseksi ja siita kerrotaan.
+       Valvomaton rebase konfliktin paalle on pahempi kuin pushaamaton
+       commit.
+
+    Epaonnistuminen EI kaada vahtia: raportti on jo levylla, ja vahdin
+    tehtava on liputtaa muutokset eika hoitaa versionhallintaa.
+    """
+    import subprocess
+
+    if not out.is_relative_to(HUB_WATCH_DIR):
+        return f"[squad-signals] ei committoida (raportti ei ole hubissa): {out}"
+
+    git_dir = HUB_ROOT / ".git"
+    for kesken in ("MERGE_HEAD", "rebase-merge", "rebase-apply", "CHERRY_PICK_HEAD"):
+        if (git_dir / kesken).exists():
+            return f"[squad-signals] EI COMMITTOITU: hub-repossa on kesken {kesken}"
+
+    def git(*a: str) -> subprocess.CompletedProcess:
+        return subprocess.run(["git", "-C", str(HUB_ROOT), *a],
+                              capture_output=True, text=True, timeout=120)
+
+    rel = str(out.relative_to(HUB_ROOT)).replace("\\", "/")
+    try:
+        git("add", "--", rel)
+        # Onko tassa tiedostossa oikeasti muutosta? Sama sisalto = ei committia.
+        if git("diff", "--cached", "--quiet", "--", rel).returncode == 0:
+            return "[squad-signals] ei muutosta raportissa, ei committia"
+        pvm = out.stem.replace("squad-signals-", "")
+        viesti = f"chore(watch): squad-signals {pvm} [skip ci]"
+        # `-m` ENNEN `--`: pathspec-erotin katkaisee optiot, joten toisin pain
+        # git tulkitsee viestin tiedostopoluksi (havaittu testissa 17.8).
+        c = git("commit", "-m", viesti, "--only", "--", rel)
+        if c.returncode != 0:
+            return f"[squad-signals] COMMIT EPAONNISTUI: {c.stderr.strip()[:200]}"
+        p = git("push")
+        if p.returncode != 0:
+            return ("[squad-signals] committoitu, PUSH EI MENNYT "
+                    f"(jaa paikalliseksi): {p.stderr.strip()[:160]}")
+        return "[squad-signals] committoitu ja pushattu hubiin"
+    except Exception as e:
+        return f"[squad-signals] git-vaihe epaonnistui: {type(e).__name__}: {e}"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true",
                     help="ala kirjoita lumikuvaa tai lokia")
     ap.add_argument("--out", default=None, help="raportin polku")
+    ap.add_argument("--no-commit", action="store_true",
+                    help="ala committoi raporttia hub-repoon")
     args = ap.parse_args()
 
     taken_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -238,6 +300,10 @@ def main() -> int:
     print(f"[squad-signals] raportti: {out}")
     if args.dry_run:
         print("[squad-signals] DRY RUN: lumikuvaa ja lokia EI kirjoitettu")
+    if args.no_commit or args.dry_run:
+        print("[squad-signals] committointi ohitettu")
+    else:
+        print(commit_report(out))
     return 0
 
 
