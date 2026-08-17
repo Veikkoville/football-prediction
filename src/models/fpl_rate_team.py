@@ -421,8 +421,17 @@ def _quota_ok(pool: list[dict], locked_ids: set[int]) -> bool:
 
 
 def _unconstrained_optimum(pool: list[dict], xi_budget: int,
-                           locked: list[dict] | None = None):
+                           locked: list[dict] | None = None,
+                           bench_pool: list[dict] | None = None):
     """Eksakti paras XI ILMAN 3/klubi-rajaa → todistettu YLÄRAJA.
+
+    `bench_pool` (17.8): penkin hinta-arvio lasketaan TASTA, ei `pool`:sta.
+    Kun XI:n valinta rajattiin pelaaviin maalivahteihin, `pool` ei enaa sisalla
+    halpaa varavahtia — ja koska sama lista syotti seka XI-ehdokkaat etta
+    penkkivarauksen, penkki "kallistui" 0,5m ja XI-budjetti kutistui saman
+    verran. Oire oli hamaava: kaksi ajoa vaitti molemmat `proven=True` mutta
+    antoi eri summan (295,07 vs 294,17), mika on mahdotonta jos molemmat ovat
+    eksakteja. DP oli eksakti; syote oli vaara.
 
     Jos tuloksena oleva XI sattuu täyttämään klubikaton, se on samalla
     todistetusti paras LAILLINEN XI: rajoitteen poistaminen ei voi huonontaa
@@ -439,6 +448,7 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int,
     Palauttaa (xi, total) tai (None, -inf).
     """
     locked = list(locked or [])
+    bench_pool = pool if bench_pool is None else bench_pool
     locked_ids = {p["id"] for p in locked}
     locked_shape = _shape_of(locked)
     locked_cost = sum(p["price"] for p in locked)
@@ -466,7 +476,7 @@ def _unconstrained_optimum(pool: list[dict], xi_budget: int,
                 continue  # lukitut eivät mahdu tähän muodostelmaan
             # Muodostelmakohtainen budjetti: 100.0m miinus TÄMÄN muodon
             # vaatima pelattava penkki.
-            _bench, bench_cost = _bench_for_shape(pool, shape, locked_ids)
+            _bench, bench_cost = _bench_for_shape(bench_pool, shape, locked_ids)
             if bench_cost < 0:
                 continue
             b_shape = (BUDGET_TENTHS - bench_cost - locked_cost) // unit
@@ -558,6 +568,35 @@ def _improve_legal(xi: list[dict], pool: list[dict], xi_budget: int,
 
 def build_optimal_squad(pool: list[dict],
                         locked: list[dict] | None = None) -> dict:
+    """Paras laillinen 15, ALOITUSVAHTI pelaava. Ks. _build_optimal_squad.
+
+    KORJAUS 17.8 (loytyi tuotannosta, luojan postauksesta). Fit checker palautti
+    aloituskokoonpanoon Steelen (BHA, 4.0m), jonka oma xP-mallimme antaa
+    **19,3 odotettua minuuttia ja 5,74 pistetta** kuudelle kierrokselle.
+    Verbruggen maksaa 0,5m enemman ja tuottaa 22,76. Otsikko lukee "BEST XI
+    AROUND YOUR LOCKS", joten se oli vaara vaite mallin OMILLA luvuilla.
+
+    Juurisyy oli `playable_pool`-rajauksen maalivahtipoikkeus: penkkivahti EI
+    pelaa jos ykkonen on kunnossa, joten halvin on siella oikea valinta, ja
+    siksi maalivahdit vapautettiin `_playable`-suodattimesta kokonaan. Vapautus
+    oli oikein penkille mutta koski myos avausta, joten kireassa budjetissa
+    ahne tayttö osti KAKSI ei-pelaavaa vahtia ja toinen niista jai avaukseen.
+    Laukaisin on budjetti: rivi 700 hylkaa kalliimman vahdin varauslaskennassa.
+
+    Korjaus rajaa VAIN aloituskokoonpanon valinnan pelaaviin vahteihin; penkin
+    valinta kayttaa yha koko poolia, joten halpa varavahti sailyy. Jos pelaavaa
+    vahtia ei saada mahtumaan lainkaan, palataan vanhaan kayttaytymiseen eika
+    palauteta virhetta: huonompi vastaus on parempi kuin ei vastausta.
+    """
+    res = _build_optimal_squad(pool, locked, require_playable_gk=True)
+    if res["xi"]:
+        return res
+    return _build_optimal_squad(pool, locked, require_playable_gk=False)
+
+
+def _build_optimal_squad(pool: list[dict],
+                         locked: list[dict] | None = None,
+                         require_playable_gk: bool = True) -> dict:
     """Paras laillinen 15 (XI + pelattava penkki), valinnaisilla lukituilla.
 
     YKSI LÄHDE (29.7): tätä käyttävät sekä #50-benchmark (locked=[]) että
@@ -631,9 +670,27 @@ def build_optimal_squad(pool: list[dict],
         by_pos[p["element_type"]].append(p)
     if any(len(by_pos[t]) < n for t, n in SQUAD_QUOTA.items()):
         return empty
+
+    # 17.8: ALOITUSKOKOONPANON pooli erikseen. `pool` sailyy penkin valintaan,
+    # jotta halpa varavahti loytyy yha; XI:n vahdiksi kelpaa vain pelaava.
+    # Ilman tata erottelua kireassa budjetissa avaukseen paatyi 19 minuutin
+    # vahti (ks. build_optimal_squadin docstring).
+    xi_pool = pool
+    if require_playable_gk:
+        cand = [p for p in pool
+                if p["element_type"] != 1 or _playable(p) or p["id"] in locked_ids]
+        if any(p["element_type"] == 1 for p in cand):
+            xi_pool = cand
+    xi_by_pos: dict[int, list[dict]] = {1: [], 2: [], 3: [], 4: []}
+    for p in xi_pool:
+        xi_by_pos[p["element_type"]].append(p)
+    if any(not xi_by_pos[t] for t in xi_by_pos):
+        return empty
     # Per-positio-halvin: ahne täyttö varaa jäljellä oleville paikoille TÄMÄN,
-    # ei poolin globaalia minimiä (ks. korjaus b yllä).
-    pos_min = {t: min(p["price"] for p in by_pos[t]) for t in by_pos}
+    # ei poolin globaalia minimiä (ks. korjaus b yllä). Lasketaan XI-poolista,
+    # koska varaus koskee XI-paikkoja: pool-minimi aliarvioisi vahtislotin nyt
+    # kun avaukseen ei kelpaa halvin ei-pelaava vahti.
+    pos_min = {t: min(p["price"] for p in xi_by_pos[t]) for t in xi_by_pos}
 
     # 28.7 (Villen havainto): penkkireservi lasketaan PELATTAVASTA penkistä,
     # ei kolmesta halvimmasta. Tässä lasketaan vain kaikkien muodostelmien
@@ -661,7 +718,8 @@ def build_optimal_squad(pool: list[dict],
     # varapolulla per shape, ks. bench_lb-käyttö alla.
     xi_budget = BUDGET_TENTHS - cheapest_bench
 
-    ranked = sorted(pool, key=lambda p: p["xp_horizon_total"], reverse=True)
+    # XI valitaan xi_poolista (pelaava vahti); penkki yha koko poolista.
+    ranked = sorted(xi_pool, key=lambda p: p["xp_horizon_total"], reverse=True)
 
     def _fill(shape: dict[int, int], budget: int) -> list[dict]:
         """Ahne täyttö KIINTEÄLLE muodostelmalle, lukitut pohjalla.
@@ -731,7 +789,9 @@ def build_optimal_squad(pool: list[dict],
         }
 
     # --- 1. EKSAKTI polku (28.7): DP ilman klubikattoa = todistettu yläraja.
-    exact, exact_total = _unconstrained_optimum(pool, xi_budget, locked)
+    # XI-ehdokkaat xi_poolista, penkin hinta-arvio koko poolista.
+    exact, exact_total = _unconstrained_optimum(
+        xi_pool, xi_budget, locked, bench_pool=pool)
     if exact and _squad_clubs_ok(exact):
         # Kelvollinen ratkaisu ylärajan arvolla ⇒ todistetusti optimi.
         # 14.8: sama _result kuin varapolulla, jotta polut eivät voi eriytyä
@@ -768,7 +828,7 @@ def build_optimal_squad(pool: list[dict],
                 cand = _fill(shape, shape_budget)
                 if not cand:
                     break
-                cand = _improve_legal(cand, pool, shape_budget, locked_ids)
+                cand = _improve_legal(cand, xi_pool, shape_budget, locked_ids)
                 _bench, bcost = _bench_for_shape(
                     pool, _shape_of(cand), {p["id"] for p in cand},
                     _club_counts(cand))

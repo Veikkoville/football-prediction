@@ -242,3 +242,117 @@ def test_fit_penkki_on_pelattava_myos_lukittujen_kanssa():
             continue  # varamaalivahti on tietoinen poikkeus
         assert (p.get("xmins") or 0) >= 45.0, (
             f"penkille valittiin pelaamaton pelaaja: {p['web_name']}")
+
+
+def test_aloitusvahti_on_pelaava_myos_kireassa_budjetissa():
+    """17.8: fit checker palautti AVAUKSEEN 19 minuutin varavahdin.
+
+    Löytyi tuotannosta, luojan julkaisemasta kuvasta: XI:n maalivahtina oli
+    Steele (4.0m), jolle oma xP-mallimme antaa 19,3 odotettua minuuttia ja
+    5,74 pistettä; Verbruggen maksoi 0,5m enemmän ja tuotti 22,76. Otsikko
+    lukee "BEST XI AROUND YOUR LOCKS", joten väite oli väärä mallin OMILLA
+    luvuilla.
+
+    Juurisyy: `_playable`-rajauksen maalivahtipoikkeus on oikein PENKILLE
+    (varavahti ei pelaa jos ykkönen on kunnossa) mutta koski myös avausta.
+    Kireässä budjetissa ahne täyttö osti kaksi ei-pelaavaa vahtia.
+
+    Synteettinen pooli ja tiukka budjetti, koska väljässä budjetissa vika ei
+    laukea lainkaan — sama ansa kuin 28.7:n penkkitestissä.
+    """
+    pool, pid = [], 0
+
+    def add(t, price, xp, club, xmins, name):
+        nonlocal pid
+        pid += 1
+        pool.append({"id": pid, "web_name": name, "element_type": t,
+                     "price": price, "xp_horizon_total": xp,
+                     "xp_per_gw": xp / 6, "club": club,
+                     "team_short": f"C{club:02d}", "xmins": xmins,
+                     "gameweeks": []})
+
+    # Budjetti on viritetty niin että 0,5m ratkaisee: koko 15 maksaa tasan
+    # 100.0m molemmilla haaroilla, ja halvemmalla vahdilla säästyvä 0,5m
+    # riittää nostamaan SWING_BADin tilalle SWING_GOODin (+22 xP > vahdin
+    # -19 xP). Ilman tätä viritystä vika ei laukea eikä testi mittaa mitään.
+    add(1, 45, 24.0, 1, 90.0, "GK_START")
+    add(1, 40, 5.0, 2, 10.0, "GK_BACKUP")     # ei pelaa
+    add(1, 40, 4.0, 3, 8.0, "GK_BENCH")       # penkin varavahti
+    for i in range(4):
+        add(2, 70, 26.0 - i * 0.1, 10 + i, 90.0, f"DEF{i}")
+    for i in range(4):
+        add(3, 70, 27.0 - i * 0.1, 20 + i, 90.0, f"MID{i}")
+    add(4, 75, 28.0, 30, 90.0, "FWD_CORE")
+    # Swing-pari: sama positio, 0,5m ero, iso xP-ero.
+    add(4, 150, 30.0, 31, 90.0, "SWING_GOOD")
+    add(4, 145, 8.0, 32, 90.0, "SWING_BAD")
+    for i in range(3):
+        add(2, 45, 3.0, 40 + i, 60.0, f"BDEF{i}")
+    for i in range(3):
+        add(3, 45, 3.0, 50 + i, 60.0, f"BMID{i}")
+    for i in range(2):
+        add(4, 45, 3.0, 60 + i, 60.0, f"BFWD{i}")
+
+    locked: list[dict] = []
+
+    def _xi_gk(res):
+        gks = [p for p in res["xi"] if p["element_type"] == 1]
+        assert len(gks) == 1, "XI:ssä pitää olla tasan yksi maalivahti"
+        return gks[0]
+
+    res = rt.build_optimal_squad(pool, locked)
+    assert res["xi"], "runko pitää saada kokoon"
+    gk = _xi_gk(res)
+    # Kynnys kovakoodattu: jos se luetaan moduulista, kynnyksen nollaaminen
+    # muuttaisi myös odotuksen ja kontrolli menisi läpi.
+    assert (gk.get("xmins") or 0) >= 45.0, (
+        f"avaukseen valittiin pelaamaton maalivahti: "
+        f"{gk['web_name']} xmins={gk.get('xmins')}")
+    assert gk["web_name"] == "GK_START"
+    # Halpa varavahti kuuluu yhä PENKILLE — rajaus ei saa poistaa sitä.
+    assert any(p["element_type"] == 1 for p in res["bench"]), \
+        "penkiltä puuttuu varamaalivahti"
+
+    # NEGATIIVINEN KONTROLLI: ilman rajausta sama pooli tuottaa vian.
+    # Ilman tätä testi voisi mennä läpi vaikka se ei mittaisi mitään.
+    rikki = rt._build_optimal_squad(pool, locked, require_playable_gk=False)
+    assert rikki["xi"], "kontrollin pitää tuottaa runko"
+    assert (_xi_gk(rikki).get("xmins") or 0) < 45.0, (
+        "negatiivinen kontrolli ei toistanut vikaa -> testi ei mittaa mitään")
+
+
+def test_pelaavan_vahdin_rajaus_ei_maksa_mitaan_kun_budjetti_riittaa():
+    """Korjaus ei saa huonontaa tapauksia jotka olivat jo kunnossa.
+
+    Ensimmäinen versioni huononsi niitä: annoin `_unconstrained_optimum`ille
+    xi_poolin, ja koska sama lista syötti sekä XI-ehdokkaat että PENKIN
+    hinta-arvion, penkki kallistui 0,5m ja XI-budjetti kutistui. Oire oli
+    kaksi ajoa jotka molemmat väittivät `proven=True` mutta antoivat eri
+    summan. Tämä testi lukitsee sen: väljässä budjetissa tulos on identtinen.
+    """
+    pool, pid = [], 0
+
+    def add(t, price, xp, club, xmins, name):
+        nonlocal pid
+        pid += 1
+        pool.append({"id": pid, "web_name": name, "element_type": t,
+                     "price": price, "xp_horizon_total": xp,
+                     "xp_per_gw": xp / 6, "club": club,
+                     "team_short": f"C{club:02d}", "xmins": xmins,
+                     "gameweeks": []})
+
+    add(1, 40, 5.0, 1, 10.0, "GK_BACKUP")
+    add(1, 45, 24.0, 2, 90.0, "GK_START")
+    for i in range(8):
+        add(2, 45, 18.0 - i * 0.1, 10 + i, 90.0, f"DEF{i}")
+    for i in range(8):
+        add(3, 45, 19.0 - i * 0.1, 20 + i, 90.0, f"MID{i}")
+    for i in range(6):
+        add(4, 45, 17.0 - i * 0.1, 30 + i, 90.0, f"FWD{i}")
+
+    rajattu = rt._build_optimal_squad(pool, [], require_playable_gk=True)
+    vapaa = rt._build_optimal_squad(pool, [], require_playable_gk=False)
+    assert rajattu["xi"] and vapaa["xi"]
+    assert abs(rajattu["xi_xp"] - vapaa["xi_xp"]) < 1e-9, (
+        f"rajaus maksoi xP:tä väljässä budjetissa: "
+        f"{rajattu['xi_xp']} vs {vapaa['xi_xp']}")
