@@ -55,10 +55,42 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Stdlib-only — EI pip installia (nopea, ei riippuvuusriskiä).
+      # 17.8: RIIPPUVUUDET ON ASENNETTAVA. Tassa luki aiemmin "Stdlib-only,
+      # EI pip installia", ja se oletus piti paikkansa siihen asti kunnes
+      # 9.8. (`f6418b8e`) build_fpl_page.py alkoi importata
+      # `scripts.build_fpl_phase0`:aa saadakseen `map_name`in. Se vetaa
+      # numpyn, pandasin ja koko loader-ketjun. Bake kaatui siita paivasta
+      # lahtien joka ajolla `ModuleNotFoundError: No module named 'numpy'`.
+      # Sama lista kuin fpl-data-refreshissa, jotta ne eivat ajaudu erilleen.
+      - name: Install builder deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install "pandas>=2.1" "numpy>=1.26" "scipy>=1.11"             "statsmodels>=0.14" "requests>=2.31" "soccerdata>=1.8"             "python-dotenv>=1.0" "tqdm>=4.66"
+
+      # 🔴 `continue-on-error: true` OLI TASSA JA SE PIILOTTI YLLAOLEVAN
+      # KAHDEKSAN PAIVAA. Bake kaatui exit 1:lla, askel merkittiin
+      # onnistuneeksi, commit-askel naki "ei muutoksia" ja ohitti itsensä,
+      # ja deploy-verify vertasi livea VANHENTUNEESEEN HEADiin ja meni lapi.
+      # Tulos: vihrea workflow joka ei tehnyt mitaan, ja fpl.html:n luvut
+      # jaatyivat 9.8:aan (Arsenal 60,7 % kun malli sanoi 57,9 %).
+      #
+      # Exit 2 on YHA laillinen ohitus (build_fpl_page.py:n oma fail-safe kun
+      # FPL-data ei ole available / sanity gate ei mene lapi). Kaikki muu
+      # nollasta poikkeava on vika ja kaataa ajon.
       - name: Bake fpl.html from repo data
-        continue-on-error: true
-        run: python scripts/build_fpl_page.py
+        run: |
+          set +e
+          python scripts/build_fpl_page.py
+          rc=$?
+          set -e
+          if [ "$rc" = "0" ]; then
+            echo "Bake OK."
+          elif [ "$rc" = "2" ]; then
+            echo "::notice::build_fpl_page.py exit 2 = fail-safe (FPL-data ei available). Ohitetaan."
+          else
+            echo "::error::build_fpl_page.py kaatui exit $rc - bake EI ajanut."
+            exit "$rc"
+          fi
 
       - name: Commit + push to main (Pages serves fresh page)
         run: |
