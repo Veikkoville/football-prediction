@@ -3,7 +3,7 @@
     "product": "GoalIQ Fantasy Phase 0 — clean sheet % + model FDR",
     "available": true,
     "phase": 0,
-    "generated_at": "2026-08-18T00:51:43",
+    "generated_at": "2026-08-18T03:39:25",
     "season": "2026/27",
     "source": "fpl-api",
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -2340,8 +2340,8 @@
           "opponent_short": "SUN",
           "venue": "H",
           "kickoff_ms": 1795273200000,
-          "fdr": 2,
-          "def_fdr": 2,
+          "fdr": 1,
+          "def_fdr": 1,
           "att_fdr": 2,
           "tier": "far"
         },
@@ -2905,8 +2905,8 @@
           "opponent_short": "COV",
           "venue": "A",
           "kickoff_ms": 1801321200000,
-          "fdr": 1,
-          "def_fdr": 1,
+          "fdr": 2,
+          "def_fdr": 2,
           "att_fdr": 2,
           "tier": "far"
         },
@@ -6294,7 +6294,7 @@
           "kickoff_ms": 1797692400000,
           "fdr": 3,
           "def_fdr": 3,
-          "att_fdr": 3,
+          "att_fdr": 4,
           "tier": "far"
         },
         {
@@ -6437,7 +6437,7 @@
           "kickoff_ms": 1804950000000,
           "fdr": 3,
           "def_fdr": 3,
-          "att_fdr": 4,
+          "att_fdr": 3,
           "tier": "far"
         },
         {
