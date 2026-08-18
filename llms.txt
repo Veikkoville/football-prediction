@@ -13,8 +13,8 @@
 - [Serie A predictions](https://goaliq.app/predictions/serie-a/): 380 fixture pages.
 - [Bundesliga predictions](https://goaliq.app/predictions/bundesliga/): 306 fixture pages.
 - [Ligue 1 predictions](https://goaliq.app/predictions/ligue-1/): 306 fixture pages.
-- [Brasileirao Serie A predictions](https://goaliq.app/predictions/brasileirao/): 151 fixture pages.
-- Live now: 6 league hubs and 1897 fixture pages, regenerated every three hours as fixtures are played and new ones are logged.
+- [Brasileirao Serie A predictions](https://goaliq.app/predictions/brasileirao/): 150 fixture pages.
+- Live now: 6 league hubs and 1896 fixture pages, regenerated every three hours as fixtures are played and new ones are logged.
 <!-- GEN:LLMS-END -->
 - Each fixture page shows the model's win, draw and loss probability for that match. The number on the page is the prediction that was logged before kick-off and is graded afterwards in the public track record, so the page and the record cannot disagree. Expected goals and the most likely scoreline for a fixture are a GoalIQ Premium feature and are not on these pages.
 - Brasileirao runs through the European summer, so this section has fixtures year round.
