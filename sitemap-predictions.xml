@@ -607,12 +607,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://goaliq.app/predictions/la-liga/atletico-madrid-vs-malaga</loc>
-    <lastmod>2026-08-19</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://goaliq.app/predictions/la-liga/rayo-vallecano-vs-alaves</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>daily</changefreq>
@@ -1400,6 +1394,12 @@
   </url>
   <url>
     <loc>https://goaliq.app/predictions/serie-a/roma-vs-inter</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goaliq.app/predictions/serie-a/venezia-vs-lazio</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
