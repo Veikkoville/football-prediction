@@ -1,7 +1,7 @@
 {
   "meta": {
     "product": "GoalIQ FPL Phase 0 — clean sheet % + model FDR",
-    "generated_at": "2026-08-20T09:27:25",
+    "generated_at": "2026-08-20T12:34:10",
     "season": "2026/27",
     "fixture_source": "premierleague.com (pulselive) compSeason 841, julkaistu 2026-06-15",
     "team_strength_source": "GoalIQ Dixon-Coles, Understat PL ['2526', '2627'] (sama fit-config kuin /api/predict: decay=0.0035, bayes=2.0)",
