@@ -1,32 +1,32 @@
 {
-  "updated_at": "2026-08-20T18:40:55+00:00",
+  "updated_at": "2026-08-20T21:30:14+00:00",
   "logged_total": 3152,
-  "pending": 2966,
+  "pending": 2965,
   "voided": 5,
   "all_time": {
-    "n": 181,
+    "n": 182,
     "correct_1x2": 94,
-    "pct_1x2": 0.5193,
+    "pct_1x2": 0.5165,
     "decisive_n": 124,
     "decisive_correct": 94,
     "pct_decisive": 0.7581,
-    "exact_n": 133,
+    "exact_n": 134,
     "exact_correct": 22,
-    "pct_exact": 0.1654,
-    "brier": 0.5922,
-    "brier_n": 133
+    "pct_exact": 0.1642,
+    "brier": 0.5942,
+    "brier_n": 134
   },
   "rolling": {
     "n": 100,
-    "correct_1x2": 46,
-    "pct_1x2": 0.46,
-    "decisive_n": 66,
-    "decisive_correct": 46,
-    "pct_decisive": 0.697,
+    "correct_1x2": 45,
+    "pct_1x2": 0.45,
+    "decisive_n": 65,
+    "decisive_correct": 45,
+    "pct_decisive": 0.6923,
     "exact_n": 100,
-    "exact_correct": 14,
-    "pct_exact": 0.14,
-    "brier": 0.6319,
+    "exact_correct": 13,
+    "pct_exact": 0.13,
+    "brier": 0.6384,
     "brier_n": 100,
     "window": 100
   },
@@ -71,17 +71,17 @@
       "brier_n": 10
     },
     "PD": {
-      "n": 6,
+      "n": 7,
       "correct_1x2": 4,
-      "pct_1x2": 0.6667,
+      "pct_1x2": 0.5714,
       "decisive_n": 4,
       "decisive_correct": 4,
       "pct_decisive": 1.0,
-      "exact_n": 6,
+      "exact_n": 7,
       "exact_correct": 2,
       "pct_exact": null,
       "brier": null,
-      "brier_n": 6
+      "brier_n": 7
     },
     "PPL": {
       "n": 7,
@@ -124,10 +124,10 @@
       "n": 54
     },
     {
-      "bin_mid": 0.253,
-      "predicted": 0.253,
-      "actual": 0.2911,
-      "n": 158
+      "bin_mid": 0.2529,
+      "predicted": 0.2529,
+      "actual": 0.2938,
+      "n": 160
     },
     {
       "bin_mid": 0.337,
@@ -142,10 +142,10 @@
       "n": 50
     },
     {
-      "bin_mid": 0.5392,
-      "predicted": 0.5392,
-      "actual": 0.5484,
-      "n": 31
+      "bin_mid": 0.5382,
+      "predicted": 0.5382,
+      "actual": 0.5312,
+      "n": 32
     },
     {
       "bin_mid": 0.653,
@@ -167,6 +167,20 @@
     }
   ],
   "recent": [
+    {
+      "date": "2026-08-20",
+      "home_team": "Rayo Vallecano de Madrid",
+      "away_team": "Deportivo Alavés",
+      "predicted_winner": "home",
+      "p_winner": 0.5083,
+      "most_likely_score": "1-0",
+      "actual_score": "1-1",
+      "actual_outcome": "draw",
+      "hit_1x2": false,
+      "exact_hit": false,
+      "duration": null,
+      "regular_score": null
+    },
     {
       "date": "2026-08-19",
       "home_team": "Club Atlético de Madrid",
@@ -429,20 +443,6 @@
       "actual_score": "1-5",
       "actual_outcome": "away",
       "hit_1x2": true,
-      "exact_hit": false,
-      "duration": null,
-      "regular_score": null
-    },
-    {
-      "date": "2026-08-16",
-      "home_team": "Vasco",
-      "away_team": "Santos",
-      "predicted_winner": "home",
-      "p_winner": 0.412,
-      "most_likely_score": "1-1",
-      "actual_score": "0-3",
-      "actual_outcome": "away",
-      "hit_1x2": false,
       "exact_hit": false,
       "duration": null,
       "regular_score": null

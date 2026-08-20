@@ -619,12 +619,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://goaliq.app/predictions/la-liga/rayo-vallecano-vs-alaves</loc>
-    <lastmod>2026-08-20</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://goaliq.app/predictions/la-liga/real-betis-vs-real-sociedad</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>daily</changefreq>
@@ -1519,6 +1513,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://goaliq.app/predictions/serie-a/ac-milan-vs-lecce</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://goaliq.app/predictions/ligue-1/</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>daily</changefreq>
@@ -1784,6 +1784,12 @@
   </url>
   <url>
     <loc>https://goaliq.app/predictions/ligue-1/angers-vs-troyes</loc>
+    <lastmod>2026-08-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://goaliq.app/predictions/ligue-1/marseille-vs-paris-saint-germain</loc>
     <lastmod>2026-08-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
