@@ -2,7 +2,18 @@
  "last_price_push": {},
  "price_alerted": {},
  "receipts": [],
- "sent": {},
- "updated_at": "2026-08-20T12:39:08Z",
+ "sent": {
+  "deadline_24h:gw1": {
+   "at": "2026-08-20T18:34:17Z",
+   "n_targets": 0,
+   "remaining_h": 22.93
+  },
+  "picks:gw1": {
+   "at": "2026-08-20T18:34:17Z",
+   "n_targets": 0,
+   "player": "Tarkowski"
+  }
+ },
+ "updated_at": "2026-08-20T18:34:19Z",
  "v": 1
 }
