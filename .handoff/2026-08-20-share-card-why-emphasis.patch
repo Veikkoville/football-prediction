@@ -1,0 +1,602 @@
+diff --git a/api/main.py b/api/main.py
+index 749a4aa..b50dfbf 100644
+--- a/api/main.py
++++ b/api/main.py
+@@ -4262,7 +4262,12 @@ def fantasy_xp(
+     # ilman uutta projektiota -> ilman nostoa ehdollinen pyynto validoisi
+     # vanhan vastauksen 304:lla ja kentta jaisi puuttumaan tasan niilta
+     # joilla vastaus on jo valimuistissa.
+-    schema = "s6"
++    # 20.8 s7: `why` sai `driver_facts`-kentan (ajurin todisteluku) ja
++    # `drivers` kapenee kolmeen. Molemmat ovat serve-time-johdoksia ilman
++    # uutta projektiota -> ilman nostoa ehdollinen pyynto validoisi vanhan
++    # vastauksen 304:lla ja luvut jaisivat nakymatta tasan niilta joilla
++    # vastaus on jo valimuistissa, eli aktiivisimmilta kayttajilta.
++    schema = "s7"
+     # Liiga-avain ETagiin: ilman sitä fpl- ja spl-vastaukset voisivat
+     # 304-validoitua ristiin samasta selainvälimuistista (sama URL-polku,
+     # eri query) — sama vikaluokka kuin mask-bitin puuttuminen olisi.
+diff --git a/src/models/fpl_xp.py b/src/models/fpl_xp.py
+index e261ce6..1c7af23 100644
+--- a/src/models/fpl_xp.py
++++ b/src/models/fpl_xp.py
+@@ -906,6 +906,119 @@ def why_stamp(path: Path = WHY_PATH) -> str:
+         return "0"
+ 
+ 
++# ---------------------------------------------------------------------------
++# WHY-THIS-PICK: ajurien todisteluvut (SHARE-CARD-WHY-EMPHASIS, 20.8)
++# ---------------------------------------------------------------------------
++
++#: Kortti ja sivu nayttavat korkeintaan kolme ajuria. Raja on kortin oma:
++#: nelja riviä tyontaisi tuotantolohkon alas ja Rowanin palaute puhuu
++#: nimenomaan "the 2-3 biggest reasons". Yksi raja tassa, ei kahta klientilla.
++WHY_DRIVER_MAX = 3
++
++_SET_PIECE_WORD = {"pens": "penalties", "corners": "corners", "fk": "free kicks"}
++
++#: Puhtaan pelin pisteet pelipaikan nimella (CS_PTS on element_type-avaimin).
++_CS_PTS_BY_POS = {POS_NAME[k]: float(v) for k, v in CS_PTS.items() if v}
++
++
++def _clean_sheet_pct(player: dict) -> float | None:
++    """P(clean sheet) headline-GW:lle mallin OMASTA komponentista.
++
++    `components.clean_sheet` on odotusarvo pisteina ja FPL:n saanto antaa
++    puhtaasta pelista 4 p (GKP/DEF) tai 1 p (MID), joten jakolasku palauttaa
++    tasan sen todennakoisyyden jolla malli itse laski. Ei uutta lukua eika
++    toista totuutta: sama komponentti on jo kortin komponenttisplitissa.
++    """
++    comps = player.get("components")
++    if not isinstance(comps, dict):
++        return None
++    pts = comps.get("clean_sheet")
++    if not isinstance(pts, (int, float)):
++        return None
++    per_cs = _CS_PTS_BY_POS.get(str(player.get("pos")))
++    if not per_cs:
++        return None
++    # Komponentti kantaa jo minuuttiodotuksen, joten yli 100 % on vain
++    # pyoristysta. Rajaus on varmistus, ei korjaus.
++    return max(0.0, min(100.0, 100.0 * float(pts) / per_cs))
++
++
++
++def driver_facts(player: dict) -> dict:
++    """Yhden rivin todiste jokaiselle ajurille, mallin omista kentista.
++
++    MIKSI SERVE-TIME. Sama peruste kuin `why`-lauseella itsellaan: selitykset
++    elavat omassa tiedostossaan ja projektio kirjoitetaan uusiksi 3 h valein,
++    joten yhdistaminen levylla pyyhkisi ne joka refreshissa. Tama johdos ei
++    myoskaan kosketa `build_fpl_why.component_hash`ia, eli olemassaolevia
++    selityksia EI generoida uusiksi — putkeen kirjoitettuna kentan lisays
++    olisi pakottanut 150 rivin LLM-ajon joka refreshissa.
++
++    MIKSI BACKENDISSA EIKA KUMMALLAKAAN KLIENTILLA. Rowanin palaute 20.8
++    ("making the 2-3 biggest reasons stand out slightly more") tarkoittaa
++    ettei ajuri ole enaa pelkka tagi vaan kantaa luvun. Jos johdos
++    kirjoitetaan erikseen Svelteen ja React Nativeen, sivu ja appi voivat
++    nayttaa saman ajurin eri lukuna — sama vikaluokka jonka takia ajurien
++    nayttonimet ovat jaetussa moduulissa (`whyDrivers.ts`).
++
++    KIELI ON ENGLANTI KAIKILLA LOKAALEILLA, ja se on tietoinen valinta:
++    ajurien nayttonimet ovat jo englanniksi molemmilla pinnoilla, joten
++    lukurivi seuraa niita eika vaita olevansa osa lauseen lokalisointia.
++    Arvot ovat lisaksi numeroetuisia ("84 mins a game").
++
++    Vain kentat jotka payloadissa OIKEASTI ovat: puuttuva kentta = ajuri
++    jaa ilman lukua, ei placeholderia eika arvausta.
++    """
++    out: dict[str, str] = {}
++
++    mins = player.get("xmins")
++    if isinstance(mins, (int, float)) and mins > 0:
++        out["minutes"] = f"{round(float(mins))} mins a game"
++
++    per90 = (player.get("last_season") or {}).get("per90") or {}
++    xgi = per90.get("xgi")
++    if isinstance(xgi, (int, float)) and xgi > 0:
++        out["attacking_output"] = f"{float(xgi):.2f} xGI/90 last season"
++
++    cs = _clean_sheet_pct(player)
++    if cs is not None:
++        out["clean_sheets"] = f"{round(cs)}% clean sheet chance"
++
++    sp = player.get("set_pieces")
++    if isinstance(sp, dict):
++        # Sama kynnys kuin kortin set piece -merkeissa: 1. tai 2. ottaja.
++        # Kolmas nimi listalla ei ole vastuu vaan jarjestysnumero.
++        duties = [_SET_PIECE_WORD[k] for k in ("pens", "corners", "fk")
++                  if isinstance(sp.get(k), (int, float)) and 1 <= sp[k] <= 2]
++        if duties:
++            out["set_pieces"] = ", ".join(duties).capitalize()
++
++    gws = player.get("gameweeks")
++    if isinstance(gws, list):
++        opps = []
++        for g in gws[:WHY_DRIVER_MAX]:
++            for o in ((g or {}).get("opponents") or []):
++                if o.get("opp"):
++                    venue = o.get("venue")
++                    opps.append(f"{o['opp']} ({venue})" if venue else str(o["opp"]))
++        if opps:
++            out["fixtures"] = ", ".join(opps[:WHY_DRIVER_MAX])
++
++    bonus = player.get("e_bonus")
++    if isinstance(bonus, (int, float)) and bonus > 0:
++        out["bonus"] = f"{float(bonus):.1f} bonus pts a game"
++
++    price = player.get("price")
++    if isinstance(price, (int, float)) and price > 0:
++        out["price"] = f"£{float(price):.1f}m"
++
++    owned = player.get("owned_pct")
++    if isinstance(owned, (int, float)):
++        out["differential"] = f"{float(owned):.1f}% owned"
++
++    return out
++
++
+ WHY_DEFAULT_LANG = "en"
+ WHY_LANGS = ("en", "es", "pt")
+ 
+@@ -948,9 +1061,21 @@ def attach_why(payload: dict, entries: dict | None = None,
+         if not sentence:
+             continue
+         sources = entry.get("sources") or {}
++        # Kolmen raja TASSA eika kummallakaan klientilla: LLM-polku saa
++        # palauttaa enemman kuin kolme ajuria, ja kaksi erillista slicea
++        # ajautuisi ennen pitkaa eri lukuun. Jarjestys sailyy sellaisenaan —
++        # se on lauseen kirjoittajan (tai templaten kiintean prioriteetin)
++        # oma nakemys siita mika on isoin, eika sita saa jarjestaa uusiksi.
++        drivers = [d for d in (entry.get("drivers") or []) if isinstance(d, str)]
++        drivers = drivers[:WHY_DRIVER_MAX]
++        facts = driver_facts(p)
+         p["why"] = {
+             "sentence": sentence,
+-            "drivers": entry.get("drivers") or [],
++            "drivers": drivers,
++            # Todisteluku per ajuri (SHARE-CARD-WHY-EMPHASIS 20.8). Vain ne
++            # ajurit jotka tama rivi oikeasti kantaa; ilman lukua jaava ajuri
++            # renderoityy pelkkana nimena eika placeholderina.
++            "driver_facts": {d: facts[d] for d in drivers if d in facts},
+             # Lukija saa tietää kummasta lähteestä lause tuli. "template" ei
+             # ole vika vaan tarkka mutta tylsä lause; sen piilottaminen tekisi
+             # provenienssilupauksesta valikoivan.
+diff --git a/tests/test_fpl_why.py b/tests/test_fpl_why.py
+index 9228427..18a7e82 100644
+--- a/tests/test_fpl_why.py
++++ b/tests/test_fpl_why.py
+@@ -491,3 +491,90 @@ def test_paid_path_needs_two_locks_not_one(monkeypatch):
+         "maksullisen polun toinen lukko on poistettu tai nimetty uudelleen")
+     assert "use_model" in src and "if args.dry_run or not use_model:" in src, (
+         "mallipolun vahti ei enaa portita batch-lahetysta")
++
++
++# --------------------------------------------------------------------------
++# Ajurien todisteluvut (SHARE-CARD-WHY-EMPHASIS 20.8, Rowanin palaute)
++# --------------------------------------------------------------------------
++
++def _rich_player() -> dict:
++    """Rivi jolla on kaikki ajurikentat — sama muoto kuin tuotannon payload."""
++    return {
++        "id": 1, "pos": "DEF", "xmins": 83.4, "owned_pct": 29.7, "price": 8.0,
++        "e_bonus": 0.6,
++        "last_season": {"per90": {"xgi": 0.15}},
++        "set_pieces": {"pens": None, "corners": 2, "fk": 4},
++        "components": {"clean_sheet": 2.03},
++        "gameweeks": [{"opponents": [{"opp": "COV", "venue": "H"}]},
++                      {"opponents": [{"opp": "AVL", "venue": "A"}]}],
++    }
++
++
++def test_driver_facts_reads_every_number_from_the_row():
++    from src.models.fpl_xp import driver_facts
++    f = driver_facts(_rich_player())
++    assert f["minutes"] == "83 mins a game"
++    assert f["attacking_output"] == "0.15 xGI/90 last season"
++    # 2.03 p / 4 p puhtaasta pelista = 51 %. Sama komponentti jonka kortin
++    # komponenttisplit jo nayttaa — ei toista totuutta.
++    assert f["clean_sheets"] == "51% clean sheet chance"
++    assert f["bonus"] == "0.6 bonus pts a game"
++    assert f["price"] == "£8.0m"
++    assert f["differential"] == "29.7% owned"
++    assert f["fixtures"] == "COV (H), AVL (A)"
++
++
++def test_driver_facts_set_pieces_only_counts_a_real_duty():
++    """Kolmas nimi listalla ei ole vastuu vaan jarjestysnumero — sama kynnys
++    kuin kortin set piece -merkeissa (1. tai 2. ottaja)."""
++    from src.models.fpl_xp import driver_facts
++    p = _rich_player()
++    assert driver_facts(p)["set_pieces"] == "Corners"
++    p["set_pieces"] = {"pens": 1, "corners": 2, "fk": None}
++    assert driver_facts(p)["set_pieces"] == "Penalties, corners"
++    p["set_pieces"] = {"pens": 3, "corners": 5, "fk": None}
++    assert "set_pieces" not in driver_facts(p)
++
++
++def test_driver_facts_omits_what_the_row_does_not_carry():
++    """Puuttuva kentta = ajuri ilman lukua. Placeholder olisi vaite datasta
++    jota ei ole ([[honest-data-labels]])."""
++    from src.models.fpl_xp import driver_facts
++    assert driver_facts({"id": 1, "pos": "DEF"}) == {}
++    # Hyokkaajalla ei ole puhtaan pelin pisteita, joten komponentista ei saa
++    # todennakoisyytta edes kun kentta on olemassa.
++    assert "clean_sheets" not in driver_facts(
++        {"id": 1, "pos": "FWD", "components": {"clean_sheet": 0.0}})
++
++
++def test_attach_why_carries_driver_facts_for_the_listed_drivers_only():
++    from src.models.fpl_xp import attach_why
++    p = _rich_player()
++    entries = {"1": {"sentence": "x", "drivers": ["minutes", "clean_sheets"],
++                     "source": "model"}}
++    w = attach_why({"meta": {}, "players": [p]}, entries)["players"][0]["why"]
++    assert w["drivers"] == ["minutes", "clean_sheets"]
++    assert set(w["driver_facts"]) == {"minutes", "clean_sheets"}
++    assert w["driver_facts"]["minutes"] == "83 mins a game"
++
++
++def test_attach_why_caps_the_driver_list_at_three_without_reordering():
++    """Raja on backendissa eika kummallakaan klientilla: kaksi erillista
++    slicea ajautuisi ennen pitkaa eri lukuun. Jarjestys on lauseen
++    kirjoittajan nakemys isoimmasta eika sita saa jarjestaa uusiksi."""
++    from src.models.fpl_xp import attach_why, WHY_DRIVER_MAX
++    entries = {"1": {"sentence": "x", "source": "model",
++                     "drivers": ["differential", "price", "bonus", "minutes"]}}
++    w = attach_why({"meta": {}, "players": [_rich_player()]},
++                   entries)["players"][0]["why"]
++    assert w["drivers"] == ["differential", "price", "bonus"]
++    assert len(w["drivers"]) == WHY_DRIVER_MAX
++    assert "minutes" not in w["driver_facts"], "pudotettu ajuri ei saa jattaa lukua"
++
++
++def test_attach_why_survives_a_row_with_no_numbers_at_all():
++    from src.models.fpl_xp import attach_why
++    entries = {"1": {"sentence": "x", "drivers": ["minutes"], "source": "model"}}
++    w = attach_why({"meta": {}, "players": [{"id": 1}]}, entries)["players"][0]["why"]
++    assert w["drivers"] == ["minutes"]
++    assert w["driver_facts"] == {}
+diff --git a/web/pro-spa/src/lib/api.ts b/web/pro-spa/src/lib/api.ts
+index 37788ac..7c095c0 100644
+--- a/web/pro-spa/src/lib/api.ts
++++ b/web/pro-spa/src/lib/api.ts
+@@ -97,7 +97,16 @@ export interface LastSeason {
+  *  lauseen ehto. */
+ export interface XpWhy {
+ 	sentence: string;
++	/** Backend rajaa kolmeen (`WHY_DRIVER_MAX`) ja SAILYTTAA jarjestyksen —
++	 *  se on lauseen kirjoittajan nakemys siita mika on isoin. Klientti ei
++	 *  jarjesta eika rajaa uudelleen. */
+ 	drivers: string[];
++	/** Ajurin todisteluku ("83 mins a game"), avaimena `drivers`-alkio.
++	 *  SHARE-CARD-WHY-EMPHASIS 20.8 (Rowanin palaute): ajuri ei ole enaa
++	 *  pelkka tagi vaan kantaa luvun, jotta lukija nakee syyn sekunnissa.
++	 *  Defensiivinen: vanha deployattu backend ei tuo kenttaa, ja ajuri jolle
++	 *  rivi ei kanna lukua renderoityy pelkkana nimena — ei placeholderia. */
++	driver_facts?: Record<string, string>;
+ 	source: 'model' | 'template' | string;
+ }
+ 
+diff --git a/web/pro-spa/src/lib/components/PlayerCard.svelte b/web/pro-spa/src/lib/components/PlayerCard.svelte
+index 4468fc3..fc04131 100644
+--- a/web/pro-spa/src/lib/components/PlayerCard.svelte
++++ b/web/pro-spa/src/lib/components/PlayerCard.svelte
+@@ -22,7 +22,7 @@
+ 	import WhyThisPick from './WhyThisPick.svelte';
+ 	import ComponentSplit from './ComponentSplit.svelte';
+ 	import { canShareToApps, sharePlayerCard, type PlayerCardCell } from '$lib/shareCard';
+-	import { WHY_DRIVER_LABEL } from '$lib/whyDrivers';
++	import { whyDriverRows } from '$lib/whyDrivers';
+ 
+ 	let pool = $state<CardPlayer[]>([]);
+ 	let meta = $state<XpMeta | null>(null);
+@@ -433,15 +433,17 @@
+ 								(p.gameweeks ?? []).length
+ 							} gameweeks`
+ 						: undefined,
+-				// SHARE-CARD-WHY (Rowan 19.8): ajurit chippeina mallirivin alle.
++				// SHARE-CARD-WHY (Rowan 19.8) + todisteluvut (Rowan 20.8): ajurit
++				// omina riveinaan mallirivin alle, kukin oma lukunsa mukanaan.
+ 				// Sama premium-gate kuin modelLine: `why` on premium-datan
+ 				// johdannainen. Backend liittaa kentan vain maskaamattomaan
+ 				// vastaukseen ja vain xP-karjelle, joten puuttuva kentta on
+-				// normaali tila — ei placeholderia. Labelit $lib/whyDrivers:sta,
+-				// samasta lahteesta kuin sivun WhyThisPick-lohko.
++				// normaali tila — ei placeholderia. Rivit $lib/whyDrivers:sta,
++				// samasta lahteesta kuin sivun WhyThisPick-lohko: kortti ja sivu
++				// eivat voi nayttaa samaa ajuria eri nimella tai eri lukuna.
+ 				drivers:
+ 					premium && !excluded && p.why?.drivers?.length
+-						? p.why.drivers.map((d) => WHY_DRIVER_LABEL[d] ?? d)
++						? whyDriverRows(p.why)
+ 						: undefined,
+ 				production:
+ 					cells.length > 0
+diff --git a/web/pro-spa/src/lib/components/WhyThisPick.svelte b/web/pro-spa/src/lib/components/WhyThisPick.svelte
+index e47c3b1..84282e2 100644
+--- a/web/pro-spa/src/lib/components/WhyThisPick.svelte
++++ b/web/pro-spa/src/lib/components/WhyThisPick.svelte
+@@ -1,33 +1,44 @@
+ <script lang="ts">
+ 	import type { XpWhy } from '$lib/api';
+-	import { WHY_DRIVER_LABEL } from '$lib/whyDrivers';
++	import { whyDriverRows } from '$lib/whyDrivers';
+ 
+ 	// WHY-THIS-PICK (14.8). Nostettu XpTablesta omaksi komponentiksi 19.8
+ 	// (Rowanin palaute): selitys oli vain xP-taulukon avatussa rivissa, eli
+-	// "kuka" ja "miksi" olivat eri nakymissa. Ajurilista elaa TASSA eika
+-	// kutsujassa — komponenttiin haudattu lista korjaa vain yhden naytto.
++	// "kuka" ja "miksi" olivat eri nakymissa. Ajurilista elaa $lib/whyDrivers
++	// -moduulissa eika kutsujassa — komponenttiin haudattu lista korjaa vain
++	// yhden nayton.
++	//
++	// 20.8 (Rowanin palaute jaettuun korttiin): ajurit olivat tasa-arvoisia
++	// chippeja ilman lukua, eli ne kertoivat MITKA syyt mutta eivat kuinka
++	// isoja. Nyt jokainen ajuri on rivi jolla on backendin antama todisteluku
++	// ("83 mins a game") — sama esitys kuin jaettavalla kortilla, jotta sivu
++	// ja kuva nayttavat saman asian samannakoisena.
+ 	//
+ 	// LAHDE NAKYY AINA. `template` ei ole vika vaan tarkka mutta tylsa lause;
+ 	// sen piilottaminen tekisi provenienssilupauksesta valikoivan. Kumpaakaan
+ 	// lahdetta EI kutsuta "malliksi": tassa tuotteessa se sana tarkoittaa
+ 	// ottelumallia, ja lauseen kirjoittajan kutsuminen malliksi siirtaisi
+ 	// ottelumallin uskottavuuden sille. Sama saanto mobiilissa.
+-	// Ajurilabelit: $lib/whyDrivers (jaettu kortin kanssa 19.8).
+ 
+ 	let { why }: { why: XpWhy | undefined } = $props();
++
++	const rows = $derived(whyDriverRows(why));
+ </script>
+ 
+ {#if why?.sentence}
+ 	<div class="why">
+ 		<p class="why-title">Why this projection</p>
+-		<p class="why-text">{why.sentence}</p>
+-		{#if why.drivers?.length}
+-			<div class="why-chips">
+-				{#each why.drivers as d (d)}
+-					<span class="why-chip">{WHY_DRIVER_LABEL[d] ?? d}</span>
++		{#if rows.length}
++			<ul class="why-drivers">
++				{#each rows as d (d.key)}
++					<li class="why-driver">
++						<span class="why-driver-label">{d.label}</span>
++						{#if d.value}<span class="why-driver-value">{d.value}</span>{/if}
++					</li>
+ 				{/each}
+-			</div>
++			</ul>
+ 		{/if}
++		<p class="why-text">{why.sentence}</p>
+ 		<p class="why-source">
+ 			{why.source === 'model'
+ 				? "Written by an AI from the model's own numbers"
+@@ -45,35 +56,53 @@
+ 		margin: 12px 0;
+ 	}
+ 	.why-title {
+-		margin: 0 0 4px;
++		margin: 0 0 8px;
+ 		font-size: 11px;
+ 		font-weight: 700;
+ 		letter-spacing: 0.04em;
+ 		text-transform: uppercase;
+ 		color: var(--muted, #a8a29a);
+ 	}
++	/* Ajurit ENNEN lausetta ja omina riveinaan: lause on tarkka mutta se
++	   luetaan sanasta sanaan, kun taas kolme riviä lukuineen luetaan
++	   silmayksella. Rowanin vaatimus oli tasan se ("within a second or two"). */
++	.why-drivers {
++		list-style: none;
++		margin: 0 0 10px;
++		padding: 0;
++		display: flex;
++		flex-direction: column;
++		gap: 4px;
++	}
++	.why-driver {
++		display: flex;
++		align-items: baseline;
++		justify-content: space-between;
++		gap: 12px;
++		border-left: 3px solid var(--giq-gold, #f5c542);
++		padding: 3px 0 3px 8px;
++	}
++	.why-driver-label {
++		font-size: 12.5px;
++		font-weight: 700;
++		color: var(--giq-cream, #f3f2f2);
++	}
++	.why-driver-value {
++		font-size: 12.5px;
++		font-weight: 700;
++		color: var(--giq-gold, #f5c542);
++		text-align: right;
++		white-space: nowrap;
++	}
+ 	.why-text {
+ 		margin: 0;
+ 		font-size: 13px;
+ 		line-height: 1.5;
++		color: var(--muted, #a8a29a);
+ 	}
+ 	.why-source {
+ 		margin: 6px 0 0;
+ 		font-size: 11px;
+ 		color: var(--muted, #a8a29a);
+ 	}
+-	.why-chips {
+-		display: flex;
+-		flex-wrap: wrap;
+-		gap: 6px;
+-		margin-top: 8px;
+-	}
+-	.why-chip {
+-		font-size: 11px;
+-		font-weight: 600;
+-		color: var(--teal, #2ed6c2);
+-		background: var(--surface, #141311);
+-		border-radius: 2px;
+-		padding: 3px 7px;
+-	}
+ </style>
+diff --git a/web/pro-spa/src/lib/shareCard.ts b/web/pro-spa/src/lib/shareCard.ts
+index 2495d48..7eb8111 100644
+--- a/web/pro-spa/src/lib/shareCard.ts
++++ b/web/pro-spa/src/lib/shareCard.ts
+@@ -695,13 +695,20 @@ export interface PlayerCardSpec {
+ 	hero?: { value: string; label: string };
+ 	/** Premium-rivi (xP). Kutsuja jattaa pois freelta. */
+ 	modelLine?: string;
+-	/** WHY-THIS-PICK-ajurit chip-rivina (SHARE-CARD-WHY, Rowanin palaute 19.8).
+-	 *  Kutsuja antaa VALMIIT nayttonimet ($lib/whyDrivers) — renderoija ei
+-	 *  mappaa avaimia, jottei kortti ja sivu voi kaantaa samaa avainta eri
+-	 *  sanaksi. `why` tulee backendilta vain maskaamattomaan vastaukseen ja
+-	 *  vain xP-karjelle, joten puuttuva/tyhja lista on normaali tila: lohkoa
+-	 *  ei silloin piirreta eika sille varata korkeutta. */
+-	drivers?: string[];
++	/** WHY-THIS-PICK-ajurit (SHARE-CARD-WHY 19.8, todisteluvut 20.8).
++	 *  Kutsuja antaa VALMIIT rivit ($lib/whyDrivers.whyDriverRows) — renderoija
++	 *  ei mappaa avaimia eika johda lukuja, jottei kortti ja sivu voi kertoa
++	 *  samasta ajurista eri asiaa. `why` tulee backendilta vain maskaamattomaan
++	 *  vastaukseen ja vain xP-karjelle, joten puuttuva/tyhja lista on normaali
++	 *  tila: lohkoa ei silloin piirreta eika sille varata korkeutta.
++	 *
++	 *  20.8 Rowanin palaute: *"making the 2-3 biggest reasons stand out
++	 *  slightly more, so you can understand why the model likes the player
++	 *  within a second or two"*. Tasa-arvoiset chipit kertoivat MITKA syyt
++	 *  mutta eivat kuinka isoja, joten ajuri on nyt oma rivinsa jolla on
++	 *  todisteluku. `value` puuttuu kun rivi ei kanna sita lukua — silloin
++	 *  piirretaan pelkka nimi, ei placeholderia. */
++	drivers?: { key: string; label: string; value?: string }[];
+ 	/** Tuotantorivi. title kantaa katteen (kausi + sarja + per 90 vai totaali)
+ 	 *  - ilman sita luvut vaittaisivat olevansa jotain muuta kuin ovat. */
+ 	production?: { title: string; cells: PlayerCardCell[]; totals?: string };
+@@ -748,7 +755,10 @@ export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
+ 	const yModel = h;
+ 	if (spec.modelLine) h += 58;
+ 	const yDrivers = h;
+-	if (spec.drivers?.length) h += 84;
++	// Otsikko + rivi per ajuri. Kiintea 84 px riitti chip-riville; rivilayout
++	// kasvaa ajurien maaran mukaan, ja backend rajaa listan kolmeen.
++	const DRIVER_ROW_H = 46;
++	if (spec.drivers?.length) h += 34 + spec.drivers.length * DRIVER_ROW_H + 10;
+ 	const yProd = h;
+ 	if (spec.production) h += 40 + 92 + (spec.production.totals ? 40 : 0);
+ 	const yDefcon = h;
+@@ -866,28 +876,42 @@ export async function renderPlayerCard(spec: PlayerCardSpec): Promise<Blob> {
+ 		ctx.fillText(spec.modelLine, MX, yModel + 12);
+ 	}
+ 
+-	// --- WHY-ajurit (chip-rivi mallirivin alla) ---
++	// --- WHY-ajurit (mallirivin alla) ---
+ 	if (spec.drivers?.length) {
+ 		// Sama otsikko kuin sivun WhyThisPick-lohkossa — kortti ja sivu
+ 		// nimeavat saman asian samoin sanoin.
+ 		ctx.font = med(18);
+ 		ctx.fillStyle = MUTED;
+ 		ctx.fillText('WHY THIS PROJECTION', MX, yDrivers + 8);
+-		// Chipit pakkautuvat vasemmalta; reunan yli menevat pudotetaan.
+-		// Kortissa ei ole rivitysta: kahdeksan ajurin lista ei mahdu, ja
+-		// katkaistu chip olisi pahempi kuin puuttuva (luvut/labelit eivat
+-		// saa leikkautua — sama vikaluokka kuin 17.8 layout-loydokset).
+-		let cxp = MX;
++
++		// Rivi per ajuri: amber-tolppa + nimi vasemmalle, todisteluku amberilla
++		// oikeaan reunaan. Chip-rivi (19.8) kertoi MITKA syyt mutta ei kuinka
++		// isoja, ja kahdeksan chipin rivi oli lisaksi tasapaksu — juuri se
++		// jonka Rowan pyysi erottumaan. Numero oikeassa reunassa syntyy samaan
++		// pystylinjaan joka rivilla, eli kolme ajuria luetaan yhdella silmayksella.
++		let ry = yDrivers + 34;
+ 		for (const d of spec.drivers) {
+-			ctx.font = bold(19);
+-			const cw = ctx.measureText(d).width + 22;
+-			if (cxp + cw > W - MX) break;
+-			ctx.strokeStyle = TAG_LINE;
+-			ctx.lineWidth = 1;
+-			ctx.strokeRect(cxp, yDrivers + 38, cw, 34);
++			ctx.fillStyle = AMBER;
++			ctx.fillRect(MX, ry + 4, 4, 28);
++
++			// Luku piirretaan ENSIN ja sen leveys varataan nimelta pois: ilman
++			// sita pitka nimi ja pitka luku voisivat mennä pallekkain (sama
++			// vikaluokka kuin 17.8 layout-loydoksissa, jotka nakyivat vasta
++			// kuvasta eivatka koodista).
++			let takenW = 0;
++			if (d.value) {
++				const vPx = shrink(ctx, d.value, 22, (W - 2 * MX) * 0.55, 14, bold);
++				ctx.font = bold(vPx);
++				const vw = ctx.measureText(d.value).width;
++				ctx.fillStyle = AMBER;
++				ctx.fillText(d.value, W - MX - vw, ry + 8);
++				takenW = vw + 24;
++			}
++			const lPx2 = shrink(ctx, d.label, 24, W - 2 * MX - 16 - takenW, 14, bold);
++			ctx.font = bold(lPx2);
+ 			ctx.fillStyle = CREAM;
+-			ctx.fillText(d, cxp + 11, yDrivers + 38 + 8);
+-			cxp += cw + 10;
++			ctx.fillText(d.label, MX + 16, ry + 7);
++			ry += DRIVER_ROW_H;
+ 		}
+ 	}
+ 
+diff --git a/web/pro-spa/src/lib/whyDrivers.ts b/web/pro-spa/src/lib/whyDrivers.ts
+index 980e911..9386415 100644
+--- a/web/pro-spa/src/lib/whyDrivers.ts
++++ b/web/pro-spa/src/lib/whyDrivers.ts
+@@ -1,8 +1,19 @@
+ /**
+- * WHY-THIS-PICK-ajurien nayttonimet. Yksi lahde kahdelle pinnalle
++ * WHY-THIS-PICK-ajurien nayttonimet + rivimuoto. Yksi lahde kahdelle pinnalle
+  * (WhyThisPick-lohko sivulla + jaettava pelaajakortti): SHARE-CARD-WHY
+  * toi samat chipit korttiin, ja komponenttiin haudattu kopio olisi
+  * antanut labelien eriytya hiljaa ([[kuratoitu-lista-jaettuun-moduuliin]]).
++ *
++ * 20.8 SHARE-CARD-WHY-EMPHASIS (Rowanin palaute jaettuun korttiin: *"making
++ * the 2-3 biggest reasons stand out slightly more, so you can understand why
++ * the model likes the player within a second or two"*): ajuri ei ole enaa
++ * pelkka tagi vaan rivi jolla on todisteluku. Luku EI synny taalla vaan
++ * backendissa (`why.driver_facts`, src/models/fpl_xp.py) — jos johdos
++ * kirjoitettaisiin erikseen Svelteen ja React Nativeen, sivu ja appi voisivat
++ * nayttaa saman ajurin eri lukuna.
++ *
++ * Mobiilin vastine on `components/whyDrivers.ts` goaliq-appissa. Nama kaksi
++ * on pidettava samoina; ne eivat voi jakaa moduulia repojen yli.
+  */
+ export const WHY_DRIVER_LABEL: Record<string, string> = {
+ 	minutes: 'Minutes',
+@@ -14,3 +25,31 @@ export const WHY_DRIVER_LABEL: Record<string, string> = {
+ 	price: 'Price',
+ 	differential: 'Differential'
+ };
++
++export interface WhyDriverRow {
++	/** Ajuriavain (`minutes`, `clean_sheets`, ...) — listan avaimena. */
++	key: string;
++	label: string;
++	/** Todisteluku backendilta. Puuttuu kun rivi ei kanna sita lukua. */
++	value?: string;
++}
++
++/**
++ * `why` -> renderoitavat ajuririvit. EI jarjesta eika rajaa: backend on jo
++ * rajannut kolmeen ja jarjestys on lauseen kirjoittajan oma nakemys siita
++ * mika on isoin. Toinen slice taalla ajautuisi ennen pitkaa eri lukuun kuin
++ * backendin oma raja.
++ *
++ * Vanha deployattu backend palauttaa ajurit ilman `driver_facts`ia, jolloin
++ * rivit renderoityvat pelkkina nimina — sama sisalto kuin ennen tata muutosta.
++ */
++export function whyDriverRows(
++	why: { drivers?: string[]; driver_facts?: Record<string, string> } | undefined
++): WhyDriverRow[] {
++	if (!why?.drivers?.length) return [];
++	return why.drivers.map((key) => ({
++		key,
++		label: WHY_DRIVER_LABEL[key] ?? key,
++		value: why.driver_facts?.[key]
++	}));
++}
