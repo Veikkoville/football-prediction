@@ -8,12 +8,17 @@
    "n_targets": 0,
    "remaining_h": 22.93
   },
+  "deadline_2h:gw1": {
+   "at": "2026-08-21T15:31:10Z",
+   "n_targets": 0,
+   "remaining_h": 1.98
+  },
   "picks:gw1": {
    "at": "2026-08-20T18:34:17Z",
    "n_targets": 0,
    "player": "Tarkowski"
   }
  },
- "updated_at": "2026-08-21T12:36:49Z",
+ "updated_at": "2026-08-21T15:31:11Z",
  "v": 1
 }

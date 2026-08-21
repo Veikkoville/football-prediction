@@ -15,7 +15,7 @@
   "West Ham",
   "Wolves"
  ],
- "n_flagged": 4,
+ "n_flagged": 5,
  "teams": [
   {
    "team": "Arsenal",
@@ -29,9 +29,9 @@
    "team": "Aston Villa",
    "model_team": "Aston Villa",
    "is_promoted": false,
-   "minutes_churn_pct": 20.6,
-   "flag": null,
-   "note": "21% of last season's minutes have left the club."
+   "minutes_churn_pct": 28.8,
+   "flag": "high_turnover",
+   "note": "29% of last season's minutes were played by players who have since left. The rating is fitted on results, so it has not priced that in yet."
   },
   {
    "team": "Bournemouth",
