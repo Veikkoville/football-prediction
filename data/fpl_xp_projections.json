@@ -134,7 +134,7 @@
       }
     },
     "phase": 1,
-    "generated_at": "2026-08-21T09:52:02",
+    "generated_at": "2026-08-21T12:33:41",
     "season": "2026/27",
     "overrides_applied": 10,
     "fixture_source": "FPL official API (fantasy.premierleague.com)",
@@ -232,7 +232,7 @@
       "predicted_starts": 87.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 51.1,
+      "owned_pct": 51.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -353,7 +353,7 @@
       "predicted_starts": 81.3,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 69.3,
+      "owned_pct": 69.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -595,7 +595,7 @@
       "predicted_starts": 92.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.4,
+      "owned_pct": 17.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -716,7 +716,7 @@
       "predicted_starts": 93.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.4,
+      "owned_pct": 8.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -837,7 +837,7 @@
       "predicted_starts": 93.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 9.0,
+      "owned_pct": 8.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -958,7 +958,7 @@
       "predicted_starts": 87.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 18.6,
+      "owned_pct": 18.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1079,7 +1079,7 @@
       "predicted_starts": 97.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.5,
+      "owned_pct": 8.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1200,7 +1200,7 @@
       "predicted_starts": 89.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 18.0,
+      "owned_pct": 17.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1321,7 +1321,7 @@
       "predicted_starts": 97.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 15.9,
+      "owned_pct": 16.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -1684,7 +1684,7 @@
       "predicted_starts": 86.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 5.1,
+      "owned_pct": 5.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2411,7 +2411,7 @@
       "predicted_starts": 80.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 30.4,
+      "owned_pct": 30.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2653,7 +2653,7 @@
       "predicted_starts": 80.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 63.4,
+      "owned_pct": 63.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2774,7 +2774,7 @@
       "predicted_starts": 83.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 10.9,
+      "owned_pct": 10.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -2895,7 +2895,7 @@
       "predicted_starts": 74.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 36.6,
+      "owned_pct": 37.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3016,7 +3016,7 @@
       "predicted_starts": 81.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 21.2,
+      "owned_pct": 21.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3258,7 +3258,7 @@
       "predicted_starts": 89.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 17.2,
+      "owned_pct": 17.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3379,7 +3379,7 @@
       "predicted_starts": 89.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.6,
+      "owned_pct": 3.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3742,7 +3742,7 @@
       "predicted_starts": 100.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 14.1,
+      "owned_pct": 14.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -3863,7 +3863,7 @@
       "predicted_starts": 84.2,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 37.0,
+      "owned_pct": 37.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4105,7 +4105,7 @@
       "predicted_starts": 92.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 21.0,
+      "owned_pct": 21.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4226,7 +4226,7 @@
       "predicted_starts": 83.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 10.9,
+      "owned_pct": 10.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4590,7 +4590,7 @@
       "predicted_starts": 85.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 9.5,
+      "owned_pct": 9.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -4832,7 +4832,7 @@
       "predicted_starts": 100.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 4.6,
+      "owned_pct": 4.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5437,7 +5437,7 @@
       "predicted_starts": 84.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 1.9,
+      "owned_pct": 1.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5558,7 +5558,7 @@
       "predicted_starts": 86.6,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 25.2,
+      "owned_pct": 25.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -5679,7 +5679,7 @@
       "predicted_starts": 90.8,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 8.5,
+      "owned_pct": 8.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6889,7 +6889,7 @@
       "predicted_starts": 63.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.3,
+      "owned_pct": 1.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -6917,7 +6917,7 @@
       "p_bench": 0.1318,
       "set_pieces": {
         "pens": null,
-        "corners": 4,
+        "corners": 2,
         "fk": null
       },
       "e_bonus": 0.38,
@@ -7010,7 +7010,7 @@
       "predicted_starts": 73.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.4,
+      "owned_pct": 10.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7252,7 +7252,7 @@
       "predicted_starts": 71.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.5,
+      "owned_pct": 3.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7494,7 +7494,7 @@
       "predicted_starts": 88.0,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 3.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7737,7 +7737,7 @@
       "predicted_starts": 65.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.1,
+      "owned_pct": 5.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -7979,7 +7979,7 @@
       "predicted_starts": 92.4,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.4,
+      "owned_pct": 3.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -8463,7 +8463,7 @@
       "predicted_starts": 65.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 13.2,
+      "owned_pct": 13.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9070,7 +9070,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Last season's minutes reflect a transfer window, not his role. He is priced and signed as Liverpool's first-choice striker",
       "data_basis": "pl_history",
-      "owned_pct": 16.4,
+      "owned_pct": 16.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9191,7 +9191,7 @@
       "predicted_starts": 91.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 15.0,
+      "owned_pct": 14.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -9312,7 +9312,7 @@
       "predicted_starts": 80.7,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 2.5,
+      "owned_pct": 2.6,
       "status": "a",
       "news": "",
       "chance_next": 100,
@@ -11009,7 +11009,7 @@
       "predicted_starts": 96.9,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 3.3,
+      "owned_pct": 3.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11615,7 +11615,7 @@
       "predicted_starts": 62.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.1,
+      "owned_pct": 2.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -11979,7 +11979,7 @@
       "predicted_starts": 77.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.5,
+      "owned_pct": 2.3,
       "status": "d",
       "news": "Ankle injury - 75% chance of playing",
       "chance_next": 75,
@@ -12100,7 +12100,7 @@
       "predicted_starts": 79.2,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.4,
+      "owned_pct": 3.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -12705,7 +12705,7 @@
       "predicted_starts": 53.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 9.6,
+      "owned_pct": 9.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13070,7 +13070,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "De Zerbi named him Tottenham first choice for 26/27 and Vicario was placed on the transfer market (multiple reports 6/2026, incl. TeamTalk new contract + TribalFootball). Last season 630 min / 7 starts reflects Vicario being the incumbent, not Kinsky role now. He was excluded from the projection entirely at 19.5 percent owned",
       "data_basis": "pl_history",
-      "owned_pct": 23.4,
+      "owned_pct": 23.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13191,7 +13191,7 @@
       "predicted_starts": 64.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 16.6,
+      "owned_pct": 17.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -13796,7 +13796,7 @@
       "predicted_starts": 72.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.8,
+      "owned_pct": 1.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14160,7 +14160,7 @@
       "predicted_starts": 74.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 14.5,
+      "owned_pct": 14.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14283,7 +14283,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Liverpool's number one, not a job share. Model read last season's 26/10 split as an ongoing rotation. This Is Anfield 8/2026: back at the AXA training centre after the World Cup and 'set for his ninth season as Liverpool's undisputed number one goalkeeper'; Liverpool triggered a 12-month extension in March so he is contracted through 26/27, and reporting is that he 'remains the first choice despite the 29m deal for Mamardashvili'. Held at 0.80 rather than 0.90 because the same sources call it a DELAYED pre-season return, which is a real GW1 risk",
       "data_basis": "pl_history",
-      "owned_pct": 3.6,
+      "owned_pct": 3.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -14646,7 +14646,7 @@
       "predicted_starts": 76.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 10.1,
+      "owned_pct": 10.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -15863,7 +15863,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "He started the Community Shield against Manchester City on 16 August as club captain, which is a competitive start rather than a friendly. The model had him on 0.428 because he played 1363 minutes and 16 starts last season, and the minutes prior cannot tell an injury from a benching. Held at 0.70 and not higher because Arsenal have been cautious with his return: he was left out of the Real Betis friendly after coming back from the World Cup",
       "data_basis": "pl_history",
-      "owned_pct": 7.3,
+      "owned_pct": 7.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16229,7 +16229,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "He started the Community Shield against Manchester City on 16 August in a back four with White, Gabriel and Calafiori, and Hincapie did not start. The model had him on 0.39 from 986 minutes last season, his first at the club. Held at 0.60 because one competitive match is thin evidence for a centre back pairing that Arteta rotates",
       "data_basis": "pl_history",
-      "owned_pct": 7.6,
+      "owned_pct": 7.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16474,7 +16474,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "He started the Community Shield against Arsenal on 16 August at left back, which is a competitive match and not a friendly. The model had him on 0.22 from 1370 minutes last season, a spell cut short by a leg fracture, and the minutes prior cannot tell an injury from a benching. Manchester City signed him to a new deal to 2031 in July. Held at 0.75 rather than higher because Maresca is a new manager and his rotation is not known yet",
       "data_basis": "pl_history",
-      "owned_pct": 11.0,
+      "owned_pct": 10.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -16716,7 +16716,7 @@
       "predicted_starts": 84.1,
       "minutes_confidence": "high",
       "data_basis": "pl_history",
-      "owned_pct": 6.6,
+      "owned_pct": 6.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -17200,7 +17200,7 @@
       "predicted_starts": 45.4,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.6,
+      "owned_pct": 1.5,
       "status": "d",
       "news": "Unspecified injury - 75% chance of playing",
       "chance_next": 75,
@@ -17442,7 +17442,7 @@
       "predicted_starts": 61.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.5,
+      "owned_pct": 1.3,
       "status": "d",
       "news": "Knock - 75% chance of playing",
       "chance_next": 75,
@@ -17926,7 +17926,7 @@
       "predicted_starts": 48.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 6.3,
+      "owned_pct": 5.7,
       "status": "d",
       "news": "Thigh injury - 75% chance of playing",
       "chance_next": 75,
@@ -18535,7 +18535,7 @@
       "predicted_starts": 57.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 5.3,
+      "owned_pct": 5.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -18656,7 +18656,7 @@
       "predicted_starts": 69.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.9,
+      "owned_pct": 3.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19386,7 +19386,7 @@
       "predicted_starts": 56.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 35.6,
+      "owned_pct": 36.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -19872,7 +19872,7 @@
       "predicted_starts": 55.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.4,
+      "owned_pct": 2.5,
       "status": "a",
       "news": "",
       "chance_next": 100,
@@ -20239,7 +20239,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Arsenal signed him from Club Brugge in July and he started the Community Shield against Manchester City at left wing on 16 August. His 0.096 was the model bottom tier for a player with no Premier League minutes, set by price rank inside the squad rather than by anything measured about him. Held at 0.55 and no higher because Martinelli started ahead of him against Como on 12 August",
       "data_basis": "no_history",
-      "owned_pct": 22.2,
+      "owned_pct": 23.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -20709,7 +20709,7 @@
       "predicted_starts": 55.0,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 2.8,
+      "owned_pct": 2.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21441,7 +21441,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 4.9,
+      "owned_pct": 5.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -21685,7 +21685,7 @@
       "predicted_starts": 53.8,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.2,
+      "owned_pct": 0.3,
       "status": "a",
       "news": "",
       "chance_next": 100,
@@ -22279,7 +22279,7 @@
       "predicted_starts": 28.5,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.0,
+      "owned_pct": 3.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -22984,7 +22984,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 1.7,
+      "owned_pct": 1.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -23106,7 +23106,7 @@
       "predicted_starts": 57.1,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.8,
+      "owned_pct": 3.7,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -23350,7 +23350,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "pl_history",
-      "owned_pct": 3.9,
+      "owned_pct": 4.0,
       "status": "a",
       "news": "",
       "chance_next": 100,
@@ -23598,7 +23598,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 2.1,
+      "owned_pct": 2.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -24419,7 +24419,7 @@
       "predicted_starts": 32.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 3.1,
+      "owned_pct": 2.9,
       "status": "d",
       "news": "Calf injury - 75% chance of playing",
       "chance_next": 75,
@@ -25913,7 +25913,7 @@
       "p_bench": 0.4184,
       "set_pieces": {
         "pens": null,
-        "corners": 2,
+        "corners": 4,
         "fk": null
       },
       "e_bonus": 0.15,
@@ -29255,7 +29255,7 @@
       "predicted_starts": 55.3,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 11.9,
+      "owned_pct": 12.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29376,7 +29376,7 @@
       "predicted_starts": 35.7,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 0.7,
+      "owned_pct": 0.6,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -29500,7 +29500,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 3.3,
+      "owned_pct": 3.4,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -31604,7 +31604,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 7.9,
+      "owned_pct": 8.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -33062,7 +33062,7 @@
       "predicted_starts": 18.6,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 1.1,
+      "owned_pct": 1.0,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -38556,7 +38556,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.4,
+      "owned_pct": 0.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -40890,7 +40890,7 @@
       "predicted_starts": 26.9,
       "minutes_confidence": "med",
       "data_basis": "pl_history",
-      "owned_pct": 18.1,
+      "owned_pct": 18.2,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -41683,6 +41683,115 @@
         "bonus": 0.08
       },
       "components_gw": 1
+    },
+    {
+      "id": 281,
+      "web_name": "Drameh",
+      "full_name": "Cody Drameh",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "DEF",
+      "xmins": 19.3,
+      "predicted_starts": 16.0,
+      "minutes_confidence": "low",
+      "minutes_source": "price_prior",
+      "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
+      "data_basis": "no_history",
+      "owned_pct": 0.0,
+      "status": "a",
+      "news": "",
+      "chance_next": 100,
+      "yellows": 0,
+      "price": 4.0,
+      "last_season": null,
+      "p_start": 0.16,
+      "p_cameo": 0.378,
+      "p_bench": 0.462,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.05,
+      "xp_per_gw": 0.82,
+      "xp_per_90": 3.13,
+      "xp_horizon_total": 4.94,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "MUN",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.82
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.88
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.86
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.74
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "NEW",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.74
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "EVE",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.9
+        }
+      ],
+      "minutes_method": "promoted_price_prior",
+      "components": {
+        "appearance": 0.67,
+        "goals": 0.09,
+        "assists": 0.05,
+        "clean_sheet": 0.08,
+        "conceded": -0.16,
+        "saves": 0.0,
+        "defensive_contribution": 0.08,
+        "yellows": -0.04,
+        "bonus": 0.06
+      },
+      "components_gw": 1,
+      "team_flag": "promoted"
     },
     {
       "id": 282,
@@ -43868,7 +43977,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.0,
+      "owned_pct": 0.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -45388,7 +45497,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 2.8,
+      "owned_pct": 2.9,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -47928,7 +48037,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 3.2,
+      "owned_pct": 3.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -51396,7 +51505,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.4,
+      "owned_pct": 0.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -54120,7 +54229,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 0.7,
+      "owned_pct": 0.8,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -54447,7 +54556,7 @@
       "minutes_source": "price_prior",
       "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
       "data_basis": "no_history",
-      "owned_pct": 2.6,
+      "owned_pct": 2.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -55026,7 +55135,7 @@
       "predicted_starts": 17.3,
       "minutes_confidence": "high",
       "data_basis": "limited_history",
-      "owned_pct": 1.4,
+      "owned_pct": 1.5,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -56115,115 +56224,6 @@
       "components_gw": 1
     },
     {
-      "id": 283,
-      "web_name": "Jacob",
-      "full_name": "Matty Jacob",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "DEF",
-      "xmins": 8.1,
-      "predicted_starts": 7.2,
-      "minutes_confidence": "low",
-      "minutes_source": "price_prior",
-      "minutes_override_reason": "no Premier League minutes yet, expected role estimated from where the player is priced in his club's squad",
-      "data_basis": "no_history",
-      "owned_pct": 0.0,
-      "status": "d",
-      "news": "Hip injury - 75% chance of playing",
-      "chance_next": 75,
-      "yellows": 0,
-      "price": 4.0,
-      "last_season": null,
-      "p_start": 0.072,
-      "p_cameo": 0.1392,
-      "p_bench": 0.7888,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.02,
-      "xp_per_gw": 0.34,
-      "xp_per_90": 3.13,
-      "xp_horizon_total": 2.04,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "MUN",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.34
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.37
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.35
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.31
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "NEW",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.3
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "EVE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.37
-        }
-      ],
-      "minutes_method": "promoted_price_prior",
-      "components": {
-        "appearance": 0.27,
-        "goals": 0.04,
-        "assists": 0.02,
-        "clean_sheet": 0.03,
-        "conceded": -0.07,
-        "saves": 0.0,
-        "defensive_contribution": 0.03,
-        "yellows": -0.02,
-        "bonus": 0.02
-      },
-      "components_gw": 1,
-      "team_flag": "promoted"
-    },
-    {
       "id": 394,
       "web_name": "Alleyne",
       "full_name": "Max Alleyne",
@@ -56603,7 +56603,7 @@
       "minutes_source": "override",
       "minutes_override_reason": "Signed as experienced deputy to Kinsky at Tottenham (same reports, 6/2026). Last season 3150 min / 35 starts was at Newcastle as first choice, so the minutes prior reads him as a starter at a club where he is the backup. Without this he outranked the actual number one",
       "data_basis": "pl_history",
-      "owned_pct": 20.4,
+      "owned_pct": 20.3,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -57194,129 +57194,6 @@
       "components_gw": 1
     },
     {
-      "id": 137,
-      "web_name": "Tzimas",
-      "full_name": "Stefanos Tzimas",
-      "team": "Brighton",
-      "team_short": "BHA",
-      "pos": "FWD",
-      "xmins": 3.5,
-      "predicted_starts": 18.5,
-      "minutes_confidence": "med",
-      "minutes_source": "price_blend",
-      "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
-      "data_basis": "limited_history",
-      "owned_pct": 0.0,
-      "status": "d",
-      "news": "Knee injury - 75% chance of playing",
-      "chance_next": 75,
-      "yellows": 0,
-      "price": 5.5,
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 132,
-        "starts": 1,
-        "goals": 1,
-        "assists": 1,
-        "xg": 0.44,
-        "xa": 0.11,
-        "cs": 0,
-        "points": 16,
-        "per90": {
-          "goals": 0.68,
-          "assists": 0.68,
-          "xgi": 0.38
-        }
-      },
-      "p_start": 0.1845,
-      "p_cameo": 0.0508,
-      "p_bench": 0.7646,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "e_bonus": 0.02,
-      "xp_per_gw": 0.26,
-      "xp_per_90": 4.17,
-      "xp_horizon_total": 1.54,
-      "gameweeks": [
-        {
-          "gw": 1,
-          "opponents": [
-            {
-              "opp": "AVL",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.27
-        },
-        {
-          "gw": 2,
-          "opponents": [
-            {
-              "opp": "CHE",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.25
-        },
-        {
-          "gw": 3,
-          "opponents": [
-            {
-              "opp": "LEE",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.27
-        },
-        {
-          "gw": 4,
-          "opponents": [
-            {
-              "opp": "COV",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.27
-        },
-        {
-          "gw": 5,
-          "opponents": [
-            {
-              "opp": "ARS",
-              "venue": "H"
-            }
-          ],
-          "xp": 0.23
-        },
-        {
-          "gw": 6,
-          "opponents": [
-            {
-              "opp": "SUN",
-              "venue": "A"
-            }
-          ],
-          "xp": 0.25
-        }
-      ],
-      "components": {
-        "appearance": 0.17,
-        "goals": 0.07,
-        "assists": 0.01,
-        "clean_sheet": 0.0,
-        "conceded": 0.0,
-        "saves": 0.0,
-        "defensive_contribution": 0.0,
-        "yellows": -0.0,
-        "bonus": 0.02
-      },
-      "components_gw": 1
-    },
-    {
       "id": 272,
       "web_name": "Kusi-Asare",
       "full_name": "Jonah Kusi-Asare",
@@ -57563,7 +57440,7 @@
       "minutes_source": "price_blend",
       "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
       "data_basis": "limited_history",
-      "owned_pct": 0.3,
+      "owned_pct": 0.2,
       "status": "u",
       "news": "Has joined West Ham United on loan for the rest of the season",
       "chance_next": 0,
@@ -58518,6 +58395,129 @@
       },
       "components_gw": 1,
       "minutes_basis_flag": "short_season"
+    },
+    {
+      "id": 137,
+      "web_name": "Tzimas",
+      "full_name": "Stefanos Tzimas",
+      "team": "Brighton",
+      "team_short": "BHA",
+      "pos": "FWD",
+      "xmins": 2.5,
+      "predicted_starts": 10.8,
+      "minutes_confidence": "med",
+      "minutes_source": "price_blend",
+      "minutes_override_reason": "thin Premier League sample, the expected role is part model and part where the player is priced",
+      "data_basis": "limited_history",
+      "owned_pct": 0.0,
+      "status": "i",
+      "news": "Knee injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 0,
+      "price": 5.5,
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 132,
+        "starts": 1,
+        "goals": 1,
+        "assists": 1,
+        "xg": 0.44,
+        "xa": 0.11,
+        "cs": 0,
+        "points": 16,
+        "per90": {
+          "goals": 0.68,
+          "assists": 0.68,
+          "xgi": 0.38
+        }
+      },
+      "p_start": 0.1085,
+      "p_cameo": 0.0,
+      "p_bench": 0.8915,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "e_bonus": 0.02,
+      "xp_per_gw": 0.17,
+      "xp_per_90": 4.17,
+      "xp_horizon_total": 1.01,
+      "gameweeks": [
+        {
+          "gw": 1,
+          "opponents": [
+            {
+              "opp": "AVL",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.18
+        },
+        {
+          "gw": 2,
+          "opponents": [
+            {
+              "opp": "CHE",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.17
+        },
+        {
+          "gw": 3,
+          "opponents": [
+            {
+              "opp": "LEE",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.18
+        },
+        {
+          "gw": 4,
+          "opponents": [
+            {
+              "opp": "COV",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.18
+        },
+        {
+          "gw": 5,
+          "opponents": [
+            {
+              "opp": "ARS",
+              "venue": "H"
+            }
+          ],
+          "xp": 0.15
+        },
+        {
+          "gw": 6,
+          "opponents": [
+            {
+              "opp": "SUN",
+              "venue": "A"
+            }
+          ],
+          "xp": 0.16
+        }
+      ],
+      "components": {
+        "appearance": 0.11,
+        "goals": 0.05,
+        "assists": 0.01,
+        "clean_sheet": 0.0,
+        "conceded": 0.0,
+        "saves": 0.0,
+        "defensive_contribution": 0.0,
+        "yellows": -0.0,
+        "bonus": 0.02
+      },
+      "components_gw": 1
     }
   ],
   "excluded": [
@@ -58529,7 +58529,7 @@
       "team_short": "NFO",
       "pos": "MID",
       "price": 4.5,
-      "owned_pct": 2.9,
+      "owned_pct": 2.6,
       "status": "i",
       "news": "Unspecified injury - Unknown return date",
       "chance_next": 0,
@@ -58601,7 +58601,7 @@
       "team_short": "TOT",
       "pos": "DEF",
       "price": 4.5,
-      "owned_pct": 1.6,
+      "owned_pct": 1.4,
       "status": "u",
       "news": "Has joined Internazionale permanently",
       "chance_next": 0,
@@ -58639,7 +58639,7 @@
       "team_short": "TOT",
       "pos": "DEF",
       "price": 4.0,
-      "owned_pct": 1.0,
+      "owned_pct": 1.1,
       "status": "a",
       "news": "",
       "chance_next": null,
@@ -58772,28 +58772,6 @@
       "excluded_reason": "below_min_xp"
     },
     {
-      "id": 298,
-      "web_name": "Destan",
-      "full_name": "Enis Destan",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "FWD",
-      "price": 4.5,
-      "owned_pct": 0.7,
-      "status": "u",
-      "news": "Has joined Konyaspor permanently",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 78,
       "web_name": "Kroupi.Jr",
       "full_name": "Junior Kroupi",
@@ -58866,6 +58844,28 @@
       "excluded_reason": "below_min_xp"
     },
     {
+      "id": 298,
+      "web_name": "Destan",
+      "full_name": "Enis Destan",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "FWD",
+      "price": 4.5,
+      "owned_pct": 0.6,
+      "status": "u",
+      "news": "Has joined Konyaspor permanently",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
       "id": 51,
       "web_name": "George Hemmings",
       "full_name": "George Hemmings",
@@ -58929,7 +58929,7 @@
       "team_short": "TOT",
       "pos": "GKP",
       "price": 4.5,
-      "owned_pct": 0.6,
+      "owned_pct": 0.5,
       "status": "u",
       "news": "Has joined Juventus on loan for the rest of the season",
       "chance_next": 0,
@@ -58956,28 +58956,6 @@
           "xgi": 0.0
         }
       },
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
-      "id": 39,
-      "web_name": "Nedeljkovic",
-      "full_name": "Kosta Nedeljkovic",
-      "team": "Aston Villa",
-      "team_short": "AVL",
-      "pos": "DEF",
-      "price": 4.0,
-      "owned_pct": 0.5,
-      "status": "u",
-      "news": "Has joined Rangers on loan for the rest of the season",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
       "in_projection": false,
       "excluded_reason": "unavailable"
     },
@@ -59038,6 +59016,28 @@
           "xgi": 0.11
         }
       },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
+      "id": 39,
+      "web_name": "Nedeljkovic",
+      "full_name": "Kosta Nedeljkovic",
+      "team": "Aston Villa",
+      "team_short": "AVL",
+      "pos": "DEF",
+      "price": 4.0,
+      "owned_pct": 0.4,
+      "status": "u",
+      "news": "Has joined Rangers on loan for the rest of the season",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
       "in_projection": false,
       "excluded_reason": "unavailable"
     },
@@ -59184,40 +59184,6 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
-    },
-    {
-      "id": 530,
-      "web_name": "Patterson",
-      "full_name": "Anthony Patterson",
-      "team": "Sunderland",
-      "team_short": "SUN",
-      "pos": "GKP",
-      "price": 4.0,
-      "owned_pct": 0.3,
-      "status": "u",
-      "news": "Has joined Wrexham permanently",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 0,
-        "starts": 0,
-        "goals": 0,
-        "assists": 0,
-        "xg": 0.0,
-        "xa": 0.0,
-        "cs": 0,
-        "points": 0,
-        "per90": null
-      },
-      "in_projection": false,
-      "excluded_reason": "unavailable"
     },
     {
       "id": 6,
@@ -59616,44 +59582,6 @@
       "excluded_reason": "unavailable"
     },
     {
-      "id": 5,
-      "web_name": "J.Timber",
-      "full_name": "Jurriën Timber",
-      "team": "Arsenal",
-      "team_short": "ARS",
-      "pos": "DEF",
-      "price": 6.5,
-      "owned_pct": 0.2,
-      "status": "i",
-      "news": "Groin injury - Unknown return date",
-      "chance_next": 0,
-      "yellows": 5,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": {
-        "season": "2025/26",
-        "league": "Premier League",
-        "minutes": 2452,
-        "starts": 28,
-        "goals": 3,
-        "assists": 6,
-        "xg": 4.71,
-        "xa": 1.53,
-        "cs": 13,
-        "points": 149,
-        "per90": {
-          "goals": 0.11,
-          "assists": 0.22,
-          "xgi": 0.23
-        }
-      },
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 409,
       "web_name": "Mukasa",
       "full_name": "Divine Mukasa",
@@ -59724,6 +59652,40 @@
       },
       "in_projection": false,
       "excluded_reason": "below_min_xp"
+    },
+    {
+      "id": 530,
+      "web_name": "Patterson",
+      "full_name": "Anthony Patterson",
+      "team": "Sunderland",
+      "team_short": "SUN",
+      "pos": "GKP",
+      "price": 4.0,
+      "owned_pct": 0.2,
+      "status": "u",
+      "news": "Has joined Wrexham permanently",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 0,
+        "starts": 0,
+        "goals": 0,
+        "assists": 0,
+        "xg": 0.0,
+        "xa": 0.0,
+        "cs": 0,
+        "points": 0,
+        "per90": null
+      },
+      "in_projection": false,
+      "excluded_reason": "unavailable"
     },
     {
       "id": 404,
@@ -60096,18 +60058,18 @@
       "excluded_reason": "unavailable"
     },
     {
-      "id": 458,
-      "web_name": "Joelinton",
-      "full_name": "Joelinton Cássio Apolinário de Lira",
-      "team": "Newcastle United",
-      "team_short": "NEW",
-      "pos": "MID",
-      "price": 5.5,
+      "id": 5,
+      "web_name": "J.Timber",
+      "full_name": "Jurriën Timber",
+      "team": "Arsenal",
+      "team_short": "ARS",
+      "pos": "DEF",
+      "price": 6.5,
       "owned_pct": 0.1,
       "status": "i",
-      "news": "Unspecified injury - Unknown return date",
+      "news": "Groin injury - Unknown return date",
       "chance_next": 0,
-      "yellows": 10,
+      "yellows": 5,
       "set_pieces": {
         "pens": null,
         "corners": null,
@@ -60116,18 +60078,18 @@
       "last_season": {
         "season": "2025/26",
         "league": "Premier League",
-        "minutes": 1950,
-        "starts": 23,
-        "goals": 2,
-        "assists": 1,
-        "xg": 2.36,
-        "xa": 1.35,
-        "cs": 5,
-        "points": 73,
+        "minutes": 2452,
+        "starts": 28,
+        "goals": 3,
+        "assists": 6,
+        "xg": 4.71,
+        "xa": 1.53,
+        "cs": 13,
+        "points": 149,
         "per90": {
-          "goals": 0.09,
-          "assists": 0.05,
-          "xgi": 0.17
+          "goals": 0.11,
+          "assists": 0.22,
+          "xgi": 0.23
         }
       },
       "in_projection": false,
@@ -61048,28 +61010,6 @@
       "excluded_reason": "unavailable"
     },
     {
-      "id": 281,
-      "web_name": "Drameh",
-      "full_name": "Cody Drameh",
-      "team": "Hull",
-      "team_short": "HUL",
-      "pos": "DEF",
-      "price": 4.0,
-      "owned_pct": 0.0,
-      "status": "i",
-      "news": "Hamstring injury - Expected back 29 Aug",
-      "chance_next": 0,
-      "yellows": 0,
-      "set_pieces": {
-        "pens": null,
-        "corners": null,
-        "fk": null
-      },
-      "last_season": null,
-      "in_projection": false,
-      "excluded_reason": "unavailable"
-    },
-    {
       "id": 216,
       "web_name": "Esse",
       "full_name": "Romain Esse",
@@ -61422,6 +61362,28 @@
       "excluded_reason": "unavailable"
     },
     {
+      "id": 283,
+      "web_name": "Jacob",
+      "full_name": "Matty Jacob",
+      "team": "Hull",
+      "team_short": "HUL",
+      "pos": "DEF",
+      "price": 4.0,
+      "owned_pct": 0.0,
+      "status": "i",
+      "news": "Hip injury - Expected back 29 Aug",
+      "chance_next": 0,
+      "yellows": 0,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
       "id": 354,
       "web_name": "Jaros",
       "full_name": "Vitezslav Jaros",
@@ -61440,6 +61402,44 @@
         "fk": null
       },
       "last_season": null,
+      "in_projection": false,
+      "excluded_reason": "unavailable"
+    },
+    {
+      "id": 458,
+      "web_name": "Joelinton",
+      "full_name": "Joelinton Cássio Apolinário de Lira",
+      "team": "Newcastle United",
+      "team_short": "NEW",
+      "pos": "MID",
+      "price": 5.5,
+      "owned_pct": 0.0,
+      "status": "i",
+      "news": "Unspecified injury - Unknown return date",
+      "chance_next": 0,
+      "yellows": 10,
+      "set_pieces": {
+        "pens": null,
+        "corners": null,
+        "fk": null
+      },
+      "last_season": {
+        "season": "2025/26",
+        "league": "Premier League",
+        "minutes": 1950,
+        "starts": 23,
+        "goals": 2,
+        "assists": 1,
+        "xg": 2.36,
+        "xa": 1.35,
+        "cs": 5,
+        "points": 73,
+        "per90": {
+          "goals": 0.09,
+          "assists": 0.05,
+          "xgi": 0.17
+        }
+      },
       "in_projection": false,
       "excluded_reason": "unavailable"
     },
